@@ -23,6 +23,7 @@ from django.conf import settings
 from django.utils.timezone import get_current_timezone
 
 from documents.search._query import extract_cjk_text
+from documents.search._query import normalize_search_text
 from documents.search._query import parse_simple_text_highlight_query
 from documents.search._query import parse_simple_text_query
 from documents.search._query import parse_simple_title_query
@@ -462,6 +463,7 @@ class TantivyBackend:
     ) -> tantivy.Query:
         """Parse a user query string into a Tantivy Query object."""
         tz = get_current_timezone()
+        query = normalize_search_text(query)
         if search_mode is SearchMode.TEXT:
             return parse_simple_text_query(self._index, query)
         elif search_mode is SearchMode.TITLE:
@@ -510,54 +512,67 @@ class TantivyBackend:
         from guardian.shortcuts import get_groups_with_perms
         from guardian.shortcuts import get_users_with_perms
 
-        content = document.get_effective_content() or ""
+        # Every searchable string is normalized on the way in, and every
+        # query string on the way out (_parse_query), so the two agree on
+        # how a composed character is spelled. See normalize_search_text.
+        content = normalize_search_text(document.get_effective_content() or "")
+        title = normalize_search_text(document.title)
 
         doc = tantivy.Document()
 
         # Basic fields
         doc.add_unsigned("id", document.pk)
         doc.add_text("checksum", document.checksum)
-        doc.add_text("title", document.title)
-        doc.add_text("title_sort", document.title)
-        doc.add_text("simple_title", document.title)
+        doc.add_text("title", title)
+        doc.add_text("title_sort", title)
+        doc.add_text("simple_title", title)
         doc.add_text("content", content)
         doc.add_text("simple_content", content)
         # Bigram (character-ngram) fields exist for CJK substring search,
         # no need to bloat the bigram index with latin characters.
-        if cjk_title := extract_cjk_text(document.title):
+        if cjk_title := extract_cjk_text(title):
             doc.add_text("bigram_title", cjk_title)
         if content and (cjk_content := extract_cjk_text(content)):
             doc.add_text("bigram_content", cjk_content)
 
         # Original filename - only add if not None/empty
         if document.original_filename:
-            doc.add_text("original_filename", document.original_filename)
+            doc.add_text(
+                "original_filename",
+                normalize_search_text(document.original_filename),
+            )
 
         # Correspondent
         if document.correspondent:
-            doc.add_text("correspondent", document.correspondent.name)
-            doc.add_text("correspondent_sort", document.correspondent.name)
-            if cjk_corr := extract_cjk_text(document.correspondent.name):
+            correspondent = normalize_search_text(document.correspondent.name)
+            doc.add_text("correspondent", correspondent)
+            doc.add_text("correspondent_sort", correspondent)
+            if cjk_corr := extract_cjk_text(correspondent):
                 doc.add_text("bigram_correspondent", cjk_corr)
 
         # Document type
         if document.document_type:
-            doc.add_text("document_type", document.document_type.name)
-            doc.add_text("type_sort", document.document_type.name)
-            if cjk_type := extract_cjk_text(document.document_type.name):
+            document_type = normalize_search_text(document.document_type.name)
+            doc.add_text("document_type", document_type)
+            doc.add_text("type_sort", document_type)
+            if cjk_type := extract_cjk_text(document_type):
                 doc.add_text("bigram_document_type", cjk_type)
 
         # Storage path
         if document.storage_path:
-            doc.add_text("storage_path", document.storage_path.name)
+            doc.add_text(
+                "storage_path",
+                normalize_search_text(document.storage_path.name),
+            )
 
         # Tags — collect names for autocomplete in the same pass
         tag_names: list[str] = []
         for tag in document.tags.all():
-            doc.add_text("tag", tag.name)
-            if cjk_tag := extract_cjk_text(tag.name):
+            tag_name = normalize_search_text(tag.name)
+            doc.add_text("tag", tag_name)
+            if cjk_tag := extract_cjk_text(tag_name):
                 doc.add_text("bigram_tag", cjk_tag)
-            tag_names.append(tag.name)
+            tag_names.append(tag_name)
 
         # Notes — JSON for structured queries (notes.user:alice, notes.note:text).
         # notes_text is a plain-text companion for snippet/highlight generation;
@@ -568,14 +583,17 @@ class TantivyBackend:
         note_texts: list[str] = []
         for note in document.notes.all():
             num_notes += 1
+            note_text = normalize_search_text(note.note)
             doc.add_json(
                 "notes",
                 {
-                    "note": note.note,
-                    "user": note.user.username if note.user else None,
+                    "note": note_text,
+                    "user": (
+                        normalize_search_text(note.user.username) if note.user else None
+                    ),
                 },
             )
-            note_texts.append(note.note)
+            note_texts.append(note_text)
         if note_texts:
             doc.add_text("notes_text", " ".join(note_texts))
 
@@ -590,8 +608,8 @@ class TantivyBackend:
             doc.add_json(
                 "custom_fields",
                 {
-                    "name": cfi.field.name,
-                    "value": search_value,
+                    "name": normalize_search_text(cfi.field.name),
+                    "value": normalize_search_text(search_value),
                 },
             )
 
@@ -645,11 +663,11 @@ class TantivyBackend:
             doc.add_unsigned("viewer_group_id", viewer_group_id)
 
         # Autocomplete words
-        text_sources = [document.title, content]
+        text_sources = [title, content]
         if document.correspondent:
-            text_sources.append(document.correspondent.name)
+            text_sources.append(correspondent)
         if document.document_type:
-            text_sources.append(document.document_type.name)
+            text_sources.append(document_type)
         text_sources.extend(tag_names)
 
         for word in sorted(_extract_autocomplete_words(text_sources)):
@@ -746,6 +764,9 @@ class TantivyBackend:
 
         self._ensure_open()
         user_query = self._parse_query(query, search_mode)
+        # _parse_query normalizes its own copy; the snippet queries below are
+        # built from the string directly, so normalize it here too.
+        query = normalize_search_text(query)
         highlight_query = user_query
         if search_mode is SearchMode.TEXT:
             try:

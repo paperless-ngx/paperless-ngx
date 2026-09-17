@@ -51,7 +51,7 @@ class TestFuzzyClauseParseFailureDegradesGracefully:
         THEN:
             - It returns None instead of propagating, so a fuzzy word
               string tantivy's own parser rejects only drops the fuzzy
-              clause: the exact/CJK clauses still stand rather than the
+              clause: the exact clause still stands rather than the
               whole query failing. The ValueError guard is insurance (the
               word string is plain tokens, so tantivy accepting it is
               expected, not assumed)

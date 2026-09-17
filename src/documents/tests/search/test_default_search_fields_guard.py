@@ -3,9 +3,9 @@ field names.
 
 Nothing enforced this before: a rename in PUBLIC_FIELDS not mirrored in
 ``_DEFAULT_SEARCH_FIELDS`` (documents/search/_query.py) would 400 every
-unfielded search at request time, since ``index.parse_query`` and the
-fuzzy/CJK clause builders are handed a field name the schema no longer
-has.
+unfielded search at request time, since ``index.parse_query``, the
+fuzzy clause builder and the CJK bigram widening are handed a field name
+the schema no longer has.
 """
 
 from __future__ import annotations

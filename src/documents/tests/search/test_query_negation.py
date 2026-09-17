@@ -1,9 +1,10 @@
 """Negation must survive the blended query.
 
-parse_user_query ORs an exact clause with optional fuzzy and CJK clauses.
-Each of those is built from positive terms only, so unless the query's
-exclusions are applied to the blend as a whole, a document the exact
-clause excluded is re-admitted by whichever other clause is enabled.
+parse_user_query ORs an exact clause with an optional fuzzy clause. That
+clause is built from positive terms only, so unless the query's exclusions
+are applied to the blend as a whole, a document the exact clause excluded
+is re-admitted by it. CJK terms are widened inside the exact clause itself,
+so the query's own structure constrains them.
 """
 
 from __future__ import annotations
@@ -12,24 +13,15 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from documents.models import Document
-
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from pytest_django.fixtures import SettingsWrapper
 
-    from documents.search._backend import TantivyBackend
+    from documents.models import Document
+
 
 pytestmark = [pytest.mark.search, pytest.mark.django_db]
-
-
-def _matched_ids(backend: TantivyBackend, query: str) -> set[int]:
-    return set(backend.search_ids(query, user=None))
-
-
-def _index(backend: TantivyBackend, **kwargs: object) -> Document:
-    doc = Document.objects.create(**kwargs)
-    backend.add_or_update(doc)
-    return doc
 
 
 @pytest.fixture
@@ -44,7 +36,8 @@ class TestNegationConstrainsEveryClause:
     @pytest.mark.usefixtures("fuzzy_enabled")
     def test_fuzzy_clause_does_not_readmit_an_excluded_document(
         self,
-        backend: TantivyBackend,
+        index_document: Callable[..., Document],
+        matched_ids: Callable[[str], set[int]],
     ) -> None:
         """
         GIVEN:
@@ -59,25 +52,22 @@ class TestNegationConstrainsEveryClause:
               the fuzzy clause (built from positive terms only) does not
               readmit the document the exact clause excluded
         """
-        secret = _index(
-            backend,
+        secret = index_document(
             title="Invoice A",
             content="invoice total secret",
-            checksum="neg-fuzzy-1",
         )
-        public = _index(
-            backend,
+        public = index_document(
             title="Invoice B",
             content="invoice total public",
-            checksum="neg-fuzzy-2",
         )
 
-        assert _matched_ids(backend, "invoice") == {secret.pk, public.pk}
-        assert _matched_ids(backend, "invoice NOT secret") == {public.pk}
+        assert matched_ids("invoice") == {secret.pk, public.pk}
+        assert matched_ids("invoice NOT secret") == {public.pk}
 
-    def test_cjk_clause_does_not_readmit_an_excluded_document(
+    def test_an_excluded_document_stays_out_of_a_cjk_match(
         self,
-        backend: TantivyBackend,
+        index_document: Callable[..., Document],
+        matched_ids: Callable[[str], set[int]],
     ) -> None:
         """
         GIVEN:
@@ -87,31 +77,26 @@ class TestNegationConstrainsEveryClause:
             - A query combining the CJK term with a NOT exclusion is run
         THEN:
             - Only the document without the excluded word is returned;
-              the CJK clause legitimately carries the CJK run, so
-              rebuilding it from the AST cannot help here, only applying
-              the exclusion above the blend keeps the excluded document
-              out
+              the CJK term's bigram match sits beside the NOT inside the
+              same query, so the exclusion applies to it
         """
-        secret = _index(
-            backend,
+        secret = index_document(
             title="Tokyo A",
             content="東京都の秘密です secret",
-            checksum="neg-cjk-1",
         )
-        public = _index(
-            backend,
+        public = index_document(
             title="Tokyo B",
             content="東京都の報告書です public",
-            checksum="neg-cjk-2",
         )
 
-        assert _matched_ids(backend, "東京") == {secret.pk, public.pk}
-        assert _matched_ids(backend, "東京 NOT secret") == {public.pk}
+        assert matched_ids("東京") == {secret.pk, public.pk}
+        assert matched_ids("東京 NOT secret") == {public.pk}
 
     @pytest.mark.usefixtures("fuzzy_enabled")
     def test_disjunctive_negation_still_admits_the_other_branch(
         self,
-        backend: TantivyBackend,
+        index_document: Callable[..., Document],
+        matched_ids: Callable[[str], set[int]],
     ) -> None:
         """
         GIVEN:
@@ -126,73 +111,54 @@ class TestNegationConstrainsEveryClause:
               left branch stays in even though it contains the excluded
               word
         """
-        secret_invoice = _index(
-            backend,
+        secret_invoice = index_document(
             title="Invoice A",
             content="invoice total secret",
-            checksum="neg-or-1",
         )
-        unrelated = _index(
-            backend,
+        unrelated = index_document(
             title="Recipe",
             content="flour and water",
-            checksum="neg-or-2",
         )
 
-        assert _matched_ids(backend, "invoice OR NOT secret") == {
+        assert matched_ids("invoice OR NOT secret") == {
             secret_invoice.pk,
             unrelated.pk,
         }
 
-    def test_a_negation_under_or_does_not_constrain_the_cjk_clause(
+    def test_a_negation_under_or_constrains_its_own_cjk_term(
         self,
-        backend: TantivyBackend,
+        index_document: Callable[..., Document],
+        matched_ids: Callable[[str], set[int]],
     ) -> None:
         """
         GIVEN:
             - Two CJK documents, one of which also contains a word an OR
               branch's own NOT excludes, plus an unrelated latin document
         WHEN:
-            - The exclusion is under a disjunctive OR branch, versus in
+            - The exclusion is under a disjunctive OR branch, and in
               conjunctive position
         THEN:
-            - Under OR, the excluded document still matches through the
-              CJK clause (an exclusion that is one branch's own condition
-              cannot be restated above the blend without dropping
-              documents the other branch matches, so it is left where it
-              is and the CJK clause stays unconstrained by it -- this
-              shows through here in a way it does not for latin text,
-              since the exact clause cannot match a CJK run at all, so
-              the CJK clause is the only thing matching the CJK
-              documents, and the excluded one comes with it)
-            - Under conjunctive "AND NOT", the same exclusion is hoisted
-              and does constrain the CJK clause, pinning the deliberate
-              limit of the hoist
+            - Either way the excluded document is left out. The CJK
+              term's bigram match is widened in place inside its own OR
+              branch, so that branch's NOT applies to it; the other
+              branch still admits the latin document
         """
-        secret = _index(
-            backend,
+        secret = index_document(
             title="Tokyo A",
             content="東京都の秘密です secret",
-            checksum="neg-or-cjk-1",
         )
-        public = _index(
-            backend,
+        public = index_document(
             title="Tokyo B",
             content="東京都の報告書です public",
-            checksum="neg-or-cjk-2",
         )
-        bill = _index(
-            backend,
+        bill = index_document(
             title="Bill",
             content="bill payment received",
-            checksum="neg-or-cjk-3",
         )
 
-        assert _matched_ids(backend, "(東京 AND NOT secret) OR bill") == {
+        assert matched_ids("(東京 AND NOT secret) OR bill") == {
             bill.pk,
             public.pk,
-            secret.pk,
         }
-        # The same exclusion in conjunctive position is hoisted, and does
-        # constrain the CJK clause.
-        assert _matched_ids(backend, "東京 AND NOT secret") == {public.pk}
+        assert matched_ids("東京 AND NOT secret") == {public.pk}
+        assert secret.pk in matched_ids("東京")

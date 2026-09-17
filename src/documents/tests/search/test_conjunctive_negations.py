@@ -3,7 +3,7 @@ query excludes from every document it matches, and _any_of, the clause-list
 collapsing helper it feeds into.
 
 Result-level proof that a negation reached through NOT/AND survives the
-fuzzy/CJK blend lives in test_query_negation.py. These are direct unit
+fuzzy blend lives in test_query_negation.py. These are direct unit
 tests of the visitor's dispatch for the rarer grammar shapes
 (AndNot/Boosted/AndMaybe/Require) that file's real-corpus queries don't
 happen to exercise, plus the empty-clause-list case of _any_of.
