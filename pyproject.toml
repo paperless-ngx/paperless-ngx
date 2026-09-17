@@ -317,6 +317,7 @@ testpaths = [
   "src/paperless/tests/",
   "src/paperless_mail/tests/",
   "src/paperless_ai/tests",
+  "src/paperless_testing/tests/",
 ]
 
 [tool.pytest_env]
@@ -336,6 +337,8 @@ omit = [
   "manage.py",
   "paperless/wsgi.py",
   "paperless/auth.py",
+  "src/paperless_testing/*",
+  "src/conftest.py",
 ]
 [tool.coverage.report]
 exclude_also = [
