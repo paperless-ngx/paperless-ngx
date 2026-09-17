@@ -24,11 +24,11 @@ from documents.permissions import permitted_document_ids
 from documents.permissions import permitted_object_ids
 from documents.permissions import restrict_queryset_to_visible
 from documents.serialisers import _get_viewable_duplicates
-from documents.tests.factories import CorrespondentFactory
-from documents.tests.factories import DocumentFactory
-from documents.tests.factories import DocumentTypeFactory
-from documents.tests.factories import StoragePathFactory
-from documents.tests.factories import TagFactory
+from paperless_testing.factories import CorrespondentFactory
+from paperless_testing.factories import DocumentFactory
+from paperless_testing.factories import DocumentTypeFactory
+from paperless_testing.factories import StoragePathFactory
+from paperless_testing.factories import TagFactory
 
 
 def assert_visible_document_ids(actual_ids, *, expected_visible, expected_hidden):

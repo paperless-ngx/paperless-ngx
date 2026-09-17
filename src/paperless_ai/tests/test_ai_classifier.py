@@ -12,9 +12,6 @@ from guardian.shortcuts import remove_perm
 
 from documents.models import Document
 from documents.search import TantivyBackend
-from documents.tests.factories import DocumentFactory
-from documents.tests.factories import TagFactory
-from documents.tests.factories import UserFactory
 from paperless.config import AIConfig
 from paperless_ai.ai_classifier import TAXONOMY_CANDIDATE_TOP_K
 from paperless_ai.ai_classifier import _fulltext_similar_documents
@@ -27,6 +24,9 @@ from paperless_ai.ai_classifier import get_taxonomy_context
 from paperless_ai.taxonomy import SimilarDocument
 from paperless_ai.taxonomy import TaxonomyCandidate
 from paperless_ai.taxonomy import TaxonomyCandidates
+from paperless_testing.factories import DocumentFactory
+from paperless_testing.factories import TagFactory
+from paperless_testing.factories import UserFactory
 
 
 @pytest.fixture

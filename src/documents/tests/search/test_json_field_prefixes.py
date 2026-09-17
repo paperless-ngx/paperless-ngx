@@ -22,7 +22,7 @@ from django.contrib.auth.models import User
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Note
-from documents.tests.factories import DocumentFactory
+from paperless_testing.factories import DocumentFactory
 
 if TYPE_CHECKING:
     from collections.abc import Callable

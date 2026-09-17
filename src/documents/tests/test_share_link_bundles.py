@@ -20,8 +20,8 @@ from documents.models import ShareLinkBundle
 from documents.serialisers import ShareLinkBundleSerializer
 from documents.tasks import build_share_link_bundle
 from documents.tasks import cleanup_expired_share_link_bundles
-from documents.tests.factories import DocumentFactory
 from documents.tests.utils import DirectoriesMixin
+from paperless_testing.factories import DocumentFactory
 
 
 class ShareLinkBundleAPITests(DirectoriesMixin, APITestCase):

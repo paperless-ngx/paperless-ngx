@@ -27,7 +27,7 @@ import time_machine
 from documents.models import Note
 from documents.models import Tag
 from documents.search._errors import InvalidDateQuery
-from documents.tests.factories import DocumentFactory
+from paperless_testing.factories import DocumentFactory
 
 if TYPE_CHECKING:
     from collections.abc import Callable
