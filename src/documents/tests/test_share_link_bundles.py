@@ -6,10 +6,8 @@ from pathlib import Path
 from unittest import mock
 
 from django.conf import settings
-from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.utils import timezone
-from guardian.shortcuts import assign_perm
 from rest_framework import serializers
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -23,6 +21,8 @@ from documents.tasks import cleanup_expired_share_link_bundles
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import DocumentFactory
 from paperless_testing.factories import UserFactory
+from paperless_testing.permissions import grant_global
+from paperless_testing.permissions import grant_object
 
 
 class ShareLinkBundleAPITests(DirectoriesMixin, APITestCase):
@@ -58,11 +58,9 @@ class ShareLinkBundleAPITests(DirectoriesMixin, APITestCase):
     ) -> None:
         owner = UserFactory(username="document_owner")
         requester = UserFactory(username="bundle_creator")
-        requester.user_permissions.add(
-            Permission.objects.get(codename="add_sharelinkbundle"),
-        )
+        grant_global(requester, "add_sharelinkbundle")
         document = DocumentFactory.create(owner=owner)
-        assign_perm("view_document", requester, document)
+        grant_object(requester, document, "view_document")
         self.client.force_authenticate(requester)
         payload = {
             "document_ids": [document.pk],
@@ -73,9 +71,7 @@ class ShareLinkBundleAPITests(DirectoriesMixin, APITestCase):
         response = self.client.post(self.ENDPOINT, payload, format="json")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-        requester.user_permissions.add(
-            Permission.objects.get(codename="view_document"),
-        )
+        grant_global(requester, "view_document")
         requester = User.objects.get(pk=requester.pk)
         self.client.force_authenticate(requester)
         response = self.client.post(self.ENDPOINT, payload, format="json")

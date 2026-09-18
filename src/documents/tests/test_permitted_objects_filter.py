@@ -1,11 +1,11 @@
 import pytest
-from guardian.shortcuts import assign_perm
 from rest_framework.test import APIRequestFactory
 
 from documents.filters import PermittedObjectsFilter
 from documents.models import Tag
 from paperless_testing.factories import TagFactory
 from paperless_testing.factories import UserFactory
+from paperless_testing.permissions import grant_object
 
 
 class _DummyView:
@@ -35,7 +35,7 @@ class TestPermittedObjectsFilter:
         unowned = TagFactory(owner=None)
         granted = TagFactory(owner=owner)
         hidden = TagFactory(owner=owner)
-        assign_perm("view_tag", grantee, granted)
+        grant_object(grantee, granted, "view_tag")
         request = APIRequestFactory().get("/")
         request.user = grantee
 
@@ -53,7 +53,7 @@ class TestPermittedObjectsFilter:
         grantee = UserFactory(username="grantee2")
         owned = TagFactory(owner=grantee)
         granted = TagFactory(owner=owner)
-        assign_perm("view_tag", grantee, granted)
+        grant_object(grantee, granted, "view_tag")
         request = APIRequestFactory().get("/")
         request.user = grantee
 
@@ -82,7 +82,7 @@ class TestPermittedObjectsFilter:
         TagFactory(owner=None)
         TagFactory(owner=user)
         granted = TagFactory(owner=UserFactory(username=f"o_{username}"))
-        assign_perm("view_tag", user, granted)
+        grant_object(user, granted, "view_tag")
         request = APIRequestFactory().get("/")
         request.user = user
 

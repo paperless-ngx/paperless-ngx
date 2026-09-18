@@ -26,7 +26,6 @@ from django.test import override_settings
 from django.utils import timezone
 from guardian.models import GroupObjectPermission
 from guardian.models import UserObjectPermission
-from guardian.shortcuts import assign_perm
 
 from documents.management.commands import document_exporter
 from documents.models import Correspondent
@@ -51,6 +50,7 @@ from documents.tests.utils import SampleDirMixin
 from paperless_mail.models import MailAccount
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.dirs import paperless_environment
+from paperless_testing.permissions import grant_object
 
 
 @pytest.mark.management
@@ -105,8 +105,8 @@ class TestExportImport(
             user=self.user,
         )
 
-        assign_perm("view_document", self.user2, self.d2)
-        assign_perm("view_document", self.group1, self.d3)
+        grant_object(self.user2, self.d2, "view_document")
+        grant_object(self.group1, self.d3, "view_document")
 
         self.t1 = Tag.objects.create(name="t")
         self.dt1 = DocumentType.objects.create(name="dt")

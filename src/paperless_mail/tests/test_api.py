@@ -1,9 +1,7 @@
 import json
 from unittest import mock
 
-from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
-from guardian.shortcuts import assign_perm
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -19,6 +17,9 @@ from paperless_testing.factories import CorrespondentFactory
 from paperless_testing.factories import DocumentTypeFactory
 from paperless_testing.factories import TagFactory
 from paperless_testing.factories import UserFactory
+from paperless_testing.permissions import grant_all_global
+from paperless_testing.permissions import grant_global
+from paperless_testing.permissions import grant_object
 
 
 class TestAPIMailAccounts(DirectoriesMixin, APITestCase):
@@ -35,7 +36,7 @@ class TestAPIMailAccounts(DirectoriesMixin, APITestCase):
         super().setUp()
 
         self.user = UserFactory(username="temp_admin")
-        self.user.user_permissions.add(*Permission.objects.all())
+        grant_all_global(self.user)
         self.user.save()
         self.client.force_authenticate(user=self.user)
 
@@ -331,7 +332,7 @@ class TestAPIMailAccounts(DirectoriesMixin, APITestCase):
             owner=owner,
         )
         user = UserFactory(username="object_perms_only")
-        assign_perm("change_mailaccount", user, account)
+        grant_object(user, account, "change_mailaccount")
         self.client.force_authenticate(user=user)
 
         response = self.client.post(
@@ -384,7 +385,7 @@ class TestAPIMailAccounts(DirectoriesMixin, APITestCase):
         account2 = MailAccountFactory(name="Email2", owner=self.user)
         _account3 = MailAccountFactory(name="Email3", owner=user2)
         account4 = MailAccountFactory(name="Email4", owner=user2)
-        assign_perm("view_mailaccount", self.user, account4)
+        grant_object(self.user, account4, "view_mailaccount")
 
         response = self.client.get(self.ENDPOINT)
 
@@ -402,7 +403,7 @@ class TestAPIMailRules(DirectoriesMixin, APITestCase):
         super().setUp()
 
         self.user = UserFactory(username="temp_admin")
-        self.user.user_permissions.add(*Permission.objects.all())
+        grant_all_global(self.user)
         self.user.save()
         self.client.force_authenticate(user=self.user)
 
@@ -636,7 +637,7 @@ class TestAPIMailRules(DirectoriesMixin, APITestCase):
     ) -> None:
         other_user = UserFactory(username="mail-owner")
         foreign_account = MailAccountFactory(name="ForeignEmail", owner=other_user)
-        assign_perm("change_mailaccount", self.user, foreign_account)
+        grant_object(self.user, foreign_account, "change_mailaccount")
 
         response = self.client.post(
             self.ENDPOINT,
@@ -688,7 +689,7 @@ class TestAPIMailRules(DirectoriesMixin, APITestCase):
         rule2 = MailRuleFactory(account=account1, order=1, owner=self.user)
         MailRuleFactory(account=account1, order=2, owner=user2)
         rule4 = MailRuleFactory(account=account1, order=3, owner=user2)
-        assign_perm("view_mailrule", self.user, rule4)
+        grant_object(self.user, rule4, "view_mailrule")
 
         response = self.client.get(self.ENDPOINT)
 
@@ -739,7 +740,7 @@ class TestAPIProcessedMails(DirectoriesMixin, APITestCase):
         super().setUp()
 
         self.user = UserFactory(username="temp_admin")
-        self.user.user_permissions.add(*Permission.objects.all())
+        grant_all_global(self.user)
         self.user.save()
         self.client.force_authenticate(user=self.user)
 
@@ -763,7 +764,7 @@ class TestAPIProcessedMails(DirectoriesMixin, APITestCase):
         )
         ProcessedMailFactory(rule=rule, owner=user2)
         pm4 = ProcessedMailFactory(rule=rule, owner=user2)
-        assign_perm("view_processedmail", self.user, pm4)
+        grant_object(self.user, pm4, "view_processedmail")
 
         response = self.client.get(self.ENDPOINT)
 
@@ -814,7 +815,7 @@ class TestAPIProcessedMails(DirectoriesMixin, APITestCase):
             owner=self.user,
         )
         pm_granted = ProcessedMailFactory(rule=rule, owner=user2)
-        assign_perm("delete_processedmail", self.user, pm_granted)
+        grant_object(self.user, pm_granted, "delete_processedmail")
         pm_forbidden = ProcessedMailFactory(rule=rule, owner=user2)
 
         # Success for allowed items
@@ -858,11 +859,9 @@ class TestAPIProcessedMails(DirectoriesMixin, APITestCase):
     def test_bulk_delete_requires_global_delete_permission(self) -> None:
         owner = UserFactory(username="mail_owner")
         requester = UserFactory(username="mail_deleter")
-        requester.user_permissions.add(
-            Permission.objects.get(codename="add_processedmail"),
-        )
+        grant_global(requester, "add_processedmail")
         mail = ProcessedMailFactory(owner=owner)
-        assign_perm("delete_processedmail", requester, mail)
+        grant_object(requester, mail, "delete_processedmail")
         self.client.force_authenticate(requester)
 
         response = self.client.post(
@@ -872,9 +871,7 @@ class TestAPIProcessedMails(DirectoriesMixin, APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-        requester.user_permissions.add(
-            Permission.objects.get(codename="delete_processedmail"),
-        )
+        grant_global(requester, "delete_processedmail")
         requester = User.objects.get(pk=requester.pk)
         self.client.force_authenticate(requester)
         response = self.client.post(

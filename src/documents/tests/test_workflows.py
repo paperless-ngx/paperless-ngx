@@ -17,7 +17,6 @@ from django.contrib.auth.models import User
 from django.core import mail
 from django.test import override_settings
 from django.utils import timezone
-from guardian.shortcuts import assign_perm
 from guardian.shortcuts import get_groups_with_perms
 from guardian.shortcuts import get_users_with_perms
 from httpx import ConnectError
@@ -72,6 +71,7 @@ from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import UserFactory
+from paperless_testing.permissions import grant_object
 
 
 class TestWorkflows(
@@ -2130,10 +2130,10 @@ class TestWorkflows(
             original_filename="sample.pdf",
         )
 
-        assign_perm("documents.view_document", self.user2, doc)
-        assign_perm("documents.change_document", self.user2, doc)
-        assign_perm("documents.view_document", self.group1, doc)
-        assign_perm("documents.change_document", self.group1, doc)
+        grant_object(self.user2, doc, "documents.view_document")
+        grant_object(self.user2, doc, "documents.change_document")
+        grant_object(self.group1, doc, "documents.view_document")
+        grant_object(self.group1, doc, "documents.change_document")
 
         superuser = UserFactory(username="superuser", superuser=True)
         self.client.force_authenticate(user=superuser)
@@ -2901,10 +2901,10 @@ class TestWorkflows(
         doc.tags.set([self.t1, self.t2])
         CustomFieldInstance.objects.create(document=doc, field=self.cf1)
         doc.save()
-        assign_perm("documents.view_document", self.user3, doc)
-        assign_perm("documents.change_document", self.user3, doc)
-        assign_perm("documents.view_document", self.group1, doc)
-        assign_perm("documents.change_document", self.group1, doc)
+        grant_object(self.user3, doc, "documents.view_document")
+        grant_object(self.user3, doc, "documents.change_document")
+        grant_object(self.group1, doc, "documents.view_document")
+        grant_object(self.group1, doc, "documents.change_document")
 
         superuser = UserFactory(username="superuser", superuser=True)
         self.client.force_authenticate(user=superuser)
@@ -3098,10 +3098,10 @@ class TestWorkflows(
         doc.tags.set([self.t1, self.t2])
         CustomFieldInstance.objects.create(document=doc, field=self.cf1)
         doc.save()
-        assign_perm("documents.view_document", self.user3, doc)
-        assign_perm("documents.change_document", self.user3, doc)
-        assign_perm("documents.view_document", self.group1, doc)
-        assign_perm("documents.change_document", self.group1, doc)
+        grant_object(self.user3, doc, "documents.view_document")
+        grant_object(self.user3, doc, "documents.change_document")
+        grant_object(self.group1, doc, "documents.view_document")
+        grant_object(self.group1, doc, "documents.change_document")
 
         superuser = UserFactory(username="superuser", superuser=True)
         self.client.force_authenticate(user=superuser)

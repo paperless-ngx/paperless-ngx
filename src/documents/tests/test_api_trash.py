@@ -1,6 +1,5 @@
 from datetime import date
 
-from django.contrib.auth.models import Permission
 from django.core.cache import cache
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -8,6 +7,7 @@ from rest_framework.test import APITestCase
 from documents.models import Document
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import UserFactory
+from paperless_testing.permissions import grant_all_global
 
 
 class TestTrashAPI(DirectoriesMixin, APITestCase):
@@ -15,7 +15,7 @@ class TestTrashAPI(DirectoriesMixin, APITestCase):
         super().setUp()
 
         self.user = UserFactory(username="temp_admin")
-        self.user.user_permissions.add(*Permission.objects.all())
+        grant_all_global(self.user)
         self.client.force_authenticate(user=self.user)
         cache.clear()
 

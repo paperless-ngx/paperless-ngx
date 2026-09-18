@@ -18,7 +18,6 @@ from typing import TYPE_CHECKING
 import pytest
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
-from guardian.shortcuts import assign_perm
 
 from documents.models import Correspondent
 from documents.models import Document
@@ -26,6 +25,7 @@ from documents.models import DocumentType
 from documents.models import StoragePath
 from documents.models import Tag
 from paperless_testing.factories import UserFactory
+from paperless_testing.permissions import grant_object
 
 if TYPE_CHECKING:
     from documents.search._backend import TantivyBackend
@@ -128,7 +128,7 @@ class TestPermissionFilteringOnIndexedDocuments:
             checksum="perm-shared-user",
             owner=owner,
         )
-        assign_perm("view_document", viewer, doc)
+        grant_object(viewer, doc, "view_document")
         backend.add_or_update(doc)
 
         assert backend.search_ids("invoice", user=viewer) == [doc.pk]
@@ -158,7 +158,7 @@ class TestPermissionFilteringOnIndexedDocuments:
             checksum="perm-shared-group",
             owner=owner,
         )
-        assign_perm("view_document", group_member.groups.first(), doc)
+        grant_object(group_member.groups.first(), doc, "view_document")
         backend.add_or_update(doc)
 
         assert backend.search_ids("invoice", user=group_member) == [doc.pk]

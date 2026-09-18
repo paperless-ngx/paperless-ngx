@@ -10,7 +10,6 @@ from django.contrib.auth.models import User
 from django.db import connection
 from django.test import TestCase
 from django.test.utils import CaptureQueriesContext
-from guardian.shortcuts import assign_perm
 from guardian.shortcuts import get_groups_with_perms
 from guardian.shortcuts import get_users_with_perms
 
@@ -24,6 +23,7 @@ from documents.models import StoragePath
 from documents.models import Tag
 from documents.permissions import set_permissions_for_objects
 from paperless_testing.dirs import DirectoriesMixin
+from paperless_testing.permissions import grant_object
 
 
 class TestBulkEdit(DirectoriesMixin, TestCase):
@@ -440,7 +440,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
     def test_set_permissions(self, m) -> None:
         doc_ids = [self.doc1.id, self.doc2.id, self.doc3.id]
 
-        assign_perm("view_document", self.group1, self.doc1)
+        grant_object(self.group1, self.doc1, "view_document")
 
         permissions = {
             "view": {
@@ -482,8 +482,8 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         self.doc1.owner = self.user1
         self.doc1.save()
 
-        assign_perm("view_document", self.user1, self.doc1)
-        assign_perm("view_document", self.group1, self.doc1)
+        grant_object(self.user1, self.doc1, "view_document")
+        grant_object(self.group1, self.doc1, "view_document")
 
         permissions = {
             "view": {
@@ -609,7 +609,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         self.doc1.owner = self.user1
         self.doc1.save()
         self.user1.groups.add(self.group1)
-        assign_perm("view_document", self.group1, self.doc1)
+        grant_object(self.group1, self.doc1, "view_document")
 
         bulk_edit.set_permissions(
             [self.doc1.id],

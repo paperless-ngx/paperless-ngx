@@ -2,7 +2,6 @@ import json
 import shutil
 from unittest import mock
 
-from django.contrib.auth.models import Permission
 from django.core import mail
 from django.test import override_settings
 from rest_framework import status
@@ -12,6 +11,7 @@ from documents.models import Document
 from documents.tests.utils import SampleDirMixin
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import UserFactory
+from paperless_testing.permissions import grant_global
 
 
 class TestEmail(DirectoriesMixin, SampleDirMixin, APITestCase):
@@ -304,7 +304,7 @@ class TestEmail(DirectoriesMixin, SampleDirMixin, APITestCase):
             - Forbidden response is returned
         """
         user1 = UserFactory(username="test1")
-        user1.user_permissions.add(*Permission.objects.filter(codename="view_document"))
+        grant_global(user1, "view_document")
 
         doc_owned = Document.objects.create(
             title="owned_doc",
@@ -339,7 +339,7 @@ class TestEmail(DirectoriesMixin, SampleDirMixin, APITestCase):
             - Request succeeds
         """
         user1 = UserFactory(username="test1")
-        user1.user_permissions.add(*Permission.objects.filter(codename="view_document"))
+        grant_global(user1, "view_document")
 
         self.client.force_authenticate(user1)
 
