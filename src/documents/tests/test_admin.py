@@ -16,8 +16,8 @@ from documents.models import Document
 from documents.models import Tag
 from documents.search import get_backend
 from documents.search import reset_backend
-from documents.tests.utils import DirectoriesMixin
 from paperless.admin import PaperlessUserAdmin
+from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import DocumentFactory
 from paperless_testing.factories import TagFactory
 from paperless_testing.factories import UserFactory

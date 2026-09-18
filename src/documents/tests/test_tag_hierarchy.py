@@ -13,7 +13,7 @@ from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
 from documents.serialisers import TagSerializer
 from documents.signals.handlers import run_workflows
-from documents.tests.utils import DirectoriesMixin
+from paperless_testing.dirs import DirectoriesMixin
 
 
 class TestTagHierarchyPermissions(APITestCase):

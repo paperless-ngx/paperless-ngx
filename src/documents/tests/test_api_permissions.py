@@ -19,7 +19,7 @@ from documents.models import DocumentType
 from documents.models import MatchingModel
 from documents.models import StoragePath
 from documents.models import Tag
-from documents.tests.utils import DirectoriesMixin
+from paperless_testing.dirs import DirectoriesMixin
 
 
 class TestApiAuth(DirectoriesMixin, APITestCase):

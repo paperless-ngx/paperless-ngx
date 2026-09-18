@@ -7,8 +7,8 @@ from django.test import override_settings
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from documents.tests.utils import DirectoriesMixin
 from paperless.settings import _parse_remote_user_settings
+from paperless_testing.dirs import DirectoriesMixin
 
 
 class TestRemoteUser(DirectoriesMixin, APITestCase):

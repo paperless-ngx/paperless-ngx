@@ -13,20 +13,11 @@ from unittest import mock
 
 import pytest
 
-from documents.tests.utils import remove_dirs
-from documents.tests.utils import setup_directories
 from paperless_mail.models import MailRule
 from paperless_mail.tests.factories import MailAccountFactory
 from paperless_mail.tests.test_mail import MessageBuilder
 from paperless_mail.tests.test_mail import _AttachmentDef
 from paperless_mail.tests.test_mail import fake_magic_from_buffer
-
-
-@pytest.fixture()
-def directories(settings):
-    dirs = setup_directories()
-    yield dirs
-    remove_dirs(dirs)
 
 
 @pytest.fixture()
@@ -78,7 +69,7 @@ class TestMailNFCNormalization:
 
     def test_attachment_nfd_filename_normalized_to_nfc(
         self,
-        directories,
+        paperless_dirs,
         queue_consumption_tasks_mock,
         attachment_rule,
         mail_account_handler,
@@ -123,7 +114,7 @@ class TestMailNFCNormalization:
 
     def test_eml_subject_filename_nfc(
         self,
-        directories,
+        paperless_dirs,
         queue_consumption_tasks_mock,
         eml_rule,
         mail_account_handler,
@@ -156,7 +147,7 @@ class TestMailNFCNormalization:
 
     def test_already_nfc_attachment_filename_unchanged(
         self,
-        directories,
+        paperless_dirs,
         queue_consumption_tasks_mock,
         attachment_rule,
         mail_account_handler,

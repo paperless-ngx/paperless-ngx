@@ -18,8 +18,8 @@ from documents.models import WorkflowAction
 from documents.sanity_checker import SanityCheckFailedException
 from documents.sanity_checker import SanityCheckMessages
 from documents.tests.test_classifier import dummy_preprocess
-from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import FileSystemAssertsMixin
+from paperless_testing.dirs import DirectoriesMixin
 
 
 @pytest.mark.django_db
