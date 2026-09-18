@@ -103,7 +103,7 @@ class AIClient:
                     allow_internal=self.settings.llm_allow_internal_endpoints,
                     timeout=self.settings.llm_request_timeout,
                 )
-            return OpenAILike(
+            llm = OpenAILike(
                 model=self.settings.llm_model or "gpt-3.5-turbo",
                 api_base=endpoint,
                 api_key=self.settings.llm_api_key or PLACEHOLDER_API_KEY,
@@ -114,6 +114,14 @@ class AIClient:
                 http_client=http_client,
                 async_http_client=async_http_client,
             )
+            # llama_index only enables the grammar-enforced response_format
+            # path for OpenAI model names (is_json_schema_supported).
+            # Self-hosted openai-like servers that enforce json_schema
+            # server-side (e.g. via xgrammar) are safe to opt in, whereas
+            # tool-call arguments are not guaranteed to be schema-constrained
+            # by such servers, which lets a model omit required fields.
+            llm._should_use_structure_outputs = lambda: True
+            return llm
         else:
             raise ValueError(f"Unsupported LLM backend: {self.settings.llm_backend}")
 
@@ -145,28 +153,18 @@ class AIClient:
                 allowed_candidate_ids,
             )
 
-        from llama_index.core.program.function_program import get_function_tool
-
-        tool = get_function_tool(DocumentClassifierSchema)
-        user_msg = ChatMessage(
-            role="user",
-            content=f"{prompt}\n\n"
-            f"Answer by calling the {tool.metadata.name} tool. Do not write the answer as text.",
-        )
+        # Structured output with server-side grammar enforcement instead of
+        # tool calls: openai-like servers are not required to constrain
+        # tool-call arguments to the tool schema, so small models can omit
+        # required fields (title) and fail DocumentClassifierSchema
+        # validation. response_format is grammar-enforced by servers that
+        # support json_schema (omlx uses xgrammar), which keeps the payload
+        # schema-valid.
+        structured_llm = self.llm.as_structured_llm(DocumentClassifierSchema)
         with self._normalize_errors():
-            result = self.llm.chat_with_tools(
-                tools=[tool],
-                user_msg=user_msg,
-                chat_history=[],
-                allow_parallel_tool_calls=True,
-                tool_required=True,
-            )
-            tool_calls = self.llm.get_tool_calls_from_response(
-                result,
-                error_on_no_tool_call=True,
-            )
-        logger.debug("LLM query result: %s", tool_calls)
-        parsed = DocumentClassifierSchema(**tool_calls[0].tool_kwargs)
+            result = structured_llm.chat([ChatMessage(role="user", content=prompt)])
+        parsed = result.raw
+        logger.debug("LLM query result: %s", parsed)
         return model_to_classification_suggestions(
             parsed,
             allowed_candidate_ids,
