@@ -1,6 +1,5 @@
 import shutil
 from collections.abc import Generator
-from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -16,16 +15,7 @@ UserModelT = get_user_model()
 
 if TYPE_CHECKING:
     from documents.models import Document
-
-
-@dataclass(frozen=True, slots=True)
-class PaperlessDirs:
-    """Standard Paperless-ngx directory layout for tests."""
-
-    media: Path
-    originals: Path
-    archive: Path
-    thumbnails: Path
+    from paperless_testing.dirs import PaperlessDirs
 
 
 @pytest.fixture(scope="session")
@@ -35,51 +25,23 @@ def samples_dir() -> Path:
 
 
 @pytest.fixture()
-def paperless_dirs(tmp_path: Path) -> PaperlessDirs:
-    """Create and return the directory structure for testing."""
-    media = tmp_path / "media"
-    dirs = PaperlessDirs(
-        media=media,
-        originals=media / "documents" / "originals",
-        archive=media / "documents" / "archive",
-        thumbnails=media / "documents" / "thumbnails",
-    )
-    for d in (dirs.originals, dirs.archive, dirs.thumbnails):
-        d.mkdir(parents=True)
-    return dirs
-
-
-@pytest.fixture()
-def _media_settings(paperless_dirs: PaperlessDirs, settings) -> None:
-    """Configure Django settings to point at temp directories."""
-    settings.MEDIA_ROOT = paperless_dirs.media
-    settings.ORIGINALS_DIR = paperless_dirs.originals
-    settings.ARCHIVE_DIR = paperless_dirs.archive
-    settings.THUMBNAIL_DIR = paperless_dirs.thumbnails
-    settings.MEDIA_LOCK = paperless_dirs.media / "media.lock"
-    settings.IGNORABLE_FILES = {".DS_Store", "Thumbs.db", "desktop.ini"}
-    settings.APP_LOGO = ""
-
-
-@pytest.fixture()
 def sample_doc(
-    paperless_dirs: PaperlessDirs,
-    _media_settings: None,
+    paperless_dirs: "PaperlessDirs",
     samples_dir: Path,
 ) -> "Document":
     """Create a document with valid files and matching checksums."""
-    with filelock.FileLock(paperless_dirs.media / "media.lock"):
+    with filelock.FileLock(paperless_dirs.media_lock):
         shutil.copy(
             samples_dir / "originals" / "0000001.pdf",
-            paperless_dirs.originals / "0000001.pdf",
+            paperless_dirs.originals_dir / "0000001.pdf",
         )
         shutil.copy(
             samples_dir / "archive" / "0000001.pdf",
-            paperless_dirs.archive / "0000001.pdf",
+            paperless_dirs.archive_dir / "0000001.pdf",
         )
         shutil.copy(
             samples_dir / "thumbnails" / "0000001.webp",
-            paperless_dirs.thumbnails / "0000001.webp",
+            paperless_dirs.thumbnail_dir / "0000001.webp",
         )
 
     return DocumentFactory(
