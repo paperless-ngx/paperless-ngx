@@ -15,6 +15,8 @@
 # Test related
 **/.pytest_cache
 **/tests
+src/paperless_testing
+src/conftest.py
 **/*.spec.ts
 **/htmlcov
 # Local folders
