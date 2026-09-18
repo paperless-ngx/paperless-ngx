@@ -4192,7 +4192,11 @@ class TestWorkflows(
             expected_str = "Error occurred sending webhook"
             self.assertIn(expected_str, cm.output[0])
 
-    def test_workflow_webhook_action_url_invalid_params_headers(self) -> None:
+    @mock.patch("documents.workflows.webhooks.send_webhook.apply_async")
+    def test_workflow_webhook_action_url_invalid_params_headers(
+        self,
+        mock_post,
+    ) -> None:
         """
         GIVEN:
             - Document updated workflow with webhook action
@@ -4201,6 +4205,7 @@ class TestWorkflows(
             - Document that matches is updated
         THEN:
             - Error is logged
+            - The webhook is still queued, with empty data and headers
         """
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
@@ -4236,6 +4241,11 @@ class TestWorkflows(
             self.assertIn(expected_str, cm.output[0])
             expected_str = "Error occurred parsing webhook headers"
             self.assertIn(expected_str, cm.output[1])
+
+        mock_post.assert_called_once()
+        kwargs = mock_post.call_args.kwargs["kwargs"]
+        self.assertEqual(kwargs["data"], {})
+        self.assertEqual(kwargs["headers"], {})
 
     @mock.patch("httpx.Client.post")
     def test_workflow_webhook_send_webhook_task(self, mock_post) -> None:
