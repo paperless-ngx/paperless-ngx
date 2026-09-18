@@ -153,8 +153,11 @@ in similar existing documents, and the document chat can retrieve relevant conte
 
 Enable it by setting
 [`PAPERLESS_AI_LLM_EMBEDDING_BACKEND`](configuration.md#PAPERLESS_AI_LLM_EMBEDDING_BACKEND)
-(`huggingface` for fully-local embeddings, or `ollama` / `openai-like`). The index is only
-built when AI is enabled **and** an embedding backend is set.
+(`huggingface` for fully-local embeddings, or `ollama` / `openai-like`). An embedding-specific
+[API key](configuration.md#PAPERLESS_AI_LLM_EMBEDDING_API_KEY) and
+[endpoint](configuration.md#PAPERLESS_AI_LLM_EMBEDDING_ENDPOINT) can be configured when the
+embedding provider differs from the main LLM provider; otherwise the main LLM API key and endpoint
+are used. The index is only built when AI is enabled **and** an embedding backend is set.
 
 The index is updated automatically on a schedule controlled by
 [`PAPERLESS_LLM_INDEX_TASK_CRON`](configuration.md#PAPERLESS_LLM_INDEX_TASK_CRON) (daily by
