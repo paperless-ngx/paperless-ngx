@@ -17,7 +17,7 @@ from documents.models import Tag
 from documents.models import WorkflowAction
 from documents.sanity_checker import SanityCheckFailedException
 from documents.sanity_checker import SanityCheckMessages
-from documents.tests.test_classifier import dummy_preprocess
+from documents.tests.helpers import dummy_preprocess
 from paperless_testing.assertions import FileSystemAssertsMixin
 from paperless_testing.dirs import DirectoriesMixin
 

@@ -1,5 +1,4 @@
 import pickle
-import re
 import warnings
 from datetime import UTC
 from datetime import datetime
@@ -28,21 +27,13 @@ from documents.models import DocumentType
 from documents.models import MatchingModel
 from documents.models import StoragePath
 from documents.models import Tag
+from documents.tests.helpers import dummy_preprocess
 from paperless.settings import CLASSIFIER_LANGUAGES
 from paperless.signed_pickle import HMAC_SIZE
 from paperless.signed_pickle import signed_pickle_dumps
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import DocumentFactory
 from paperless_testing.factories import TagFactory
-
-
-def dummy_preprocess(content: str) -> str:
-    """
-    Simpler, faster pre-processing for testing purposes
-    """
-    content = content.lower().strip()
-    content = re.sub(r"\s+", " ", content)
-    return content
 
 
 class TestClassifier(DirectoriesMixin, TestCase):

@@ -11,7 +11,7 @@ from paperless_mail.models import ProcessedMail
 from paperless_mail.tests.factories import MailAccountFactory
 from paperless_mail.tests.factories import MailRuleFactory
 from paperless_mail.tests.factories import ProcessedMailFactory
-from paperless_mail.tests.test_mail import BogusMailBox
+from paperless_mail.tests.helpers import BogusMailBox
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import CorrespondentFactory
 from paperless_testing.factories import DocumentTypeFactory
