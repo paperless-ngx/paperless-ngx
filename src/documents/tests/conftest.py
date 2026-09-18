@@ -1,5 +1,4 @@
 import shutil
-import zoneinfo
 from collections.abc import Generator
 from dataclasses import dataclass
 from pathlib import Path
@@ -115,11 +114,6 @@ def _search_index(
     reset_backend()
     yield
     reset_backend()
-
-
-@pytest.fixture()
-def settings_timezone(settings: Settings) -> zoneinfo.ZoneInfo:
-    return zoneinfo.ZoneInfo(settings.TIME_ZONE)
 
 
 @pytest.fixture
