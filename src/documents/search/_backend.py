@@ -196,52 +196,49 @@ class WriteBatch:
         return self._raw_writer
 
     def __enter__(self) -> Self:
-        if self._backend._path is not None:
-            lock_path = self._backend._path / ".tantivy.lock"
-            self._lock = filelock.FileLock(str(lock_path))
-            for attempt in range(_LOCK_RETRY_ATTEMPTS):
-                try:
-                    self._lock.acquire(timeout=self._lock_timeout)
-                    break
-                except filelock.Timeout:
-                    if attempt == _LOCK_RETRY_ATTEMPTS - 1:
-                        raise SearchIndexLockError(
-                            f"Could not acquire index lock after {_LOCK_RETRY_ATTEMPTS} "
-                            f"attempts (timeout={self._lock_timeout}s each)",
-                        )
-                    sleep_s = random.uniform(
-                        0,
-                        min(_LOCK_BACKOFF_CAP, _LOCK_BACKOFF_BASE * (2**attempt)),
+        lock_path = self._backend._path / ".tantivy.lock"
+        self._lock = filelock.FileLock(str(lock_path))
+        for attempt in range(_LOCK_RETRY_ATTEMPTS):
+            try:
+                self._lock.acquire(timeout=self._lock_timeout)
+                break
+            except filelock.Timeout:
+                if attempt == _LOCK_RETRY_ATTEMPTS - 1:
+                    raise SearchIndexLockError(
+                        f"Could not acquire index lock after {_LOCK_RETRY_ATTEMPTS} "
+                        f"attempts (timeout={self._lock_timeout}s each)",
                     )
-                    logger.debug(
-                        "Index lock contention; retrying in %.2fs (attempt %d/%d)",
-                        sleep_s,
-                        attempt + 1,
-                        _LOCK_RETRY_ATTEMPTS,
-                    )
-                    time.sleep(sleep_s)
+                sleep_s = random.uniform(
+                    0,
+                    min(_LOCK_BACKOFF_CAP, _LOCK_BACKOFF_BASE * (2**attempt)),
+                )
+                logger.debug(
+                    "Index lock contention; retrying in %.2fs (attempt %d/%d)",
+                    sleep_s,
+                    attempt + 1,
+                    _LOCK_RETRY_ATTEMPTS,
+                )
+                time.sleep(sleep_s)
 
-            # Open a fresh Index (and thus a fresh Tantivy ManagedDirectory)
-            # for the write, rather than reusing the process-local cached
-            # index. ManagedDirectory loads its GC bookkeeping (.managed.json)
-            # once, at construction, and never re-reads it; paperless runs
-            # several long-lived processes (Granian workers, Celery workers)
-            # that take turns writing under the file lock above. A cached,
-            # long-lived writer index would carry a stale managed-files view
-            # and, on commit, overwrite .managed.json with that stale view -
-            # permanently losing track of segment files other processes
-            # registered in the meantime, so they can never be garbage
-            # collected. Reopening fresh here always picks up the current
-            # on-disk state. The long-lived self._backend._index is used for
-            # reads only and is reloaded (not reopened) after commit below.
-            write_index = tantivy.Index(
-                build_schema(),
-                path=str(self._backend._path),
-            )
-            register_tokenizers(write_index, settings.SEARCH_LANGUAGE)
-            self._raw_writer = write_index.writer()
-        else:
-            self._raw_writer = self._backend._index.writer()
+        # Open a fresh Index (and thus a fresh Tantivy ManagedDirectory)
+        # for the write, rather than reusing the process-local cached
+        # index. ManagedDirectory loads its GC bookkeeping (.managed.json)
+        # once, at construction, and never re-reads it; paperless runs
+        # several long-lived processes (Granian workers, Celery workers)
+        # that take turns writing under the file lock above. A cached,
+        # long-lived writer index would carry a stale managed-files view
+        # and, on commit, overwrite .managed.json with that stale view -
+        # permanently losing track of segment files other processes
+        # registered in the meantime, so they can never be garbage
+        # collected. Reopening fresh here always picks up the current
+        # on-disk state. The long-lived self._backend._index is used for
+        # reads only and is reloaded (not reopened) after commit below.
+        write_index = tantivy.Index(
+            build_schema(),
+            path=str(self._backend._path),
+        )
+        register_tokenizers(write_index, settings.SEARCH_LANGUAGE)
+        self._raw_writer = write_index.writer()
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -372,9 +369,8 @@ class TantivyBackend:
     Tantivy search backend with explicit lifecycle management.
 
     Provides full-text search capabilities using the Tantivy search engine.
-    Supports in-memory indexes (for testing) and persistent on-disk indexes
-    (for production use). Handles document indexing, search queries, autocompletion,
-    and "more like this" functionality.
+    Keeps a persistent on-disk index. Handles document indexing, search queries,
+    autocompletion, and "more like this" functionality.
 
     The backend manages its own connection lifecycle and can be reset when
     the underlying index directory changes (e.g., during test isolation).
@@ -408,9 +404,7 @@ class TantivyBackend:
         },
     )
 
-    def __init__(self, path: Path | None = None):
-        # path=None → in-memory index (for tests)
-        # path=some_dir → on-disk index (for production)
+    def __init__(self, path: Path):
         self._path = path
         self._raw_index: tantivy.Index | None = None
         self._raw_schema: tantivy.Schema | None = None
@@ -429,16 +423,13 @@ class TantivyBackend:
         """
         Open or rebuild the index as needed.
 
-        For disk-based indexes, checks if rebuilding is needed due to schema
-        version or language changes. Registers custom tokenizers after opening.
+        Checks if rebuilding is needed due to schema version or language
+        changes. Registers custom tokenizers after opening.
         Safe to call multiple times - subsequent calls are no-ops.
         """
         if self._raw_index is not None:
             return  # pragma: no cover
-        if self._path is not None:
-            self._raw_index = open_or_rebuild_index(self._path)
-        else:
-            self._raw_index = tantivy.Index(build_schema())
+        self._raw_index = open_or_rebuild_index(self._path)
         register_tokenizers(self._raw_index, settings.SEARCH_LANGUAGE)
         self._raw_schema = self._raw_index.schema
 
@@ -1102,13 +1093,9 @@ class TantivyBackend:
                 writer's threads). Larger values buffer more docs in RAM before
                 flushing a segment, deferring merge work; they do not avoid it.
         """
-        # Create new index (on-disk or in-memory)
-        if self._path is not None:
-            wipe_index(self._path)
-            new_index = tantivy.Index(build_schema(), path=str(self._path))
-            _write_sentinels(self._path)
-        else:
-            new_index = tantivy.Index(build_schema())
+        wipe_index(self._path)
+        new_index = tantivy.Index(build_schema(), path=str(self._path))
+        _write_sentinels(self._path)
         register_tokenizers(new_index, settings.SEARCH_LANGUAGE)
 
         # Point instance at the new index so _build_tantivy_doc uses it

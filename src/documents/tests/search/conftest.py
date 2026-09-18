@@ -19,6 +19,7 @@ if TYPE_CHECKING:
     from pytest_django.fixtures import Settings
 
     from documents.models import Document
+    from paperless_testing.dirs import PaperlessDirs
 
 
 @pytest.fixture
@@ -30,8 +31,8 @@ def index_dir(tmp_path: Path, settings: Settings) -> Path:
 
 
 @pytest.fixture
-def backend() -> Generator[TantivyBackend, None, None]:
-    b = TantivyBackend()  # path=None → in-memory index
+def backend(paperless_dirs: PaperlessDirs) -> Generator[TantivyBackend, None, None]:
+    b = TantivyBackend(path=paperless_dirs.index_dir)
     b.open()
     try:
         yield b
