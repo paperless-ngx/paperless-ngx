@@ -17,6 +17,7 @@ from documents.double_sided import STAGING_FILE_NAME
 from documents.double_sided import TIMEOUT_MINUTES
 from documents.tests.utils import DummyProgressManager
 from documents.tests.utils import FileSystemAssertsMixin
+from documents.tests.utils import SampleDirMixin
 from paperless_testing.dirs import DirectoriesMixin
 
 
@@ -24,9 +25,12 @@ from paperless_testing.dirs import DirectoriesMixin
     CONSUMER_RECURSIVE=True,
     CONSUMER_ENABLE_COLLATE_DOUBLE_SIDED=True,
 )
-class TestDoubleSided(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
-    SAMPLE_DIR = Path(__file__).parent / "samples"
-
+class TestDoubleSided(
+    DirectoriesMixin,
+    FileSystemAssertsMixin,
+    SampleDirMixin,
+    TestCase,
+):
     def setUp(self) -> None:
         super().setUp()
         self.double_sided_dir = self.dirs.consumption_dir / "double-sided"

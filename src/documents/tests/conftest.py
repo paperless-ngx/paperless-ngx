@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 
 @pytest.fixture(scope="session")
-def samples_dir() -> Path:
+def document_samples_dir() -> Path:
     """Path to the shared test sample documents."""
     return Path(__file__).parent / "samples" / "documents"
 
@@ -23,20 +23,20 @@ def samples_dir() -> Path:
 @pytest.fixture()
 def sample_doc(
     paperless_dirs: "PaperlessDirs",
-    samples_dir: Path,
+    document_samples_dir: Path,
 ) -> "Document":
     """Create a document with valid files and matching checksums."""
     with filelock.FileLock(paperless_dirs.media_lock):
         shutil.copy(
-            samples_dir / "originals" / "0000001.pdf",
+            document_samples_dir / "originals" / "0000001.pdf",
             paperless_dirs.originals_dir / "0000001.pdf",
         )
         shutil.copy(
-            samples_dir / "archive" / "0000001.pdf",
+            document_samples_dir / "archive" / "0000001.pdf",
             paperless_dirs.archive_dir / "0000001.pdf",
         )
         shutil.copy(
-            samples_dir / "thumbnails" / "0000001.webp",
+            document_samples_dir / "thumbnails" / "0000001.webp",
             paperless_dirs.thumbnail_dir / "0000001.webp",
         )
 
