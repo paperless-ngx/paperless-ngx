@@ -20,6 +20,7 @@ if TYPE_CHECKING:
     from rest_framework.test import APIClient
 
     from paperless_testing.dirs import PaperlessDirs
+    from paperless_testing.fakes.progress import FakeProgressManager
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -136,3 +137,15 @@ def user_client(rest_api_client: APIClient, regular_user: User) -> APIClient:
     rest_api_client.force_authenticate(user=regular_user)
     rest_api_client.credentials(HTTP_ACCEPT="application/json; version=10")
     return rest_api_client
+
+
+@pytest.fixture
+def fake_progress_manager(
+    monkeypatch: pytest.MonkeyPatch,
+) -> type[FakeProgressManager]:
+    """Replace documents.tasks.ProgressManager with the fake, so consuming a file
+    in a test never tries to reach a broker."""
+    from paperless_testing.fakes.progress import FakeProgressManager
+
+    monkeypatch.setattr("documents.tasks.ProgressManager", FakeProgressManager)
+    return FakeProgressManager

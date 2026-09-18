@@ -63,12 +63,11 @@ from documents.models import WorkflowTrigger
 from documents.plugins.base import StopConsumeTaskError
 from documents.serialisers import WorkflowTriggerSerializer
 from documents.signals import document_consumption_finished
-from documents.tests.utils import DummyProgressManager
-from documents.tests.utils import FileSystemAssertsMixin
 from documents.tests.utils import SampleDirMixin
 from documents.workflows.actions import execute_password_removal_action
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
+from paperless_testing.assertions import FileSystemAssertsMixin
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import UserFactory
 from paperless_testing.permissions import grant_object
@@ -128,6 +127,7 @@ class TestWorkflows(
 
         return super().setUp()
 
+    @pytest.mark.usefixtures("fake_progress_manager")
     def test_workflow_match(self) -> None:
         """
         GIVEN:
@@ -180,74 +180,74 @@ class TestWorkflows(
             self.dirs.scratch_dir / "simple.pdf",
         )
 
-        with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
-            with self.assertLogs("paperless.matching", level="INFO") as cm:
-                tasks.consume_file(
-                    ConsumableDocument(
-                        source=DocumentSource.ConsumeFolder,
-                        original_file=test_file,
-                    ),
-                    None,
-                )
+        with self.assertLogs("paperless.matching", level="INFO") as cm:
+            tasks.consume_file(
+                ConsumableDocument(
+                    source=DocumentSource.ConsumeFolder,
+                    original_file=test_file,
+                ),
+                None,
+            )
 
-                document = Document.objects.first()
-                assert document is not None
-                self.assertEqual(document.correspondent, self.c)
-                self.assertEqual(document.document_type, self.dt)
-                self.assertEqual(list(document.tags.all()), [self.t1, self.t2, self.t3])
-                self.assertEqual(document.storage_path, self.sp)
-                self.assertEqual(document.owner, self.user2)
-                self.assertEqual(
-                    list(
-                        get_users_with_perms(
-                            document,
-                            only_with_perms_in=["view_document"],
-                        ),
+            document = Document.objects.first()
+            assert document is not None
+            self.assertEqual(document.correspondent, self.c)
+            self.assertEqual(document.document_type, self.dt)
+            self.assertEqual(list(document.tags.all()), [self.t1, self.t2, self.t3])
+            self.assertEqual(document.storage_path, self.sp)
+            self.assertEqual(document.owner, self.user2)
+            self.assertEqual(
+                list(
+                    get_users_with_perms(
+                        document,
+                        only_with_perms_in=["view_document"],
                     ),
-                    [self.user3],
-                )
-                self.assertEqual(
-                    list(
-                        get_groups_with_perms(
-                            document,
-                        ),
+                ),
+                [self.user3],
+            )
+            self.assertEqual(
+                list(
+                    get_groups_with_perms(
+                        document,
                     ),
-                    [self.group1],
-                )
-                self.assertEqual(
-                    list(
-                        get_users_with_perms(
-                            document,
-                            only_with_perms_in=["change_document"],
-                        ),
+                ),
+                [self.group1],
+            )
+            self.assertEqual(
+                list(
+                    get_users_with_perms(
+                        document,
+                        only_with_perms_in=["change_document"],
                     ),
-                    [self.user3],
-                )
-                self.assertEqual(
-                    list(
-                        get_groups_with_perms(
-                            document,
-                        ),
+                ),
+                [self.user3],
+            )
+            self.assertEqual(
+                list(
+                    get_groups_with_perms(
+                        document,
                     ),
-                    [self.group1],
-                )
-                self.assertEqual(
-                    document.title,
-                    f"Doc from {self.c.name}",
-                )
-                self.assertEqual(
-                    list(document.custom_fields.all().values_list("field", flat=True)),
-                    [self.cf1.pk, self.cf2.pk],
-                )
-                self.assertEqual(
-                    document.custom_fields.get(field=self.cf2.pk).value,
-                    42,
-                )
+                ),
+                [self.group1],
+            )
+            self.assertEqual(
+                document.title,
+                f"Doc from {self.c.name}",
+            )
+            self.assertEqual(
+                list(document.custom_fields.all().values_list("field", flat=True)),
+                [self.cf1.pk, self.cf2.pk],
+            )
+            self.assertEqual(
+                document.custom_fields.get(field=self.cf2.pk).value,
+                42,
+            )
 
         info = cm.output[0]
         expected_str = f"Document matched {trigger} from {w}"
         self.assertIn(expected_str, info)
 
+    @pytest.mark.usefixtures("fake_progress_manager")
     def test_workflow_match_mailrule(self) -> None:
         """
         GIVEN:
@@ -292,65 +292,65 @@ class TestWorkflows(
             self.dirs.scratch_dir / "simple.pdf",
         )
 
-        with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
-            with self.assertLogs("paperless.matching", level="INFO") as cm:
-                tasks.consume_file(
-                    ConsumableDocument(
-                        source=DocumentSource.ConsumeFolder,
-                        original_file=test_file,
-                        mailrule_id=self.rule1.pk,
+        with self.assertLogs("paperless.matching", level="INFO") as cm:
+            tasks.consume_file(
+                ConsumableDocument(
+                    source=DocumentSource.ConsumeFolder,
+                    original_file=test_file,
+                    mailrule_id=self.rule1.pk,
+                ),
+                None,
+            )
+            document = Document.objects.first()
+            assert document is not None
+            self.assertEqual(document.correspondent, self.c)
+            self.assertEqual(document.document_type, self.dt)
+            self.assertEqual(list(document.tags.all()), [self.t1, self.t2, self.t3])
+            self.assertEqual(document.storage_path, self.sp)
+            self.assertEqual(document.owner, self.user2)
+            self.assertEqual(
+                list(
+                    get_users_with_perms(
+                        document,
+                        only_with_perms_in=["view_document"],
                     ),
-                    None,
-                )
-                document = Document.objects.first()
-                assert document is not None
-                self.assertEqual(document.correspondent, self.c)
-                self.assertEqual(document.document_type, self.dt)
-                self.assertEqual(list(document.tags.all()), [self.t1, self.t2, self.t3])
-                self.assertEqual(document.storage_path, self.sp)
-                self.assertEqual(document.owner, self.user2)
-                self.assertEqual(
-                    list(
-                        get_users_with_perms(
-                            document,
-                            only_with_perms_in=["view_document"],
-                        ),
+                ),
+                [self.user3],
+            )
+            self.assertEqual(
+                list(
+                    get_groups_with_perms(
+                        document,
                     ),
-                    [self.user3],
-                )
-                self.assertEqual(
-                    list(
-                        get_groups_with_perms(
-                            document,
-                        ),
+                ),
+                [self.group1],
+            )
+            self.assertEqual(
+                list(
+                    get_users_with_perms(
+                        document,
+                        only_with_perms_in=["change_document"],
                     ),
-                    [self.group1],
-                )
-                self.assertEqual(
-                    list(
-                        get_users_with_perms(
-                            document,
-                            only_with_perms_in=["change_document"],
-                        ),
+                ),
+                [self.user3],
+            )
+            self.assertEqual(
+                list(
+                    get_groups_with_perms(
+                        document,
                     ),
-                    [self.user3],
-                )
-                self.assertEqual(
-                    list(
-                        get_groups_with_perms(
-                            document,
-                        ),
-                    ),
-                    [self.group1],
-                )
-                self.assertEqual(
-                    document.title,
-                    f"Doc from {self.c.name}",
-                )
+                ),
+                [self.group1],
+            )
+            self.assertEqual(
+                document.title,
+                f"Doc from {self.c.name}",
+            )
         info = cm.output[0]
         expected_str = f"Document matched {trigger} from {w}"
         self.assertIn(expected_str, info)
 
+    @pytest.mark.usefixtures("fake_progress_manager")
     def test_workflow_match_multiple(self) -> None:
         """
         GIVEN:
@@ -411,42 +411,42 @@ class TestWorkflows(
             self.dirs.scratch_dir / "simple.pdf",
         )
 
-        with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
-            with self.assertLogs("paperless.matching", level="INFO") as cm:
-                tasks.consume_file(
-                    ConsumableDocument(
-                        source=DocumentSource.ConsumeFolder,
-                        original_file=test_file,
+        with self.assertLogs("paperless.matching", level="INFO") as cm:
+            tasks.consume_file(
+                ConsumableDocument(
+                    source=DocumentSource.ConsumeFolder,
+                    original_file=test_file,
+                ),
+                None,
+            )
+            document = Document.objects.first()
+            assert document is not None
+            # workflow 1
+            self.assertEqual(document.document_type, self.dt)
+            # workflow 2
+            self.assertEqual(document.correspondent, self.c2)
+            self.assertEqual(document.storage_path, self.sp)
+            # workflow 1 & 2
+            self.assertEqual(
+                list(document.tags.all()),
+                [self.t1, self.t2, self.t3],
+            )
+            self.assertEqual(
+                list(
+                    get_users_with_perms(
+                        document,
+                        only_with_perms_in=["view_document"],
                     ),
-                    None,
-                )
-                document = Document.objects.first()
-                assert document is not None
-                # workflow 1
-                self.assertEqual(document.document_type, self.dt)
-                # workflow 2
-                self.assertEqual(document.correspondent, self.c2)
-                self.assertEqual(document.storage_path, self.sp)
-                # workflow 1 & 2
-                self.assertEqual(
-                    list(document.tags.all()),
-                    [self.t1, self.t2, self.t3],
-                )
-                self.assertEqual(
-                    list(
-                        get_users_with_perms(
-                            document,
-                            only_with_perms_in=["view_document"],
-                        ),
-                    ),
-                    [self.user2, self.user3],
-                )
+                ),
+                [self.user2, self.user3],
+            )
 
         expected_str = f"Document matched {trigger1} from {w1}"
         self.assertIn(expected_str, cm.output[0])
         expected_str = f"Document matched {trigger2} from {w2}"
         self.assertIn(expected_str, cm.output[1])
 
+    @pytest.mark.usefixtures("fake_progress_manager")
     def test_workflow_fnmatch_path(self) -> None:
         """
         GIVEN:
@@ -480,22 +480,22 @@ class TestWorkflows(
             self.dirs.scratch_dir / "simple.pdf",
         )
 
-        with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
-            with self.assertLogs("paperless.matching", level="DEBUG") as cm:
-                tasks.consume_file(
-                    ConsumableDocument(
-                        source=DocumentSource.ConsumeFolder,
-                        original_file=test_file,
-                    ),
-                    None,
-                )
-                document = Document.objects.first()
-                assert document is not None
-                self.assertEqual(document.title, "Doc fnmatch title")
+        with self.assertLogs("paperless.matching", level="DEBUG") as cm:
+            tasks.consume_file(
+                ConsumableDocument(
+                    source=DocumentSource.ConsumeFolder,
+                    original_file=test_file,
+                ),
+                None,
+            )
+            document = Document.objects.first()
+            assert document is not None
+            self.assertEqual(document.title, "Doc fnmatch title")
 
         expected_str = f"Document matched {trigger} from {w}"
         self.assertIn(expected_str, cm.output[0])
 
+    @pytest.mark.usefixtures("fake_progress_manager")
     def test_workflow_no_match_filename(self) -> None:
         """
         GIVEN:
@@ -533,47 +533,47 @@ class TestWorkflows(
             self.dirs.scratch_dir / "simple.pdf",
         )
 
-        with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
-            with self.assertLogs("paperless.matching", level="DEBUG") as cm:
-                tasks.consume_file(
-                    ConsumableDocument(
-                        source=DocumentSource.ConsumeFolder,
-                        original_file=test_file,
-                    ),
-                    None,
-                )
-                document = Document.objects.first()
-                assert document is not None
-                self.assertIsNone(document.correspondent)
-                self.assertIsNone(document.document_type)
-                self.assertEqual(document.tags.all().count(), 0)
-                self.assertIsNone(document.storage_path)
-                self.assertIsNone(document.owner)
-                self.assertEqual(
-                    get_users_with_perms(
-                        document,
-                        only_with_perms_in=["view_document"],
-                    ).count(),
-                    0,
-                )
-                group_perms: QuerySet[Any] = get_groups_with_perms(document)
-                self.assertEqual(group_perms.count(), 0)
-                self.assertEqual(
-                    get_users_with_perms(
-                        document,
-                        only_with_perms_in=["change_document"],
-                    ).count(),
-                    0,
-                )
-                group_perms: QuerySet[Any] = get_groups_with_perms(document)
-                self.assertEqual(group_perms.count(), 0)
-                self.assertEqual(document.title, "simple")
+        with self.assertLogs("paperless.matching", level="DEBUG") as cm:
+            tasks.consume_file(
+                ConsumableDocument(
+                    source=DocumentSource.ConsumeFolder,
+                    original_file=test_file,
+                ),
+                None,
+            )
+            document = Document.objects.first()
+            assert document is not None
+            self.assertIsNone(document.correspondent)
+            self.assertIsNone(document.document_type)
+            self.assertEqual(document.tags.all().count(), 0)
+            self.assertIsNone(document.storage_path)
+            self.assertIsNone(document.owner)
+            self.assertEqual(
+                get_users_with_perms(
+                    document,
+                    only_with_perms_in=["view_document"],
+                ).count(),
+                0,
+            )
+            group_perms: QuerySet[Any] = get_groups_with_perms(document)
+            self.assertEqual(group_perms.count(), 0)
+            self.assertEqual(
+                get_users_with_perms(
+                    document,
+                    only_with_perms_in=["change_document"],
+                ).count(),
+                0,
+            )
+            group_perms: QuerySet[Any] = get_groups_with_perms(document)
+            self.assertEqual(group_perms.count(), 0)
+            self.assertEqual(document.title, "simple")
 
         expected_str = f"Document did not match {w}"
         self.assertIn(expected_str, cm.output[0])
         expected_str = f"Document filename {test_file.name} does not match"
         self.assertIn(expected_str, cm.output[1])
 
+    @pytest.mark.usefixtures("fake_progress_manager")
     def test_workflow_no_match_path(self) -> None:
         """
         GIVEN:
@@ -610,41 +610,40 @@ class TestWorkflows(
             self.dirs.scratch_dir / "simple.pdf",
         )
 
-        with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
-            with self.assertLogs("paperless.matching", level="DEBUG") as cm:
-                tasks.consume_file(
-                    ConsumableDocument(
-                        source=DocumentSource.ConsumeFolder,
-                        original_file=test_file,
-                    ),
-                    None,
-                )
-                document = Document.objects.first()
-                assert document is not None
-                self.assertIsNone(document.correspondent)
-                self.assertIsNone(document.document_type)
-                self.assertEqual(document.tags.all().count(), 0)
-                self.assertIsNone(document.storage_path)
-                self.assertIsNone(document.owner)
-                self.assertEqual(
-                    get_users_with_perms(
-                        document,
-                        only_with_perms_in=["view_document"],
-                    ).count(),
-                    0,
-                )
-                group_perms: QuerySet[Any] = get_groups_with_perms(document)
-                self.assertEqual(group_perms.count(), 0)
-                self.assertEqual(
-                    get_users_with_perms(
-                        document,
-                        only_with_perms_in=["change_document"],
-                    ).count(),
-                    0,
-                )
-                group_perms: QuerySet[Any] = get_groups_with_perms(document)
-                self.assertEqual(group_perms.count(), 0)
-                self.assertEqual(document.title, "simple")
+        with self.assertLogs("paperless.matching", level="DEBUG") as cm:
+            tasks.consume_file(
+                ConsumableDocument(
+                    source=DocumentSource.ConsumeFolder,
+                    original_file=test_file,
+                ),
+                None,
+            )
+            document = Document.objects.first()
+            assert document is not None
+            self.assertIsNone(document.correspondent)
+            self.assertIsNone(document.document_type)
+            self.assertEqual(document.tags.all().count(), 0)
+            self.assertIsNone(document.storage_path)
+            self.assertIsNone(document.owner)
+            self.assertEqual(
+                get_users_with_perms(
+                    document,
+                    only_with_perms_in=["view_document"],
+                ).count(),
+                0,
+            )
+            group_perms: QuerySet[Any] = get_groups_with_perms(document)
+            self.assertEqual(group_perms.count(), 0)
+            self.assertEqual(
+                get_users_with_perms(
+                    document,
+                    only_with_perms_in=["change_document"],
+                ).count(),
+                0,
+            )
+            group_perms: QuerySet[Any] = get_groups_with_perms(document)
+            self.assertEqual(group_perms.count(), 0)
+            self.assertEqual(document.title, "simple")
 
         expected_str = f"Document did not match {w}"
         self.assertIn(expected_str, cm.output[0])
@@ -653,6 +652,7 @@ class TestWorkflows(
         )
         self.assertIn(expected_str, cm.output[1])
 
+    @pytest.mark.usefixtures("fake_progress_manager")
     def test_workflow_no_match_mail_rule(self) -> None:
         """
         GIVEN:
@@ -689,48 +689,48 @@ class TestWorkflows(
             self.dirs.scratch_dir / "simple.pdf",
         )
 
-        with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
-            with self.assertLogs("paperless.matching", level="DEBUG") as cm:
-                tasks.consume_file(
-                    ConsumableDocument(
-                        source=DocumentSource.ConsumeFolder,
-                        original_file=test_file,
-                        mailrule_id=99,
-                    ),
-                    None,
-                )
-                document = Document.objects.first()
-                assert document is not None
-                self.assertIsNone(document.correspondent)
-                self.assertIsNone(document.document_type)
-                self.assertEqual(document.tags.all().count(), 0)
-                self.assertIsNone(document.storage_path)
-                self.assertIsNone(document.owner)
-                self.assertEqual(
-                    get_users_with_perms(
-                        document,
-                        only_with_perms_in=["view_document"],
-                    ).count(),
-                    0,
-                )
-                group_perms: QuerySet[Any] = get_groups_with_perms(document)
-                self.assertEqual(group_perms.count(), 0)
-                self.assertEqual(
-                    get_users_with_perms(
-                        document,
-                        only_with_perms_in=["change_document"],
-                    ).count(),
-                    0,
-                )
-                group_perms: QuerySet[Any] = get_groups_with_perms(document)
-                self.assertEqual(group_perms.count(), 0)
-                self.assertEqual(document.title, "simple")
+        with self.assertLogs("paperless.matching", level="DEBUG") as cm:
+            tasks.consume_file(
+                ConsumableDocument(
+                    source=DocumentSource.ConsumeFolder,
+                    original_file=test_file,
+                    mailrule_id=99,
+                ),
+                None,
+            )
+            document = Document.objects.first()
+            assert document is not None
+            self.assertIsNone(document.correspondent)
+            self.assertIsNone(document.document_type)
+            self.assertEqual(document.tags.all().count(), 0)
+            self.assertIsNone(document.storage_path)
+            self.assertIsNone(document.owner)
+            self.assertEqual(
+                get_users_with_perms(
+                    document,
+                    only_with_perms_in=["view_document"],
+                ).count(),
+                0,
+            )
+            group_perms: QuerySet[Any] = get_groups_with_perms(document)
+            self.assertEqual(group_perms.count(), 0)
+            self.assertEqual(
+                get_users_with_perms(
+                    document,
+                    only_with_perms_in=["change_document"],
+                ).count(),
+                0,
+            )
+            group_perms: QuerySet[Any] = get_groups_with_perms(document)
+            self.assertEqual(group_perms.count(), 0)
+            self.assertEqual(document.title, "simple")
 
         expected_str = f"Document did not match {w}"
         self.assertIn(expected_str, cm.output[0])
         expected_str = "Document mail rule 99 !="
         self.assertIn(expected_str, cm.output[1])
 
+    @pytest.mark.usefixtures("fake_progress_manager")
     def test_workflow_no_match_source(self) -> None:
         """
         GIVEN:
@@ -767,41 +767,40 @@ class TestWorkflows(
             self.dirs.scratch_dir / "simple.pdf",
         )
 
-        with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
-            with self.assertLogs("paperless.matching", level="DEBUG") as cm:
-                tasks.consume_file(
-                    ConsumableDocument(
-                        source=DocumentSource.ApiUpload,
-                        original_file=test_file,
-                    ),
-                    None,
-                )
-                document = Document.objects.first()
-                assert document is not None
-                self.assertIsNone(document.correspondent)
-                self.assertIsNone(document.document_type)
-                self.assertEqual(document.tags.all().count(), 0)
-                self.assertIsNone(document.storage_path)
-                self.assertIsNone(document.owner)
-                self.assertEqual(
-                    get_users_with_perms(
-                        document,
-                        only_with_perms_in=["view_document"],
-                    ).count(),
-                    0,
-                )
-                group_perms: QuerySet[Any] = get_groups_with_perms(document)
-                self.assertEqual(group_perms.count(), 0)
-                self.assertEqual(
-                    get_users_with_perms(
-                        document,
-                        only_with_perms_in=["change_document"],
-                    ).count(),
-                    0,
-                )
-                group_perms: QuerySet[Any] = get_groups_with_perms(document)
-                self.assertEqual(group_perms.count(), 0)
-                self.assertEqual(document.title, "simple")
+        with self.assertLogs("paperless.matching", level="DEBUG") as cm:
+            tasks.consume_file(
+                ConsumableDocument(
+                    source=DocumentSource.ApiUpload,
+                    original_file=test_file,
+                ),
+                None,
+            )
+            document = Document.objects.first()
+            assert document is not None
+            self.assertIsNone(document.correspondent)
+            self.assertIsNone(document.document_type)
+            self.assertEqual(document.tags.all().count(), 0)
+            self.assertIsNone(document.storage_path)
+            self.assertIsNone(document.owner)
+            self.assertEqual(
+                get_users_with_perms(
+                    document,
+                    only_with_perms_in=["view_document"],
+                ).count(),
+                0,
+            )
+            group_perms: QuerySet[Any] = get_groups_with_perms(document)
+            self.assertEqual(group_perms.count(), 0)
+            self.assertEqual(
+                get_users_with_perms(
+                    document,
+                    only_with_perms_in=["change_document"],
+                ).count(),
+                0,
+            )
+            group_perms: QuerySet[Any] = get_groups_with_perms(document)
+            self.assertEqual(group_perms.count(), 0)
+            self.assertEqual(document.title, "simple")
 
         expected_str = f"Document did not match {w}"
         self.assertIn(expected_str, cm.output[0])
@@ -843,6 +842,7 @@ class TestWorkflows(
             expected_str = f"No matching triggers with type {WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED} found"
             self.assertIn(expected_str, cm.output[1])
 
+    @pytest.mark.usefixtures("fake_progress_manager")
     def test_workflow_repeat_custom_fields(self) -> None:
         """
         GIVEN:
@@ -878,21 +878,20 @@ class TestWorkflows(
             self.dirs.scratch_dir / "simple.pdf",
         )
 
-        with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
-            with self.assertLogs("paperless.matching", level="INFO") as cm:
-                tasks.consume_file(
-                    ConsumableDocument(
-                        source=DocumentSource.ConsumeFolder,
-                        original_file=test_file,
-                    ),
-                    None,
-                )
-                document = Document.objects.first()
-                assert document is not None
-                self.assertEqual(
-                    list(document.custom_fields.all().values_list("field", flat=True)),
-                    [self.cf1.pk],
-                )
+        with self.assertLogs("paperless.matching", level="INFO") as cm:
+            tasks.consume_file(
+                ConsumableDocument(
+                    source=DocumentSource.ConsumeFolder,
+                    original_file=test_file,
+                ),
+                None,
+            )
+            document = Document.objects.first()
+            assert document is not None
+            self.assertEqual(
+                list(document.custom_fields.all().values_list("field", flat=True)),
+                [self.cf1.pk],
+            )
 
         expected_str = f"Document matched {trigger} from {w}"
         self.assertIn(expected_str, cm.output[0])
@@ -1964,6 +1963,7 @@ class TestWorkflows(
 
         self.assertEqual(doc.custom_fields.all().count(), 1)
 
+    @pytest.mark.usefixtures("fake_progress_manager")
     def test_document_consumption_workflow_month_placeholder_addded(self) -> None:
         trigger = WorkflowTrigger.objects.create(
             type=WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
@@ -1989,20 +1989,19 @@ class TestWorkflows(
             self.SAMPLE_DIR / "simple.pdf",
             self.dirs.scratch_dir / "simple.pdf",
         )
-        with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
-            tasks.consume_file(
-                ConsumableDocument(
-                    source=DocumentSource.ApiUpload,
-                    original_file=test_file,
-                ),
-                None,
-            )
-            document = Document.objects.first()
-            assert document is not None
-            self.assertRegex(
-                document.title,
-                r"Doc added in \w{3,}",
-            )  # Match any 3-letter month name
+        tasks.consume_file(
+            ConsumableDocument(
+                source=DocumentSource.ApiUpload,
+                original_file=test_file,
+            ),
+            None,
+        )
+        document = Document.objects.first()
+        assert document is not None
+        self.assertRegex(
+            document.title,
+            r"Doc added in \w{3,}",
+        )  # Match any 3-letter month name
 
     def test_document_updated_workflow_existing_custom_field_empty_value(self) -> None:
         """
@@ -3125,6 +3124,7 @@ class TestWorkflows(
         group_perms: QuerySet[Any] = get_groups_with_perms(doc)
         self.assertNotIn(self.group1, group_perms)
 
+    @pytest.mark.usefixtures("fake_progress_manager")
     def test_removal_action_document_consumed(self) -> None:
         """
         GIVEN:
@@ -3189,74 +3189,74 @@ class TestWorkflows(
             self.dirs.scratch_dir / "simple.pdf",
         )
 
-        with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
-            with self.assertLogs("paperless.matching", level="INFO") as cm:
-                tasks.consume_file(
-                    ConsumableDocument(
-                        source=DocumentSource.ConsumeFolder,
-                        original_file=test_file,
-                    ),
-                    None,
-                )
+        with self.assertLogs("paperless.matching", level="INFO") as cm:
+            tasks.consume_file(
+                ConsumableDocument(
+                    source=DocumentSource.ConsumeFolder,
+                    original_file=test_file,
+                ),
+                None,
+            )
 
-                document = Document.objects.first()
-                assert document is not None
+            document = Document.objects.first()
+            assert document is not None
 
-                self.assertIsNone(document.correspondent)
-                self.assertIsNone(document.document_type)
-                self.assertEqual(
-                    list(document.tags.all()),
-                    [self.t2, self.t3],
-                )
-                self.assertIsNone(document.storage_path)
-                self.assertIsNone(document.owner)
-                self.assertEqual(
-                    list(
-                        get_users_with_perms(
-                            document,
-                            only_with_perms_in=["view_document"],
-                        ),
+            self.assertIsNone(document.correspondent)
+            self.assertIsNone(document.document_type)
+            self.assertEqual(
+                list(document.tags.all()),
+                [self.t2, self.t3],
+            )
+            self.assertIsNone(document.storage_path)
+            self.assertIsNone(document.owner)
+            self.assertEqual(
+                list(
+                    get_users_with_perms(
+                        document,
+                        only_with_perms_in=["view_document"],
                     ),
-                    [self.user2],
-                )
-                self.assertEqual(
-                    list(
-                        get_groups_with_perms(
-                            document,
-                        ),
+                ),
+                [self.user2],
+            )
+            self.assertEqual(
+                list(
+                    get_groups_with_perms(
+                        document,
                     ),
-                    [self.group2],
-                )
-                self.assertEqual(
-                    list(
-                        get_users_with_perms(
-                            document,
-                            only_with_perms_in=["change_document"],
-                        ),
+                ),
+                [self.group2],
+            )
+            self.assertEqual(
+                list(
+                    get_users_with_perms(
+                        document,
+                        only_with_perms_in=["change_document"],
                     ),
-                    [self.user2],
-                )
-                self.assertEqual(
-                    list(
-                        get_groups_with_perms(
-                            document,
-                        ),
+                ),
+                [self.user2],
+            )
+            self.assertEqual(
+                list(
+                    get_groups_with_perms(
+                        document,
                     ),
-                    [self.group2],
-                )
-                self.assertEqual(
-                    document.title,
-                    "Doc from None",
-                )
-                self.assertEqual(
-                    list(document.custom_fields.all().values_list("field", flat=True)),
-                    [self.cf2.pk],
-                )
+                ),
+                [self.group2],
+            )
+            self.assertEqual(
+                document.title,
+                "Doc from None",
+            )
+            self.assertEqual(
+                list(document.custom_fields.all().values_list("field", flat=True)),
+                [self.cf2.pk],
+            )
 
         info = cm.output[0]
         expected_str = f"Document matched {trigger} from {w}"
         self.assertIn(expected_str, info)
 
+    @pytest.mark.usefixtures("fake_progress_manager")
     def test_removal_action_document_consumed_remove_all(self) -> None:
         """
         GIVEN:
@@ -3313,49 +3313,48 @@ class TestWorkflows(
             self.dirs.scratch_dir / "simple.pdf",
         )
 
-        with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
-            with self.assertLogs("paperless.matching", level="INFO") as cm:
-                tasks.consume_file(
-                    ConsumableDocument(
-                        source=DocumentSource.ConsumeFolder,
-                        original_file=test_file,
-                    ),
-                    None,
-                )
-                document = Document.objects.first()
-                assert document is not None
-                self.assertIsNone(document.correspondent)
-                self.assertIsNone(document.document_type)
-                self.assertEqual(document.tags.all().count(), 0)
+        with self.assertLogs("paperless.matching", level="INFO") as cm:
+            tasks.consume_file(
+                ConsumableDocument(
+                    source=DocumentSource.ConsumeFolder,
+                    original_file=test_file,
+                ),
+                None,
+            )
+            document = Document.objects.first()
+            assert document is not None
+            self.assertIsNone(document.correspondent)
+            self.assertIsNone(document.document_type)
+            self.assertEqual(document.tags.all().count(), 0)
 
-                self.assertIsNone(document.storage_path)
-                self.assertIsNone(document.owner)
-                self.assertEqual(
-                    get_users_with_perms(
-                        document,
-                        only_with_perms_in=["view_document"],
-                    ).count(),
-                    0,
+            self.assertIsNone(document.storage_path)
+            self.assertIsNone(document.owner)
+            self.assertEqual(
+                get_users_with_perms(
+                    document,
+                    only_with_perms_in=["view_document"],
+                ).count(),
+                0,
+            )
+            group_perms: QuerySet[Any] = get_groups_with_perms(document)
+            self.assertEqual(group_perms.count(), 0)
+            self.assertEqual(
+                get_users_with_perms(
+                    document,
+                    only_with_perms_in=["change_document"],
+                ).count(),
+                0,
+            )
+            group_perms: QuerySet[Any] = get_groups_with_perms(document)
+            self.assertEqual(group_perms.count(), 0)
+            self.assertEqual(
+                document.custom_fields.all()
+                .values_list(
+                    "field",
                 )
-                group_perms: QuerySet[Any] = get_groups_with_perms(document)
-                self.assertEqual(group_perms.count(), 0)
-                self.assertEqual(
-                    get_users_with_perms(
-                        document,
-                        only_with_perms_in=["change_document"],
-                    ).count(),
-                    0,
-                )
-                group_perms: QuerySet[Any] = get_groups_with_perms(document)
-                self.assertEqual(group_perms.count(), 0)
-                self.assertEqual(
-                    document.custom_fields.all()
-                    .values_list(
-                        "field",
-                    )
-                    .count(),
-                    0,
-                )
+                .count(),
+                0,
+            )
 
         info = cm.output[0]
         expected_str = f"Document matched {trigger} from {w}"
@@ -3837,6 +3836,7 @@ class TestWorkflows(
     )
     @mock.patch("httpx.post")
     @mock.patch("django.core.mail.message.EmailMessage.send")
+    @pytest.mark.usefixtures("fake_progress_manager")
     def test_workflow_email_consumption_started(
         self,
         mock_email_send,
@@ -3882,15 +3882,14 @@ class TestWorkflows(
             self.dirs.scratch_dir / "simple.pdf",
         )
 
-        with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
-            with self.assertLogs("paperless.matching", level="INFO"):
-                tasks.consume_file(
-                    ConsumableDocument(
-                        source=DocumentSource.ConsumeFolder,
-                        original_file=test_file,
-                    ),
-                    None,
-                )
+        with self.assertLogs("paperless.matching", level="INFO"):
+            tasks.consume_file(
+                ConsumableDocument(
+                    source=DocumentSource.ConsumeFolder,
+                    original_file=test_file,
+                ),
+                None,
+            )
 
         mock_email_send.assert_called_once()
 
@@ -4314,6 +4313,7 @@ class TestWorkflows(
                 self.assertIn(expected_str, cm.output[0])
 
     @mock.patch("documents.workflows.webhooks.send_webhook.apply_async")
+    @pytest.mark.usefixtures("fake_progress_manager")
     def test_workflow_webhook_action_consumption(self, mock_post) -> None:
         """
         GIVEN:
@@ -4354,15 +4354,14 @@ class TestWorkflows(
             self.dirs.scratch_dir / "simple.pdf",
         )
 
-        with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
-            with self.assertLogs("paperless.matching", level="INFO"):
-                tasks.consume_file(
-                    ConsumableDocument(
-                        source=DocumentSource.ConsumeFolder,
-                        original_file=test_file,
-                    ),
-                    None,
-                )
+        with self.assertLogs("paperless.matching", level="INFO"):
+            tasks.consume_file(
+                ConsumableDocument(
+                    source=DocumentSource.ConsumeFolder,
+                    original_file=test_file,
+                ),
+                None,
+            )
 
         mock_post.assert_called_once()
 
@@ -5424,6 +5423,7 @@ class TestDateWorkflowLocalization(
             ),
         ],
     )
+    @pytest.mark.usefixtures("fake_progress_manager")
     def test_document_consumption_workflow_localization(
         self,
         tmp_path: Path,
@@ -5460,10 +5460,6 @@ class TestDateWorkflowLocalization(
         # Temporarily override "now" for the environment so templates using
         # added/created placeholders behave as if it's a different system date.
         with (
-            mock.patch(
-                "documents.tasks.ProgressManager",
-                DummyProgressManager,
-            ),
             mock.patch(
                 "django.utils.timezone.now",
                 return_value=self.TEST_DATETIME,

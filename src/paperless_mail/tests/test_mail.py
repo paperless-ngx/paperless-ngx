@@ -27,7 +27,6 @@ from rest_framework.test import APITestCase
 
 from documents.models import Correspondent
 from documents.models import MatchingModel
-from documents.tests.utils import FileSystemAssertsMixin
 from paperless_mail import tasks
 from paperless_mail.mail import MailAccountHandler
 from paperless_mail.mail import MailError
@@ -40,6 +39,7 @@ from paperless_mail.models import MailRule
 from paperless_mail.models import ProcessedMail
 from paperless_mail.tests.factories import MailAccountFactory
 from paperless_mail.tests.factories import MailRuleFactory
+from paperless_testing.assertions import FileSystemAssertsMixin
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import CorrespondentFactory
 from paperless_testing.factories import UserFactory

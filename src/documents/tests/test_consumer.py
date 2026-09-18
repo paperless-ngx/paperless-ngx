@@ -30,12 +30,12 @@ from documents.models import Tag
 from documents.parsers import ParseError
 from documents.plugins.helpers import ProgressStatusOptions
 from documents.tasks import sanity_check
-from documents.tests.utils import DummyProgressManager
-from documents.tests.utils import FileSystemAssertsMixin
 from documents.tests.utils import GetConsumerMixin
 from paperless_mail.models import MailRule
+from paperless_testing.assertions import FileSystemAssertsMixin
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import UserFactory
+from paperless_testing.fakes.progress import FakeProgressManager
 
 
 class _BaseNewStyleParser:
@@ -777,7 +777,7 @@ class TestConsumer(
         )
 
         version_file = self.get_test_file2()
-        status = DummyProgressManager(version_file.name, None)
+        status = FakeProgressManager(version_file.name, None)
         overrides = DocumentMetadataOverrides(
             version_label="v2",
             actor_id=actor.pk,
@@ -840,7 +840,7 @@ class TestConsumer(
         assert root_doc is not None
 
         version_file = self.get_test_file2()
-        status = DummyProgressManager(version_file.name, None)
+        status = FakeProgressManager(version_file.name, None)
         overrides = DocumentMetadataOverrides(
             filename="valid_pdf_version-upload",
             actor_id=999999,
@@ -897,7 +897,7 @@ class TestConsumer(
         assert root_doc is not None
 
         def consume_version(version_file: Path) -> Document:
-            status = DummyProgressManager(version_file.name, None)
+            status = FakeProgressManager(version_file.name, None)
             overrides = DocumentMetadataOverrides()
             doc = ConsumableDocument(
                 DocumentSource.ApiUpload,

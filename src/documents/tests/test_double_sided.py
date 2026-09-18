@@ -2,8 +2,8 @@ import datetime as dt
 import os
 import shutil
 from pathlib import Path
-from unittest import mock
 
+import pytest
 from django.test import TestCase
 from django.test import override_settings
 from pdfminer.high_level import extract_text
@@ -15,12 +15,12 @@ from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentSource
 from documents.double_sided import STAGING_FILE_NAME
 from documents.double_sided import TIMEOUT_MINUTES
-from documents.tests.utils import DummyProgressManager
-from documents.tests.utils import FileSystemAssertsMixin
 from documents.tests.utils import SampleDirMixin
+from paperless_testing.assertions import FileSystemAssertsMixin
 from paperless_testing.dirs import DirectoriesMixin
 
 
+@pytest.mark.usefixtures("fake_progress_manager")
 @override_settings(
     CONSUMER_RECURSIVE=True,
     CONSUMER_ENABLE_COLLATE_DOUBLE_SIDED=True,
@@ -46,17 +46,13 @@ class TestDoubleSided(
         dst = self.double_sided_dir / dstname
         dst.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy(src, dst)
-        with mock.patch(
-            "documents.tasks.ProgressManager",
-            DummyProgressManager,
-        ):
-            msg = tasks.consume_file(
-                ConsumableDocument(
-                    source=DocumentSource.ConsumeFolder,
-                    original_file=dst,
-                ),
-                None,
-            )
+        msg = tasks.consume_file(
+            ConsumableDocument(
+                source=DocumentSource.ConsumeFolder,
+                original_file=dst,
+            ),
+            None,
+        )
         self.assertIsNotFile(dst)
         return msg
 

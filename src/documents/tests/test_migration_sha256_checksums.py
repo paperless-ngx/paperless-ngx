@@ -7,7 +7,7 @@ from django.conf import settings
 from django.db import connection
 from django.test import override_settings
 
-from documents.tests.utils import TestMigrations
+from paperless_testing.migrations import TestMigrations
 
 
 def _sha256(data: bytes) -> str:
