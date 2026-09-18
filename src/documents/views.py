@@ -194,7 +194,7 @@ from documents.serialisers import BulkEditSerializer
 from documents.serialisers import CorrespondentSerializer
 from documents.serialisers import CustomFieldSerializer
 from documents.serialisers import DeleteDocumentsSerializer
-from documents.serialisers import DocumentListSerializer
+from documents.serialisers import DocumentSelectionSerializer
 from documents.serialisers import DocumentSerializer
 from documents.serialisers import DocumentTypeSerializer
 from documents.serialisers import DocumentVersionLabelSerializer
@@ -2933,6 +2933,10 @@ class DocumentSelectionMixin:
         )
         if search_filtered_ids is not None:
             filtered_documents = filtered_documents.filter(pk__in=search_filtered_ids)
+        if validated_data.get("excluded_documents"):
+            filtered_documents = filtered_documents.exclude(
+                pk__in=validated_data["excluded_documents"],
+            )
         return list(filtered_documents.values_list("pk", flat=True))
 
 
@@ -3056,7 +3060,14 @@ class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
         parameters = {
             k: v
             for k, v in validated_data.items()
-            if k not in {"documents", "all", "filters", "from_webui"}
+            if k
+            not in {
+                "documents",
+                "all",
+                "filters",
+                "excluded_documents",
+                "from_webui",
+            }
         }
         user = self.request.user
         from_webui = validated_data.get("from_webui", False)
@@ -3557,16 +3568,19 @@ class PostDocumentView(GenericAPIView[Any]):
         },
     ),
 )
-class SelectionDataView(GenericAPIView[Any]):
+class SelectionDataView(DocumentSelectionMixin, GenericAPIView[Any]):
     permission_classes = (IsAuthenticated, ViewDocumentsPermissions)
-    serializer_class = DocumentListSerializer
+    serializer_class = DocumentSelectionSerializer
     parser_classes = (parsers.MultiPartParser, parsers.JSONParser)
 
     def post(self, request, format=None):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        ids = serializer.validated_data.get("documents")
+        ids = self._resolve_document_ids(
+            user=request.user,
+            validated_data=serializer.validated_data,
+        )
         permitted_documents = Document.objects.filter(
             id__in=permitted_document_ids(request.user),
         )

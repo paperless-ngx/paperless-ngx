@@ -520,6 +520,30 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(args[0], [self.doc1.id])
         self.assertEqual(len(kwargs), 0)
 
+    @mock.patch("documents.views.bulk_edit.delete")
+    def test_delete_documents_endpoint_with_excluded_documents(self, m) -> None:
+        self.setup_mock(m, "delete")
+        response = self.client.post(
+            "/api/documents/delete/",
+            json.dumps(
+                {
+                    "all": True,
+                    "excluded_documents": [
+                        self.doc2.id,
+                        self.doc3.id,
+                        self.doc4.id,
+                        self.doc5.id,
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        m.assert_called_once()
+        args, kwargs = m.call_args
+        self.assertEqual(args[0], [self.doc1.id])
+        self.assertEqual(len(kwargs), 0)
+
     @mock.patch("documents.views.bulk_edit.reprocess")
     def test_reprocess_documents_endpoint(self, m) -> None:
         self.setup_mock(m, "reprocess")
@@ -691,6 +715,26 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn(b"documents is required unless all is true", response.content)
 
+    def test_api_rejects_excluded_documents_unless_all_is_true(self) -> None:
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": [self.doc1.id],
+                    "excluded_documents": [self.doc2.id],
+                    "method": "set_storage_path",
+                    "parameters": {"storage_path": self.sp1.id},
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(
+            b"excluded_documents is only supported when all is true",
+            response.content,
+        )
+
     @mock.patch("documents.serialisers.bulk_edit.set_storage_path")
     def test_api_bulk_edit_with_all_true_resolves_documents_from_filters(
         self,
@@ -715,6 +759,29 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         m.assert_called_once()
         args, kwargs = m.call_args
         self.assertEqual(args[0], [self.doc2.id])
+        self.assertEqual(kwargs["storage_path"], self.sp1.id)
+
+    @mock.patch("documents.serialisers.bulk_edit.set_storage_path")
+    def test_api_bulk_edit_with_all_true_excludes_documents(self, m) -> None:
+        self.setup_mock(m, "set_storage_path")
+
+        response = self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "all": True,
+                    "excluded_documents": [self.doc2.id, self.doc4.id],
+                    "method": "set_storage_path",
+                    "parameters": {"storage_path": self.sp1.id},
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        m.assert_called_once()
+        args, kwargs = m.call_args
+        self.assertCountEqual(args[0], [self.doc1.id, self.doc3.id, self.doc5.id])
         self.assertEqual(kwargs["storage_path"], self.sp1.id)
 
     @mock.patch("documents.serialisers.bulk_edit.set_storage_path")
@@ -1074,6 +1141,33 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
             [
                 {"id": self.c1.id, "document_count": 1},
                 {"id": self.c2.id, "document_count": 0},
+            ],
+        )
+
+    def test_api_selection_data_with_excluded_documents(self) -> None:
+        response = self.client.post(
+            "/api/documents/selection_data/",
+            json.dumps(
+                {
+                    "all": True,
+                    "excluded_documents": [self.doc2.id],
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertCountEqual(
+            response.data["selected_correspondents"],
+            [
+                {"id": self.c1.id, "document_count": 0},
+                {"id": self.c2.id, "document_count": 1},
+            ],
+        )
+        self.assertCountEqual(
+            response.data["selected_tags"],
+            [
+                {"id": self.t1.id, "document_count": 1},
+                {"id": self.t2.id, "document_count": 2},
             ],
         )
 
