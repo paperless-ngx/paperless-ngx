@@ -8,6 +8,7 @@ pytestmark = pytest.mark.search
 class TestMigrateFulltextQueryFieldPrefixes(TestMigrations):
     migrate_from = "0016_sha256_checksums"
     migrate_to = "0017_migrate_fulltext_query_field_prefixes"
+    migrate_once = True
 
     def setUpBeforeMigration(self, apps) -> None:
         User = apps.get_model("auth", "User")

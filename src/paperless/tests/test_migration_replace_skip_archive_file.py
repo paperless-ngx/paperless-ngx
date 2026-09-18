@@ -4,6 +4,7 @@ from documents.tests.utils import TestMigrations
 class TestMigrateSkipArchiveFile(TestMigrations):
     migrate_from = "0007_optimize_integer_field_sizes"
     migrate_to = "0008_replace_skip_archive_file"
+    migrate_once = True
 
     def setUpBeforeMigration(self, apps):
         ApplicationConfiguration = apps.get_model(

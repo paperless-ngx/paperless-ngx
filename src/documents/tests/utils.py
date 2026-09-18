@@ -159,6 +159,16 @@ class ConsumeTaskMixin:
 
 
 class TestMigrations(TransactionTestCase):
+    """Run a migration on seeded data, then let the tests inspect the result.
+
+    By default every test migrates back, seeds, migrates forward and returns to
+    the latest migration, which costs several seconds. A class whose tests only
+    read the migrated data can set ``migrate_once`` to pay that once per class:
+    the migration runs for the first test, the database is left alone between
+    tests, and it is restored and flushed when the class finishes. Such tests
+    must not write to the database.
+    """
+
     @property
     def app(self):
         return apps.get_containing_app_config(type(self).__module__).name
@@ -166,10 +176,38 @@ class TestMigrations(TransactionTestCase):
     migrate_from = None
     dependencies = None
     migrate_to = None
+    migrate_once = False
+
+    _once_owner: "TestMigrations | None" = None
+    _once_state: dict[str, Any] | None = None
+    _once_finishing = False
 
     def setUp(self) -> None:
         super().setUp()
 
+        cls = type(self)
+        if self.migrate_once:
+            if cls._once_state is not None:
+                vars(self).update(cls._once_state)
+                return
+            if cls._once_owner is not None:
+                raise RuntimeError(
+                    f"The migration in '{cls.__name__}' failed for an earlier test",
+                )
+            # Recorded before migrating so a failed migration is still restored
+            cls._once_owner = self
+            before = dict(vars(self))
+
+        self._migrate()
+
+        if self.migrate_once:
+            cls._once_state = {
+                name: value
+                for name, value in vars(self).items()
+                if name not in before or before[name] is not value
+            }
+
+    def _migrate(self) -> None:
         assert self.migrate_from and self.migrate_to, (
             f"TestCase '{type(self).__name__}' must define migrate_from and migrate_to properties"
         )
@@ -197,18 +235,44 @@ class TestMigrations(TransactionTestCase):
     def setUpBeforeMigration(self, apps) -> None:
         pass
 
+    def _migrate_to_latest(self) -> None:
+        executor = MigrationExecutor(connection)
+        executor.loader.build_graph()
+        targets = executor.loader.graph.leaf_nodes()
+        executor.migrate(targets)
+
     def tearDown(self) -> None:
         """
         Ensure the database schema is restored to the latest migration after
         each migration test, so subsequent tests run against HEAD.
         """
+        if self.migrate_once and not self._once_finishing:
+            return
         try:
-            executor = MigrationExecutor(connection)
-            executor.loader.build_graph()
-            targets = executor.loader.graph.leaf_nodes()
-            executor.migrate(targets)
+            self._migrate_to_latest()
         finally:
             super().tearDown()
+
+    def _fixture_teardown(self) -> None:
+        # Django flushes every table after each test, which would discard the
+        # data the remaining tests of a migrate_once class still need
+        if self.migrate_once and not self._once_finishing:
+            return
+        super()._fixture_teardown()
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        owner = cls._once_owner
+        try:
+            if owner is not None:
+                cls._once_finishing = True
+                owner.tearDown()
+                owner._fixture_teardown()
+        finally:
+            cls._once_owner = None
+            cls._once_state = None
+            cls._once_finishing = False
+            super().tearDownClass()
 
 
 class SampleDirMixin:

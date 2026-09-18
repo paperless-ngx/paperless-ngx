@@ -1,5 +1,4 @@
 import hashlib
-import shutil
 import tempfile
 from pathlib import Path
 
@@ -19,19 +18,22 @@ class TestSha256ChecksumDataMigration(TestMigrations):
 
     migrate_from = "0015_document_version_index_and_more"
     migrate_to = "0016_sha256_checksums"
+    migrate_once = True
     reset_sequences = True
 
     ORIGINAL_CONTENT = b"original file content for sha256 migration test"
     ARCHIVE_CONTENT = b"archive file content for sha256 migration test"
 
-    def setUpBeforeMigration(self, apps) -> None:
-        self._originals_dir = Path(tempfile.mkdtemp())
-        self._archive_dir = Path(tempfile.mkdtemp())
-        self._settings_override = override_settings(
-            ORIGINALS_DIR=self._originals_dir,
-            ARCHIVE_DIR=self._archive_dir,
+    @classmethod
+    def setUpClass(cls) -> None:
+        super().setUpClass()
+        originals_dir = Path(cls.enterClassContext(tempfile.TemporaryDirectory()))
+        archive_dir = Path(cls.enterClassContext(tempfile.TemporaryDirectory()))
+        cls.enterClassContext(
+            override_settings(ORIGINALS_DIR=originals_dir, ARCHIVE_DIR=archive_dir),
         )
-        self._settings_override.enable()
+
+    def setUpBeforeMigration(self, apps) -> None:
         Document = apps.get_model("documents", "Document")
 
         # doc1: original file present, no archive
@@ -85,8 +87,9 @@ class TestSha256ChecksumDataMigration(TestMigrations):
             archive_checksum=None,
         ).pk
 
-    def _fixture_teardown(self) -> None:
-        super()._fixture_teardown()
+    @classmethod
+    def tearDownClass(cls) -> None:
+        super().tearDownClass()
         # Django's SQLite backend returns [] from sequence_reset_sql(), so
         # reset_sequences=True flushes rows but never clears sqlite_sequence.
         # Explicitly delete the entry so subsequent tests start from pk=1.
@@ -95,12 +98,6 @@ class TestSha256ChecksumDataMigration(TestMigrations):
                 cursor.execute(
                     "DELETE FROM sqlite_sequence WHERE name='documents_document'",
                 )
-
-    def tearDown(self) -> None:
-        super().tearDown()
-        self._settings_override.disable()
-        shutil.rmtree(self._originals_dir, ignore_errors=True)
-        shutil.rmtree(self._archive_dir, ignore_errors=True)
 
     def test_original_checksum_updated_to_sha256_when_file_exists(self) -> None:
         Document = self.apps.get_model("documents", "Document")
