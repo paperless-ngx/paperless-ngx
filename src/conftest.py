@@ -22,13 +22,11 @@ if TYPE_CHECKING:
 
 @pytest.fixture(scope="session", autouse=True)
 def faker_session_locale() -> str:
-    """Set Faker locale for reproducibility."""
+    """Pin Faker's locale so generated data does not follow the host locale.
+
+    The seed itself is left to pytest-randomly, which derives one per run.
+    """
     return "en_US"
-
-
-@pytest.fixture(scope="session", autouse=True)
-def faker_seed() -> int:
-    return 12345
 
 
 @pytest.fixture(autouse=True)
@@ -45,6 +43,21 @@ def _clear_content_type_caches() -> None:
 
     ContentType.objects.clear_cache()
     clear_ct_cache()
+
+
+@pytest.fixture(autouse=True)
+def _clear_django_caches() -> None:
+    """Clear every configured cache before each test.
+
+    Cached values outlive the test that wrote them: the classifier keys its
+    vectorized content on a hash of the content itself, so a second test
+    generating the same fixture data takes the cache-hit path and never calls
+    the code it is asserting against.
+    """
+    from django.core.cache import caches
+
+    for cache in caches.all(initialized_only=False):
+        cache.clear()
 
 
 @pytest.fixture

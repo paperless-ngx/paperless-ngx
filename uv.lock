@@ -2965,6 +2965,7 @@ dev = [
     { name = "pytest-env" },
     { name = "pytest-httpx" },
     { name = "pytest-mock" },
+    { name = "pytest-randomly" },
     { name = "pytest-rerunfailures" },
     { name = "pytest-sugar" },
     { name = "pytest-xdist" },
@@ -2990,6 +2991,7 @@ testing = [
     { name = "pytest-env" },
     { name = "pytest-httpx" },
     { name = "pytest-mock" },
+    { name = "pytest-randomly" },
     { name = "pytest-rerunfailures" },
     { name = "pytest-sugar" },
     { name = "pytest-xdist" },
@@ -3107,6 +3109,7 @@ dev = [
     { name = "pytest-env", specifier = "~=1.7.0" },
     { name = "pytest-httpx" },
     { name = "pytest-mock", specifier = "~=3.15.1" },
+    { name = "pytest-randomly", specifier = "~=5.0.0" },
     { name = "pytest-rerunfailures", specifier = "~=16.4" },
     { name = "pytest-sugar" },
     { name = "pytest-xdist", specifier = "~=3.8.0" },
@@ -3130,6 +3133,7 @@ testing = [
     { name = "pytest-env", specifier = "~=1.7.0" },
     { name = "pytest-httpx" },
     { name = "pytest-mock", specifier = "~=3.15.1" },
+    { name = "pytest-randomly", specifier = "~=5.0.0" },
     { name = "pytest-rerunfailures", specifier = "~=16.4" },
     { name = "pytest-sugar" },
     { name = "pytest-xdist", specifier = "~=3.8.0" },
@@ -3893,6 +3897,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/68/14/eb014d26be205d38ad5ad20d9a80f7d201472e08167f0bb4361e251084a9/pytest_mock-3.15.1.tar.gz", hash = "sha256:1849a238f6f396da19762269de72cb1814ab44416fa73a8686deac10b0d87a0f", size = 34036, upload-time = "2025-09-16T16:37:27.081Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/5a/cc/06253936f4a7fa2e0f48dfe6d851d9c56df896a9ab09ac019d70b760619c/pytest_mock-3.15.1-py3-none-any.whl", hash = "sha256:0a25e2eb88fe5168d535041d09a4529a188176ae608a6d249ee65abc0949630d", size = 10095, upload-time = "2025-09-16T16:37:25.734Z" },
+]
+
+[[package]]
+name = "pytest-randomly"
+version = "5.0.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pytest" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/01/3b/6a40e1b9d925651e601e056a97f60d8a1daeddeac03d5609be60cb4362ce/pytest_randomly-5.0.0.tar.gz", hash = "sha256:e9c575a5873ef168ddbe340ed9e97ce9edb4492ccc821e4b2ac6bb1f0ed515d2", size = 8542, upload-time = "2026-09-01T22:34:20.441Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/10/b4/47e939285caad9a623d021512912ac08dc92a467ad075d179f43729d2934/pytest_randomly-5.0.0-py3-none-any.whl", hash = "sha256:8a0d4703115c0c25b38b6e129fc16b1947b9643ff26a41bc1d185d7e5a7689c1", size = 8920, upload-time = "2026-09-01T22:34:19.227Z" },
 ]
 
 [[package]]

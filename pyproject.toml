@@ -117,7 +117,7 @@ testing = [
   "pytest-env~=1.7.0",
   "pytest-httpx",
   "pytest-mock~=3.15.1",
-  # "pytest-randomly~=4.0.1",
+  "pytest-randomly~=5.0.0",
   "pytest-rerunfailures~=16.4",
   "pytest-sugar",
   "pytest-xdist~=3.8.0",
