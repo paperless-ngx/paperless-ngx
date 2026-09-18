@@ -1,20 +1,20 @@
 from datetime import date
 
 from django.contrib.auth.models import Permission
-from django.contrib.auth.models import User
 from django.core.cache import cache
 from rest_framework import status
 from rest_framework.test import APITestCase
 
 from documents.models import Document
 from paperless_testing.dirs import DirectoriesMixin
+from paperless_testing.factories import UserFactory
 
 
 class TestTrashAPI(DirectoriesMixin, APITestCase):
     def setUp(self) -> None:
         super().setUp()
 
-        self.user = User.objects.create_user(username="temp_admin")
+        self.user = UserFactory(username="temp_admin")
         self.user.user_permissions.add(*Permission.objects.all())
         self.client.force_authenticate(user=self.user)
         cache.clear()
@@ -70,7 +70,7 @@ class TestTrashAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(Document.global_objects.count(), 0)
 
     def test_trash_list_requires_global_document_view_permission(self) -> None:
-        user = User.objects.create_user(username="trash_owner")
+        user = UserFactory(username="trash_owner")
         document = Document.objects.create(title="Owned", owner=user)
         document.delete()
         self.client.force_authenticate(user)
@@ -140,7 +140,7 @@ class TestTrashAPI(DirectoriesMixin, APITestCase):
             created=date(2023, 1, 2),
         )
         document_not_owned.delete()
-        user2 = User.objects.create_user(username="user2")
+        user2 = UserFactory(username="user2")
         document_u2 = Document.objects.create(
             title="Title3",
             content="content3",
@@ -158,7 +158,7 @@ class TestTrashAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(resp.data["results"][1]["id"], document_u1.pk)
 
         # superuser sees all documents
-        superuser = User.objects.create_superuser(username="superuser")
+        superuser = UserFactory(username="superuser", superuser=True)
         self.client.force_authenticate(user=superuser)
         resp = self.client.get("/api/trash/")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
@@ -174,7 +174,7 @@ class TestTrashAPI(DirectoriesMixin, APITestCase):
             - 403 Forbidden
         """
 
-        user2 = User.objects.create_user(username="user2")
+        user2 = UserFactory(username="user2")
         document = Document.objects.create(
             title="Title",
             content="content",

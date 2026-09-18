@@ -10,6 +10,8 @@ from rest_framework import status
 from rest_framework.test import APIClient
 from rest_framework.test import APITestCase
 
+from paperless_testing.factories import UserFactory
+
 if TYPE_CHECKING:
     from pytest_mock import MockerFixture
 
@@ -17,7 +19,7 @@ if TYPE_CHECKING:
 class TestChatStreamingViewInputValidation(APITestCase):
     def setUp(self) -> None:
         super().setUp()
-        self.user = User.objects.create_superuser(username="temp_admin")
+        self.user = UserFactory(username="temp_admin", superuser=True)
         self.client.force_authenticate(user=self.user)
 
     def _mock_ai_enabled(self) -> mock.MagicMock:

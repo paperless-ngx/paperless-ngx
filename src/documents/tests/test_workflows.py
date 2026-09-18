@@ -71,6 +71,7 @@ from documents.workflows.actions import execute_password_removal_action
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 from paperless_testing.dirs import DirectoriesMixin
+from paperless_testing.factories import UserFactory
 
 
 class TestWorkflows(
@@ -1952,7 +1953,7 @@ class TestWorkflows(
             original_filename="sample.pdf",
         )
 
-        superuser = User.objects.create_superuser("superuser")
+        superuser = UserFactory(username="superuser", superuser=True)
         self.client.force_authenticate(user=superuser)
 
         self.client.patch(
@@ -1982,7 +1983,7 @@ class TestWorkflows(
         w.actions.add(action)
         w.save()
 
-        superuser = User.objects.create_superuser("superuser")
+        superuser = UserFactory(username="superuser", superuser=True)
         self.client.force_authenticate(user=superuser)
         test_file = shutil.copy(
             self.SAMPLE_DIR / "simple.pdf",
@@ -2040,7 +2041,7 @@ class TestWorkflows(
             value_text="existing value",
         )
 
-        superuser = User.objects.create_superuser("superuser")
+        superuser = UserFactory(username="superuser", superuser=True)
         self.client.force_authenticate(user=superuser)
 
         self.client.patch(
@@ -2084,7 +2085,7 @@ class TestWorkflows(
         )
         CustomFieldInstance.objects.create(document=doc, field=self.cf1)
 
-        superuser = User.objects.create_superuser("superuser")
+        superuser = UserFactory(username="superuser", superuser=True)
         self.client.force_authenticate(user=superuser)
 
         self.client.patch(
@@ -2134,7 +2135,7 @@ class TestWorkflows(
         assign_perm("documents.view_document", self.group1, doc)
         assign_perm("documents.change_document", self.group1, doc)
 
-        superuser = User.objects.create_superuser("superuser")
+        superuser = UserFactory(username="superuser", superuser=True)
         self.client.force_authenticate(user=superuser)
 
         self.client.patch(
@@ -2905,7 +2906,7 @@ class TestWorkflows(
         assign_perm("documents.view_document", self.group1, doc)
         assign_perm("documents.change_document", self.group1, doc)
 
-        superuser = User.objects.create_superuser("superuser")
+        superuser = UserFactory(username="superuser", superuser=True)
         self.client.force_authenticate(user=superuser)
 
         self.client.patch(
@@ -2977,7 +2978,7 @@ class TestWorkflows(
         doc.refresh_from_db()
         doc.tags.set([self.t1, self.t2])
 
-        superuser = User.objects.create_superuser("superuser")
+        superuser = UserFactory(username="superuser", superuser=True)
         self.client.force_authenticate(user=superuser)
         self.client.patch(
             f"/api/documents/{doc.id}/",
@@ -3041,7 +3042,7 @@ class TestWorkflows(
         doc.refresh_from_db()
         doc.tags.set([self.t1])
 
-        superuser = User.objects.create_superuser("superuser")
+        superuser = UserFactory(username="superuser", superuser=True)
         self.client.force_authenticate(user=superuser)
         self.client.patch(
             f"/api/documents/{doc.id}/",
@@ -3102,7 +3103,7 @@ class TestWorkflows(
         assign_perm("documents.view_document", self.group1, doc)
         assign_perm("documents.change_document", self.group1, doc)
 
-        superuser = User.objects.create_superuser("superuser")
+        superuser = UserFactory(username="superuser", superuser=True)
         self.client.force_authenticate(user=superuser)
 
         self.client.patch(
@@ -3395,7 +3396,7 @@ class TestWorkflows(
             original_filename="sample.pdf",
         )
 
-        superuser = User.objects.create_superuser("superuser")
+        superuser = UserFactory(username="superuser", superuser=True)
         self.client.force_authenticate(user=superuser)
 
         self.client.patch(
@@ -5357,7 +5358,7 @@ class TestDateWorkflowLocalization(
         c = Correspondent.objects.create(name="Correspondent Name")
 
         client = APIClient()
-        superuser = User.objects.create_superuser("superuser")
+        superuser = UserFactory(username="superuser", superuser=True)
         client.force_authenticate(user=superuser)
 
         trigger = WorkflowTrigger.objects.create(

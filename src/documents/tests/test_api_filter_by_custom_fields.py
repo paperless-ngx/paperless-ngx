@@ -4,7 +4,6 @@ from collections.abc import Callable
 from datetime import date
 from urllib.parse import quote
 
-from django.contrib.auth.models import User
 from rest_framework.test import APITestCase
 
 from documents.models import CustomField
@@ -14,6 +13,7 @@ from documents.models import SavedView
 from documents.models import SavedViewFilterRule
 from documents.serialisers import DocumentSerializer
 from paperless_testing.dirs import DirectoriesMixin
+from paperless_testing.factories import UserFactory
 
 
 class DocumentWrapper:
@@ -35,7 +35,7 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
     def setUp(self) -> None:
         super().setUp()
 
-        self.user = User.objects.create_superuser(username="temp_admin")
+        self.user = UserFactory(username="temp_admin", superuser=True)
         self.client.force_authenticate(user=self.user)
 
         # Create one custom field per type. The fields are called f"{type}_field".

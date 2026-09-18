@@ -15,7 +15,9 @@ if TYPE_CHECKING:
     from collections.abc import Generator
     from pathlib import Path
 
+    from django.contrib.auth.models import User
     from pytest_django.fixtures import Settings
+    from rest_framework.test import APIClient
 
     from paperless_testing.dirs import PaperlessDirs
 
@@ -82,3 +84,43 @@ def paperless_dirs(
     reset_backend()
     yield dirs
     reset_backend()
+
+
+@pytest.fixture
+def rest_api_client() -> APIClient:
+    """The basic DRF APIClient, unauthenticated."""
+    from rest_framework.test import APIClient
+
+    return APIClient()
+
+
+@pytest.fixture
+def regular_user(db: None) -> User:
+    """Unprivileged user for permission boundary tests."""
+    from paperless_testing.factories import UserFactory
+
+    return UserFactory(username="regular")
+
+
+@pytest.fixture
+def admin_client(rest_api_client: APIClient, admin_user: User) -> APIClient:
+    """Admin client pre-authenticated and sending the v10 Accept header."""
+    rest_api_client.force_authenticate(user=admin_user)
+    rest_api_client.credentials(HTTP_ACCEPT="application/json; version=10")
+    return rest_api_client
+
+
+@pytest.fixture
+def v9_client(rest_api_client: APIClient, admin_user: User) -> APIClient:
+    """Admin client pre-authenticated and sending the v9 Accept header."""
+    rest_api_client.force_authenticate(user=admin_user)
+    rest_api_client.credentials(HTTP_ACCEPT="application/json; version=9")
+    return rest_api_client
+
+
+@pytest.fixture
+def user_client(rest_api_client: APIClient, regular_user: User) -> APIClient:
+    """Regular-user client pre-authenticated and sending the v10 Accept header."""
+    rest_api_client.force_authenticate(user=regular_user)
+    rest_api_client.credentials(HTTP_ACCEPT="application/json; version=10")
+    return rest_api_client

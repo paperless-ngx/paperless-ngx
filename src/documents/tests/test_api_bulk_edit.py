@@ -16,13 +16,14 @@ from documents.models import DocumentType
 from documents.models import StoragePath
 from documents.models import Tag
 from paperless_testing.dirs import DirectoriesMixin
+from paperless_testing.factories import UserFactory
 
 
 class TestBulkEditAPI(DirectoriesMixin, APITestCase):
     def setUp(self) -> None:
         super().setUp()
 
-        user = User.objects.create_superuser(username="temp_admin")
+        user = UserFactory(username="temp_admin", superuser=True)
         self.user = user
         self.client.force_authenticate(user=user)
 
@@ -284,9 +285,9 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         m,
     ) -> None:
         self.setup_mock(m, "modify_custom_fields")
-        user = User.objects.create_user(username="doc-owner")
+        user = UserFactory(username="doc-owner")
         user.user_permissions.add(Permission.objects.get(codename="change_document"))
-        other_user = User.objects.create_user(username="other-user")
+        other_user = UserFactory(username="other-user")
         source_doc = Document.objects.create(
             checksum="source",
             title="Source",
@@ -787,7 +788,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
     @mock.patch("documents.serialisers.bulk_edit.set_storage_path")
     def test_api_bulk_edit_with_all_true_resolves_owned_duplicates(self, m) -> None:
         self.setup_mock(m, "set_storage_path")
-        user = User.objects.create_user(username="duplicate-owner")
+        user = UserFactory(username="duplicate-owner")
         user.user_permissions.add(
             Permission.objects.get(codename="change_document"),
         )
@@ -1919,7 +1920,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
     @mock.patch("documents.views.bulk_edit.merge")
     def test_merge_and_delete_requires_change_permission(self, m) -> None:
         self.setup_mock(m, "merge")
-        user = User.objects.create_user(username="no-change")
+        user = UserFactory(username="no-change")
         user.user_permissions.add(
             Permission.objects.get(codename="add_document"),
             Permission.objects.get(codename="delete_document"),
@@ -2345,7 +2346,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
     @mock.patch("documents.views.bulk_edit.edit_pdf")
     def test_edit_pdf_update_requires_change_permission(self, m) -> None:
         self.setup_mock(m, "edit_pdf")
-        user = User.objects.create_user(username="no-change")
+        user = UserFactory(username="no-change")
         self.client.force_authenticate(user=user)
 
         response = self.client.post(
@@ -2372,7 +2373,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
     ) -> None:
         self.setup_mock(edit_pdf_mock, "edit_pdf")
         self.setup_mock(remove_password_mock, "remove_password")
-        user = User.objects.create_user(username="no-delete")
+        user = UserFactory(username="no-delete")
         user.user_permissions.add(
             Permission.objects.get(codename="add_document"),
             Permission.objects.get(codename="change_document"),

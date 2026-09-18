@@ -1,10 +1,10 @@
 from django.contrib.auth.models import AnonymousUser
-from django.contrib.auth.models import User
 from django.test import RequestFactory
 from django.test import TestCase
 from django.test import override_settings
 
 from paperless.auth import AutoLoginMiddleware
+from paperless_testing.factories import UserFactory
 
 
 @override_settings(AUTO_LOGIN_USERNAME="autologin")
@@ -29,7 +29,7 @@ class TestAutoLoginMiddleware(TestCase):
         THEN:
             - That user is attached to the request
         """
-        user = User.objects.create_user(username="autologin")
+        user = UserFactory(username="autologin")
 
         request = self._process(self.factory.get("/"))
 
@@ -44,7 +44,7 @@ class TestAutoLoginMiddleware(TestCase):
         THEN:
             - The request is left anonymous rather than authenticated as them
         """
-        User.objects.create_user(username="autologin", is_active=False)
+        UserFactory(username="autologin", is_active=False)
 
         request = self.factory.get("/")
         request.user = AnonymousUser()

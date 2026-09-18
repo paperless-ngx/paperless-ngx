@@ -8,7 +8,6 @@ from unittest import mock
 import pytest
 from auditlog.context import disable_auditlog
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.db import DatabaseError
 from django.db import connection
 from django.test import TestCase
@@ -33,6 +32,7 @@ from documents.tasks import empty_trash
 from documents.tests.utils import FileSystemAssertsMixin
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import DocumentFactory
+from paperless_testing.factories import UserFactory
 
 
 class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
@@ -1323,7 +1323,7 @@ class TestFilenameGeneration(DirectoriesMixin, TestCase):
             - Document without owner returns "none"
         """
 
-        u1 = User.objects.create_user("user1")
+        u1 = UserFactory(username="user1")
 
         owned_doc = Document.objects.create(
             title="The Title",

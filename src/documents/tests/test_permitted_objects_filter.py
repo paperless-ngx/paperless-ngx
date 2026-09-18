@@ -1,11 +1,11 @@
 import pytest
-from django.contrib.auth.models import User
 from guardian.shortcuts import assign_perm
 from rest_framework.test import APIRequestFactory
 
 from documents.filters import PermittedObjectsFilter
 from documents.models import Tag
 from paperless_testing.factories import TagFactory
+from paperless_testing.factories import UserFactory
 
 
 class _DummyView:
@@ -15,8 +15,8 @@ class _DummyView:
 @pytest.mark.django_db
 class TestPermittedObjectsFilter:
     def test_superuser_bypasses_filtering_entirely(self):
-        superuser = User.objects.create_superuser(username="root")
-        owner = User.objects.create_user(username="owner")
+        superuser = UserFactory(username="root", superuser=True)
+        owner = UserFactory(username="owner")
         TagFactory(owner=owner)
         request = APIRequestFactory().get("/")
         request.user = superuser
@@ -29,8 +29,8 @@ class TestPermittedObjectsFilter:
         assert result.count() == Tag.objects.count()
 
     def test_non_superuser_sees_only_owned_unowned_and_granted(self):
-        owner = User.objects.create_user(username="owner")
-        grantee = User.objects.create_user(username="grantee")
+        owner = UserFactory(username="owner")
+        grantee = UserFactory(username="grantee")
         owned = TagFactory(owner=grantee)
         unowned = TagFactory(owner=None)
         granted = TagFactory(owner=owner)
@@ -49,8 +49,8 @@ class TestPermittedObjectsFilter:
         assert hidden.pk not in visible_ids
 
     def test_include_granted_false_excludes_explicitly_shared_objects(self):
-        owner = User.objects.create_user(username="owner2")
-        grantee = User.objects.create_user(username="grantee2")
+        owner = UserFactory(username="owner2")
+        grantee = UserFactory(username="grantee2")
         owned = TagFactory(owner=grantee)
         granted = TagFactory(owner=owner)
         assign_perm("view_tag", grantee, granted)
@@ -74,14 +74,14 @@ class TestPermittedObjectsFilter:
         [("inactive", False), ("inactive_super", True)],
     )
     def test_inactive_user_sees_nothing(self, username: str, *, is_superuser: bool):
-        user = User.objects.create_user(
+        user = UserFactory(
             username=username,
             is_active=False,
             is_superuser=is_superuser,
         )
         TagFactory(owner=None)
         TagFactory(owner=user)
-        granted = TagFactory(owner=User.objects.create_user(username=f"o_{username}"))
+        granted = TagFactory(owner=UserFactory(username=f"o_{username}"))
         assign_perm("view_tag", user, granted)
         request = APIRequestFactory().get("/")
         request.user = user
@@ -94,7 +94,7 @@ class TestPermittedObjectsFilter:
         assert result.count() == 0
 
     def test_inactive_user_sees_nothing_with_include_granted_false(self):
-        user = User.objects.create_user(username="inactive_owner", is_active=False)
+        user = UserFactory(username="inactive_owner", is_active=False)
         TagFactory(owner=user)
         TagFactory(owner=None)
         request = APIRequestFactory().get("/")

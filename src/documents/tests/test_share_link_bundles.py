@@ -22,6 +22,7 @@ from documents.tasks import build_share_link_bundle
 from documents.tasks import cleanup_expired_share_link_bundles
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import DocumentFactory
+from paperless_testing.factories import UserFactory
 
 
 class ShareLinkBundleAPITests(DirectoriesMixin, APITestCase):
@@ -29,7 +30,7 @@ class ShareLinkBundleAPITests(DirectoriesMixin, APITestCase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.user = User.objects.create_superuser(username="bundle_admin")
+        self.user = UserFactory(username="bundle_admin", superuser=True)
         self.client.force_authenticate(self.user)
         self.document = DocumentFactory.create()
 
@@ -55,8 +56,8 @@ class ShareLinkBundleAPITests(DirectoriesMixin, APITestCase):
         self,
         delay_mock,
     ) -> None:
-        owner = User.objects.create_user(username="document_owner")
-        requester = User.objects.create_user(username="bundle_creator")
+        owner = UserFactory(username="document_owner")
+        requester = UserFactory(username="bundle_creator")
         requester.user_permissions.add(
             Permission.objects.get(codename="add_sharelinkbundle"),
         )

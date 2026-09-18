@@ -5,13 +5,9 @@ from typing import TYPE_CHECKING
 
 import filelock
 import pytest
-from django.contrib.auth import get_user_model
 from pytest_django.fixtures import Settings
-from rest_framework.test import APIClient
 
 from paperless_testing.factories import DocumentFactory
-
-UserModelT = get_user_model()
 
 if TYPE_CHECKING:
     from documents.models import Document
@@ -74,44 +70,6 @@ def _search_index(
     reset_backend()
     yield
     reset_backend()
-
-
-@pytest.fixture
-def rest_api_client():
-    """
-    The basic DRF ApiClient
-    """
-    yield APIClient()
-
-
-@pytest.fixture()
-def regular_user(django_user_model: type[UserModelT]) -> UserModelT:
-    """Unprivileged authenticated user for permission boundary tests."""
-    return django_user_model.objects.create_user(username="regular", password="regular")
-
-
-@pytest.fixture()
-def admin_client(rest_api_client: APIClient, admin_user: UserModelT) -> APIClient:
-    """Admin client pre-authenticated and sending the v10 Accept header."""
-    rest_api_client.force_authenticate(user=admin_user)
-    rest_api_client.credentials(HTTP_ACCEPT="application/json; version=10")
-    return rest_api_client
-
-
-@pytest.fixture()
-def v9_client(rest_api_client: APIClient, admin_user: UserModelT) -> APIClient:
-    """Admin client pre-authenticated and sending the v9 Accept header."""
-    rest_api_client.force_authenticate(user=admin_user)
-    rest_api_client.credentials(HTTP_ACCEPT="application/json; version=9")
-    return rest_api_client
-
-
-@pytest.fixture()
-def user_client(rest_api_client: APIClient, regular_user: UserModelT) -> APIClient:
-    """Regular-user client pre-authenticated and sending the v10 Accept header."""
-    rest_api_client.force_authenticate(user=regular_user)
-    rest_api_client.credentials(HTTP_ACCEPT="application/json; version=10")
-    return rest_api_client
 
 
 @pytest.fixture

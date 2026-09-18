@@ -22,13 +22,14 @@ from documents.models import DocumentType
 from documents.models import StoragePath
 from documents.models import Tag
 from paperless_testing.dirs import DirectoriesMixin
+from paperless_testing.factories import UserFactory
 
 
 class TestApiObjects(DirectoriesMixin, APITestCase):
     def setUp(self) -> None:
         super().setUp()
 
-        user = User.objects.create_superuser(username="temp_admin")
+        user = UserFactory(username="temp_admin", superuser=True)
         self.client.force_authenticate(user=user)
 
         self.tag1 = Tag.objects.create(name="t1", is_inbox_tag=True)
@@ -153,7 +154,7 @@ class TestApiObjects(DirectoriesMixin, APITestCase):
 
         # A newer document owned by another user must not leak through the
         # aggregate for a non-superuser who cannot view it
-        other = User.objects.create_user(username="other")
+        other = UserFactory(username="other")
         Document.objects.create(
             mime_type="application/pdf",
             correspondent=self.c1,
@@ -162,7 +163,7 @@ class TestApiObjects(DirectoriesMixin, APITestCase):
             owner=other,
         )
 
-        user = User.objects.create_user(username="regular")
+        user = UserFactory(username="regular")
         user.user_permissions.add(
             Permission.objects.get(codename="view_correspondent"),
         )
@@ -200,7 +201,7 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
     def setUp(self) -> None:
         super().setUp()
 
-        user = User.objects.create_superuser(username="temp_admin")
+        user = UserFactory(username="temp_admin", superuser=True)
         self.client.force_authenticate(user=user)
 
         self.sp1 = StoragePath.objects.create(name="sp1", path="Something/{checksum}")
@@ -455,8 +456,8 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
         self.assertEqual(response.data, "folder/Something.pdf")
 
     def test_test_storage_path_requires_document_view_permission(self) -> None:
-        owner = User.objects.create_user(username="owner")
-        unprivileged = User.objects.create_user(username="unprivileged")
+        owner = UserFactory(username="owner")
+        unprivileged = UserFactory(username="unprivileged")
         unprivileged.user_permissions.add(
             Permission.objects.get(codename="view_document"),
         )
@@ -481,8 +482,8 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
         self.assertIn("document", response.data)
 
     def test_test_storage_path_allows_shared_document_view_permission(self) -> None:
-        owner = User.objects.create_user(username="owner")
-        viewer = User.objects.create_user(username="viewer")
+        owner = UserFactory(username="owner")
+        viewer = UserFactory(username="viewer")
         document = Document.objects.create(
             mime_type="application/pdf",
             owner=owner,
@@ -545,7 +546,7 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
     def test_test_storage_path_exposes_basic_document_context_but_not_sensitive_owner_data(
         self,
     ) -> None:
-        owner = User.objects.create_user(
+        owner = UserFactory(
             username="owner",
             password="password",
             email="owner@example.com",
@@ -614,8 +615,8 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
     def test_test_storage_path_includes_related_objects_for_visible_document(
         self,
     ) -> None:
-        owner = User.objects.create_user(username="owner")
-        viewer = User.objects.create_user(username="viewer")
+        owner = UserFactory(username="owner")
+        viewer = UserFactory(username="viewer")
         private_correspondent = Correspondent.objects.create(
             name="Private Correspondent",
             owner=owner,
@@ -662,7 +663,7 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
         self.assertEqual(response.data, "Private Correspondent.pdf")
 
     def test_test_storage_path_superuser_can_view_private_related_objects(self) -> None:
-        owner = User.objects.create_user(username="owner")
+        owner = UserFactory(username="owner")
         private_correspondent = Correspondent.objects.create(
             name="Private Correspondent",
             owner=owner,
@@ -693,8 +694,8 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
     def test_test_storage_path_includes_doc_type_storage_path_and_tags(
         self,
     ) -> None:
-        owner = User.objects.create_user(username="owner")
-        viewer = User.objects.create_user(username="viewer")
+        owner = UserFactory(username="owner")
+        viewer = UserFactory(username="viewer")
         private_document_type = DocumentType.objects.create(
             name="Private Type",
             owner=owner,
@@ -756,8 +757,8 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
     def test_test_storage_path_includes_custom_fields_for_visible_document(
         self,
     ) -> None:
-        owner = User.objects.create_user(username="owner")
-        viewer = User.objects.create_user(username="viewer")
+        owner = UserFactory(username="owner")
+        viewer = UserFactory(username="viewer")
         document = Document.objects.create(
             mime_type="application/pdf",
             owner=owner,
@@ -798,7 +799,7 @@ class TestBulkEditObjects(APITestCase):
     def setUp(self) -> None:
         super().setUp()
 
-        self.temp_admin = User.objects.create_superuser(username="temp_admin")
+        self.temp_admin = UserFactory(username="temp_admin", superuser=True)
         self.client.force_authenticate(user=self.temp_admin)
 
         self.t1 = Tag.objects.create(name="t1")

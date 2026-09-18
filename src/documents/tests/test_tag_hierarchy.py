@@ -1,7 +1,6 @@
 from unittest import mock
 
 from django.contrib.auth.models import Permission
-from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -14,12 +13,13 @@ from documents.models import WorkflowTrigger
 from documents.serialisers import TagSerializer
 from documents.signals.handlers import run_workflows
 from paperless_testing.dirs import DirectoriesMixin
+from paperless_testing.factories import UserFactory
 
 
 class TestTagHierarchyPermissions(APITestCase):
     def test_children_only_include_visible_tags(self) -> None:
-        owner = User.objects.create_user(username="owner")
-        requester = User.objects.create_user(username="requester")
+        owner = UserFactory(username="owner")
+        requester = UserFactory(username="requester")
         requester.user_permissions.add(
             Permission.objects.get(codename="view_tag"),
         )
@@ -49,7 +49,7 @@ class TestTagHierarchyPermissions(APITestCase):
 class TestTagHierarchy(DirectoriesMixin, APITestCase):
     def setUp(self) -> None:
         super().setUp()
-        self.user = User.objects.create_superuser(username="admin")
+        self.user = UserFactory(username="admin", superuser=True)
         self.client.force_authenticate(user=self.user)
 
         self.parent = Tag.objects.create(name="Parent")

@@ -35,6 +35,7 @@ from documents.tests.utils import FileSystemAssertsMixin
 from documents.tests.utils import GetConsumerMixin
 from paperless_mail.models import MailRule
 from paperless_testing.dirs import DirectoriesMixin
+from paperless_testing.factories import UserFactory
 
 
 class _BaseNewStyleParser:
@@ -769,7 +770,7 @@ class TestConsumer(
 
         original_modified = timezone.now() - datetime.timedelta(days=1)
         Document.objects.filter(pk=root_doc.pk).update(modified=original_modified)
-        actor = User.objects.create_user(
+        actor = UserFactory(
             username="actor",
             email="actor@example.com",
             password="password",

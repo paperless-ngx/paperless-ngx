@@ -18,6 +18,7 @@ from documents.signals.handlers import task_postrun_handler
 from documents.signals.handlers import task_prerun_handler
 from documents.signals.handlers import task_revoked_handler
 from paperless_testing.factories import PaperlessTaskFactory
+from paperless_testing.factories import UserFactory
 
 
 @pytest.fixture
@@ -34,8 +35,8 @@ def consume_input_doc():
 
 
 @pytest.fixture
-def consume_overrides(django_user_model):
-    user = django_user_model.objects.create_user(username="testuser")
+def consume_overrides():
+    user = UserFactory(username="testuser")
     overrides = mock.MagicMock(spec=DocumentMetadataOverrides)
     overrides.owner_id = user.id
     return overrides

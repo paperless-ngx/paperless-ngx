@@ -3,7 +3,6 @@ from pathlib import Path
 
 import pytest
 from django.contrib.auth.models import Group
-from django.contrib.auth.models import User
 from django.db import connection
 from django.test.utils import CaptureQueriesContext
 from guardian.shortcuts import assign_perm
@@ -763,8 +762,8 @@ class TestSearchIds:
 
     def test_respects_permission_filter(self, backend: TantivyBackend) -> None:
         """search_ids must respect user permission filtering."""
-        owner = User.objects.create_user("ids_owner")
-        other = User.objects.create_user("ids_other")
+        owner = UserFactory(username="ids_owner")
+        other = UserFactory(username="ids_other")
         doc = Document.objects.create(
             title="private doc",
             content="secret keyword",
@@ -1071,7 +1070,7 @@ class TestFieldHandling:
 
     def test_notes_include_user_information(self, backend: TantivyBackend) -> None:
         """Notes must be indexed with user information when available for structured queries."""
-        user = User.objects.create_user("notewriter")
+        user = UserFactory(username="notewriter")
         doc = Document.objects.create(
             title="Doc with notes",
             content="test",
@@ -1173,7 +1172,7 @@ class TestHighlightHits:
         notes.note: prefix so the query targets notes content directly, but
         the snippet is generated from notes_text which stores the same text.
         """
-        user = User.objects.create_user("hl_noteuser")
+        user = UserFactory(username="hl_noteuser")
         doc = Document.objects.create(
             title="Doc with matching note",
             content="unrelated content",

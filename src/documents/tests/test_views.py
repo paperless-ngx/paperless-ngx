@@ -34,6 +34,7 @@ from paperless.models import ApplicationConfiguration
 from paperless_ai.exceptions import LLMProviderError
 from paperless_ai.exceptions import LLMTimeoutError
 from paperless_testing.dirs import DirectoriesMixin
+from paperless_testing.factories import UserFactory
 
 
 class TestViews(DirectoriesMixin, TestCase):
@@ -43,7 +44,7 @@ class TestViews(DirectoriesMixin, TestCase):
         ApplicationConfiguration.objects.get_or_create()
 
     def setUp(self) -> None:
-        self.user = User.objects.create_user("testuser")
+        self.user = UserFactory(username="testuser")
         super().setUp()
 
     def test_login_redirect(self) -> None:
@@ -338,7 +339,7 @@ class TestViews(DirectoriesMixin, TestCase):
 
 class TestAISuggestions(DirectoriesMixin, TestCase):
     def setUp(self) -> None:
-        self.user = User.objects.create_superuser(username="testuser")
+        self.user = UserFactory(username="testuser", superuser=True)
         self.document = Document.objects.create(
             title="Test Document",
             filename="test.pdf",
@@ -425,9 +426,9 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
               requester; the invisible tag id does not leak into either the
               matched or suggested tags
         """
-        tag_owner = User.objects.create_user(username="cache_tag_owner")
+        tag_owner = UserFactory(username="cache_tag_owner")
         invisible_tag = Tag.objects.create(name="cache_restricted", owner=tag_owner)
-        requester = User.objects.create_user(username="cache_requester")
+        requester = UserFactory(username="cache_requester")
         requester.user_permissions.add(
             *Permission.objects.filter(
                 codename__in=["view_document", "change_document", "view_tag"],
@@ -637,7 +638,7 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
             - The classification runs with the second user's visibility
               context without evicting the first user's result
         """
-        second_user = User.objects.create_superuser(username="second_user")
+        second_user = UserFactory(username="second_user", superuser=True)
         empty_choices = {
             "tags": {"existing_ids": [], "new_names": []},
             "correspondents": {"existing_ids": [], "new_names": []},
@@ -875,9 +876,9 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
               permission filtering survives the full request path
             - it does not appear in either the matched or suggested tags
         """
-        tag_owner = User.objects.create_user(username="tagowner")
+        tag_owner = UserFactory(username="tagowner")
         invisible_tag = Tag.objects.create(name="restricted", owner=tag_owner)
-        requester = User.objects.create_user(username="requester")
+        requester = UserFactory(username="requester")
         requester.user_permissions.add(
             *Permission.objects.filter(
                 codename__in=["view_document", "change_document", "view_tag"],
@@ -956,7 +957,7 @@ class TestAIChatStreamingView(DirectoriesMixin, TestCase):
     ENDPOINT = "/api/documents/chat/"
 
     def setUp(self) -> None:
-        self.user = User.objects.create_user(username="testuser", password="pass")
+        self.user = UserFactory(username="testuser", password="pass")
         self.client.force_login(user=self.user)
         self.document = Document.objects.create(
             title="Test Document",

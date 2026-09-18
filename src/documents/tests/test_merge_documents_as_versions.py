@@ -3,7 +3,6 @@ from unittest import mock
 
 from auditlog.models import LogEntry
 from django.contrib.auth.models import Permission
-from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 from rest_framework import status
@@ -12,6 +11,7 @@ from rest_framework.test import APITestCase
 from documents.bulk_edit import merge_as_versions
 from documents.models import Document
 from documents.serialisers import MergeDocumentsAsVersionsSerializer
+from paperless_testing.factories import UserFactory
 
 
 class TestMergeDocumentsAsVersionsSerializer(TestCase):
@@ -294,7 +294,7 @@ class TestMergeDocumentsAsVersions(TestCase):
     @mock.patch("documents.bulk_edit.bulk_update_documents.apply_async")
     @mock.patch("documents.search.get_backend")
     def test_writes_audit_log_entry(self, *_mocks) -> None:
-        user = User.objects.create_user(username="merger")
+        user = UserFactory(username="merger")
         root = Document.objects.create(checksum="A", title="Root")
         source = Document.objects.create(checksum="B", title="Source")
         LogEntry.objects.all().delete()
@@ -335,7 +335,7 @@ class TestMergeDocumentsAsVersions(TestCase):
 
 class TestMergeDocumentsAsVersionsAPI(APITestCase):
     def setUp(self) -> None:
-        self.user = User.objects.create_user(username="user")
+        self.user = UserFactory(username="user")
         self.user.user_permissions.add(
             Permission.objects.get(codename="change_document"),
             Permission.objects.get(codename="view_document"),
@@ -382,7 +382,7 @@ class TestMergeDocumentsAsVersionsAPI(APITestCase):
     @mock.patch("documents.views.bulk_edit.merge_as_versions")
     def test_requires_change_permission(self, merge_mock) -> None:
         merge_mock.__name__ = "merge_as_versions"
-        user = User.objects.create_user(username="no-change")
+        user = UserFactory(username="no-change")
         self.doc1.owner = user
         self.doc1.save()
         self.doc2.owner = user
@@ -405,7 +405,7 @@ class TestMergeDocumentsAsVersionsAPI(APITestCase):
     def test_requires_delete_permission(self, merge_mock) -> None:
         merge_mock.__name__ = "merge_as_versions"
         # Owns them and may change them, but may not make them stop being documents
-        user = User.objects.create_user(username="no-delete")
+        user = UserFactory(username="no-delete")
         user.user_permissions.add(
             Permission.objects.get(codename="change_document"),
             Permission.objects.get(codename="view_document"),
