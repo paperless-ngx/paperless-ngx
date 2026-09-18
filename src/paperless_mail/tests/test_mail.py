@@ -28,7 +28,6 @@ from rest_framework.test import APITestCase
 
 from documents.models import Correspondent
 from documents.models import MatchingModel
-from documents.tests.factories import CorrespondentFactory
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import FileSystemAssertsMixin
 from paperless_mail import tasks
@@ -43,6 +42,7 @@ from paperless_mail.models import MailRule
 from paperless_mail.models import ProcessedMail
 from paperless_mail.tests.factories import MailAccountFactory
 from paperless_mail.tests.factories import MailRuleFactory
+from paperless_testing.factories import CorrespondentFactory
 
 
 @dataclasses.dataclass

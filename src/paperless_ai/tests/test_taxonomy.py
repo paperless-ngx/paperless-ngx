@@ -3,16 +3,16 @@ import json
 import pytest
 import pytest_mock
 
-from documents.tests.factories import CorrespondentFactory
-from documents.tests.factories import DocumentFactory
-from documents.tests.factories import DocumentTypeFactory
-from documents.tests.factories import StoragePathFactory
-from documents.tests.factories import TagFactory
-from documents.tests.factories import UserFactory
 from paperless_ai.taxonomy import SimilarDocument
 from paperless_ai.taxonomy import TaxonomyCandidates
 from paperless_ai.taxonomy import build_taxonomy_candidates
 from paperless_ai.taxonomy import format_taxonomy_for_prompt
+from paperless_testing.factories import CorrespondentFactory
+from paperless_testing.factories import DocumentFactory
+from paperless_testing.factories import DocumentTypeFactory
+from paperless_testing.factories import StoragePathFactory
+from paperless_testing.factories import TagFactory
+from paperless_testing.factories import UserFactory
 
 
 def make_similar(document_id: int, weight: float) -> SimilarDocument:

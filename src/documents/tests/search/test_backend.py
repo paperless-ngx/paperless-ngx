@@ -19,11 +19,11 @@ from documents.search._backend import WriteBatch
 from documents.search._backend import get_backend
 from documents.search._backend import reset_backend
 from documents.signals.handlers import add_to_index
-from documents.tests.factories import CorrespondentFactory
-from documents.tests.factories import DocumentFactory
-from documents.tests.factories import DocumentTypeFactory
-from documents.tests.factories import TagFactory
-from documents.tests.factories import UserFactory
+from paperless_testing.factories import CorrespondentFactory
+from paperless_testing.factories import DocumentFactory
+from paperless_testing.factories import DocumentTypeFactory
+from paperless_testing.factories import TagFactory
+from paperless_testing.factories import UserFactory
 
 pytestmark = [pytest.mark.search, pytest.mark.django_db]
 

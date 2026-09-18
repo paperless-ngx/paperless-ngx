@@ -9,11 +9,11 @@ from django.test.utils import CaptureQueriesContext
 from rest_framework import status
 
 from documents.models import Document
-from documents.tests.factories import DocumentFactory
 from documents.versioning import LATEST_VERSION_CONTENT_PREFETCH_ATTR
 from documents.versioning import has_prefetched_effective_content
 from documents.versioning import latest_version_content_prefetch
 from documents.views import DocumentViewSet
+from paperless_testing.factories import DocumentFactory
 
 if TYPE_CHECKING:
     from rest_framework.test import APIClient

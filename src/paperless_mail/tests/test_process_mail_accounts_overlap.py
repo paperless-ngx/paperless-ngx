@@ -4,10 +4,10 @@ import pytest
 import pytest_mock
 
 from documents.models import PaperlessTask
-from documents.tests.factories import PaperlessTaskFactory
 from paperless_mail import tasks
 from paperless_mail.tests.factories import MailAccountFactory
 from paperless_mail.tests.factories import MailRuleFactory
+from paperless_testing.factories import PaperlessTaskFactory
 
 NO_DOCUMENTS_ADDED: Final = "No new documents were added."
 SKIPPED: Final = "Skipped: mail account processing already in progress."

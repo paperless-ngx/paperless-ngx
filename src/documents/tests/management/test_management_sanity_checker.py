@@ -15,7 +15,7 @@ from rich.console import Console
 
 from documents.management.commands.document_sanity_checker import Command
 from documents.sanity_checker import SanityCheckMessages
-from documents.tests.factories import DocumentFactory
+from paperless_testing.factories import DocumentFactory
 
 if TYPE_CHECKING:
     from documents.models import Document

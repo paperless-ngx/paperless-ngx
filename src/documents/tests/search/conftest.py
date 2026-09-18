@@ -9,7 +9,7 @@ from documents.search._backend import TantivyBackend
 from documents.search._backend import reset_backend
 from documents.search._schema import build_schema
 from documents.search._tokenizer import register_tokenizers
-from documents.tests.factories import DocumentFactory
+from paperless_testing.factories import DocumentFactory
 
 if TYPE_CHECKING:
     from collections.abc import Callable

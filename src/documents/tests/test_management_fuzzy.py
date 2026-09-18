@@ -8,7 +8,7 @@ from django.core.management import call_command
 from django.test import TestCase
 
 from documents.models import Document
-from documents.tests.factories import DocumentFactory
+from paperless_testing.factories import DocumentFactory
 
 
 @pytest.mark.management
