@@ -1200,7 +1200,7 @@ classifier to assign a correspondent, document type, or storage path to a
 document. Predictions below this threshold are discarded and the field is
 left unassigned, preventing low-confidence guesses from being applied.
 
-    Defaults to 0.6.
+    Defaults to 0.3.
 
 #### [`PAPERLESS_MATCH_REGEX_TIMEOUT_SECONDS=<float>`](#PAPERLESS_MATCH_REGEX_TIMEOUT_SECONDS) {#PAPERLESS_MATCH_REGEX_TIMEOUT_SECONDS}
 

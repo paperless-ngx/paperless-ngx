@@ -1040,9 +1040,9 @@ def test_classifier_match_threshold_default() -> None:
     GIVEN:
         - No PAPERLESS_CLASSIFIER_MATCH_THRESHOLD environment variable is set
     THEN:
-        - The classifier match threshold defaults to 0.6
+        - The classifier match threshold defaults to 0.3
     """
-    assert settings.CLASSIFIER_MATCH_THRESHOLD == 0.6
+    assert settings.CLASSIFIER_MATCH_THRESHOLD == 0.3
 
 
 class TestPreprocessContent:

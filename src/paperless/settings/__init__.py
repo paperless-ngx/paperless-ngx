@@ -98,7 +98,7 @@ MODEL_FILE = get_path_from_env(
 # document type, or storage path. 0.0 disables the threshold.
 CLASSIFIER_MATCH_THRESHOLD: Final[float] = get_float_from_env(
     "PAPERLESS_CLASSIFIER_MATCH_THRESHOLD",
-    0.6,
+    0.3,
 )
 MATCH_REGEX_TIMEOUT_SECONDS: Final[float] = get_float_from_env(
     "PAPERLESS_MATCH_REGEX_TIMEOUT_SECONDS",
