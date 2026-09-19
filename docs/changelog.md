@@ -4,14 +4,11 @@
 
 ### Features / Enhancements
 
-- docker(deps): Bump astral-sh/uv from 0.12.9-python3.14-trixie-slim to 0.12.16-python3.14-trixie-slim @[dependabot[bot]](https://github.com/apps/dependabot) ([#14134](https://github.com/paperless-ngx/paperless-ngx/pull/14134))
 - Enhancement (QoL): support deselecting single items from "select all" [@shamoon](https://github.com/shamoon) ([#14117](https://github.com/paperless-ngx/paperless-ngx/pull/14117))
-- docker-compose(deps): bump gotenberg/gotenberg from 8.36 to 8.37 in /docker/compose @[dependabot[bot]](https://github.com/apps/dependabot) ([#14137](https://github.com/paperless-ngx/paperless-ngx/pull/14137))
-- docker-compose(deps): Bump nginx from 1.31.5-alpine to 1.31.6-alpine in /docker/compose @[dependabot[bot]](https://github.com/apps/dependabot) ([#14138](https://github.com/paperless-ngx/paperless-ngx/pull/14138))
 - Enhancement: Match fuzzy terms in place inside the parsed query [@stumpylog](https://github.com/stumpylog) ([#14157](https://github.com/paperless-ngx/paperless-ngx/pull/14157))
 - Enhancement: Match CJK terms through their bigram fields in place [@stumpylog](https://github.com/stumpylog) ([#14156](https://github.com/paperless-ngx/paperless-ngx/pull/14156))
 - Enhancement: centralized management of share links + bundles [@shamoon](https://github.com/shamoon) ([#14115](https://github.com/paperless-ngx/paperless-ngx/pull/14115))
-- Feature: parse advanced search with whoosh-compat and delete the handwritten translation [@stumpylog](https://github.com/stumpylog) ([#14072](https://github.com/paperless-ngx/paperless-ngx/pull/14072))
+- Enhancement: parse advanced search with whoosh-compat and delete the handwritten translation [@stumpylog](https://github.com/stumpylog) ([#14072](https://github.com/paperless-ngx/paperless-ngx/pull/14072))
 - Enhancement: allow regex timeout configuration [@shamoon](https://github.com/shamoon) ([#14085](https://github.com/paperless-ngx/paperless-ngx/pull/14085))
 - Enhancement: hide-able sidebar items [@shamoon](https://github.com/shamoon) ([#14052](https://github.com/paperless-ngx/paperless-ngx/pull/14052))
 - Enhancement: Improve matching for correspondents, storage path and labels by removing bias + adding minimum match threshold [@dewey](https://github.com/dewey) ([#12164](https://github.com/paperless-ngx/paperless-ngx/pull/12164))
@@ -57,11 +54,6 @@
 - Fix: enforce the overflow hidden rule on pdf editor thumbnails [@shamoon](https://github.com/shamoon) ([#13976](https://github.com/paperless-ngx/paperless-ngx/pull/13976))
 - Fix: also correct unbroken long names on small cards [@shamoon](https://github.com/shamoon) ([#13974](https://github.com/paperless-ngx/paperless-ngx/pull/13974))
 - Fix: ensure parent + child tags change together in bulk editor [@shamoon](https://github.com/shamoon) ([#13972](https://github.com/paperless-ngx/paperless-ngx/pull/13972))
-
-### Maintenance
-
-- Chore(deps): Bump the actions group across 1 directory with 8 updates @[dependabot[bot]](https://github.com/apps/dependabot) ([#14162](https://github.com/paperless-ngx/paperless-ngx/pull/14162))
-- Chore(deps): Bump the actions group across 1 directory with 15 updates @[dependabot[bot]](https://github.com/apps/dependabot) ([#13920](https://github.com/paperless-ngx/paperless-ngx/pull/13920))
 
 ### Dependencies
 
