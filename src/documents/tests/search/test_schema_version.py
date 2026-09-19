@@ -21,9 +21,11 @@ import pytest
 import tantivy
 from django.conf import settings as django_settings
 
+from documents.search._schema import SCHEMA_VERSION
 from documents.search._schema import build_schema
 from documents.search._schema import needs_rebuild
 from documents.search._schema import open_or_rebuild_index
+from documents.search._schema import schema_fingerprint
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -176,3 +178,50 @@ class TestUpgradeFromReleasedV1Index:
         open_or_rebuild_index(released_v1_index)
 
         assert needs_rebuild(released_v1_index) is False
+
+
+class TestCorruptedIndex:
+    @pytest.fixture
+    def current_index_missing_meta_json(self, tmp_path: Path) -> Path:
+        """A current-schema index directory whose meta.json has gone missing.
+
+        The sentinel matches the current schema, so needs_rebuild() reports
+        False and open_or_rebuild_index() takes the plain Index.open() path.
+        """
+        index_dir = tmp_path / "index"
+        index_dir.mkdir()
+        tantivy.Index(build_schema(), path=str(index_dir))
+        (index_dir / ".index_settings.json").write_text(
+            json.dumps(
+                {
+                    "schema_version": SCHEMA_VERSION,
+                    "language": django_settings.SEARCH_LANGUAGE,
+                    "schema_fingerprint": schema_fingerprint(),
+                },
+            ),
+        )
+        (index_dir / "meta.json").unlink()
+        return index_dir
+
+    def test_missing_meta_json_is_rebuilt_instead_of_raising(
+        self,
+        current_index_missing_meta_json: Path,
+    ) -> None:
+        """
+        GIVEN:
+            - An index directory with a sentinel matching the current
+              schema, but a missing/corrupted meta.json (e.g. an
+              interrupted write left the directory in a torn state)
+        WHEN:
+            - open_or_rebuild_index() is called against it
+        THEN:
+            - It rebuilds the index instead of letting tantivy's
+              ValueError propagate; before this, a corrupted index left
+              every read, write, and `document_index reindex --if-needed`
+              hard-failing indefinitely, since the sentinel already
+              matched and reported the index as up to date
+        """
+        open_or_rebuild_index(current_index_missing_meta_json)
+
+        assert (current_index_missing_meta_json / "meta.json").exists()
+        tantivy.Index.open(str(current_index_missing_meta_json))

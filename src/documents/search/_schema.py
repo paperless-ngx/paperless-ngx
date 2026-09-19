@@ -337,4 +337,13 @@ def open_or_rebuild_index(index_dir: Path | None = None) -> tantivy.Index:
         idx = tantivy.Index(build_schema(), path=str(index_dir))
         _write_sentinels(index_dir)
         return idx
-    return tantivy.Index.open(str(index_dir))
+    try:
+        return tantivy.Index.open(str(index_dir))
+    except ValueError:
+        logger.exception(
+            "Search index is corrupted or incomplete - rebuilding from scratch.",
+        )
+        wipe_index(index_dir)
+        idx = tantivy.Index(build_schema(), path=str(index_dir))
+        _write_sentinels(index_dir)
+        return idx
