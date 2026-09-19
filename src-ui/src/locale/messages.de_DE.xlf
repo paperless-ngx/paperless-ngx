@@ -2855,7 +2855,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">104</context>
         </context-group>
-        <target state="needs-translation">Apply AI Suggestions</target>
+        <target state="translated">KI-Vorschläge anwenden</target>
       </trans-unit>
       <trans-unit id="9172233176401579786" datatype="html" approved="yes">
         <source>Scheduled</source>
@@ -3907,7 +3907,7 @@
           <context context-type="sourcefile">src/app/components/manage/share-links/share-links.component.html</context>
           <context context-type="linenumber">2,3</context>
         </context-group>
-        <target state="needs-translation">Share links</target>
+        <target state="translated">Share Links</target>
       </trans-unit>
       <trans-unit id="7844706011418789951" datatype="html" approved="yes">
         <source>Administration</source>
@@ -5835,7 +5835,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">182</context>
         </context-group>
-        <target state="needs-translation">Error retrieving correspondents</target>
+        <target state="translated">Fehler beim Abrufen der Korrespondenten</target>
       </trans-unit>
       <trans-unit id="3407606224361082860" datatype="html">
         <source>Error retrieving document types</source>
