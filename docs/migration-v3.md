@@ -94,7 +94,7 @@ PAPERLESS_DBHOST: postgres
 
 # v3 (engine must be explicit)
 PAPERLESS_DBENGINE: postgresql
-PAPERLESS_DBHOST: postgres
+PAPERLESS_DBHOST: postgresql
 ```
 
 See [`PAPERLESS_DBENGINE`](configuration.md#PAPERLESS_DBENGINE) for accepted values.
