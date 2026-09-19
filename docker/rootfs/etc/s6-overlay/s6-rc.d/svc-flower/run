@@ -10,7 +10,7 @@ if [[ -n "${PAPERLESS_ENABLE_FLOWER}" ]]; then
 	# Small delay to allow celery to be up first
 	echo "${log_prefix} Starting flower in 5s"
 	sleep 5
-	cd ${PAPERLESS_SRC_DIR}
+	cd "${PAPERLESS_SRC_DIR}" || exit 1
 
 	# Only pass --conf if the file is actually there. The image does not ship one, and
 	# flower >= 2.1.0 exits with FileNotFoundError when an explicitly given --conf path
