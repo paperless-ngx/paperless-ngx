@@ -115,7 +115,7 @@ jobs:
             unpaper tesseract-ocr imagemagick ghostscript poppler-utils
       - name: Configure ImageMagick
         run: |
-          sudo cp docker/rootfs/etc/ImageMagick-6/paperless-policy.xml /etc/ImageMagick-6/policy.xml
+          sudo cp docker/rootfs/etc/ImageMagick-6/paperless-policy.xml /etc/ImageMagick-7/policy.xml
       - name: Install Python dependencies
         env:
           PYTHON_VERSION: ${{ steps.setup-python.outputs.python-version }}

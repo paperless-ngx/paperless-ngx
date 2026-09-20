@@ -72,7 +72,7 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -qq --no-install-recommends gettext liblept5
+          sudo apt-get install -qq --no-install-recommends gettext libleptonica6
       # ---- Build Documentation ----
       - name: Build documentation
         env:
