@@ -1,5 +1,7 @@
 from unittest.mock import Mock
 
+from allauth.socialaccount.signals import social_account_added
+
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
 from django.http import HttpRequest
@@ -669,6 +671,39 @@ class TestSyncSocialLoginGroups(TestCase):
         )
         user.refresh_from_db()
         self.assertFalse(user.is_staff)
+
+    @override_settings(
+        SOCIAL_ACCOUNT_SYNC_SUPERUSER_GROUP="admin-group",
+        SOCIAL_ACCOUNT_SYNC_STAFF_GROUP=None,
+    )
+    def test_sync_on_first_login_via_added_signal(self) -> None:
+        """
+        GIVEN:
+            - Configured superuser group sync, and a user with that group
+        WHEN:
+            - The social account is added (first login), firing social_account_added
+        THEN:
+            - The user is synced to superuser, i.e. the handler is wired to the
+              added signal and not only to the updated signal
+        """
+        user = User.objects.create_user(
+            username="testuser_added",
+            is_superuser=False,
+            is_staff=False,
+        )
+        sociallogin = Mock(
+            user=user,
+            account=Mock(extra_data={"groups": ["admin-group"]}),
+        )
+        social_account_added.send(
+            sender=None,
+            request=HttpRequest(),
+            sociallogin=sociallogin,
+        )
+        user.refresh_from_db()
+        self.assertTrue(user.is_superuser)
+        self.assertTrue(user.is_staff)
+
 
 
 class TestUserGroupDeletionCleanup(TestCase):

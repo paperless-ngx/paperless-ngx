@@ -19,4 +19,8 @@ class PaperlessConfig(AppConfig):
 
         social_account_updated.connect(handle_social_account_updated)
 
+        from allauth.socialaccount.signals import social_account_added
+
+        social_account_added.connect(handle_social_account_updated)
+
         AppConfig.ready(self)
