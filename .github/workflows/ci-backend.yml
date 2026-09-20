@@ -80,7 +80,7 @@ jobs:
     needs: changes
     if: needs.changes.outputs.backend_changed == 'true'
     name: "Python ${{ matrix.python-version }}"
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
     strategy:
@@ -159,7 +159,7 @@ jobs:
     needs: changes
     if: needs.changes.outputs.backend_changed == 'true'
     name: Check project typing
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
     env:

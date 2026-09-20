@@ -15,7 +15,7 @@ permissions:
 jobs:
   zizmor:
     name: Run zizmor
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
       actions: read
@@ -29,7 +29,7 @@ jobs:
         uses: zizmorcore/zizmor-action@cc914d7f3750a2d13d75c7f184a1060aa0e9d482 # v0.6.4
   semgrep:
     name: Semgrep CE
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     container:
       image: semgrep/semgrep:1.155.0@sha256:cc869c685dcc0fe497c86258da9f205397d8108e56d21a86082ea4886e52784d
     if: github.actor != 'dependabot[bot]'

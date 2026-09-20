@@ -24,10 +24,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - runner: ubuntu-24.04
+          - runner: ubuntu-26.04
             arch: amd64
             platform: linux/amd64
-          - runner: ubuntu-24.04-arm
+          - runner: ubuntu-26.04-arm
             arch: arm64
             platform: linux/arm64
     runs-on: ${{ matrix.runner }}
@@ -163,7 +163,7 @@ jobs:
           archive: false
   merge-and-push:
     name: Merge and Push Manifest
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs: build-arch
     if: needs.build-arch.outputs.should-push == 'true'
     environment: image-publishing

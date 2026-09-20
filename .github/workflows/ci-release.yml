@@ -14,7 +14,7 @@ permissions: {}
 jobs:
   wait-for-docker:
     name: Wait for Docker Build
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       checks: read
       statuses: read
@@ -30,7 +30,7 @@ jobs:
   build-release:
     name: Build Release
     needs: wait-for-docker
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
     steps:
@@ -144,7 +144,7 @@ jobs:
   publish-release:
     name: Publish Release
     needs: build-release
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: write
       pull-requests: write
@@ -196,7 +196,7 @@ jobs:
     name: Append Changelog
     needs: publish-release
     if: needs.publish-release.outputs.prerelease == 'false'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: write
       pull-requests: write

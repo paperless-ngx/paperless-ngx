@@ -72,7 +72,7 @@ jobs:
     needs: changes
     if: needs.changes.outputs.frontend_changed == 'true'
     name: Install Dependencies
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
     steps:
@@ -104,7 +104,7 @@ jobs:
     name: Lint
     needs: [changes, install-dependencies]
     if: needs.changes.outputs.frontend_changed == 'true'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
     steps:
@@ -137,7 +137,7 @@ jobs:
     name: "Unit Tests (${{ matrix.shard-index }}/${{ matrix.shard-count }})"
     needs: [changes, install-dependencies]
     if: needs.changes.outputs.frontend_changed == 'true'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
     strategy:
@@ -188,7 +188,7 @@ jobs:
     name: E2E Tests
     needs: [changes, install-dependencies]
     if: needs.changes.outputs.frontend_changed == 'true'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
     container: mcr.microsoft.com/playwright:v1.62.1-noble
@@ -245,7 +245,7 @@ jobs:
     name: Frontend Build
     needs: [changes, unit-tests, e2e-tests]
     if: needs.changes.outputs.frontend_changed == 'true'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
     steps:
