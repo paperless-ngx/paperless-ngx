@@ -11518,7 +11518,7 @@
           <context context-type="sourcefile">src/app/components/manage/document-attributes/custom-fields/custom-fields.component.html</context>
           <context context-type="linenumber">70,72</context>
         </context-group>
-        <target state="translated"/>
+        <target state="translated">Inga fält har definierats.</target>
       </trans-unit>
       <trans-unit id="3032792139967609806" datatype="html">
         <source>Confirm delete field</source>
