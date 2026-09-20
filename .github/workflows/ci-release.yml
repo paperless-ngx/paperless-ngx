@@ -73,7 +73,7 @@ jobs:
         timeout-minutes: 12
         uses: $/.github/actions/apt-install
         with:
-          packages: gettext liblept5
+          packages: gettext libleptonica6
       # ---- Build Documentation ----
       - name: Build documentation
         env:
