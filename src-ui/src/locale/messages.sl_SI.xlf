@@ -2855,7 +2855,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">104</context>
         </context-group>
-        <target state="needs-translation">Apply AI Suggestions</target>
+        <target state="translated">Uporabi predloge umetne inteligence</target>
       </trans-unit>
       <trans-unit id="9172233176401579786" datatype="html">
         <source>Scheduled</source>
@@ -3907,7 +3907,7 @@
           <context context-type="sourcefile">src/app/components/manage/share-links/share-links.component.html</context>
           <context context-type="linenumber">2,3</context>
         </context-group>
-        <target state="needs-translation">Share links</target>
+        <target state="translated">Delite povezave</target>
       </trans-unit>
       <trans-unit id="7844706011418789951" datatype="html">
         <source>Administration</source>
@@ -12411,7 +12411,7 @@
           <context context-type="sourcefile">src/app/components/manage/share-links/share-link-list/share-link-list.component.html</context>
           <context context-type="linenumber">40,41</context>
         </context-group>
-        <target state="needs-translation">Expired</target>
+        <target state="translated">Poteklo</target>
       </trans-unit>
       <trans-unit id="2057574872309338088" datatype="html">
         <source>Copy share link</source>
@@ -12455,7 +12455,7 @@
           <context context-type="sourcefile">src/app/components/manage/share-links/share-link-bundle-list/share-link-bundle-list.component.html</context>
           <context context-type="linenumber">164,165</context>
         </context-group>
-        <target state="needs-translation">Share link bundles pagination</target>
+        <target state="translated">Deljenje povezav – strani v sklopih</target>
       </trans-unit>
       <trans-unit id="1541995860059283227" datatype="html">
         <source>Failed to load share link bundles.</source>
@@ -12511,7 +12511,7 @@
           <context context-type="sourcefile">src/app/components/manage/share-links/share-link-list/share-link-list.component.html</context>
           <context context-type="linenumber">7,8</context>
         </context-group>
-        <target state="needs-translation"> No document share links currently exist. </target>
+        <target state="translated"> Trenutno ni povezav za skupno rabo dokumentov. </target>
       </trans-unit>
       <trans-unit id="894965666917873756" datatype="html">
         <source>Document</source>
@@ -12519,7 +12519,7 @@
           <context context-type="sourcefile">src/app/components/manage/share-links/share-link-list/share-link-list.component.html</context>
           <context context-type="linenumber">15,16</context>
         </context-group>
-        <target state="needs-translation">Document</target>
+        <target state="translated">Dokument</target>
       </trans-unit>
       <trans-unit id="7420713064779772535" datatype="html">
         <source>Delete share link</source>
@@ -12527,7 +12527,7 @@
           <context context-type="sourcefile">src/app/components/manage/share-links/share-link-list/share-link-list.component.html</context>
           <context context-type="linenumber">75,76</context>
         </context-group>
-        <target state="needs-translation">Delete share link</target>
+        <target state="translated">Izbriši povezavo za deljenje</target>
       </trans-unit>
       <trans-unit id="5198271726831144068" datatype="html">
         <source>Share links pagination</source>
@@ -12535,7 +12535,7 @@
           <context context-type="sourcefile">src/app/components/manage/share-links/share-link-list/share-link-list.component.html</context>
           <context context-type="linenumber">104,105</context>
         </context-group>
-        <target state="needs-translation">Share links pagination</target>
+        <target state="translated">Deljenje povezav – strani v sklopih</target>
       </trans-unit>
       <trans-unit id="2976350639944567244" datatype="html">
         <source>Failed to load share links.</source>
@@ -12543,7 +12543,7 @@
           <context context-type="sourcefile">src/app/components/manage/share-links/share-link-list/share-link-list.component.ts</context>
           <context context-type="linenumber">105</context>
         </context-group>
-        <target state="needs-translation">Failed to load share links.</target>
+        <target state="translated">Povezav za deljenje ni bilo mogoče naložiti.</target>
       </trans-unit>
       <trans-unit id="4100863040928608880" datatype="html">
         <source>Error retrieving share links.</source>
@@ -12551,7 +12551,7 @@
           <context context-type="sourcefile">src/app/components/manage/share-links/share-link-list/share-link-list.component.ts</context>
           <context context-type="linenumber">107</context>
         </context-group>
-        <target state="needs-translation">Error retrieving share links.</target>
+        <target state="translated">Napaka pri pridobivanju povezav za deljenje.</target>
       </trans-unit>
       <trans-unit id="326120283142363299" datatype="html">
         <source>Share link deleted.</source>
@@ -12559,7 +12559,7 @@
           <context context-type="sourcefile">src/app/components/manage/share-links/share-link-list/share-link-list.component.ts</context>
           <context context-type="linenumber">154</context>
         </context-group>
-        <target state="needs-translation">Share link deleted.</target>
+        <target state="translated">Povezava za deljenje je bila izbrisana.</target>
       </trans-unit>
       <trans-unit id="4964931417181298145" datatype="html">
         <source>Error deleting share link.</source>
@@ -12567,7 +12567,7 @@
           <context context-type="sourcefile">src/app/components/manage/share-links/share-link-list/share-link-list.component.ts</context>
           <context context-type="linenumber">159</context>
         </context-group>
-        <target state="needs-translation">Error deleting share link.</target>
+        <target state="translated">Napaka pri brisanju povezave za deljenje.</target>
       </trans-unit>
       <trans-unit id="3439104787814858626" datatype="html">
         <source>Manage public links to individual documents and document bundles.</source>
@@ -12575,7 +12575,7 @@
           <context context-type="sourcefile">src/app/components/manage/share-links/share-links.component.html</context>
           <context context-type="linenumber">4,5</context>
         </context-group>
-        <target state="needs-translation">Manage public links to individual documents and document bundles.</target>
+        <target state="translated">Upravljajte javne povezave do posameznih dokumentov in paketov dokumentov.</target>
       </trans-unit>
       <trans-unit id="3740311348735113099" datatype="html">
         <source>Document links</source>
@@ -12583,7 +12583,7 @@
           <context context-type="sourcefile">src/app/components/manage/share-links/share-links.component.html</context>
           <context context-type="linenumber">18,19</context>
         </context-group>
-        <target state="needs-translation">Document links</target>
+        <target state="translated">Povezave do dokumentov</target>
       </trans-unit>
       <trans-unit id="8216780576869093031" datatype="html">
         <source>Bundles</source>
@@ -12591,7 +12591,7 @@
           <context context-type="sourcefile">src/app/components/manage/share-links/share-links.component.html</context>
           <context context-type="linenumber">26,27</context>
         </context-group>
-        <target state="needs-translation">Bundles</target>
+        <target state="translated">Paketi</target>
       </trans-unit>
       <trans-unit id="1229748338333965418" datatype="html">
         <source>Use workflows to customize the behavior of Paperless-ngx when events &apos;trigger&apos; a workflow.</source>
