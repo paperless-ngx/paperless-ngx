@@ -8,7 +8,7 @@ env:
 jobs:
   generate-translate-strings:
     name: Generate Translation Strings
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     environment: translation-sync
     permissions:
       contents: write

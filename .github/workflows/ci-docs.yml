@@ -65,7 +65,7 @@ jobs:
     needs: changes
     if: needs.changes.outputs.docs_changed == 'true'
     name: Build Documentation
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
       - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
       - name: Checkout
@@ -102,7 +102,7 @@ jobs:
     name: Deploy Documentation
     needs: [changes, build]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.changes.outputs.docs_changed == 'true'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       pages: write
       id-token: write
