@@ -1081,6 +1081,25 @@ CLASSIFIER_LANGUAGES: Final[dict[str, str]] = {
 }
 
 
+def _get_llm_extra_params() -> dict:
+    """
+    Parse PAPERLESS_AI_LLM_EXTRA_PARAMS, a JSON object passed straight through
+    to the LLM backend's request body.
+    """
+    raw = os.getenv("PAPERLESS_AI_LLM_EXTRA_PARAMS", "{}")
+    try:
+        parsed = json.loads(raw)
+    except json.JSONDecodeError as e:
+        raise ImproperlyConfigured(
+            "PAPERLESS_AI_LLM_EXTRA_PARAMS must be valid JSON",
+        ) from e
+    if not isinstance(parsed, dict):
+        raise ImproperlyConfigured(
+            "PAPERLESS_AI_LLM_EXTRA_PARAMS must be a JSON object",
+        )
+    return parsed
+
+
 def _get_classifier_language_setting(ocr_lang: str) -> str | None:
     """
     Maps the primary Tesseract language to the classifier's stemming
@@ -1241,3 +1260,4 @@ LLM_ALLOW_INTERNAL_ENDPOINTS = get_bool_from_env(
     "PAPERLESS_AI_LLM_ALLOW_INTERNAL_ENDPOINTS",
     "true",
 )
+LLM_EXTRA_PARAMS = _get_llm_extra_params()

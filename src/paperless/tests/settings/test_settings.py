@@ -7,6 +7,7 @@ from django.core.exceptions import ImproperlyConfigured
 
 from paperless.settings import _get_allauth_trusted_proxy_count
 from paperless.settings import _get_classifier_language_setting
+from paperless.settings import _get_llm_extra_params
 from paperless.settings import _get_search_language_setting
 from paperless.settings import _parse_paperless_url
 from paperless.settings import default_threads_per_worker
@@ -166,3 +167,67 @@ class TestPaperlessURLSettings(TestCase):
 
             self.assertIn(url, settings.CSRF_TRUSTED_ORIGINS)
             self.assertIn(url, settings.CORS_ALLOWED_ORIGINS)
+
+
+class TestLlmExtraParams(TestCase):
+    def test_unset_is_empty(self) -> None:
+        """
+        GIVEN:
+            - No extra LLM params configured
+        WHEN:
+            - The setting is parsed
+        THEN:
+            - An empty dict is returned, so nothing is added to requests
+        """
+        with mock.patch.dict(os.environ, {}, clear=True):
+            self.assertEqual(_get_llm_extra_params(), {})
+
+    def test_parses_json_object(self) -> None:
+        """
+        GIVEN:
+            - A JSON object of provider parameters
+        WHEN:
+            - The setting is parsed
+        THEN:
+            - It is returned as a dict
+        """
+        with mock.patch.dict(
+            os.environ,
+            {"PAPERLESS_AI_LLM_EXTRA_PARAMS": '{"reasoning_effort": "none"}'},
+        ):
+            self.assertEqual(
+                _get_llm_extra_params(),
+                {"reasoning_effort": "none"},
+            )
+
+    def test_invalid_json_raises(self) -> None:
+        """
+        GIVEN:
+            - A value which is not valid JSON
+        WHEN:
+            - The setting is parsed
+        THEN:
+            - Startup fails with a clear error instead of being ignored
+        """
+        with mock.patch.dict(
+            os.environ,
+            {"PAPERLESS_AI_LLM_EXTRA_PARAMS": "reasoning_effort=none"},
+        ):
+            with pytest.raises(ImproperlyConfigured, match="valid JSON"):
+                _get_llm_extra_params()
+
+    def test_non_object_raises(self) -> None:
+        """
+        GIVEN:
+            - Valid JSON which is not an object
+        WHEN:
+            - The setting is parsed
+        THEN:
+            - Startup fails with a clear error
+        """
+        with mock.patch.dict(
+            os.environ,
+            {"PAPERLESS_AI_LLM_EXTRA_PARAMS": '["none"]'},
+        ):
+            with pytest.raises(ImproperlyConfigured, match="JSON object"):
+                _get_llm_extra_params()

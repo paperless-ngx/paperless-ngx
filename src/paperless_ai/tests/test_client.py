@@ -23,6 +23,7 @@ def mock_ai_config():
         mock_config.llm_allow_internal_endpoints = True
         mock_config.llm_context_size = 8192
         mock_config.llm_request_timeout = 120
+        mock_config.llm_extra_params = {}
         MockAIConfig.return_value = mock_config
         yield mock_config
 
@@ -52,6 +53,7 @@ def test_get_llm_ollama(mock_ai_config, mock_ollama_llm):
         context_window=8192,
         request_timeout=120,
         system_prompt=LLM_SYSTEM_PROMPT,
+        additional_kwargs={},
         client=ANY,
         async_client=ANY,
     )
@@ -74,6 +76,7 @@ def test_get_llm_openai(mock_ai_config, mock_openai_llm):
         is_chat_model=True,
         is_function_calling_model=True,
         system_prompt=LLM_SYSTEM_PROMPT,
+        additional_kwargs={},
         http_client=ANY,
         async_http_client=ANY,
     )
@@ -194,6 +197,28 @@ def test_run_llm_query_openai_uses_tools(mock_ai_config, mock_openai_llm):
         f"Answer by calling the {offered_tool_name} tool. "
         "Do not write the answer as text."
     )
+
+
+def test_get_llm_passes_extra_params(mock_ai_config, mock_openai_llm):
+    """
+    GIVEN:
+        - Extra LLM params configured, e.g. for a provider that needs a
+          parameter we do not set ourselves
+    WHEN:
+        - The client builds the LLM
+    THEN:
+        - They are handed to the backend as additional_kwargs
+    """
+    mock_ai_config.llm_backend = "openai-like"
+    mock_ai_config.llm_model = "gpt-5.6-luna"
+    mock_ai_config.llm_endpoint = "http://test-url"
+    mock_ai_config.llm_extra_params = {"reasoning_effort": "none"}
+
+    AIClient()
+
+    assert mock_openai_llm.call_args.kwargs["additional_kwargs"] == {
+        "reasoning_effort": "none",
+    }
 
 
 def test_run_llm_query_openai_timeout_raises_local_error(
