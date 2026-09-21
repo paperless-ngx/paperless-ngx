@@ -1785,6 +1785,36 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         m.assert_not_called()
 
     @mock.patch("documents.serialisers.bulk_edit.split")
+    def test_bulk_edit_split_rejects_unknown_page_count(self, m) -> None:
+        """
+        GIVEN:
+            - A legacy split bulk edit of a document without a page count
+        WHEN:
+            - API to bulk edit is called
+        THEN:
+            - API returns HTTP 400
+            - split is not called
+        """
+        self.setup_mock(m, "split")
+
+        for pages in ("1", "1-5000000"):
+            with self.subTest(pages=pages):
+                response = self.client.post(
+                    "/api/documents/bulk_edit/",
+                    json.dumps(
+                        {
+                            "documents": [self.doc1.id],
+                            "method": "split",
+                            "parameters": {"pages": pages},
+                        },
+                    ),
+                    content_type="application/json",
+                )
+                self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+                self.assertIn(b"document page count is unknown", response.content)
+        m.assert_not_called()
+
+    @mock.patch("documents.serialisers.bulk_edit.split")
     def test_bulk_edit_split_parses_pages(self, m) -> None:
         """
         GIVEN:

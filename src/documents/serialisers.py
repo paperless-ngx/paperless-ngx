@@ -2098,6 +2098,8 @@ class BulkEditSerializer(
         if not isinstance(parameters["pages"], str):
             raise serializers.ValidationError("invalid pages specified")
         page_count = Document.objects.get(id=document_id).page_count
+        if not page_count:
+            raise serializers.ValidationError("document page count is unknown")
         pages = []
         for group in parameters["pages"].split(","):
             start, is_range, end = group.partition("-")
@@ -2107,7 +2109,7 @@ class BulkEditSerializer(
             except ValueError as e:
                 raise serializers.ValidationError("invalid pages specified") from e
             # Bound the range before building it, a huge one would exhaust memory
-            if not 1 <= first <= last or (page_count and last > page_count):
+            if not 1 <= first <= last <= page_count:
                 raise serializers.ValidationError("invalid pages specified")
             pages.append(list(range(first, last + 1)))
         parameters["pages"] = pages
