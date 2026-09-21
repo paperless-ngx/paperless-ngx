@@ -5,7 +5,7 @@ Factory-boy factories for documents app models.
 from __future__ import annotations
 
 import factory
-from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User
 from factory.django import DjangoModelFactory
 
 from documents.models import Correspondent
@@ -15,8 +15,6 @@ from documents.models import MatchingModel
 from documents.models import PaperlessTask
 from documents.models import StoragePath
 from documents.models import Tag
-
-UserModelT = get_user_model()
 
 
 class CorrespondentFactory(DjangoModelFactory[Correspondent]):
@@ -71,9 +69,9 @@ class DocumentFactory(DjangoModelFactory[Document]):
     storage_path = None
 
 
-class UserFactory(DjangoModelFactory[UserModelT]):
+class UserFactory(DjangoModelFactory[User]):
     class Meta:
-        model = UserModelT
+        model = User
 
     username = factory.Sequence(lambda n: f"user{n}")
     is_staff = False
