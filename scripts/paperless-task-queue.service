@@ -1,12 +1,16 @@
 [Unit]
 Description=Paperless Celery Workers
 Requires=redis.service
+StartLimitIntervalSec=600
+StartLimitBurst=3
 
 [Service]
 User=paperless
 Group=paperless
 WorkingDirectory=/opt/paperless/src
 ExecStart=celery --app paperless worker --loglevel INFO
+Restart=on-failure
+RestartSec=10
 
 [Install]
 WantedBy=multi-user.target

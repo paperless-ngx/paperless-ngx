@@ -4,6 +4,8 @@ After=network.target
 Wants=network.target
 Requires=redis.service
 #Requires=paperless-webserver.socket
+StartLimitIntervalSec=600
+StartLimitBurst=3
 
 [Service]
 User=paperless
@@ -24,6 +26,8 @@ ExecStart=/bin/sh -c '\
   # URL path prefix: only set if PAPERLESS_FORCE_SCRIPT_NAME exists \
   [ -n "$PAPERLESS_FORCE_SCRIPT_NAME" ] && export GRANIAN_URL_PATH_PREFIX=$PAPERLESS_FORCE_SCRIPT_NAME; \
   exec granian --interface asginl --ws --loop uvloop "paperless.asgi:application"'
+Restart=on-failure
+RestartSec=10
 
 [Install]
 WantedBy=multi-user.target
