@@ -329,6 +329,8 @@ PAPERLESS_CACHE_BACKEND = "django.core.cache.backends.locmem.LocMemCache"
 PAPERLESS_CHANNELS_BACKEND = "channels.layers.InMemoryChannelLayer"
 # I don't think anything hits this, but just in case, basically infinite
 PAPERLESS_TOKEN_THROTTLE_RATE = "1000/min"
+# The 0.1s production default trips on a stalled CI runner, the date parsing tests then find no dates
+PAPERLESS_MATCH_REGEX_TIMEOUT_SECONDS = "5"
 
 [tool.coverage.run]
 source = [
