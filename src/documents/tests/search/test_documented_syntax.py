@@ -269,7 +269,7 @@ class TestDocumentedDateForms:
             yield
 
     @pytest.fixture
-    def dated(self, index_document: Callable[..., Document]) -> dict[str, int]:
+    def dated(self, backend: TantivyBackend) -> dict[str, int]:
         stamps = {
             "today": datetime(2026, 6, 15, 9, 0, tzinfo=UTC),
             "yesterday": datetime(2026, 6, 14, 9, 0, tzinfo=UTC),
@@ -279,14 +279,14 @@ class TestDocumentedDateForms:
             "january": datetime(2026, 1, 10, 10, 0, tzinfo=UTC),
             "old": datetime(2005, 3, 4, 15, 30, tzinfo=UTC),
         }
-        return {
-            label: index_document(
-                title=label,
-                content="dated body",
-                added=stamp,
-            ).pk
+        docs = {
+            label: DocumentFactory(title=label, content="dated body", added=stamp)
             for label, stamp in stamps.items()
         }
+        with backend.batch_update() as batch:
+            for doc in docs.values():
+                batch.add_or_update(doc)
+        return {label: doc.pk for label, doc in docs.items()}
 
     @pytest.mark.parametrize(
         ("query", "label"),

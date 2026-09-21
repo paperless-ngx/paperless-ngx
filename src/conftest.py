@@ -32,6 +32,18 @@ def faker_session_locale() -> str:
 
 
 @pytest.fixture(autouse=True)
+def _fast_password_hasher(settings: Settings) -> None:
+    """Hash test passwords with MD5 instead of Django's default PBKDF2.
+
+    PBKDF2 is deliberately slow, and every ``admin_user`` or
+    ``create_superuser`` call pays for it: about 600 ms each. No test depends
+    on the hash format, only on ``check_password`` and on the stored value
+    changing when the password does.
+    """
+    settings.PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
+
+
+@pytest.fixture(autouse=True)
 def _clear_content_type_caches() -> None:
     """Clear Django's ContentType cache and guardian's lru_cache before each test.
 
