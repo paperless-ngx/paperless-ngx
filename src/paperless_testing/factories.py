@@ -6,7 +6,6 @@ from __future__ import annotations
 
 import factory
 from django.contrib.auth.models import User
-from factory.django import DjangoModelFactory
 
 from documents.models import Correspondent
 from documents.models import Document
@@ -15,9 +14,10 @@ from documents.models import MatchingModel
 from documents.models import PaperlessTask
 from documents.models import StoragePath
 from documents.models import Tag
+from paperless_testing.typed_factory import TypedModelFactory
 
 
-class CorrespondentFactory(DjangoModelFactory[Correspondent]):
+class CorrespondentFactory(TypedModelFactory[Correspondent]):
     class Meta:
         model = Correspondent
 
@@ -26,7 +26,7 @@ class CorrespondentFactory(DjangoModelFactory[Correspondent]):
     matching_algorithm = MatchingModel.MATCH_NONE
 
 
-class DocumentTypeFactory(DjangoModelFactory[DocumentType]):
+class DocumentTypeFactory(TypedModelFactory[DocumentType]):
     class Meta:
         model = DocumentType
 
@@ -35,7 +35,7 @@ class DocumentTypeFactory(DjangoModelFactory[DocumentType]):
     matching_algorithm = MatchingModel.MATCH_NONE
 
 
-class TagFactory(DjangoModelFactory[Tag]):
+class TagFactory(TypedModelFactory[Tag]):
     class Meta:
         model = Tag
 
@@ -45,7 +45,7 @@ class TagFactory(DjangoModelFactory[Tag]):
     is_inbox_tag = False
 
 
-class StoragePathFactory(DjangoModelFactory[StoragePath]):
+class StoragePathFactory(TypedModelFactory[StoragePath]):
     class Meta:
         model = StoragePath
 
@@ -57,7 +57,7 @@ class StoragePathFactory(DjangoModelFactory[StoragePath]):
     matching_algorithm = MatchingModel.MATCH_NONE
 
 
-class DocumentFactory(DjangoModelFactory[Document]):
+class DocumentFactory(TypedModelFactory[Document]):
     class Meta:
         model = Document
 
@@ -69,7 +69,7 @@ class DocumentFactory(DjangoModelFactory[Document]):
     storage_path = None
 
 
-class UserFactory(DjangoModelFactory[User]):
+class UserFactory(TypedModelFactory[User]):
     class Meta:
         model = User
 
@@ -86,7 +86,7 @@ class UserFactory(DjangoModelFactory[User]):
         staff = factory.Trait(is_staff=True)
 
 
-class PaperlessTaskFactory(DjangoModelFactory[PaperlessTask]):
+class PaperlessTaskFactory(TypedModelFactory[PaperlessTask]):
     class Meta:
         model = PaperlessTask
 
