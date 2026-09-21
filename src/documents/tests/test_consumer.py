@@ -230,12 +230,7 @@ class TestConsumer(
         shutil.copy(src, dst)
         return dst
 
-    @override_settings(
-        FILENAME_FORMAT=None,
-        TIME_ZONE="America/Chicago",
-        ARCHIVE_FILE_GENERATION="always",
-    )
-    def testNormalOperation(self) -> None:
+    def _testNormalOperation(self) -> None:
         filename = self.get_test_file()
 
         # Get the local time, as an aware datetime
@@ -279,9 +274,36 @@ class TestConsumer(
 
         self._assert_first_last_send_progress()
 
-        self.assertEqual(document.created.year, rough_create_date_local.year)
-        self.assertEqual(document.created.month, rough_create_date_local.month)
-        self.assertEqual(document.created.day, rough_create_date_local.day)
+        # Within a couple minutes of each other
+        self.assertAlmostEqual(
+            document.modified,
+            rough_create_date_local,
+            delta=datetime.timedelta(minutes=2),
+        )
+
+    @override_settings(
+        FILENAME_FORMAT=None,
+        TIME_ZONE="America/Chicago",
+        ARCHIVE_FILE_GENERATION="always",
+    )
+    def testNormalOperation(self) -> None:
+        self._testNormalOperation()
+
+    @override_settings(
+        FILENAME_FORMAT=None,
+        TIME_ZONE="Etc/GMT-14",
+        ARCHIVE_FILE_GENERATION="always",
+    )
+    def testNormalOperationBehind(self) -> None:
+        self._testNormalOperation()
+
+    @override_settings(
+        FILENAME_FORMAT=None,
+        TIME_ZONE="Etc/GMT+12",
+        ARCHIVE_FILE_GENERATION="always",
+    )
+    def testNormalOperationAhead(self) -> None:
+        self._testNormalOperation()
 
     @override_settings(FILENAME_FORMAT=None)
     def testDeleteMacFiles(self) -> None:
