@@ -18,6 +18,7 @@ import img2pdf
 import magic
 import pikepdf
 import pytest
+from PIL import Image
 
 from documents.parsers import ParseError
 
@@ -139,3 +140,24 @@ class TestConvertImageToPdfa:
         tesseract_parser._convert_image_to_pdfa(simple_png_file)
 
         spy.assert_not_called()
+
+    def test_invalid_exif_orientation_is_ignored(
+        self,
+        tesseract_parser: RasterisedDocumentParser,
+        tmp_path: Path,
+    ) -> None:
+        """
+        GIVEN: a JPEG with an invalid EXIF orientation value (0)
+        WHEN: _convert_image_to_pdfa is called
+        THEN: the invalid value is ignored and a valid PDF is produced
+        """
+        image_path = tmp_path / "invalid_orientation.jpg"
+        with Image.new("RGB", (120, 80), "white") as image:
+            exif = image.getexif()
+            exif[274] = 0  # EXIF tag 274: Orientation
+            image.save(image_path, exif=exif)
+
+        result = tesseract_parser._convert_image_to_pdfa(image_path)
+
+        assert result.exists()
+        assert magic.from_file(str(result), mime=True) == "application/pdf"
