@@ -7,6 +7,7 @@ import multiprocessing
 import os
 import tempfile
 from pathlib import Path
+from typing import Any
 from typing import Final
 from urllib.parse import urlparse
 
@@ -1081,7 +1082,7 @@ CLASSIFIER_LANGUAGES: Final[dict[str, str]] = {
 }
 
 
-def _get_llm_extra_params() -> dict:
+def _get_llm_extra_params() -> dict[str, Any]:
     """
     Parse PAPERLESS_AI_LLM_EXTRA_PARAMS, a JSON object passed straight through
     to the LLM backend's request body.

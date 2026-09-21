@@ -1,5 +1,6 @@
 import dataclasses
 import json
+from typing import Any
 
 from django.conf import settings
 
@@ -254,7 +255,7 @@ class AIConfig(BaseConfig):
     llm_endpoint: str = dataclasses.field(init=False)
     llm_output_language: str = dataclasses.field(init=False)
     llm_allow_internal_endpoints: bool = dataclasses.field(init=False)
-    llm_extra_params: dict = dataclasses.field(init=False)
+    llm_extra_params: dict[str, Any] = dataclasses.field(init=False)
 
     def __post_init__(self) -> None:
         app_config = self._get_config_instance()
