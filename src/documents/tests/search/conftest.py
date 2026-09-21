@@ -14,20 +14,11 @@ from paperless_testing.factories import DocumentFactory
 if TYPE_CHECKING:
     from collections.abc import Callable
     from collections.abc import Generator
-    from pathlib import Path
 
     from pytest_django.fixtures import Settings
 
     from documents.models import Document
     from paperless_testing.dirs import PaperlessDirs
-
-
-@pytest.fixture
-def index_dir(tmp_path: Path, settings: Settings) -> Path:
-    path = tmp_path / "index"
-    path.mkdir()
-    settings.INDEX_DIR = path
-    return path
 
 
 @pytest.fixture

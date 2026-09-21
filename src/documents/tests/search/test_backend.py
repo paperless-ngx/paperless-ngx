@@ -947,7 +947,8 @@ class TestSingleton:
         yield
         reset_backend()
 
-    def test_returns_same_instance_on_repeated_calls(self, index_dir) -> None:
+    @pytest.mark.usefixtures("paperless_dirs")
+    def test_returns_same_instance_on_repeated_calls(self) -> None:
         """Singleton pattern: repeated calls to get_backend() must return the same instance."""
         assert get_backend() is get_backend()
 
@@ -964,7 +965,8 @@ class TestSingleton:
         assert b1 is not b2
         assert b2._path == tmp_path / "b"
 
-    def test_reset_forces_new_instance(self, index_dir) -> None:
+    @pytest.mark.usefixtures("paperless_dirs")
+    def test_reset_forces_new_instance(self) -> None:
         """reset_backend() must force creation of a new backend instance on next get_backend() call."""
         b1 = get_backend()
         reset_backend()

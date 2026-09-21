@@ -36,7 +36,7 @@ class TestGetSearchEndpointEnforcesTheCap:
     def test_query_one_over_the_cap_is_a_400(
         self,
         admin_client: APIClient,
-        indexed_document: Document,
+        searchable_document: Document,
     ) -> None:
         """
         GIVEN:
@@ -66,7 +66,7 @@ class TestGetSearchEndpointEnforcesTheCap:
     def test_query_at_exactly_the_cap_is_accepted(
         self,
         admin_client: APIClient,
-        indexed_document: Document,
+        searchable_document: Document,
     ) -> None:
         """
         GIVEN:
@@ -86,7 +86,7 @@ class TestGetSearchEndpointEnforcesTheCap:
     def test_an_ordinary_query_is_unaffected(
         self,
         admin_client: APIClient,
-        indexed_document: Document,
+        searchable_document: Document,
     ) -> None:
         """
         GIVEN:
@@ -112,7 +112,7 @@ class TestPostSelectionPathsEnforceTheCap:
     def test_bulk_edit_query_one_over_the_cap_is_a_400(
         self,
         admin_client: APIClient,
-        indexed_document: Document,
+        searchable_document: Document,
     ) -> None:
         """
         GIVEN:
@@ -154,7 +154,7 @@ class TestPostSelectionPathsEnforceTheCap:
         self,
         bulk_update_task_mock: mock.MagicMock,
         admin_client: APIClient,
-        indexed_document: Document,
+        searchable_document: Document,
     ) -> None:
         """
         GIVEN:
@@ -187,7 +187,7 @@ class TestPostSelectionPathsEnforceTheCap:
     def test_bulk_download_query_one_over_the_cap_is_a_400(
         self,
         admin_client: APIClient,
-        indexed_document: Document,
+        searchable_document: Document,
     ) -> None:
         """
         GIVEN:
@@ -236,7 +236,7 @@ class TestGlobalSearchEnforcesTheCapToo:
     def test_query_one_over_the_cap_is_a_400(
         self,
         admin_client: APIClient,
-        indexed_document: Document,
+        searchable_document: Document,
     ) -> None:
         """
         GIVEN:
@@ -260,7 +260,7 @@ class TestGlobalSearchEnforcesTheCapToo:
     def test_query_at_exactly_the_cap_is_accepted(
         self,
         admin_client: APIClient,
-        indexed_document: Document,
+        searchable_document: Document,
     ) -> None:
         """
         GIVEN:
