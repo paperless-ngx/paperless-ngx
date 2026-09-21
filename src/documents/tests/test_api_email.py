@@ -10,8 +10,8 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from documents.models import Document
-from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import SampleDirMixin
+from paperless_testing.dirs import DirectoriesMixin
 
 
 class TestEmail(DirectoriesMixin, SampleDirMixin, APITestCase):

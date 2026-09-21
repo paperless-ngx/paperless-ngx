@@ -14,7 +14,7 @@ from documents.models import Tag
 from documents.models import Workflow
 from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
-from documents.tests.utils import DirectoriesMixin
+from paperless_testing.dirs import DirectoriesMixin
 
 
 class TestApiWorkflows(DirectoriesMixin, APITestCase):

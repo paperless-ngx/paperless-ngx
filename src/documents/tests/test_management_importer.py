@@ -15,9 +15,9 @@ from documents.management.commands.document_importer import _deserialize_record
 from documents.models import Document
 from documents.settings import EXPORTER_ARCHIVE_NAME
 from documents.settings import EXPORTER_FILE_NAME
-from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import FileSystemAssertsMixin
 from documents.tests.utils import SampleDirMixin
+from paperless_testing.dirs import DirectoriesMixin
 
 
 @pytest.mark.management

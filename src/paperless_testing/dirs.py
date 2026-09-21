@@ -14,6 +14,7 @@ from tempfile import TemporaryDirectory
 from typing import TYPE_CHECKING
 from typing import TypedDict
 
+import pytest
 from django.test import override_settings
 
 if TYPE_CHECKING:
@@ -129,3 +130,17 @@ def paperless_environment() -> Iterator[PaperlessDirs]:
                 yield dirs
             finally:
                 reset_backend()
+
+
+class DirectoriesMixin:
+    """Bridges the directory fixture to unittest TestCase subclasses and to
+    plain pytest test classes that want `self.dirs`.
+
+    Delete once no class depends on it.
+    """
+
+    dirs: PaperlessDirs
+
+    @pytest.fixture(autouse=True)
+    def _paperless_dirs(self, paperless_dirs: PaperlessDirs) -> None:
+        self.dirs = paperless_dirs

@@ -11,10 +11,10 @@ from PIL.PngImagePlugin import PngInfo
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import read_streaming_response
 from paperless.models import ApplicationConfiguration
 from paperless.models import ColorConvertChoices
+from paperless_testing.dirs import DirectoriesMixin
 
 
 class TestApiAppConfig(DirectoriesMixin, APITestCase):

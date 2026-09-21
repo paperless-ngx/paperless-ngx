@@ -27,9 +27,9 @@ from documents.models import Tag
 from documents.models import Workflow
 from documents.search import get_backend
 from documents.search import reset_backend
-from documents.tests.utils import DirectoriesMixin
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
+from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import DocumentFactory
 
 pytestmark = pytest.mark.search

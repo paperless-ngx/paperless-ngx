@@ -29,11 +29,11 @@ from documents.models import StoragePath
 from documents.models import Tag
 from documents.models import UiSettings
 from documents.signals.handlers import update_llm_suggestions_cache
-from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import read_streaming_response
 from paperless.models import ApplicationConfiguration
 from paperless_ai.exceptions import LLMProviderError
 from paperless_ai.exceptions import LLMTimeoutError
+from paperless_testing.dirs import DirectoriesMixin
 
 
 class TestViews(DirectoriesMixin, TestCase):

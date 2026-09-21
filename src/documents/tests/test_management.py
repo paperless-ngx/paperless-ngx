@@ -20,8 +20,8 @@ if TYPE_CHECKING:
 from documents.file_handling import generate_filename
 from documents.models import Document
 from documents.tasks import update_document_content_maybe_archive_file
-from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import FileSystemAssertsMixin
+from paperless_testing.dirs import DirectoriesMixin
 
 sample_file: Path = Path(__file__).parent / "samples" / "simple.pdf"
 

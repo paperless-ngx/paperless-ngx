@@ -23,7 +23,7 @@ from documents.models import DocumentType
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.permissions import set_permissions_for_objects
-from documents.tests.utils import DirectoriesMixin
+from paperless_testing.dirs import DirectoriesMixin
 
 
 class TestBulkEdit(DirectoriesMixin, TestCase):

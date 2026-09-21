@@ -13,7 +13,7 @@ from rest_framework.test import APITestCase
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
-from documents.tests.utils import DirectoriesMixin
+from paperless_testing.dirs import DirectoriesMixin
 
 
 class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
