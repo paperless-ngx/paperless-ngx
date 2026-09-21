@@ -49,8 +49,8 @@ from documents.settings import EXPORTER_SHARE_LINK_BUNDLE_NAME
 from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import FileSystemAssertsMixin
 from documents.tests.utils import SampleDirMixin
-from documents.tests.utils import paperless_environment
 from paperless_mail.models import MailAccount
+from paperless_testing.dirs import paperless_environment
 
 
 @pytest.mark.management
