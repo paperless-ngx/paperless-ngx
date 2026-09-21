@@ -1,7 +1,9 @@
 [project]
 name = "paperless-ngx"
 version = "3.2.1"
-description = "A community-supported supercharged document management system: scan, index and archive all your physical documents"
+description = """\
+  A community-supported supercharged document management system: scan, index and archive all your physical documents\
+  """
 readme = "README.md"
 requires-python = ">=3.11"
 classifiers = [
@@ -10,6 +12,7 @@ classifiers = [
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.14",
+  "Programming Language :: Python :: 3.15",
 ]
 # TODO: Move certain things to groups and then utilize that further
 # This will allow testing to not install a webserver, mysql, etc
@@ -271,9 +274,9 @@ plugins = [
 ]
 
 [tool.pyrefly]
-baseline = ".pyrefly-baseline.json"
 python-platform = "linux"
 search-path = [ "src" ]
+baseline = ".pyrefly-baseline.json"
 
 [tool.django-stubs]
 django_settings_module = "paperless.settings"
@@ -334,13 +337,13 @@ source = [
 omit = [
   "*/tests/*",
   "manage.py",
-  "paperless/wsgi.py",
   "paperless/auth.py",
+  "paperless/wsgi.py",
 ]
 [tool.coverage.report]
 exclude_also = [
-  "if settings.AUDIT_LOG_ENABLED:",
   "if AUDIT_LOG_ENABLED:",
+  "if settings.AUDIT_LOG_ENABLED:",
   "if TYPE_CHECKING:",
 ]
 
