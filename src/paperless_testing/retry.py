@@ -61,8 +61,9 @@ def util_call_with_backoff(
 
         retry_count = retry_count + 1
 
-        time.sleep(retry_time)
-        retry_time = retry_time * 2.0
+        if not succeeded and retry_count < max_retry_count:
+            time.sleep(retry_time)
+            retry_time = retry_time * 2.0
 
     if (
         not succeeded
