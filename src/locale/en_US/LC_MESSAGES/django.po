@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 01:29+0000\n"
+"POT-Creation-Date: 2026-09-21 19:00+0000\n"
 "PO-Revision-Date: 2022-02-17 04:17\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -1632,7 +1632,7 @@ msgid "workflow runs"
 msgstr ""
 
 #: documents/serialisers.py:514 documents/serialisers.py:871
-#: documents/serialisers.py:2883 documents/views.py:343 documents/views.py:2726
+#: documents/serialisers.py:2885 documents/views.py:343 documents/views.py:2726
 #: paperless_mail/serialisers.py:156
 msgid "Insufficient permissions."
 msgstr ""
@@ -1641,39 +1641,39 @@ msgstr ""
 msgid "Invalid color."
 msgstr ""
 
-#: documents/serialisers.py:2350
+#: documents/serialisers.py:2352
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr ""
 
-#: documents/serialisers.py:2394
+#: documents/serialisers.py:2396
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
 msgstr ""
 
-#: documents/serialisers.py:2401
+#: documents/serialisers.py:2403
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
 msgstr ""
 
-#: documents/serialisers.py:2418 documents/serialisers.py:2428
+#: documents/serialisers.py:2420 documents/serialisers.py:2430
 msgid ""
 "Custom fields must be a list of integers or an object mapping ids to values."
 msgstr ""
 
-#: documents/serialisers.py:2423
+#: documents/serialisers.py:2425
 msgid "Some custom fields don't exist or were specified twice."
 msgstr ""
 
-#: documents/serialisers.py:2570
+#: documents/serialisers.py:2572
 msgid "Invalid variable detected."
 msgstr ""
 
-#: documents/serialisers.py:2939
+#: documents/serialisers.py:2941
 msgid "Duplicate document identifiers are not allowed."
 msgstr ""
 
-#: documents/serialisers.py:2969 documents/views.py:4763
+#: documents/serialisers.py:2971 documents/views.py:4763
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr ""
