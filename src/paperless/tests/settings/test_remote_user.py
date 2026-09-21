@@ -2,22 +2,20 @@ import os
 from unittest import mock
 
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.test import override_settings
 from rest_framework import status
 from rest_framework.test import APITestCase
 
 from paperless.settings import _parse_remote_user_settings
 from paperless_testing.dirs import DirectoriesMixin
+from paperless_testing.factories import UserFactory
 
 
 class TestRemoteUser(DirectoriesMixin, APITestCase):
     def setUp(self) -> None:
         super().setUp()
 
-        self.user = User.objects.create_superuser(
-            username="temp_admin",
-        )
+        self.user = UserFactory(username="temp_admin", superuser=True)
 
     def test_remote_user(self) -> None:
         """

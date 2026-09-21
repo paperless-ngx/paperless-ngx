@@ -17,12 +17,12 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import pytest
-from django.contrib.auth.models import User
 
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Note
 from paperless_testing.factories import DocumentFactory
+from paperless_testing.factories import UserFactory
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -53,7 +53,7 @@ class TestBareJsonFieldPrefixes:
               decoy's content match does not resurface through a demoted
               text search
         """
-        alice = User.objects.create_user(username="alice")
+        alice = UserFactory(username="alice")
         with_note = DocumentFactory(title="Has note", content="x")
         Note.objects.create(document=with_note, user=alice, note="crocodile")
         backend.add_or_update(with_note)
@@ -116,7 +116,7 @@ class TestBareJsonFieldPrefixes:
               document; the default-subpath resolution for the bare
               prefix does not interfere with explicit subpath addressing
         """
-        bob = User.objects.create_user(username="bob")
+        bob = UserFactory(username="bob")
         doc = DocumentFactory(title="Bob note", content="x")
         Note.objects.create(document=doc, user=bob, note="remark")
         backend.add_or_update(doc)

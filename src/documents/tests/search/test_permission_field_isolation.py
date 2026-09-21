@@ -25,6 +25,7 @@ from documents.models import Document
 from documents.models import DocumentType
 from documents.models import StoragePath
 from documents.models import Tag
+from paperless_testing.factories import UserFactory
 
 if TYPE_CHECKING:
     from documents.search._backend import TantivyBackend
@@ -34,22 +35,22 @@ pytestmark = [pytest.mark.search, pytest.mark.django_db]
 
 @pytest.fixture
 def owner() -> User:
-    return User.objects.create_user(username="owner")
+    return UserFactory(username="owner")
 
 
 @pytest.fixture
 def stranger() -> User:
-    return User.objects.create_user(username="stranger")
+    return UserFactory(username="stranger")
 
 
 @pytest.fixture
 def viewer() -> User:
-    return User.objects.create_user(username="viewer")
+    return UserFactory(username="viewer")
 
 
 @pytest.fixture
 def group_member() -> User:
-    user = User.objects.create_user(username="group_member")
+    user = UserFactory(username="group_member")
     user.groups.add(Group.objects.create(name="accounting"))
     return user
 

@@ -6,7 +6,6 @@ from unittest import mock
 
 from auditlog.models import LogEntry  # type: ignore[import-untyped]
 from django.contrib.auth.models import Permission
-from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase as DjangoTestCase
@@ -22,6 +21,7 @@ from documents.tests.utils import read_streaming_response
 from documents.versioning import annotate_effective_content
 from documents.views import DocumentSelectionMixin
 from paperless_testing.dirs import DirectoriesMixin
+from paperless_testing.factories import UserFactory
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -31,7 +31,7 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
     def setUp(self) -> None:
         super().setUp()
 
-        self.user = User.objects.create_superuser(username="temp_admin")
+        self.user = UserFactory(username="temp_admin", superuser=True)
         self.client.force_authenticate(user=self.user)
 
     def _make_pdf_upload(self, name: str = "version.pdf") -> SimpleUploadedFile:
@@ -89,8 +89,8 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_root_endpoint_returns_403_when_user_lacks_permission(self) -> None:
-        owner = User.objects.create_user(username="owner")
-        viewer = User.objects.create_user(username="viewer")
+        owner = UserFactory(username="owner")
+        viewer = UserFactory(username="viewer")
         viewer.user_permissions.add(
             Permission.objects.get(codename="view_document"),
         )
@@ -283,8 +283,8 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
         self.assertEqual(mock_backend.add_or_update.call_args[0][0].id, root.id)
 
     def test_delete_version_returns_403_without_permission(self) -> None:
-        owner = User.objects.create_user(username="owner")
-        other = User.objects.create_user(username="other")
+        owner = UserFactory(username="owner")
+        other = UserFactory(username="other")
         other.user_permissions.add(
             Permission.objects.get(codename="delete_document"),
         )
@@ -371,8 +371,8 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
         self.assertTrue(resp.data["is_root"])
 
     def test_update_version_label_returns_403_without_permission(self) -> None:
-        owner = User.objects.create_user(username="owner")
-        other = User.objects.create_user(username="other")
+        owner = UserFactory(username="owner")
+        other = UserFactory(username="other")
         other.user_permissions.add(
             Permission.objects.get(codename="change_document"),
         )
@@ -553,8 +553,8 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_metadata_returns_403_when_user_lacks_permission(self) -> None:
-        owner = User.objects.create_user(username="owner")
-        other = User.objects.create_user(username="other")
+        owner = UserFactory(username="owner")
+        other = UserFactory(username="other")
         other.user_permissions.add(
             Permission.objects.get(codename="view_document"),
         )
@@ -653,8 +653,8 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
         self.assertEqual(resp.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def test_update_version_returns_403_without_permission(self) -> None:
-        owner = User.objects.create_user(username="owner")
-        other = User.objects.create_user(username="other")
+        owner = UserFactory(username="owner")
+        other = UserFactory(username="other")
         root = Document.objects.create(
             title="root",
             checksum="root",
@@ -672,7 +672,7 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_update_version_requires_global_change_permission(self) -> None:
-        user = User.objects.create_user(username="add-only")
+        user = UserFactory(username="add-only")
         user.user_permissions.add(Permission.objects.get(codename="add_document"))
         root = Document.objects.create(
             title="root",
@@ -978,7 +978,7 @@ class TestVersionAwareFilters(DjangoTestCase):
         superseded content -- selecting documents the list view, filtered by
         the same term, does not show.
         """
-        user = User.objects.create_superuser(username="bulk_selection")
+        user = UserFactory(username="bulk_selection", superuser=True)
 
         selected = DocumentSelectionMixin()._resolve_document_ids(
             user=user,
@@ -1005,7 +1005,7 @@ class TestBulkSelectionExcludesVersions(DjangoTestCase):
         "Select all matching" reconstructs the document list, which never
         contains version documents as rows of their own.
         """
-        user = User.objects.create_superuser(username="bulk_versions")
+        user = UserFactory(username="bulk_versions", superuser=True)
         root = Document.objects.create(
             title="shared-title root",
             checksum="bulk-root",

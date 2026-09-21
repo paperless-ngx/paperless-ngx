@@ -20,7 +20,6 @@ from typing import TYPE_CHECKING
 
 import pytest
 import tantivy
-from django.contrib.auth.models import User
 from whoosh_compat import FieldKind
 
 from documents.models import CustomField
@@ -28,6 +27,7 @@ from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import Note
 from documents.search._fields import PUBLIC_FIELDS
+from paperless_testing.factories import UserFactory
 
 if TYPE_CHECKING:
     from documents.search._backend import TantivyBackend
@@ -49,7 +49,7 @@ class TestJsonSubpathsAreWrittenAtIndexTime:
             - Every subpath PUBLIC_FIELDS declares for notes/custom_fields
               is present as a key in the document's stored JSON payload
         """
-        user = User.objects.create_user(username="completeness-user")
+        user = UserFactory(username="completeness-user")
         field = CustomField.objects.create(
             name="Completeness Field",
             data_type=CustomField.FieldDataType.STRING,

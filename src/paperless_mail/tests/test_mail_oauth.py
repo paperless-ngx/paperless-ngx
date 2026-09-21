@@ -2,7 +2,6 @@ from datetime import timedelta
 from unittest import mock
 
 from django.contrib.auth.models import Permission
-from django.contrib.auth.models import User
 from django.test import TestCase
 from django.test import override_settings
 from django.utils import timezone
@@ -14,6 +13,7 @@ from paperless_mail.mail import MailAccountHandler
 from paperless_mail.models import MailAccount
 from paperless_mail.oauth import PaperlessMailOAuth2Manager
 from paperless_mail.tests.factories import MailAccountFactory
+from paperless_testing.factories import UserFactory
 
 
 @override_settings(
@@ -27,7 +27,7 @@ class TestMailOAuth(
     TestCase,
 ):
     def setUp(self) -> None:
-        self.user = User.objects.create_user("testuser")
+        self.user = UserFactory(username="testuser")
         self.user.user_permissions.add(
             *Permission.objects.filter(
                 codename__in=[

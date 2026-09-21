@@ -14,7 +14,6 @@ from typing import TYPE_CHECKING
 
 import pytest
 import time_machine
-from django.contrib.auth.models import User
 
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
@@ -23,6 +22,7 @@ from documents.models import Note
 from documents.models import StoragePath
 from documents.search._query import parse_user_query
 from paperless_testing.factories import DocumentFactory
+from paperless_testing.factories import UserFactory
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -148,7 +148,7 @@ class TestJsonSubpaths:
         THEN:
             - Only the document with alice's note matches
         """
-        alice = User.objects.create_user(username="alice")
+        alice = UserFactory(username="alice")
         doc_with_note = DocumentFactory(
             title="Has note",
             content="x",

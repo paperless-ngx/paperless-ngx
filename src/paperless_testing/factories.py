@@ -78,7 +78,10 @@ class UserFactory(DjangoModelFactory[UserModelT]):
     username = factory.Sequence(lambda n: f"user{n}")
     is_staff = False
     is_superuser = False
-    password = factory.django.Password("test")
+    # Hashing a real password costs about half a second per user, and no test
+    # authenticates with its password. None gives the unusable password
+    # create_user() gives.
+    password = factory.django.Password(None)
 
     class Params:
         superuser = factory.Trait(is_staff=True, is_superuser=True)

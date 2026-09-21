@@ -9,6 +9,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 
 from paperless_testing.dirs import DirectoriesMixin
+from paperless_testing.factories import UserFactory
 
 
 # see allauth.socialaccount.providers.openid.provider.OpenIDProvider
@@ -55,10 +56,11 @@ class TestApiProfile(DirectoriesMixin, APITestCase):
     def setUp(self) -> None:
         super().setUp()
 
-        self.user = User.objects.create_superuser(
+        self.user = UserFactory(
             username="temp_admin",
             first_name="firstname",
             last_name="surname",
+            superuser=True,
         )
         self.client.force_authenticate(user=self.user)
 
@@ -401,7 +403,7 @@ class TestApiTOTPViews(APITestCase):
     def setUp(self) -> None:
         super().setUp()
 
-        self.user = User.objects.create_superuser(username="temp_admin")
+        self.user = UserFactory(username="temp_admin", superuser=True)
         self.client.force_authenticate(user=self.user)
 
     def test_get_totp(self) -> None:

@@ -3,7 +3,6 @@ from io import BytesIO
 from pathlib import Path
 from unittest.mock import patch
 
-from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import override_settings
 from PIL import Image
@@ -15,6 +14,7 @@ from documents.tests.utils import read_streaming_response
 from paperless.models import ApplicationConfiguration
 from paperless.models import ColorConvertChoices
 from paperless_testing.dirs import DirectoriesMixin
+from paperless_testing.factories import UserFactory
 
 
 class TestApiAppConfig(DirectoriesMixin, APITestCase):
@@ -23,7 +23,7 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
     def setUp(self) -> None:
         super().setUp()
 
-        user = User.objects.create_superuser(username="temp_admin")
+        user = UserFactory(username="temp_admin", superuser=True)
         self.client.force_authenticate(user=user)
 
     def test_api_get_config(self) -> None:
@@ -267,7 +267,7 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
         THEN:
             - old app_logo file is deleted
         """
-        admin = User.objects.create_superuser(username="admin")
+        admin = UserFactory(username="admin", superuser=True)
         self.client.force_login(user=admin)
         response = self.client.get("/logo/")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

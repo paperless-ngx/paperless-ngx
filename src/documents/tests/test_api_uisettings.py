@@ -1,13 +1,13 @@
 import json
 
 from django.contrib.auth.models import Permission
-from django.contrib.auth.models import User
 from django.test import override_settings
 from rest_framework import status
 from rest_framework.test import APITestCase
 
 from paperless.version import __full_version_str__
 from paperless_testing.dirs import DirectoriesMixin
+from paperless_testing.factories import UserFactory
 
 
 class TestApiUiSettings(DirectoriesMixin, APITestCase):
@@ -15,7 +15,7 @@ class TestApiUiSettings(DirectoriesMixin, APITestCase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.test_user = User.objects.create_superuser(username="test")
+        self.test_user = UserFactory(username="test", superuser=True)
         self.test_user.first_name = "Test"
         self.test_user.last_name = "User"
         self.test_user.save()
@@ -91,7 +91,7 @@ class TestApiUiSettings(DirectoriesMixin, APITestCase):
         )
 
     def test_api_set_ui_settings_insufficient_global_permissions(self) -> None:
-        not_superuser = User.objects.create_user(username="test_not_superuser")
+        not_superuser = UserFactory(username="test_not_superuser")
         self.client.force_authenticate(user=not_superuser)
 
         settings = {
@@ -111,7 +111,7 @@ class TestApiUiSettings(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_api_set_ui_settings_sufficient_global_permissions(self) -> None:
-        not_superuser = User.objects.create_user(username="test_not_superuser")
+        not_superuser = UserFactory(username="test_not_superuser")
         not_superuser.user_permissions.add(
             *Permission.objects.filter(codename__contains="uisettings"),
         )

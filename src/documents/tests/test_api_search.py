@@ -7,7 +7,6 @@ import time_machine
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
-from django.contrib.auth.models import User
 from django.test import override_settings
 from django.utils import timezone
 from guardian.shortcuts import assign_perm
@@ -31,6 +30,7 @@ from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import DocumentFactory
+from paperless_testing.factories import UserFactory
 
 pytestmark = pytest.mark.search
 
@@ -40,7 +40,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         super().setUp()
         reset_backend()
 
-        self.user = User.objects.create_superuser(username="temp_admin")
+        self.user = UserFactory(username="temp_admin", superuser=True)
         self.client.force_authenticate(user=self.user)
 
     def tearDown(self) -> None:
@@ -949,8 +949,8 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         THEN:
             - Terms only within docs user has access to are returned
         """
-        u1 = User.objects.create_user("user1")
-        u2 = User.objects.create_user("user2")
+        u1 = UserFactory(username="user1")
+        u2 = UserFactory(username="user2")
         u1.user_permissions.add(Permission.objects.get(codename="view_document"))
 
         self.client.force_authenticate(user=u1)
@@ -999,8 +999,8 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         self.assertEqual(response.data, ["applebaum", "apples", "appletini"])
 
     def test_search_autocomplete_group_revocation_is_immediate(self) -> None:
-        user = User.objects.create_user("group-user")
-        owner = User.objects.create_user("document-owner")
+        user = UserFactory(username="group-user")
+        owner = UserFactory(username="document-owner")
         group = Group.objects.create(name="temporary-viewers")
         user.user_permissions.add(Permission.objects.get(codename="view_document"))
         user.groups.add(group)
@@ -1091,8 +1091,8 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         self.assertIsNone(response.data["corrected_query"])
 
     def test_search_spelling_suggestion_suppressed_for_private_terms(self) -> None:
-        owner = User.objects.create_user("owner")
-        attacker = User.objects.create_user("attacker")
+        owner = UserFactory(username="owner")
+        attacker = UserFactory(username="attacker")
         attacker.user_permissions.add(
             Permission.objects.get(codename="view_document"),
         )
@@ -1222,8 +1222,8 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         THEN:
             - The request is rejected
         """
-        owner = User.objects.create_user("owner")
-        attacker = User.objects.create_user("attacker")
+        owner = UserFactory(username="owner")
+        attacker = UserFactory(username="attacker")
         attacker.user_permissions.add(
             Permission.objects.get(codename="view_document"),
         )
@@ -1534,9 +1534,9 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
             - Only owned docs are returned for regular users
             - All docs are returned for superuser
         """
-        superuser = User.objects.create_superuser("superuser")
-        u1 = User.objects.create_user("user1")
-        u2 = User.objects.create_user("user2")
+        superuser = UserFactory(username="superuser", superuser=True)
+        u1 = UserFactory(username="user1")
+        u2 = UserFactory(username="user2")
         u1.user_permissions.add(*Permission.objects.filter(codename="view_document"))
         u2.user_permissions.add(*Permission.objects.filter(codename="view_document"))
 
@@ -1588,8 +1588,8 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         THEN:
             - Only docs with granted view permissions are returned
         """
-        u1 = User.objects.create_user("user1")
-        u2 = User.objects.create_user("user2")
+        u1 = UserFactory(username="user1")
+        u2 = UserFactory(username="user2")
         u1.user_permissions.add(*Permission.objects.filter(codename="view_document"))
         u2.user_permissions.add(*Permission.objects.filter(codename="view_document"))
 
@@ -1641,8 +1641,8 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         self.assertEqual(r.data["count"], 1)
 
     def test_search_sorting(self) -> None:
-        u1 = User.objects.create_user("user1")
-        u2 = User.objects.create_user("user2")
+        u1 = UserFactory(username="user1")
+        u2 = UserFactory(username="user2")
         c1 = Correspondent.objects.create(name="corres Ax")
         c2 = Correspondent.objects.create(name="corres Cx")
         c3 = Correspondent.objects.create(name="corres Bx")
@@ -1892,8 +1892,8 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
             pk=5,
         )
 
-        user1 = User.objects.create_user("bank user1")
-        user2 = User.objects.create_superuser("user2")
+        user1 = UserFactory(username="bank user1")
+        user2 = UserFactory(username="user2", superuser=True)
         group1 = Group.objects.create(name="bank group1")
         Group.objects.create(name="group2")
 
@@ -2018,8 +2018,8 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         self.assertEqual(returned.get(root.id), "latest content")
 
     def test_global_search_filters_owned_mail_objects(self) -> None:
-        user1 = User.objects.create_user("mail-search-user")
-        user2 = User.objects.create_user("other-mail-search-user")
+        user1 = UserFactory(username="mail-search-user")
+        user2 = UserFactory(username="other-mail-search-user")
         user1.user_permissions.add(
             Permission.objects.get(codename="view_mailaccount"),
             Permission.objects.get(codename="view_mailrule"),

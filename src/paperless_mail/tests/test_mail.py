@@ -9,7 +9,6 @@ from unittest import mock
 
 import pytest
 from django.contrib.auth.models import Permission
-from django.contrib.auth.models import User
 from django.core.management import call_command
 from django.db import DatabaseError
 from django.test import TestCase
@@ -43,6 +42,7 @@ from paperless_mail.tests.factories import MailAccountFactory
 from paperless_mail.tests.factories import MailRuleFactory
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import CorrespondentFactory
+from paperless_testing.factories import UserFactory
 
 
 @dataclasses.dataclass
@@ -2263,10 +2263,7 @@ class TestMailAccountTestView(APITestCase):
         self.mailMocker = MailMocker()
         self.mailMocker.setUp()
         self.addCleanup(self.mailMocker.doCleanups)
-        self.user = User.objects.create_user(
-            username="testuser",
-            password="testpassword",
-        )
+        self.user = UserFactory(username="testuser", password="testpassword")
         self.user.user_permissions.add(
             *Permission.objects.filter(
                 codename__in=["add_mailaccount", "change_mailaccount"],
@@ -2409,10 +2406,7 @@ class TestMailAccountTestView(APITestCase):
             self.assertIn(expected_str, error_str)
 
     def test_mail_account_test_view_existing_forbidden_for_other_owner(self) -> None:
-        other_user = User.objects.create_user(
-            username="otheruser",
-            password="testpassword",
-        )
+        other_user = UserFactory(username="otheruser", password="testpassword")
         existing_account = MailAccount.objects.create(
             name="Owned account",
             imap_server="imap.example.com",
@@ -2535,9 +2529,10 @@ class TestMailAccountProcess(APITestCase):
         self.mailMocker = MailMocker()
         self.mailMocker.setUp()
         self.addCleanup(self.mailMocker.doCleanups)
-        self.user = User.objects.create_superuser(
+        self.user = UserFactory(
             username="testuser",
             password="testpassword",
+            superuser=True,
         )
         self.client.force_authenticate(user=self.user)
         self.account = MailAccount.objects.create(
@@ -2560,9 +2555,10 @@ class TestMailAccountProcess(APITestCase):
 
 class TestMailRuleAPI(APITestCase):
     def setUp(self) -> None:
-        self.user = User.objects.create_superuser(
+        self.user = UserFactory(
             username="testuser",
             password="testpassword",
+            superuser=True,
         )
         self.client.force_authenticate(user=self.user)
         self.account = MailAccountFactory(owner=self.user)

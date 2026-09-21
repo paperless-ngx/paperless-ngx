@@ -26,7 +26,6 @@ from paperless_testing.factories import PaperlessTaskFactory
 pytestmark = pytest.mark.api
 
 ENDPOINT = "/api/tasks/"
-ACCEPT_V10 = "application/json; version=10"
 ACCEPT_V9 = "application/json; version=9"
 
 
@@ -346,21 +345,18 @@ class TestGetTasksV10:
         self,
         admin_user: User,
         regular_user: User,
+        user_client: APIClient,
     ) -> None:
         """Regular users see their own tasks and unowned (system) tasks; other users' tasks are hidden."""
         regular_user.user_permissions.add(
             Permission.objects.get(codename="view_paperlesstask"),
         )
 
-        client = APIClient()
-        client.force_authenticate(user=regular_user)
-        client.credentials(HTTP_ACCEPT=ACCEPT_V10)
-
         PaperlessTaskFactory(owner=admin_user)  # other user — not visible
         unowned_task = PaperlessTaskFactory()  # unowned (system task) — visible
         own_task = PaperlessTaskFactory(owner=regular_user)
 
-        response = client.get(ENDPOINT)
+        response = user_client.get(ENDPOINT)
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data["count"] == 2
@@ -732,19 +728,19 @@ class TestAcknowledge:
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    def test_succeeds_with_change_permission(self, regular_user: User) -> None:
+    def test_succeeds_with_change_permission(
+        self,
+        regular_user: User,
+        user_client: APIClient,
+    ) -> None:
         """Users granted change_paperlesstask permission can acknowledge tasks."""
         regular_user.user_permissions.add(
             Permission.objects.get(codename="change_paperlesstask"),
         )
         regular_user.save()
 
-        client = APIClient()
-        client.force_authenticate(user=regular_user)
-        client.credentials(HTTP_ACCEPT=ACCEPT_V10)
-
         task = PaperlessTaskFactory()
-        response = client.post(
+        response = user_client.post(
             ENDPOINT + "acknowledge/",
             {"tasks": [task.id]},
             format="json",

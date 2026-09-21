@@ -3,7 +3,6 @@ import shutil
 from unittest import mock
 
 from django.contrib.auth.models import Permission
-from django.contrib.auth.models import User
 from django.core import mail
 from django.test import override_settings
 from rest_framework import status
@@ -12,6 +11,7 @@ from rest_framework.test import APITestCase
 from documents.models import Document
 from documents.tests.utils import SampleDirMixin
 from paperless_testing.dirs import DirectoriesMixin
+from paperless_testing.factories import UserFactory
 
 
 class TestEmail(DirectoriesMixin, SampleDirMixin, APITestCase):
@@ -20,7 +20,7 @@ class TestEmail(DirectoriesMixin, SampleDirMixin, APITestCase):
     def setUp(self) -> None:
         super().setUp()
 
-        self.user = User.objects.create_superuser(username="temp_admin")
+        self.user = UserFactory(username="temp_admin", superuser=True)
         self.client.force_authenticate(user=self.user)
 
         self.doc1 = Document.objects.create(
@@ -303,7 +303,7 @@ class TestEmail(DirectoriesMixin, SampleDirMixin, APITestCase):
         THEN:
             - Forbidden response is returned
         """
-        user1 = User.objects.create_user(username="test1")
+        user1 = UserFactory(username="test1")
         user1.user_permissions.add(*Permission.objects.filter(codename="view_document"))
 
         doc_owned = Document.objects.create(
@@ -338,7 +338,7 @@ class TestEmail(DirectoriesMixin, SampleDirMixin, APITestCase):
         THEN:
             - Request succeeds
         """
-        user1 = User.objects.create_user(username="test1")
+        user1 = UserFactory(username="test1")
         user1.user_permissions.add(*Permission.objects.filter(codename="view_document"))
 
         self.client.force_authenticate(user1)

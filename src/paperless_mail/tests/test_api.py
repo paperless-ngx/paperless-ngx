@@ -18,6 +18,7 @@ from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import CorrespondentFactory
 from paperless_testing.factories import DocumentTypeFactory
 from paperless_testing.factories import TagFactory
+from paperless_testing.factories import UserFactory
 
 
 class TestAPIMailAccounts(DirectoriesMixin, APITestCase):
@@ -33,7 +34,7 @@ class TestAPIMailAccounts(DirectoriesMixin, APITestCase):
 
         super().setUp()
 
-        self.user = User.objects.create_user(username="temp_admin")
+        self.user = UserFactory(username="temp_admin")
         self.user.user_permissions.add(*Permission.objects.all())
         self.user.save()
         self.client.force_authenticate(user=self.user)
@@ -291,7 +292,7 @@ class TestAPIMailAccounts(DirectoriesMixin, APITestCase):
             imap_port=443,
             owner=None,
         )
-        user = User.objects.create_user(username="no_perms")
+        user = UserFactory(username="no_perms")
         self.client.force_authenticate(user=user)
 
         response = self.client.post(
@@ -321,7 +322,7 @@ class TestAPIMailAccounts(DirectoriesMixin, APITestCase):
         THEN:
             - API returns forbidden
         """
-        owner = User.objects.create_user(username="account_owner")
+        owner = UserFactory(username="account_owner")
         account = MailAccountFactory(
             username="admin",
             password="secret",
@@ -329,7 +330,7 @@ class TestAPIMailAccounts(DirectoriesMixin, APITestCase):
             imap_port=443,
             owner=owner,
         )
-        user = User.objects.create_user(username="object_perms_only")
+        user = UserFactory(username="object_perms_only")
         assign_perm("change_mailaccount", user, account)
         self.client.force_authenticate(user=user)
 
@@ -377,7 +378,7 @@ class TestAPIMailAccounts(DirectoriesMixin, APITestCase):
             - Only unowned, owned by user or granted accounts are provided
         """
 
-        user2 = User.objects.create_user(username="temp_admin2")
+        user2 = UserFactory(username="temp_admin2")
 
         account1 = MailAccountFactory(name="Email1")
         account2 = MailAccountFactory(name="Email2", owner=self.user)
@@ -400,7 +401,7 @@ class TestAPIMailRules(DirectoriesMixin, APITestCase):
     def setUp(self) -> None:
         super().setUp()
 
-        self.user = User.objects.create_user(username="temp_admin")
+        self.user = UserFactory(username="temp_admin")
         self.user.user_permissions.add(*Permission.objects.all())
         self.user.save()
         self.client.force_authenticate(user=self.user)
@@ -590,7 +591,7 @@ class TestAPIMailRules(DirectoriesMixin, APITestCase):
         self.assertEqual(returned_rule1.action, MailRule.MailAction.DELETE)
 
     def test_create_mail_rule_scopes_accounts(self) -> None:
-        other_user = User.objects.create_user(username="mail-owner")
+        other_user = UserFactory(username="mail-owner")
         foreign_account = MailAccountFactory(name="ForeignEmail", owner=other_user)
 
         response = self.client.post(
@@ -633,7 +634,7 @@ class TestAPIMailRules(DirectoriesMixin, APITestCase):
     def test_create_mail_rule_allowed_for_granted_account_change_permission(
         self,
     ) -> None:
-        other_user = User.objects.create_user(username="mail-owner")
+        other_user = UserFactory(username="mail-owner")
         foreign_account = MailAccountFactory(name="ForeignEmail", owner=other_user)
         assign_perm("change_mailaccount", self.user, foreign_account)
 
@@ -658,7 +659,7 @@ class TestAPIMailRules(DirectoriesMixin, APITestCase):
 
     def test_update_mail_rule_forbidden_for_unpermitted_account(self) -> None:
         own_account = MailAccountFactory()
-        other_user = User.objects.create_user(username="mail-owner")
+        other_user = UserFactory(username="mail-owner")
         foreign_account = MailAccountFactory(owner=other_user)
         rule1 = MailRuleFactory(account=own_account)
 
@@ -681,7 +682,7 @@ class TestAPIMailRules(DirectoriesMixin, APITestCase):
             - Only unowned, owned by user or granted mail rules are provided
         """
 
-        user2 = User.objects.create_user(username="temp_admin2")
+        user2 = UserFactory(username="temp_admin2")
         account1 = MailAccountFactory()
         rule1 = MailRuleFactory(account=account1, order=0)
         rule2 = MailRuleFactory(account=account1, order=1, owner=self.user)
@@ -737,7 +738,7 @@ class TestAPIProcessedMails(DirectoriesMixin, APITestCase):
     def setUp(self) -> None:
         super().setUp()
 
-        self.user = User.objects.create_user(username="temp_admin")
+        self.user = UserFactory(username="temp_admin")
         self.user.user_permissions.add(*Permission.objects.all())
         self.user.save()
         self.client.force_authenticate(user=self.user)
@@ -751,7 +752,7 @@ class TestAPIProcessedMails(DirectoriesMixin, APITestCase):
         THEN:
             - Only unowned, owned by user or granted processed mails are provided
         """
-        user2 = User.objects.create_user(username="temp_admin2")
+        user2 = UserFactory(username="temp_admin2")
         rule = MailRuleFactory()
         pm1 = ProcessedMailFactory(rule=rule)
         pm2 = ProcessedMailFactory(
@@ -802,7 +803,7 @@ class TestAPIProcessedMails(DirectoriesMixin, APITestCase):
         THEN:
             - Only the specified processed mails are deleted, respecting ownership and permissions
         """
-        user2 = User.objects.create_user(username="temp_admin2")
+        user2 = UserFactory(username="temp_admin2")
         rule = MailRuleFactory()
         # unowned, owned by self, and one with explicit object perm
         pm_unowned = ProcessedMailFactory(rule=rule)
@@ -855,8 +856,8 @@ class TestAPIProcessedMails(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_bulk_delete_requires_global_delete_permission(self) -> None:
-        owner = User.objects.create_user(username="mail_owner")
-        requester = User.objects.create_user(username="mail_deleter")
+        owner = UserFactory(username="mail_owner")
+        requester = UserFactory(username="mail_deleter")
         requester.user_permissions.add(
             Permission.objects.get(codename="add_processedmail"),
         )
@@ -893,7 +894,7 @@ class TestAPIProcessedMails(DirectoriesMixin, APITestCase):
         THEN:
             - The request is rejected and neither mail is deleted
         """
-        user2 = User.objects.create_user(username="temp_admin2")
+        user2 = UserFactory(username="temp_admin2")
         rule = MailRuleFactory()
         # Created first so it sorts ahead of the forbidden mail, i.e. the
         # permission check has to cover the whole batch before deleting rather

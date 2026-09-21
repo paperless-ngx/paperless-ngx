@@ -15,6 +15,7 @@ from documents.models import Workflow
 from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
 from paperless_testing.dirs import DirectoriesMixin
+from paperless_testing.factories import UserFactory
 
 
 class TestApiWorkflows(DirectoriesMixin, APITestCase):
@@ -25,7 +26,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
     def setUp(self) -> None:
         super().setUp()
 
-        user = User.objects.create_superuser(username="temp_admin")
+        user = UserFactory(username="temp_admin", superuser=True)
         self.client.force_authenticate(user=user)
         self.user2 = User.objects.create(username="user2")
         self.user3 = User.objects.create(username="user3")
