@@ -14,6 +14,7 @@ from paperless_mail.models import MailAccount
 from paperless_mail.oauth import PaperlessMailOAuth2Manager
 from paperless_mail.tests.factories import MailAccountFactory
 from paperless_testing.factories import UserFactory
+from paperless_testing.permissions import grant_global
 
 
 @override_settings(
@@ -28,13 +29,7 @@ class TestMailOAuth(
 ):
     def setUp(self) -> None:
         self.user = UserFactory(username="testuser")
-        self.user.user_permissions.add(
-            *Permission.objects.filter(
-                codename__in=[
-                    "add_mailaccount",
-                ],
-            ),
-        )
+        grant_global(self.user, "add_mailaccount")
         self.user.save()
         self.client.force_login(self.user)
         self.mail_account_handler = MailAccountHandler()

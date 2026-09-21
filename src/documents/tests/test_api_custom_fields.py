@@ -5,7 +5,6 @@ from unittest.mock import ANY
 
 from django.contrib.auth.models import Permission
 from django.test import override_settings
-from guardian.shortcuts import assign_perm
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -14,6 +13,8 @@ from documents.models import CustomFieldInstance
 from documents.models import Document
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import UserFactory
+from paperless_testing.permissions import grant_global
+from paperless_testing.permissions import grant_object
 
 
 class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
@@ -1175,9 +1176,7 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
         self,
     ) -> None:
         source_owner = UserFactory(username="source-owner")
-        source_owner.user_permissions.add(
-            Permission.objects.get(codename="change_document"),
-        )
+        grant_global(source_owner, "change_document")
         other_user = UserFactory(username="other-user")
 
         source_doc = Document.objects.create(
@@ -1222,9 +1221,7 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
         self,
     ) -> None:
         source_owner = UserFactory(username="source-owner")
-        source_owner.user_permissions.add(
-            Permission.objects.get(codename="change_document"),
-        )
+        grant_global(source_owner, "change_document")
         other_user = UserFactory(username="other-user")
 
         source_doc = Document.objects.create(
@@ -1244,7 +1241,7 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
             data_type=CustomField.FieldDataType.DOCUMENTLINK,
         )
 
-        assign_perm("change_document", source_owner, target_doc)
+        grant_object(source_owner, target_doc, "change_document")
         self.client.force_authenticate(user=source_owner)
 
         resp = self.client.patch(

@@ -15,7 +15,6 @@ from django.test import TestCase
 from django.test import override_settings
 from django.test.utils import CaptureQueriesContext
 from django.utils import timezone
-from guardian.shortcuts import assign_perm
 from rest_framework import status
 
 from documents.caching import get_llm_suggestion_cache
@@ -35,6 +34,8 @@ from paperless_ai.exceptions import LLMProviderError
 from paperless_ai.exceptions import LLMTimeoutError
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import UserFactory
+from paperless_testing.permissions import grant_global
+from paperless_testing.permissions import grant_object
 
 
 class TestViews(DirectoriesMixin, TestCase):
@@ -142,9 +143,7 @@ class TestViews(DirectoriesMixin, TestCase):
             codename__contains="sharelink",
         )
         self.user.user_permissions.add(*sharelink_permissions)
-        self.user.user_permissions.add(
-            Permission.objects.get(codename="view_document"),
-        )
+        grant_global(self.user, "view_document")
         self.user.save()
 
         self.client.force_login(self.user)
@@ -206,9 +205,7 @@ class TestViews(DirectoriesMixin, TestCase):
             codename__contains="sharelink",
         )
         self.user.user_permissions.add(*sharelink_permissions)
-        self.user.user_permissions.add(
-            Permission.objects.get(codename="view_document"),
-        )
+        grant_global(self.user, "view_document")
         self.client.force_login(self.user)
 
         create_response = self.client.post(
@@ -241,16 +238,16 @@ class TestViews(DirectoriesMixin, TestCase):
         group2 = Group.objects.create(name="group2")
         group3 = Group.objects.create(name="group3")
         t1 = Tag.objects.create(name="invoice", pk=1)
-        assign_perm("view_tag", self.user, t1)
-        assign_perm("view_tag", user2, t1)
-        assign_perm("view_tag", user3, t1)
-        assign_perm("view_tag", group1, t1)
-        assign_perm("view_tag", group2, t1)
-        assign_perm("view_tag", group3, t1)
-        assign_perm("change_tag", self.user, t1)
-        assign_perm("change_tag", user2, t1)
-        assign_perm("change_tag", group1, t1)
-        assign_perm("change_tag", group2, t1)
+        grant_object(self.user, t1, "view_tag")
+        grant_object(user2, t1, "view_tag")
+        grant_object(user3, t1, "view_tag")
+        grant_object(group1, t1, "view_tag")
+        grant_object(group2, t1, "view_tag")
+        grant_object(group3, t1, "view_tag")
+        grant_object(self.user, t1, "change_tag")
+        grant_object(user2, t1, "change_tag")
+        grant_object(group1, t1, "change_tag")
+        grant_object(group2, t1, "change_tag")
 
         Tag.objects.create(name="bank statement", pk=2)
         d1 = Document.objects.create(
@@ -429,11 +426,7 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
         tag_owner = UserFactory(username="cache_tag_owner")
         invisible_tag = Tag.objects.create(name="cache_restricted", owner=tag_owner)
         requester = UserFactory(username="cache_requester")
-        requester.user_permissions.add(
-            *Permission.objects.filter(
-                codename__in=["view_document", "change_document", "view_tag"],
-            ),
-        )
+        grant_global(requester, "view_document", "change_document", "view_tag")
         mock_get_cache.return_value = MagicMock(
             suggestions={
                 "title": "Untitled",
@@ -879,11 +872,7 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
         tag_owner = UserFactory(username="tagowner")
         invisible_tag = Tag.objects.create(name="restricted", owner=tag_owner)
         requester = UserFactory(username="requester")
-        requester.user_permissions.add(
-            *Permission.objects.filter(
-                codename__in=["view_document", "change_document", "view_tag"],
-            ),
-        )
+        grant_global(requester, "view_document", "change_document", "view_tag")
 
         mock_get_ai_classification.return_value = {
             "title": "Untitled",
@@ -967,9 +956,7 @@ class TestAIChatStreamingView(DirectoriesMixin, TestCase):
         super().setUp()
 
     def grant_view_document_permission(self) -> None:
-        self.user.user_permissions.add(
-            *Permission.objects.filter(codename="view_document"),
-        )
+        grant_global(self.user, "view_document")
 
     @override_settings(AI_ENABLED=False)
     def test_post_ai_disabled(self) -> None:

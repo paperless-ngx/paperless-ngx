@@ -4,7 +4,6 @@ import json
 import shutil
 import zipfile
 
-from django.contrib.auth.models import Permission
 from django.test import override_settings
 from django.utils import timezone
 from rest_framework import status
@@ -17,6 +16,7 @@ from documents.tests.utils import SampleDirMixin
 from documents.tests.utils import read_streaming_response
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import UserFactory
+from paperless_testing.permissions import grant_global
 
 
 class TestBulkDownload(DirectoriesMixin, SampleDirMixin, APITestCase):
@@ -327,9 +327,7 @@ class TestBulkDownload(DirectoriesMixin, SampleDirMixin, APITestCase):
 
     def test_download_insufficient_permissions(self) -> None:
         user = UserFactory(username="temp_user")
-        user.user_permissions.add(
-            Permission.objects.get(codename="view_document"),
-        )
+        grant_global(user, "view_document")
         self.client.force_authenticate(user=user)
 
         self.doc2.owner = self.user

@@ -5,7 +5,6 @@ from datetime import timedelta
 from pathlib import Path
 from unittest import mock
 
-from django.contrib.auth.models import Permission
 from django.test import override_settings
 from django.utils import timezone
 from rest_framework import status
@@ -16,6 +15,7 @@ from documents.permissions import has_system_status_permission
 from paperless import version
 from paperless_testing.factories import PaperlessTaskFactory
 from paperless_testing.factories import UserFactory
+from paperless_testing.permissions import grant_global
 
 
 class TestSystemStatus(APITestCase):
@@ -106,9 +106,7 @@ class TestSystemStatus(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
         user = UserFactory(username="status_user")
-        user.user_permissions.add(
-            Permission.objects.get(codename="view_system_monitoring"),
-        )
+        grant_global(user, "view_system_monitoring")
 
         self.client.force_login(user)
         response = self.client.get(self.ENDPOINT)

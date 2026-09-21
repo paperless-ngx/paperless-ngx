@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING
 from unittest import mock
 
 from auditlog.models import LogEntry  # type: ignore[import-untyped]
-from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase as DjangoTestCase
@@ -22,6 +21,7 @@ from documents.versioning import annotate_effective_content
 from documents.views import DocumentSelectionMixin
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import UserFactory
+from paperless_testing.permissions import grant_global
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -91,9 +91,7 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
     def test_root_endpoint_returns_403_when_user_lacks_permission(self) -> None:
         owner = UserFactory(username="owner")
         viewer = UserFactory(username="viewer")
-        viewer.user_permissions.add(
-            Permission.objects.get(codename="view_document"),
-        )
+        grant_global(viewer, "view_document")
         root = Document.objects.create(
             title="root",
             checksum="root",
@@ -285,9 +283,7 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
     def test_delete_version_returns_403_without_permission(self) -> None:
         owner = UserFactory(username="owner")
         other = UserFactory(username="other")
-        other.user_permissions.add(
-            Permission.objects.get(codename="delete_document"),
-        )
+        grant_global(other, "delete_document")
         root = Document.objects.create(
             title="root",
             checksum="root",
@@ -373,9 +369,7 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
     def test_update_version_label_returns_403_without_permission(self) -> None:
         owner = UserFactory(username="owner")
         other = UserFactory(username="other")
-        other.user_permissions.add(
-            Permission.objects.get(codename="change_document"),
-        )
+        grant_global(other, "change_document")
         root = Document.objects.create(
             title="root",
             checksum="root",
@@ -555,9 +549,7 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
     def test_metadata_returns_403_when_user_lacks_permission(self) -> None:
         owner = UserFactory(username="owner")
         other = UserFactory(username="other")
-        other.user_permissions.add(
-            Permission.objects.get(codename="view_document"),
-        )
+        grant_global(other, "view_document")
         doc = Document.objects.create(
             title="root",
             checksum="root",
@@ -673,7 +665,7 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
 
     def test_update_version_requires_global_change_permission(self) -> None:
         user = UserFactory(username="add-only")
-        user.user_permissions.add(Permission.objects.get(codename="add_document"))
+        grant_global(user, "add_document")
         root = Document.objects.create(
             title="root",
             checksum="root",

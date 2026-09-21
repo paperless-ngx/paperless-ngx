@@ -2,7 +2,6 @@ import json
 from unittest import mock
 
 from auditlog.models import LogEntry
-from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 from rest_framework import status
@@ -12,6 +11,7 @@ from documents.bulk_edit import merge_as_versions
 from documents.models import Document
 from documents.serialisers import MergeDocumentsAsVersionsSerializer
 from paperless_testing.factories import UserFactory
+from paperless_testing.permissions import grant_global
 
 
 class TestMergeDocumentsAsVersionsSerializer(TestCase):
@@ -336,11 +336,7 @@ class TestMergeDocumentsAsVersions(TestCase):
 class TestMergeDocumentsAsVersionsAPI(APITestCase):
     def setUp(self) -> None:
         self.user = UserFactory(username="user")
-        self.user.user_permissions.add(
-            Permission.objects.get(codename="change_document"),
-            Permission.objects.get(codename="view_document"),
-            Permission.objects.get(codename="delete_document"),
-        )
+        grant_global(self.user, "change_document", "view_document", "delete_document")
         self.doc1 = Document.objects.create(
             checksum="A",
             title="A",
@@ -406,10 +402,7 @@ class TestMergeDocumentsAsVersionsAPI(APITestCase):
         merge_mock.__name__ = "merge_as_versions"
         # Owns them and may change them, but may not make them stop being documents
         user = UserFactory(username="no-delete")
-        user.user_permissions.add(
-            Permission.objects.get(codename="change_document"),
-            Permission.objects.get(codename="view_document"),
-        )
+        grant_global(user, "change_document", "view_document")
         for doc in (self.doc1, self.doc2):
             doc.owner = user
             doc.save()

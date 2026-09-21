@@ -9,7 +9,6 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.test import override_settings
 from django.utils import timezone
-from guardian.shortcuts import assign_perm
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -31,6 +30,8 @@ from paperless_mail.models import MailRule
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import DocumentFactory
 from paperless_testing.factories import UserFactory
+from paperless_testing.permissions import grant_global
+from paperless_testing.permissions import grant_object
 
 pytestmark = pytest.mark.search
 
@@ -951,7 +952,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         """
         u1 = UserFactory(username="user1")
         u2 = UserFactory(username="user2")
-        u1.user_permissions.add(Permission.objects.get(codename="view_document"))
+        grant_global(u1, "view_document")
 
         self.client.force_authenticate(user=u1)
 
@@ -991,7 +992,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, ["applebaum", "apples"])
 
-        assign_perm("view_document", u1, d3)
+        grant_object(u1, d3, "view_document")
         backend.add_or_update(d3)
 
         response = self.client.get("/api/search/autocomplete/?term=app")
@@ -1002,7 +1003,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         user = UserFactory(username="group-user")
         owner = UserFactory(username="document-owner")
         group = Group.objects.create(name="temporary-viewers")
-        user.user_permissions.add(Permission.objects.get(codename="view_document"))
+        grant_global(user, "view_document")
         user.groups.add(group)
 
         document = Document.objects.create(
@@ -1011,7 +1012,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
             checksum="group-revocation",
             owner=owner,
         )
-        assign_perm("view_document", group, document)
+        grant_object(group, document, "view_document")
         get_backend().add_or_update(document)
         self.client.force_authenticate(user=user)
 
@@ -1093,9 +1094,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
     def test_search_spelling_suggestion_suppressed_for_private_terms(self) -> None:
         owner = UserFactory(username="owner")
         attacker = UserFactory(username="attacker")
-        attacker.user_permissions.add(
-            Permission.objects.get(codename="view_document"),
-        )
+        grant_global(attacker, "view_document")
 
         backend = get_backend()
         for i in range(5):
@@ -1224,9 +1223,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         """
         owner = UserFactory(username="owner")
         attacker = UserFactory(username="attacker")
-        attacker.user_permissions.add(
-            Permission.objects.get(codename="view_document"),
-        )
+        grant_global(attacker, "view_document")
 
         private_seed = Document.objects.create(
             title="private bank statement",
@@ -1537,8 +1534,8 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         superuser = UserFactory(username="superuser", superuser=True)
         u1 = UserFactory(username="user1")
         u2 = UserFactory(username="user2")
-        u1.user_permissions.add(*Permission.objects.filter(codename="view_document"))
-        u2.user_permissions.add(*Permission.objects.filter(codename="view_document"))
+        grant_global(u1, "view_document")
+        grant_global(u2, "view_document")
 
         Document.objects.create(checksum="1", content="test 1", owner=u1)
         Document.objects.create(checksum="2", content="test 2", owner=u2)
@@ -1590,8 +1587,8 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         """
         u1 = UserFactory(username="user1")
         u2 = UserFactory(username="user2")
-        u1.user_permissions.add(*Permission.objects.filter(codename="view_document"))
-        u2.user_permissions.add(*Permission.objects.filter(codename="view_document"))
+        grant_global(u1, "view_document")
+        grant_global(u2, "view_document")
 
         d1 = Document.objects.create(checksum="1", content="test 1", owner=u1)
         d2 = Document.objects.create(checksum="2", content="test 2", owner=u2)
@@ -1616,9 +1613,9 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         r = self.client.get("/api/documents/?query=test&owner__isnull=true")
         self.assertEqual(r.data["count"], 1)
 
-        assign_perm("view_document", u1, d2)
-        assign_perm("view_document", u1, d3)
-        assign_perm("view_document", u2, d1)
+        grant_object(u1, d2, "view_document")
+        grant_object(u1, d3, "view_document")
+        grant_object(u2, d1, "view_document")
 
         backend.add_or_update(d1)
         backend.add_or_update(d2)
@@ -1925,7 +1922,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
             sort_field="",
             owner=user2,
         )
-        assign_perm("view_savedview", user1, shared_view)
+        grant_object(user1, shared_view, "view_savedview")
         mail_account1 = MailAccount.objects.create(name="bank mail account 1")
         mail_account2 = MailAccount.objects.create(name="mail account 2")
         mail_rule1 = MailRule.objects.create(
@@ -2020,10 +2017,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
     def test_global_search_filters_owned_mail_objects(self) -> None:
         user1 = UserFactory(username="mail-search-user")
         user2 = UserFactory(username="other-mail-search-user")
-        user1.user_permissions.add(
-            Permission.objects.get(codename="view_mailaccount"),
-            Permission.objects.get(codename="view_mailrule"),
-        )
+        grant_global(user1, "view_mailaccount", "view_mailrule")
 
         own_account = MailAccount.objects.create(
             name="bank owned account",

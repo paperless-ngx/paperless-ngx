@@ -4,15 +4,15 @@ from typing import TYPE_CHECKING
 from unittest import mock
 
 import pytest
-from django.contrib.auth.models import Permission
-from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.test import APIClient
 from rest_framework.test import APITestCase
 
 from paperless_testing.factories import UserFactory
+from paperless_testing.permissions import grant_global
 
 if TYPE_CHECKING:
+    from django.contrib.auth.models import User
     from pytest_mock import MockerFixture
 
 
@@ -115,9 +115,7 @@ class TestChatStreamingViewUnrestrictedFlag:
         needs to reach the view at all. Model-level only: says nothing
         about which documents (if any) this user can actually see.
         """
-        regular_user.user_permissions.add(
-            *Permission.objects.filter(codename="view_document"),
-        )
+        grant_global(regular_user, "view_document")
         return user_client
 
     @pytest.mark.parametrize(

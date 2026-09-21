@@ -2,10 +2,8 @@ import json
 from unittest import mock
 
 from auditlog.models import LogEntry
-from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.test import override_settings
-from guardian.shortcuts import assign_perm
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -17,6 +15,9 @@ from documents.models import StoragePath
 from documents.models import Tag
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import UserFactory
+from paperless_testing.permissions import grant_all_global
+from paperless_testing.permissions import grant_global
+from paperless_testing.permissions import grant_object
 
 
 class TestBulkEditAPI(DirectoriesMixin, APITestCase):
@@ -286,7 +287,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
     ) -> None:
         self.setup_mock(m, "modify_custom_fields")
         user = UserFactory(username="doc-owner")
-        user.user_permissions.add(Permission.objects.get(codename="change_document"))
+        grant_global(user, "change_document")
         other_user = UserFactory(username="other-user")
         source_doc = Document.objects.create(
             checksum="source",
@@ -789,9 +790,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
     def test_api_bulk_edit_with_all_true_resolves_owned_duplicates(self, m) -> None:
         self.setup_mock(m, "set_storage_path")
         user = UserFactory(username="duplicate-owner")
-        user.user_permissions.add(
-            Permission.objects.get(codename="change_document"),
-        )
+        grant_global(user, "change_document")
         first_duplicate = Document.objects.create(
             checksum="owned-duplicate",
             title="First duplicate",
@@ -1179,7 +1178,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         user1 = User.objects.create(username="user1")
         self.client.force_authenticate(user=user1)
 
-        assign_perm("view_document", user1, self.doc2)
+        grant_object(user1, self.doc2, "view_document")
 
         response = self.client.post(
             "/api/documents/selection_data/",
@@ -1189,9 +1188,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-        user1.user_permissions.add(
-            Permission.objects.get(codename="view_document"),
-        )
+        grant_global(user1, "view_document")
         user1 = User.objects.get(pk=user1.pk)
         self.client.force_authenticate(user=user1)
         response = self.client.post(
@@ -1534,7 +1531,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.doc1.owner = User.objects.get(username="temp_admin")
         self.doc1.save()
         user1 = User.objects.create(username="user1")
-        user1.user_permissions.add(*Permission.objects.all())
+        grant_all_global(user1)
         user1.save()
         self.client.force_authenticate(user=user1)
 
@@ -1588,8 +1585,8 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.doc1.owner = User.objects.get(username="temp_admin")
         self.doc1.save()
         user1 = User.objects.create(username="user1")
-        assign_perm("view_document", user1, self.doc1)
-        user1.user_permissions.add(*Permission.objects.all())
+        grant_object(user1, self.doc1, "view_document")
+        grant_all_global(user1)
         user1.save()
         self.client.force_authenticate(user=user1)
 
@@ -1610,7 +1607,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         m.assert_not_called()
         self.assertEqual(response.content, b"Insufficient permissions")
 
-        assign_perm("change_document", user1, self.doc1)
+        grant_object(user1, self.doc1, "change_document")
 
         response = self.client.post(
             "/api/documents/bulk_edit/",
@@ -1820,7 +1817,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.doc1.owner = User.objects.get(username="temp_admin")
         self.doc1.save()
         user1 = User.objects.create(username="user1")
-        user1.user_permissions.add(*Permission.objects.all())
+        grant_all_global(user1)
         user1.save()
         self.client.force_authenticate(user=user1)
 
@@ -1881,7 +1878,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.doc1.owner = User.objects.get(username="temp_admin")
         self.doc1.save()
         user1 = User.objects.create(username="user1")
-        user1.user_permissions.add(*Permission.objects.all())
+        grant_all_global(user1)
         user1.save()
         self.client.force_authenticate(user=user1)
 
@@ -1921,10 +1918,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
     def test_merge_and_delete_requires_change_permission(self, m) -> None:
         self.setup_mock(m, "merge")
         user = UserFactory(username="no-change")
-        user.user_permissions.add(
-            Permission.objects.get(codename="add_document"),
-            Permission.objects.get(codename="delete_document"),
-        )
+        grant_global(user, "add_document", "delete_document")
         self.client.force_authenticate(user=user)
 
         response = self.client.post(
@@ -2311,7 +2305,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.doc1.owner = User.objects.get(username="temp_admin")
         self.doc1.save()
         user1 = User.objects.create(username="user1")
-        user1.user_permissions.add(*Permission.objects.all())
+        grant_all_global(user1)
         user1.save()
         self.client.force_authenticate(user=user1)
 
@@ -2374,10 +2368,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.setup_mock(edit_pdf_mock, "edit_pdf")
         self.setup_mock(remove_password_mock, "remove_password")
         user = UserFactory(username="no-delete")
-        user.user_permissions.add(
-            Permission.objects.get(codename="add_document"),
-            Permission.objects.get(codename="change_document"),
-        )
+        grant_global(user, "add_document", "change_document")
         self.client.force_authenticate(user=user)
 
         cases = [
@@ -2464,7 +2455,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.doc1.owner = User.objects.get(username="temp_admin")
         self.doc1.save()
         user1 = User.objects.create(username="user1")
-        user1.user_permissions.add(*Permission.objects.all())
+        grant_all_global(user1)
         user1.save()
         self.client.force_authenticate(user=user1)
 

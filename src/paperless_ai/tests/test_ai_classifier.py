@@ -7,7 +7,6 @@ from unittest.mock import patch
 import pytest
 import pytest_mock
 from django.test import override_settings
-from guardian.shortcuts import assign_perm
 from guardian.shortcuts import remove_perm
 
 from documents.models import Document
@@ -27,6 +26,7 @@ from paperless_ai.taxonomy import TaxonomyCandidates
 from paperless_testing.factories import DocumentFactory
 from paperless_testing.factories import TagFactory
 from paperless_testing.factories import UserFactory
+from paperless_testing.permissions import grant_object
 
 
 @pytest.fixture
@@ -815,8 +815,8 @@ class TestFulltextSimilarDocuments:
             content="shared content phrase",
             owner=owner,
         )
-        assign_perm("view_document", viewer, permitted)
-        assign_perm("view_document", viewer, now_private)
+        grant_object(viewer, permitted, "view_document")
+        grant_object(viewer, now_private, "view_document")
         fulltext_backend.add_or_update(source)
         fulltext_backend.add_or_update(permitted)
         fulltext_backend.add_or_update(now_private)

@@ -5,7 +5,6 @@ import pytest
 from django.contrib.auth.models import Group
 from django.db import connection
 from django.test.utils import CaptureQueriesContext
-from guardian.shortcuts import assign_perm
 from pytest_mock import MockerFixture
 
 from documents.models import CustomField
@@ -23,6 +22,7 @@ from paperless_testing.factories import DocumentFactory
 from paperless_testing.factories import DocumentTypeFactory
 from paperless_testing.factories import TagFactory
 from paperless_testing.factories import UserFactory
+from paperless_testing.permissions import grant_object
 
 pytestmark = [pytest.mark.search, pytest.mark.django_db]
 
@@ -188,7 +188,7 @@ class TestAddOrUpdateIds:
             pk=1,
             owner=owner,
         )
-        assign_perm("view_document", user, doc)
+        grant_object(user, doc, "view_document")
 
         with backend.batch_update() as batch:
             batch.add_or_update_ids([doc.pk])
@@ -208,7 +208,7 @@ class TestAddOrUpdateIds:
             pk=1,
             owner=owner,
         )
-        assign_perm("view_document", group, doc)
+        grant_object(group, doc, "view_document")
 
         with backend.batch_update() as batch:
             batch.add_or_update_ids([doc.pk])
@@ -842,7 +842,7 @@ class TestRebuild:
             content="group secret keyword",
             owner=owner,
         )
-        assign_perm("view_document", group, doc)
+        grant_object(group, doc, "view_document")
 
         backend.rebuild(Document.objects.all())
 

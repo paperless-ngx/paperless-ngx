@@ -43,6 +43,7 @@ from paperless_mail.tests.factories import MailRuleFactory
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import CorrespondentFactory
 from paperless_testing.factories import UserFactory
+from paperless_testing.permissions import grant_global
 
 
 @dataclasses.dataclass
@@ -2264,11 +2265,7 @@ class TestMailAccountTestView(APITestCase):
         self.mailMocker.setUp()
         self.addCleanup(self.mailMocker.doCleanups)
         self.user = UserFactory(username="testuser", password="testpassword")
-        self.user.user_permissions.add(
-            *Permission.objects.filter(
-                codename__in=["add_mailaccount", "change_mailaccount"],
-            ),
-        )
+        grant_global(self.user, "add_mailaccount", "change_mailaccount")
         self.user.save()
         self.client.force_authenticate(user=self.user)
         self.url = "/api/mail_accounts/test/"
