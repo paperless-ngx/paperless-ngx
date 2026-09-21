@@ -14,8 +14,8 @@ from rest_framework.test import APITestCase
 
 from documents.models import PaperlessTask
 from documents.permissions import has_system_status_permission
-from documents.tests.factories import PaperlessTaskFactory
 from paperless import version
+from paperless_testing.factories import PaperlessTaskFactory
 
 
 class TestSystemStatus(APITestCase):

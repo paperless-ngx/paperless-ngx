@@ -10,7 +10,7 @@ from django.contrib.auth import get_user_model
 from pytest_django.fixtures import Settings
 from rest_framework.test import APIClient
 
-from documents.tests.factories import DocumentFactory
+from paperless_testing.factories import DocumentFactory
 
 UserModelT = get_user_model()
 

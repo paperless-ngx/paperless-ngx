@@ -14,7 +14,6 @@ from llama_index.core.embeddings.mock_embed_model import MockEmbedding
 from llama_index.core.schema import TextNode
 
 from documents.models import Document
-from documents.tests.factories import DocumentFactory
 from paperless_ai import chat
 from paperless_ai import indexing
 from paperless_ai.chat import CHAT_ERROR_MESSAGE
@@ -22,6 +21,7 @@ from paperless_ai.chat import CHAT_METADATA_DELIMITER
 from paperless_ai.chat import _build_chat_prompt
 from paperless_ai.chat import _build_refine_prompt
 from paperless_ai.chat import stream_chat_with_documents
+from paperless_testing.factories import DocumentFactory
 
 if TYPE_CHECKING:
     from pathlib import Path

@@ -17,7 +17,7 @@ from documents.signals.handlers import task_failure_handler
 from documents.signals.handlers import task_postrun_handler
 from documents.signals.handlers import task_prerun_handler
 from documents.signals.handlers import task_revoked_handler
-from documents.tests.factories import PaperlessTaskFactory
+from paperless_testing.factories import PaperlessTaskFactory
 
 
 @pytest.fixture

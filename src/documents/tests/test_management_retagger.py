@@ -14,12 +14,12 @@ from documents.models import DocumentType
 from documents.models import MatchingModel
 from documents.models import StoragePath
 from documents.models import Tag
-from documents.tests.factories import CorrespondentFactory
-from documents.tests.factories import DocumentFactory
-from documents.tests.factories import DocumentTypeFactory
-from documents.tests.factories import StoragePathFactory
-from documents.tests.factories import TagFactory
 from documents.tests.utils import DirectoriesMixin
+from paperless_testing.factories import CorrespondentFactory
+from paperless_testing.factories import DocumentFactory
+from paperless_testing.factories import DocumentTypeFactory
+from paperless_testing.factories import StoragePathFactory
+from paperless_testing.factories import TagFactory
 
 # ---------------------------------------------------------------------------
 # Module-level type aliases

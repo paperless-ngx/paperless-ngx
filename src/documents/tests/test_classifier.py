@@ -28,12 +28,12 @@ from documents.models import DocumentType
 from documents.models import MatchingModel
 from documents.models import StoragePath
 from documents.models import Tag
-from documents.tests.factories import DocumentFactory
-from documents.tests.factories import TagFactory
 from documents.tests.utils import DirectoriesMixin
 from paperless.settings import CLASSIFIER_LANGUAGES
 from paperless.signed_pickle import HMAC_SIZE
 from paperless.signed_pickle import signed_pickle_dumps
+from paperless_testing.factories import DocumentFactory
+from paperless_testing.factories import TagFactory
 
 
 def dummy_preprocess(content: str) -> str:

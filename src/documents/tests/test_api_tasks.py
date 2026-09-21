@@ -20,8 +20,8 @@ from rest_framework.test import APIClient
 
 from documents.filters import PaperlessTaskFilterSet
 from documents.models import PaperlessTask
-from documents.tests.factories import DocumentFactory
-from documents.tests.factories import PaperlessTaskFactory
+from paperless_testing.factories import DocumentFactory
+from paperless_testing.factories import PaperlessTaskFactory
 
 pytestmark = pytest.mark.api
 

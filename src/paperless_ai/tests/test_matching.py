@@ -10,11 +10,6 @@ from documents.models import Correspondent
 from documents.models import DocumentType
 from documents.models import StoragePath
 from documents.models import Tag
-from documents.tests.factories import CorrespondentFactory
-from documents.tests.factories import DocumentTypeFactory
-from documents.tests.factories import StoragePathFactory
-from documents.tests.factories import TagFactory
-from documents.tests.factories import UserFactory
 from paperless_ai.matching import extract_unmatched_names
 from paperless_ai.matching import match_correspondents_by_name
 from paperless_ai.matching import match_document_types_by_name
@@ -24,6 +19,11 @@ from paperless_ai.matching import resolve_correspondent_ids
 from paperless_ai.matching import resolve_document_type_ids
 from paperless_ai.matching import resolve_storage_path_ids
 from paperless_ai.matching import resolve_tag_ids
+from paperless_testing.factories import CorrespondentFactory
+from paperless_testing.factories import DocumentTypeFactory
+from paperless_testing.factories import StoragePathFactory
+from paperless_testing.factories import TagFactory
+from paperless_testing.factories import UserFactory
 
 
 class TestAIMatching(TestCase):

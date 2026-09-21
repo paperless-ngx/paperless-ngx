@@ -15,7 +15,7 @@ from documents.search._backend import SearchIndexLockError
 from documents.search._backend import TantivyBackend
 from documents.tasks import index_document
 from documents.tasks import remove_document_from_index
-from documents.tests.factories import DocumentFactory
+from paperless_testing.factories import DocumentFactory
 
 if TYPE_CHECKING:
     from collections.abc import Generator

@@ -22,7 +22,7 @@ from documents.models import DocumentType
 from documents.models import Note
 from documents.models import StoragePath
 from documents.search._query import parse_user_query
-from documents.tests.factories import DocumentFactory
+from paperless_testing.factories import DocumentFactory
 
 if TYPE_CHECKING:
     from collections.abc import Callable

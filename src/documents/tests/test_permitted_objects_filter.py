@@ -5,7 +5,7 @@ from rest_framework.test import APIRequestFactory
 
 from documents.filters import PermittedObjectsFilter
 from documents.models import Tag
-from documents.tests.factories import TagFactory
+from paperless_testing.factories import TagFactory
 
 
 class _DummyView:
