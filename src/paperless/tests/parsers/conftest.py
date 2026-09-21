@@ -37,15 +37,15 @@ if TYPE_CHECKING:
 
 
 @pytest.fixture(scope="session")
-def text_samples_dir(samples_dir: Path) -> Path:
+def text_samples_dir(parser_samples_dir: Path) -> Path:
     """Absolute path to the text parser sample files directory.
 
     Returns
     -------
     Path
-        ``<samples_dir>/text/``
+        ``<parser_samples_dir>/text/``
     """
-    return samples_dir / "text"
+    return parser_samples_dir / "text"
 
 
 @pytest.fixture(scope="session")
@@ -175,15 +175,15 @@ def no_engine_settings(
 
 
 @pytest.fixture(scope="session")
-def tika_samples_dir(samples_dir: Path) -> Path:
+def tika_samples_dir(parser_samples_dir: Path) -> Path:
     """Absolute path to the Tika parser sample files directory.
 
     Returns
     -------
     Path
-        ``<samples_dir>/tika/``
+        ``<parser_samples_dir>/tika/``
     """
-    return samples_dir / "tika"
+    return parser_samples_dir / "tika"
 
 
 @pytest.fixture(scope="session")
@@ -258,15 +258,15 @@ def tika_parser() -> Generator[TikaDocumentParser, None, None]:
 
 
 @pytest.fixture(scope="session")
-def mail_samples_dir(samples_dir: Path) -> Path:
+def mail_samples_dir(parser_samples_dir: Path) -> Path:
     """Absolute path to the mail parser sample files directory.
 
     Returns
     -------
     Path
-        ``<samples_dir>/mail/``
+        ``<parser_samples_dir>/mail/``
     """
-    return samples_dir / "mail"
+    return parser_samples_dir / "mail"
 
 
 @pytest.fixture(scope="session")
@@ -421,75 +421,15 @@ def nginx_base_url() -> Generator[str, None, None]:
 
 
 @pytest.fixture(scope="session")
-def tesseract_samples_dir(samples_dir: Path) -> Path:
+def tesseract_samples_dir(parser_samples_dir: Path) -> Path:
     """Absolute path to the tesseract parser sample files directory.
 
     Returns
     -------
     Path
-        ``<samples_dir>/tesseract/``
+        ``<parser_samples_dir>/tesseract/``
     """
-    return samples_dir / "tesseract"
-
-
-@pytest.fixture(scope="session")
-def document_webp_file(tesseract_samples_dir: Path) -> Path:
-    """Path to a WebP document sample file.
-
-    Returns
-    -------
-    Path
-        Absolute path to ``tesseract/document.webp``.
-    """
-    return tesseract_samples_dir / "document.webp"
-
-
-@pytest.fixture(scope="session")
-def encrypted_pdf_file(tesseract_samples_dir: Path) -> Path:
-    """Path to an encrypted PDF sample file.
-
-    Returns
-    -------
-    Path
-        Absolute path to ``tesseract/encrypted.pdf``.
-    """
-    return tesseract_samples_dir / "encrypted.pdf"
-
-
-@pytest.fixture(scope="session")
-def multi_page_digital_pdf_file(tesseract_samples_dir: Path) -> Path:
-    """Path to a multi-page digital PDF sample file.
-
-    Returns
-    -------
-    Path
-        Absolute path to ``tesseract/multi-page-digital.pdf``.
-    """
-    return tesseract_samples_dir / "multi-page-digital.pdf"
-
-
-@pytest.fixture(scope="session")
-def multi_page_images_alpha_rgb_tiff_file(tesseract_samples_dir: Path) -> Path:
-    """Path to a multi-page TIFF with alpha channel in RGB.
-
-    Returns
-    -------
-    Path
-        Absolute path to ``tesseract/multi-page-images-alpha-rgb.tiff``.
-    """
-    return tesseract_samples_dir / "multi-page-images-alpha-rgb.tiff"
-
-
-@pytest.fixture(scope="session")
-def multi_page_images_alpha_tiff_file(tesseract_samples_dir: Path) -> Path:
-    """Path to a multi-page TIFF with alpha channel.
-
-    Returns
-    -------
-    Path
-        Absolute path to ``tesseract/multi-page-images-alpha.tiff``.
-    """
-    return tesseract_samples_dir / "multi-page-images-alpha.tiff"
+    return parser_samples_dir / "tesseract"
 
 
 @pytest.fixture(scope="session")
@@ -502,90 +442,6 @@ def multi_page_images_pdf_file(tesseract_samples_dir: Path) -> Path:
         Absolute path to ``tesseract/multi-page-images.pdf``.
     """
     return tesseract_samples_dir / "multi-page-images.pdf"
-
-
-@pytest.fixture(scope="session")
-def multi_page_images_tiff_file(tesseract_samples_dir: Path) -> Path:
-    """Path to a multi-page TIFF sample file.
-
-    Returns
-    -------
-    Path
-        Absolute path to ``tesseract/multi-page-images.tiff``.
-    """
-    return tesseract_samples_dir / "multi-page-images.tiff"
-
-
-@pytest.fixture(scope="session")
-def multi_page_mixed_pdf_file(tesseract_samples_dir: Path) -> Path:
-    """Path to a multi-page mixed PDF sample file.
-
-    Returns
-    -------
-    Path
-        Absolute path to ``tesseract/multi-page-mixed.pdf``.
-    """
-    return tesseract_samples_dir / "multi-page-mixed.pdf"
-
-
-@pytest.fixture(scope="session")
-def no_text_alpha_png_file(tesseract_samples_dir: Path) -> Path:
-    """Path to a PNG with alpha channel and no text.
-
-    Returns
-    -------
-    Path
-        Absolute path to ``tesseract/no-text-alpha.png``.
-    """
-    return tesseract_samples_dir / "no-text-alpha.png"
-
-
-@pytest.fixture(scope="session")
-def rotated_pdf_file(tesseract_samples_dir: Path) -> Path:
-    """Path to a rotated PDF sample file.
-
-    Returns
-    -------
-    Path
-        Absolute path to ``tesseract/rotated.pdf``.
-    """
-    return tesseract_samples_dir / "rotated.pdf"
-
-
-@pytest.fixture(scope="session")
-def rtl_test_pdf_file(tesseract_samples_dir: Path) -> Path:
-    """Path to an RTL test PDF sample file.
-
-    Returns
-    -------
-    Path
-        Absolute path to ``tesseract/rtl-test.pdf``.
-    """
-    return tesseract_samples_dir / "rtl-test.pdf"
-
-
-@pytest.fixture(scope="session")
-def signed_pdf_file(tesseract_samples_dir: Path) -> Path:
-    """Path to a signed PDF sample file.
-
-    Returns
-    -------
-    Path
-        Absolute path to ``tesseract/signed.pdf``.
-    """
-    return tesseract_samples_dir / "signed.pdf"
-
-
-@pytest.fixture(scope="session")
-def simple_alpha_png_file(tesseract_samples_dir: Path) -> Path:
-    """Path to a simple PNG with alpha channel.
-
-    Returns
-    -------
-    Path
-        Absolute path to ``tesseract/simple-alpha.png``.
-    """
-    return tesseract_samples_dir / "simple-alpha.png"
 
 
 @pytest.fixture(scope="session")
@@ -613,54 +469,6 @@ def simple_no_dpi_png_file(tesseract_samples_dir: Path) -> Path:
 
 
 @pytest.fixture(scope="session")
-def simple_bmp_file(tesseract_samples_dir: Path) -> Path:
-    """Path to a simple BMP sample file.
-
-    Returns
-    -------
-    Path
-        Absolute path to ``tesseract/simple.bmp``.
-    """
-    return tesseract_samples_dir / "simple.bmp"
-
-
-@pytest.fixture(scope="session")
-def simple_gif_file(tesseract_samples_dir: Path) -> Path:
-    """Path to a simple GIF sample file.
-
-    Returns
-    -------
-    Path
-        Absolute path to ``tesseract/simple.gif``.
-    """
-    return tesseract_samples_dir / "simple.gif"
-
-
-@pytest.fixture(scope="session")
-def simple_heic_file(tesseract_samples_dir: Path) -> Path:
-    """Path to a simple HEIC sample file.
-
-    Returns
-    -------
-    Path
-        Absolute path to ``tesseract/simple.heic``.
-    """
-    return tesseract_samples_dir / "simple.heic"
-
-
-@pytest.fixture(scope="session")
-def simple_jpg_file(tesseract_samples_dir: Path) -> Path:
-    """Path to a simple JPG sample file.
-
-    Returns
-    -------
-    Path
-        Absolute path to ``tesseract/simple.jpg``.
-    """
-    return tesseract_samples_dir / "simple.jpg"
-
-
-@pytest.fixture(scope="session")
 def simple_png_file(tesseract_samples_dir: Path) -> Path:
     """Path to a simple PNG sample file.
 
@@ -670,42 +478,6 @@ def simple_png_file(tesseract_samples_dir: Path) -> Path:
         Absolute path to ``tesseract/simple.png``.
     """
     return tesseract_samples_dir / "simple.png"
-
-
-@pytest.fixture(scope="session")
-def simple_tif_file(tesseract_samples_dir: Path) -> Path:
-    """Path to a simple TIF sample file.
-
-    Returns
-    -------
-    Path
-        Absolute path to ``tesseract/simple.tif``.
-    """
-    return tesseract_samples_dir / "simple.tif"
-
-
-@pytest.fixture(scope="session")
-def single_page_mixed_pdf_file(tesseract_samples_dir: Path) -> Path:
-    """Path to a single-page mixed PDF sample file.
-
-    Returns
-    -------
-    Path
-        Absolute path to ``tesseract/single-page-mixed.pdf``.
-    """
-    return tesseract_samples_dir / "single-page-mixed.pdf"
-
-
-@pytest.fixture(scope="session")
-def with_form_pdf_file(tesseract_samples_dir: Path) -> Path:
-    """Path to a PDF with form sample file.
-
-    Returns
-    -------
-    Path
-        Absolute path to ``tesseract/with-form.pdf``.
-    """
-    return tesseract_samples_dir / "with-form.pdf"
 
 
 # ------------------------------------------------------------------
