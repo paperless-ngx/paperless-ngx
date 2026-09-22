@@ -20,6 +20,9 @@ import anyio
 import httpcore
 import httpx
 
+# Not exported by httpcore; the guard asserts it is still the async default.
+from httpcore._backends.auto import AutoBackend
+
 logger = logging.getLogger("paperless.network")
 
 # requires-python is >=3.11, so no PEP 695 `type` statement.
@@ -413,6 +416,86 @@ class _GuardedAsyncBackend(httpcore.AsyncNetworkBackend):
 
     async def sleep(self, seconds: float) -> None:
         await self._inner.sleep(seconds)
+
+
+_LAYOUT_ERROR = (
+    "Unexpected httpx transport layout; refusing to create a transport "
+    "without the outbound connection guard"
+)
+
+
+class GuardedHTTPTransport(httpx.HTTPTransport):
+    """
+    httpx transport whose connections pass through the outbound guard.
+
+    Deliberately accepts no proxy, uds or retries options: a proxy would be
+    dialled instead of the destination, and a unix socket bypasses TCP
+    entirely. Adding an option here is a reviewed change, not a pass-through.
+    """
+
+    def __init__(self, *, allow_internal: bool) -> None:
+        super().__init__()
+        # httpx has no public hook for the network backend. Check the exact
+        # layout before swapping so an httpx or httpcore change fails loudly.
+        pool = self._pool
+        if (
+            type(pool) is not httpcore.ConnectionPool
+            or type(pool._network_backend) is not httpcore.SyncBackend
+        ):
+            raise RuntimeError(_LAYOUT_ERROR)
+        pool._network_backend = _GuardedSyncBackend(
+            pool._network_backend,
+            allow_internal=allow_internal,
+        )
+
+
+class GuardedAsyncHTTPTransport(httpx.AsyncHTTPTransport):
+    """Async twin of GuardedHTTPTransport."""
+
+    def __init__(self, *, allow_internal: bool) -> None:
+        super().__init__()
+        pool = self._pool
+        if (
+            type(pool) is not httpcore.AsyncConnectionPool
+            or type(pool._network_backend) is not AutoBackend
+        ):
+            raise RuntimeError(_LAYOUT_ERROR)
+        pool._network_backend = _GuardedAsyncBackend(
+            pool._network_backend,
+            allow_internal=allow_internal,
+        )
+
+
+def create_guarded_httpx_client(
+    url: str,
+    *,
+    allow_internal: bool,
+    timeout: float,
+) -> httpx.Client:
+    """
+    Validate ``url`` up front, then build a client that re-checks at connect
+    time. The up-front check turns static misconfiguration into a ValueError
+    before any retry layer sees it.
+    """
+    validate_outbound_http_url(url, allow_internal=allow_internal)
+    return httpx.Client(
+        transport=GuardedHTTPTransport(allow_internal=allow_internal),
+        timeout=timeout,
+    )
+
+
+def create_guarded_async_httpx_client(
+    url: str,
+    *,
+    allow_internal: bool,
+    timeout: float,
+) -> httpx.AsyncClient:
+    """Async twin of create_guarded_httpx_client."""
+    validate_outbound_http_url(url, allow_internal=allow_internal)
+    return httpx.AsyncClient(
+        transport=GuardedAsyncHTTPTransport(allow_internal=allow_internal),
+        timeout=timeout,
+    )
 
 
 def resolve_hostname_ips(hostname: str) -> list[str]:

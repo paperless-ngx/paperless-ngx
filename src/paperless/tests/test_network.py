@@ -10,12 +10,16 @@ from unittest.mock import MagicMock
 import anyio
 import httpcore
 import httpx
+import ollama
 import pytest
 from celery.utils.serialization import get_pickleable_exception
+from httpcore._backends.auto import AutoBackend
 from pytest_mock import MockerFixture
 
 from paperless.network import MAX_ADDRESSES_TRIED
 from paperless.network import BlockReason
+from paperless.network import GuardedAsyncHTTPTransport
+from paperless.network import GuardedHTTPTransport
 from paperless.network import HostResolutionError
 from paperless.network import OutboundRequestBlockedError
 from paperless.network import PinnedHostHTTPTransport
@@ -23,6 +27,8 @@ from paperless.network import _GuardedAsyncBackend
 from paperless.network import _GuardedSyncBackend
 from paperless.network import aresolve_public_addresses
 from paperless.network import blocked_message
+from paperless.network import create_guarded_async_httpx_client
+from paperless.network import create_guarded_httpx_client
 from paperless.network import is_public_ip
 from paperless.network import resolve_public_addresses
 from paperless.network import validate_outbound_http_url
@@ -1287,3 +1293,142 @@ class TestGuardedAsyncBackend:
         await _GuardedAsyncBackend(inner, allow_internal=False).sleep(0.5)
 
         assert inner.slept == [0.5]
+
+
+class TestGuardedTransports:
+    def test_sync_transport_installs_guard(self) -> None:
+        """
+        GIVEN:
+            - A guarded sync transport
+        WHEN:
+            - It is constructed
+        THEN:
+            - The httpcore pool dials through the guard wrapping the stock backend
+        """
+        transport = GuardedHTTPTransport(allow_internal=False)
+
+        assert type(transport._pool) is httpcore.ConnectionPool
+        backend = transport._pool._network_backend
+        assert isinstance(backend, _GuardedSyncBackend)
+        assert type(backend._inner) is httpcore.SyncBackend
+        assert backend._allow_internal is False
+
+    def test_async_transport_installs_guard(self) -> None:
+        """
+        GIVEN:
+            - A guarded async transport
+        WHEN:
+            - It is constructed
+        THEN:
+            - The httpcore pool dials through the guard wrapping the stock backend
+        """
+        transport = GuardedAsyncHTTPTransport(allow_internal=True)
+
+        assert type(transport._pool) is httpcore.AsyncConnectionPool
+        backend = transport._pool._network_backend
+        assert isinstance(backend, _GuardedAsyncBackend)
+        assert type(backend._inner) is AutoBackend
+        assert backend._allow_internal is True
+
+    def test_sync_transport_refuses_unexpected_layout(
+        self,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - An httpcore whose default sync backend is not the expected type
+        WHEN:
+            - A guarded transport is constructed
+        THEN:
+            - Construction fails instead of producing an unguarded transport
+        """
+        mocker.patch.object(httpcore, "SyncBackend", type("OtherBackend", (), {}))
+
+        with pytest.raises(RuntimeError, match="transport layout"):
+            GuardedHTTPTransport(allow_internal=False)
+
+    def test_async_transport_refuses_unexpected_layout(
+        self,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - An httpcore whose default async backend is not the expected type
+        WHEN:
+            - A guarded async transport is constructed
+        THEN:
+            - Construction fails instead of producing an unguarded transport
+        """
+        mocker.patch("paperless.network.AutoBackend", type("OtherBackend", (), {}))
+
+        with pytest.raises(RuntimeError, match="transport layout"):
+            GuardedAsyncHTTPTransport(allow_internal=False)
+
+    def test_factory_validates_url_first(self) -> None:
+        """
+        GIVEN:
+            - An internal endpoint with internal addresses disallowed
+        WHEN:
+            - A guarded client is requested
+        THEN:
+            - The up-front check raises ValueError
+        """
+        with pytest.raises(ValueError, match="non-public address"):
+            create_guarded_httpx_client(
+                "http://127.0.0.1:8080",
+                allow_internal=False,
+                timeout=5.0,
+            )
+
+    def test_factory_builds_guarded_clients(self) -> None:
+        """
+        GIVEN:
+            - A public endpoint
+        WHEN:
+            - Sync and async guarded clients are requested
+        THEN:
+            - Both use guarded transports and the requested timeout
+        """
+        with create_guarded_httpx_client(
+            "http://93.184.216.34",
+            allow_internal=False,
+            timeout=5.0,
+        ) as client:
+            assert isinstance(client._transport, GuardedHTTPTransport)
+            assert client.timeout == httpx.Timeout(5.0)
+
+        async_client = create_guarded_async_httpx_client(
+            "http://93.184.216.34",
+            allow_internal=False,
+            timeout=5.0,
+        )
+        assert isinstance(async_client._transport, GuardedAsyncHTTPTransport)
+        assert async_client.timeout == httpx.Timeout(5.0)
+
+    def test_environment_proxies_are_ignored(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """
+        GIVEN:
+            - HTTP_PROXY and HTTPS_PROXY set in the environment
+        WHEN:
+            - A guarded client is built, directly or inside ollama.Client
+        THEN:
+            - No proxy transport is mounted, so requests go through the guard
+        """
+        monkeypatch.setenv("HTTP_PROXY", "http://proxy.invalid:3128")
+        monkeypatch.setenv("HTTPS_PROXY", "http://proxy.invalid:3128")
+
+        with create_guarded_httpx_client(
+            "http://93.184.216.34",
+            allow_internal=False,
+            timeout=5.0,
+        ) as client:
+            assert client._mounts == {}
+
+        ollama_client = ollama.Client(
+            host="http://93.184.216.34:11434",
+            transport=GuardedHTTPTransport(allow_internal=False),
+        )
+        assert ollama_client._client._mounts == {}

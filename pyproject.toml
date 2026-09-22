@@ -17,6 +17,7 @@ classifiers = [
 # TODO: Move certain things to groups and then utilize that further
 # This will allow testing to not install a webserver, mysql, etc
 dependencies = [
+  "anyio>=4.12",
   "azure-ai-documentintelligence>=1.0.2",
   "babel>=2.17",
   "bleach~=6.4.0",
@@ -47,6 +48,8 @@ dependencies = [
   "filelock~=3.32.0",
   "flower>=2.0.1,<2.2",
   "gotenberg-client[httpx]~=1.0",
+  "httpcore~=1.0.9",
+  "httpx~=0.28.1",
   "httpx-oauth~=0.17",
   "ijson>=3.5.1",
   "imap-tools>=1.14,<1.16",
