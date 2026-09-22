@@ -1,11 +1,9 @@
 import shutil
-from collections.abc import Generator
 from pathlib import Path
 from typing import TYPE_CHECKING
 
 import filelock
 import pytest
-from pytest_django.fixtures import Settings
 
 from paperless_testing.factories import DocumentFactory
 
@@ -52,28 +50,17 @@ def sample_doc(
     )
 
 
-@pytest.fixture()
-def _search_index(
-    tmp_path: Path,
-    settings: Settings,
-) -> Generator[None, None, None]:
-    """Create a temp index directory and point INDEX_DIR at it.
+@pytest.fixture
+def _search_index(paperless_dirs: "PaperlessDirs") -> None:
+    """Point the search backend at a fresh, empty index directory.
 
-    Resets the backend singleton before and after so each test gets a clean
-    index rather than reusing a stale singleton from another test.
+    paperless_dirs owns INDEX_DIR and resets the backend singleton on both
+    sides of the test, so requesting it is all that is needed.
     """
-    from documents.search import reset_backend
-
-    index_dir = tmp_path / "index"
-    index_dir.mkdir()
-    settings.INDEX_DIR = index_dir
-    reset_backend()
-    yield
-    reset_backend()
 
 
 @pytest.fixture
-def indexed_document(_search_index: None) -> "Document":
+def searchable_document(_search_index: None) -> "Document":
     """One searchable document, for tests about what the search endpoint
     returns rather than about what it finds.
     """
