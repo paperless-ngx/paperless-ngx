@@ -1,6 +1,7 @@
 import datetime
 from collections.abc import Generator
 from types import SimpleNamespace
+from typing import TYPE_CHECKING
 from unittest.mock import MagicMock
 from unittest.mock import patch
 
@@ -27,6 +28,9 @@ from paperless_testing.factories import DocumentFactory
 from paperless_testing.factories import TagFactory
 from paperless_testing.factories import UserFactory
 from paperless_testing.permissions import grant_object
+
+if TYPE_CHECKING:
+    from paperless_testing.dirs import PaperlessDirs
 
 
 @pytest.fixture
@@ -630,10 +634,11 @@ class TestFulltextSimilarDocuments:
     def fulltext_backend(
         self,
         mocker: pytest_mock.MockerFixture,
+        paperless_dirs: "PaperlessDirs",
     ) -> Generator[TantivyBackend, None, None]:
-        """An in-memory Tantivy backend, wired up as the module-level
+        """An on-disk Tantivy backend, wired up as the module-level
         singleton _fulltext_similar_documents resolves via get_backend()."""
-        backend = TantivyBackend(path=None)
+        backend = TantivyBackend(path=paperless_dirs.index_dir)
         backend.open()
         mocker.patch("documents.search.get_backend", return_value=backend)
         try:
