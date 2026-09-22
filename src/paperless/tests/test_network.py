@@ -377,6 +377,73 @@ class TestResolvePublicAddresses:
         with pytest.raises(HostResolutionError):
             resolve_public_addresses("example.com", 443)
 
+    def test_ipv4_with_percent_is_resolved_as_a_name(
+        self,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A dotted quad followed by "%" and more text, which is not an IP
+              literal since zone ids exist only on IPv6
+            - A resolver answering with a public address
+        WHEN:
+            - It is resolved
+        THEN:
+            - The whole host is looked up as a name and its answer returned
+        """
+        resolver = _answer(mocker, "93.184.216.34")
+
+        assert resolve_public_addresses("8.8.8.8%2eexample.test", 443) == (
+            ipaddress.ip_address("93.184.216.34"),
+        )
+        resolver.assert_called_once_with(
+            "8.8.8.8%2eexample.test",
+            443,
+            type=socket.SOCK_STREAM,
+        )
+
+    def test_ipv4_with_percent_resolving_privately_is_blocked(
+        self,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A dotted quad followed by "%" and more text
+            - A resolver answering with a private address
+        WHEN:
+            - It is resolved
+        THEN:
+            - The name is blocked instead of passing as the public literal
+        """
+        resolver = _answer(mocker, "169.254.169.254")
+
+        with pytest.raises(OutboundRequestBlockedError) as exc_info:
+            resolve_public_addresses("8.8.8.8%2eexample.test", 443)
+
+        assert exc_info.value.address == ipaddress.ip_address("169.254.169.254")
+        resolver.assert_called_once()
+
+    def test_scoped_ipv6_literal_is_blocked_without_dns(
+        self,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A link-local IPv6 literal with a zone id
+        WHEN:
+            - It is resolved
+        THEN:
+            - It is parsed as the IPv6 literal and blocked without a resolver
+              call
+        """
+        resolver = _answer(mocker, "93.184.216.34")
+
+        with pytest.raises(OutboundRequestBlockedError) as exc_info:
+            resolve_public_addresses("fe80::1%eth0", 443)
+
+        assert exc_info.value.address == ipaddress.ip_address("fe80::1")
+        resolver.assert_not_called()
+
 
 class TestAsyncResolvePublicAddresses:
     @pytest.fixture(autouse=True)
@@ -413,6 +480,59 @@ class TestAsyncResolvePublicAddresses:
 
         with pytest.raises(OutboundRequestBlockedError):
             await aresolve_public_addresses("example.com", 443)
+
+    @pytest.mark.anyio
+    async def test_ipv4_with_percent_is_resolved_as_a_name(
+        self,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A dotted quad followed by "%" and more text
+            - An async resolver answering with a public address
+        WHEN:
+            - It is resolved asynchronously
+        THEN:
+            - The whole host is looked up as a name and its answer returned
+        """
+        resolver = mocker.patch(
+            "paperless.network._agetaddrinfo",
+            new=mocker.AsyncMock(return_value=_addrinfo("93.184.216.34")),
+        )
+
+        assert await aresolve_public_addresses("8.8.8.8%2eexample.test", 443) == (
+            ipaddress.ip_address("93.184.216.34"),
+        )
+        resolver.assert_awaited_once_with(
+            "8.8.8.8%2eexample.test",
+            443,
+            type=socket.SOCK_STREAM,
+        )
+
+    @pytest.mark.anyio
+    async def test_ipv4_with_percent_resolving_privately_is_blocked(
+        self,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A dotted quad followed by "%" and more text
+            - An async resolver answering with a private address
+        WHEN:
+            - It is resolved asynchronously
+        THEN:
+            - The name is blocked instead of passing as the public literal
+        """
+        resolver = mocker.patch(
+            "paperless.network._agetaddrinfo",
+            new=mocker.AsyncMock(return_value=_addrinfo("169.254.169.254")),
+        )
+
+        with pytest.raises(OutboundRequestBlockedError) as exc_info:
+            await aresolve_public_addresses("8.8.8.8%2eexample.test", 443)
+
+        assert exc_info.value.address == ipaddress.ip_address("169.254.169.254")
+        resolver.assert_awaited_once()
 
     @pytest.mark.anyio
     @pytest.mark.parametrize(
@@ -606,6 +726,61 @@ class TestValidateOutboundHttpUrl:
             r"http://127.0.0.1\@evil.example/",
             allow_internal=True,
         )
+
+    @pytest.mark.parametrize(
+        "url",
+        [
+            pytest.param(
+                "https://8.8.8.8%2e169-254-169-254.sslip.io/",
+                id="dotted-quad-then-wildcard-dns",
+            ),
+            pytest.param(
+                "https://8.8.8.8%2elocalhost/",
+                id="dotted-quad-then-localhost",
+            ),
+        ],
+    )
+    def test_rejects_percent_in_host(self, mocker: MockerFixture, url: str) -> None:
+        """
+        GIVEN:
+            - A host containing a percent-escape, which requests decodes before
+              resolving while httpx does not
+            - A resolver that would answer with a public address
+        WHEN:
+            - The URL is validated with internal addresses disallowed
+        THEN:
+            - It is rejected as invalid without a resolver call
+        """
+        resolver = _answer(mocker, "93.184.216.34")
+
+        with pytest.raises(ValueError, match="Invalid URL scheme or hostname"):
+            validate_outbound_http_url(url, allow_internal=False)
+
+        resolver.assert_not_called()
+
+    @pytest.mark.parametrize(
+        "url",
+        [
+            pytest.param(
+                "https://8.8.8.8%2e169-254-169-254.sslip.io/",
+                id="dotted-quad-then-wildcard-dns",
+            ),
+            pytest.param(
+                "https://8.8.8.8%2elocalhost/",
+                id="dotted-quad-then-localhost",
+            ),
+        ],
+    )
+    def test_allow_internal_does_not_reject_percent_in_host(self, url: str) -> None:
+        """
+        GIVEN:
+            - A host containing a percent-escape
+        WHEN:
+            - The URL is validated with internal addresses allowed
+        THEN:
+            - It is not rejected, since no host check is made
+        """
+        validate_outbound_http_url(url, allow_internal=True)
 
 
 class FakeClock:

@@ -128,10 +128,15 @@ _monotonic = time.monotonic
 
 
 def _parse_ip_literal(host: str) -> IPAddress | None:
+    address, zone_sep, _zone = host.partition("%")
     try:
-        return ipaddress.ip_address(host.split("%", 1)[0])
+        parsed = ipaddress.ip_address(address)
     except ValueError:
         return None
+    # Zone ids exist only on IPv6; anything else after "%" is not a literal.
+    if zone_sep and parsed.version != 6:
+        return None
+    return parsed
 
 
 def _collect_addresses(
@@ -545,8 +550,14 @@ def validate_outbound_http_url(
     if not allow_internal:
         if _UNSAFE_URL_CHARS.search(url):
             raise ValueError("Invalid URL scheme or hostname.")
+        host = _dns_name(url)
+        # HTTP clients may percent-decode the host before resolving it, so the
+        # checked name could differ from the dialled one. An IPv6 zone id is the
+        # only legitimate use, and link-local addresses are non-public anyway.
+        if "%" in host:
+            raise ValueError("Invalid URL scheme or hostname.")
         try:
-            resolve_public_addresses(_dns_name(url), port)
+            resolve_public_addresses(host, port)
         except (OutboundRequestBlockedError, HostResolutionError) as e:
             raise ValueError(blocked_message(e)) from e
 
