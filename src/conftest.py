@@ -17,10 +17,14 @@ if TYPE_CHECKING:
 
     from django.contrib.auth.models import User
     from pytest_django.fixtures import Settings
+    from pytest_mock import MockerFixture
     from rest_framework.test import APIClient
 
     from paperless_testing.dirs import PaperlessDirs
     from paperless_testing.fakes.progress import FakeProgressManager
+    from paperless_testing.outbound import DialRecorder
+    from paperless_testing.outbound import FakeDNS
+    from paperless_testing.outbound import LocalHTTPServer
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -149,3 +153,28 @@ def fake_progress_manager(
 
     monkeypatch.setattr("documents.tasks.ProgressManager", FakeProgressManager)
     return FakeProgressManager
+
+
+@pytest.fixture
+def local_http_server() -> Generator[LocalHTTPServer, None, None]:
+    """A recording HTTP server on 127.0.0.1, for outbound connection tests."""
+    from paperless_testing.outbound import running_http_server
+
+    with running_http_server() as server:
+        yield server
+
+
+@pytest.fixture
+def fake_dns(mocker: MockerFixture) -> FakeDNS:
+    """Per-hostname answers for the outbound guard's resolver hooks."""
+    from paperless_testing.outbound import install_fake_dns
+
+    return install_fake_dns(mocker)
+
+
+@pytest.fixture
+def dial_recorder(mocker: MockerFixture) -> DialRecorder:
+    """Records which addresses the outbound guard actually dialled."""
+    from paperless_testing.outbound import install_dial_recorder
+
+    return install_dial_recorder(mocker)
