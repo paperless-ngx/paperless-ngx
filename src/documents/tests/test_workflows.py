@@ -5192,6 +5192,35 @@ class TestWebhookSecurity:
         assert received.body == b"hi"
         assert received.headers["host"] == f"webhook.test:{local_http_server.port}"
 
+    @override_settings(WEBHOOKS_ALLOW_INTERNAL_REQUESTS=True)
+    def test_allow_internal_sends_to_internal_address(
+        self,
+        local_http_server: LocalHTTPServer,
+        fake_dns: FakeDNS,
+    ) -> None:
+        """
+        GIVEN:
+            - A webhook to localhost
+            - WEBHOOKS_ALLOW_INTERNAL_REQUESTS is True
+        WHEN:
+            - send_webhook is called
+        THEN:
+            - The payload arrives at the internal address
+            - The guard does not resolve the host, leaving it to the stock
+              connection path
+        """
+        send_webhook(
+            url=f"http://localhost:{local_http_server.port}",
+            data="hi",
+            headers={},
+            files=None,
+            as_json=False,
+        )
+
+        received = local_http_server.requests[0]
+        assert received.body == b"hi"
+        assert fake_dns.lookups == []
+
     @override_settings(WEBHOOKS_ALLOW_INTERNAL_REQUESTS=False)
     def test_block_is_an_expected_task_failure(
         self,
@@ -5267,7 +5296,7 @@ class TestWebhookSecurity:
         WHEN:
             - send_webhook is called with a malicious Host header
         THEN:
-            - The Host header is stripped and replaced with the resolved hostname
+            - The Host header is stripped and set from the URL hostname
         """
         httpx_mock.add_response(content=b"ok")
 
