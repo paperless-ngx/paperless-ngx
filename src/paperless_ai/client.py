@@ -14,10 +14,10 @@ if TYPE_CHECKING:
     from llama_index.llms.openai_like import OpenAILike
 
 from paperless.config import AIConfig
-from paperless.network import PinnedHostAsyncHTTPTransport
-from paperless.network import PinnedHostHTTPTransport
-from paperless.network import create_pinned_async_httpx_client
-from paperless.network import create_pinned_httpx_client
+from paperless.network import GuardedAsyncHTTPTransport
+from paperless.network import GuardedHTTPTransport
+from paperless.network import create_guarded_async_httpx_client
+from paperless.network import create_guarded_httpx_client
 from paperless.network import validate_outbound_http_url
 from paperless_ai.base_model import ClassificationSuggestions
 from paperless_ai.base_model import DocumentClassifierSchema
@@ -63,10 +63,10 @@ class AIClient:
                 endpoint,
                 allow_internal=self.settings.llm_allow_internal_endpoints,
             )
-            transport = PinnedHostHTTPTransport(
+            transport = GuardedHTTPTransport(
                 allow_internal=self.settings.llm_allow_internal_endpoints,
             )
-            async_transport = PinnedHostAsyncHTTPTransport(
+            async_transport = GuardedAsyncHTTPTransport(
                 allow_internal=self.settings.llm_allow_internal_endpoints,
             )
             return Ollama(
@@ -93,12 +93,12 @@ class AIClient:
             http_client = None
             async_http_client = None
             if endpoint:
-                http_client = create_pinned_httpx_client(
+                http_client = create_guarded_httpx_client(
                     endpoint,
                     allow_internal=self.settings.llm_allow_internal_endpoints,
                     timeout=self.settings.llm_request_timeout,
                 )
-                async_http_client = create_pinned_async_httpx_client(
+                async_http_client = create_guarded_async_httpx_client(
                     endpoint,
                     allow_internal=self.settings.llm_allow_internal_endpoints,
                     timeout=self.settings.llm_request_timeout,

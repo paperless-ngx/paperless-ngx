@@ -14,6 +14,7 @@ from paperless_ai.client import PLACEHOLDER_API_KEY
 from paperless_ai.client import AIClient
 from paperless_ai.exceptions import LLMProviderError
 from paperless_ai.exceptions import LLMTimeoutError
+from paperless_testing.outbound import guard_of
 
 
 @pytest.fixture
@@ -277,3 +278,76 @@ def test_run_llm_query_httpx_timeout_raises_local_error(
 
     with pytest.raises(LLMTimeoutError):
         client.run_llm_query("test_prompt")
+
+
+class TestGuardedLLMClients:
+    @pytest.mark.parametrize(
+        ("endpoint", "allow_internal"),
+        [
+            pytest.param("http://test-url", True, id="internal-allowed"),
+            pytest.param("http://93.184.216.34:11434", False, id="internal-blocked"),
+        ],
+    )
+    def test_ollama_clients_are_guarded(
+        self,
+        mock_ai_config: MagicMock,
+        mock_ollama_llm: MagicMock,
+        endpoint: str,
+        *,
+        allow_internal: bool,
+    ) -> None:
+        """
+        GIVEN:
+            - The Ollama backend
+        WHEN:
+            - The LLM is built
+        THEN:
+            - Its sync and async clients use guarded transports with the setting
+        """
+        mock_ai_config.llm_backend = "ollama"
+        mock_ai_config.llm_model = "test_model"
+        mock_ai_config.llm_endpoint = endpoint
+        mock_ai_config.llm_allow_internal_endpoints = allow_internal
+
+        AIClient()
+
+        kwargs = mock_ollama_llm.call_args.kwargs
+        assert guard_of(kwargs["client"]._client)._allow_internal is allow_internal
+        assert (
+            guard_of(kwargs["async_client"]._client)._allow_internal is allow_internal
+        )
+
+    @pytest.mark.parametrize(
+        ("endpoint", "allow_internal"),
+        [
+            pytest.param("http://test-url", True, id="internal-allowed"),
+            pytest.param("http://93.184.216.34:8080", False, id="internal-blocked"),
+        ],
+    )
+    def test_openai_like_clients_are_guarded(
+        self,
+        mock_ai_config: MagicMock,
+        mock_openai_llm: MagicMock,
+        endpoint: str,
+        *,
+        allow_internal: bool,
+    ) -> None:
+        """
+        GIVEN:
+            - The OpenAI-like backend with an endpoint
+        WHEN:
+            - The LLM is built
+        THEN:
+            - Its sync and async http clients use guarded transports
+        """
+        mock_ai_config.llm_backend = "openai-like"
+        mock_ai_config.llm_model = "test_model"
+        mock_ai_config.llm_api_key = "key"
+        mock_ai_config.llm_endpoint = endpoint
+        mock_ai_config.llm_allow_internal_endpoints = allow_internal
+
+        AIClient()
+
+        kwargs = mock_openai_llm.call_args.kwargs
+        assert guard_of(kwargs["http_client"])._allow_internal is allow_internal
+        assert guard_of(kwargs["async_http_client"])._allow_internal is allow_internal

@@ -9,10 +9,10 @@ if TYPE_CHECKING:
 from documents.models import Document
 from paperless.config import AIConfig
 from paperless.models import LLMEmbeddingBackend
-from paperless.network import PinnedHostAsyncHTTPTransport
-from paperless.network import PinnedHostHTTPTransport
-from paperless.network import create_pinned_async_httpx_client
-from paperless.network import create_pinned_httpx_client
+from paperless.network import GuardedAsyncHTTPTransport
+from paperless.network import GuardedHTTPTransport
+from paperless.network import create_guarded_async_httpx_client
+from paperless.network import create_guarded_httpx_client
 from paperless.network import validate_outbound_http_url
 from paperless_ai.client import PLACEHOLDER_API_KEY
 
@@ -29,12 +29,12 @@ def get_embedding_model(config: AIConfig) -> "BaseEmbedding":
             http_client = None
             async_http_client = None
             if endpoint:
-                http_client = create_pinned_httpx_client(
+                http_client = create_guarded_httpx_client(
                     endpoint,
                     allow_internal=config.llm_allow_internal_endpoints,
                     timeout=config.llm_request_timeout,
                 )
-                async_http_client = create_pinned_async_httpx_client(
+                async_http_client = create_guarded_async_httpx_client(
                     endpoint,
                     allow_internal=config.llm_allow_internal_endpoints,
                     timeout=config.llm_request_timeout,
@@ -77,14 +77,14 @@ def get_embedding_model(config: AIConfig) -> "BaseEmbedding":
             embedding._client = Client(
                 host=endpoint,
                 timeout=config.llm_request_timeout,
-                transport=PinnedHostHTTPTransport(
+                transport=GuardedHTTPTransport(
                     allow_internal=config.llm_allow_internal_endpoints,
                 ),
             )
             embedding._async_client = AsyncClient(
                 host=endpoint,
                 timeout=config.llm_request_timeout,
-                transport=PinnedHostAsyncHTTPTransport(
+                transport=GuardedAsyncHTTPTransport(
                     allow_internal=config.llm_allow_internal_endpoints,
                 ),
             )

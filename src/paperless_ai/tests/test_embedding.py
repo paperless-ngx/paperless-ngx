@@ -1,9 +1,12 @@
+from typing import TYPE_CHECKING
+from typing import cast
 from unittest.mock import ANY
 from unittest.mock import MagicMock
 from unittest.mock import patch
 
 import pytest
 from django.conf import settings
+from pytest_mock import MockerFixture
 
 from documents.models import Document
 from paperless.models import LLMEmbeddingBackend
@@ -12,6 +15,10 @@ from paperless_ai.embedding import _normalize_llm_index_text
 from paperless_ai.embedding import build_llm_index_text
 from paperless_ai.embedding import get_configured_model_name
 from paperless_ai.embedding import get_embedding_model
+from paperless_testing.outbound import guard_of
+
+if TYPE_CHECKING:
+    from llama_index.embeddings.ollama import OllamaEmbedding
 
 
 @pytest.fixture
@@ -283,3 +290,61 @@ def test_normalize_llm_index_text_collapses_ocr_leaders_without_joining_lines():
 
 def test_normalize_llm_index_text_collapses_non_breaking_spaces():
     assert _normalize_llm_index_text("A\u00a0........\u00a0B") == "A B"
+
+
+class TestGuardedEmbeddingClients:
+    def test_ollama_embedding_clients_are_guarded(
+        self,
+        mocker: MockerFixture,
+        mock_ai_config: MagicMock,
+    ) -> None:
+        """
+        GIVEN:
+            - The Ollama embedding backend
+        WHEN:
+            - The embedding model is built
+        THEN:
+            - The clients swapped onto it use guarded transports
+        """
+        config = mock_ai_config.return_value
+        config.llm_embedding_backend = LLMEmbeddingBackend.OLLAMA
+        config.llm_embedding_model = "embeddinggemma"
+        config.llm_endpoint = "http://93.184.216.34:11434"
+        config.llm_allow_internal_endpoints = False
+
+        mocker.patch("llama_index.embeddings.ollama.OllamaEmbedding")
+
+        model = cast("OllamaEmbedding", get_embedding_model(config))
+
+        assert guard_of(model._client._client)._allow_internal is False
+        assert guard_of(model._async_client._client)._allow_internal is False
+
+    def test_openai_like_embedding_clients_are_guarded(
+        self,
+        mocker: MockerFixture,
+        mock_ai_config: MagicMock,
+    ) -> None:
+        """
+        GIVEN:
+            - The OpenAI-like embedding backend with an endpoint
+        WHEN:
+            - The embedding model is built
+        THEN:
+            - Its http clients use guarded transports
+        """
+        config = mock_ai_config.return_value
+        config.llm_embedding_backend = LLMEmbeddingBackend.OPENAI_LIKE
+        config.llm_embedding_model = "text-embedding-3-small"
+        config.llm_api_key = "key"
+        config.llm_endpoint = "http://93.184.216.34:8080"
+        config.llm_allow_internal_endpoints = False
+
+        embedding_class = mocker.patch(
+            "llama_index.embeddings.openai_like.OpenAILikeEmbedding",
+        )
+
+        get_embedding_model(config)
+
+        kwargs = embedding_class.call_args.kwargs
+        assert guard_of(kwargs["http_client"])._allow_internal is False
+        assert guard_of(kwargs["async_http_client"])._allow_internal is False
