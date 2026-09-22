@@ -124,6 +124,9 @@ def is_public_ip(ip: IPAddress) -> bool:
 # guard dials.
 _getaddrinfo = socket.getaddrinfo
 _agetaddrinfo = anyio.getaddrinfo
+# The clock is a seam because time-machine does not mock monotonic clocks, and
+# patching time.monotonic globally would also replace the asyncio event loop's
+# own clock, hanging or misfiring its timers for the rest of the test.
 _monotonic = time.monotonic
 
 
@@ -251,9 +254,40 @@ def _budget_exhausted(host: str, tried: int, total: int) -> httpcore.ConnectTime
     )
 
 
+def _next_attempt_budget(
+    host: str,
+    deadline: float,
+    candidates: list[IPAddress],
+    index: int,
+) -> float:
+    """Budget for the attempt at index, or a timeout if none is left."""
+    remaining = deadline - _monotonic()
+    if remaining <= 0:
+        raise _budget_exhausted(host, index, len(candidates))
+    return _attempt_timeout(remaining, len(candidates) - index)
+
+
 def _resolve_for_connect(host: str, port: int) -> tuple[IPAddress, ...]:
     try:
         return resolve_public_addresses(host, port)
+    except OutboundRequestBlockedError as e:
+        _log_block(e)
+        raise
+    except HostResolutionError as e:
+        raise httpcore.ConnectError(str(e)) from e
+
+
+async def _aresolve_for_connect(
+    host: str,
+    port: int,
+    timeout: float | None,
+) -> tuple[IPAddress, ...]:
+    # The scope closes before dialling; attempts are not nested inside it.
+    try:
+        with anyio.fail_after(timeout):
+            return await aresolve_public_addresses(host, port)
+    except TimeoutError as e:
+        raise httpcore.ConnectTimeout(f"Timed out resolving {host}") from e
     except OutboundRequestBlockedError as e:
         _log_block(e)
         raise
@@ -295,10 +329,7 @@ class _GuardedSyncBackend(httpcore.NetworkBackend):
         deadline = _deadline(timeout)
         last_error: httpcore.ConnectError | httpcore.ConnectTimeout | None = None
         for index, address in enumerate(candidates):
-            remaining = deadline - _monotonic()
-            if remaining <= 0:
-                raise _budget_exhausted(host, index, len(candidates))
-            budget = _attempt_timeout(remaining, len(candidates) - index)
+            budget = _next_attempt_budget(host, deadline, candidates, index)
             try:
                 return self._inner.connect_tcp(
                     str(address),
@@ -361,25 +392,11 @@ class _GuardedAsyncBackend(httpcore.AsyncNetworkBackend):
             )
         _require_positive_timeout(host, timeout)
         # Resolution counts against the budget, matching the stock backend.
-        # This scope closes before dialling; attempts are not nested inside it.
         deadline = _deadline(timeout)
-        try:
-            with anyio.fail_after(timeout):
-                addresses = await aresolve_public_addresses(host, port)
-        except TimeoutError as e:
-            raise httpcore.ConnectTimeout(f"Timed out resolving {host}") from e
-        except OutboundRequestBlockedError as e:
-            _log_block(e)
-            raise
-        except HostResolutionError as e:
-            raise httpcore.ConnectError(str(e)) from e
-        candidates = _attempt_order(addresses)
+        candidates = _attempt_order(await _aresolve_for_connect(host, port, timeout))
         last_error: httpcore.ConnectError | httpcore.ConnectTimeout | None = None
         for index, address in enumerate(candidates):
-            remaining = deadline - _monotonic()
-            if remaining <= 0:
-                raise _budget_exhausted(host, index, len(candidates))
-            budget = _attempt_timeout(remaining, len(candidates) - index)
+            budget = _next_attempt_budget(host, deadline, candidates, index)
             try:
                 return await self._inner.connect_tcp(
                     str(address),

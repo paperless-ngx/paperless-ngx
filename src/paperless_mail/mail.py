@@ -448,6 +448,11 @@ class PinnedIMAP4(imaplib.IMAP4):
 
     Without pinned addresses, and with the ssl_context of the matching imaplib
     class, this behaves exactly like imaplib.IMAP4 / imaplib.IMAP4_SSL.
+
+    ``pinned_ips`` of ``None`` means no pinning was requested and the stock
+    imaplib connection path is used. An empty tuple means pinning was requested
+    and yielded nothing, and the connection fails without opening a socket
+    rather than falling back to a hostname lookup.
     """
 
     def __init__(
@@ -462,10 +467,13 @@ class PinnedIMAP4(imaplib.IMAP4):
         self.ssl_context = ssl_context
         super().__init__(host, port, timeout=timeout)
 
-    def _connect_pinned(self, timeout: float | None) -> socket.socket:
-        assert self._pinned_ips is not None
+    def _connect_pinned(
+        self,
+        pinned_ips: tuple[IPAddress, ...],
+        timeout: float | None,
+    ) -> socket.socket:
         last_error: OSError | None = None
-        for ip in self._pinned_ips:
+        for ip in pinned_ips:
             try:
                 address = (str(ip), self.port)
                 if timeout is not None:
@@ -477,7 +485,7 @@ class PinnedIMAP4(imaplib.IMAP4):
 
     def _create_socket(self, timeout: float | None) -> socket.socket:
         if self._pinned_ips is not None:
-            sock = self._connect_pinned(timeout)
+            sock = self._connect_pinned(self._pinned_ips, timeout)
         else:
             sock = super()._create_socket(timeout)
         if self.ssl_context is None:
