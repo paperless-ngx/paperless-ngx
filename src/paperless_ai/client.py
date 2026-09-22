@@ -16,12 +16,14 @@ if TYPE_CHECKING:
 from paperless.config import AIConfig
 from paperless.network import GuardedAsyncHTTPTransport
 from paperless.network import GuardedHTTPTransport
+from paperless.network import OutboundRequestBlockedError
 from paperless.network import create_guarded_async_httpx_client
 from paperless.network import create_guarded_httpx_client
 from paperless.network import validate_outbound_http_url
 from paperless_ai.base_model import ClassificationSuggestions
 from paperless_ai.base_model import DocumentClassifierSchema
 from paperless_ai.base_model import model_to_classification_suggestions
+from paperless_ai.exceptions import LLMBlockedError
 from paperless_ai.exceptions import LLMProviderError
 from paperless_ai.exceptions import LLMTimeoutError
 
@@ -41,6 +43,19 @@ LLM_SYSTEM_PROMPT = (
 # openai-python rejects empty keys since 2.34.0, "fake" is the stand-in from
 # llama-index's own OpenAILike docs https://docs.llamaindex.ai/en/stable/api_reference/llms/openai_like/
 PLACEHOLDER_API_KEY: Final = "fake"
+
+
+def _find_blocked_cause(exc: BaseException) -> OutboundRequestBlockedError | None:
+    # The openai SDK wraps transport errors in APIConnectionError, so the
+    # block can sit anywhere in the __cause__ chain.
+    current: BaseException | None = exc
+    seen: set[int] = set()
+    while current is not None and id(current) not in seen:
+        if isinstance(current, OutboundRequestBlockedError):
+            return current
+        seen.add(id(current))
+        current = current.__cause__
+    return None
 
 
 class AIClient:
@@ -179,6 +194,12 @@ class AIClient:
         except httpx.TimeoutException as exc:
             raise LLMTimeoutError from exc
         except Exception as exc:
+            blocked = _find_blocked_cause(exc)
+            if blocked is not None:
+                raise LLMBlockedError(
+                    "AI backend request was blocked by the outbound request "
+                    f"policy: {blocked}",
+                ) from exc
             if self._is_openai_timeout(exc):
                 raise LLMTimeoutError from exc
             if self._is_provider_error(exc):

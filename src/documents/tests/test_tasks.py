@@ -18,6 +18,7 @@ from documents.models import WorkflowAction
 from documents.sanity_checker import SanityCheckFailedException
 from documents.sanity_checker import SanityCheckMessages
 from documents.tests.helpers import dummy_preprocess
+from paperless_ai.exceptions import LLMBlockedError
 from paperless_testing.assertions import FileSystemAssertsMixin
 from paperless_testing.dirs import DirectoriesMixin
 
@@ -555,3 +556,37 @@ class TestApplyAISuggestionsTask(DirectoriesMixin, TestCase):
 
         apply_suggestions.assert_not_called()
         self.assertIn("no longer exists", "".join(cm.output))
+
+    @override_settings(AI_ENABLED=True)
+    def test_blocked_request_fails_without_retry(self) -> None:
+        """
+        GIVEN:
+            - AI enabled and a document with content
+            - The AI classification call blocked by the outbound request policy
+        WHEN:
+            - The task runs through Celery
+        THEN:
+            - The workflow code does not swallow the block
+            - The task fails with LLMBlockedError and is never retried
+        """
+        with (
+            mock.patch(
+                "documents.workflows.ai.get_ai_document_classification",
+                side_effect=LLMBlockedError(
+                    "AI backend request was blocked by the outbound request "
+                    "policy: detail",
+                ),
+            ),
+            mock.patch.object(
+                tasks.apply_ai_suggestions,
+                "retry",
+                wraps=tasks.apply_ai_suggestions.retry,
+            ) as retry,
+        ):
+            result = tasks.apply_ai_suggestions.apply(
+                args=(self.action.pk, self.doc.pk),
+            )
+
+        self.assertTrue(result.failed())
+        self.assertIsInstance(result.result, LLMBlockedError)
+        retry.assert_not_called()

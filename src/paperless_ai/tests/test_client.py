@@ -1,3 +1,4 @@
+import ipaddress
 import json
 from unittest.mock import ANY
 from unittest.mock import MagicMock
@@ -9,9 +10,12 @@ import openai
 import pytest
 from llama_index.core.llms.llm import ToolSelection
 
+from paperless.network import BlockReason
+from paperless.network import OutboundRequestBlockedError
 from paperless_ai.client import LLM_SYSTEM_PROMPT
 from paperless_ai.client import PLACEHOLDER_API_KEY
 from paperless_ai.client import AIClient
+from paperless_ai.exceptions import LLMBlockedError
 from paperless_ai.exceptions import LLMProviderError
 from paperless_ai.exceptions import LLMTimeoutError
 from paperless_testing.outbound import guard_of
@@ -351,3 +355,69 @@ class TestGuardedLLMClients:
         kwargs = mock_openai_llm.call_args.kwargs
         assert guard_of(kwargs["http_client"])._allow_internal is allow_internal
         assert guard_of(kwargs["async_http_client"])._allow_internal is allow_internal
+
+
+def _block() -> OutboundRequestBlockedError:
+    return OutboundRequestBlockedError(
+        host="llm.example",
+        port=443,
+        reason=BlockReason.NON_PUBLIC_ADDRESS,
+        address=ipaddress.ip_address("10.0.0.1"),
+    )
+
+
+class TestBlockedLLMRequests:
+    def test_ollama_block_becomes_llm_blocked_error(
+        self,
+        mock_ai_config: MagicMock,
+        mock_ollama_llm: MagicMock,
+    ) -> None:
+        """
+        GIVEN:
+            - The Ollama backend and a connection blocked by policy
+        WHEN:
+            - An LLM query runs
+        THEN:
+            - LLMBlockedError is raised with a message, chained to the block
+            - The message, which tracked tasks store, names the destination but
+              not the resolved internal address
+        """
+        mock_ai_config.llm_backend = "ollama"
+        mock_ai_config.llm_model = "test_model"
+        mock_ai_config.llm_endpoint = "http://test-url"
+        block = _block()
+        mock_ollama_llm.return_value.chat.side_effect = block
+
+        with pytest.raises(LLMBlockedError) as exc_info:
+            AIClient().run_llm_query("test_prompt")
+
+        assert exc_info.value.__cause__ is block
+        assert "llm.example:443" in str(exc_info.value)
+        assert "10.0.0.1" not in str(exc_info.value)
+
+    def test_openai_wrapped_block_becomes_llm_blocked_error(
+        self,
+        mock_ai_config: MagicMock,
+        mock_openai_llm: MagicMock,
+    ) -> None:
+        """
+        GIVEN:
+            - The OpenAI-like backend, whose SDK wraps the block in
+              APIConnectionError
+        WHEN:
+            - An LLM query runs
+        THEN:
+            - LLMBlockedError is raised
+        """
+        mock_ai_config.llm_backend = "openai-like"
+        mock_ai_config.llm_model = "test_model"
+        mock_ai_config.llm_api_key = "key"
+        mock_ai_config.llm_endpoint = "http://test-url"
+        wrapped = openai.APIConnectionError(
+            request=httpx.Request("POST", "http://test-url/v1/chat/completions"),
+        )
+        wrapped.__cause__ = _block()
+        mock_openai_llm.return_value.chat_with_tools.side_effect = wrapped
+
+        with pytest.raises(LLMBlockedError):
+            AIClient().run_llm_query("test_prompt")

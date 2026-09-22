@@ -256,6 +256,7 @@ from paperless.views import StandardPagination
 from paperless_ai.ai_classifier import get_ai_document_classification
 from paperless_ai.ai_classifier import get_llm_output_language
 from paperless_ai.chat import stream_chat_with_documents
+from paperless_ai.exceptions import LLMBlockedError
 from paperless_ai.exceptions import LLMProviderError
 from paperless_ai.exceptions import LLMTimeoutError
 from paperless_ai.matching import extract_unmatched_names
@@ -1692,6 +1693,23 @@ class DocumentViewSet(
                             _(
                                 "AI backend rejected the request. "
                                 "Check logs for details.",
+                            ),
+                        ],
+                    },
+                    status=status.HTTP_502_BAD_GATEWAY,
+                )
+            except LLMBlockedError as exc:
+                logger.warning(
+                    "AI backend request for document %s was blocked: %s",
+                    doc.pk,
+                    exc,
+                )
+                return Response(
+                    {
+                        "ai": [
+                            _(
+                                "AI backend request was blocked by the outbound "
+                                "request policy. Check logs for details.",
                             ),
                         ],
                     },
