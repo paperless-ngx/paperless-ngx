@@ -1,5 +1,6 @@
 import datetime
 import imaplib
+import ipaddress
 import itertools
 import logging
 import socket
@@ -527,7 +528,7 @@ def get_mailbox(server, port, security) -> MailBox:
             raise MailError(str(e)) from e
 
         for ip_str in pinned_ips:
-            if not is_public_ip(ip_str):
+            if not is_public_ip(ipaddress.ip_address(ip_str)):
                 raise MailError(
                     f"Connection blocked: {server} resolves to a non-public address",
                 )

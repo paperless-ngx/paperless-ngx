@@ -1,36 +1,108 @@
+import functools
 import ipaddress
 import socket
+from collections.abc import Callable
 from collections.abc import Collection
+from enum import StrEnum
+from typing import Self
+from typing import TypeAlias
 from urllib.parse import ParseResult
 from urllib.parse import urlparse
 
 import httpx
 
-# Ranges ipaddress does not report as private, but which routinely front
-# internal infrastructure.
+# requires-python is >=3.11, so no PEP 695 `type` statement.
+IPAddress: TypeAlias = ipaddress.IPv4Address | ipaddress.IPv6Address
+
+# Ranges that ipaddress reports as global but which still reach internal hosts.
 _NON_PUBLIC_NETWORKS = (
-    # RFC 6598 shared address space: ISP CGNAT, and the default pod/service
-    # CIDR on several managed Kubernetes offerings.
-    ipaddress.ip_network("100.64.0.0/10"),
     # RFC 6052 NAT64 well-known prefix: 64:ff9b::7f00:1 is 127.0.0.1 wherever
-    # a NAT64 gateway exists.
+    # a NAT64 gateway exists, yet ipaddress classifies the prefix as global.
     ipaddress.ip_network("64:ff9b::/96"),
 )
 
 
-def is_public_ip(ip: str | int) -> bool:
-    try:
-        obj = ipaddress.ip_address(ip)
-        return not (
-            obj.is_private
-            or obj.is_loopback
-            or obj.is_link_local
-            or obj.is_multicast
-            or obj.is_unspecified
-            or any(obj in network for network in _NON_PUBLIC_NETWORKS)
+class BlockReason(StrEnum):
+    NON_PUBLIC_ADDRESS = "non_public_address"
+    UNIX_SOCKET = "unix_socket"
+
+
+class OutboundRequestBlockedError(Exception):
+    """
+    An outbound connection was refused by policy before any socket was opened.
+
+    For NON_PUBLIC_ADDRESS, ``host`` is the name or literal being connected to
+    and ``address`` the first offending address. For UNIX_SOCKET, ``host`` is
+    the socket path and ``port`` and ``address`` are None.
+
+    ``address`` is deliberately left out of the message: the message is logged
+    and stored on failed tasks, and must not disclose internal addresses.
+    """
+
+    def __init__(
+        self,
+        *,
+        host: str,
+        port: int | None,
+        reason: BlockReason,
+        address: IPAddress | None = None,
+    ) -> None:
+        self.host = host
+        self.port = port
+        self.reason = reason
+        self.address = address
+        target = host if port is None else f"{host}:{port}"
+        super().__init__(f"Outbound connection to {target} blocked ({reason})")
+
+    def __reduce__(self) -> tuple[Callable[..., Self], tuple[object, ...]]:
+        # Celery rebuilds failed-task exceptions by pickling; keyword-only
+        # fields cannot be recovered from ``args`` alone.
+        return (
+            functools.partial(
+                type(self),
+                host=self.host,
+                port=self.port,
+                reason=self.reason,
+                address=self.address,
+            ),
+            (),
         )
-    except ValueError:  # pragma: no cover
-        return False
+
+
+class HostResolutionError(Exception):
+    """The resolver returned no usable addresses for a host."""
+
+    def __init__(self, *, host: str, detail: str) -> None:
+        self.host = host
+        self.detail = detail
+        super().__init__(f"Could not resolve {host}: {detail}")
+
+    def __reduce__(self) -> tuple[Callable[..., Self], tuple[object, ...]]:
+        return (
+            functools.partial(type(self), host=self.host, detail=self.detail),
+            (),
+        )
+
+
+def blocked_message(exc: OutboundRequestBlockedError | HostResolutionError) -> str:
+    """User-facing text for validation errors, kept stable for existing callers."""
+    if isinstance(exc, HostResolutionError):
+        return f"Could not resolve hostname: {exc.host}"
+    if exc.reason is BlockReason.UNIX_SOCKET:
+        return "Connection blocked: unix sockets are not permitted"
+    return f"Connection blocked: {exc.host} resolves to a non-public address"
+
+
+def is_public_ip(ip: IPAddress) -> bool:
+    """
+    True when ``ip`` is globally routable unicast and not in a range that
+    ipaddress reports as global but which still reaches internal hosts.
+    """
+    return (
+        ip.is_global
+        and not ip.is_multicast
+        and not any(ip in network for network in _NON_PUBLIC_NETWORKS)
+    )
 
 
 def resolve_hostname_ips(hostname: str) -> list[str]:
@@ -82,7 +154,7 @@ def validate_outbound_http_url(
 
     if not allow_internal:
         for ip_str in resolve_hostname_ips(parsed.hostname):
-            if not is_public_ip(ip_str):
+            if not is_public_ip(ipaddress.ip_address(ip_str)):
                 raise ValueError(
                     f"Connection blocked: {parsed.hostname} resolves to a non-public address",
                 )
@@ -107,7 +179,7 @@ def _rewrite_request_to_pinned_ip(
 
     if not allow_internal:
         for ip_str in ips:
-            if not is_public_ip(ip_str):
+            if not is_public_ip(ipaddress.ip_address(ip_str)):
                 raise httpx.ConnectError(
                     f"Connection blocked: {hostname} resolves to a non-public address",
                 )
