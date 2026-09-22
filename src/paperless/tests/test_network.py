@@ -240,61 +240,77 @@ def _answer(mocker: MockerFixture, *addresses: str) -> MagicMock:
 
 
 class TestResolvePublicAddresses:
-    def test_ip_literal_is_validated_from_resolver_answer(
+    @pytest.mark.parametrize(
+        "host",
+        [
+            pytest.param("93.184.216.34", id="public-ip-literal"),
+            pytest.param("example.com", id="hostname"),
+            pytest.param(
+                "8.8.8.8%2eexample.test",
+                id="dotted-quad-then-percent-and-name",
+            ),
+        ],
+    )
+    def test_host_reaches_the_resolver_verbatim(
         self,
         mocker: MockerFixture,
+        host: str,
     ) -> None:
         """
         GIVEN:
-            - A public IP literal, which the resolver answers with itself
+            - A host: a public IP literal, a hostname, or a dotted quad
+              followed by "%" and more text
+            - A resolver answering with a public address
         WHEN:
             - It is resolved
         THEN:
-            - The literal is passed to the resolver and its answer returned
+            - The whole host is passed to the resolver as a TCP stream lookup
+              on the port, and the resolver's answer is what is returned:
+              nothing is short-circuited on the text of the host
         """
         resolver = _answer(mocker, "93.184.216.34")
 
-        assert resolve_public_addresses("93.184.216.34", 443) == (
+        assert resolve_public_addresses(host, 443) == (
             ipaddress.ip_address("93.184.216.34"),
         )
-        resolver.assert_called_once_with("93.184.216.34", 443, type=socket.SOCK_STREAM)
+        resolver.assert_called_once_with(host, 443, type=socket.SOCK_STREAM)
 
-    def test_private_ip_literal_is_blocked_from_resolver_answer(
+    @pytest.mark.parametrize(
+        ("host", "answer"),
+        [
+            pytest.param("10.0.0.1", "10.0.0.1", id="private-ip-literal"),
+            pytest.param(
+                "8.8.8.8%2eexample.test",
+                "169.254.169.254",
+                id="dotted-quad-then-percent-and-name",
+            ),
+        ],
+    )
+    def test_private_answer_blocks_whatever_the_host_looked_like(
         self,
         mocker: MockerFixture,
+        host: str,
+        answer: str,
     ) -> None:
         """
         GIVEN:
-            - A private IP literal, which the resolver answers with itself
+            - A host that is a private IP literal, or a dotted quad followed
+              by "%" and more text
+            - A resolver answering with a non-public address
         WHEN:
             - It is resolved
         THEN:
-            - The literal is passed to the resolver and blocked as a
-              non-public address
+            - The host is blocked on the resolver's answer, not on the text
+              before "%", and the resolver saw the whole host
         """
-        resolver = _answer(mocker, "10.0.0.1")
+        resolver = _answer(mocker, answer)
 
         with pytest.raises(OutboundRequestBlockedError) as exc_info:
-            resolve_public_addresses("10.0.0.1", 443)
+            resolve_public_addresses(host, 443)
 
         assert exc_info.value.reason is BlockReason.NON_PUBLIC_ADDRESS
-        assert exc_info.value.address == ipaddress.ip_address("10.0.0.1")
-        resolver.assert_called_once_with("10.0.0.1", 443, type=socket.SOCK_STREAM)
-
-    def test_asks_for_stream_sockets_on_the_port(self, mocker: MockerFixture) -> None:
-        """
-        GIVEN:
-            - A hostname
-        WHEN:
-            - It is resolved
-        THEN:
-            - The resolver is asked for TCP stream results for that port
-        """
-        resolver = _answer(mocker, "93.184.216.34")
-
-        resolve_public_addresses("example.com", 443)
-
-        resolver.assert_called_once_with("example.com", 443, type=socket.SOCK_STREAM)
+        assert exc_info.value.address == ipaddress.ip_address(answer)
+        resolver.assert_called_once_with(host, 443, type=socket.SOCK_STREAM)
 
     def test_deduplicates_preserving_order(self, mocker: MockerFixture) -> None:
         """
@@ -384,51 +400,6 @@ class TestResolvePublicAddresses:
 
         with pytest.raises(HostResolutionError):
             resolve_public_addresses("example.com", 443)
-
-    def test_ipv4_with_percent_is_resolved_as_a_name(
-        self,
-        mocker: MockerFixture,
-    ) -> None:
-        """
-        GIVEN:
-            - A dotted quad followed by "%" and more text
-            - A resolver answering with a public address
-        WHEN:
-            - It is resolved
-        THEN:
-            - The whole host is passed to the resolver and its answer returned
-        """
-        resolver = _answer(mocker, "93.184.216.34")
-
-        assert resolve_public_addresses("8.8.8.8%2eexample.test", 443) == (
-            ipaddress.ip_address("93.184.216.34"),
-        )
-        resolver.assert_called_once_with(
-            "8.8.8.8%2eexample.test",
-            443,
-            type=socket.SOCK_STREAM,
-        )
-
-    def test_ipv4_with_percent_resolving_privately_is_blocked(
-        self,
-        mocker: MockerFixture,
-    ) -> None:
-        """
-        GIVEN:
-            - A dotted quad followed by "%" and more text
-            - A resolver answering with a private address
-        WHEN:
-            - It is resolved
-        THEN:
-            - The name is blocked, not taken as the public address before "%"
-        """
-        resolver = _answer(mocker, "169.254.169.254")
-
-        with pytest.raises(OutboundRequestBlockedError) as exc_info:
-            resolve_public_addresses("8.8.8.8%2eexample.test", 443)
-
-        assert exc_info.value.address == ipaddress.ip_address("169.254.169.254")
-        resolver.assert_called_once()
 
 
 class TestAsyncResolvePublicAddresses:
@@ -642,13 +613,42 @@ class TestValidateOutboundHttpUrl:
             type=socket.SOCK_STREAM,
         )
 
-    def test_hostname_invalid_for_http_clients_is_rejected(
+    @pytest.mark.parametrize(
+        "url",
+        [
+            pytest.param(
+                "https://bad\u2764host.example/v1",
+                id="no-idna2008-encoding",
+            ),
+            pytest.param(r"http://127.0.0.1\@evil.example/", id="backslash"),
+            pytest.param(
+                r"http://127.0.0.1:80\@evil.example/",
+                id="backslash-with-port",
+            ),
+            pytest.param("http://evil\t.example/", id="tab-in-host"),
+            pytest.param("http://evil .example/", id="space-in-host"),
+            pytest.param(
+                "https://8.8.8.8%2e169-254-169-254.sslip.io/",
+                id="percent-then-wildcard-dns",
+            ),
+            pytest.param(
+                "https://8.8.8.8%2elocalhost/",
+                id="percent-then-localhost",
+            ),
+        ],
+    )
+    def test_rejects_hosts_http_clients_may_parse_differently(
         self,
         mocker: MockerFixture,
+        url: str,
     ) -> None:
         """
         GIVEN:
-            - A hostname that has no valid IDNA 2008 encoding
+            - A URL whose host another HTTP client may read differently than
+              urlparse and httpx do: no valid IDNA 2008 encoding, a backslash,
+              a control or whitespace character urllib3 may split on, or a
+              percent-escape requests decodes before resolving
+            - A resolver that would answer with a public address
         WHEN:
             - The URL is validated with internal addresses disallowed
         THEN:
@@ -657,10 +657,7 @@ class TestValidateOutboundHttpUrl:
         resolver = _answer(mocker, "93.184.216.34")
 
         with pytest.raises(ValueError, match="Invalid URL scheme or hostname"):
-            validate_outbound_http_url(
-                "https://bad\u2764host.example/v1",
-                allow_internal=False,
-            )
+            validate_outbound_http_url(url, allow_internal=False)
 
         resolver.assert_not_called()
 
@@ -669,98 +666,19 @@ class TestValidateOutboundHttpUrl:
         [
             pytest.param(r"http://127.0.0.1\@evil.example/", id="backslash"),
             pytest.param(
-                r"http://127.0.0.1:80\@evil.example/",
-                id="backslash-with-port",
-            ),
-            pytest.param("http://evil\t.example/", id="tab-in-host"),
-            pytest.param("http://evil .example/", id="space-in-host"),
-        ],
-    )
-    def test_rejects_urls_http_clients_may_parse_differently(
-        self,
-        mocker: MockerFixture,
-        url: str,
-    ) -> None:
-        """
-        GIVEN:
-            - A URL containing a backslash, control or whitespace character,
-              which urllib3 may split into a different host than urlparse and
-              httpx do
-            - A resolver that would answer with a public address
-        WHEN:
-            - The URL is validated with internal addresses disallowed
-        THEN:
-            - It is rejected as invalid without a resolver call
-        """
-        resolver = _answer(mocker, "93.184.216.34")
-
-        with pytest.raises(ValueError, match="Invalid URL scheme or hostname"):
-            validate_outbound_http_url(url, allow_internal=False)
-
-        resolver.assert_not_called()
-
-    def test_allow_internal_does_not_reject_backslash(self) -> None:
-        """
-        GIVEN:
-            - A URL containing a backslash
-        WHEN:
-            - The URL is validated with internal addresses allowed
-        THEN:
-            - It is not rejected, since no host check is made
-        """
-        validate_outbound_http_url(
-            r"http://127.0.0.1\@evil.example/",
-            allow_internal=True,
-        )
-
-    @pytest.mark.parametrize(
-        "url",
-        [
-            pytest.param(
                 "https://8.8.8.8%2e169-254-169-254.sslip.io/",
-                id="dotted-quad-then-wildcard-dns",
+                id="percent-then-wildcard-dns",
             ),
             pytest.param(
                 "https://8.8.8.8%2elocalhost/",
-                id="dotted-quad-then-localhost",
+                id="percent-then-localhost",
             ),
         ],
     )
-    def test_rejects_percent_in_host(self, mocker: MockerFixture, url: str) -> None:
+    def test_allow_internal_does_not_reject_unusual_hosts(self, url: str) -> None:
         """
         GIVEN:
-            - A host containing a percent-escape, which requests decodes before
-              resolving while httpx does not
-            - A resolver that would answer with a public address
-        WHEN:
-            - The URL is validated with internal addresses disallowed
-        THEN:
-            - It is rejected as invalid without a resolver call
-        """
-        resolver = _answer(mocker, "93.184.216.34")
-
-        with pytest.raises(ValueError, match="Invalid URL scheme or hostname"):
-            validate_outbound_http_url(url, allow_internal=False)
-
-        resolver.assert_not_called()
-
-    @pytest.mark.parametrize(
-        "url",
-        [
-            pytest.param(
-                "https://8.8.8.8%2e169-254-169-254.sslip.io/",
-                id="dotted-quad-then-wildcard-dns",
-            ),
-            pytest.param(
-                "https://8.8.8.8%2elocalhost/",
-                id="dotted-quad-then-localhost",
-            ),
-        ],
-    )
-    def test_allow_internal_does_not_reject_percent_in_host(self, url: str) -> None:
-        """
-        GIVEN:
-            - A host containing a percent-escape
+            - A URL whose host contains a backslash or a percent-escape
         WHEN:
             - The URL is validated with internal addresses allowed
         THEN:

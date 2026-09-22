@@ -67,31 +67,6 @@ class TestGuardedTransportSync:
         assert response.status_code == 200
         assert fake_dns.lookups == []
 
-    def test_blocks_internal_host_without_connecting(
-        self,
-        local_http_server: LocalHTTPServer,
-        dial_recorder: DialRecorder,
-    ) -> None:
-        """
-        GIVEN:
-            - Internal addresses disallowed
-        WHEN:
-            - A request is made to localhost through the transport
-        THEN:
-            - It is blocked and the server never sees a connection
-        """
-        with (
-            httpx.Client(
-                transport=GuardedHTTPTransport(allow_internal=False),
-                timeout=5.0,
-            ) as client,
-            pytest.raises(OutboundRequestBlockedError),
-        ):
-            client.get(f"http://localhost:{local_http_server.port}/")
-
-        assert local_http_server.connections == 0
-        assert dial_recorder.hosts() == []
-
     @pytest.mark.usefixtures("every_address_is_public")
     def test_host_header_is_the_hostname(
         self,
@@ -233,12 +208,13 @@ class TestGuardedTransportSync:
     @pytest.mark.parametrize(
         "host",
         [
+            pytest.param("localhost", id="name"),
             pytest.param("2130706433", id="decimal"),
             pytest.param("0x7f.1", id="hex-short"),
             pytest.param("127.1", id="short-dotted"),
         ],
     )
-    def test_numeric_host_forms_are_blocked(
+    def test_blocks_internal_host_without_connecting(
         self,
         local_http_server: LocalHTTPServer,
         dial_recorder: DialRecorder,
@@ -247,7 +223,8 @@ class TestGuardedTransportSync:
         """
         GIVEN:
             - Internal addresses disallowed
-            - A URL whose host is a non-canonical spelling of 127.0.0.1
+            - A URL whose host reaches loopback, by name or by a
+              non-canonical spelling of 127.0.0.1
         WHEN:
             - A request is made through the transport
         THEN:
