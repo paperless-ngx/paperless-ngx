@@ -15,9 +15,9 @@ import pytest
 
 from paperless_mail.models import MailRule
 from paperless_mail.tests.factories import MailAccountFactory
-from paperless_mail.tests.test_mail import MessageBuilder
-from paperless_mail.tests.test_mail import _AttachmentDef
-from paperless_mail.tests.test_mail import fake_magic_from_buffer
+from paperless_mail.tests.helpers import MessageBuilder
+from paperless_mail.tests.helpers import _AttachmentDef
+from paperless_mail.tests.helpers import fake_magic_from_buffer
 
 
 @pytest.fixture()
