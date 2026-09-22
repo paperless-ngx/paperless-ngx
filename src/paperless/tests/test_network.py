@@ -590,3 +590,52 @@ class TestValidateOutboundHttpUrl:
             )
 
         resolver.assert_not_called()
+
+    @pytest.mark.parametrize(
+        "url",
+        [
+            pytest.param(r"http://127.0.0.1\@evil.example/", id="backslash"),
+            pytest.param(
+                r"http://127.0.0.1:80\@evil.example/",
+                id="backslash-with-port",
+            ),
+            pytest.param("http://evil\t.example/", id="tab-in-host"),
+            pytest.param("http://evil .example/", id="space-in-host"),
+        ],
+    )
+    def test_rejects_urls_http_clients_may_parse_differently(
+        self,
+        mocker: MockerFixture,
+        url: str,
+    ) -> None:
+        """
+        GIVEN:
+            - A URL containing a backslash, control or whitespace character,
+              which urllib3 may split into a different host than urlparse and
+              httpx do
+            - A resolver that would answer with a public address
+        WHEN:
+            - The URL is validated with internal addresses disallowed
+        THEN:
+            - It is rejected as invalid without a resolver call
+        """
+        resolver = _answer(mocker, "93.184.216.34")
+
+        with pytest.raises(ValueError, match="Invalid URL scheme or hostname"):
+            validate_outbound_http_url(url, allow_internal=False)
+
+        resolver.assert_not_called()
+
+    def test_allow_internal_does_not_reject_backslash(self) -> None:
+        """
+        GIVEN:
+            - A URL containing a backslash
+        WHEN:
+            - The URL is validated with internal addresses allowed
+        THEN:
+            - It is not rejected, since no host check is made
+        """
+        validate_outbound_http_url(
+            r"http://127.0.0.1\@evil.example/",
+            allow_internal=True,
+        )

@@ -1,5 +1,6 @@
 import functools
 import ipaddress
+import re
 import socket
 from collections.abc import Callable
 from collections.abc import Collection
@@ -207,6 +208,12 @@ def format_host_for_url(host: str) -> str:
         return host
 
 
+# urllib3 treats a backslash as ending the authority while urlparse and httpx do
+# not, so the host checked here could differ from the one that is dialled.
+# Control and whitespace characters are refused for the same reason.
+_UNSAFE_URL_CHARS = re.compile(r"[\\\x00-\x1f\x7f\s]")
+
+
 def _dns_name(url: str) -> str:
     """
     The ASCII hostname that httpx and urllib3 look up for ``url``.
@@ -246,6 +253,8 @@ def validate_outbound_http_url(
         raise ValueError("Destination port not permitted.")
 
     if not allow_internal:
+        if _UNSAFE_URL_CHARS.search(url):
+            raise ValueError("Invalid URL scheme or hostname.")
         try:
             resolve_public_addresses(_dns_name(url), port)
         except (OutboundRequestBlockedError, HostResolutionError) as e:
