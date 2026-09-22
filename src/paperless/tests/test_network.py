@@ -1,19 +1,26 @@
 import ipaddress
+import logging
 import pickle
 import socket
+from collections.abc import Iterable
 from typing import Any
 from unittest import mock
 from unittest.mock import MagicMock
 
+import anyio
+import httpcore
 import httpx
 import pytest
 from celery.utils.serialization import get_pickleable_exception
 from pytest_mock import MockerFixture
 
+from paperless.network import MAX_ADDRESSES_TRIED
 from paperless.network import BlockReason
 from paperless.network import HostResolutionError
 from paperless.network import OutboundRequestBlockedError
 from paperless.network import PinnedHostHTTPTransport
+from paperless.network import _GuardedAsyncBackend
+from paperless.network import _GuardedSyncBackend
 from paperless.network import aresolve_public_addresses
 from paperless.network import blocked_message
 from paperless.network import is_public_ip
@@ -639,3 +646,644 @@ class TestValidateOutboundHttpUrl:
             r"http://127.0.0.1\@evil.example/",
             allow_internal=True,
         )
+
+
+class FakeClock:
+    def __init__(self) -> None:
+        self.now = 1000.0
+
+    def __call__(self) -> float:
+        return self.now
+
+    def advance(self, seconds: float) -> None:
+        self.now += seconds
+
+
+@pytest.fixture
+def clock(mocker: MockerFixture) -> FakeClock:
+    fake = FakeClock()
+    mocker.patch("paperless.network._monotonic", new=fake)
+    return fake
+
+
+class ScriptedBackend(httpcore.NetworkBackend):
+    """
+    Inner backend double. Each host either connects (default), refuses
+    immediately, or black-holes (uses its whole timeout, then times out).
+    """
+
+    def __init__(self, clock: FakeClock, outcomes: dict[str, str]) -> None:
+        self.clock = clock
+        self.outcomes = outcomes
+        self.calls: list[tuple[str, float | None]] = []
+        self.slept: list[float] = []
+
+    def connect_tcp(
+        self,
+        host: str,
+        port: int,
+        timeout: float | None = None,
+        local_address: str | None = None,
+        socket_options: Iterable[httpcore.SOCKET_OPTION] | None = None,
+    ) -> httpcore.NetworkStream:
+        self.calls.append((host, timeout))
+        outcome = self.outcomes.get(host, "connect")
+        if outcome == "refuse":
+            raise httpcore.ConnectError(f"refused {host}")
+        if outcome == "blackhole":
+            self.clock.advance(timeout or 0.0)
+            raise httpcore.ConnectTimeout(f"timed out {host}")
+        return httpcore.MockStream([])
+
+    def sleep(self, seconds: float) -> None:
+        self.slept.append(seconds)
+
+
+class AsyncScriptedBackend(httpcore.AsyncNetworkBackend):
+    """Async twin of ScriptedBackend."""
+
+    def __init__(self, clock: FakeClock, outcomes: dict[str, str]) -> None:
+        self.clock = clock
+        self.outcomes = outcomes
+        self.calls: list[tuple[str, float | None]] = []
+        self.slept: list[float] = []
+
+    async def connect_tcp(
+        self,
+        host: str,
+        port: int,
+        timeout: float | None = None,
+        local_address: str | None = None,
+        socket_options: Iterable[httpcore.SOCKET_OPTION] | None = None,
+    ) -> httpcore.AsyncNetworkStream:
+        self.calls.append((host, timeout))
+        outcome = self.outcomes.get(host, "connect")
+        if outcome == "refuse":
+            raise httpcore.ConnectError(f"refused {host}")
+        if outcome == "blackhole":
+            self.clock.advance(timeout or 0.0)
+            raise httpcore.ConnectTimeout(f"timed out {host}")
+        return httpcore.AsyncMockStream([])
+
+    async def sleep(self, seconds: float) -> None:
+        self.slept.append(seconds)
+
+
+def _public_ipv4(count: int) -> list[str]:
+    return [f"93.184.216.{index + 1}" for index in range(count)]
+
+
+_ATTEMPT_BUDGETS = [
+    pytest.param(5.0, 2, [2.5, 2.5], id="5s-2-addresses"),
+    pytest.param(5.0, 3, [2.0, 3.0], id="5s-3-addresses"),
+    pytest.param(5.0, 8, [2.0, 3.0], id="5s-8-addresses"),
+    pytest.param(1.0, 2, [1.0], id="1s-2-addresses"),
+    pytest.param(120.0, 8, [10.0] * 7 + [50.0], id="120s-8-addresses"),
+    pytest.param(None, 3, [10.0, 10.0, None], id="no-timeout-3-addresses"),
+]
+
+
+class TestGuardedSyncBackend:
+    def test_dials_validated_literals_in_order(
+        self,
+        mocker: MockerFixture,
+        clock: FakeClock,
+    ) -> None:
+        """
+        GIVEN:
+            - A hostname whose first address refuses and second accepts
+        WHEN:
+            - The guard connects
+        THEN:
+            - It dials the IP literals in turn, never the hostname
+        """
+        _answer(mocker, "93.184.216.1", "93.184.216.2")
+        inner = ScriptedBackend(clock, {"93.184.216.1": "refuse"})
+        guard = _GuardedSyncBackend(inner, allow_internal=False)
+
+        guard.connect_tcp("example.com", 443, timeout=5.0)
+
+        assert [host for host, _ in inner.calls] == ["93.184.216.1", "93.184.216.2"]
+
+    @pytest.mark.parametrize(
+        ("answers", "expected"),
+        [
+            pytest.param(
+                ["2606:4700::1", "2606:4700::2", "93.184.216.1", "93.184.216.2"],
+                ["2606:4700::1", "93.184.216.1", "2606:4700::2", "93.184.216.2"],
+                id="balanced",
+            ),
+            pytest.param(
+                ["2606:4700::1", "2606:4700::2", "2606:4700::3", "93.184.216.1"],
+                ["2606:4700::1", "93.184.216.1", "2606:4700::2", "2606:4700::3"],
+                id="one-family-runs-out",
+            ),
+            pytest.param(
+                ["93.184.216.1", "93.184.216.2"],
+                ["93.184.216.1", "93.184.216.2"],
+                id="single-family",
+            ),
+        ],
+    )
+    def test_interleaves_address_families(
+        self,
+        mocker: MockerFixture,
+        clock: FakeClock,
+        answers: list[str],
+        expected: list[str],
+    ) -> None:
+        """
+        GIVEN:
+            - Resolver results grouped by address family
+        WHEN:
+            - Every address refuses
+        THEN:
+            - Families are alternated, starting with the first result's family
+        """
+        _answer(mocker, *answers)
+        inner = ScriptedBackend(clock, dict.fromkeys(answers, "refuse"))
+        guard = _GuardedSyncBackend(inner, allow_internal=False)
+
+        with pytest.raises(httpcore.ConnectError):
+            guard.connect_tcp("example.com", 443, timeout=5.0)
+
+        assert [host for host, _ in inner.calls] == expected
+
+    @pytest.mark.parametrize(("timeout", "count", "expected"), _ATTEMPT_BUDGETS)
+    def test_attempt_budgets(
+        self,
+        mocker: MockerFixture,
+        clock: FakeClock,
+        timeout: float | None,
+        count: int,
+        expected: list[float | None],
+    ) -> None:
+        """
+        GIVEN:
+            - Every resolved address black-holed
+        WHEN:
+            - The guard connects with a given timeout
+        THEN:
+            - Each attempt gets the budget the connect-time policy prescribes
+        """
+        addresses = _public_ipv4(count)
+        _answer(mocker, *addresses)
+        inner = ScriptedBackend(clock, dict.fromkeys(addresses, "blackhole"))
+        guard = _GuardedSyncBackend(inner, allow_internal=False)
+
+        with pytest.raises(httpcore.ConnectTimeout):
+            guard.connect_tcp("example.com", 443, timeout=timeout)
+
+        assert [budget for _, budget in inner.calls] == expected
+
+    def test_quick_refusal_leaves_budget_for_next_address(
+        self,
+        mocker: MockerFixture,
+        clock: FakeClock,
+    ) -> None:
+        """
+        GIVEN:
+            - A 1 second budget, a refusing first address and a working second
+        WHEN:
+            - The guard connects
+        THEN:
+            - Both addresses are tried and the connection succeeds
+        """
+        _answer(mocker, "93.184.216.1", "93.184.216.2")
+        inner = ScriptedBackend(clock, {"93.184.216.1": "refuse"})
+        guard = _GuardedSyncBackend(inner, allow_internal=False)
+
+        guard.connect_tcp("example.com", 443, timeout=1.0)
+
+        assert inner.calls == [("93.184.216.1", 1.0), ("93.184.216.2", 1.0)]
+
+    def test_resolution_time_is_not_charged(
+        self,
+        mocker: MockerFixture,
+        clock: FakeClock,
+    ) -> None:
+        """
+        GIVEN:
+            - A resolver that takes 4 seconds against a 5 second timeout
+        WHEN:
+            - The guard connects to two black-holed addresses
+        THEN:
+            - The attempts share the full 5 seconds
+        """
+        infos = _addrinfo("93.184.216.1", "93.184.216.2")
+
+        def slow_resolver(*_args: object, **_kwargs: object) -> list[tuple[Any, ...]]:
+            clock.advance(4.0)
+            return infos
+
+        mocker.patch("paperless.network._getaddrinfo", side_effect=slow_resolver)
+        inner = ScriptedBackend(
+            clock,
+            {"93.184.216.1": "blackhole", "93.184.216.2": "blackhole"},
+        )
+        guard = _GuardedSyncBackend(inner, allow_internal=False)
+
+        with pytest.raises(httpcore.ConnectTimeout):
+            guard.connect_tcp("example.com", 443, timeout=5.0)
+
+        assert [budget for _, budget in inner.calls] == [2.5, 2.5]
+
+    @pytest.mark.parametrize(
+        "timeout",
+        [pytest.param(0.0, id="zero"), pytest.param(-1.0, id="negative")],
+    )
+    def test_non_positive_timeout(
+        self,
+        mocker: MockerFixture,
+        clock: FakeClock,
+        timeout: float,
+    ) -> None:
+        """
+        GIVEN:
+            - A zero or negative connect timeout
+        WHEN:
+            - The guard connects
+        THEN:
+            - It times out without resolving or dialling
+        """
+        resolver = _answer(mocker, "93.184.216.1")
+        inner = ScriptedBackend(clock, {})
+        guard = _GuardedSyncBackend(inner, allow_internal=False)
+
+        with pytest.raises(httpcore.ConnectTimeout):
+            guard.connect_tcp("example.com", 443, timeout=timeout)
+
+        resolver.assert_not_called()
+        assert inner.calls == []
+
+    def test_caps_attempts(self, mocker: MockerFixture, clock: FakeClock) -> None:
+        """
+        GIVEN:
+            - More public addresses than the attempt cap, all refusing
+        WHEN:
+            - The guard connects
+        THEN:
+            - Only the capped number of addresses is dialled
+        """
+        addresses = _public_ipv4(MAX_ADDRESSES_TRIED + 2)
+        _answer(mocker, *addresses)
+        inner = ScriptedBackend(clock, dict.fromkeys(addresses, "refuse"))
+        guard = _GuardedSyncBackend(inner, allow_internal=False)
+
+        with pytest.raises(httpcore.ConnectError):
+            guard.connect_tcp("example.com", 443, timeout=5.0)
+
+        assert len(inner.calls) == MAX_ADDRESSES_TRIED
+
+    def test_private_address_beyond_cap_still_blocks(
+        self,
+        mocker: MockerFixture,
+        clock: FakeClock,
+    ) -> None:
+        """
+        GIVEN:
+            - A private address after more public addresses than the cap
+        WHEN:
+            - The guard connects
+        THEN:
+            - The name is blocked and nothing is dialled
+        """
+        _answer(mocker, *_public_ipv4(MAX_ADDRESSES_TRIED), "10.0.0.1")
+        inner = ScriptedBackend(clock, {})
+        guard = _GuardedSyncBackend(inner, allow_internal=False)
+
+        with pytest.raises(OutboundRequestBlockedError):
+            guard.connect_tcp("example.com", 443, timeout=5.0)
+
+        assert inner.calls == []
+
+    def test_block_is_logged(
+        self,
+        mocker: MockerFixture,
+        clock: FakeClock,
+        caplog: pytest.LogCaptureFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A hostname resolving to a private address
+        WHEN:
+            - The guard connects
+        THEN:
+            - A warning names the destination and the reason
+            - The resolved internal address is not logged
+        """
+        _answer(mocker, "10.0.0.1")
+        guard = _GuardedSyncBackend(ScriptedBackend(clock, {}), allow_internal=False)
+
+        with (
+            caplog.at_level(logging.DEBUG, logger="paperless.network"),
+            pytest.raises(OutboundRequestBlockedError),
+        ):
+            guard.connect_tcp("example.com", 443, timeout=5.0)
+
+        assert "example.com:443" in caplog.text
+        assert "non_public_address" in caplog.text
+        assert "10.0.0.1" not in caplog.text
+
+    def test_resolves_again_for_every_connection(
+        self,
+        mocker: MockerFixture,
+        clock: FakeClock,
+    ) -> None:
+        """
+        GIVEN:
+            - A hostname that resolves to a public address, then to a private
+              one (DNS rebinding)
+        WHEN:
+            - The guard opens two connections to it
+        THEN:
+            - The first connects to the public address
+            - The second is blocked and nothing more is dialled
+        """
+        mocker.patch(
+            "paperless.network._getaddrinfo",
+            side_effect=[_addrinfo("93.184.216.34"), _addrinfo("10.0.0.1")],
+        )
+        inner = ScriptedBackend(clock, {})
+        guard = _GuardedSyncBackend(inner, allow_internal=False)
+
+        guard.connect_tcp("example.com", 443, timeout=5.0)
+        with pytest.raises(OutboundRequestBlockedError):
+            guard.connect_tcp("example.com", 443, timeout=5.0)
+
+        assert [host for host, _ in inner.calls] == ["93.184.216.34"]
+
+    def test_resolution_failure_is_a_connect_error(
+        self,
+        mocker: MockerFixture,
+        clock: FakeClock,
+    ) -> None:
+        """
+        GIVEN:
+            - A resolver that fails
+        WHEN:
+            - The guard connects
+        THEN:
+            - A connect error is raised, not a policy block
+        """
+        mocker.patch(
+            "paperless.network._getaddrinfo",
+            side_effect=socket.gaierror(-2, "Name or service not known"),
+        )
+        guard = _GuardedSyncBackend(ScriptedBackend(clock, {}), allow_internal=False)
+
+        with pytest.raises(
+            httpcore.ConnectError,
+            match=r"Could not resolve example\.com",
+        ):
+            guard.connect_tcp("example.com", 443, timeout=5.0)
+
+    def test_allow_internal_passes_hostname_through(
+        self,
+        mocker: MockerFixture,
+        clock: FakeClock,
+    ) -> None:
+        """
+        GIVEN:
+            - Internal addresses allowed
+        WHEN:
+            - The guard connects
+        THEN:
+            - The inner backend gets the hostname and no resolution happens
+        """
+        resolver = _answer(mocker, "10.0.0.1")
+        inner = ScriptedBackend(clock, {})
+        guard = _GuardedSyncBackend(inner, allow_internal=True)
+
+        guard.connect_tcp("localhost", 8080, timeout=5.0)
+
+        assert inner.calls == [("localhost", 5.0)]
+        resolver.assert_not_called()
+
+    def test_unix_sockets_are_refused(self, clock: FakeClock) -> None:
+        """
+        GIVEN:
+            - A guard
+        WHEN:
+            - A unix socket connection is requested
+        THEN:
+            - It is blocked with the unix socket reason
+        """
+        guard = _GuardedSyncBackend(ScriptedBackend(clock, {}), allow_internal=True)
+
+        with pytest.raises(OutboundRequestBlockedError) as exc_info:
+            guard.connect_unix_socket("/run/app.sock")
+
+        assert exc_info.value.reason is BlockReason.UNIX_SOCKET
+        assert exc_info.value.host == "/run/app.sock"
+
+    def test_sleep_delegates(self, clock: FakeClock) -> None:
+        """
+        GIVEN:
+            - A guard
+        WHEN:
+            - httpcore asks it to sleep between retries
+        THEN:
+            - The inner backend sleeps
+        """
+        inner = ScriptedBackend(clock, {})
+
+        _GuardedSyncBackend(inner, allow_internal=False).sleep(0.5)
+
+        assert inner.slept == [0.5]
+
+
+class TestGuardedAsyncBackend:
+    @pytest.fixture(autouse=True)
+    def anyio_backend(self) -> str:
+        return "asyncio"
+
+    @pytest.mark.anyio
+    async def test_falls_back_to_next_address(
+        self,
+        mocker: MockerFixture,
+        clock: FakeClock,
+    ) -> None:
+        """
+        GIVEN:
+            - A refusing first address and a working second
+        WHEN:
+            - The async guard connects
+        THEN:
+            - Both literals are dialled in order
+        """
+        _answer(mocker, "2606:4700::1", "93.184.216.1")
+        inner = AsyncScriptedBackend(clock, {"2606:4700::1": "refuse"})
+        guard = _GuardedAsyncBackend(inner, allow_internal=False)
+
+        await guard.connect_tcp("example.com", 443, timeout=5.0)
+
+        assert [host for host, _ in inner.calls] == ["2606:4700::1", "93.184.216.1"]
+
+    @pytest.mark.anyio
+    @pytest.mark.parametrize(("timeout", "count", "expected"), _ATTEMPT_BUDGETS)
+    async def test_attempt_budgets(
+        self,
+        mocker: MockerFixture,
+        clock: FakeClock,
+        timeout: float | None,
+        count: int,
+        expected: list[float | None],
+    ) -> None:
+        """
+        GIVEN:
+            - Every resolved address black-holed
+        WHEN:
+            - The async guard connects with a given timeout
+        THEN:
+            - Each attempt gets the prescribed budget
+        """
+        addresses = _public_ipv4(count)
+        _answer(mocker, *addresses)
+        inner = AsyncScriptedBackend(clock, dict.fromkeys(addresses, "blackhole"))
+        guard = _GuardedAsyncBackend(inner, allow_internal=False)
+
+        with pytest.raises(httpcore.ConnectTimeout):
+            await guard.connect_tcp("example.com", 443, timeout=timeout)
+
+        assert [budget for _, budget in inner.calls] == expected
+
+    @pytest.mark.anyio
+    async def test_blocks_non_public(
+        self,
+        mocker: MockerFixture,
+        clock: FakeClock,
+    ) -> None:
+        """
+        GIVEN:
+            - A hostname resolving to a private address
+        WHEN:
+            - The async guard connects
+        THEN:
+            - It is blocked and nothing is dialled
+        """
+        _answer(mocker, "10.0.0.1")
+        inner = AsyncScriptedBackend(clock, {})
+        guard = _GuardedAsyncBackend(inner, allow_internal=False)
+
+        with pytest.raises(OutboundRequestBlockedError):
+            await guard.connect_tcp("example.com", 443, timeout=5.0)
+
+        assert inner.calls == []
+
+    @pytest.mark.anyio
+    async def test_slow_resolution_times_out(self, mocker: MockerFixture) -> None:
+        """
+        GIVEN:
+            - A resolver slower than the connect timeout
+        WHEN:
+            - The async guard connects
+        THEN:
+            - It raises a connect timeout (real time: fail_after follows the
+              event loop clock)
+        """
+
+        async def slow_resolver(
+            *_args: object,
+            **_kwargs: object,
+        ) -> list[tuple[Any, ...]]:
+            await anyio.sleep(0.2)
+            return _addrinfo("93.184.216.1")
+
+        mocker.patch("paperless.network._agetaddrinfo", new=slow_resolver)
+        guard = _GuardedAsyncBackend(
+            AsyncScriptedBackend(FakeClock(), {}),
+            allow_internal=False,
+        )
+
+        with pytest.raises(httpcore.ConnectTimeout, match="Timed out resolving"):
+            await guard.connect_tcp("example.com", 443, timeout=0.05)
+
+    @pytest.mark.anyio
+    async def test_resolution_failure_is_a_connect_error(
+        self,
+        mocker: MockerFixture,
+        clock: FakeClock,
+    ) -> None:
+        """
+        GIVEN:
+            - An async resolver that fails
+        WHEN:
+            - The async guard connects
+        THEN:
+            - A connect error is raised, not a policy block
+        """
+        mocker.patch(
+            "paperless.network._agetaddrinfo",
+            new=mocker.AsyncMock(
+                side_effect=socket.gaierror(-2, "Name or service not known"),
+            ),
+        )
+        guard = _GuardedAsyncBackend(
+            AsyncScriptedBackend(clock, {}),
+            allow_internal=False,
+        )
+
+        with pytest.raises(
+            httpcore.ConnectError,
+            match=r"Could not resolve example\.com",
+        ):
+            await guard.connect_tcp("example.com", 443, timeout=5.0)
+
+    @pytest.mark.anyio
+    async def test_allow_internal_passes_hostname_through(
+        self,
+        mocker: MockerFixture,
+        clock: FakeClock,
+    ) -> None:
+        """
+        GIVEN:
+            - Internal addresses allowed
+        WHEN:
+            - The async guard connects
+        THEN:
+            - The inner backend gets the hostname and no resolution happens
+        """
+        _answer(mocker, "10.0.0.1")
+        inner = AsyncScriptedBackend(clock, {})
+        guard = _GuardedAsyncBackend(inner, allow_internal=True)
+
+        await guard.connect_tcp("localhost", 8080, timeout=5.0)
+
+        assert inner.calls == [("localhost", 5.0)]
+
+    @pytest.mark.anyio
+    async def test_unix_sockets_are_refused(self, clock: FakeClock) -> None:
+        """
+        GIVEN:
+            - An async guard
+        WHEN:
+            - A unix socket connection is requested
+        THEN:
+            - It is blocked with the unix socket reason
+        """
+        guard = _GuardedAsyncBackend(
+            AsyncScriptedBackend(clock, {}),
+            allow_internal=True,
+        )
+
+        with pytest.raises(OutboundRequestBlockedError) as exc_info:
+            await guard.connect_unix_socket("/run/app.sock")
+
+        assert exc_info.value.reason is BlockReason.UNIX_SOCKET
+
+    @pytest.mark.anyio
+    async def test_sleep_delegates(self, clock: FakeClock) -> None:
+        """
+        GIVEN:
+            - An async guard
+        WHEN:
+            - httpcore asks it to sleep between retries
+        THEN:
+            - The inner backend sleeps
+        """
+        inner = AsyncScriptedBackend(clock, {})
+
+        await _GuardedAsyncBackend(inner, allow_internal=False).sleep(0.5)
+
+        assert inner.slept == [0.5]

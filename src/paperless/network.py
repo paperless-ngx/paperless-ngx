@@ -1,19 +1,26 @@
 import functools
 import ipaddress
+import logging
+import math
 import re
 import socket
+import time
 from collections.abc import Callable
 from collections.abc import Collection
 from collections.abc import Iterable
 from enum import StrEnum
 from typing import Any
+from typing import Final
 from typing import Self
 from typing import TypeAlias
 from urllib.parse import ParseResult
 from urllib.parse import urlparse
 
 import anyio
+import httpcore
 import httpx
+
+logger = logging.getLogger("paperless.network")
 
 # requires-python is >=3.11, so no PEP 695 `type` statement.
 IPAddress: TypeAlias = ipaddress.IPv4Address | ipaddress.IPv6Address
@@ -109,10 +116,12 @@ def is_public_ip(ip: IPAddress) -> bool:
     )
 
 
-# Resolver indirection so tests can fake DNS for this module without changing
-# how the stock httpcore backends resolve the literals the guard dials.
+# Resolver and clock indirection so tests can fake DNS and time for this module
+# without changing how the stock httpcore backends resolve the literals the
+# guard dials.
 _getaddrinfo = socket.getaddrinfo
 _agetaddrinfo = anyio.getaddrinfo
+_monotonic = time.monotonic
 
 
 def _parse_ip_literal(host: str) -> IPAddress | None:
@@ -181,6 +190,229 @@ async def aresolve_public_addresses(
     except (OSError, UnicodeError) as e:
         raise HostResolutionError(host=host, detail=str(e)) from e
     return _require_public(host, port, _collect_addresses(host, infos))
+
+
+MAX_ADDRESSES_TRIED: Final = 8
+MIN_ATTEMPT_TIMEOUT: Final = 2.0
+MAX_ATTEMPT_TIMEOUT: Final = 10.0
+
+
+def _require_positive_timeout(host: str, timeout: float | None) -> None:
+    # A zero timeout makes the socket non-blocking and a negative one is
+    # rejected by settimeout; neither can produce a useful connection attempt.
+    if timeout is not None and timeout <= 0:
+        raise httpcore.ConnectTimeout(
+            f"Connect timeout for {host} must be positive, got {timeout}",
+        )
+
+
+def _deadline(timeout: float | None) -> float:
+    return math.inf if timeout is None else _monotonic() + timeout
+
+
+def _attempt_order(addresses: tuple[IPAddress, ...]) -> list[IPAddress]:
+    # Alternate address families, starting with the resolver's first family
+    # (RFC 8305 section 4), so one unreachable family cannot delay the other.
+    first_version = addresses[0].version
+    primary = [a for a in addresses if a.version == first_version]
+    secondary = [a for a in addresses if a.version != first_version]
+    ordered: list[IPAddress] = []
+    for index in range(max(len(primary), len(secondary))):
+        ordered.extend(primary[index : index + 1])
+        ordered.extend(secondary[index : index + 1])
+    return ordered[:MAX_ADDRESSES_TRIED]
+
+
+def _attempt_timeout(remaining: float, attempts_left: int) -> float:
+    """
+    Budget for the next attempt. Once the budget is too small to split, or on
+    the last address, the attempt gets everything left. Otherwise it gets an
+    equal share clamped to [MIN, MAX], always leaving MIN for a later attempt.
+    The floor survives one lost SYN; the ceiling bounds how long a black-holed
+    address delays the next one.
+    """
+    if attempts_left == 1 or remaining < 2 * MIN_ATTEMPT_TIMEOUT:
+        return remaining
+    share = remaining / attempts_left
+    return min(
+        MAX_ATTEMPT_TIMEOUT,
+        max(MIN_ATTEMPT_TIMEOUT, share),
+        remaining - MIN_ATTEMPT_TIMEOUT,
+    )
+
+
+def _as_httpcore_timeout(seconds: float) -> float | None:
+    return None if math.isinf(seconds) else seconds
+
+
+def _log_block(error: OutboundRequestBlockedError) -> None:
+    logger.warning("Blocked outbound connection: %s", error)
+
+
+def _budget_exhausted(host: str, tried: int, total: int) -> httpcore.ConnectTimeout:
+    return httpcore.ConnectTimeout(
+        f"Timed out connecting to {host} after trying {tried} of {total} addresses",
+    )
+
+
+def _resolve_for_connect(host: str, port: int) -> tuple[IPAddress, ...]:
+    try:
+        return resolve_public_addresses(host, port)
+    except OutboundRequestBlockedError as e:
+        _log_block(e)
+        raise
+    except HostResolutionError as e:
+        raise httpcore.ConnectError(str(e)) from e
+
+
+class _GuardedSyncBackend(httpcore.NetworkBackend):
+    """
+    Wraps httpcore's sync backend. With internal addresses disallowed, it
+    resolves the origin host itself, rejects the name if any address is
+    non-public, and dials the validated literals so the checked address is
+    the connected one. TLS still verifies against the origin hostname.
+    """
+
+    def __init__(self, inner: httpcore.NetworkBackend, *, allow_internal: bool) -> None:
+        self._inner = inner
+        self._allow_internal = allow_internal
+
+    def connect_tcp(
+        self,
+        host: str,
+        port: int,
+        timeout: float | None = None,
+        local_address: str | None = None,
+        socket_options: Iterable[httpcore.SOCKET_OPTION] | None = None,
+    ) -> httpcore.NetworkStream:
+        if self._allow_internal:
+            return self._inner.connect_tcp(
+                host,
+                port,
+                timeout=timeout,
+                local_address=local_address,
+                socket_options=socket_options,
+            )
+        _require_positive_timeout(host, timeout)
+        # Resolution is not charged to the budget, matching the stock backend.
+        candidates = _attempt_order(_resolve_for_connect(host, port))
+        deadline = _deadline(timeout)
+        last_error: httpcore.ConnectError | httpcore.ConnectTimeout | None = None
+        for index, address in enumerate(candidates):
+            remaining = deadline - _monotonic()
+            if remaining <= 0:
+                raise _budget_exhausted(host, index, len(candidates))
+            budget = _attempt_timeout(remaining, len(candidates) - index)
+            try:
+                return self._inner.connect_tcp(
+                    str(address),
+                    port,
+                    timeout=_as_httpcore_timeout(budget),
+                    local_address=local_address,
+                    socket_options=socket_options,
+                )
+            except (httpcore.ConnectError, httpcore.ConnectTimeout) as e:
+                logger.debug("Connecting to %s via %s failed: %s", host, address, e)
+                last_error = e
+        # candidates is never empty, so every address was tried and failed
+        raise last_error or _budget_exhausted(host, len(candidates), len(candidates))
+
+    def connect_unix_socket(
+        self,
+        path: str,
+        timeout: float | None = None,
+        socket_options: Iterable[httpcore.SOCKET_OPTION] | None = None,
+    ) -> httpcore.NetworkStream:
+        error = OutboundRequestBlockedError(
+            host=path,
+            port=None,
+            reason=BlockReason.UNIX_SOCKET,
+        )
+        _log_block(error)
+        raise error
+
+    def sleep(self, seconds: float) -> None:
+        self._inner.sleep(seconds)
+
+
+class _GuardedAsyncBackend(httpcore.AsyncNetworkBackend):
+    """Async twin of _GuardedSyncBackend."""
+
+    def __init__(
+        self,
+        inner: httpcore.AsyncNetworkBackend,
+        *,
+        allow_internal: bool,
+    ) -> None:
+        self._inner = inner
+        self._allow_internal = allow_internal
+
+    async def connect_tcp(
+        self,
+        host: str,
+        port: int,
+        timeout: float | None = None,
+        local_address: str | None = None,
+        socket_options: Iterable[httpcore.SOCKET_OPTION] | None = None,
+    ) -> httpcore.AsyncNetworkStream:
+        if self._allow_internal:
+            return await self._inner.connect_tcp(
+                host,
+                port,
+                timeout=timeout,
+                local_address=local_address,
+                socket_options=socket_options,
+            )
+        _require_positive_timeout(host, timeout)
+        # Resolution counts against the budget, matching the stock backend.
+        # This scope closes before dialling; attempts are not nested inside it.
+        deadline = _deadline(timeout)
+        try:
+            with anyio.fail_after(timeout):
+                addresses = await aresolve_public_addresses(host, port)
+        except TimeoutError as e:
+            raise httpcore.ConnectTimeout(f"Timed out resolving {host}") from e
+        except OutboundRequestBlockedError as e:
+            _log_block(e)
+            raise
+        except HostResolutionError as e:
+            raise httpcore.ConnectError(str(e)) from e
+        candidates = _attempt_order(addresses)
+        last_error: httpcore.ConnectError | httpcore.ConnectTimeout | None = None
+        for index, address in enumerate(candidates):
+            remaining = deadline - _monotonic()
+            if remaining <= 0:
+                raise _budget_exhausted(host, index, len(candidates))
+            budget = _attempt_timeout(remaining, len(candidates) - index)
+            try:
+                return await self._inner.connect_tcp(
+                    str(address),
+                    port,
+                    timeout=_as_httpcore_timeout(budget),
+                    local_address=local_address,
+                    socket_options=socket_options,
+                )
+            except (httpcore.ConnectError, httpcore.ConnectTimeout) as e:
+                logger.debug("Connecting to %s via %s failed: %s", host, address, e)
+                last_error = e
+        raise last_error or _budget_exhausted(host, len(candidates), len(candidates))
+
+    async def connect_unix_socket(
+        self,
+        path: str,
+        timeout: float | None = None,
+        socket_options: Iterable[httpcore.SOCKET_OPTION] | None = None,
+    ) -> httpcore.AsyncNetworkStream:
+        error = OutboundRequestBlockedError(
+            host=path,
+            port=None,
+            reason=BlockReason.UNIX_SOCKET,
+        )
+        _log_block(error)
+        raise error
+
+    async def sleep(self, seconds: float) -> None:
+        await self._inner.sleep(seconds)
 
 
 def resolve_hostname_ips(hostname: str) -> list[str]:
