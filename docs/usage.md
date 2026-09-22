@@ -613,7 +613,7 @@ The following workflow action types are available:
 - The request headers as key-value pairs
 
 For security reasons, webhooks can be limited to specific ports and disallowed from connecting to local URLs. See the relevant
-[configuration settings](configuration.md#workflow-webhooks) to change this behavior. If you are allowing non-admins to create workflows,
+[configuration settings](configuration.md#workflow-webhooks) to change this behavior. Webhook requests connect directly (proxy environment variables are not used) and do not follow redirects. If you are allowing non-admins to create workflows,
 you may want to adjust these settings to prevent abuse.
 
 ##### Move to Trash {#workflow-action-move-to-trash}

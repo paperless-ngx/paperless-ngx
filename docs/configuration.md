@@ -1576,6 +1576,9 @@ ports.
 #### [`PAPERLESS_WEBHOOKS_ALLOW_INTERNAL_REQUESTS=<bool>`](#PAPERLESS_WEBHOOKS_ALLOW_INTERNAL_REQUESTS) {#PAPERLESS_WEBHOOKS_ALLOW_INTERNAL_REQUESTS}
 
 : If set to false, webhooks cannot be sent to internal URLs (e.g., localhost).
+A hostname is blocked if any of the addresses it resolves to is non-public.
+Webhook requests connect directly, without using the `HTTP_PROXY` or
+`HTTPS_PROXY` environment variables, and never follow redirects.
 
     Defaults to true, which allows internal requests.
 
@@ -1584,7 +1587,7 @@ ports.
 #### [`PAPERLESS_EMAIL_ALLOW_INTERNAL_HOSTS=<bool>`](#PAPERLESS_EMAIL_ALLOW_INTERNAL_HOSTS) {#PAPERLESS_EMAIL_ALLOW_INTERNAL_HOSTS}
 
 : If set to false, incoming mail account connections are blocked when the
-configured IMAP hostname resolves to a non-public address (for example,
+configured IMAP hostname resolves to any non-public address (for example,
 localhost, link-local, or RFC1918 private ranges).
 
     Defaults to true, which allows internal hosts.
@@ -2214,6 +2217,8 @@ used with the OpenAI-compatible backend to target a custom provider or local gat
 #### [`PAPERLESS_AI_LLM_ALLOW_INTERNAL_ENDPOINTS=<bool>`](#PAPERLESS_AI_LLM_ALLOW_INTERNAL_ENDPOINTS) {#PAPERLESS_AI_LLM_ALLOW_INTERNAL_ENDPOINTS}
 
 : If set to false, Paperless blocks AI endpoint URLs that resolve to non-public addresses (e.g., localhost, etc).
+A hostname is blocked if any of the addresses it resolves to is non-public, and redirects are checked the same way.
+Requests to a configured AI endpoint connect directly, without using the `HTTP_PROXY` or `HTTPS_PROXY` environment variables.
 
     Defaults to true, which allows internal endpoints.
 
