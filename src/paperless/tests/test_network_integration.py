@@ -17,9 +17,9 @@ from paperless_testing.outbound import running_http_server
 
 
 class TestGuardedTransportSync:
+    @pytest.mark.usefixtures("every_address_is_public")
     def test_pinned_connection_falls_back_to_next_address(
         self,
-        mocker: MockerFixture,
         local_http_server: LocalHTTPServer,
         fake_dns: FakeDNS,
         dial_recorder: DialRecorder,
@@ -35,7 +35,6 @@ class TestGuardedTransportSync:
             - ::1 fails, 127.0.0.1 is dialled next and the request succeeds
         """
         fake_dns.add("dual-stack.test", "::1", "127.0.0.1")
-        mocker.patch("paperless.network.is_public_ip", return_value=True)
 
         with httpx.Client(
             transport=GuardedHTTPTransport(allow_internal=False),
@@ -93,9 +92,9 @@ class TestGuardedTransportSync:
         assert local_http_server.connections == 0
         assert dial_recorder.hosts() == []
 
+    @pytest.mark.usefixtures("every_address_is_public")
     def test_host_header_is_the_hostname(
         self,
-        mocker: MockerFixture,
         local_http_server: LocalHTTPServer,
         fake_dns: FakeDNS,
     ) -> None:
@@ -108,7 +107,6 @@ class TestGuardedTransportSync:
             - The server receives the hostname in Host, not the dialled IP
         """
         fake_dns.add("pinned.test", "127.0.0.1")
-        mocker.patch("paperless.network.is_public_ip", return_value=True)
 
         with httpx.Client(
             transport=GuardedHTTPTransport(allow_internal=False),
@@ -161,9 +159,9 @@ class TestGuardedTransportSync:
         assert dial_recorder.hosts() == ["127.0.0.1"]
         assert len(local_http_server.requests) == 1
 
+    @pytest.mark.usefixtures("every_address_is_public")
     def test_connections_are_not_shared_between_hosts_on_one_address(
         self,
-        mocker: MockerFixture,
         local_http_server: LocalHTTPServer,
         fake_dns: FakeDNS,
         dial_recorder: DialRecorder,
@@ -181,7 +179,6 @@ class TestGuardedTransportSync:
         """
         fake_dns.add("first.test", "127.0.0.1")
         fake_dns.add("second.test", "127.0.0.1")
-        mocker.patch("paperless.network.is_public_ip", return_value=True)
 
         with httpx.Client(
             transport=GuardedHTTPTransport(allow_internal=False),
@@ -199,6 +196,7 @@ class TestGuardedTransportSync:
             f"second.test:{local_http_server.port}",
         ]
 
+    @pytest.mark.usefixtures("every_address_is_public")
     def test_tls_uses_the_hostname_not_the_dialled_address(
         self,
         mocker: MockerFixture,
@@ -217,7 +215,6 @@ class TestGuardedTransportSync:
             - TLS is started with the hostname for SNI and certificate checks
         """
         fake_dns.add("pinned.test", "127.0.0.1")
-        mocker.patch("paperless.network.is_public_ip", return_value=True)
         start_tls = mocker.spy(httpcore._backends.sync.SyncStream, "start_tls")
 
         with (
@@ -269,6 +266,7 @@ class TestGuardedTransportSync:
         assert local_http_server.connections == 0
         assert dial_recorder.hosts() == []
 
+    @pytest.mark.usefixtures("every_address_is_public")
     def test_environment_proxy_is_not_used(
         self,
         mocker: MockerFixture,
@@ -297,7 +295,6 @@ class TestGuardedTransportSync:
                 },
             )
             fake_dns.add("origin.test", "127.0.0.1")
-            mocker.patch("paperless.network.is_public_ip", return_value=True)
 
             url = f"http://origin.test:{local_http_server.port}/"
             with create_guarded_httpx_client(
@@ -323,9 +320,9 @@ class TestGuardedTransportAsync:
         return "asyncio"
 
     @pytest.mark.anyio
+    @pytest.mark.usefixtures("every_address_is_public")
     async def test_pinned_connection_falls_back_to_next_address(
         self,
-        mocker: MockerFixture,
         local_http_server: LocalHTTPServer,
         fake_dns: FakeDNS,
         dial_recorder: DialRecorder,
@@ -341,7 +338,6 @@ class TestGuardedTransportAsync:
             - ::1 fails, 127.0.0.1 is dialled next and the request succeeds
         """
         fake_dns.add("dual-stack.test", "::1", "127.0.0.1")
-        mocker.patch("paperless.network.is_public_ip", return_value=True)
 
         async with httpx.AsyncClient(
             transport=GuardedAsyncHTTPTransport(allow_internal=False),

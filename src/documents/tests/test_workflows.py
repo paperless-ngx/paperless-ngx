@@ -5162,9 +5162,9 @@ class TestWebhookSecurity:
         assert dial_recorder.hosts() == []
 
     @override_settings(WEBHOOKS_ALLOW_INTERNAL_REQUESTS=False)
+    @pytest.mark.usefixtures("every_address_is_public")
     def test_sends_to_validated_address(
         self,
-        mocker: MockerFixture,
         local_http_server: LocalHTTPServer,
         fake_dns: FakeDNS,
     ) -> None:
@@ -5178,7 +5178,6 @@ class TestWebhookSecurity:
             - The payload arrives with the webhook hostname in the Host header
         """
         fake_dns.add("webhook.test", "127.0.0.1")
-        mocker.patch("paperless.network.is_public_ip", return_value=True)
 
         send_webhook(
             url=f"http://webhook.test:{local_http_server.port}",

@@ -198,6 +198,15 @@ def install_dial_recorder(mocker: MockerFixture) -> DialRecorder:
     )
 
 
+def allow_all_addresses(mocker: MockerFixture) -> None:
+    """Patch the guard's public-address check to accept every address.
+
+    Loopback and other private addresses pass just like a public one, for
+    tests that exercise something other than the address policy itself.
+    """
+    mocker.patch("paperless.network.is_public_ip", return_value=True)
+
+
 def guard_of(
     client: httpx.Client | httpx.AsyncClient,
 ) -> _GuardedSyncBackend | _GuardedAsyncBackend:

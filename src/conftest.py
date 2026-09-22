@@ -178,3 +178,16 @@ def dial_recorder(mocker: MockerFixture) -> DialRecorder:
     from paperless_testing.outbound import install_dial_recorder
 
     return install_dial_recorder(mocker)
+
+
+@pytest.fixture
+def every_address_is_public(mocker: MockerFixture) -> None:
+    """Disable the outbound guard's address policy: every address passes.
+
+    For tests that are not themselves exercising which addresses the guard
+    accepts, so loopback and other private addresses dial just like a
+    public one.
+    """
+    from paperless_testing.outbound import allow_all_addresses
+
+    allow_all_addresses(mocker)
