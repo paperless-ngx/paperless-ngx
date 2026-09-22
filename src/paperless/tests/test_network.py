@@ -1,17 +1,24 @@
 import ipaddress
 import pickle
+import socket
+from typing import Any
 from unittest import mock
+from unittest.mock import MagicMock
 
 import httpx
 import pytest
 from celery.utils.serialization import get_pickleable_exception
+from pytest_mock import MockerFixture
 
 from paperless.network import BlockReason
 from paperless.network import HostResolutionError
 from paperless.network import OutboundRequestBlockedError
 from paperless.network import PinnedHostHTTPTransport
+from paperless.network import aresolve_public_addresses
 from paperless.network import blocked_message
 from paperless.network import is_public_ip
+from paperless.network import resolve_public_addresses
+from paperless.network import validate_outbound_http_url
 
 
 def test_pinned_host_transport_blocks_internal_rebinding():
@@ -242,3 +249,344 @@ class TestOutboundErrors:
             - It matches the established wording
         """
         assert blocked_message(error) == expected
+
+
+def _addrinfo(
+    *addresses: str,
+) -> list[tuple[socket.AddressFamily, socket.SocketKind, int, str, tuple[Any, ...]]]:
+    return [
+        (socket.AF_INET6, socket.SOCK_STREAM, 6, "", (address, 443, 0, 0))
+        if ":" in address
+        else (socket.AF_INET, socket.SOCK_STREAM, 6, "", (address, 443))
+        for address in addresses
+    ]
+
+
+def _answer(mocker: MockerFixture, *addresses: str) -> MagicMock:
+    """Make both resolver hooks answer with ``addresses``; returns the sync mock."""
+    infos = _addrinfo(*addresses)
+    mocker.patch(
+        "paperless.network._agetaddrinfo",
+        new=mocker.AsyncMock(return_value=infos),
+    )
+    return mocker.patch("paperless.network._getaddrinfo", return_value=infos)
+
+
+class TestResolvePublicAddresses:
+    def test_ip_literal_skips_dns(self, mocker: MockerFixture) -> None:
+        """
+        GIVEN:
+            - A public IP literal
+        WHEN:
+            - It is resolved
+        THEN:
+            - It is returned without a resolver call
+        """
+        resolver = _answer(mocker)
+
+        assert resolve_public_addresses("93.184.216.34", 443) == (
+            ipaddress.ip_address("93.184.216.34"),
+        )
+        resolver.assert_not_called()
+
+    def test_private_ip_literal_is_blocked(self, mocker: MockerFixture) -> None:
+        """
+        GIVEN:
+            - A private IP literal
+        WHEN:
+            - It is resolved
+        THEN:
+            - It is blocked as a non-public address
+        """
+        _answer(mocker)
+
+        with pytest.raises(OutboundRequestBlockedError) as exc_info:
+            resolve_public_addresses("10.0.0.1", 443)
+
+        assert exc_info.value.reason is BlockReason.NON_PUBLIC_ADDRESS
+        assert exc_info.value.address == ipaddress.ip_address("10.0.0.1")
+
+    def test_asks_for_stream_sockets_on_the_port(self, mocker: MockerFixture) -> None:
+        """
+        GIVEN:
+            - A hostname
+        WHEN:
+            - It is resolved
+        THEN:
+            - The resolver is asked for TCP stream results for that port
+        """
+        resolver = _answer(mocker, "93.184.216.34")
+
+        resolve_public_addresses("example.com", 443)
+
+        resolver.assert_called_once_with("example.com", 443, type=socket.SOCK_STREAM)
+
+    def test_deduplicates_preserving_order(self, mocker: MockerFixture) -> None:
+        """
+        GIVEN:
+            - Resolver results containing a duplicate
+        WHEN:
+            - They are resolved
+        THEN:
+            - Each address appears once, in resolver order
+        """
+        _answer(mocker, "2606:4700::1", "93.184.216.34", "2606:4700::1")
+
+        assert resolve_public_addresses("example.com", 443) == (
+            ipaddress.ip_address("2606:4700::1"),
+            ipaddress.ip_address("93.184.216.34"),
+        )
+
+    def test_strips_zone_ids(self, mocker: MockerFixture) -> None:
+        """
+        GIVEN:
+            - A scoped link-local result
+        WHEN:
+            - It is resolved
+        THEN:
+            - The zone id is stripped and the address is blocked
+        """
+        _answer(mocker, "fe80::1%eth0")
+
+        with pytest.raises(OutboundRequestBlockedError) as exc_info:
+            resolve_public_addresses("example.com", 443)
+
+        assert exc_info.value.address == ipaddress.ip_address("fe80::1")
+
+    def test_any_non_public_answer_blocks_the_name(self, mocker: MockerFixture) -> None:
+        """
+        GIVEN:
+            - Resolver results mixing public and private addresses
+        WHEN:
+            - They are resolved
+        THEN:
+            - The whole name is blocked, naming the first offending address
+        """
+        _answer(mocker, "93.184.216.34", "127.0.0.1", "10.0.0.1")
+
+        with pytest.raises(OutboundRequestBlockedError) as exc_info:
+            resolve_public_addresses("example.com", 443)
+
+        assert exc_info.value.reason is BlockReason.NON_PUBLIC_ADDRESS
+        assert exc_info.value.host == "example.com"
+        assert exc_info.value.port == 443
+        assert exc_info.value.address == ipaddress.ip_address("127.0.0.1")
+
+    @pytest.mark.parametrize(
+        "failure",
+        [
+            pytest.param(
+                socket.gaierror(-2, "Name or service not known"),
+                id="gaierror",
+            ),
+            pytest.param(UnicodeError("label too long"), id="invalid-idna"),
+        ],
+    )
+    def test_resolver_failure(self, mocker: MockerFixture, failure: Exception) -> None:
+        """
+        GIVEN:
+            - A resolver that fails
+        WHEN:
+            - A hostname is resolved
+        THEN:
+            - HostResolutionError is raised
+        """
+        mocker.patch("paperless.network._getaddrinfo", side_effect=failure)
+
+        with pytest.raises(HostResolutionError):
+            resolve_public_addresses("example.com", 443)
+
+    def test_empty_answer(self, mocker: MockerFixture) -> None:
+        """
+        GIVEN:
+            - A resolver returning no results
+        WHEN:
+            - A hostname is resolved
+        THEN:
+            - HostResolutionError is raised
+        """
+        _answer(mocker)
+
+        with pytest.raises(HostResolutionError):
+            resolve_public_addresses("example.com", 443)
+
+
+class TestAsyncResolvePublicAddresses:
+    @pytest.fixture(autouse=True)
+    def anyio_backend(self) -> str:
+        return "asyncio"
+
+    @pytest.mark.anyio
+    async def test_returns_public_addresses(self, mocker: MockerFixture) -> None:
+        """
+        GIVEN:
+            - Public resolver results
+        WHEN:
+            - They are resolved asynchronously
+        THEN:
+            - The addresses are returned
+        """
+        _answer(mocker, "93.184.216.34")
+
+        assert await aresolve_public_addresses("example.com", 443) == (
+            ipaddress.ip_address("93.184.216.34"),
+        )
+
+    @pytest.mark.anyio
+    async def test_blocks_non_public(self, mocker: MockerFixture) -> None:
+        """
+        GIVEN:
+            - A private resolver result
+        WHEN:
+            - It is resolved asynchronously
+        THEN:
+            - It is blocked
+        """
+        _answer(mocker, "10.0.0.1")
+
+        with pytest.raises(OutboundRequestBlockedError):
+            await aresolve_public_addresses("example.com", 443)
+
+    @pytest.mark.anyio
+    @pytest.mark.parametrize(
+        "failure",
+        [
+            pytest.param(
+                socket.gaierror(-2, "Name or service not known"),
+                id="gaierror",
+            ),
+            pytest.param(UnicodeError("label too long"), id="invalid-idna"),
+        ],
+    )
+    async def test_resolver_failure(
+        self,
+        mocker: MockerFixture,
+        failure: Exception,
+    ) -> None:
+        """
+        GIVEN:
+            - An async resolver that fails
+        WHEN:
+            - A hostname is resolved
+        THEN:
+            - HostResolutionError is raised
+        """
+        mocker.patch(
+            "paperless.network._agetaddrinfo",
+            new=mocker.AsyncMock(side_effect=failure),
+        )
+
+        with pytest.raises(HostResolutionError):
+            await aresolve_public_addresses("example.com", 443)
+
+
+class TestValidateOutboundHttpUrl:
+    @pytest.mark.parametrize(
+        ("answers", "expected"),
+        [
+            pytest.param(
+                ["10.0.0.1"],
+                "Connection blocked: internal.example resolves to a non-public address",
+                id="non-public",
+            ),
+            pytest.param(
+                [],
+                "Could not resolve hostname: internal.example",
+                id="unresolvable",
+            ),
+        ],
+    )
+    def test_messages(
+        self,
+        mocker: MockerFixture,
+        answers: list[str],
+        expected: str,
+    ) -> None:
+        """
+        GIVEN:
+            - A hostname that resolves to a private address, or to nothing
+        WHEN:
+            - The URL is validated with internal addresses disallowed
+        THEN:
+            - ValueError carries the established message
+        """
+        _answer(mocker, *answers)
+
+        with pytest.raises(ValueError, match=expected):
+            validate_outbound_http_url(
+                "https://internal.example/v1",
+                allow_internal=False,
+            )
+
+    def test_allow_internal_skips_dns(self, mocker: MockerFixture) -> None:
+        """
+        GIVEN:
+            - Internal addresses allowed
+        WHEN:
+            - A URL is validated
+        THEN:
+            - No resolver call is made
+        """
+        resolver = _answer(mocker, "10.0.0.1")
+
+        validate_outbound_http_url("https://internal.example/v1", allow_internal=True)
+
+        resolver.assert_not_called()
+
+    def test_resolves_the_name_http_clients_connect_to(
+        self,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A hostname containing a character that IDNA 2003 and IDNA 2008
+              encode differently ("fass" versus "xn--fa-hia")
+            - The IDNA 2003 name resolves to a public address and the IDNA 2008
+              name, which httpx and urllib3 connect to, to a private one
+        WHEN:
+            - The URL is validated with internal addresses disallowed
+        THEN:
+            - The IDNA 2008 name is the one checked, so the URL is blocked
+        """
+        answers = {
+            "fass.example": _addrinfo("93.184.216.34"),
+            "xn--fa-hia.example": _addrinfo("10.0.0.1"),
+        }
+        resolver = mocker.patch(
+            "paperless.network._getaddrinfo",
+            side_effect=lambda host, *args, **kwargs: answers[host],
+        )
+
+        with pytest.raises(ValueError, match="resolves to a non-public address"):
+            validate_outbound_http_url(
+                "https://fa\u00df.example/v1",
+                allow_internal=False,
+            )
+
+        resolver.assert_called_once_with(
+            "xn--fa-hia.example",
+            443,
+            type=socket.SOCK_STREAM,
+        )
+
+    def test_hostname_invalid_for_http_clients_is_rejected(
+        self,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A hostname that has no valid IDNA 2008 encoding
+        WHEN:
+            - The URL is validated with internal addresses disallowed
+        THEN:
+            - It is rejected as invalid without a resolver call
+        """
+        resolver = _answer(mocker, "93.184.216.34")
+
+        with pytest.raises(ValueError, match="Invalid URL scheme or hostname"):
+            validate_outbound_http_url(
+                "https://bad\u2764host.example/v1",
+                allow_internal=False,
+            )
+
+        resolver.assert_not_called()

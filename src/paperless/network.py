@@ -3,12 +3,15 @@ import ipaddress
 import socket
 from collections.abc import Callable
 from collections.abc import Collection
+from collections.abc import Iterable
 from enum import StrEnum
+from typing import Any
 from typing import Self
 from typing import TypeAlias
 from urllib.parse import ParseResult
 from urllib.parse import urlparse
 
+import anyio
 import httpx
 
 # requires-python is >=3.11, so no PEP 695 `type` statement.
@@ -105,6 +108,80 @@ def is_public_ip(ip: IPAddress) -> bool:
     )
 
 
+# Resolver indirection so tests can fake DNS for this module without changing
+# how the stock httpcore backends resolve the literals the guard dials.
+_getaddrinfo = socket.getaddrinfo
+_agetaddrinfo = anyio.getaddrinfo
+
+
+def _parse_ip_literal(host: str) -> IPAddress | None:
+    try:
+        return ipaddress.ip_address(host.split("%", 1)[0])
+    except ValueError:
+        return None
+
+
+def _collect_addresses(
+    host: str,
+    infos: Iterable[tuple[Any, ...]],
+) -> tuple[IPAddress, ...]:
+    # dict keys keep the first occurrence and resolver order
+    addresses: dict[IPAddress, None] = {}
+    for info in infos:
+        address = ipaddress.ip_address(str(info[4][0]).split("%", 1)[0])
+        addresses.setdefault(address, None)
+    if not addresses:
+        raise HostResolutionError(host=host, detail="no addresses returned")
+    return tuple(addresses)
+
+
+def _require_public(
+    host: str,
+    port: int | None,
+    addresses: tuple[IPAddress, ...],
+) -> tuple[IPAddress, ...]:
+    for address in addresses:
+        if not is_public_ip(address):
+            raise OutboundRequestBlockedError(
+                host=host,
+                port=port,
+                reason=BlockReason.NON_PUBLIC_ADDRESS,
+                address=address,
+            )
+    return addresses
+
+
+def resolve_public_addresses(host: str, port: int | None) -> tuple[IPAddress, ...]:
+    """
+    Resolve ``host`` and return its addresses in resolver order, or raise if
+    any of them is non-public. A name is rejected as a whole; offending
+    addresses are never filtered out.
+    """
+    literal = _parse_ip_literal(host)
+    if literal is not None:
+        return _require_public(host, port, (literal,))
+    try:
+        infos = _getaddrinfo(host, port, type=socket.SOCK_STREAM)
+    except (OSError, UnicodeError) as e:
+        raise HostResolutionError(host=host, detail=str(e)) from e
+    return _require_public(host, port, _collect_addresses(host, infos))
+
+
+async def aresolve_public_addresses(
+    host: str,
+    port: int | None,
+) -> tuple[IPAddress, ...]:
+    """Async variant of resolve_public_addresses."""
+    literal = _parse_ip_literal(host)
+    if literal is not None:
+        return _require_public(host, port, (literal,))
+    try:
+        infos = await _agetaddrinfo(host, port, type=socket.SOCK_STREAM)
+    except (OSError, UnicodeError) as e:
+        raise HostResolutionError(host=host, detail=str(e)) from e
+    return _require_public(host, port, _collect_addresses(host, infos))
+
+
 def resolve_hostname_ips(hostname: str) -> list[str]:
     try:
         addr_info = socket.getaddrinfo(hostname, None)
@@ -130,6 +207,22 @@ def format_host_for_url(host: str) -> str:
         return host
 
 
+def _dns_name(url: str) -> str:
+    """
+    The ASCII hostname that httpx and urllib3 look up for ``url``.
+
+    urlparse keeps a non-ASCII hostname as typed, and getaddrinfo would then
+    encode it with the stdlib IDNA 2003 codec. That maps some characters
+    differently from the IDNA 2008 encoding the HTTP clients use ("faß"
+    becomes "fass" instead of "xn--fa-hia"), so the check would resolve a
+    different name from the one that is connected to.
+    """
+    try:
+        return httpx.URL(url).raw_host.decode("ascii")
+    except (httpx.InvalidURL, UnicodeError) as e:
+        raise ValueError("Invalid URL scheme or hostname.") from e
+
+
 def validate_outbound_http_url(
     url: str,
     *,
@@ -153,11 +246,10 @@ def validate_outbound_http_url(
         raise ValueError("Destination port not permitted.")
 
     if not allow_internal:
-        for ip_str in resolve_hostname_ips(parsed.hostname):
-            if not is_public_ip(ipaddress.ip_address(ip_str)):
-                raise ValueError(
-                    f"Connection blocked: {parsed.hostname} resolves to a non-public address",
-                )
+        try:
+            resolve_public_addresses(_dns_name(url), port)
+        except (OutboundRequestBlockedError, HostResolutionError) as e:
+            raise ValueError(blocked_message(e)) from e
 
     return parsed
 
