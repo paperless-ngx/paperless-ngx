@@ -533,8 +533,8 @@ class PinnedMailBoxStartTls(PinnedClientMixin, MailBoxStartTls):
 
 def get_mailbox(
     server: str,
-    port: int,
-    security: MailAccount.ImapSecurity,
+    port: int | None,
+    security: int,
 ) -> MailBox:
     """
     Returns the correct MailBox instance for the given configuration.
