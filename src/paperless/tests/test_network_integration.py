@@ -9,9 +9,11 @@ from pytest_mock import MockerFixture
 from paperless.network import GuardedAsyncHTTPTransport
 from paperless.network import GuardedHTTPTransport
 from paperless.network import OutboundRequestBlockedError
+from paperless.network import create_guarded_httpx_client
 from paperless_testing.outbound import DialRecorder
 from paperless_testing.outbound import FakeDNS
 from paperless_testing.outbound import LocalHTTPServer
+from paperless_testing.outbound import running_http_server
 
 
 class TestGuardedTransportSync:
@@ -69,6 +71,7 @@ class TestGuardedTransportSync:
     def test_blocks_internal_host_without_connecting(
         self,
         local_http_server: LocalHTTPServer,
+        dial_recorder: DialRecorder,
     ) -> None:
         """
         GIVEN:
@@ -88,6 +91,7 @@ class TestGuardedTransportSync:
             client.get(f"http://localhost:{local_http_server.port}/")
 
         assert local_http_server.connections == 0
+        assert dial_recorder.hosts() == []
 
     def test_host_header_is_the_hostname(
         self,
@@ -240,6 +244,7 @@ class TestGuardedTransportSync:
     def test_numeric_host_forms_are_blocked(
         self,
         local_http_server: LocalHTTPServer,
+        dial_recorder: DialRecorder,
         host: str,
     ) -> None:
         """
@@ -262,41 +267,54 @@ class TestGuardedTransportSync:
             client.get(f"http://{host}:{local_http_server.port}/")
 
         assert local_http_server.connections == 0
+        assert dial_recorder.hosts() == []
 
     def test_environment_proxy_is_not_used(
         self,
         mocker: MockerFixture,
         local_http_server: LocalHTTPServer,
+        fake_dns: FakeDNS,
+        dial_recorder: DialRecorder,
     ) -> None:
         """
         GIVEN:
-            - Proxy variables in the environment pointing at an unreachable proxy
+            - Proxy variables in the environment pointing at a second local server
             - Internal addresses disallowed
         WHEN:
-            - A request is made to localhost
+            - A request is made through the production client factory to an
+              allowed origin
         THEN:
-            - The guard blocks it, rather than the request going to the proxy
+            - The origin server receives the request directly and the proxy
+              server never sees a connection
         """
-        unreachable = "http://127.0.0.1:9"
-        mocker.patch.dict(
-            os.environ,
-            {
-                "HTTP_PROXY": unreachable,
-                "HTTPS_PROXY": unreachable,
-                "ALL_PROXY": unreachable,
-            },
-        )
+        with running_http_server() as proxy_server:
+            mocker.patch.dict(
+                os.environ,
+                {
+                    "HTTP_PROXY": f"http://127.0.0.1:{proxy_server.port}",
+                    "HTTPS_PROXY": f"http://127.0.0.1:{proxy_server.port}",
+                    "ALL_PROXY": f"http://127.0.0.1:{proxy_server.port}",
+                },
+            )
+            fake_dns.add("origin.test", "127.0.0.1")
+            mocker.patch("paperless.network.is_public_ip", return_value=True)
 
-        with (
-            httpx.Client(
-                transport=GuardedHTTPTransport(allow_internal=False),
+            url = f"http://origin.test:{local_http_server.port}/"
+            with create_guarded_httpx_client(
+                url,
+                allow_internal=False,
                 timeout=5.0,
-            ) as client,
-            pytest.raises(OutboundRequestBlockedError),
-        ):
-            client.get(f"http://localhost:{local_http_server.port}/")
+            ) as client:
+                response = client.get(url)
 
-        assert local_http_server.connections == 0
+            assert response.status_code == 200
+            assert len(local_http_server.requests) == 1
+            assert local_http_server.requests[0].headers["host"] == (
+                f"origin.test:{local_http_server.port}"
+            )
+            assert proxy_server.connections == 0
+            assert proxy_server.requests == []
+            assert dial_recorder.hosts() == ["127.0.0.1"]
 
 
 class TestGuardedTransportAsync:
@@ -363,6 +381,7 @@ class TestGuardedTransportAsync:
     async def test_blocks_internal_host_without_connecting(
         self,
         local_http_server: LocalHTTPServer,
+        dial_recorder: DialRecorder,
     ) -> None:
         """
         GIVEN:
@@ -380,3 +399,4 @@ class TestGuardedTransportAsync:
                 await client.get(f"http://localhost:{local_http_server.port}/")
 
         assert local_http_server.connections == 0
+        assert dial_recorder.hosts() == []
