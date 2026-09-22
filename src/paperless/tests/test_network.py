@@ -240,38 +240,46 @@ def _answer(mocker: MockerFixture, *addresses: str) -> MagicMock:
 
 
 class TestResolvePublicAddresses:
-    def test_ip_literal_skips_dns(self, mocker: MockerFixture) -> None:
+    def test_ip_literal_is_validated_from_resolver_answer(
+        self,
+        mocker: MockerFixture,
+    ) -> None:
         """
         GIVEN:
-            - A public IP literal
+            - A public IP literal, which the resolver answers with itself
         WHEN:
             - It is resolved
         THEN:
-            - It is returned without a resolver call
+            - The literal is passed to the resolver and its answer returned
         """
-        resolver = _answer(mocker)
+        resolver = _answer(mocker, "93.184.216.34")
 
         assert resolve_public_addresses("93.184.216.34", 443) == (
             ipaddress.ip_address("93.184.216.34"),
         )
-        resolver.assert_not_called()
+        resolver.assert_called_once_with("93.184.216.34", 443, type=socket.SOCK_STREAM)
 
-    def test_private_ip_literal_is_blocked(self, mocker: MockerFixture) -> None:
+    def test_private_ip_literal_is_blocked_from_resolver_answer(
+        self,
+        mocker: MockerFixture,
+    ) -> None:
         """
         GIVEN:
-            - A private IP literal
+            - A private IP literal, which the resolver answers with itself
         WHEN:
             - It is resolved
         THEN:
-            - It is blocked as a non-public address
+            - The literal is passed to the resolver and blocked as a
+              non-public address
         """
-        _answer(mocker)
+        resolver = _answer(mocker, "10.0.0.1")
 
         with pytest.raises(OutboundRequestBlockedError) as exc_info:
             resolve_public_addresses("10.0.0.1", 443)
 
         assert exc_info.value.reason is BlockReason.NON_PUBLIC_ADDRESS
         assert exc_info.value.address == ipaddress.ip_address("10.0.0.1")
+        resolver.assert_called_once_with("10.0.0.1", 443, type=socket.SOCK_STREAM)
 
     def test_asks_for_stream_sockets_on_the_port(self, mocker: MockerFixture) -> None:
         """
@@ -383,13 +391,12 @@ class TestResolvePublicAddresses:
     ) -> None:
         """
         GIVEN:
-            - A dotted quad followed by "%" and more text, which is not an IP
-              literal since zone ids exist only on IPv6
+            - A dotted quad followed by "%" and more text
             - A resolver answering with a public address
         WHEN:
             - It is resolved
         THEN:
-            - The whole host is looked up as a name and its answer returned
+            - The whole host is passed to the resolver and its answer returned
         """
         resolver = _answer(mocker, "93.184.216.34")
 
@@ -413,7 +420,7 @@ class TestResolvePublicAddresses:
         WHEN:
             - It is resolved
         THEN:
-            - The name is blocked instead of passing as the public literal
+            - The name is blocked, not taken as the public address before "%"
         """
         resolver = _answer(mocker, "169.254.169.254")
 
@@ -422,27 +429,6 @@ class TestResolvePublicAddresses:
 
         assert exc_info.value.address == ipaddress.ip_address("169.254.169.254")
         resolver.assert_called_once()
-
-    def test_scoped_ipv6_literal_is_blocked_without_dns(
-        self,
-        mocker: MockerFixture,
-    ) -> None:
-        """
-        GIVEN:
-            - A link-local IPv6 literal with a zone id
-        WHEN:
-            - It is resolved
-        THEN:
-            - It is parsed as the IPv6 literal and blocked without a resolver
-              call
-        """
-        resolver = _answer(mocker, "93.184.216.34")
-
-        with pytest.raises(OutboundRequestBlockedError) as exc_info:
-            resolve_public_addresses("fe80::1%eth0", 443)
-
-        assert exc_info.value.address == ipaddress.ip_address("fe80::1")
-        resolver.assert_not_called()
 
 
 class TestAsyncResolvePublicAddresses:
@@ -493,7 +479,7 @@ class TestAsyncResolvePublicAddresses:
         WHEN:
             - It is resolved asynchronously
         THEN:
-            - The whole host is looked up as a name and its answer returned
+            - The whole host is passed to the resolver and its answer returned
         """
         resolver = mocker.patch(
             "paperless.network._agetaddrinfo",
@@ -521,7 +507,7 @@ class TestAsyncResolvePublicAddresses:
         WHEN:
             - It is resolved asynchronously
         THEN:
-            - The name is blocked instead of passing as the public literal
+            - The name is blocked, not taken as the public address before "%"
         """
         resolver = mocker.patch(
             "paperless.network._agetaddrinfo",

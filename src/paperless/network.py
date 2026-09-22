@@ -127,22 +127,12 @@ _agetaddrinfo = anyio.getaddrinfo
 _monotonic = time.monotonic
 
 
-def _parse_ip_literal(host: str) -> IPAddress | None:
-    address, zone_sep, _zone = host.partition("%")
-    try:
-        parsed = ipaddress.ip_address(address)
-    except ValueError:
-        return None
-    # Zone ids exist only on IPv6; anything else after "%" is not a literal.
-    if zone_sep and parsed.version != 6:
-        return None
-    return parsed
-
-
 def _collect_addresses(
     host: str,
     infos: Iterable[tuple[Any, ...]],
 ) -> tuple[IPAddress, ...]:
+    # Resolver output is always an address, but a scoped IPv6 answer carries a
+    # zone id ("fe80::1%1"), which is dropped before classification.
     # dict keys keep the first occurrence and resolver order
     addresses: dict[IPAddress, None] = {}
     for info in infos:
@@ -174,10 +164,11 @@ def resolve_public_addresses(host: str, port: int | None) -> tuple[IPAddress, ..
     Resolve ``host`` and return its addresses in resolver order, or raise if
     any of them is non-public. A name is rejected as a whole; offending
     addresses are never filtered out.
+
+    IP literals go through the resolver too: getaddrinfo answers them without
+    a lookup, and validating only its answer means no second parser can read
+    the host differently from the one that connects.
     """
-    literal = _parse_ip_literal(host)
-    if literal is not None:
-        return _require_public(host, port, (literal,))
     try:
         infos = _getaddrinfo(host, port, type=socket.SOCK_STREAM)
     except (OSError, UnicodeError) as e:
@@ -190,9 +181,6 @@ async def aresolve_public_addresses(
     port: int | None,
 ) -> tuple[IPAddress, ...]:
     """Async variant of resolve_public_addresses."""
-    literal = _parse_ip_literal(host)
-    if literal is not None:
-        return _require_public(host, port, (literal,))
     try:
         infos = await _agetaddrinfo(host, port, type=socket.SOCK_STREAM)
     except (OSError, UnicodeError) as e:
