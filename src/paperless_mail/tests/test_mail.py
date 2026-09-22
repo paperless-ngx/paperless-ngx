@@ -1,9 +1,12 @@
 import dataclasses
+import ipaddress
+import socket
 import time
 import uuid
 from collections import namedtuple
 from datetime import timedelta
 from unittest import mock
+from unittest.mock import MagicMock
 
 import pytest
 from django.contrib.auth.models import Permission
@@ -25,6 +28,7 @@ from documents.models import MatchingModel
 from paperless_mail import tasks
 from paperless_mail.mail import MailAccountHandler
 from paperless_mail.mail import MailError
+from paperless_mail.mail import PinnedIMAP4
 from paperless_mail.mail import TagMailAction
 from paperless_mail.mail import apply_mail_action
 from paperless_mail.mail import error_callback
@@ -2045,10 +2049,13 @@ class TestMailAccountTestView(APITestCase):
         self.assertEqual(response.content.decode(), "Unable to connect to server")
 
     @override_settings(EMAIL_ALLOW_INTERNAL_HOSTS=False)
-    @mock.patch("paperless_mail.mail.resolve_hostname_ips", return_value=["127.0.0.1"])
+    @mock.patch(
+        "paperless.network._getaddrinfo",
+        return_value=[(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("127.0.0.1", 993))],
+    )
     def test_mail_account_test_view_blocks_internal_host_when_disabled(
         self,
-        _mock_resolve_hostname_ips,
+        _mock_getaddrinfo: MagicMock,
     ) -> None:
         data = {
             "imap_server": "internal.example",
@@ -2205,10 +2212,10 @@ class TestGetMailboxHostPinning(TestCase):
 
     @override_settings(EMAIL_ALLOW_INTERNAL_HOSTS=False)
     @mock.patch(
-        "paperless_mail.mail.resolve_hostname_ips",
-        return_value=["93.184.216.34"],
+        "paperless_mail.mail.resolve_public_addresses",
+        return_value=(ipaddress.ip_address("93.184.216.34"),),
     )
-    def test_connects_to_validated_ip(self, _mock_resolve) -> None:
+    def test_connects_to_validated_ip(self, _mock_resolve: MagicMock) -> None:
         with mock.patch(
             "paperless_mail.mail.socket.create_connection",
             side_effect=OSError("no connection in tests"),
@@ -2225,10 +2232,13 @@ class TestGetMailboxHostPinning(TestCase):
 
     @override_settings(EMAIL_ALLOW_INTERNAL_HOSTS=False)
     @mock.patch(
-        "paperless_mail.mail.resolve_hostname_ips",
-        return_value=["93.184.216.34"],
+        "paperless_mail.mail.resolve_public_addresses",
+        return_value=(ipaddress.ip_address("93.184.216.34"),),
     )
-    def test_ssl_pins_ip_but_keeps_hostname_for_sni(self, _mock_resolve) -> None:
+    def test_ssl_pins_ip_but_keeps_hostname_for_sni(
+        self,
+        _mock_resolve: MagicMock,
+    ) -> None:
         ssl_context = mock.MagicMock()
         ssl_context.wrap_socket.return_value.makefile.side_effect = OSError(
             "no connection in tests",
@@ -2259,12 +2269,50 @@ class TestGetMailboxHostPinning(TestCase):
 
     @override_settings(EMAIL_ALLOW_INTERNAL_HOSTS=False)
     @mock.patch(
-        "paperless_mail.mail.resolve_hostname_ips",
-        return_value=["93.184.216.34", "127.0.0.1"],
+        "paperless.network._getaddrinfo",
+        return_value=[
+            (socket.AF_INET, socket.SOCK_STREAM, 6, "", ("93.184.216.34", 993)),
+            (socket.AF_INET, socket.SOCK_STREAM, 6, "", ("127.0.0.1", 993)),
+        ],
     )
-    def test_blocks_when_any_resolved_address_is_internal(self, _mock_resolve) -> None:
-        with self.assertRaises(MailError):
+    def test_blocks_when_any_resolved_address_is_internal(
+        self,
+        _mock_resolve: MagicMock,
+    ) -> None:
+        """
+        GIVEN:
+            - A mail host resolving to one public and one loopback address
+            - EMAIL_ALLOW_INTERNAL_HOSTS is False
+        WHEN:
+            - A mailbox is requested
+        THEN:
+            - The whole host is blocked with the existing message
+        """
+        with self.assertRaisesMessage(
+            MailError,
+            "Connection blocked: mail.example.com resolves to a non-public address",
+        ):
             get_mailbox("mail.example.com", 993, MailAccount.ImapSecurity.SSL)
+
+    def test_empty_pin_list_never_falls_back_to_hostname_lookup(self) -> None:
+        """
+        GIVEN:
+            - A pinned IMAP client given an empty tuple of addresses
+        WHEN:
+            - It connects
+        THEN:
+            - It fails without opening any socket, rather than resolving the
+              hostname itself
+        """
+        with (
+            mock.patch("paperless_mail.mail.socket.create_connection") as pinned,
+            mock.patch("imaplib.IMAP4._create_socket") as unpinned,
+            self.assertRaises(OSError),
+        ):
+            PinnedIMAP4("mail.example.com", 143, ())
+
+        pinned.assert_not_called()
+        unpinned.assert_not_called()
 
 
 class TestMailAccountProcess(APITestCase):

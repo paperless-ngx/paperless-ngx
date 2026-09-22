@@ -1,6 +1,5 @@
 import datetime
 import imaplib
-import ipaddress
 import itertools
 import logging
 import socket
@@ -46,8 +45,11 @@ from documents.models import Correspondent
 from documents.models import PaperlessTask
 from documents.parsers import is_mime_type_supported
 from documents.tasks import consume_file
-from paperless.network import is_public_ip
-from paperless.network import resolve_hostname_ips
+from paperless.network import HostResolutionError
+from paperless.network import IPAddress
+from paperless.network import OutboundRequestBlockedError
+from paperless.network import blocked_message
+from paperless.network import resolve_public_addresses
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 from paperless_mail.models import ProcessedMail
@@ -448,16 +450,24 @@ class PinnedIMAP4(imaplib.IMAP4):
     class, this behaves exactly like imaplib.IMAP4 / imaplib.IMAP4_SSL.
     """
 
-    def __init__(self, host, port, pinned_ips, ssl_context=None, timeout=None) -> None:
+    def __init__(
+        self,
+        host: str,
+        port: int | None,
+        pinned_ips: tuple[IPAddress, ...] | None,
+        ssl_context: ssl.SSLContext | None = None,
+        timeout: float | None = None,
+    ) -> None:
         self._pinned_ips = pinned_ips
         self.ssl_context = ssl_context
         super().__init__(host, port, timeout=timeout)
 
-    def _connect_pinned(self, timeout):
+    def _connect_pinned(self, timeout: float | None) -> socket.socket:
+        assert self._pinned_ips is not None
         last_error: OSError | None = None
-        for ip_str in self._pinned_ips:
+        for ip in self._pinned_ips:
             try:
-                address = (ip_str, self.port)
+                address = (str(ip), self.port)
                 if timeout is not None:
                     return socket.create_connection(address, timeout)
                 return socket.create_connection(address)
@@ -465,8 +475,8 @@ class PinnedIMAP4(imaplib.IMAP4):
                 last_error = e
         raise last_error or OSError(f"Could not connect to {self.host}")
 
-    def _create_socket(self, timeout):
-        if self._pinned_ips:
+    def _create_socket(self, timeout: float | None) -> socket.socket:
+        if self._pinned_ips is not None:
             sock = self._connect_pinned(timeout)
         else:
             sock = super()._create_socket(timeout)
@@ -478,7 +488,12 @@ class PinnedIMAP4(imaplib.IMAP4):
 class PinnedClientMixin:
     """Builds the imaplib client against the pre-resolved addresses, if any."""
 
-    def __init__(self, *args, pinned_ips: list[str] | None, **kwargs) -> None:
+    def __init__(
+        self,
+        *args,
+        pinned_ips: tuple[IPAddress, ...] | None,
+        **kwargs,
+    ) -> None:
         self._pinned_ips = pinned_ips
         super().__init__(*args, **kwargs)
 
@@ -516,22 +531,20 @@ class PinnedMailBoxStartTls(PinnedClientMixin, MailBoxStartTls):
         return client
 
 
-def get_mailbox(server, port, security) -> MailBox:
+def get_mailbox(
+    server: str,
+    port: int,
+    security: MailAccount.ImapSecurity,
+) -> MailBox:
     """
     Returns the correct MailBox instance for the given configuration.
     """
-    pinned_ips: list[str] | None = None
+    pinned_ips: tuple[IPAddress, ...] | None = None
     if not settings.EMAIL_ALLOW_INTERNAL_HOSTS:
         try:
-            pinned_ips = resolve_hostname_ips(server)
-        except ValueError as e:
-            raise MailError(str(e)) from e
-
-        for ip_str in pinned_ips:
-            if not is_public_ip(ipaddress.ip_address(ip_str)):
-                raise MailError(
-                    f"Connection blocked: {server} resolves to a non-public address",
-                )
+            pinned_ips = resolve_public_addresses(server, port)
+        except (OutboundRequestBlockedError, HostResolutionError) as e:
+            raise MailError(blocked_message(e)) from e
 
     ssl_context = ssl.create_default_context()
     if settings.EMAIL_CERTIFICATE_FILE is not None:  # pragma: no cover
