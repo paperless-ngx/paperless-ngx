@@ -13,9 +13,9 @@ from documents.models import Correspondent
 from documents.models import Document
 from documents.models import DocumentType
 from documents.tests.utils import SampleDirMixin
-from documents.tests.utils import read_streaming_response
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import UserFactory
+from paperless_testing.http import read_streaming_response
 from paperless_testing.permissions import grant_global
 
 

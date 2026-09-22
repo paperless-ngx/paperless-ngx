@@ -2,8 +2,8 @@ import shutil
 from collections.abc import Generator
 from contextlib import contextmanager
 from pathlib import Path
-from unittest import mock
 
+import pytest
 from django.conf import settings
 from django.test import TestCase
 from django.test import override_settings
@@ -18,11 +18,11 @@ from documents.models import Document
 from documents.models import Tag
 from documents.plugins.base import StopConsumeTaskError
 from documents.tests.utils import ConsumeTaskMixin
-from documents.tests.utils import DummyProgressManager
-from documents.tests.utils import FileSystemAssertsMixin
 from documents.tests.utils import SampleDirMixin
 from paperless.models import ApplicationConfiguration
+from paperless_testing.assertions import FileSystemAssertsMixin
 from paperless_testing.dirs import DirectoriesMixin
+from paperless_testing.fakes.progress import FakeProgressManager
 
 
 class GetReaderPluginMixin:
@@ -31,7 +31,7 @@ class GetReaderPluginMixin:
         reader = BarcodePlugin(
             ConsumableDocument(DocumentSource.ConsumeFolder, original_file=filepath),
             DocumentMetadataOverrides(),
-            DummyProgressManager(filepath.name, None),
+            FakeProgressManager(filepath.name, None),
             self.dirs.scratch_dir,
             "task-id",
         )
@@ -86,6 +86,7 @@ class TestBarcode(
             self.assertDictEqual(separator_page_numbers, {1: False})
 
     @override_settings(CONSUMER_ENABLE_ASN_BARCODE=True)
+    @pytest.mark.usefixtures("fake_progress_manager")
     def test_asn_barcode_duplicate_in_trash_fails(self) -> None:
         """
         GIVEN:
@@ -110,15 +111,14 @@ class TestBarcode(
         dupe_asn = settings.SCRATCH_DIR / "barcode-39-asn-123-second.pdf"
         shutil.copy(test_file, dupe_asn)
 
-        with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
-            with self.assertRaisesRegex(ConsumerError, r"ASN 123.*trash"):
-                tasks.consume_file(
-                    ConsumableDocument(
-                        source=DocumentSource.ConsumeFolder,
-                        original_file=dupe_asn,
-                    ),
-                    None,
-                )
+        with self.assertRaisesRegex(ConsumerError, r"ASN 123.*trash"):
+            tasks.consume_file(
+                ConsumableDocument(
+                    source=DocumentSource.ConsumeFolder,
+                    original_file=dupe_asn,
+                ),
+                None,
+            )
 
     @override_settings(
         CONSUMER_BARCODE_TIFF_SUPPORT=True,
@@ -606,6 +606,7 @@ class TestBarcodeNewConsume(
     TestCase,
 ):
     @override_settings(CONSUMER_ENABLE_BARCODES=True)
+    @pytest.mark.usefixtures("fake_progress_manager")
     def test_consume_barcode_file(self) -> None:
         """
         GIVEN:
@@ -624,34 +625,33 @@ class TestBarcodeNewConsume(
 
         overrides = DocumentMetadataOverrides(tag_ids=[1, 2, 9])
 
-        with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
-            self.assertEqual(
-                tasks.consume_file(
-                    ConsumableDocument(
-                        source=DocumentSource.ConsumeFolder,
-                        original_file=temp_copy,
-                    ),
-                    overrides,
+        self.assertEqual(
+            tasks.consume_file(
+                ConsumableDocument(
+                    source=DocumentSource.ConsumeFolder,
+                    original_file=temp_copy,
                 ),
-                {"reason": "Barcode splitting complete!"},
-            )
-            # 2 new document consume tasks created
-            self.assertEqual(self.consume_file_mock.call_count, 2)
+                overrides,
+            ),
+            {"reason": "Barcode splitting complete!"},
+        )
+        # 2 new document consume tasks created
+        self.assertEqual(self.consume_file_mock.call_count, 2)
 
-            self.assertIsNotFile(temp_copy)
+        self.assertIsNotFile(temp_copy)
 
-            # Check the split files exist
-            # Check the original_path is set
-            # Check the source is unchanged
-            # Check the overrides are unchanged
-            for (
-                new_input_doc,
-                new_doc_overrides,
-            ) in self.get_all_consume_task_call_args():
-                self.assertIsFile(new_input_doc.original_file)
-                self.assertEqual(new_input_doc.original_path, temp_copy)
-                self.assertEqual(new_input_doc.source, DocumentSource.ConsumeFolder)
-                self.assertEqual(overrides, new_doc_overrides)
+        # Check the split files exist
+        # Check the original_path is set
+        # Check the source is unchanged
+        # Check the overrides are unchanged
+        for (
+            new_input_doc,
+            new_doc_overrides,
+        ) in self.get_all_consume_task_call_args():
+            self.assertIsFile(new_input_doc.original_file)
+            self.assertEqual(new_input_doc.original_path, temp_copy)
+            self.assertEqual(new_input_doc.source, DocumentSource.ConsumeFolder)
+            self.assertEqual(overrides, new_doc_overrides)
 
 
 class TestAsnBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, TestCase):
@@ -660,7 +660,7 @@ class TestAsnBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
         reader = BarcodePlugin(
             ConsumableDocument(DocumentSource.ConsumeFolder, original_file=filepath),
             DocumentMetadataOverrides(),
-            DummyProgressManager(filepath.name, None),
+            FakeProgressManager(filepath.name, None),
             self.dirs.scratch_dir,
             "task-id",
         )
@@ -745,6 +745,7 @@ class TestAsnBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
             self.assertEqual(asn, None)
 
     @override_settings(CONSUMER_ENABLE_ASN_BARCODE=True)
+    @pytest.mark.usefixtures("fake_progress_manager")
     def test_consume_barcode_file_asn_assignment(self) -> None:
         """
         GIVEN:
@@ -762,19 +763,18 @@ class TestAsnBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
         dst = settings.SCRATCH_DIR / "barcode-39-asn-123.pdf"
         shutil.copy(test_file, dst)
 
-        with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
-            tasks.consume_file(
-                ConsumableDocument(
-                    source=DocumentSource.ConsumeFolder,
-                    original_file=dst,
-                ),
-                None,
-            )
+        tasks.consume_file(
+            ConsumableDocument(
+                source=DocumentSource.ConsumeFolder,
+                original_file=dst,
+            ),
+            None,
+        )
 
-            document = Document.objects.first()
-            assert document is not None
+        document = Document.objects.first()
+        assert document is not None
 
-            self.assertEqual(document.archive_serial_number, 123)
+        self.assertEqual(document.archive_serial_number, 123)
 
     def test_scan_file_for_qrcode_without_upscale(self) -> None:
         """
@@ -819,7 +819,7 @@ class TestTagBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
         reader = BarcodePlugin(
             ConsumableDocument(DocumentSource.ConsumeFolder, original_file=filepath),
             DocumentMetadataOverrides(),
-            DummyProgressManager(filepath.name, None),
+            FakeProgressManager(filepath.name, None),
             self.dirs.scratch_dir,
             "task-id",
         )
@@ -1024,6 +1024,7 @@ class TestTagBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
         CELERY_TASK_ALWAYS_EAGER=True,
         OCR_MODE="auto",
     )
+    @pytest.mark.usefixtures("fake_progress_manager")
     def test_consume_barcode_file_tag_split_and_assignment(self) -> None:
         """
         GIVEN:
@@ -1042,34 +1043,33 @@ class TestTagBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
         dst = settings.SCRATCH_DIR / "split-by-tag-basic.pdf"
         shutil.copy(test_file, dst)
 
-        with mock.patch("documents.tasks.ProgressManager", DummyProgressManager):
-            result = tasks.consume_file(
-                ConsumableDocument(
-                    source=DocumentSource.ConsumeFolder,
-                    original_file=dst,
-                ),
-                None,
-            )
+        result = tasks.consume_file(
+            ConsumableDocument(
+                source=DocumentSource.ConsumeFolder,
+                original_file=dst,
+            ),
+            None,
+        )
 
-            self.assertEqual(result, {"reason": "Barcode splitting complete!"})
+        self.assertEqual(result, {"reason": "Barcode splitting complete!"})
 
-            documents = Document.objects.all().order_by("id")
-            self.assertEqual(documents.count(), 3)
+        documents = Document.objects.all().order_by("id")
+        self.assertEqual(documents.count(), 3)
 
-            doc1 = documents[0]
-            self.assertEqual(doc1.tags.count(), 0)
+        doc1 = documents[0]
+        self.assertEqual(doc1.tags.count(), 0)
 
-            doc2 = documents[1]
-            self.assertEqual(doc2.tags.count(), 1)
-            _tag_1 = doc2.tags.first()
-            assert _tag_1 is not None
-            self.assertEqual(_tag_1.name, "invoice")
+        doc2 = documents[1]
+        self.assertEqual(doc2.tags.count(), 1)
+        _tag_1 = doc2.tags.first()
+        assert _tag_1 is not None
+        self.assertEqual(_tag_1.name, "invoice")
 
-            doc3 = documents[2]
-            self.assertEqual(doc3.tags.count(), 1)
-            _tag_2 = doc3.tags.first()
-            assert _tag_2 is not None
-            self.assertEqual(_tag_2.name, "receipt")
+        doc3 = documents[2]
+        self.assertEqual(doc3.tags.count(), 1)
+        _tag_2 = doc3.tags.first()
+        assert _tag_2 is not None
+        self.assertEqual(_tag_2.name, "receipt")
 
     @override_settings(
         CONSUMER_ENABLE_TAG_BARCODE=True,

@@ -10,8 +10,8 @@ from imagehash import average_hash
 from PIL import Image
 from pytest_mock import MockerFixture
 
-from documents.tests.utils import util_call_with_backoff
 from paperless.parsers.mail import MailDocumentParser
+from paperless_testing.retry import util_call_with_backoff
 
 
 def extract_text(pdf_path: Path) -> str:

@@ -9,7 +9,7 @@ from django.test import TestCase
 from documents.management.commands.document_thumbnails import _process_document
 from documents.models import Document
 from documents.parsers import get_default_thumbnail
-from documents.tests.utils import FileSystemAssertsMixin
+from paperless_testing.assertions import FileSystemAssertsMixin
 from paperless_testing.dirs import DirectoriesMixin
 
 
