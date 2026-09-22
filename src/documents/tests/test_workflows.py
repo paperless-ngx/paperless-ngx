@@ -1,9 +1,7 @@
 import datetime
 import json
 import shutil
-import socket
 import tempfile
-from collections.abc import Callable
 from datetime import timedelta
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -19,11 +17,11 @@ from django.test import override_settings
 from django.utils import timezone
 from guardian.shortcuts import get_groups_with_perms
 from guardian.shortcuts import get_users_with_perms
-from httpx import ConnectError
 from httpx import HTTPError
 from httpx import HTTPStatusError
 from pytest_django.fixtures import Settings
 from pytest_httpx import HTTPXMock
+from pytest_mock import MockerFixture
 from rest_framework.test import APIClient
 from rest_framework.test import APITestCase
 
@@ -33,8 +31,12 @@ from documents.file_handling import generate_unique_filename
 from documents.signals.handlers import run_workflows
 from documents.workflows.ai import apply_ai_suggestions_to_document
 from documents.workflows.webhooks import send_webhook
+from paperless.network import OutboundRequestBlockedError
 from paperless_ai.base_model import ClassificationSuggestions
 from paperless_ai.exceptions import LLMTimeoutError
+from paperless_testing.outbound import DialRecorder
+from paperless_testing.outbound import FakeDNS
+from paperless_testing.outbound import LocalHTTPServer
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
@@ -5069,25 +5071,6 @@ class TestWebhookSend:
         assert httpx_mock.get_request().headers["Content-Type"] == "application/json"
 
 
-@pytest.fixture
-def resolve_to(monkeypatch: pytest.MonkeyPatch) -> Callable[[str], None]:
-    """
-    Force DNS resolution to a specific IP for any hostname.
-    """
-
-    def _set(ip: str) -> None:
-        def fake_getaddrinfo(
-            host: str,
-            *_args: object,
-            **_kwargs: object,
-        ) -> list[tuple[Any, ...]]:
-            return [(socket.AF_INET, None, None, "", (ip, 0))]
-
-        monkeypatch.setattr(socket, "getaddrinfo", fake_getaddrinfo)
-
-    return _set
-
-
 class TestWebhookSecurity:
     def test_blocks_invalid_scheme_or_hostname(self, httpx_mock: HTTPXMock) -> None:
         """
@@ -5137,60 +5120,117 @@ class TestWebhookSecurity:
 
         assert httpx_mock.get_request() is None
 
+    @pytest.mark.parametrize(
+        "address",
+        [
+            pytest.param("127.0.0.1", id="loopback"),
+            pytest.param("10.0.0.1", id="private"),
+            pytest.param("169.254.169.254", id="link-local-metadata"),
+            pytest.param("::ffff:127.0.0.1", id="ipv4-mapped-loopback"),
+            pytest.param("64:ff9b::7f00:1", id="nat64-wrapping-loopback"),
+        ],
+    )
     @override_settings(WEBHOOKS_ALLOW_INTERNAL_REQUESTS=False)
     def test_blocks_private_loopback_linklocal(
         self,
-        httpx_mock: HTTPXMock,
-        resolve_to,
+        local_http_server: LocalHTTPServer,
+        fake_dns: FakeDNS,
+        dial_recorder: DialRecorder,
+        address: str,
     ) -> None:
         """
         GIVEN:
-            - URL with a private, loopback, or link-local IP address
+            - A webhook host resolving to a non-public address
             - WEBHOOKS_ALLOW_INTERNAL_REQUESTS is False
         WHEN:
-            - send_webhook is called with such URL
+            - send_webhook is called
         THEN:
-            - ValueError is raised
+            - The request is blocked before any connection is opened
         """
-        resolve_to("127.0.0.1")
-        with pytest.raises(ConnectError):
+        fake_dns.add("webhook.test", address)
+
+        with pytest.raises(OutboundRequestBlockedError):
             send_webhook(
-                "http://paperless-ngx.com",
+                f"http://webhook.test:{local_http_server.port}",
                 data="",
                 headers={},
                 files=None,
                 as_json=False,
             )
 
-    def test_allows_public_ip_and_sends(
+        assert local_http_server.connections == 0
+        assert dial_recorder.hosts() == []
+
+    @override_settings(WEBHOOKS_ALLOW_INTERNAL_REQUESTS=False)
+    def test_sends_to_validated_address(
         self,
-        httpx_mock: HTTPXMock,
-        resolve_to,
+        mocker: MockerFixture,
+        local_http_server: LocalHTTPServer,
+        fake_dns: FakeDNS,
     ) -> None:
         """
         GIVEN:
-            - URL with a public IP address
+            - A webhook host resolving to an address the policy accepts
+            - WEBHOOKS_ALLOW_INTERNAL_REQUESTS is False
         WHEN:
-            - send_webhook is called with such URL
+            - send_webhook is called
         THEN:
-            - Request is sent successfully
+            - The payload arrives with the webhook hostname in the Host header
         """
-        resolve_to("52.207.186.75")
-        httpx_mock.add_response(content=b"ok")
+        fake_dns.add("webhook.test", "127.0.0.1")
+        mocker.patch("paperless.network.is_public_ip", return_value=True)
 
         send_webhook(
-            url="http://paperless-ngx.com",
+            url=f"http://webhook.test:{local_http_server.port}",
             data="hi",
             headers={},
             files=None,
             as_json=False,
         )
 
-        req = httpx_mock.get_request()
-        assert req.url.host == "52.207.186.75"
-        assert req.headers["host"] == "paperless-ngx.com"
+        received = local_http_server.requests[0]
+        assert received.body == b"hi"
+        assert received.headers["host"] == f"webhook.test:{local_http_server.port}"
 
-    def test_follow_redirects_disabled(self, httpx_mock: HTTPXMock, resolve_to) -> None:
+    @override_settings(WEBHOOKS_ALLOW_INTERNAL_REQUESTS=False)
+    def test_block_is_an_expected_task_failure(
+        self,
+        mocker: MockerFixture,
+        local_http_server: LocalHTTPServer,
+        fake_dns: FakeDNS,
+        dial_recorder: DialRecorder,
+    ) -> None:
+        """
+        GIVEN:
+            - A webhook host resolving to a loopback address
+            - WEBHOOKS_ALLOW_INTERNAL_REQUESTS is False
+        WHEN:
+            - The webhook task runs through Celery
+        THEN:
+            - The task fails with the original block error, not a wrapper,
+              so it matches the task's expected errors, and is not retried
+        """
+        fake_dns.add("webhook.test", "127.0.0.1")
+        retry = mocker.spy(send_webhook, "retry")
+
+        result = send_webhook.apply(
+            kwargs={
+                "url": f"http://webhook.test:{local_http_server.port}",
+                "data": "",
+                "headers": {},
+                "files": None,
+                "as_json": False,
+            },
+        )
+
+        assert result.failed()
+        assert isinstance(result.result, OutboundRequestBlockedError)
+        assert isinstance(result.result, send_webhook.throws)
+        retry.assert_not_called()
+        assert local_http_server.connections == 0
+        assert dial_recorder.hosts() == []
+
+    def test_follow_redirects_disabled(self, httpx_mock: HTTPXMock) -> None:
         """
         GIVEN:
             - A URL that redirects
@@ -5199,7 +5239,6 @@ class TestWebhookSecurity:
         THEN:
             - Request is made to the original URL and does not follow the redirect
         """
-        resolve_to("52.207.186.75")
         # Return a redirect and ensure we don't follow it (only one request recorded)
         httpx_mock.add_response(
             status_code=302,
@@ -5221,7 +5260,6 @@ class TestWebhookSecurity:
     def test_strips_user_supplied_host_header(
         self,
         httpx_mock: HTTPXMock,
-        resolve_to: Callable[[str], None],
     ) -> None:
         """
         GIVEN:
@@ -5231,7 +5269,6 @@ class TestWebhookSecurity:
         THEN:
             - The Host header is stripped and replaced with the resolved hostname
         """
-        resolve_to("52.207.186.75")
         httpx_mock.add_response(content=b"ok")
 
         send_webhook(
