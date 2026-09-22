@@ -247,6 +247,10 @@ per-file-ignores."docker/wait-for-redis.py" = [
 per-file-ignores."src/documents/models.py" = [
   "SIM115",
 ]
+per-file-ignores."src/documents/tests/*.py" = [
+  "TID251",
+]
+flake8-tidy-imports.banned-api."documents.tests".msg = "Shared test infrastructure lives in src/paperless_testing/."
 isort.force-single-line = true
 
 [tool.codespell]
