@@ -76,7 +76,9 @@ is not supported by any of the available parsers.
 
 **A:** Not by default. As of v3, a file whose contents match an existing document is still
 consumed, and the duplicate is flagged in the UI — open the document and check the
-**Duplicates** tab to review documents that share the same content. If you prefer the old
+**Duplicates** tab to review documents that share the same content, or filter the document
+list by **Duplicates** to find all of them (see
+[Duplicate documents](usage.md#duplicate-documents)). If you prefer the old
 behavior of rejecting duplicates during consumption, set
 [`PAPERLESS_CONSUMER_DELETE_DUPLICATES`](configuration.md#PAPERLESS_CONSUMER_DELETE_DUPLICATES)
 to `true`.
