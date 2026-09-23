@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-23 18:21+0000\n"
+"POT-Creation-Date: 2026-09-23 18:45+0000\n"
 "PO-Revision-Date: 2022-02-17 04:17\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -2219,42 +2219,46 @@ msgid "Sets the LLM embedding model"
 msgstr ""
 
 #: paperless/models.py:369
-msgid "Sets the LLM embedding endpoint, optional"
+msgid "Sets the LLM embedding API key"
 msgstr ""
 
 #: paperless/models.py:376
+msgid "Sets the LLM embedding endpoint, optional"
+msgstr ""
+
+#: paperless/models.py:383
 msgid "Sets the LLM embedding chunk size"
 msgstr ""
 
-#: paperless/models.py:382
+#: paperless/models.py:389
 msgid "Sets the LLM context size"
 msgstr ""
 
-#: paperless/models.py:388
+#: paperless/models.py:395
 msgid "Sets the LLM backend"
 msgstr ""
 
-#: paperless/models.py:396
+#: paperless/models.py:403
 msgid "Sets the LLM model"
 msgstr ""
 
-#: paperless/models.py:403
+#: paperless/models.py:410
 msgid "Sets the LLM API key"
 msgstr ""
 
-#: paperless/models.py:410
+#: paperless/models.py:417
 msgid "Sets the LLM endpoint, optional"
 msgstr ""
 
-#: paperless/models.py:417
+#: paperless/models.py:424
 msgid "Sets the LLM output language"
 msgstr ""
 
-#: paperless/models.py:424
+#: paperless/models.py:431
 msgid "Sets the LLM timeout in seconds"
 msgstr ""
 
-#: paperless/models.py:430
+#: paperless/models.py:437
 msgid "paperless application settings"
 msgstr ""
 
