@@ -49,7 +49,6 @@ from django.db.models import Sum
 from django.db.models import When
 from django.db.models.functions import Coalesce
 from django.db.models.functions import Lower
-from django.db.models.manager import Manager
 from django.http import FileResponse
 from django.http import Http404
 from django.http import HttpRequest
@@ -3141,6 +3140,38 @@ class BulkEditView(DocumentOperationPermissionMixin):
 
     serializer_class = BulkEditSerializer
 
+    @staticmethod
+    def _snapshot_field(doc_ids: list[int], field: str) -> dict[int, Any]:
+        """
+        Returns each document's current value of field, for the audit log.
+
+        Tags and custom fields are one row per value, so they are gathered
+        into a sorted list of pks per document (empty when there are none).
+        Reading them through Document.values() instead would join those rows
+        and return one arbitrary value per document.
+        """
+        if field == "tags":
+            rows = (
+                Document.tags.through.objects.filter(document_id__in=doc_ids)
+                .order_by("tag_id")
+                .values_list("document_id", "tag_id")
+            )
+        elif field == "custom_fields":
+            rows = (
+                CustomFieldInstance.objects.filter(document_id__in=doc_ids)
+                .order_by("pk")
+                .values_list("document_id", "pk")
+            )
+        else:
+            return dict(
+                Document.objects.filter(pk__in=doc_ids).values_list("pk", field),
+            )
+
+        values: dict[int, list[int]] = {doc_id: [] for doc_id in doc_ids}
+        for doc_id, pk in rows:
+            values[doc_id].append(pk)
+        return values
+
     def post(self, request, *args, **kwargs):
         request_method = request.data.get("method")
         api_version = int(request.version or settings.REST_FRAMEWORK["DEFAULT_VERSION"])
@@ -3187,41 +3218,19 @@ class BulkEditView(DocumentOperationPermissionMixin):
         try:
             modified_field = self.MODIFIED_FIELD_BY_METHOD.get(method.__name__, None)
             if settings.AUDIT_LOG_ENABLED and modified_field:
-                old_documents = {
-                    obj["pk"]: obj
-                    for obj in Document.objects.filter(pk__in=documents).values(
-                        "pk",
-                        "correspondent",
-                        "document_type",
-                        "storage_path",
-                        "tags",
-                        "custom_fields",
-                        "deleted_at",
-                        "checksum",
-                    )
-                }
+                old_values = self._snapshot_field(documents, modified_field)
 
             result = method(documents, **parameters)
 
             if settings.AUDIT_LOG_ENABLED and modified_field:
-                new_documents = Document.objects.filter(pk__in=documents)
-                for doc in new_documents:
-                    old_value = old_documents[doc.pk][modified_field]
-                    new_value = getattr(doc, modified_field)
-
-                    if isinstance(new_value, Model):
-                        # correspondent, document type, etc.
-                        new_value = new_value.pk
-                    elif isinstance(new_value, Manager):
-                        # tags, custom fields
-                        new_value = list(new_value.values_list("pk", flat=True))
-
+                new_values = self._snapshot_field(documents, modified_field)
+                for doc in Document.objects.filter(pk__in=documents):
                     LogEntry.objects.log_create(
                         instance=doc,
                         changes={
                             modified_field: [
-                                old_value,
-                                new_value,
+                                old_values[doc.pk],
+                                new_values[doc.pk],
                             ],
                         },
                         action=LogEntry.Action.UPDATE,
