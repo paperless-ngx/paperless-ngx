@@ -69,6 +69,7 @@ from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 from paperless_testing.assertions import FileSystemAssertsMixin
 from paperless_testing.dirs import DirectoriesMixin
+from paperless_testing.factories import DocumentFactory
 from paperless_testing.factories import UserFactory
 from paperless_testing.permissions import grant_global
 from paperless_testing.permissions import grant_object
@@ -1079,10 +1080,7 @@ class TestWorkflows(
         workflow.triggers.add(trigger)
         workflow.actions.add(action)
 
-        doc = Document.objects.create(
-            title="Original title",
-            original_filename="sample.pdf",
-        )
+        doc = DocumentFactory.create()
         document_consumption_finished.send(sender=self.__class__, document=doc)
 
         self.assertTrue(doc.custom_fields.filter(field=link_field).exists())
