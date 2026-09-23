@@ -9,6 +9,7 @@ from rest_framework.test import APITestCase
 
 from documents.models import Correspondent
 from documents.models import CustomField
+from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import StoragePath
@@ -2525,7 +2526,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         WHEN:
             - API to bulk edit documents is called
         THEN:
-            - Audit log is created
+            - Audit log is created with the old and new correspondent
         """
         LogEntry.objects.all().delete()
         response = self.client.post(
@@ -2541,7 +2542,8 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(LogEntry.objects.filter(object_pk=self.doc1.id).count(), 1)
+        entry = LogEntry.objects.get_for_object(self.doc1).get()
+        self.assertEqual(entry.changes, {"correspondent": [None, self.c2.id]})
 
     @override_settings(AUDIT_LOG_ENABLED=True)
     def test_bulk_edit_audit_log_enabled_tags(self) -> None:
@@ -2549,16 +2551,18 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         GIVEN:
             - Audit log is enabled
         WHEN:
-            - API to bulk edit tags is called
+            - API to bulk edit tags is called on an untagged document and a
+              document with several tags
         THEN:
-            - Audit log is created
+            - Audit log is created for each document with its full tag list
+              before and after the edit
         """
         LogEntry.objects.all().delete()
         response = self.client.post(
             "/api/documents/bulk_edit/",
             json.dumps(
                 {
-                    "documents": [self.doc1.id],
+                    "documents": [self.doc1.id, self.doc4.id],
                     "method": "modify_tags",
                     "parameters": {
                         "add_tags": [self.t1.id],
@@ -2570,18 +2574,32 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(LogEntry.objects.filter(object_pk=self.doc1.id).count(), 1)
+        entry = LogEntry.objects.get_for_object(self.doc1).get()
+        self.assertEqual(entry.changes, {"tags": [[], [self.t1.id]]})
+        entry = LogEntry.objects.get_for_object(self.doc4).get()
+        self.assertEqual(
+            entry.changes,
+            {"tags": [[self.t1.id, self.t2.id], [self.t1.id]]},
+        )
 
     @override_settings(AUDIT_LOG_ENABLED=True)
     def test_bulk_edit_audit_log_enabled_custom_fields(self) -> None:
         """
         GIVEN:
             - Audit log is enabled
+            - A document with two custom fields
         WHEN:
-            - API to bulk edit custom fields is called
+            - API to bulk edit custom fields is called to add a third
         THEN:
-            - Audit log is created
+            - Audit log is created with every custom field instance before and
+              after the edit
+            - Audit log is created for the new custom field instance
         """
+        cf3 = CustomField.objects.create(name="cf3", data_type="string")
+        existing = [
+            CustomFieldInstance.objects.create(document=self.doc1, field=field)
+            for field in (self.cf2, cf3)
+        ]
         LogEntry.objects.all().delete()
         response = self.client.post(
             "/api/documents/bulk_edit/",
@@ -2599,7 +2617,14 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(LogEntry.objects.filter(object_pk=self.doc1.id).count(), 2)
+        added = CustomFieldInstance.objects.get(document=self.doc1, field=self.cf1)
+        existing_ids = [instance.id for instance in existing]
+        entry = LogEntry.objects.get_for_object(self.doc1).get()
+        self.assertEqual(
+            entry.changes,
+            {"custom_fields": [existing_ids, [*existing_ids, added.id]]},
+        )
+        self.assertEqual(LogEntry.objects.get_for_object(added).count(), 1)
 
     def test_api_bulk_edit_with_bad_search_query_returns_400(self) -> None:
         """
