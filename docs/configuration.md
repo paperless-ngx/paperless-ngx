@@ -2217,6 +2217,19 @@ used with the OpenAI-compatible backend to target a custom provider or local gat
 
     Defaults to true, which allows internal endpoints.
 
+#### [`PAPERLESS_AI_LLM_EXTRA_PARAMS=<json>`](#PAPERLESS_AI_LLM_EXTRA_PARAMS) {#PAPERLESS_AI_LLM_EXTRA_PARAMS}
+
+: A JSON object of extra parameters sent with every LLM request, for providers that require a parameter Paperless does not
+set itself. Values here override Paperless' own, and no validation is performed. Whatever you put here is passed to the
+backend as-is, so an invalid parameter will simply be rejected by your provider. For example, current OpenAI reasoning
+models refuse tool calls on the chat completions API unless reasoning is off:
+
+    ```
+    PAPERLESS_AI_LLM_EXTRA_PARAMS={"reasoning_effort": "none"}
+    ```
+
+    Defaults to empty, which adds nothing to requests.
+
 #### [`PAPERLESS_LLM_INDEX_TASK_CRON=<cron expression>`](#PAPERLESS_LLM_INDEX_TASK_CRON) {#PAPERLESS_LLM_INDEX_TASK_CRON}
 
 : Configures the schedule to update the AI embeddings of text content and metadata for all documents. Only performed if
