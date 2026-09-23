@@ -365,6 +365,13 @@ class ApplicationConfiguration(AbstractSingletonModel):
         max_length=128,
     )
 
+    llm_embedding_api_key = models.CharField(
+        verbose_name=_("Sets the LLM embedding API key"),
+        blank=True,
+        null=True,
+        max_length=1024,
+    )
+
     llm_embedding_endpoint = models.CharField(
         verbose_name=_("Sets the LLM embedding endpoint, optional"),
         blank=True,
