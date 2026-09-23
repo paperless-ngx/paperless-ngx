@@ -17,6 +17,24 @@ class TestRemoteUser(DirectoriesMixin, APITestCase):
 
         self.user = UserFactory(username="temp_admin", superuser=True)
 
+        # _parse_remote_user_settings() mutates these shared lists in place,
+        # so undo that after the test instead of leaking remote-user auth
+        # into every test that runs afterward.
+        original_middleware = list(settings.MIDDLEWARE)
+        original_auth_backends = list(settings.AUTHENTICATION_BACKENDS)
+        original_auth_classes = list(
+            settings.REST_FRAMEWORK["DEFAULT_AUTHENTICATION_CLASSES"],
+        )
+
+        def _restore_remote_user_settings() -> None:
+            settings.MIDDLEWARE[:] = original_middleware
+            settings.AUTHENTICATION_BACKENDS[:] = original_auth_backends
+            settings.REST_FRAMEWORK["DEFAULT_AUTHENTICATION_CLASSES"][:] = (
+                original_auth_classes
+            )
+
+        self.addCleanup(_restore_remote_user_settings)
+
     def test_remote_user(self) -> None:
         """
         GIVEN:
