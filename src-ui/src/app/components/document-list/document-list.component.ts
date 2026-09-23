@@ -270,9 +270,12 @@ export class DocumentListComponent
         this.list.reload()
       })
 
-    this.websocketStatusService.onDocumentDeleted().subscribe(() => {
-      this.list.reload()
-    })
+    this.websocketStatusService
+      .onDocumentDeleted()
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        this.list.reload()
+      })
 
     this.route.paramMap
       .pipe(
