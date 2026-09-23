@@ -199,7 +199,14 @@ def test_run_llm_query_openai_uses_tools(mock_ai_config, mock_openai_llm):
     )
 
 
-def test_get_llm_passes_extra_params(mock_ai_config, mock_openai_llm, mock_ollama_llm):
+@pytest.mark.parametrize(
+    ("backend", "llm_fixture"),
+    [
+        pytest.param("openai-like", "mock_openai_llm", id="openai-like"),
+        pytest.param("ollama", "mock_ollama_llm", id="ollama"),
+    ],
+)
+def test_get_llm_passes_extra_params(request, mock_ai_config, backend, llm_fixture):
     """
     GIVEN:
         - Extra LLM params configured, e.g. for a provider that needs a
@@ -209,26 +216,15 @@ def test_get_llm_passes_extra_params(mock_ai_config, mock_openai_llm, mock_ollam
     THEN:
         - They are handed to the backend as additional_kwargs
     """
-    mock_ai_config.llm_backend = "openai-like"
+    llm_mock = request.getfixturevalue(llm_fixture)
+    mock_ai_config.llm_backend = backend
     mock_ai_config.llm_model = "gpt-5.6-luna"
     mock_ai_config.llm_endpoint = "http://test-url"
     mock_ai_config.llm_extra_params = {"reasoning_effort": "none"}
 
     AIClient()
 
-    assert mock_openai_llm.call_args.kwargs["additional_kwargs"] == {
-        "reasoning_effort": "none",
-    }
-
-    # ollama
-    mock_ai_config.llm_backend = "ollama"
-    mock_ai_config.llm_model = "test_model"
-    mock_ai_config.llm_endpoint = "http://test-url"
-    mock_ai_config.llm_extra_params = {"reasoning_effort": "none"}
-
-    AIClient()
-
-    assert mock_ollama_llm.call_args.kwargs["additional_kwargs"] == {
+    assert llm_mock.call_args.kwargs["additional_kwargs"] == {
         "reasoning_effort": "none",
     }
 
