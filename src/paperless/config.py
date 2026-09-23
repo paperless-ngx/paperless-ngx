@@ -1,5 +1,6 @@
 import dataclasses
 import json
+from typing import Any
 
 from django.conf import settings
 
@@ -244,6 +245,7 @@ class AIConfig(BaseConfig):
     ai_enabled: bool = dataclasses.field(init=False)
     llm_embedding_backend: str = dataclasses.field(init=False)
     llm_embedding_model: str = dataclasses.field(init=False)
+    llm_embedding_api_key: str = dataclasses.field(init=False)
     llm_embedding_endpoint: str = dataclasses.field(init=False)
     llm_embedding_chunk_size: int = dataclasses.field(init=False)
     llm_context_size: int = dataclasses.field(init=False)
@@ -254,6 +256,7 @@ class AIConfig(BaseConfig):
     llm_endpoint: str = dataclasses.field(init=False)
     llm_output_language: str = dataclasses.field(init=False)
     llm_allow_internal_endpoints: bool = dataclasses.field(init=False)
+    llm_extra_params: dict[str, Any] = dataclasses.field(init=False)
 
     def __post_init__(self) -> None:
         app_config = self._get_config_instance()
@@ -268,6 +271,9 @@ class AIConfig(BaseConfig):
         )
         self.llm_embedding_model = (
             app_config.llm_embedding_model or settings.LLM_EMBEDDING_MODEL
+        )
+        self.llm_embedding_api_key = (
+            app_config.llm_embedding_api_key or settings.LLM_EMBEDDING_API_KEY
         )
         self.llm_embedding_endpoint = (
             app_config.llm_embedding_endpoint or settings.LLM_EMBEDDING_ENDPOINT
@@ -287,6 +293,7 @@ class AIConfig(BaseConfig):
             app_config.llm_output_language or settings.LLM_OUTPUT_LANGUAGE
         )
         self.llm_allow_internal_endpoints = settings.LLM_ALLOW_INTERNAL_ENDPOINTS
+        self.llm_extra_params = settings.LLM_EXTRA_PARAMS
 
     @property
     def llm_index_enabled(self) -> bool:
