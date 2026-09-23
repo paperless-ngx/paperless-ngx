@@ -339,15 +339,6 @@ class ShareLinkBundleBuildTaskTests(DirectoriesMixin, APITestCase):
         )
         self.document.archive_checksum = ""
         self.document.save()
-        self.addCleanup(
-            setattr,
-            settings,
-            "SHARE_LINK_BUNDLE_DIR",
-            settings.SHARE_LINK_BUNDLE_DIR,
-        )
-        settings.SHARE_LINK_BUNDLE_DIR = (
-            Path(settings.MEDIA_ROOT) / "documents" / "share_link_bundles"
-        )
 
     def _write_document_file(self, *, archive: bool, content: bytes) -> Path:
         if archive:

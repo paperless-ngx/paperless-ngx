@@ -37,6 +37,7 @@ class PaperlessDirs:
     logging_dir: Path
     model_file: Path
     media_lock: Path
+    share_link_bundle_dir: Path
 
 
 class DirSettings(TypedDict):
@@ -54,6 +55,7 @@ class DirSettings(TypedDict):
     STATIC_ROOT: Path
     MODEL_FILE: Path
     MEDIA_LOCK: Path
+    SHARE_LINK_BUNDLE_DIR: Path
 
 
 def build_paperless_dirs(root: Path) -> PaperlessDirs:
@@ -75,6 +77,7 @@ def build_paperless_dirs(root: Path) -> PaperlessDirs:
         logging_dir=data_dir / "log",
         model_file=data_dir / "classification_model.pickle",
         media_lock=media_dir / "media.lock",
+        share_link_bundle_dir=documents_dir / "share_link_bundles",
     )
 
     for directory in (
@@ -109,6 +112,7 @@ def dirs_settings(dirs: PaperlessDirs) -> DirSettings:
         STATIC_ROOT=dirs.static_dir,
         MODEL_FILE=dirs.model_file,
         MEDIA_LOCK=dirs.media_lock,
+        SHARE_LINK_BUNDLE_DIR=dirs.share_link_bundle_dir,
     )
 
 

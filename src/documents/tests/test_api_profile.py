@@ -64,16 +64,15 @@ class TestApiProfile(DirectoriesMixin, APITestCase):
         )
         self.client.force_authenticate(user=self.user)
 
-    def setupSocialAccount(self) -> None:
+    def setupSocialAccount(self) -> SocialAccount:
         SocialApp.objects.create(
             name="Keycloak",
             provider="openid_connect",
             provider_id="keycloak-test",
         )
-        self.user.socialaccount_set.add(
-            SocialAccount(uid="123456789", provider="keycloak-test"),
-            bulk=False,
-        )
+        social_account = SocialAccount(uid="123456789", provider="keycloak-test")
+        self.user.socialaccount_set.add(social_account, bulk=False)
+        return social_account
 
     def test_get_profile(self) -> None:
         """
@@ -111,19 +110,17 @@ class TestApiProfile(DirectoriesMixin, APITestCase):
         THEN:
             - Profile is returned with social accounts
         """
-        self.setupSocialAccount()
+        social_account = self.setupSocialAccount()
 
-        openid_provider = (
-            MockOpenIDConnectProvider(
-                app=SocialApp.objects.get(provider_id="keycloak-test"),
-            ),
+        openid_provider = MockOpenIDConnectProvider(
+            app=SocialApp.objects.get(provider_id="keycloak-test"),
         )
         mock_list_providers.return_value = [
             openid_provider,
         ]
         mock_get_provider_account.return_value = MockOpenIDConnectProviderAccount(
             mock_social_account_dict={
-                "name": openid_provider[0].name,
+                "name": openid_provider.name,
             },
         )
 
@@ -135,7 +132,7 @@ class TestApiProfile(DirectoriesMixin, APITestCase):
             response.data["social_accounts"],
             [
                 {
-                    "id": 1,
+                    "id": social_account.pk,
                     "provider": "keycloak-test",
                     "name": "Keycloak",
                 },
@@ -152,7 +149,7 @@ class TestApiProfile(DirectoriesMixin, APITestCase):
         THEN:
             - Profile is returned with "Unknown App" as name
         """
-        self.setupSocialAccount()
+        social_account = self.setupSocialAccount()
 
         # Remove the social app
         SocialApp.objects.get(provider_id="keycloak-test").delete()
@@ -165,7 +162,7 @@ class TestApiProfile(DirectoriesMixin, APITestCase):
             response.data["social_accounts"],
             [
                 {
-                    "id": 1,
+                    "id": social_account.pk,
                     "provider": "keycloak-test",
                     "name": "Unknown App",
                 },

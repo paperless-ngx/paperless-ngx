@@ -4459,18 +4459,18 @@ class TestWorkflows(
         )
 
     @mock.patch("documents.bulk_edit.remove_password")
-    def test_password_removal_action_fails_without_correct_password(
+    def test_password_removal_action_skips_blank_and_whitespace_passwords(
         self,
         mock_remove_password,
     ) -> None:
         """
         GIVEN:
             - Workflow password removal action
-            - No correct password provided
+            - Only blank and whitespace-only passwords configured
         WHEN:
             - Document updated triggering the workflow
         THEN:
-            - Password removal is attempted for all passwords and fails
+            - Password removal is not attempted
         """
         doc = Document.objects.create(
             title="Protected",
@@ -4490,6 +4490,60 @@ class TestWorkflows(
         run_workflows(trigger.type, doc)
 
         mock_remove_password.assert_not_called()
+
+    @mock.patch("documents.bulk_edit.remove_password")
+    def test_password_removal_action_fails_without_correct_password(
+        self,
+        mock_remove_password,
+    ) -> None:
+        """
+        GIVEN:
+            - Workflow password removal action
+            - No configured password is correct
+        WHEN:
+            - Document updated triggering the workflow
+        THEN:
+            - Password removal is attempted for every configured password and fails
+        """
+        doc = Document.objects.create(
+            title="Protected",
+            checksum="pw-checksum-3",
+        )
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+        )
+        action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.PASSWORD_REMOVAL,
+            passwords=["wrong", "also-wrong"],
+        )
+        workflow = Workflow.objects.create(name="Password workflow wrong passwords")
+        workflow.triggers.add(trigger)
+        workflow.actions.add(action)
+
+        mock_remove_password.side_effect = ValueError("wrong password")
+
+        with self.assertLogs("paperless.workflows.actions", level="ERROR"):
+            run_workflows(trigger.type, doc)
+
+        assert mock_remove_password.call_count == 2
+        mock_remove_password.assert_has_calls(
+            [
+                mock.call(
+                    [doc.id],
+                    password="wrong",
+                    update_document=True,
+                    user=doc.owner,
+                    source_paths_by_id=None,
+                ),
+                mock.call(
+                    [doc.id],
+                    password="also-wrong",
+                    update_document=True,
+                    user=doc.owner,
+                    source_paths_by_id=None,
+                ),
+            ],
+        )
 
     @mock.patch("documents.bulk_edit.remove_password")
     def test_password_removal_action_skips_without_passwords(

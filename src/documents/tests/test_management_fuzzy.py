@@ -123,14 +123,14 @@ class TestFuzzyMatchCommand(TestCase):
             - Output contains clickable links to the documents instead of titles
         """
         # Content similarity is 86.667
-        Document.objects.create(
+        doc1 = Document.objects.create(
             checksum="BEEFCAFE",
             title="A",
             content="first document scanned by bob",
             mime_type="application/pdf",
             filename="test.pdf",
         )
-        Document.objects.create(
+        doc2 = Document.objects.create(
             checksum="DEADBEAF",
             title="A",
             content="first document scanned by alice",
@@ -145,8 +145,8 @@ class TestFuzzyMatchCommand(TestCase):
                 "http://localhost:8000",
             )
         self.assertIn("Found 1 matching pair(s)", stdout)
-        self.assertIn("http://localhost:8000/documents/1/details", stdout)
-        self.assertIn("http://localhost:8000/documents/2/details", stdout)
+        self.assertIn(f"http://localhost:8000/documents/{doc1.pk}/details", stdout)
+        self.assertIn(f"http://localhost:8000/documents/{doc2.pk}/details", stdout)
 
     def test_with_3_matches(self) -> None:
         """
@@ -198,14 +198,14 @@ class TestFuzzyMatchCommand(TestCase):
             - Documents 1 and 2 remain
         """
         # Content similarity is 86.667
-        Document.objects.create(
+        doc1 = Document.objects.create(
             checksum="BEEFCAFE",
             title="A",
             content="first document scanned by bob",
             mime_type="application/pdf",
             filename="test.pdf",
         )
-        Document.objects.create(
+        doc2 = Document.objects.create(
             checksum="DEADBEAF",
             title="A",
             content="second document scanned by alice",
@@ -235,8 +235,8 @@ class TestFuzzyMatchCommand(TestCase):
         self.assertIn("Deleting 1 document(s)", stdout)
 
         self.assertEqual(Document.objects.count(), 2)
-        self.assertIsNotNone(Document.objects.get(pk=1))
-        self.assertIsNotNone(Document.objects.get(pk=2))
+        self.assertIsNotNone(Document.objects.get(pk=doc1.pk))
+        self.assertIsNotNone(Document.objects.get(pk=doc2.pk))
 
     def test_document_deletion_cancelled(self) -> None:
         """
