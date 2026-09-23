@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import factory
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 from factory.django import DjangoModelFactory
 
 from documents.models import Correspondent
@@ -69,6 +70,13 @@ class DocumentFactory(DjangoModelFactory[Document]):
     correspondent = None
     document_type = None
     storage_path = None
+
+
+class GroupFactory(DjangoModelFactory[Group]):
+    class Meta:
+        model = Group
+
+    name = factory.Sequence(lambda n: f"group{n}")
 
 
 class UserFactory(DjangoModelFactory[UserModelT]):

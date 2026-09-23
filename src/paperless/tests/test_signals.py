@@ -1,174 +1,127 @@
-from unittest.mock import Mock
+import dataclasses
+import logging
+from typing import Any
 
-from django.contrib.auth.models import Group
+import pytest
+from django.contrib.auth.models import AbstractUser
 from django.http import HttpRequest
-from django.test import TestCase
-from django.test import override_settings
+from pytest_django.fixtures import Settings
+from pytest_mock import MockerFixture
 
 from documents.models import UiSettings
 from paperless.signals import handle_failed_login
 from paperless.signals import handle_social_account_updated
+from paperless_testing.factories import GroupFactory
 from paperless_testing.factories import UserFactory
 
 
-class TestFailedLoginLogging(TestCase):
-    def setUp(self) -> None:
-        super().setUp()
-
-        self.creds = {
-            "username": "john lennon",
-        }
-
-    def test_unauthenticated(self) -> None:
-        """
-        GIVEN:
-            - Request with no authentication provided
-        WHEN:
-            - Request provided to signal handler
-        THEN:
-            - Unable to determine logged for unauthenticated user
-        """
-        request = HttpRequest()
-        request.META = {}
-        with self.assertLogs("paperless.auth") as logs:
-            handle_failed_login(None, {}, request)
-            self.assertEqual(
-                logs.output,
-                [
-                    "INFO:paperless.auth:No authentication provided. Unable to determine IP address.",
-                ],
-            )
-
-    def test_none(self) -> None:
-        """
-        GIVEN:
-            - Request with no IP possible
-        WHEN:
-            - Request provided to signal handler
-        THEN:
-            - Unable to determine logged
-        """
-        request = HttpRequest()
-        request.META = {}
-        with self.assertLogs("paperless.auth") as logs:
-            handle_failed_login(None, self.creds, request)
-
-            self.assertEqual(
-                logs.output,
-                [
-                    "INFO:paperless.auth:Login failed for user `john lennon`. Unable to determine IP address.",
-                ],
-            )
-
-    def test_public(self) -> None:
-        """
-        GIVEN:
-            - Request with publicly routeable IP
-        WHEN:
-            - Request provided to signal handler
-        THEN:
-            - Expected IP is logged
-        """
-        request = HttpRequest()
-        request.META = {
-            "HTTP_X_FORWARDED_FOR": "177.139.233.139",
-        }
-        with self.assertLogs("paperless.auth") as logs:
-            handle_failed_login(None, self.creds, request)
-
-            self.assertEqual(
-                logs.output,
-                [
-                    "INFO:paperless.auth:Login failed for user `john lennon` from IP `177.139.233.139`.",
-                ],
-            )
-
-    def test_private(self) -> None:
-        """
-        GIVEN:
-            - Request with private range IP
-        WHEN:
-            - Request provided to signal handler
-        THEN:
-            - Expected IP is logged
-            - IP is noted to be a private IP
-        """
-        request = HttpRequest()
-        request.META = {
-            "HTTP_X_FORWARDED_FOR": "10.0.0.1",
-        }
-        with self.assertLogs("paperless.auth") as logs:
-            handle_failed_login(None, self.creds, request)
-
-            self.assertEqual(
-                logs.output,
-                [
-                    "INFO:paperless.auth:Login failed for user `john lennon` from private IP `10.0.0.1`.",
-                ],
-            )
-
-
-class TestSyncSocialLoginGroups(TestCase):
-    @override_settings(SOCIAL_ACCOUNT_SYNC_GROUPS=True)
-    def test_sync_enabled(self) -> None:
-        """
-        GIVEN:
-            - Enabled group syncing, a user, and a social login
-        WHEN:
-            - The social login is updated via signal after login
-        THEN:
-            - The user's groups are updated to match the social login's groups
-        """
-        group = Group.objects.create(name="group1")
-        user = UserFactory(username="testuser")
-        sociallogin = Mock(
-            user=user,
-            account=Mock(
-                extra_data={
-                    "groups": ["group1"],
-                },
+class TestFailedLoginLogging:
+    @pytest.mark.parametrize(
+        ("meta", "credentials", "expected_message"),
+        [
+            pytest.param(
+                {},
+                {},
+                "No authentication provided. Unable to determine IP address.",
+                id="unauthenticated",
             ),
-        )
-        handle_social_account_updated(
-            sender=None,
-            request=HttpRequest(),
-            sociallogin=sociallogin,
-        )
-        self.assertEqual(list(user.groups.all()), [group])
-
-    @override_settings(SOCIAL_ACCOUNT_SYNC_GROUPS=False)
-    def test_sync_disabled(self) -> None:
-        """
-        GIVEN:
-            - Disabled group syncing, a user, and a social login
-        WHEN:
-            - The social login is updated via signal after login
-        THEN:
-            - The user's groups are not updated
-        """
-        Group.objects.create(name="group1")
-        user = UserFactory(username="testuser")
-        sociallogin = Mock(
-            user=user,
-            account=Mock(
-                extra_data={
-                    "groups": ["group1"],
-                },
+            pytest.param(
+                {},
+                {"username": "john lennon"},
+                "Login failed for user `john lennon`. Unable to determine IP address.",
+                id="no_ip",
             ),
-        )
-        handle_social_account_updated(
-            sender=None,
-            request=HttpRequest(),
-            sociallogin=sociallogin,
-        )
-        self.assertEqual(list(user.groups.all()), [])
-
-    @override_settings(
-        SOCIAL_ACCOUNT_SYNC_GROUPS=True,
-        SOCIAL_ACCOUNT_SYNC_SUPERUSER_GROUP="admin-group",
-        SOCIAL_ACCOUNT_SYNC_STAFF_GROUP="staff-group",
+            pytest.param(
+                {"HTTP_X_FORWARDED_FOR": "177.139.233.139"},
+                {"username": "john lennon"},
+                "Login failed for user `john lennon` from IP `177.139.233.139`.",
+                id="public_ip",
+            ),
+            pytest.param(
+                {"HTTP_X_FORWARDED_FOR": "10.0.0.1"},
+                {"username": "john lennon"},
+                "Login failed for user `john lennon` from private IP `10.0.0.1`.",
+                id="private_ip",
+            ),
+        ],
     )
-    def test_no_sync_for_inactive_user(self) -> None:
+    def test_handle_failed_login(
+        self,
+        caplog: pytest.LogCaptureFixture,
+        meta: dict[str, str],
+        credentials: dict[str, str],
+        expected_message: str,
+    ) -> None:
+        """
+        GIVEN:
+            - A failed login, with varying request metadata and credentials
+        WHEN:
+            - The failed-login signal handler runs
+        THEN:
+            - The expected message is logged, based on what could be determined
+              about the user and their IP address
+        """
+        request = HttpRequest()
+        request.META = meta
+        with caplog.at_level(logging.INFO, logger="paperless.auth"):
+            handle_failed_login(None, credentials, request)
+
+        assert caplog.messages == [expected_message]
+
+
+@pytest.mark.django_db
+class TestSyncSocialLoginGroups:
+    @staticmethod
+    def _update_social_account(
+        mocker: MockerFixture,
+        user: AbstractUser,
+        extra_data: dict[str, Any],
+    ) -> None:
+        sociallogin = mocker.MagicMock(
+            user=user,
+            account=mocker.MagicMock(extra_data=extra_data),
+        )
+        handle_social_account_updated(
+            sender=None,
+            request=HttpRequest(),
+            sociallogin=sociallogin,
+        )
+
+    @pytest.mark.parametrize(
+        "sync_enabled",
+        [
+            pytest.param(True, id="sync_enabled"),
+            pytest.param(False, id="sync_disabled"),
+        ],
+    )
+    def test_sync_group_membership(
+        self,
+        settings: Settings,
+        mocker: MockerFixture,
+        sync_enabled: bool,  # noqa: FBT001
+    ) -> None:
+        """
+        GIVEN:
+            - A user, a social login claiming a group, and group syncing on or off
+        WHEN:
+            - The social login is updated via signal after login
+        THEN:
+            - The user's groups are updated to match the claim only when syncing
+              is enabled
+        """
+        settings.SOCIAL_ACCOUNT_SYNC_GROUPS = sync_enabled
+        group = GroupFactory(name="group1")
+        user = UserFactory()
+
+        self._update_social_account(mocker, user, {"groups": ["group1"]})
+
+        assert list(user.groups.all()) == ([group] if sync_enabled else [])
+
+    def test_no_sync_for_inactive_user(
+        self,
+        settings: Settings,
+        mocker: MockerFixture,
+    ) -> None:
         """
         GIVEN:
             - Enabled group, superuser, and staff syncing
@@ -179,33 +132,28 @@ class TestSyncSocialLoginGroups(TestCase):
             - Groups and roles are left untouched, since the login itself
               would be rejected for a deactivated user anyway
         """
-        Group.objects.create(name="admin-group")
-        user = UserFactory(
-            username="inactive_user",
-            is_active=False,
-            is_superuser=False,
-            is_staff=False,
-        )
-        sociallogin = Mock(
-            user=user,
-            account=Mock(
-                extra_data={
-                    "groups": ["admin-group", "staff-group"],
-                },
-            ),
-        )
-        handle_social_account_updated(
-            sender=None,
-            request=HttpRequest(),
-            sociallogin=sociallogin,
-        )
-        user.refresh_from_db()
-        self.assertEqual(list(user.groups.all()), [])
-        self.assertFalse(user.is_superuser)
-        self.assertFalse(user.is_staff)
+        settings.SOCIAL_ACCOUNT_SYNC_GROUPS = True
+        settings.SOCIAL_ACCOUNT_SYNC_SUPERUSER_GROUP = "admin-group"
+        settings.SOCIAL_ACCOUNT_SYNC_STAFF_GROUP = "staff-group"
+        GroupFactory(name="admin-group")
+        user = UserFactory(is_active=False)
 
-    @override_settings(SOCIAL_ACCOUNT_SYNC_GROUPS=True)
-    def test_no_groups(self) -> None:
+        self._update_social_account(
+            mocker,
+            user,
+            {"groups": ["admin-group", "staff-group"]},
+        )
+
+        user.refresh_from_db()
+        assert list(user.groups.all()) == []
+        assert not user.is_superuser
+        assert not user.is_staff
+
+    def test_no_groups_clears_existing_membership(
+        self,
+        settings: Settings,
+        mocker: MockerFixture,
+    ) -> None:
         """
         GIVEN:
             - Enabled group syncing, a user, and a social login with no groups
@@ -214,429 +162,246 @@ class TestSyncSocialLoginGroups(TestCase):
         THEN:
             - The user's groups are cleared to match the social login's groups
         """
-        group = Group.objects.create(name="group1")
-        user = UserFactory(username="testuser")
+        settings.SOCIAL_ACCOUNT_SYNC_GROUPS = True
+        group = GroupFactory(name="group1")
+        user = UserFactory()
         user.groups.add(group)
-        user.save()
-        sociallogin = Mock(
-            user=user,
-            account=Mock(
-                extra_data={
-                    "groups": [],
-                },
-            ),
-        )
-        handle_social_account_updated(
-            sender=None,
-            request=HttpRequest(),
-            sociallogin=sociallogin,
-        )
-        self.assertEqual(list(user.groups.all()), [])
 
-    @override_settings(SOCIAL_ACCOUNT_SYNC_GROUPS=True)
-    def test_userinfo_groups(self) -> None:
-        """
-        GIVEN:
-            - Enabled group syncing, and `groups` nested under `userinfo`
-        WHEN:
-            - The social login is updated via signal after login
-        THEN:
-            - The user's groups are updated using `userinfo.groups`
-        """
-        group = Group.objects.create(name="group1")
-        user = UserFactory(username="testuser")
-        sociallogin = Mock(
-            user=user,
-            account=Mock(
-                extra_data={
-                    "userinfo": {
-                        "groups": ["group1"],
-                    },
-                },
-            ),
-        )
+        self._update_social_account(mocker, user, {"groups": []})
 
-        handle_social_account_updated(
-            sender=None,
-            request=HttpRequest(),
-            sociallogin=sociallogin,
-        )
+        assert list(user.groups.all()) == []
 
-        self.assertEqual(list(user.groups.all()), [group])
-
-    @override_settings(SOCIAL_ACCOUNT_SYNC_GROUPS=True)
-    def test_id_token_groups_fallback(self) -> None:
-        """
-        GIVEN:
-            - Enabled group syncing, and `groups` only under `id_token`
-        WHEN:
-            - The social login is updated via signal after login
-        THEN:
-            - The user's groups are updated using `id_token.groups`
-        """
-        group = Group.objects.create(name="group1")
-        user = UserFactory(username="testuser")
-        sociallogin = Mock(
-            user=user,
-            account=Mock(
-                extra_data={
-                    "id_token": {
-                        "groups": ["group1"],
-                    },
-                },
-            ),
-        )
-
-        handle_social_account_updated(
-            sender=None,
-            request=HttpRequest(),
-            sociallogin=sociallogin,
-        )
-
-        self.assertEqual(list(user.groups.all()), [group])
-
-    @override_settings(
-        SOCIAL_ACCOUNT_SYNC_SUPERUSER_GROUP="admin",
-        SOCIAL_ACCOUNT_SYNC_STAFF_GROUP="admin",
+    @pytest.mark.parametrize(
+        "extra_data",
+        [
+            pytest.param({"userinfo": {"groups": ["group1"]}}, id="userinfo"),
+            pytest.param({"id_token": {"groups": ["group1"]}}, id="id_token_fallback"),
+        ],
     )
-    def test_sync_superuser_claim_no_substring_match(self) -> None:
+    def test_sync_group_nested_claim_locations(
+        self,
+        settings: Settings,
+        mocker: MockerFixture,
+        extra_data: dict[str, Any],
+    ) -> None:
+        """
+        GIVEN:
+            - Enabled group syncing, and `groups` nested under `userinfo` or
+              `id_token` (allauth 65.11.0+ structure)
+        WHEN:
+            - The social login is updated via signal after login
+        THEN:
+            - The user's groups are updated using the nested claim
+        """
+        settings.SOCIAL_ACCOUNT_SYNC_GROUPS = True
+        group = GroupFactory(name="group1")
+        user = UserFactory()
+
+        self._update_social_account(mocker, user, extra_data)
+
+        assert list(user.groups.all()) == [group]
+
+    def test_sync_superuser_claim_no_substring_match(
+        self,
+        settings: Settings,
+        mocker: MockerFixture,
+    ) -> None:
         """
         GIVEN:
             - Configured superuser group sync
-            - Provider emits the groups claim as a bare string, and the user's
-              only group merely *contains* the configured name
+            - Provider emits the groups claim as a bare string that merely
+              *contains* the configured name
         WHEN:
             - Social login updated via signal
         THEN:
             - User is not promoted, since only an exact group match counts
         """
-        user = UserFactory(username="testuser", is_superuser=False, is_staff=False)
-        sociallogin = Mock(
-            user=user,
-            account=Mock(
-                extra_data={
-                    "groups": "paperless-admins-readonly",
-                },
+        settings.SOCIAL_ACCOUNT_SYNC_SUPERUSER_GROUP = "admin"
+        settings.SOCIAL_ACCOUNT_SYNC_STAFF_GROUP = "admin"
+        user = UserFactory()
+
+        self._update_social_account(
+            mocker,
+            user,
+            {"groups": "paperless-admins-readonly"},
+        )
+
+        user.refresh_from_db()
+        assert not user.is_superuser
+        assert not user.is_staff
+
+    @dataclasses.dataclass(frozen=True, slots=True)
+    class RoleSyncCase:
+        superuser_group: str | None
+        staff_group: str | None
+        initial_superuser: bool
+        initial_staff: bool
+        claimed_groups: list[str]
+        expected_superuser: bool
+        expected_staff: bool
+        # A usable local password, to prove it offers no protection against demotion.
+        password: str | None = None
+
+    @pytest.mark.parametrize(
+        "case",
+        [
+            pytest.param(
+                RoleSyncCase(
+                    superuser_group="admin-group",
+                    staff_group=None,
+                    initial_superuser=False,
+                    initial_staff=False,
+                    claimed_groups=["admin-group"],
+                    expected_superuser=True,
+                    expected_staff=True,
+                ),
+                id="superuser_enabled",
             ),
-        )
-        handle_social_account_updated(
-            sender=None,
-            request=HttpRequest(),
-            sociallogin=sociallogin,
-        )
-        user.refresh_from_db()
-        self.assertFalse(user.is_superuser)
-        self.assertFalse(user.is_staff)
-
-    @override_settings(
-        SOCIAL_ACCOUNT_SYNC_SUPERUSER_GROUP="admin-group",
-        SOCIAL_ACCOUNT_SYNC_STAFF_GROUP=None,
-    )
-    def test_sync_superuser_enabled(self) -> None:
-        """
-        GIVEN:
-            - Configured superuser group sync, and user with that group
-        WHEN:
-            - Social login updated via signal
-        THEN:
-            - User becomes superuser and staff
-        """
-        user = UserFactory(username="testuser_s_e", is_superuser=False, is_staff=False)
-        sociallogin = Mock(
-            user=user,
-            account=Mock(
-                extra_data={
-                    "groups": ["admin-group"],
-                },
+            pytest.param(
+                RoleSyncCase(
+                    superuser_group="admin-group",
+                    staff_group=None,
+                    initial_superuser=True,
+                    initial_staff=True,
+                    claimed_groups=["other-group"],
+                    expected_superuser=False,
+                    expected_staff=True,
+                ),
+                id="superuser_disabled_keeps_staff",
             ),
-        )
-        handle_social_account_updated(
-            sender=None,
-            request=HttpRequest(),
-            sociallogin=sociallogin,
-        )
-        user.refresh_from_db()
-        self.assertTrue(user.is_superuser)
-        self.assertTrue(user.is_staff)
-
-    @override_settings(
-        SOCIAL_ACCOUNT_SYNC_SUPERUSER_GROUP="admin-group",
-        SOCIAL_ACCOUNT_SYNC_STAFF_GROUP=None,
-    )
-    def test_sync_superuser_disabled(self) -> None:
-        """
-        GIVEN:
-            - Configured superuser group sync, and user without that group
-        WHEN:
-            - Social login updated via signal
-        THEN:
-            - User loses superuser status but preserves staff status if they had it
-        """
-        user = UserFactory(username="testuser_s_d", is_superuser=True, is_staff=True)
-        sociallogin = Mock(
-            user=user,
-            account=Mock(
-                extra_data={
-                    "groups": ["other-group"],
-                },
+            pytest.param(
+                RoleSyncCase(
+                    superuser_group=None,
+                    staff_group="staff-group",
+                    initial_superuser=False,
+                    initial_staff=False,
+                    claimed_groups=["staff-group"],
+                    expected_superuser=False,
+                    expected_staff=True,
+                ),
+                id="staff_enabled",
             ),
-        )
-        handle_social_account_updated(
-            sender=None,
-            request=HttpRequest(),
-            sociallogin=sociallogin,
-        )
-        user.refresh_from_db()
-        self.assertFalse(user.is_superuser)
-        self.assertTrue(user.is_staff)
-
-    @override_settings(
-        SOCIAL_ACCOUNT_SYNC_SUPERUSER_GROUP=None,
-        SOCIAL_ACCOUNT_SYNC_STAFF_GROUP="staff-group",
-    )
-    def test_sync_staff_enabled(self) -> None:
-        """
-        GIVEN:
-            - Configured staff group sync, and user with that group
-        WHEN:
-            - Social login updated via signal
-        THEN:
-            - User becomes staff
-        """
-        user = UserFactory(username="testuser_st_e", is_superuser=False, is_staff=False)
-        sociallogin = Mock(
-            user=user,
-            account=Mock(
-                extra_data={
-                    "groups": ["staff-group"],
-                },
+            pytest.param(
+                RoleSyncCase(
+                    superuser_group=None,
+                    staff_group="staff-group",
+                    initial_superuser=False,
+                    initial_staff=True,
+                    claimed_groups=["other-group"],
+                    expected_superuser=False,
+                    expected_staff=False,
+                ),
+                id="staff_disabled",
             ),
-        )
-        handle_social_account_updated(
-            sender=None,
-            request=HttpRequest(),
-            sociallogin=sociallogin,
-        )
-        user.refresh_from_db()
-        self.assertTrue(user.is_staff)
-        self.assertFalse(user.is_superuser)
-
-    @override_settings(
-        SOCIAL_ACCOUNT_SYNC_SUPERUSER_GROUP=None,
-        SOCIAL_ACCOUNT_SYNC_STAFF_GROUP="staff-group",
-    )
-    def test_sync_staff_disabled(self) -> None:
-        """
-        GIVEN:
-            - Configured staff group sync, and user without that group
-        WHEN:
-            - Social login updated via signal
-        THEN:
-            - User loses staff status
-        """
-        user = UserFactory(username="testuser_st_d", is_superuser=False, is_staff=True)
-        sociallogin = Mock(
-            user=user,
-            account=Mock(
-                extra_data={
-                    "groups": ["other-group"],
-                },
+            pytest.param(
+                RoleSyncCase(
+                    superuser_group="admin-group",
+                    staff_group="staff-group",
+                    initial_superuser=False,
+                    initial_staff=False,
+                    claimed_groups=["admin-group", "staff-group"],
+                    expected_superuser=True,
+                    expected_staff=True,
+                ),
+                id="both_groups_has_both",
             ),
-        )
-        handle_social_account_updated(
-            sender=None,
-            request=HttpRequest(),
-            sociallogin=sociallogin,
-        )
-        user.refresh_from_db()
-        self.assertFalse(user.is_staff)
-
-    @override_settings(
-        SOCIAL_ACCOUNT_SYNC_SUPERUSER_GROUP="admin-group",
-        SOCIAL_ACCOUNT_SYNC_STAFF_GROUP="staff-group",
+            pytest.param(
+                RoleSyncCase(
+                    superuser_group="admin-group",
+                    staff_group="staff-group",
+                    initial_superuser=True,
+                    initial_staff=True,
+                    claimed_groups=["staff-group"],
+                    expected_superuser=False,
+                    expected_staff=True,
+                ),
+                id="both_groups_has_only_staff",
+            ),
+            pytest.param(
+                RoleSyncCase(
+                    superuser_group="admin-group",
+                    staff_group="staff-group",
+                    initial_superuser=True,
+                    initial_staff=True,
+                    claimed_groups=["other-group"],
+                    expected_superuser=False,
+                    expected_staff=False,
+                ),
+                id="both_groups_has_neither",
+            ),
+            pytest.param(
+                RoleSyncCase(
+                    superuser_group=None,
+                    staff_group=None,
+                    initial_superuser=True,
+                    initial_staff=True,
+                    claimed_groups=["admin-group", "staff-group"],
+                    expected_superuser=True,
+                    expected_staff=True,
+                ),
+                id="not_configured_leaves_roles",
+            ),
+            pytest.param(
+                RoleSyncCase(
+                    superuser_group="admin-group",
+                    staff_group=None,
+                    initial_superuser=True,
+                    initial_staff=True,
+                    claimed_groups=["other-group"],
+                    expected_superuser=False,
+                    expected_staff=True,
+                    password="password123",
+                ),
+                id="superuser_demotes_local_user_with_usable_password",
+            ),
+            pytest.param(
+                RoleSyncCase(
+                    superuser_group=None,
+                    staff_group="staff-group",
+                    initial_superuser=False,
+                    initial_staff=True,
+                    claimed_groups=["other-group"],
+                    expected_superuser=False,
+                    expected_staff=False,
+                    password="password123",
+                ),
+                id="staff_demotes_local_user_with_usable_password",
+            ),
+        ],
     )
-    def test_sync_both_groups(self) -> None:
+    def test_sync_roles(
+        self,
+        settings: Settings,
+        mocker: MockerFixture,
+        case: RoleSyncCase,
+    ) -> None:
         """
         GIVEN:
-            - Configured both superuser and staff group sync
+            - Various combinations of superuser/staff group sync configuration
+              and a user's current roles
         WHEN:
-            - Social login updated via signal
+            - The social login is updated via signal with a set of claimed groups
         THEN:
-            - Roles are correctly assigned/revoked according to groups
+            - The user's superuser and staff flags are set to match the claim
+              exactly
         """
-        # Case 1: has both
-        user = UserFactory(username="testuser_b_1", is_superuser=False, is_staff=False)
-        sociallogin = Mock(
-            user=user,
-            account=Mock(extra_data={"groups": ["admin-group", "staff-group"]}),
-        )
-        handle_social_account_updated(
-            sender=None,
-            request=HttpRequest(),
-            sociallogin=sociallogin,
-        )
-        user.refresh_from_db()
-        self.assertTrue(user.is_superuser)
-        self.assertTrue(user.is_staff)
-
-        # Case 2: has only staff
-        user2 = UserFactory(username="testuser_b_2", is_superuser=True, is_staff=True)
-        sociallogin2 = Mock(
-            user=user2,
-            account=Mock(extra_data={"groups": ["staff-group"]}),
-        )
-        handle_social_account_updated(
-            sender=None,
-            request=HttpRequest(),
-            sociallogin=sociallogin2,
-        )
-        user2.refresh_from_db()
-        self.assertFalse(user2.is_superuser)
-        self.assertTrue(user2.is_staff)
-
-        # Case 3: has neither
-        user3 = UserFactory(username="testuser_b_3", is_superuser=True, is_staff=True)
-        sociallogin3 = Mock(
-            user=user3,
-            account=Mock(extra_data={"groups": ["other-group"]}),
-        )
-        handle_social_account_updated(
-            sender=None,
-            request=HttpRequest(),
-            sociallogin=sociallogin3,
-        )
-        user3.refresh_from_db()
-        self.assertFalse(user3.is_superuser)
-        self.assertFalse(user3.is_staff)
-
-    @override_settings(
-        SOCIAL_ACCOUNT_SYNC_SUPERUSER_GROUP=None,
-        SOCIAL_ACCOUNT_SYNC_STAFF_GROUP=None,
-    )
-    def test_no_sync_when_not_configured(self) -> None:
-        """
-        GIVEN:
-            - No sync settings configured
-        WHEN:
-            - Social login updated via signal
-        THEN:
-            - Existing roles are not modified
-        """
-        user = UserFactory(username="testuser_n_s", is_superuser=True, is_staff=True)
-        sociallogin = Mock(
-            user=user,
-            account=Mock(extra_data={"groups": ["admin-group", "staff-group"]}),
-        )
-        handle_social_account_updated(
-            sender=None,
-            request=HttpRequest(),
-            sociallogin=sociallogin,
-        )
-        user.refresh_from_db()
-        self.assertTrue(user.is_superuser)
-        self.assertTrue(user.is_staff)
-
-    @override_settings(
-        SOCIAL_ACCOUNT_SYNC_SUPERUSER_GROUP="admin-group",
-        SOCIAL_ACCOUNT_SYNC_STAFF_GROUP=None,
-    )
-    def test_sync_superuser_demotes_local_user_without_group(self) -> None:
-        """
-        GIVEN:
-            - Configured superuser group sync
-            - User with a usable (local) password, but without the group
-        WHEN:
-            - Social login updated via signal
-        THEN:
-            - User's superuser status is demoted, matching the group claim exactly
-        """
+        settings.SOCIAL_ACCOUNT_SYNC_SUPERUSER_GROUP = case.superuser_group
+        settings.SOCIAL_ACCOUNT_SYNC_STAFF_GROUP = case.staff_group
         user = UserFactory(
-            username="local_admin",
-            password="password123",
-            is_superuser=True,
-            is_staff=True,
+            is_superuser=case.initial_superuser,
+            is_staff=case.initial_staff,
+            **({"password": case.password} if case.password else {}),
         )
-        sociallogin = Mock(
-            user=user,
-            account=Mock(extra_data={"groups": ["other-group"]}),
-        )
-        handle_social_account_updated(
-            sender=None,
-            request=HttpRequest(),
-            sociallogin=sociallogin,
-        )
+
+        self._update_social_account(mocker, user, {"groups": case.claimed_groups})
+
         user.refresh_from_db()
-        self.assertFalse(user.is_superuser)
-
-    @override_settings(
-        SOCIAL_ACCOUNT_SYNC_SUPERUSER_GROUP="admin-group",
-        SOCIAL_ACCOUNT_SYNC_STAFF_GROUP=None,
-    )
-    def test_sync_superuser_demotes_last_admin(self) -> None:
-        """
-        GIVEN:
-            - Configured superuser group sync
-            - User without the group, and no other active superuser exists
-        WHEN:
-            - Social login updated via signal
-        THEN:
-            - User's superuser status is demoted, even though they are the last admin
-        """
-        user = UserFactory(username="last_admin", is_superuser=True, is_staff=True)
-        user.set_unusable_password()
-        user.save()
-
-        sociallogin = Mock(
-            user=user,
-            account=Mock(extra_data={"groups": ["other-group"]}),
-        )
-        handle_social_account_updated(
-            sender=None,
-            request=HttpRequest(),
-            sociallogin=sociallogin,
-        )
-        user.refresh_from_db()
-        self.assertFalse(user.is_superuser)
-
-    @override_settings(
-        SOCIAL_ACCOUNT_SYNC_SUPERUSER_GROUP=None,
-        SOCIAL_ACCOUNT_SYNC_STAFF_GROUP="staff-group",
-    )
-    def test_sync_staff_demotes_local_user_without_group(self) -> None:
-        """
-        GIVEN:
-            - Configured staff group sync
-            - User with a usable (local) password, but without the group
-        WHEN:
-            - Social login updated via signal
-        THEN:
-            - User's staff status is demoted, matching the group claim exactly
-        """
-        user = UserFactory(
-            username="local_staff",
-            password="password123",
-            is_superuser=False,
-            is_staff=True,
-        )
-        sociallogin = Mock(
-            user=user,
-            account=Mock(extra_data={"groups": ["other-group"]}),
-        )
-        handle_social_account_updated(
-            sender=None,
-            request=HttpRequest(),
-            sociallogin=sociallogin,
-        )
-        user.refresh_from_db()
-        self.assertFalse(user.is_staff)
+        assert user.is_superuser == case.expected_superuser
+        assert user.is_staff == case.expected_staff
 
 
-class TestUserGroupDeletionCleanup(TestCase):
-    """
-    Test that when a user or group is deleted, references are cleaned up properly
-    from ui_settings
-    """
-
+@pytest.mark.django_db
+class TestUserGroupDeletionCleanup:
     def test_user_group_deletion_cleanup(self) -> None:
         """
         GIVEN:
@@ -648,9 +413,9 @@ class TestUserGroupDeletionCleanup(TestCase):
         THEN:
             - References in ui_settings are cleaned up
         """
-        user = UserFactory(username="testuser")
-        user2 = UserFactory(username="testuser2")
-        group = Group.objects.create(name="testgroup")
+        user = UserFactory()
+        user2 = UserFactory()
+        group = GroupFactory()
 
         ui_settings = UiSettings.objects.create(
             user=user,
@@ -668,37 +433,35 @@ class TestUserGroupDeletionCleanup(TestCase):
         user2.delete()
         ui_settings.refresh_from_db()
         permissions = ui_settings.settings.get("permissions", {})
-        self.assertIsNone(permissions.get("default_owner"))
-        self.assertEqual(permissions.get("default_view_users"), [])
-        self.assertEqual(permissions.get("default_change_users"), [])
+        assert permissions.get("default_owner") is None
+        assert permissions.get("default_view_users") == []
+        assert permissions.get("default_change_users") == []
 
         group.delete()
         ui_settings.refresh_from_db()
         permissions = ui_settings.settings.get("permissions", {})
-        self.assertEqual(permissions.get("default_view_groups"), [])
-        self.assertEqual(permissions.get("default_change_groups"), [])
+        assert permissions.get("default_view_groups") == []
+        assert permissions.get("default_change_groups") == []
 
-    def test_user_group_deletion_error_handling(self) -> None:
+    def test_user_group_deletion_error_handling(
+        self,
+        caplog: pytest.LogCaptureFixture,
+    ) -> None:
         """
         GIVEN:
-            - Existing user and group
+            - Existing user, referenced by ui_settings with no `settings` set
+              (invalid; this probably should not happen in production)
         WHEN:
             - The user is deleted and an error occurs during the signal handling
         THEN:
             - Error is logged and the system remains stable
         """
-        user = UserFactory(username="testuser")
-        user2 = UserFactory(username="testuser2")
+        user = UserFactory()
+        user2 = UserFactory()
         user2_id = user2.id
-        Group.objects.create(name="testgroup")
+        UiSettings.objects.create(user=user)
 
-        UiSettings.objects.create(
-            user=user,
-        )  # invalid, no settings, this probably should not happen in production
-
-        with self.assertLogs("paperless.handlers", level="ERROR") as cm:
+        with caplog.at_level(logging.ERROR, logger="paperless.handlers"):
             user2.delete()
-            self.assertIn(
-                f"Error while cleaning up user {user2_id}",
-                cm.output[0],
-            )
+
+        assert f"Error while cleaning up user {user2_id}" in caplog.text
