@@ -146,6 +146,19 @@ describe('DocumentListComponent', () => {
     expect(reloadSpy).toHaveBeenCalled()
   })
 
+  it('should stop reloading on document deleted after destroy', () => {
+    const reloadSpy = jest.spyOn(documentListService, 'reload')
+    const documentDeletedSubject = new Subject<boolean>()
+    jest
+      .spyOn(websocketStatusService, 'onDocumentDeleted')
+      .mockReturnValue(documentDeletedSubject)
+    fixture.detectChanges()
+    fixture.destroy()
+    reloadSpy.mockClear()
+    documentDeletedSubject.next(true)
+    expect(reloadSpy).not.toHaveBeenCalled()
+  })
+
   it('should show score sort fields on fulltext queries', () => {
     documentListService.setFilterRules([
       {
