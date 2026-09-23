@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-21 19:00+0000\n"
+"POT-Creation-Date: 2026-09-23 03:18+0000\n"
 "PO-Revision-Date: 2022-02-17 04:17\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -1632,7 +1632,7 @@ msgid "workflow runs"
 msgstr ""
 
 #: documents/serialisers.py:514 documents/serialisers.py:871
-#: documents/serialisers.py:2885 documents/views.py:343 documents/views.py:2726
+#: documents/serialisers.py:2885 documents/views.py:342 documents/views.py:2725
 #: paperless_mail/serialisers.py:156
 msgid "Insufficient permissions."
 msgstr ""
@@ -1673,7 +1673,7 @@ msgstr ""
 msgid "Duplicate document identifiers are not allowed."
 msgstr ""
 
-#: documents/serialisers.py:2971 documents/views.py:4763
+#: documents/serialisers.py:2971 documents/views.py:4772
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr ""
@@ -1941,40 +1941,40 @@ msgstr ""
 msgid "Unable to parse URI {value}"
 msgstr ""
 
-#: documents/views.py:336 documents/views.py:2723
+#: documents/views.py:335 documents/views.py:2722
 msgid "Invalid more_like_id"
 msgstr ""
 
-#: documents/views.py:1670
+#: documents/views.py:1669
 msgid "Invalid AI configuration."
 msgstr ""
 
-#: documents/views.py:1681
+#: documents/views.py:1680
 msgid "AI backend request timed out."
 msgstr ""
 
-#: documents/views.py:1693
+#: documents/views.py:1692
 msgid "AI backend rejected the request. Check logs for details."
 msgstr ""
 
-#: documents/views.py:2548 documents/views.py:2864
+#: documents/views.py:2547 documents/views.py:2863
 msgid "Specify only one of text, title_search, query, or more_like_id."
 msgstr ""
 
-#: documents/views.py:4776
+#: documents/views.py:4785
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr ""
 
-#: documents/views.py:4822
+#: documents/views.py:4831
 msgid "Bundle is already being processed."
 msgstr ""
 
-#: documents/views.py:4886
+#: documents/views.py:4895
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr ""
 
-#: documents/views.py:4900
+#: documents/views.py:4909
 msgid "The share link bundle is unavailable."
 msgstr ""
 
