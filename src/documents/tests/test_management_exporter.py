@@ -677,12 +677,13 @@ class TestExportImport(
         THEN:
             - Error is raised
         """
-        args = ["document_exporter", "/tmp/foo/bar"]
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            args = ["document_exporter", str(Path(tmp_dir) / "does-not-exist")]
 
-        with self.assertRaises(CommandError) as e:
-            call_command(*args, skip_checks=True)
+            with self.assertRaises(CommandError) as e:
+                call_command(*args, skip_checks=True)
 
-        self.assertEqual("That path doesn't exist", str(e.exception))
+            self.assertEqual("That path doesn't exist", str(e.exception))
 
     def test_export_target_exists_but_is_file(self) -> None:
         """
