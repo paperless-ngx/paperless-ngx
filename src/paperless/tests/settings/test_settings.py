@@ -7,6 +7,7 @@ from django.core.exceptions import ImproperlyConfigured
 
 from paperless.settings import _get_allauth_trusted_proxy_count
 from paperless.settings import _get_classifier_language_setting
+from paperless.settings import _get_llm_extra_params
 from paperless.settings import _get_search_language_setting
 from paperless.settings import _parse_paperless_url
 from paperless.settings import default_threads_per_worker
@@ -166,3 +167,45 @@ class TestPaperlessURLSettings(TestCase):
 
             self.assertIn(url, settings.CSRF_TRUSTED_ORIGINS)
             self.assertIn(url, settings.CORS_ALLOWED_ORIGINS)
+
+
+class TestLlmExtraParams:
+    @pytest.mark.parametrize(
+        ("env_value", "expected"),
+        [
+            pytest.param(None, {}, id="unset"),
+            pytest.param(
+                '{"reasoning_effort": "none"}',
+                {"reasoning_effort": "none"},
+                id="json-object",
+            ),
+        ],
+    )
+    def test_parses(
+        self,
+        monkeypatch,
+        env_value,
+        expected,
+    ):
+        if env_value is None:
+            monkeypatch.delenv("PAPERLESS_AI_LLM_EXTRA_PARAMS", raising=False)
+        else:
+            monkeypatch.setenv("PAPERLESS_AI_LLM_EXTRA_PARAMS", env_value)
+        assert _get_llm_extra_params() == expected
+
+    @pytest.mark.parametrize(
+        ("env_value", "match"),
+        [
+            pytest.param("reasoning_effort=none", "valid JSON", id="invalid-json"),
+            pytest.param('["none"]', "JSON object", id="not-an-object"),
+        ],
+    )
+    def test_invalid_raises(
+        self,
+        monkeypatch,
+        env_value,
+        match,
+    ):
+        monkeypatch.setenv("PAPERLESS_AI_LLM_EXTRA_PARAMS", env_value)
+        with pytest.raises(ImproperlyConfigured, match=match):
+            _get_llm_extra_params()

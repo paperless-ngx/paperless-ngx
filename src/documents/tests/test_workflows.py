@@ -69,7 +69,9 @@ from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 from paperless_testing.assertions import FileSystemAssertsMixin
 from paperless_testing.dirs import DirectoriesMixin
+from paperless_testing.factories import DocumentFactory
 from paperless_testing.factories import UserFactory
+from paperless_testing.permissions import grant_global
 from paperless_testing.permissions import grant_object
 
 
@@ -1058,6 +1060,41 @@ class TestWorkflows(
 
         self.assertEqual(doc.correspondent, self.c2)
         self.assertEqual(doc.title, f"Doc created in {created.year}")
+
+    @pytest.mark.usefixtures("_search_index")
+    def test_document_added_workflow_indexes_final_title(self) -> None:
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+            filter_filename="*sample*",
+        )
+        action = WorkflowAction.objects.create(
+            assign_title="Linked document",
+            assign_owner=self.user2,
+        )
+        link_field = CustomField.objects.create(
+            name="Related documents",
+            data_type=CustomField.FieldDataType.DOCUMENTLINK,
+        )
+        action.assign_custom_fields.add(link_field)
+        workflow = Workflow.objects.create(name="Link workflow", order=0)
+        workflow.triggers.add(trigger)
+        workflow.actions.add(action)
+
+        doc = DocumentFactory.create()
+        document_consumption_finished.send(sender=self.__class__, document=doc)
+
+        self.assertTrue(doc.custom_fields.filter(field=link_field).exists())
+        doc.refresh_from_db()
+        self.assertEqual(doc.title, "Linked document")
+
+        grant_global(self.user2, "view_document")
+        self.client.force_authenticate(user=self.user2)
+        response = self.client.get("/api/documents/?title_search=linked")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            [result["id"] for result in response.data["results"]],
+            [doc.pk],
+        )
 
     def test_document_added_no_match_filename(self) -> None:
         trigger = WorkflowTrigger.objects.create(

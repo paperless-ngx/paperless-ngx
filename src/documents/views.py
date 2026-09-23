@@ -2967,11 +2967,15 @@ class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
         if user.is_superuser:
             return True
 
-        document_objs = Document.objects.select_related("owner").filter(
-            pk__in=documents,
-        )
+        root_docs = {
+            get_root_document(doc)
+            for doc in Document.objects.select_related(
+                "owner",
+                "root_document__owner",
+            ).filter(pk__in=documents)
+        }
         user_is_owner_of_all_documents = all(
-            (doc.owner == user or doc.owner is None) for doc in document_objs
+            (doc.owner == user or doc.owner is None) for doc in root_docs
         )
 
         # check global and object permissions for all documents
@@ -2979,9 +2983,13 @@ class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
             user.has_perm(
                 "documents.change_document",
             )
-            and not document_objs.exclude(
+            and not Document.global_objects.filter(
+                pk__in=[doc.pk for doc in root_docs],
+            )
+            .exclude(
                 pk__in=permitted_document_ids(user, perm="change_document"),
-            ).exists()
+            )
+            .exists()
         )
 
         # check ownership for methods that change original document
