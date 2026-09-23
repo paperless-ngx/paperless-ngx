@@ -14,7 +14,7 @@ from paperless_testing.dirs import DirectoriesMixin
 class TestManageSuperUser(DirectoriesMixin, TestCase):
     def call_command(self, environ):
         out = StringIO()
-        with mock.patch.dict(os.environ, environ):
+        with mock.patch.dict(os.environ, environ, clear=True):
             call_command(
                 "manage_superuser",
                 "--no-color",
