@@ -166,7 +166,15 @@ class TestBulkDownload(DirectoriesMixin, SampleDirMixin, APITestCase):
             ),
             content_type="application/json",
         )
-        response.close()
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response["Content-Type"], "application/zip")
+
+        with zipfile.ZipFile(io.BytesIO(read_streaming_response(response))) as zipf:
+            self.assertEqual(zipf.infolist()[0].compress_type, zipfile.ZIP_LZMA)
+
+            with self.doc2.source_file as f:
+                self.assertEqual(f.read(), zipf.read("2021-01-01 document A.pdf"))
 
     @override_settings(FILENAME_FORMAT="{correspondent}/{title}")
     def test_formatted_download_originals(self) -> None:
