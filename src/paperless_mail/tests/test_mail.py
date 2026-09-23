@@ -1565,7 +1565,12 @@ class TestMail(
             ("electronic", None, "invoices@mycompany.com", None, 1),
             (None, "amazon", "me@myselfandi.com", None, 1),
         ]:
-            with self.subTest(f_body=f_body, f_from=f_from, f_subject=f_subject):
+            with self.subTest(
+                f_body=f_body,
+                f_from=f_from,
+                f_to=f_to,
+                f_subject=f_subject,
+            ):
                 MailRule.objects.all().delete()
                 _ = MailRule.objects.create(
                     name="testrule3",
