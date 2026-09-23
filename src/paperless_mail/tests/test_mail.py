@@ -1811,7 +1811,7 @@ class TestPostConsumeAction(TestCase):
 
         with (
             self.assertRaises(errors.ImapToolsError),
-            self.assertLogs("paperless.mail", level="ERROR") as cm,
+            self.assertLogs("paperless_mail", level="ERROR") as cm,
         ):
             apply_mail_action(
                 result=[],
@@ -1820,9 +1820,10 @@ class TestPostConsumeAction(TestCase):
                 message_subject=self.message_subject,
                 message_date=self.message_date,
             )
-            error_str = cm.output[0]
-            expected_str = "Error while processing mail action during post_consume"
-            self.assertIn(expected_str, error_str)
+
+        error_str = cm.output[0]
+        expected_str = "Error while processing mail action during post_consume"
+        self.assertIn(expected_str, error_str)
 
         processed_mail = ProcessedMail.objects.get(uid=self.message_uid)
         self.assertEqual(processed_mail.status, "FAILED")
