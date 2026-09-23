@@ -431,6 +431,53 @@ class TestBulkDownloadPermissionChecksRootDocument:
 
 
 @pytest.mark.django_db
+class TestDocumentOperationPermissionChecksRootDocument:
+    @pytest.mark.parametrize(
+        ("endpoint", "payload"),
+        [
+            pytest.param("/api/documents/merge/", {}, id="merge"),
+            pytest.param("/api/documents/rotate/", {"degrees": 90}, id="rotate"),
+        ],
+    )
+    @pytest.mark.parametrize("version_owner", ["none", "requester"])
+    def test_version_operation_acts_on_root(
+        self,
+        rest_api_client: APIClient,
+        endpoint: str,
+        payload: dict,
+        version_owner: str,
+    ) -> None:
+        owner = UserFactory(username="owner")
+        requester = UserFactory(username="requester")
+        grant_global(requester, "change_document")
+        grant_global(requester, "add_document")
+        rest_api_client.force_authenticate(user=requester)
+        root = DocumentFactory(owner=owner)
+        # A version whose owner went stale, e.g. created before the root changed hands
+        version = DocumentFactory(
+            owner=requester if version_owner == "requester" else None,
+            root_document=root,
+            version_index=1,
+        )
+
+        with (
+            patch("documents.views.bulk_edit.merge") as mock_merge,
+            patch("documents.views.bulk_edit.rotate") as mock_rotate,
+        ):
+            mock_merge.__name__ = "merge"
+            mock_rotate.__name__ = "rotate"
+            response = rest_api_client.post(
+                endpoint,
+                {"documents": [version.pk], **payload},
+                format="json",
+            )
+
+        assert response.status_code == HTTPStatus.FORBIDDEN
+        mock_merge.assert_not_called()
+        mock_rotate.assert_not_called()
+
+
+@pytest.mark.django_db
 @pytest.mark.usefixtures("_search_index")
 class TestTrashRestorePermissionBoundary:
     def test_restore_rejects_document_without_delete_permission(
