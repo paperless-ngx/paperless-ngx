@@ -44,6 +44,7 @@ import {
   HIDEABLE_SIDEBAR_ITEM_IDS,
   HideableSidebarItemID,
   SETTINGS_KEYS,
+  SuggestionSource,
 } from 'src/app/data/ui-settings'
 import { User } from 'src/app/data/user'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
@@ -184,6 +185,7 @@ export class SettingsComponent
     documentEditingRemoveInboxTags: new FormControl(null),
     documentEditingOverlayThumbnail: new FormControl(null),
     documentEditingAutoSuggest: new FormControl(null),
+    documentEditingSuggestionSource: new FormControl(null),
     documentDetailsHiddenFields: new FormControl([]),
     searchDbOnly: new FormControl(null),
     searchLink: new FormControl(null),
@@ -217,6 +219,11 @@ export class SettingsComponent
   public readonly PdfZoomScale = PdfZoomScale
 
   public readonly PdfEditorEditMode = PdfEditorEditMode
+  public readonly SuggestionSource = SuggestionSource
+
+  get aiEnabled(): boolean {
+    return this.settings.get(SETTINGS_KEYS.AI_ENABLED)
+  }
 
   public readonly documentDetailFieldOptions = documentDetailFieldOptions
   public readonly sidebarItemOptions = HIDEABLE_SIDEBAR_ITEM_IDS.map((id) => ({
@@ -403,6 +410,9 @@ export class SettingsComponent
       ),
       documentEditingAutoSuggest: this.settings.get(
         SETTINGS_KEYS.DOCUMENT_EDITING_AUTO_SUGGEST
+      ),
+      documentEditingSuggestionSource: this.settings.get(
+        SETTINGS_KEYS.DOCUMENT_EDITING_SUGGESTION_SOURCE
       ),
       documentDetailsHiddenFields: this.settings.get(
         SETTINGS_KEYS.DOCUMENT_DETAILS_HIDDEN_FIELDS
@@ -624,6 +634,10 @@ export class SettingsComponent
     this.settings.set(
       SETTINGS_KEYS.DOCUMENT_EDITING_AUTO_SUGGEST,
       this.settingsForm.value.documentEditingAutoSuggest
+    )
+    this.settings.set(
+      SETTINGS_KEYS.DOCUMENT_EDITING_SUGGESTION_SOURCE,
+      this.settingsForm.value.documentEditingSuggestionSource
     )
     this.settings.set(
       SETTINGS_KEYS.DOCUMENT_DETAILS_HIDDEN_FIELDS,
