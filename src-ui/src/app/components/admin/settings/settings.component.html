@@ -259,11 +259,14 @@
                   <span i18n>Suggestions use</span>
                 </div>
                 <div class="col">
-                  <select class="form-select" formControlName="documentEditingSuggestionSource">
-                    <option [ngValue]="SuggestionSource.ML" i18n>ML</option>
-                    <option [ngValue]="SuggestionSource.AI" i18n>AI</option>
-                    <option [ngValue]="SuggestionSource.Both" i18n>Both</option>
-                  </select>
+                  <div class="btn-group btn-group-sm" role="group">
+                    <input type="radio" class="btn-check" id="suggestionSourceML" [value]="SuggestionSource.ML" formControlName="documentEditingSuggestionSource">
+                    <label class="btn btn-outline-primary" for="suggestionSourceML"><i-bs class="me-1" name="cpu"></i-bs><ng-container i18n>ML</ng-container></label>
+                    <input type="radio" class="btn-check" id="suggestionSourceAI" [value]="SuggestionSource.AI" formControlName="documentEditingSuggestionSource">
+                    <label class="btn btn-outline-primary" for="suggestionSourceAI"><i-bs class="me-1" name="stars"></i-bs><ng-container i18n>AI</ng-container></label>
+                    <input type="radio" class="btn-check" id="suggestionSourceBoth" [value]="SuggestionSource.Both" formControlName="documentEditingSuggestionSource">
+                    <label class="btn btn-outline-primary" for="suggestionSourceBoth"><i-bs name="cpu"></i-bs><i-bs class="me-1" name="stars"></i-bs><ng-container i18n>Both</ng-container></label>
+                  </div>
                 </div>
               </div>
             }
