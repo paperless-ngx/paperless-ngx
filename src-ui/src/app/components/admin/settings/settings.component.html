@@ -256,17 +256,17 @@
             @if (aiEnabled) {
               <div class="row mb-3">
                 <div class="col-md-3 col-form-label pt-0">
-                  <span i18n>Suggestions use</span>
+                  <span i18n>Suggestions default to</span>
                 </div>
                 <div class="col">
-                  <div class="btn-group btn-group-sm" role="group">
-                    <input type="radio" class="btn-check" id="suggestionSourceML" [value]="SuggestionSource.ML" formControlName="documentEditingSuggestionSource">
-                    <label class="btn btn-outline-primary" for="suggestionSourceML"><i-bs class="me-1" name="cpu"></i-bs><ng-container i18n>ML</ng-container></label>
-                    <input type="radio" class="btn-check" id="suggestionSourceAI" [value]="SuggestionSource.AI" formControlName="documentEditingSuggestionSource">
-                    <label class="btn btn-outline-primary" for="suggestionSourceAI"><i-bs class="me-1" name="stars"></i-bs><ng-container i18n>AI</ng-container></label>
+                  <fieldset class="btn-group btn-group-sm">
                     <input type="radio" class="btn-check" id="suggestionSourceBoth" [value]="SuggestionSource.Both" formControlName="documentEditingSuggestionSource">
-                    <label class="btn btn-outline-primary" for="suggestionSourceBoth"><i-bs name="cpu"></i-bs><i-bs class="me-1" name="stars"></i-bs><ng-container i18n>Both</ng-container></label>
-                  </div>
+                    <label class="btn btn-outline-primary" for="suggestionSourceBoth"><ng-container i18n>Both</ng-container></label>
+                    <input type="radio" class="btn-check" id="suggestionSourceML" [value]="SuggestionSource.ML" formControlName="documentEditingSuggestionSource">
+                    <label class="btn btn-outline-primary" for="suggestionSourceML"><i-bs class="me-1" name="cpu"></i-bs><ng-container i18n>ML only</ng-container></label>
+                    <input type="radio" class="btn-check" id="suggestionSourceAI" [value]="SuggestionSource.AI" formControlName="documentEditingSuggestionSource">
+                    <label class="btn btn-outline-primary" for="suggestionSourceAI"><i-bs class="me-1" name="stars"></i-bs><ng-container i18n>AI only</ng-container></label>
+                  </fieldset>
                 </div>
               </div>
             }
