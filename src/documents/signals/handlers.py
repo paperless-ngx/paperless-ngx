@@ -56,6 +56,7 @@ from documents.permissions import get_objects_for_user_owner_aware
 from documents.plugins.helpers import DocumentsStatusManager
 from documents.templating.utils import convert_format_str_to_template_format
 from documents.utils import compute_checksum
+from documents.utils import copy_file_with_basic_stats
 from documents.workflows.actions import build_workflow_action_context
 from documents.workflows.actions import execute_email_action
 from documents.workflows.actions import execute_move_to_trash_action
@@ -363,7 +364,11 @@ def cleanup_document_deletion(sender, instance, **kwargs) -> None:
 
             logger.debug(f"Moving {instance.source_path} to trash at {new_file_path}")
             try:
-                shutil.move(instance.source_path, new_file_path)
+                shutil.move(
+                    instance.source_path,
+                    new_file_path,
+                    copy_function=copy_file_with_basic_stats,
+                )
             except OSError as e:
                 logger.error(
                     f"Failed to move {instance.source_path} to trash at "
