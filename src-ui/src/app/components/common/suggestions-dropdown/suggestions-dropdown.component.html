@@ -74,11 +74,11 @@
         <div class="small text-muted mb-2" i18n>Suggest using:</div>
         <div class="form-check">
           <input class="form-check-input" type="checkbox" id="suggestionSourceML" [checked]="useML" [disabled]="useML && !useAI" (change)="toggleSource(SuggestionSource.ML)">
-          <label class="form-check-label" for="suggestionSourceML" i18n>ML</label>
+          <label class="form-check-label" for="suggestionSourceML"><i-bs class="me-1" name="cpu"></i-bs><ng-container i18n>ML</ng-container></label>
         </div>
         <div class="form-check">
           <input class="form-check-input" type="checkbox" id="suggestionSourceAI" [checked]="useAI" [disabled]="useAI && !useML" (change)="toggleSource(SuggestionSource.AI)">
-          <label class="form-check-label" for="suggestionSourceAI" i18n>AI</label>
+          <label class="form-check-label" for="suggestionSourceAI"><i-bs class="me-1" name="stars"></i-bs><ng-container i18n>AI</ng-container></label>
         </div>
       </div>
     </div>
