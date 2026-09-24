@@ -4,10 +4,10 @@ from rest_framework.exceptions import PermissionDenied
 
 from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import has_perms_owner_aware
-from documents.serialisers import CorrespondentField
-from documents.serialisers import DocumentTypeField
-from documents.serialisers import OwnedObjectSerializer
-from documents.serialisers import TagsField
+from documents.serialisers.base import OwnedObjectSerializer
+from documents.serialisers.metadata import CorrespondentField
+from documents.serialisers.metadata import DocumentTypeField
+from documents.serialisers.metadata import TagsField
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 from paperless_mail.models import ProcessedMail
