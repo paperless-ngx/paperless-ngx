@@ -28,7 +28,7 @@ import {
 import { dirtyCheck, DirtyComponent } from '@ngneat/dirty-check-forms'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { DeviceDetectorService } from 'ngx-device-detector'
-import { BehaviorSubject, Observable, of, Subject, timer } from 'rxjs'
+import { BehaviorSubject, merge, Observable, of, Subject, timer } from 'rxjs'
 import {
   catchError,
   debounceTime,
@@ -48,7 +48,10 @@ import { DataType } from 'src/app/data/datatype'
 import { Document, DocumentVersionInfo } from 'src/app/data/document'
 import { DocumentMetadata } from 'src/app/data/document-metadata'
 import { DocumentNote } from 'src/app/data/document-note'
-import { DocumentSuggestions } from 'src/app/data/document-suggestions'
+import {
+  DocumentSuggestions,
+  mergeSuggestions,
+} from 'src/app/data/document-suggestions'
 import { DocumentType } from 'src/app/data/document-type'
 import { FilterRule } from 'src/app/data/filter-rule'
 import {
@@ -63,7 +66,7 @@ import {
 import { ObjectWithId } from 'src/app/data/object-with-id'
 import { StoragePath } from 'src/app/data/storage-path'
 import { Tag } from 'src/app/data/tag'
-import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { SETTINGS_KEYS, SuggestionSource } from 'src/app/data/ui-settings'
 import { User } from 'src/app/data/user'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
@@ -240,6 +243,10 @@ export class DocumentDetailComponent
   private readonly autoSuggestSetting = this.settings.getSignal<boolean>(
     SETTINGS_KEYS.DOCUMENT_EDITING_AUTO_SUGGEST
   )
+  private readonly suggestionSourceSetting =
+    this.settings.getSignal<SuggestionSource>(
+      SETTINGS_KEYS.DOCUMENT_EDITING_SUGGESTION_SOURCE
+    )
   private readonly hiddenFieldsSetting = this.settings.getSignal<
     DocumentDetailFieldID[]
   >(SETTINGS_KEYS.DOCUMENT_DETAILS_HIDDEN_FIELDS)
@@ -261,6 +268,9 @@ export class DocumentDetailComponent
   readonly metadata = signal<DocumentMetadata>(undefined)
   readonly suggestions = signal<DocumentSuggestions>(undefined)
   readonly suggestionsLoading = signal(false)
+  // per-document, resets on navigation
+  readonly suggestionSourceOverride = signal<SuggestionSource>(null)
+  readonly fetchedSuggestionSources = signal<SuggestionSource[]>([])
   readonly users = signal<User[]>(undefined)
 
   readonly title = signal<string>(undefined)
@@ -363,6 +373,11 @@ export class DocumentDetailComponent
 
   get autoSuggest(): boolean {
     return this.autoSuggestSetting()
+  }
+
+  get suggestionSource(): SuggestionSource {
+    if (!this.aiEnabled) return SuggestionSource.ML
+    return this.suggestionSourceOverride() ?? this.suggestionSourceSetting()
   }
 
   get archiveContentRenderType(): ContentRenderType {
@@ -590,6 +605,8 @@ export class DocumentDetailComponent
           }
           this.documentId.set(doc.id)
           this.suggestions.set(null)
+          this.suggestionSourceOverride.set(null)
+          this.fetchedSuggestionSources.set([])
           const openDocument = this.openDocumentService.getOpenDocument(
             this.documentId()
           )
@@ -1077,29 +1094,44 @@ export class DocumentDetailComponent
     return this.documentForm.get('custom_fields') as FormArray
   }
 
-  getSuggestions() {
+  getSuggestions(source: SuggestionSource = this.suggestionSource) {
+    const sources = (
+      source === SuggestionSource.Both
+        ? [SuggestionSource.ML, SuggestionSource.AI]
+        : [source]
+    ).filter((s) => !this.fetchedSuggestionSources().includes(s))
+    if (!sources.length) return
+
     this.suggestionsLoading.set(true)
-    const suggestionsObservable = this.aiEnabled
-      ? this.documentsService.getAiSuggestions(this.documentId())
-      : this.documentsService.getSuggestions(this.documentId())
-    suggestionsObservable
+    merge(
+      ...sources.map((s) =>
+        (s === SuggestionSource.AI
+          ? this.documentsService.getAiSuggestions(this.documentId())
+          : this.documentsService.getSuggestions(this.documentId())
+        ).pipe(
+          first(),
+          map((result) => ({ source: s, result })),
+          catchError((error) => {
+            this.toastService.showError(
+              $localize`Error retrieving suggestions.`,
+              error
+            )
+            return of(null)
+          })
+        )
+      )
+    )
       .pipe(
-        first(),
         takeUntil(this.unsubscribeNotifier),
         takeUntil(this.docChangeNotifier),
         finalize(() => this.suggestionsLoading.set(false))
       )
-      .subscribe({
-        next: (result) => {
-          this.suggestions.set(result)
-        },
-        error: (error) => {
-          this.suggestions.set(null)
-          this.toastService.showError(
-            $localize`Error retrieving suggestions.`,
-            error
-          )
-        },
+      .subscribe((response) => {
+        if (!response) return
+        this.fetchedSuggestionSources.update((f) => [...f, response.source])
+        this.suggestions.set(
+          mergeSuggestions(this.suggestions(), response.result)
+        )
       })
   }
 
