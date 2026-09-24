@@ -203,7 +203,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.doc1.refresh_from_db()
         self.assertFalse(self.doc1.tags.filter(pk=self.t1.pk).exists())
 
-    @mock.patch("documents.serialisers.bulk_edit.modify_tags")
+    @mock.patch("documents.serialisers.bulk_edit.bulk_edit.modify_tags")
     def test_api_modify_tags(self, m) -> None:
         self.setup_mock(m, "modify_tags")
         response = self.client.post(
@@ -227,7 +227,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(kwargs["add_tags"], [self.t1.id])
         self.assertEqual(kwargs["remove_tags"], [self.t2.id])
 
-    @mock.patch("documents.serialisers.bulk_edit.modify_tags")
+    @mock.patch("documents.serialisers.bulk_edit.bulk_edit.modify_tags")
     def test_api_modify_tags_not_provided(self, m) -> None:
         """
         GIVEN:
@@ -255,7 +255,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         m.assert_not_called()
 
-    @mock.patch("documents.serialisers.bulk_edit.modify_custom_fields")
+    @mock.patch("documents.serialisers.bulk_edit.bulk_edit.modify_custom_fields")
     def test_api_modify_custom_fields(self, m) -> None:
         self.setup_mock(m, "modify_custom_fields")
         response = self.client.post(
@@ -281,7 +281,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(kwargs["add_custom_fields"], [self.cf1.id])
         self.assertEqual(kwargs["remove_custom_fields"], [self.cf2.id])
 
-    @mock.patch("documents.serialisers.bulk_edit.modify_custom_fields")
+    @mock.patch("documents.serialisers.bulk_edit.bulk_edit.modify_custom_fields")
     def test_api_modify_custom_fields_documentlink_forbidden_for_unpermitted_target(
         self,
         m,
@@ -325,7 +325,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         m.assert_not_called()
 
-    @mock.patch("documents.serialisers.bulk_edit.modify_custom_fields")
+    @mock.patch("documents.serialisers.bulk_edit.bulk_edit.modify_custom_fields")
     def test_api_modify_custom_fields_with_values(self, m) -> None:
         self.setup_mock(m, "modify_custom_fields")
         response = self.client.post(
@@ -349,7 +349,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(kwargs["add_custom_fields"], {self.cf1.id: "foo"})
         self.assertEqual(kwargs["remove_custom_fields"], [self.cf2.id])
 
-    @mock.patch("documents.serialisers.bulk_edit.modify_custom_fields")
+    @mock.patch("documents.serialisers.bulk_edit.bulk_edit.modify_custom_fields")
     def test_api_modify_custom_fields_rejects_invalid_value(self, m) -> None:
         self.setup_mock(m, "modify_custom_fields")
 
@@ -373,7 +373,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertIn(str(self.cf1.id), response.data["add_custom_fields"])
         m.assert_not_called()
 
-    @mock.patch("documents.serialisers.bulk_edit.modify_custom_fields")
+    @mock.patch("documents.serialisers.bulk_edit.bulk_edit.modify_custom_fields")
     def test_api_modify_custom_fields_invalid_params(self, m) -> None:
         """
         GIVEN:
@@ -493,7 +493,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         m.assert_not_called()
 
-    @mock.patch("documents.serialisers.bulk_edit.delete")
+    @mock.patch("documents.serialisers.bulk_edit.bulk_edit.delete")
     def test_api_delete(self, m) -> None:
         self.setup_mock(m, "delete")
         response = self.client.post(
@@ -509,7 +509,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(args[0], [self.doc1.id])
         self.assertEqual(len(kwargs), 0)
 
-    @mock.patch("documents.views.bulk_edit.delete")
+    @mock.patch("documents.views.bulk_edit.bulk_edit.delete")
     def test_delete_documents_endpoint(self, m) -> None:
         self.setup_mock(m, "delete")
         response = self.client.post(
@@ -523,7 +523,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(args[0], [self.doc1.id])
         self.assertEqual(len(kwargs), 0)
 
-    @mock.patch("documents.views.bulk_edit.delete")
+    @mock.patch("documents.views.bulk_edit.bulk_edit.delete")
     def test_delete_documents_endpoint_with_excluded_documents(self, m) -> None:
         self.setup_mock(m, "delete")
         response = self.client.post(
@@ -547,7 +547,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(args[0], [self.doc1.id])
         self.assertEqual(len(kwargs), 0)
 
-    @mock.patch("documents.views.bulk_edit.reprocess")
+    @mock.patch("documents.views.bulk_edit.bulk_edit.reprocess")
     def test_reprocess_documents_endpoint(self, m) -> None:
         self.setup_mock(m, "reprocess")
         response = self.client.post(
@@ -561,7 +561,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(args[0], [self.doc1.id])
         self.assertEqual(kwargs, {"remote_ocr": False})
 
-    @mock.patch("documents.views.bulk_edit.reprocess")
+    @mock.patch("documents.views.bulk_edit.bulk_edit.reprocess")
     def test_reprocess_documents_endpoint_remote_ocr(self, m) -> None:
         """
         GIVEN:
@@ -583,7 +583,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(args[0], [self.doc1.id])
         self.assertEqual(kwargs, {"remote_ocr": True})
 
-    @mock.patch("documents.serialisers.bulk_edit.set_storage_path")
+    @mock.patch("documents.serialisers.bulk_edit.bulk_edit.set_storage_path")
     def test_api_set_storage_path(self, m) -> None:
         """
         GIVEN:
@@ -613,7 +613,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertListEqual(args[0], [self.doc1.id])
         self.assertEqual(kwargs["storage_path"], self.sp1.id)
 
-    @mock.patch("documents.serialisers.bulk_edit.set_storage_path")
+    @mock.patch("documents.serialisers.bulk_edit.bulk_edit.set_storage_path")
     def test_api_unset_storage_path(self, m) -> None:
         """
         GIVEN:
@@ -738,7 +738,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
             response.content,
         )
 
-    @mock.patch("documents.serialisers.bulk_edit.set_storage_path")
+    @mock.patch("documents.serialisers.bulk_edit.bulk_edit.set_storage_path")
     def test_api_bulk_edit_with_all_true_resolves_documents_from_filters(
         self,
         m,
@@ -764,7 +764,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(args[0], [self.doc2.id])
         self.assertEqual(kwargs["storage_path"], self.sp1.id)
 
-    @mock.patch("documents.serialisers.bulk_edit.set_storage_path")
+    @mock.patch("documents.serialisers.bulk_edit.bulk_edit.set_storage_path")
     def test_api_bulk_edit_with_all_true_excludes_documents(self, m) -> None:
         self.setup_mock(m, "set_storage_path")
 
@@ -787,7 +787,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertCountEqual(args[0], [self.doc1.id, self.doc3.id, self.doc5.id])
         self.assertEqual(kwargs["storage_path"], self.sp1.id)
 
-    @mock.patch("documents.serialisers.bulk_edit.set_storage_path")
+    @mock.patch("documents.serialisers.bulk_edit.bulk_edit.set_storage_path")
     def test_api_bulk_edit_with_all_true_resolves_owned_duplicates(self, m) -> None:
         self.setup_mock(m, "set_storage_path")
         user = UserFactory(username="duplicate-owner")
@@ -824,7 +824,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(kwargs["storage_path"], self.sp1.id)
 
     @mock.patch("documents.search.get_backend")
-    @mock.patch("documents.serialisers.bulk_edit.set_storage_path")
+    @mock.patch("documents.serialisers.bulk_edit.bulk_edit.set_storage_path")
     def test_api_bulk_edit_with_all_true_resolves_documents_from_search_filters(
         self,
         m,
@@ -1199,7 +1199,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    @mock.patch("documents.serialisers.bulk_edit.set_permissions")
+    @mock.patch("documents.serialisers.bulk_edit.bulk_edit.set_permissions")
     def test_set_permissions(self, m) -> None:
         self.setup_mock(m, "set_permissions")
         user1 = User.objects.create(username="user1")
@@ -1234,7 +1234,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertCountEqual(args[0], [self.doc2.id, self.doc3.id])
         self.assertEqual(len(kwargs["set_permissions"]["view"]["users"]), 2)
 
-    @mock.patch("documents.serialisers.bulk_edit.set_permissions")
+    @mock.patch("documents.serialisers.bulk_edit.bulk_edit.set_permissions")
     def test_set_permissions_requires_set_permissions_parameter(self, m) -> None:
         self.setup_mock(m, "set_permissions")
 
@@ -1258,7 +1258,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertIn(b"set_permissions not specified", response.content)
         m.assert_not_called()
 
-    @mock.patch("documents.serialisers.bulk_edit.set_permissions")
+    @mock.patch("documents.serialisers.bulk_edit.bulk_edit.set_permissions")
     def test_set_permissions_rejects_malformed_set_permissions(self, m) -> None:
         """
         GIVEN:
@@ -1293,7 +1293,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
                 self.assertIn(expected_message, response.content)
         m.assert_not_called()
 
-    @mock.patch("documents.serialisers.bulk_edit.set_permissions")
+    @mock.patch("documents.serialisers.bulk_edit.bulk_edit.set_permissions")
     def test_set_permissions_rejects_invalid_owner(self, m) -> None:
         """
         GIVEN:
@@ -1335,7 +1335,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
                 self.assertIn(b"Specified owner cannot be found", response.content)
         m.assert_not_called()
 
-    @mock.patch("documents.serialisers.bulk_edit.set_permissions")
+    @mock.patch("documents.serialisers.bulk_edit.bulk_edit.set_permissions")
     def test_set_permissions_null_is_a_noop(self, m) -> None:
         """
         GIVEN:
@@ -1371,7 +1371,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
             {"view": {}, "change": {}},
         )
 
-    @mock.patch("documents.serialisers.bulk_edit.set_permissions")
+    @mock.patch("documents.serialisers.bulk_edit.bulk_edit.set_permissions")
     def test_set_permissions_passes_validated_owner_id(self, m) -> None:
         """
         GIVEN:
@@ -1402,7 +1402,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         m.assert_called_once()
         self.assertEqual(m.call_args.kwargs["owner"], self.user.id)
 
-    @mock.patch("documents.serialisers.bulk_edit.set_permissions")
+    @mock.patch("documents.serialisers.bulk_edit.bulk_edit.set_permissions")
     def test_set_permissions_merge(self, m) -> None:
         self.setup_mock(m, "set_permissions")
         user1 = User.objects.create(username="user1")
@@ -1454,8 +1454,8 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         _, kwargs = m.call_args
         self.assertEqual(kwargs["merge"], True)
 
-    @mock.patch("documents.serialisers.bulk_edit.set_storage_path")
-    @mock.patch("documents.views.bulk_edit.merge")
+    @mock.patch("documents.serialisers.bulk_edit.bulk_edit.set_storage_path")
+    @mock.patch("documents.views.bulk_edit.bulk_edit.merge")
     def test_insufficient_global_perms(self, mock_merge, mock_set_storage) -> None:
         """
         GIVEN:
@@ -1518,7 +1518,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         mock_merge.assert_not_called()
 
-    @mock.patch("documents.serialisers.bulk_edit.set_permissions")
+    @mock.patch("documents.serialisers.bulk_edit.bulk_edit.set_permissions")
     def test_insufficient_permissions_ownership(self, m) -> None:
         """
         GIVEN:
@@ -1572,7 +1572,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         m.assert_called_once()
 
-    @mock.patch("documents.serialisers.bulk_edit.set_storage_path")
+    @mock.patch("documents.serialisers.bulk_edit.bulk_edit.set_storage_path")
     def test_insufficient_permissions_edit(self, m) -> None:
         """
         GIVEN:
@@ -1626,7 +1626,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
 
         m.assert_called_once()
 
-    @mock.patch("documents.views.bulk_edit.rotate")
+    @mock.patch("documents.views.bulk_edit.bulk_edit.rotate")
     def test_rotate(self, m) -> None:
         self.setup_mock(m, "rotate")
         response = self.client.post(
@@ -1648,7 +1648,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(kwargs["source_mode"], "latest_version")
         self.assertEqual(kwargs["user"], self.user)
 
-    @mock.patch("documents.views.bulk_edit.rotate")
+    @mock.patch("documents.views.bulk_edit.bulk_edit.rotate")
     def test_rotate_invalid_params(self, m) -> None:
         response = self.client.post(
             "/api/documents/rotate/",
@@ -1688,7 +1688,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertIn(b"degrees must be a multiple of 90", response.content)
         m.assert_not_called()
 
-    @mock.patch("documents.serialisers.bulk_edit.rotate")
+    @mock.patch("documents.serialisers.bulk_edit.bulk_edit.rotate")
     def test_bulk_edit_rotate_rejects_invalid_degrees(self, m) -> None:
         """
         GIVEN:
@@ -1725,7 +1725,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
                 self.assertIn(expected_message, response.content)
         m.assert_not_called()
 
-    @mock.patch("documents.serialisers.bulk_edit.rotate")
+    @mock.patch("documents.serialisers.bulk_edit.bulk_edit.rotate")
     def test_bulk_edit_rotate_passes_integer_degrees(self, m) -> None:
         """
         GIVEN:
@@ -1753,7 +1753,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         m.assert_called_once()
         self.assertEqual(m.call_args.kwargs["degrees"], -90)
 
-    @mock.patch("documents.serialisers.bulk_edit.split")
+    @mock.patch("documents.serialisers.bulk_edit.bulk_edit.split")
     def test_bulk_edit_split_rejects_invalid_pages(self, m) -> None:
         """
         GIVEN:
@@ -1785,7 +1785,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
                 self.assertIn(b"invalid pages specified", response.content)
         m.assert_not_called()
 
-    @mock.patch("documents.serialisers.bulk_edit.split")
+    @mock.patch("documents.serialisers.bulk_edit.bulk_edit.split")
     def test_bulk_edit_split_rejects_unknown_page_count(self, m) -> None:
         """
         GIVEN:
@@ -1815,7 +1815,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
                 self.assertIn(b"document page count is unknown", response.content)
         m.assert_not_called()
 
-    @mock.patch("documents.serialisers.bulk_edit.split")
+    @mock.patch("documents.serialisers.bulk_edit.bulk_edit.split")
     def test_bulk_edit_split_parses_pages(self, m) -> None:
         """
         GIVEN:
@@ -1843,7 +1843,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         m.assert_called_once()
         self.assertEqual(m.call_args.kwargs["pages"], [[1], [2, 3, 4], [5]])
 
-    @mock.patch("documents.views.bulk_edit.rotate")
+    @mock.patch("documents.views.bulk_edit.bulk_edit.rotate")
     def test_rotate_insufficient_permissions(self, m) -> None:
         self.doc1.owner = User.objects.get(username="temp_admin")
         self.doc1.save()
@@ -1882,7 +1882,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         m.assert_called_once()
 
-    @mock.patch("documents.views.bulk_edit.merge")
+    @mock.patch("documents.views.bulk_edit.bulk_edit.merge")
     def test_merge(self, m) -> None:
         self.setup_mock(m, "merge")
         response = self.client.post(
@@ -1904,7 +1904,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(kwargs["source_mode"], "latest_version")
         self.assertEqual(kwargs["user"], self.user)
 
-    @mock.patch("documents.views.bulk_edit.merge")
+    @mock.patch("documents.views.bulk_edit.bulk_edit.merge")
     def test_merge_and_delete_insufficient_permissions(self, m) -> None:
         self.doc1.owner = User.objects.get(username="temp_admin")
         self.doc1.save()
@@ -1945,7 +1945,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         m.assert_called_once()
 
-    @mock.patch("documents.views.bulk_edit.merge")
+    @mock.patch("documents.views.bulk_edit.bulk_edit.merge")
     def test_merge_and_delete_requires_change_permission(self, m) -> None:
         self.setup_mock(m, "merge")
         user = UserFactory(username="no-change")
@@ -1966,7 +1966,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         m.assert_not_called()
 
-    @mock.patch("documents.views.bulk_edit.merge")
+    @mock.patch("documents.views.bulk_edit.bulk_edit.merge")
     def test_merge_invalid_parameters(self, m) -> None:
         self.setup_mock(m, "merge")
         response = self.client.post(
@@ -1999,7 +1999,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
             for method, parameters in method_payloads.items():
                 with self.subTest(method=method, version=version):
                     with mock.patch(
-                        f"documents.views.bulk_edit.{method}",
+                        f"documents.views.bulk_edit.bulk_edit.{method}",
                     ) as mocked_method:
                         self.setup_mock(mocked_method, method)
                         with self.assertLogs("paperless.api", level="WARNING") as logs:
@@ -2088,7 +2088,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
             {"operations": ["This list may not be empty."]},
         )
 
-    @mock.patch("documents.views.bulk_edit.edit_pdf")
+    @mock.patch("documents.views.bulk_edit.bulk_edit.edit_pdf")
     def test_edit_pdf(self, m) -> None:
         self.setup_mock(m, "edit_pdf")
         response = self.client.post(
@@ -2248,7 +2248,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn(b"Invalid source_mode", response.content)
 
-    @mock.patch("documents.views.bulk_edit.edit_pdf")
+    @mock.patch("documents.views.bulk_edit.bulk_edit.edit_pdf")
     def test_edit_pdf_rejects_invalid_operation_values(self, m) -> None:
         """
         GIVEN:
@@ -2314,7 +2314,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
             {"operations": {"0": {"rotate": ["rotate must be a multiple of 90"]}}},
         )
 
-    @mock.patch("documents.views.bulk_edit.edit_pdf")
+    @mock.patch("documents.views.bulk_edit.bulk_edit.edit_pdf")
     def test_edit_pdf_page_out_of_bounds(self, m) -> None:
         self.setup_mock(m, "edit_pdf")
         response = self.client.post(
@@ -2331,7 +2331,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertIn(b"out of bounds", response.content)
         m.assert_not_called()
 
-    @mock.patch("documents.views.bulk_edit.edit_pdf")
+    @mock.patch("documents.views.bulk_edit.bulk_edit.edit_pdf")
     def test_edit_pdf_insufficient_permissions(self, m) -> None:
         self.doc1.owner = User.objects.get(username="temp_admin")
         self.doc1.save()
@@ -2368,7 +2368,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         m.assert_called_once()
 
-    @mock.patch("documents.views.bulk_edit.edit_pdf")
+    @mock.patch("documents.views.bulk_edit.bulk_edit.edit_pdf")
     def test_edit_pdf_update_requires_change_permission(self, m) -> None:
         self.setup_mock(m, "edit_pdf")
         user = UserFactory(username="no-change")
@@ -2389,8 +2389,8 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         m.assert_not_called()
 
-    @mock.patch("documents.views.bulk_edit.remove_password")
-    @mock.patch("documents.views.bulk_edit.edit_pdf")
+    @mock.patch("documents.views.bulk_edit.bulk_edit.remove_password")
+    @mock.patch("documents.views.bulk_edit.bulk_edit.edit_pdf")
     def test_delete_original_requires_delete_permission(
         self,
         edit_pdf_mock,
@@ -2433,7 +2433,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
                 self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
                 operation_mock.assert_not_called()
 
-    @mock.patch("documents.views.bulk_edit.remove_password")
+    @mock.patch("documents.views.bulk_edit.bulk_edit.remove_password")
     def test_remove_password(self, m) -> None:
         self.setup_mock(m, "remove_password")
         response = self.client.post(
@@ -2481,7 +2481,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    @mock.patch("documents.views.bulk_edit.remove_password")
+    @mock.patch("documents.views.bulk_edit.bulk_edit.remove_password")
     def test_remove_password_insufficient_permissions(self, m) -> None:
         self.doc1.owner = User.objects.get(username="temp_admin")
         self.doc1.save()

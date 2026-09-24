@@ -9,7 +9,7 @@ from rest_framework.test import APITestCase
 
 from documents.bulk_edit import merge_as_versions
 from documents.models import Document
-from documents.serialisers import MergeDocumentsAsVersionsSerializer
+from documents.serialisers.bulk_edit import MergeDocumentsAsVersionsSerializer
 from paperless_testing.factories import UserFactory
 from paperless_testing.permissions import grant_global
 
@@ -349,7 +349,7 @@ class TestMergeDocumentsAsVersionsAPI(APITestCase):
         )
         self.client.force_authenticate(user=self.user)
 
-    @mock.patch("documents.views.bulk_edit.merge_as_versions")
+    @mock.patch("documents.views.bulk_edit.bulk_edit.merge_as_versions")
     def test_merges_documents_as_versions(self, merge_mock) -> None:
         merge_mock.return_value = "OK"
         merge_mock.__name__ = "merge_as_versions"
@@ -375,7 +375,7 @@ class TestMergeDocumentsAsVersionsAPI(APITestCase):
             user=self.user,
         )
 
-    @mock.patch("documents.views.bulk_edit.merge_as_versions")
+    @mock.patch("documents.views.bulk_edit.bulk_edit.merge_as_versions")
     def test_requires_change_permission(self, merge_mock) -> None:
         merge_mock.__name__ = "merge_as_versions"
         user = UserFactory(username="no-change")
@@ -397,7 +397,7 @@ class TestMergeDocumentsAsVersionsAPI(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         merge_mock.assert_not_called()
 
-    @mock.patch("documents.views.bulk_edit.merge_as_versions")
+    @mock.patch("documents.views.bulk_edit.bulk_edit.merge_as_versions")
     def test_requires_delete_permission(self, merge_mock) -> None:
         merge_mock.__name__ = "merge_as_versions"
         # Owns them and may change them, but may not make them stop being documents
@@ -420,7 +420,7 @@ class TestMergeDocumentsAsVersionsAPI(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         merge_mock.assert_not_called()
 
-    @mock.patch("documents.views.bulk_edit.merge_as_versions")
+    @mock.patch("documents.views.bulk_edit.bulk_edit.merge_as_versions")
     def test_rejects_unselected_root(self, merge_mock) -> None:
         doc3 = Document.objects.create(
             checksum="C",
@@ -440,7 +440,7 @@ class TestMergeDocumentsAsVersionsAPI(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         merge_mock.assert_not_called()
 
-    @mock.patch("documents.views.bulk_edit.merge_as_versions")
+    @mock.patch("documents.views.bulk_edit.bulk_edit.merge_as_versions")
     def test_rejects_source_document_with_versions(self, merge_mock) -> None:
         Document.objects.create(
             checksum="C",

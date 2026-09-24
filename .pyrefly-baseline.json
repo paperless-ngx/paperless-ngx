@@ -897,239 +897,232 @@
       "severity": "error"
     },
     {
-      "column": 17,
-      "path": "src/documents/search/_schema.py",
-      "name": "unexpected-keyword",
-      "concise_description": "Unexpected keyword argument `fast` in function `tantivy.tantivy.SchemaBuilder.add_json_field`",
-      "severity": "error"
-    },
-    {
       "column": 9,
-      "path": "src/documents/serialisers.py",
+      "path": "src/documents/serialisers/base.py",
       "name": "bad-override-param-name",
       "concise_description": "Class member `MatchingModelSerializer.validate` overrides parent class `ModelSerializer` in an inconsistent manner",
       "severity": "error"
     },
     {
       "column": 62,
-      "path": "src/documents/serialisers.py",
+      "path": "src/documents/serialisers/base.py",
       "name": "unsupported-operation",
       "concise_description": "Cannot set item in `dict[str, QuerySet[User, User]]`",
       "severity": "error"
     },
     {
       "column": 17,
-      "path": "src/documents/serialisers.py",
+      "path": "src/documents/serialisers/base.py",
       "name": "missing-attribute",
       "concise_description": "Object of class `list` has no attribute `values_list`",
       "severity": "error"
     },
     {
       "column": 9,
-      "path": "src/documents/serialisers.py",
+      "path": "src/documents/serialisers/base.py",
       "name": "bad-override-param-name",
       "concise_description": "Class member `OwnedObjectListSerializer.to_representation` overrides parent class `ListSerializer` in an inconsistent manner",
       "severity": "error"
     },
     {
       "column": 9,
-      "path": "src/documents/serialisers.py",
+      "path": "src/documents/serialisers/base.py",
       "name": "missing-attribute",
       "concise_description": "Object of class `NoneType` has no attribute `context`",
       "severity": "error"
     },
     {
       "column": 51,
-      "path": "src/documents/serialisers.py",
+      "path": "src/documents/serialisers/base.py",
       "name": "missing-attribute",
       "concise_description": "Object of type `BaseSerializer[Unknown] | Field[Unknown, Unknown, Unknown, Unknown] | None` has no attribute `get_shared_object_pks`",
       "severity": "error"
     },
     {
-      "column": 14,
-      "path": "src/documents/serialisers.py",
-      "name": "bad-assignment",
-      "concise_description": "`ManyRelatedField | RelatedField[@_, @_, Any]` is not assignable to attribute `parent` with type `BaseSerializer[Unknown]`",
-      "severity": "error"
-    },
-    {
-      "column": 17,
-      "path": "src/documents/serialisers.py",
-      "name": "unsupported-operation",
-      "concise_description": "Cannot set item in `Mapping[str, Any]`",
-      "severity": "error"
-    },
-    {
-      "column": 9,
-      "path": "src/documents/serialisers.py",
-      "name": "bad-override-param-name",
-      "concise_description": "Class member `TagSerializer.validate` overrides parent class `MatchingModelSerializer` in an inconsistent manner",
-      "severity": "error"
-    },
-    {
-      "column": 17,
-      "path": "src/documents/serialisers.py",
-      "name": "bad-argument-type",
-      "concise_description": "Argument `type[CustomField.FieldDataType]` is not assignable to parameter `choices` with type `Sequence[Any]` in function `rest_framework.fields.ChoiceField.__init__`",
-      "severity": "error"
-    },
-    {
       "column": 28,
-      "path": "src/documents/serialisers.py",
+      "path": "src/documents/serialisers/base.py",
       "name": "bad-assignment",
       "concise_description": "`Unknown | None` is not assignable to attribute `method_name` with type `str`",
       "severity": "error"
     },
     {
-      "column": 13,
-      "path": "src/documents/serialisers.py",
-      "name": "bad-argument-type",
-      "concise_description": "Argument `str` is not assignable to parameter `data_type` with type `CustomField.FieldDataType` in function `documents.models.CustomFieldInstance.get_value_field_name`",
-      "severity": "error"
-    },
-    {
-      "column": 9,
-      "path": "src/documents/serialisers.py",
-      "name": "bad-override-param-name",
-      "concise_description": "Class member `CustomFieldInstanceSerializer.get_value` overrides parent class `ModelSerializer` in an inconsistent manner",
-      "severity": "error"
-    },
-    {
-      "column": 9,
-      "path": "src/documents/serialisers.py",
-      "name": "bad-override-param-name",
-      "concise_description": "Class member `CustomFieldInstanceSerializer.validate` overrides parent class `ModelSerializer` in an inconsistent manner",
-      "severity": "error"
-    },
-    {
-      "column": 34,
-      "path": "src/documents/serialisers.py",
-      "name": "unsupported-operation",
-      "concise_description": "`None` is not subscriptable",
+      "column": 7,
+      "path": "src/documents/serialisers/bulk_edit.py",
+      "name": "invalid-inheritance",
+      "concise_description": "Class `BulkEditSerializer` has inconsistent type arguments for base class `Field`: `Field[Any, Any, Any, dict[str, Any]]` and `Field[Any, Any, Any, dict[str, list[int]]]`",
       "severity": "error"
     },
     {
       "column": 30,
-      "path": "src/documents/serialisers.py",
+      "path": "src/documents/serialisers/documents.py",
       "name": "unsupported-operation",
       "concise_description": "`None` is not subscriptable",
       "severity": "error"
     },
     {
       "column": 9,
-      "path": "src/documents/serialisers.py",
+      "path": "src/documents/serialisers/documents.py",
       "name": "bad-override-param-name",
       "concise_description": "Class member `SearchResultListSerializer.to_representation` overrides parent class `ListSerializer` in an inconsistent manner",
       "severity": "error"
     },
     {
       "column": 21,
-      "path": "src/documents/serialisers.py",
+      "path": "src/documents/serialisers/documents.py",
       "name": "missing-attribute",
       "concise_description": "Object of type `BaseSerializer[Unknown] | Field[Unknown, Unknown, Unknown, Unknown] | None` has no attribute `fetch_documents`",
       "severity": "error"
     },
     {
       "column": 9,
-      "path": "src/documents/serialisers.py",
+      "path": "src/documents/serialisers/documents.py",
       "name": "missing-attribute",
       "concise_description": "Object of class `NoneType` has no attribute `context`",
       "severity": "error"
     },
     {
       "column": 9,
-      "path": "src/documents/serialisers.py",
+      "path": "src/documents/serialisers/documents.py",
       "name": "missing-attribute",
       "concise_description": "Object of class `NoneType` has no attribute `context`",
       "severity": "error"
     },
     {
       "column": 51,
-      "path": "src/documents/serialisers.py",
+      "path": "src/documents/serialisers/documents.py",
       "name": "missing-attribute",
       "concise_description": "Object of type `BaseSerializer[Unknown] | Field[Unknown, Unknown, Unknown, Unknown] | None` has no attribute `get_shared_object_pks`",
       "severity": "error"
     },
     {
       "column": 9,
-      "path": "src/documents/serialisers.py",
+      "path": "src/documents/serialisers/documents.py",
       "name": "bad-override-param-name",
       "concise_description": "Class member `SearchResultSerializer.to_representation` overrides parent class `DocumentSerializer` in an inconsistent manner",
       "severity": "error"
     },
     {
       "column": 9,
-      "path": "src/documents/serialisers.py",
+      "path": "src/documents/serialisers/documents.py",
       "name": "bad-override-mutable-attribute",
       "concise_description": "Class member `Meta.list_serializer_class` overrides parent class `Meta` in an inconsistent manner",
       "severity": "error"
     },
     {
+      "column": 14,
+      "path": "src/documents/serialisers/metadata.py",
+      "name": "bad-assignment",
+      "concise_description": "`ManyRelatedField | RelatedField[@_, @_, Any]` is not assignable to attribute `parent` with type `BaseSerializer[Unknown]`",
+      "severity": "error"
+    },
+    {
+      "column": 17,
+      "path": "src/documents/serialisers/metadata.py",
+      "name": "unsupported-operation",
+      "concise_description": "Cannot set item in `Mapping[str, Any]`",
+      "severity": "error"
+    },
+    {
+      "column": 9,
+      "path": "src/documents/serialisers/metadata.py",
+      "name": "bad-override-param-name",
+      "concise_description": "Class member `TagSerializer.validate` overrides parent class `MatchingModelSerializer` in an inconsistent manner",
+      "severity": "error"
+    },
+    {
+      "column": 17,
+      "path": "src/documents/serialisers/metadata.py",
+      "name": "bad-argument-type",
+      "concise_description": "Argument `type[CustomField.FieldDataType]` is not assignable to parameter `choices` with type `Sequence[Any]` in function `rest_framework.fields.ChoiceField.__init__`",
+      "severity": "error"
+    },
+    {
+      "column": 13,
+      "path": "src/documents/serialisers/metadata.py",
+      "name": "bad-argument-type",
+      "concise_description": "Argument `str` is not assignable to parameter `data_type` with type `CustomField.FieldDataType` in function `documents.models.CustomFieldInstance.get_value_field_name`",
+      "severity": "error"
+    },
+    {
+      "column": 9,
+      "path": "src/documents/serialisers/metadata.py",
+      "name": "bad-override-param-name",
+      "concise_description": "Class member `CustomFieldInstanceSerializer.get_value` overrides parent class `ModelSerializer` in an inconsistent manner",
+      "severity": "error"
+    },
+    {
+      "column": 9,
+      "path": "src/documents/serialisers/metadata.py",
+      "name": "bad-override-param-name",
+      "concise_description": "Class member `CustomFieldInstanceSerializer.validate` overrides parent class `ModelSerializer` in an inconsistent manner",
+      "severity": "error"
+    },
+    {
+      "column": 34,
+      "path": "src/documents/serialisers/metadata.py",
+      "name": "unsupported-operation",
+      "concise_description": "`None` is not subscriptable",
+      "severity": "error"
+    },
+    {
       "column": 21,
-      "path": "src/documents/serialisers.py",
+      "path": "src/documents/serialisers/saved_views.py",
       "name": "unsupported-operation",
       "concise_description": "`Literal[SavedView.DisplayFields.CUSTOM_FIELD]` is not subscriptable",
       "severity": "error"
     },
     {
       "column": 36,
-      "path": "src/documents/serialisers.py",
+      "path": "src/documents/serialisers/saved_views.py",
       "name": "unsupported-operation",
       "concise_description": "`None` is not subscriptable",
       "severity": "error"
     },
     {
-      "column": 7,
-      "path": "src/documents/serialisers.py",
-      "name": "invalid-inheritance",
-      "concise_description": "Class `BulkEditSerializer` has inconsistent type arguments for base class `Field`: `Field[Any, Any, Any, dict[str, Any]]` and `Field[Any, Any, Any, dict[str, list[int]]]`",
-      "severity": "error"
-    },
-    {
       "column": 73,
-      "path": "src/documents/serialisers.py",
+      "path": "src/documents/serialisers/sharing.py",
       "name": "unbound-name",
       "concise_description": "`address` is uninitialized",
       "severity": "error"
     },
     {
       "column": 9,
-      "path": "src/documents/serialisers.py",
+      "path": "src/documents/serialisers/system.py",
       "name": "bad-override",
       "concise_description": "Class member `UiSettingsViewSerializer.create` overrides parent class `ModelSerializer` in an inconsistent manner",
       "severity": "error"
     },
     {
       "column": 46,
-      "path": "src/documents/serialisers.py",
+      "path": "src/documents/serialisers/tasks.py",
       "name": "no-matching-overload",
       "concise_description": "No matching overload found for function `dict.get` called with arguments: (str, str)",
       "severity": "error"
     },
     {
       "column": 38,
-      "path": "src/documents/serialisers.py",
+      "path": "src/documents/serialisers/tasks.py",
       "name": "no-matching-overload",
       "concise_description": "No matching overload found for function `dict.get` called with arguments: (str, str)",
       "severity": "error"
     },
     {
       "column": 51,
-      "path": "src/documents/serialisers.py",
+      "path": "src/documents/serialisers/tasks.py",
       "name": "no-matching-overload",
       "concise_description": "No matching overload found for function `dict.get` called with arguments: (str, Literal['manual_task'])",
       "severity": "error"
     },
     {
       "column": 52,
-      "path": "src/documents/serialisers.py",
+      "path": "src/documents/serialisers/workflows.py",
       "name": "unbound-name",
       "concise_description": "`triggers` may be uninitialized",
       "severity": "error"
     },
     {
       "column": 62,
-      "path": "src/documents/serialisers.py",
+      "path": "src/documents/serialisers/workflows.py",
       "name": "unbound-name",
       "concise_description": "`actions` may be uninitialized",
       "severity": "error"
@@ -3620,388 +3613,388 @@
       "severity": "error"
     },
     {
-      "column": 31,
-      "path": "src/documents/views.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `AbstractBaseUser` has no attribute `username`",
-      "severity": "error"
-    },
-    {
-      "column": 32,
-      "path": "src/documents/views.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of type `AbstractBaseUser | AnonymousUser` has no attribute `get_full_name`",
-      "severity": "error"
-    },
-    {
       "column": 17,
-      "path": "src/documents/views.py",
+      "path": "src/documents/views/base.py",
       "name": "missing-attribute",
       "concise_description": "Object of class `BulkPermissionMixin` has no attribute `queryset`",
       "severity": "error"
     },
     {
       "column": 19,
-      "path": "src/documents/views.py",
+      "path": "src/documents/views/base.py",
       "name": "missing-attribute",
       "concise_description": "Object of class `object` has no attribute `get_serializer_context`",
       "severity": "error"
     },
     {
       "column": 24,
-      "path": "src/documents/views.py",
+      "path": "src/documents/views/base.py",
       "name": "missing-attribute",
       "concise_description": "Object of class `BulkPermissionMixin` has no attribute `filter_queryset`",
       "severity": "error"
     },
     {
       "column": 45,
-      "path": "src/documents/views.py",
+      "path": "src/documents/views/base.py",
       "name": "missing-attribute",
       "concise_description": "Object of class `BulkPermissionMixin` has no attribute `get_queryset`",
       "severity": "error"
     },
     {
       "column": 22,
-      "path": "src/documents/views.py",
+      "path": "src/documents/views/base.py",
       "name": "missing-attribute",
       "concise_description": "Object of class `BulkPermissionMixin` has no attribute `queryset`",
       "severity": "error"
     },
     {
-      "column": 29,
-      "path": "src/documents/views.py",
-      "name": "bad-argument-type",
-      "concise_description": "Argument `Self@CorrespondentViewSet` is not assignable to parameter `instance` with type `Options[Any] | None` in function `django.db.models.manager.BaseManager.__get__`",
-      "severity": "error"
-    },
-    {
-      "column": 29,
-      "path": "src/documents/views.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `NoneType` has no attribute `annotate`",
-      "severity": "error"
-    },
-    {
-      "column": 25,
-      "path": "src/documents/views.py",
-      "name": "bad-argument-type",
-      "concise_description": "Argument `Self@CorrespondentViewSet` is not assignable to parameter `instance` with type `Options[Any] | None` in function `django.db.models.manager.BaseManager.__get__`",
-      "severity": "error"
-    },
-    {
-      "column": 25,
-      "path": "src/documents/views.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `NoneType` has no attribute `annotate`",
-      "severity": "error"
-    },
-    {
-      "column": 48,
-      "path": "src/documents/views.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `Correspondent` has no attribute `document_count`",
-      "severity": "error"
-    },
-    {
-      "column": 48,
-      "path": "src/documents/views.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `DocumentType` has no attribute `document_count`",
-      "severity": "error"
-    },
-    {
-      "column": 48,
-      "path": "src/documents/views.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `StoragePath` has no attribute `document_count`",
-      "severity": "error"
-    },
-    {
-      "column": 28,
-      "path": "src/documents/views.py",
-      "name": "missing-attribute",
-      "concise_description": "Class `DocumentFilterSet` has no class attribute `declared_filters`",
-      "severity": "error"
-    },
-    {
-      "column": 9,
-      "path": "src/documents/views.py",
-      "name": "bad-override",
-      "concise_description": "Class member `DocumentViewSet.destroy` overrides parent class `DestroyModelMixin` in an inconsistent manner",
-      "severity": "error"
-    },
-    {
-      "column": 37,
-      "path": "src/documents/views.py",
-      "name": "bad-argument-type",
-      "concise_description": "Argument `list[MetadataEntry] | list[Unknown] | None` is not assignable to parameter `original_metadata` with type `list[Unknown]` in function `documents.caching.set_metadata_cache`",
-      "severity": "error"
-    },
-    {
-      "column": 57,
-      "path": "src/documents/views.py",
-      "name": "bad-argument-type",
-      "concise_description": "Argument `DocumentClassifier | None` is not assignable to parameter `classifier` with type `DocumentClassifier` in function `documents.matching.match_correspondents`",
-      "severity": "error"
-    },
-    {
-      "column": 52,
-      "path": "src/documents/views.py",
-      "name": "bad-argument-type",
-      "concise_description": "Argument `DocumentClassifier | None` is not assignable to parameter `classifier` with type `DocumentClassifier` in function `documents.matching.match_tags`",
-      "severity": "error"
-    },
-    {
-      "column": 59,
-      "path": "src/documents/views.py",
-      "name": "bad-argument-type",
-      "concise_description": "Argument `DocumentClassifier | None` is not assignable to parameter `classifier` with type `DocumentClassifier` in function `documents.matching.match_document_types`",
-      "severity": "error"
-    },
-    {
-      "column": 58,
-      "path": "src/documents/views.py",
-      "name": "bad-argument-type",
-      "concise_description": "Argument `DocumentClassifier | None` is not assignable to parameter `classifier` with type `DocumentClassifier` in function `documents.matching.match_storage_paths`",
-      "severity": "error"
-    },
-    {
       "column": 17,
-      "path": "src/documents/views.py",
-      "name": "bad-argument-type",
-      "concise_description": "Argument `ClassificationSuggestions` is not assignable to parameter `suggestions` with type `dict[Unknown, Unknown]` in function `documents.caching.set_llm_suggestions_cache`",
-      "severity": "error"
-    },
-    {
-      "column": 5,
-      "path": "src/documents/views.py",
-      "name": "bad-specialization",
-      "concise_description": "`(self: Self@DocumentViewSet, request: Unknown, pk: Unknown | None = None) -> HttpResponseForbidden | Response | None` is not assignable to upper bound `(...) -> HttpResponseBase` of type variable `_View`",
-      "severity": "error"
-    },
-    {
-      "column": 36,
-      "path": "src/documents/views.py",
-      "name": "missing-argument",
-      "concise_description": "Missing argument `request` in function `DocumentViewSet.email_documents`",
-      "severity": "error"
-    },
-    {
-      "column": 9,
-      "path": "src/documents/views.py",
-      "name": "bad-override",
-      "concise_description": "Class member `UnifiedSearchViewSet.list` overrides parent class `DocumentViewSet` in an inconsistent manner",
-      "severity": "error"
-    },
-    {
-      "column": 17,
-      "path": "src/documents/views.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of type `BasePagination | None` has no attribute `get_page_size`",
-      "severity": "error"
-    },
-    {
-      "column": 58,
-      "path": "src/documents/views.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of type `BasePagination | None` has no attribute `page_size`",
-      "severity": "error"
-    },
-    {
-      "column": 13,
-      "path": "src/documents/views.py",
-      "name": "not-iterable",
-      "concise_description": "Type `None` is not iterable",
-      "severity": "error"
-    },
-    {
-      "column": 43,
-      "path": "src/documents/views.py",
-      "name": "bad-argument-type",
-      "concise_description": "Argument `TantivyRelevanceList` is not assignable to parameter `queryset` with type `QuerySet[Any, @_] | Sequence[@_]` in function `rest_framework.generics.GenericAPIView.paginate_queryset`",
-      "severity": "error"
-    },
-    {
-      "column": 25,
-      "path": "src/documents/views.py",
-      "name": "unsupported-operation",
-      "concise_description": "`+` is not supported between `None` and `Literal[1]`",
-      "severity": "error"
-    },
-    {
-      "column": 17,
-      "path": "src/documents/views.py",
+      "path": "src/documents/views/base.py",
       "name": "not-iterable",
       "concise_description": "Type `None` is not iterable",
       "severity": "error"
     },
     {
       "column": 18,
-      "path": "src/documents/views.py",
+      "path": "src/documents/views/base.py",
       "name": "bad-argument-type",
       "concise_description": "Argument `AbstractBaseUser | AnonymousUser` is not assignable to parameter `user` with type `User` in function `DocumentSelectionMixin._resolve_document_ids`",
       "severity": "error"
     },
     {
       "column": 18,
-      "path": "src/documents/views.py",
+      "path": "src/documents/views/base.py",
       "name": "bad-argument-type",
       "concise_description": "Argument `AbstractBaseUser | AnonymousUser` is not assignable to parameter `user` with type `User` in function `DocumentOperationPermissionMixin._has_document_permissions`",
       "severity": "error"
     },
     {
       "column": 18,
-      "path": "src/documents/views.py",
+      "path": "src/documents/views/bulk_edit.py",
       "name": "bad-argument-type",
-      "concise_description": "Argument `AbstractBaseUser | AnonymousUser` is not assignable to parameter `user` with type `User` in function `DocumentSelectionMixin._resolve_document_ids`",
+      "concise_description": "Argument `AbstractBaseUser | AnonymousUser` is not assignable to parameter `user` with type `User` in function `documents.views.base.DocumentSelectionMixin._resolve_document_ids`",
       "severity": "error"
     },
     {
       "column": 18,
-      "path": "src/documents/views.py",
+      "path": "src/documents/views/bulk_edit.py",
       "name": "bad-argument-type",
-      "concise_description": "Argument `AbstractBaseUser | AnonymousUser` is not assignable to parameter `user` with type `User` in function `DocumentOperationPermissionMixin._has_document_permissions`",
+      "concise_description": "Argument `AbstractBaseUser | AnonymousUser` is not assignable to parameter `user` with type `User` in function `documents.views.base.DocumentOperationPermissionMixin._has_document_permissions`",
       "severity": "error"
     },
     {
       "column": 33,
-      "path": "src/documents/views.py",
+      "path": "src/documents/views/bulk_edit.py",
       "name": "unbound-name",
       "concise_description": "`old_values` may be uninitialized",
       "severity": "error"
     },
     {
-      "column": 52,
-      "path": "src/documents/views.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `Correspondent` has no attribute `document_count`",
-      "severity": "error"
-    },
-    {
-      "column": 52,
-      "path": "src/documents/views.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `Tag` has no attribute `document_count`",
-      "severity": "error"
-    },
-    {
-      "column": 52,
-      "path": "src/documents/views.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `DocumentType` has no attribute `document_count`",
-      "severity": "error"
-    },
-    {
-      "column": 52,
-      "path": "src/documents/views.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `StoragePath` has no attribute `document_count`",
-      "severity": "error"
-    },
-    {
-      "column": 52,
-      "path": "src/documents/views.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `CustomField` has no attribute `document_count`",
-      "severity": "error"
-    },
-    {
-      "column": 65,
-      "path": "src/documents/views.py",
-      "name": "bad-argument-type",
-      "concise_description": "Argument `AbstractBaseUser | AnonymousUser | None` is not assignable to parameter `user` with type `AbstractUser | None` in function `documents.search._backend.TantivyBackend.autocomplete`",
-      "severity": "error"
-    },
-    {
-      "column": 9,
-      "path": "src/documents/views.py",
-      "name": "bad-override",
-      "concise_description": "Class member `TasksViewSet.get_serializer_class` overrides parent class `ReadOnlyModelViewSet` in an inconsistent manner",
-      "severity": "error"
-    },
-    {
-      "column": 12,
-      "path": "src/documents/views.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `AbstractBaseUser` has no attribute `is_staff`",
-      "severity": "error"
-    },
-    {
-      "column": 44,
-      "path": "src/documents/views.py",
-      "name": "bad-argument-type",
-      "concise_description": "Argument `QuerySet[PaperlessTask, dict[str, Any]]` is not assignable to parameter `instance` with type `dict[str, Any] | None` in function `rest_framework.serializers.BaseSerializer.__init__`",
-      "severity": "error"
-    },
-    {
-      "column": 13,
-      "path": "src/documents/views.py",
-      "name": "missing-attribute",
-      "concise_description": "Object of class `Sequence` has no attribute `append`",
-      "severity": "error"
-    },
-    {
       "column": 24,
-      "path": "src/documents/views.py",
+      "path": "src/documents/views/bulk_edit.py",
       "name": "missing-attribute",
       "concise_description": "Object of class `BaseSerializer` has no attribute `get_object_class`",
       "severity": "error"
     },
     {
       "column": 45,
-      "path": "src/documents/views.py",
+      "path": "src/documents/views/bulk_edit.py",
       "name": "bad-argument-type",
       "concise_description": "Argument `AbstractBaseUser | AnonymousUser` is not assignable to parameter `user` with type `User | None` in function `documents.permissions.permitted_object_ids`",
       "severity": "error"
     },
     {
       "column": 16,
-      "path": "src/documents/views.py",
+      "path": "src/documents/views/bulk_edit.py",
       "name": "missing-attribute",
       "concise_description": "Object of class `AbstractBaseUser` has no attribute `is_superuser`",
       "severity": "error"
     },
     {
       "column": 17,
-      "path": "src/documents/views.py",
+      "path": "src/documents/views/bulk_edit.py",
       "name": "missing-attribute",
       "concise_description": "Object of class `AbstractBaseUser` has no attribute `has_perm`",
       "severity": "error"
     },
     {
-      "column": 9,
-      "path": "src/documents/views.py",
-      "name": "bad-override",
-      "concise_description": "Class member `WorkflowTriggerViewSet.partial_update` overrides parent class `ModelViewSet` in an inconsistent manner",
+      "column": 48,
+      "path": "src/documents/views/documents.py",
+      "name": "missing-attribute",
+      "concise_description": "Object of class `Correspondent` has no attribute `document_count`",
+      "severity": "error"
+    },
+    {
+      "column": 48,
+      "path": "src/documents/views/documents.py",
+      "name": "missing-attribute",
+      "concise_description": "Object of class `DocumentType` has no attribute `document_count`",
+      "severity": "error"
+    },
+    {
+      "column": 48,
+      "path": "src/documents/views/documents.py",
+      "name": "missing-attribute",
+      "concise_description": "Object of class `StoragePath` has no attribute `document_count`",
+      "severity": "error"
+    },
+    {
+      "column": 28,
+      "path": "src/documents/views/documents.py",
+      "name": "missing-attribute",
+      "concise_description": "Class `DocumentFilterSet` has no class attribute `declared_filters`",
       "severity": "error"
     },
     {
       "column": 9,
-      "path": "src/documents/views.py",
+      "path": "src/documents/views/documents.py",
       "name": "bad-override",
-      "concise_description": "Class member `WorkflowActionViewSet.partial_update` overrides parent class `ModelViewSet` in an inconsistent manner",
+      "concise_description": "Class member `DocumentViewSet.destroy` overrides parent class `DestroyModelMixin` in an inconsistent manner",
+      "severity": "error"
+    },
+    {
+      "column": 37,
+      "path": "src/documents/views/documents.py",
+      "name": "bad-argument-type",
+      "concise_description": "Argument `list[MetadataEntry] | list[Unknown] | None` is not assignable to parameter `original_metadata` with type `list[Unknown]` in function `documents.caching.set_metadata_cache`",
+      "severity": "error"
+    },
+    {
+      "column": 57,
+      "path": "src/documents/views/documents.py",
+      "name": "bad-argument-type",
+      "concise_description": "Argument `DocumentClassifier | None` is not assignable to parameter `classifier` with type `DocumentClassifier` in function `documents.matching.match_correspondents`",
+      "severity": "error"
+    },
+    {
+      "column": 52,
+      "path": "src/documents/views/documents.py",
+      "name": "bad-argument-type",
+      "concise_description": "Argument `DocumentClassifier | None` is not assignable to parameter `classifier` with type `DocumentClassifier` in function `documents.matching.match_tags`",
+      "severity": "error"
+    },
+    {
+      "column": 59,
+      "path": "src/documents/views/documents.py",
+      "name": "bad-argument-type",
+      "concise_description": "Argument `DocumentClassifier | None` is not assignable to parameter `classifier` with type `DocumentClassifier` in function `documents.matching.match_document_types`",
+      "severity": "error"
+    },
+    {
+      "column": 58,
+      "path": "src/documents/views/documents.py",
+      "name": "bad-argument-type",
+      "concise_description": "Argument `DocumentClassifier | None` is not assignable to parameter `classifier` with type `DocumentClassifier` in function `documents.matching.match_storage_paths`",
+      "severity": "error"
+    },
+    {
+      "column": 17,
+      "path": "src/documents/views/documents.py",
+      "name": "bad-argument-type",
+      "concise_description": "Argument `ClassificationSuggestions` is not assignable to parameter `suggestions` with type `dict[Unknown, Unknown]` in function `documents.caching.set_llm_suggestions_cache`",
+      "severity": "error"
+    },
+    {
+      "column": 5,
+      "path": "src/documents/views/documents.py",
+      "name": "bad-specialization",
+      "concise_description": "`(self: Self@DocumentViewSet, request: Unknown, pk: Unknown | None = None) -> HttpResponseForbidden | Response | None` is not assignable to upper bound `(...) -> HttpResponseBase` of type variable `_View`",
+      "severity": "error"
+    },
+    {
+      "column": 36,
+      "path": "src/documents/views/documents.py",
+      "name": "missing-argument",
+      "concise_description": "Missing argument `request` in function `DocumentViewSet.email_documents`",
+      "severity": "error"
+    },
+    {
+      "column": 9,
+      "path": "src/documents/views/documents.py",
+      "name": "bad-override",
+      "concise_description": "Class member `UnifiedSearchViewSet.list` overrides parent class `DocumentViewSet` in an inconsistent manner",
+      "severity": "error"
+    },
+    {
+      "column": 17,
+      "path": "src/documents/views/documents.py",
+      "name": "missing-attribute",
+      "concise_description": "Object of type `BasePagination | None` has no attribute `get_page_size`",
+      "severity": "error"
+    },
+    {
+      "column": 58,
+      "path": "src/documents/views/documents.py",
+      "name": "missing-attribute",
+      "concise_description": "Object of type `BasePagination | None` has no attribute `page_size`",
+      "severity": "error"
+    },
+    {
+      "column": 13,
+      "path": "src/documents/views/documents.py",
+      "name": "not-iterable",
+      "concise_description": "Type `None` is not iterable",
+      "severity": "error"
+    },
+    {
+      "column": 43,
+      "path": "src/documents/views/documents.py",
+      "name": "bad-argument-type",
+      "concise_description": "Argument `TantivyRelevanceList` is not assignable to parameter `queryset` with type `QuerySet[Any, @_] | Sequence[@_]` in function `rest_framework.generics.GenericAPIView.paginate_queryset`",
+      "severity": "error"
+    },
+    {
+      "column": 25,
+      "path": "src/documents/views/documents.py",
+      "name": "unsupported-operation",
+      "concise_description": "`+` is not supported between `None` and `Literal[1]`",
+      "severity": "error"
+    },
+    {
+      "column": 31,
+      "path": "src/documents/views/index.py",
+      "name": "missing-attribute",
+      "concise_description": "Object of class `AbstractBaseUser` has no attribute `username`",
+      "severity": "error"
+    },
+    {
+      "column": 32,
+      "path": "src/documents/views/index.py",
+      "name": "missing-attribute",
+      "concise_description": "Object of type `AbstractBaseUser | AnonymousUser` has no attribute `get_full_name`",
+      "severity": "error"
+    },
+    {
+      "column": 16,
+      "path": "src/documents/views/index.py",
+      "name": "missing-attribute",
+      "concise_description": "Object of class `NoneType` has no attribute `app_logo`",
+      "severity": "error"
+    },
+    {
+      "column": 29,
+      "path": "src/documents/views/metadata.py",
+      "name": "bad-argument-type",
+      "concise_description": "Argument `Self@CorrespondentViewSet` is not assignable to parameter `instance` with type `Options[Any] | None` in function `django.db.models.manager.BaseManager.__get__`",
+      "severity": "error"
+    },
+    {
+      "column": 29,
+      "path": "src/documents/views/metadata.py",
+      "name": "missing-attribute",
+      "concise_description": "Object of class `NoneType` has no attribute `annotate`",
+      "severity": "error"
+    },
+    {
+      "column": 25,
+      "path": "src/documents/views/metadata.py",
+      "name": "bad-argument-type",
+      "concise_description": "Argument `Self@CorrespondentViewSet` is not assignable to parameter `instance` with type `Options[Any] | None` in function `django.db.models.manager.BaseManager.__get__`",
+      "severity": "error"
+    },
+    {
+      "column": 25,
+      "path": "src/documents/views/metadata.py",
+      "name": "missing-attribute",
+      "concise_description": "Object of class `NoneType` has no attribute `annotate`",
+      "severity": "error"
+    },
+    {
+      "column": 52,
+      "path": "src/documents/views/search.py",
+      "name": "missing-attribute",
+      "concise_description": "Object of class `Correspondent` has no attribute `document_count`",
+      "severity": "error"
+    },
+    {
+      "column": 52,
+      "path": "src/documents/views/search.py",
+      "name": "missing-attribute",
+      "concise_description": "Object of class `Tag` has no attribute `document_count`",
+      "severity": "error"
+    },
+    {
+      "column": 52,
+      "path": "src/documents/views/search.py",
+      "name": "missing-attribute",
+      "concise_description": "Object of class `DocumentType` has no attribute `document_count`",
+      "severity": "error"
+    },
+    {
+      "column": 52,
+      "path": "src/documents/views/search.py",
+      "name": "missing-attribute",
+      "concise_description": "Object of class `StoragePath` has no attribute `document_count`",
+      "severity": "error"
+    },
+    {
+      "column": 52,
+      "path": "src/documents/views/search.py",
+      "name": "missing-attribute",
+      "concise_description": "Object of class `CustomField` has no attribute `document_count`",
+      "severity": "error"
+    },
+    {
+      "column": 65,
+      "path": "src/documents/views/search.py",
+      "name": "bad-argument-type",
+      "concise_description": "Argument `AbstractBaseUser | AnonymousUser | None` is not assignable to parameter `user` with type `AbstractUser | None` in function `documents.search._backend.TantivyBackend.autocomplete`",
+      "severity": "error"
+    },
+    {
+      "column": 13,
+      "path": "src/documents/views/sharing.py",
+      "name": "missing-attribute",
+      "concise_description": "Object of class `Sequence` has no attribute `append`",
       "severity": "error"
     },
     {
       "column": 40,
-      "path": "src/documents/views.py",
+      "path": "src/documents/views/system.py",
       "name": "unbound-name",
       "concise_description": "`all_migrations` may be uninitialized",
       "severity": "error"
     },
     {
       "column": 17,
-      "path": "src/documents/views.py",
+      "path": "src/documents/views/system.py",
       "name": "bad-argument-type",
       "concise_description": "Argument `AbstractBaseUser | AnonymousUser` is not assignable to parameter `user` with type `User | None` in function `documents.permissions.permitted_document_ids`",
       "severity": "error"
     },
     {
-      "column": 16,
-      "path": "src/documents/views.py",
+      "column": 9,
+      "path": "src/documents/views/tasks.py",
+      "name": "bad-override",
+      "concise_description": "Class member `TasksViewSet.get_serializer_class` overrides parent class `ReadOnlyModelViewSet` in an inconsistent manner",
+      "severity": "error"
+    },
+    {
+      "column": 12,
+      "path": "src/documents/views/tasks.py",
       "name": "missing-attribute",
-      "concise_description": "Object of class `NoneType` has no attribute `app_logo`",
+      "concise_description": "Object of class `AbstractBaseUser` has no attribute `is_staff`",
+      "severity": "error"
+    },
+    {
+      "column": 44,
+      "path": "src/documents/views/tasks.py",
+      "name": "bad-argument-type",
+      "concise_description": "Argument `QuerySet[PaperlessTask, dict[str, Any]]` is not assignable to parameter `instance` with type `dict[str, Any] | None` in function `rest_framework.serializers.BaseSerializer.__init__`",
+      "severity": "error"
+    },
+    {
+      "column": 9,
+      "path": "src/documents/views/workflows.py",
+      "name": "bad-override",
+      "concise_description": "Class member `WorkflowTriggerViewSet.partial_update` overrides parent class `ModelViewSet` in an inconsistent manner",
+      "severity": "error"
+    },
+    {
+      "column": 9,
+      "path": "src/documents/views/workflows.py",
+      "name": "bad-override",
+      "concise_description": "Class member `WorkflowActionViewSet.partial_update` overrides parent class `ModelViewSet` in an inconsistent manner",
       "severity": "error"
     },
     {

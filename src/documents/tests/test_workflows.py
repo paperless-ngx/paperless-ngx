@@ -61,7 +61,7 @@ from documents.models import WorkflowActionWebhook
 from documents.models import WorkflowRun
 from documents.models import WorkflowTrigger
 from documents.plugins.base import StopConsumeTaskError
-from documents.serialisers import WorkflowTriggerSerializer
+from documents.serialisers.workflows import WorkflowTriggerSerializer
 from documents.signals import document_consumption_finished
 from documents.tests.utils import SampleDirMixin
 from documents.workflows.actions import execute_password_removal_action

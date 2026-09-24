@@ -11,7 +11,7 @@ from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import SavedView
 from documents.models import SavedViewFilterRule
-from documents.serialisers import DocumentSerializer
+from documents.serialisers.documents import DocumentSerializer
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import UserFactory
 

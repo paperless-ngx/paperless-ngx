@@ -348,8 +348,8 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
         self.path1 = StoragePath.objects.create(name="path1")
         super().setUp()
 
-    @patch("documents.views.get_llm_suggestion_cache")
-    @patch("documents.views.refresh_llm_suggestions_cache")
+    @patch("documents.views.documents.get_llm_suggestion_cache")
+    @patch("documents.views.documents.refresh_llm_suggestions_cache")
     @override_settings(
         AI_ENABLED=True,
         LLM_BACKEND="mock_backend",
@@ -397,8 +397,8 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
             backend=f"mock_backend:user={self.user.pk}",
         )
 
-    @patch("documents.views.get_llm_suggestion_cache")
-    @patch("documents.views.refresh_llm_suggestions_cache")
+    @patch("documents.views.documents.get_llm_suggestion_cache")
+    @patch("documents.views.documents.refresh_llm_suggestions_cache")
     @override_settings(
         AI_ENABLED=True,
         LLM_BACKEND="mock_backend",
@@ -447,7 +447,7 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
         self.assertEqual(response.json()["tags"], [])
         self.assertEqual(response.json()["suggested_tags"], [])
 
-    @patch("documents.views.get_ai_document_classification")
+    @patch("documents.views.documents.get_ai_document_classification")
     @override_settings(
         AI_ENABLED=True,
         LLM_BACKEND="mock_backend",
@@ -497,7 +497,7 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
             None,
         )
 
-    @patch("documents.views.get_ai_document_classification")
+    @patch("documents.views.documents.get_ai_document_classification")
     @override_settings(
         AI_ENABLED=True,
         LLM_BACKEND="mock_backend",
@@ -535,7 +535,7 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
             "KI Title",
         )
 
-    @patch("documents.views.get_ai_document_classification")
+    @patch("documents.views.documents.get_ai_document_classification")
     @override_settings(
         AI_ENABLED=True,
         LLM_BACKEND="mock_backend",
@@ -574,7 +574,7 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
             "Titre IA",
         )
 
-    @patch("documents.views.get_ai_document_classification")
+    @patch("documents.views.documents.get_ai_document_classification")
     @override_settings(
         AI_ENABLED=True,
         LLM_BACKEND="mock_backend",
@@ -610,7 +610,7 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
             ),
         )
 
-    @patch("documents.views.get_ai_document_classification")
+    @patch("documents.views.documents.get_ai_document_classification")
     @override_settings(
         AI_ENABLED=True,
         LLM_BACKEND="mock_backend",
@@ -682,7 +682,7 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
             ),
         )
 
-    @patch("documents.views.get_ai_document_classification")
+    @patch("documents.views.documents.get_ai_document_classification")
     @override_settings(
         AI_ENABLED=True,
         LLM_BACKEND="openai-like",
@@ -711,7 +711,7 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
             get_llm_suggestion_cache(self.document.pk, backend="openai-like"),
         )
 
-    @patch("documents.views.get_ai_document_classification")
+    @patch("documents.views.documents.get_ai_document_classification")
     @override_settings(
         AI_ENABLED=True,
         LLM_BACKEND="openai-like",
@@ -738,7 +738,7 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
             get_llm_suggestion_cache(self.document.pk, backend="openai-like"),
         )
 
-    @patch("documents.views.get_ai_document_classification")
+    @patch("documents.views.documents.get_ai_document_classification")
     @override_settings(
         AI_ENABLED=True,
         LLM_BACKEND="openai-like",
@@ -770,7 +770,7 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
             get_llm_suggestion_cache(self.document.pk, backend="openai-like"),
         )
 
-    @patch("documents.views.get_ai_document_classification")
+    @patch("documents.views.documents.get_ai_document_classification")
     @override_settings(
         AI_ENABLED=True,
         LLM_BACKEND="mock_backend",
@@ -808,7 +808,7 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
         self.assertEqual(response.json()["tags"], [self.tag1.pk])
         self.assertEqual(response.json()["suggested_tags"], ["Follow-up"])
 
-    @patch("documents.views.get_ai_document_classification")
+    @patch("documents.views.documents.get_ai_document_classification")
     @override_settings(
         AI_ENABLED=True,
         LLM_BACKEND="mock_backend",
@@ -847,7 +847,7 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
         self.assertEqual(response.json()["tags"], [self.tag1.pk])
         self.assertEqual(response.json()["suggested_tags"], [])
 
-    @patch("documents.views.get_ai_document_classification")
+    @patch("documents.views.documents.get_ai_document_classification")
     @override_settings(
         AI_ENABLED=True,
         LLM_BACKEND="mock_backend",
@@ -969,8 +969,8 @@ class TestAIChatStreamingView(DirectoriesMixin, TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertIn(b"AI is required for this feature", response.content)
 
-    @patch("documents.views.stream_chat_with_documents")
-    @patch("documents.views.permitted_document_ids")
+    @patch("documents.views.chat.stream_chat_with_documents")
+    @patch("documents.views.chat.permitted_document_ids")
     @override_settings(AI_ENABLED=True)
     def test_post_no_document_id(self, mock_permitted_ids, mock_stream_chat) -> None:
         self.grant_view_document_permission()
@@ -989,8 +989,8 @@ class TestAIChatStreamingView(DirectoriesMixin, TestCase):
         self.assertEqual(list(call_kwargs["documents"]), [self.document])
         self.assertIsNone(call_kwargs["output_language"])
 
-    @patch("documents.views.stream_chat_with_documents")
-    @patch("documents.views.permitted_document_ids")
+    @patch("documents.views.chat.stream_chat_with_documents")
+    @patch("documents.views.chat.permitted_document_ids")
     @override_settings(AI_ENABLED=True)
     def test_post_uses_user_display_language(
         self,
@@ -1015,7 +1015,7 @@ class TestAIChatStreamingView(DirectoriesMixin, TestCase):
         self.assertEqual(list(call_kwargs["documents"]), [self.document])
         self.assertEqual(call_kwargs["output_language"], "de-de")
 
-    @patch("documents.views.stream_chat_with_documents")
+    @patch("documents.views.chat.stream_chat_with_documents")
     @override_settings(AI_ENABLED=True)
     def test_post_with_document_id(self, mock_stream_chat) -> None:
         self.grant_view_document_permission()
@@ -1039,7 +1039,7 @@ class TestAIChatStreamingView(DirectoriesMixin, TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertIn(b"Document not found", response.content)
 
-    @patch("documents.views.has_perms_owner_aware")
+    @patch("documents.views.chat.has_perms_owner_aware")
     @override_settings(AI_ENABLED=True)
     def test_post_with_document_id_no_permission(self, mock_has_perms) -> None:
         self.grant_view_document_permission()
@@ -1052,7 +1052,7 @@ class TestAIChatStreamingView(DirectoriesMixin, TestCase):
         self.assertEqual(response.status_code, 403)
         self.assertIn(b"Insufficient permissions", response.content)
 
-    @patch("documents.views.stream_chat_with_documents")
+    @patch("documents.views.chat.stream_chat_with_documents")
     @override_settings(AI_ENABLED=True)
     def test_post_no_document_id_requires_view_document_permission(
         self,
@@ -1066,7 +1066,7 @@ class TestAIChatStreamingView(DirectoriesMixin, TestCase):
         self.assertEqual(response.status_code, 403)
         mock_stream_chat.assert_not_called()
 
-    @patch("documents.views.stream_chat_with_documents")
+    @patch("documents.views.chat.stream_chat_with_documents")
     @override_settings(AI_ENABLED=True)
     def test_post_with_document_id_requires_view_document_permission(
         self,

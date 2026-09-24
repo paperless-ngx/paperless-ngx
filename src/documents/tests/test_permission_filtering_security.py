@@ -21,7 +21,7 @@ from documents.models import Tag
 from documents.permissions import permitted_document_ids
 from documents.permissions import permitted_object_ids
 from documents.permissions import restrict_queryset_to_visible
-from documents.serialisers import _get_viewable_duplicates
+from documents.serialisers.documents import _get_viewable_duplicates
 from paperless_testing.factories import CorrespondentFactory
 from paperless_testing.factories import DocumentFactory
 from paperless_testing.factories import DocumentTypeFactory
@@ -191,7 +191,7 @@ class TestAiChatAllDocumentsPermissionBoundary:
     ENDPOINT = "/api/documents/chat/"
 
     @override_settings(AI_ENABLED=True)
-    @patch("documents.views.stream_chat_with_documents")
+    @patch("documents.views.chat.stream_chat_with_documents")
     def test_chat_all_documents_excludes_unshared_document(self, mock_stream_chat):
         mock_stream_chat.return_value = iter([b"data"])
 
@@ -461,8 +461,8 @@ class TestDocumentOperationPermissionChecksRootDocument:
         )
 
         with (
-            patch("documents.views.bulk_edit.merge") as mock_merge,
-            patch("documents.views.bulk_edit.rotate") as mock_rotate,
+            patch("documents.views.bulk_edit.bulk_edit.merge") as mock_merge,
+            patch("documents.views.bulk_edit.bulk_edit.rotate") as mock_rotate,
         ):
             mock_merge.__name__ = "merge"
             mock_rotate.__name__ = "rotate"

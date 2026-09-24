@@ -22,7 +22,7 @@ import pytest
 from rest_framework import status
 
 import documents.search._backend
-from documents.views import _MAX_QUERY_LENGTH
+from documents.views.base import _MAX_QUERY_LENGTH
 
 if TYPE_CHECKING:
     from rest_framework.test import APIClient

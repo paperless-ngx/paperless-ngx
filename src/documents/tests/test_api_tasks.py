@@ -918,7 +918,7 @@ class TestRun:
         mock_apply_async = mock.Mock(return_value=mock_async_result)
 
         with mock.patch(
-            "documents.views.train_classifier.apply_async",
+            "documents.views.tasks.train_classifier.apply_async",
             mock_apply_async,
         ):
             response = admin_client.post(
@@ -973,7 +973,7 @@ class TestRun:
         mock_apply_async = mock.Mock(return_value=mock_async_result)
 
         with mock.patch(
-            "documents.views.sanity_check.apply_async",
+            "documents.views.tasks.sanity_check.apply_async",
             mock_apply_async,
         ):
             response = admin_client.post(

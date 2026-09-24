@@ -15,7 +15,7 @@ from rest_framework.test import APITestCase
 from documents.filters import ShareLinkBundleFilterSet
 from documents.models import ShareLink
 from documents.models import ShareLinkBundle
-from documents.serialisers import ShareLinkBundleSerializer
+from documents.serialisers.sharing import ShareLinkBundleSerializer
 from documents.tasks import build_share_link_bundle
 from documents.tasks import cleanup_expired_share_link_bundles
 from paperless_testing.dirs import DirectoriesMixin
@@ -34,7 +34,7 @@ class ShareLinkBundleAPITests(DirectoriesMixin, APITestCase):
         self.client.force_authenticate(self.user)
         self.document = DocumentFactory.create()
 
-    @mock.patch("documents.views.build_share_link_bundle.apply_async")
+    @mock.patch("documents.views.sharing.build_share_link_bundle.apply_async")
     def test_create_bundle_triggers_build_job(self, delay_mock) -> None:
         payload = {
             "document_ids": [self.document.pk],
@@ -51,7 +51,7 @@ class ShareLinkBundleAPITests(DirectoriesMixin, APITestCase):
         delay_mock.assert_called_once()
         self.assertEqual(delay_mock.call_args.kwargs["kwargs"]["bundle_id"], bundle.pk)
 
-    @mock.patch("documents.views.build_share_link_bundle.apply_async")
+    @mock.patch("documents.views.sharing.build_share_link_bundle.apply_async")
     def test_create_bundle_requires_global_document_view_permission(
         self,
         delay_mock,
@@ -90,7 +90,7 @@ class ShareLinkBundleAPITests(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("document_ids", response.data)
 
-    @mock.patch("documents.views.permitted_document_ids", return_value=set())
+    @mock.patch("documents.views.sharing.permitted_document_ids", return_value=set())
     def test_create_bundle_rejects_insufficient_permissions(self, perms_mock) -> None:
         payload = {
             "document_ids": [self.document.pk],
@@ -104,7 +104,7 @@ class ShareLinkBundleAPITests(DirectoriesMixin, APITestCase):
         self.assertIn("document_ids", response.data)
         perms_mock.assert_called()
 
-    @mock.patch("documents.views.build_share_link_bundle.apply_async")
+    @mock.patch("documents.views.sharing.build_share_link_bundle.apply_async")
     def test_rebuild_bundle_resets_state(self, delay_mock) -> None:
         bundle = ShareLinkBundle.objects.create(
             slug="rebuild-slug",

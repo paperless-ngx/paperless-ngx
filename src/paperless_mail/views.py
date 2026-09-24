@@ -29,7 +29,7 @@ from documents.models import PaperlessTask
 from documents.permissions import PaperlessObjectPermissions
 from documents.permissions import has_perms_owner_aware
 from documents.permissions import permitted_object_ids
-from documents.views import PassUserMixin
+from documents.views.base import PassUserMixin
 from paperless.views import StandardPagination
 from paperless_mail.filters import ProcessedMailFilterSet
 from paperless_mail.mail import MailError

@@ -9,7 +9,7 @@ from documents.models import Tag
 from documents.models import Workflow
 from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
-from documents.serialisers import TagSerializer
+from documents.serialisers.metadata import TagSerializer
 from documents.signals.handlers import run_workflows
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import UserFactory
