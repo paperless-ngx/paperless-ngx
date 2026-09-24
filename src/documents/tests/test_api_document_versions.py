@@ -17,7 +17,7 @@ from documents.filters import EffectiveContentFilter
 from documents.filters import TitleContentFilter
 from documents.models import Document
 from documents.versioning import annotate_effective_content
-from documents.views import DocumentSelectionMixin
+from documents.views.base import DocumentSelectionMixin
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import UserFactory
 from paperless_testing.http import read_streaming_response
@@ -515,7 +515,9 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
             root_document=root,
         )
 
-        with mock.patch("documents.views.DocumentViewSet.get_metadata") as metadata:
+        with mock.patch(
+            "documents.views.documents.DocumentViewSet.get_metadata",
+        ) as metadata:
             metadata.return_value = []
             resp = self.client.get(
                 f"/api/documents/{root.id}/metadata/?version={version.id}",
@@ -573,7 +575,7 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
         async_task = mock.Mock()
         async_task.id = "task-123"
 
-        with mock.patch("documents.views.consume_file") as consume_mock:
+        with mock.patch("documents.views.documents.consume_file") as consume_mock:
             consume_mock.apply_async.return_value = async_task
             resp = self.client.post(
                 f"/api/documents/{root.id}/update_version/",
@@ -609,7 +611,7 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
         async_task = mock.Mock()
         async_task.id = "task-123"
 
-        with mock.patch("documents.views.consume_file") as consume_mock:
+        with mock.patch("documents.views.documents.consume_file") as consume_mock:
             consume_mock.apply_async.return_value = async_task
             resp = self.client.post(
                 f"/api/documents/{version.id}/update_version/",
@@ -634,7 +636,7 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
         )
         upload = self._make_pdf_upload()
 
-        with mock.patch("documents.views.consume_file") as consume_mock:
+        with mock.patch("documents.views.documents.consume_file") as consume_mock:
             consume_mock.apply_async.side_effect = Exception("boom")
             resp = self.client.post(
                 f"/api/documents/{root.id}/update_version/",
@@ -673,7 +675,7 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
         )
         self.client.force_authenticate(user=user)
 
-        with mock.patch("documents.views.consume_file") as consume_mock:
+        with mock.patch("documents.views.documents.consume_file") as consume_mock:
             resp = self.client.post(
                 f"/api/documents/{root.id}/update_version/",
                 {"document": self._make_pdf_upload()},

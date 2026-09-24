@@ -27,7 +27,7 @@ from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import StoragePath
-from documents.serialisers import DocumentSerializer
+from documents.serialisers.documents import DocumentSerializer
 from documents.tasks import empty_trash
 from paperless_testing.assertions import FileSystemAssertsMixin
 from paperless_testing.dirs import DirectoriesMixin

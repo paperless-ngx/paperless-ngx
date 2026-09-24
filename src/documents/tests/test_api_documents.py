@@ -2605,7 +2605,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         response = self.client.get("/api/documents/34676/suggestions/")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    @mock.patch("documents.views.get_ai_document_classification")
+    @mock.patch("documents.views.documents.get_ai_document_classification")
     @override_settings(AI_ENABLED=True)
     def test_suggestions_still_uses_classifier_when_ai_enabled(
         self,
@@ -2628,10 +2628,10 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         )
         mock_get_ai_classification.assert_not_called()
 
-    @mock.patch("documents.views.match_storage_paths")
-    @mock.patch("documents.views.match_document_types")
-    @mock.patch("documents.views.match_tags")
-    @mock.patch("documents.views.match_correspondents")
+    @mock.patch("documents.views.documents.match_storage_paths")
+    @mock.patch("documents.views.documents.match_document_types")
+    @mock.patch("documents.views.documents.match_tags")
+    @mock.patch("documents.views.documents.match_correspondents")
     @override_settings(NUMBER_OF_SUGGESTED_DATES=10)
     def test_get_suggestions(
         self,
@@ -2663,11 +2663,11 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             },
         )
 
-    @mock.patch("documents.views.load_classifier")
-    @mock.patch("documents.views.match_storage_paths")
-    @mock.patch("documents.views.match_document_types")
-    @mock.patch("documents.views.match_tags")
-    @mock.patch("documents.views.match_correspondents")
+    @mock.patch("documents.views.documents.load_classifier")
+    @mock.patch("documents.views.documents.match_storage_paths")
+    @mock.patch("documents.views.documents.match_document_types")
+    @mock.patch("documents.views.documents.match_tags")
+    @mock.patch("documents.views.documents.match_correspondents")
     @override_settings(NUMBER_OF_SUGGESTED_DATES=10)
     def test_get_suggestions_cached(
         self,
@@ -2754,7 +2754,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         response = self.client.get(f"/api/documents/{doc.pk}/suggestions/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    @mock.patch("documents.views.get_date_parser")
+    @mock.patch("documents.views.documents.get_date_parser")
     @override_settings(NUMBER_OF_SUGGESTED_DATES=0)
     def test_get_suggestions_dates_disabled(
         self,

@@ -12,7 +12,7 @@ from documents.models import Document
 from documents.versioning import LATEST_VERSION_CONTENT_PREFETCH_ATTR
 from documents.versioning import has_prefetched_effective_content
 from documents.versioning import latest_version_content_prefetch
-from documents.views import DocumentViewSet
+from documents.views.documents import DocumentViewSet
 from paperless_testing.factories import DocumentFactory
 
 if TYPE_CHECKING:

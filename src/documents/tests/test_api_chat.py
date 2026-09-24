@@ -30,7 +30,7 @@ class TestChatStreamingViewInputValidation(APITestCase):
 
     def test_oversized_question_is_rejected(self) -> None:
         with mock.patch(
-            "documents.views.AIConfig",
+            "documents.views.chat.AIConfig",
             return_value=self._mock_ai_enabled(),
         ):
             resp = self.client.post(
@@ -57,11 +57,11 @@ class TestChatStreamingViewInputValidation(APITestCase):
         chunks = [f"token{i} " for i in range(40)]
         with (
             mock.patch(
-                "documents.views.AIConfig",
+                "documents.views.chat.AIConfig",
                 return_value=self._mock_ai_enabled(),
             ),
             mock.patch(
-                "documents.views.stream_chat_with_documents",
+                "documents.views.chat.stream_chat_with_documents",
                 return_value=iter(chunks),
             ),
         ):
@@ -78,7 +78,7 @@ class TestChatStreamingViewInputValidation(APITestCase):
 
     def test_missing_question_is_rejected(self) -> None:
         with mock.patch(
-            "documents.views.AIConfig",
+            "documents.views.chat.AIConfig",
             return_value=self._mock_ai_enabled(),
         ):
             resp = self.client.post(
@@ -102,9 +102,11 @@ class TestChatStreamingViewUnrestrictedFlag:
         never touches the real vector store; returns the patched callable so
         tests can inspect how it was called.
         """
-        mocker.patch("documents.views.AIConfig").return_value.ai_enabled = True
+        mocker.patch(
+            "documents.views.chat.AIConfig",
+        ).return_value.ai_enabled = True
         return mocker.patch(
-            "documents.views.stream_chat_with_documents",
+            "documents.views.chat.stream_chat_with_documents",
             return_value=iter(()),
         )
 

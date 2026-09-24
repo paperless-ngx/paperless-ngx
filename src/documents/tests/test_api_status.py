@@ -259,7 +259,7 @@ class TestSystemStatus(APITestCase):
                     "Celery worker responded unexpectedly.",
                 )
 
-    @mock.patch("documents.views.sleep")
+    @mock.patch("documents.views.system.sleep")
     @mock.patch("celery.app.control.Inspect.ping")
     def test_system_status_celery_ping_retry_success(
         self,
