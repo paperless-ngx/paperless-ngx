@@ -108,6 +108,7 @@ export const SETTINGS_KEYS = {
   GMAIL_OAUTH_URL: 'gmail_oauth_url',
   OUTLOOK_OAUTH_URL: 'outlook_oauth_url',
   EMAIL_ENABLED: 'email_enabled',
+  SHARE_LINK_BASE_URL: 'share_link_base_url',
   AI_ENABLED: 'ai_enabled',
   REMOTE_OCR_CONFIGURED: 'remote_ocr:configured',
   REMOTE_OCR_MODE: 'remote_ocr:mode',
@@ -360,6 +361,11 @@ export const SETTINGS: UiSetting[] = [
     key: SETTINGS_KEYS.EMAIL_ENABLED,
     type: 'boolean',
     default: false,
+  },
+  {
+    key: SETTINGS_KEYS.SHARE_LINK_BASE_URL,
+    type: 'string',
+    default: null,
   },
   {
     key: SETTINGS_KEYS.PDF_VIEWER_ZOOM_SETTING,

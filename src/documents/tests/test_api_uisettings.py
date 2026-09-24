@@ -30,6 +30,7 @@ class TestApiUiSettings(DirectoriesMixin, APITestCase):
         EMAIL_ENABLED=False,
         GMAIL_OAUTH_ENABLED=False,
         OUTLOOK_OAUTH_ENABLED=False,
+        SHARE_LINK_BASE_URL=None,
     )
     def test_api_get_ui_settings(self) -> None:
         response = self.client.get(self.ENDPOINT, format="json")
@@ -54,6 +55,7 @@ class TestApiUiSettings(DirectoriesMixin, APITestCase):
                 "app_title": None,
                 "app_logo": None,
                 "auditlog_enabled": True,
+                "share_link_base_url": None,
                 "trash_delay": 30,
                 "update_checking": {
                     "backend_setting": "default",
@@ -156,6 +158,24 @@ class TestApiUiSettings(DirectoriesMixin, APITestCase):
         self.assertIn(
             "Expected a dictionary",
             str(response.data["settings"]),
+        )
+
+    @override_settings(SHARE_LINK_BASE_URL="https://share.example.com")
+    def test_settings_includes_share_link_base_url(self) -> None:
+        """
+        GIVEN:
+            - A share link base URL is configured
+        WHEN:
+            - The ui_settings endpoint is called
+        THEN:
+            - The configured base URL is returned so the UI can build share links
+        """
+        response = self.client.get(self.ENDPOINT, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            response.data["settings"]["share_link_base_url"],
+            "https://share.example.com",
         )
 
     @override_settings(

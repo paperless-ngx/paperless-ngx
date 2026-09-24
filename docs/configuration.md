@@ -479,6 +479,18 @@ not include a trailing slash. E.g. <https://paperless.domain.com>
         This value cannot contain a path (e.g. domain.com/path), even if
         you are installing paperless-ngx at a subpath.
 
+#### [`PAPERLESS_SHARE_LINK_BASE_URL=<url>`](#PAPERLESS_SHARE_LINK_BASE_URL) {#PAPERLESS_SHARE_LINK_BASE_URL}
+
+: The base URL used when building share link URLs in the web UI. This is
+useful if share links should point to a different host than the one used to
+access Paperless-ngx, e.g. a public-facing domain or reverse proxy that only
+exposes `/share/`. The value may include a subpath but should not include a
+trailing slash or the `/share/` segment. E.g. <https://share.domain.com> results
+in share links like `https://share.domain.com/share/<slug>`.
+
+    Defaults to none, in which case share links use the host (and subpath)
+    that Paperless-ngx is currently being accessed at.
+
 #### [`PAPERLESS_CSRF_TRUSTED_ORIGINS=<comma-separated-list>`](#PAPERLESS_CSRF_TRUSTED_ORIGINS) {#PAPERLESS_CSRF_TRUSTED_ORIGINS}
 
 : A list of trusted origins for unsafe requests (e.g. POST). As of

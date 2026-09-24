@@ -9,9 +9,11 @@ import {
   SHARE_LINK_EXPIRATION_OPTIONS,
   ShareLink,
 } from 'src/app/data/share-link'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { ShareLinkService } from 'src/app/services/rest/share-link.service'
+import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
-import { environment } from 'src/environments/environment'
+import { getShareUrl } from 'src/app/utils/share-link'
 
 @Component({
   selector: 'pngx-share-links-dialog',
@@ -24,6 +26,7 @@ export class ShareLinksDialogComponent implements OnInit {
   private shareLinkService = inject(ShareLinkService)
   private toastService = inject(ToastService)
   private clipboard = inject(Clipboard)
+  private settingsService = inject(SettingsService)
 
   readonly expirationOptions = SHARE_LINK_EXPIRATION_OPTIONS
 
@@ -73,10 +76,10 @@ export class ShareLinksDialogComponent implements OnInit {
   }
 
   getShareUrl(link: ShareLink): string {
-    const apiURL = new URL(environment.apiBaseUrl)
-    return `${apiURL.origin}${apiURL.pathname.replace(/\/api\/$/, '/share/')}${
-      link.slug
-    }`
+    return getShareUrl(
+      link.slug,
+      this.settingsService.get(SETTINGS_KEYS.SHARE_LINK_BASE_URL)
+    )
   }
 
   getDaysRemaining(link: ShareLink): string {

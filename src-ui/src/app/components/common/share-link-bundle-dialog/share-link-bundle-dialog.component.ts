@@ -15,9 +15,11 @@ import {
   ShareLinkBundleStatus,
   ShareLinkBundleSummary,
 } from 'src/app/data/share-link-bundle'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
 import { FileSizePipe } from 'src/app/pipes/file-size.pipe'
-import { environment } from 'src/environments/environment'
+import { SettingsService } from 'src/app/services/settings.service'
+import { getShareUrl } from 'src/app/utils/share-link'
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component'
 
 @Component({
@@ -35,6 +37,7 @@ import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.compone
 export class ShareLinkBundleDialogComponent extends ConfirmDialogComponent {
   private readonly formBuilder = inject(FormBuilder)
   private readonly clipboard = inject(Clipboard)
+  private readonly settingsService = inject(SettingsService)
 
   readonly documents = signal<Document[]>([])
   readonly selectionCount = signal(0)
@@ -82,10 +85,10 @@ export class ShareLinkBundleDialogComponent extends ConfirmDialogComponent {
   }
 
   getShareUrl(bundle: ShareLinkBundleSummary): string {
-    const apiURL = new URL(environment.apiBaseUrl)
-    return `${apiURL.origin}${apiURL.pathname.replace(/\/api\/$/, '/share/')}${
-      bundle.slug
-    }`
+    return getShareUrl(
+      bundle.slug,
+      this.settingsService.get(SETTINGS_KEYS.SHARE_LINK_BASE_URL)
+    )
   }
 
   copy(bundle: ShareLinkBundleSummary): void {

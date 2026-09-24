@@ -11,7 +11,9 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of, throwError } from 'rxjs'
 import { FileVersion, ShareLink } from 'src/app/data/share-link'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { ShareLinkService } from 'src/app/services/rest/share-link.service'
+import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
 import { ShareLinksDialogComponent } from './share-links-dialog.component'
@@ -220,6 +222,17 @@ describe('ShareLinksDialogComponent', () => {
       'http://example.domainwithapiinit.com:1234/subpath/api/'
     expect(component.getShareUrl({ slug: '123abc123' } as any)).toEqual(
       'http://example.domainwithapiinit.com:1234/subpath/share/123abc123'
+    )
+  })
+
+  it('should use the configured share link base URL if set', () => {
+    environment.apiBaseUrl = 'http://example.com/api/'
+    TestBed.inject(SettingsService).set(
+      SETTINGS_KEYS.SHARE_LINK_BASE_URL,
+      'https://share.example.org'
+    )
+    expect(component.getShareUrl({ slug: '123abc123' } as any)).toEqual(
+      'https://share.example.org/share/123abc123'
     )
   })
 

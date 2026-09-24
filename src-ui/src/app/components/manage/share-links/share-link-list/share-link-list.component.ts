@@ -24,7 +24,7 @@ import {
 import { ShareLinkService } from 'src/app/services/rest/share-link.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
-import { environment } from 'src/environments/environment'
+import { getShareUrl } from 'src/app/utils/share-link'
 
 @Component({
   selector: 'pngx-share-link-list',
@@ -124,10 +124,10 @@ export class ShareLinkListComponent
   }
 
   getShareUrl(link: ShareLink): string {
-    const apiURL = new URL(environment.apiBaseUrl)
-    return `${apiURL.origin}${apiURL.pathname.replace(/\/api\/$/, '/share/')}${
-      link.slug
-    }`
+    return getShareUrl(
+      link.slug,
+      this.settingsService.get(SETTINGS_KEYS.SHARE_LINK_BASE_URL)
+    )
   }
 
   fileVersionLabel(version: FileVersion): string {

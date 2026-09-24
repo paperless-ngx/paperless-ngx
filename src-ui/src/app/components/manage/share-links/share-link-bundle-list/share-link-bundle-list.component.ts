@@ -8,6 +8,8 @@ import {
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Subject, catchError, of, switchMap, takeUntil, timer } from 'rxjs'
+import { ConfirmButtonComponent } from 'src/app/components/common/confirm-button/confirm-button.component'
+import { LoadingComponentWithPermissions } from 'src/app/components/loading-component/loading.component'
 import { FileVersion } from 'src/app/data/share-link'
 import {
   SHARE_LINK_BUNDLE_FILE_VERSION_LABELS,
@@ -24,9 +26,7 @@ import { FileSizePipe } from 'src/app/pipes/file-size.pipe'
 import { ShareLinkBundleService } from 'src/app/services/rest/share-link-bundle.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
-import { environment } from 'src/environments/environment'
-import { ConfirmButtonComponent } from 'src/app/components/common/confirm-button/confirm-button.component'
-import { LoadingComponentWithPermissions } from 'src/app/components/loading-component/loading.component'
+import { getShareUrl } from 'src/app/utils/share-link'
 
 @Component({
   selector: 'pngx-share-link-bundle-list',
@@ -139,10 +139,10 @@ export class ShareLinkBundleListComponent
   }
 
   getShareUrl(bundle: ShareLinkBundleSummary): string {
-    const apiURL = new URL(environment.apiBaseUrl)
-    return `${apiURL.origin}${apiURL.pathname.replace(/\/api\/$/, '/share/')}${
-      bundle.slug
-    }`
+    return getShareUrl(
+      bundle.slug,
+      this.settingsService.get(SETTINGS_KEYS.SHARE_LINK_BASE_URL)
+    )
   }
 
   setPage(page: number): void {

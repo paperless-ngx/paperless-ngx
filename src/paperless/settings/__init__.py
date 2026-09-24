@@ -1061,6 +1061,12 @@ if ENABLE_UPDATE_CHECK != "default":
 APP_TITLE = os.getenv("PAPERLESS_APP_TITLE", None)
 APP_LOGO = os.getenv("PAPERLESS_APP_LOGO", None)
 
+# Optional base URL (scheme, host and optional subpath) used when building share
+# link URLs in the UI, e.g. to hand out links on a different, public-facing host
+SHARE_LINK_BASE_URL: Final[str | None] = (
+    os.getenv("PAPERLESS_SHARE_LINK_BASE_URL", "").strip().rstrip("/") or None
+)
+
 ###############################################################################
 # Machine Learning                                                            #
 ###############################################################################

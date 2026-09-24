@@ -4266,6 +4266,8 @@ class UiSettingsView(GenericAPIView[Any]):
 
         ui_settings["auditlog_enabled"] = settings.AUDIT_LOG_ENABLED
 
+        ui_settings["share_link_base_url"] = settings.SHARE_LINK_BASE_URL
+
         ui_settings["remote_ocr"] = {
             "configured": RemoteEngineConfig.from_app_config().engine_is_valid(),
             "mode": RemoteOCRConfig().remote_ocr_mode,
