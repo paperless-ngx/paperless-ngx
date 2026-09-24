@@ -253,6 +253,21 @@
               </div>
             </div>
 
+            @if (aiEnabled) {
+              <div class="row mb-3">
+                <div class="col-md-3 col-form-label pt-0">
+                  <span i18n>Suggestions use</span>
+                </div>
+                <div class="col">
+                  <select class="form-select" formControlName="documentEditingSuggestionSource">
+                    <option [ngValue]="SuggestionSource.ML" i18n>ML</option>
+                    <option [ngValue]="SuggestionSource.AI" i18n>AI</option>
+                    <option [ngValue]="SuggestionSource.Both" i18n>Both</option>
+                  </select>
+                </div>
+              </div>
+            }
+
             <div class="row">
               <div class="col">
                 <pngx-input-check i18n-title title="Automatically request suggestions for inbox documents" i18n-hint hint="If un-checked, suggestions must be requested via the Suggest button." formControlName="documentEditingAutoSuggest"></pngx-input-check>
