@@ -292,6 +292,7 @@ a.btn-link:active,
 a.btn-link:focus-visible,
 .btn-link:hover,
 .btn-link:active,
+.btn-link.show,
 .btn-link:focus-visible {
   color: var(--pngx-primary-lighten-10) !important;
   .primary-light & {
