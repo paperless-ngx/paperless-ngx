@@ -375,9 +375,13 @@ export class DocumentDetailComponent
     return this.autoSuggestSetting()
   }
 
+  get defaultSuggestionSource(): SuggestionSource {
+    return this.aiEnabled ? this.suggestionSourceSetting() : SuggestionSource.ML
+  }
+
   get suggestionSource(): SuggestionSource {
     if (!this.aiEnabled) return SuggestionSource.ML
-    return this.suggestionSourceOverride() ?? this.suggestionSourceSetting()
+    return this.suggestionSourceOverride() ?? this.defaultSuggestionSource
   }
 
   get archiveContentRenderType(): ContentRenderType {
