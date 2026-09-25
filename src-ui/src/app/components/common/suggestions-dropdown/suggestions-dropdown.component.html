@@ -73,11 +73,11 @@
       <div ngbDropdownMenu class="shadow p-3">
         <div class="small text-muted mb-2" i18n>Suggest using:</div>
         <div class="form-check small">
-          <input class="form-check-input" type="checkbox" id="suggestionSourceML" [checked]="useML" [disabled]="useML && !useAI" (change)="toggleSource(SuggestionSource.ML)">
+          <input class="form-check-input" type="checkbox" id="suggestionSourceML" [checked]="useML" [disabled]="useML && !useAI" (change)="setSources($event.target.checked, useAI)">
           <label class="form-check-label d-inline-flex align-items-center gap-1" for="suggestionSourceML"><i-bs name="cpu"></i-bs><ng-container i18n>ML</ng-container></label>
         </div>
         <div class="form-check small">
-          <input class="form-check-input" type="checkbox" id="suggestionSourceAI" [checked]="useAI" [disabled]="useAI && !useML" (change)="toggleSource(SuggestionSource.AI)">
+          <input class="form-check-input" type="checkbox" id="suggestionSourceAI" [checked]="useAI" [disabled]="useAI && !useML" (change)="setSources(useML, $event.target.checked)">
           <label class="form-check-label d-inline-flex align-items-center gap-1" for="suggestionSourceAI"><i-bs name="stars"></i-bs><ng-container i18n>AI</ng-container></label>
         </div>
       </div>

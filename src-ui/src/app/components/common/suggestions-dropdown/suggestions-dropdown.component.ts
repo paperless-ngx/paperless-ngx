@@ -86,17 +86,14 @@ export class SuggestionsDropdownComponent {
     )
   }
 
-  public toggleSource(source: SuggestionSource.ML | SuggestionSource.AI) {
-    const ml = source === SuggestionSource.ML ? !this.useML : this.useML
-    const ai = source === SuggestionSource.AI ? !this.useAI : this.useAI
-    if (!ml && !ai) return
-    this.sourceChange.emit(
-      ml && ai
-        ? SuggestionSource.Both
-        : ml
-          ? SuggestionSource.ML
-          : SuggestionSource.AI
-    )
+  public setSources(ml: boolean, ai: boolean) {
+    if (ml && ai) {
+      this.sourceChange.emit(SuggestionSource.Both)
+    } else if (ml) {
+      this.sourceChange.emit(SuggestionSource.ML)
+    } else if (ai) {
+      this.sourceChange.emit(SuggestionSource.AI)
+    }
   }
 
   get novelSuggestions(): number {
