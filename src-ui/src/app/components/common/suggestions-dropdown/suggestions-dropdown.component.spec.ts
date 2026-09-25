@@ -224,17 +224,15 @@ describe('SuggestionsDropdownComponent', () => {
 
   it('should emit source changes and never allow no source', () => {
     const emitSpy = jest.spyOn(component.sourceChange, 'emit')
-    fixture.componentRef.setInput('source', SuggestionSource.AI)
-    component.toggleSource(SuggestionSource.ML)
+    component.setSources(true, true)
     expect(emitSpy).toHaveBeenCalledWith(SuggestionSource.Both)
-
-    fixture.componentRef.setInput('source', SuggestionSource.Both)
-    component.toggleSource(SuggestionSource.AI)
+    component.setSources(true, false)
     expect(emitSpy).toHaveBeenCalledWith(SuggestionSource.ML)
+    component.setSources(false, true)
+    expect(emitSpy).toHaveBeenCalledWith(SuggestionSource.AI)
 
     emitSpy.mockClear()
-    fixture.componentRef.setInput('source', SuggestionSource.ML)
-    component.toggleSource(SuggestionSource.ML)
+    component.setSources(false, false)
     expect(emitSpy).not.toHaveBeenCalled()
   })
 
