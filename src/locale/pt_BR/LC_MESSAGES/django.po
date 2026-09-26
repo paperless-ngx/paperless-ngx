@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 01:29+0000\n"
-"PO-Revision-Date: 2026-09-18 01:30\n"
+"POT-Creation-Date: 2026-09-23 19:00+0000\n"
+"PO-Revision-Date: 2026-09-23 19:01\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
@@ -47,7 +47,7 @@ msgstr "{name!r} não é um campo personalizado válido."
 
 #: documents/filters.py:628
 msgid "{data_type} does not support query expr {expr!r}."
-msgstr "{data_type} Não suporta a consulta expr {expr!r}."
+msgstr "{data_type} não suporta a consulta expr {expr!r}."
 
 #: documents/filters.py:747 documents/models.py:137
 msgid "Maximum nesting depth exceeded."
@@ -1616,7 +1616,7 @@ msgid "workflow runs"
 msgstr "execução de fluxo de trabalho"
 
 #: documents/serialisers.py:514 documents/serialisers.py:871
-#: documents/serialisers.py:2883 documents/views.py:343 documents/views.py:2726
+#: documents/serialisers.py:2885 documents/views.py:342 documents/views.py:2725
 #: paperless_mail/serialisers.py:156
 msgid "Insufficient permissions."
 msgstr "Permissões insuficientes."
@@ -1625,38 +1625,38 @@ msgstr "Permissões insuficientes."
 msgid "Invalid color."
 msgstr "Cor inválida."
 
-#: documents/serialisers.py:2350
+#: documents/serialisers.py:2352
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Tipo de arquivo %(type)s não suportado"
 
-#: documents/serialisers.py:2394
+#: documents/serialisers.py:2396
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
 msgstr "O ID do campo personalizado deve ser um número inteiro: %(id)s"
 
-#: documents/serialisers.py:2401
+#: documents/serialisers.py:2403
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
 msgstr "Não existe um campo personalizado com o ID %(id)s"
 
-#: documents/serialisers.py:2418 documents/serialisers.py:2428
+#: documents/serialisers.py:2420 documents/serialisers.py:2430
 msgid "Custom fields must be a list of integers or an object mapping ids to values."
 msgstr "Campos personalizados devem estar em uma lista de números inteiros ou em um objeto que relacione IDs a valores."
 
-#: documents/serialisers.py:2423
+#: documents/serialisers.py:2425
 msgid "Some custom fields don't exist or were specified twice."
 msgstr "Campos personalizados inválidos ou duplicados."
 
-#: documents/serialisers.py:2570
+#: documents/serialisers.py:2572
 msgid "Invalid variable detected."
 msgstr "Variável inválida detectada."
 
-#: documents/serialisers.py:2939
+#: documents/serialisers.py:2941
 msgid "Duplicate document identifiers are not allowed."
 msgstr "Não são permitidos identificadores de documento duplicados."
 
-#: documents/serialisers.py:2969 documents/views.py:4763
+#: documents/serialisers.py:2971 documents/views.py:4780
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr "Documentos não encontrados: %(ids)s"
@@ -1913,40 +1913,40 @@ msgstr "Esquema URI '{parts.scheme}' não é permitido. Esquemas permitidos:\n"
 msgid "Unable to parse URI {value}"
 msgstr "Não é possível analisar o URI {value}"
 
-#: documents/views.py:336 documents/views.py:2723
+#: documents/views.py:335 documents/views.py:2722
 msgid "Invalid more_like_id"
 msgstr "more_like_id inválido"
 
-#: documents/views.py:1670
+#: documents/views.py:1669
 msgid "Invalid AI configuration."
 msgstr "Configuração de IA inválida."
 
-#: documents/views.py:1681
+#: documents/views.py:1680
 msgid "AI backend request timed out."
 msgstr "A requisição backend da IA expirou."
 
-#: documents/views.py:1693
+#: documents/views.py:1692
 msgid "AI backend rejected the request. Check logs for details."
 msgstr ""
 
-#: documents/views.py:2548 documents/views.py:2864
+#: documents/views.py:2547 documents/views.py:2863
 msgid "Specify only one of text, title_search, query, or more_like_id."
 msgstr "Especifique apenas um text, title_search, consulta ou mais_like_id."
 
-#: documents/views.py:4776
+#: documents/views.py:4793
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr "Permissões insuficientes para compartilhar o documento %(id)s."
 
-#: documents/views.py:4822
+#: documents/views.py:4839
 msgid "Bundle is already being processed."
 msgstr "Pacote já está sendo processado."
 
-#: documents/views.py:4886
+#: documents/views.py:4903
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr "O pacote de link de compartilhamento ainda está sendo preparado. Tente novamente mais tarde."
 
-#: documents/views.py:4900
+#: documents/views.py:4917
 msgid "The share link bundle is unavailable."
 msgstr "O pacote de link de compartilhamento não está disponível."
 
@@ -2191,190 +2191,194 @@ msgid "Sets the LLM embedding model"
 msgstr "Define o modelo de incorporação LLM"
 
 #: paperless/models.py:369
+msgid "Sets the LLM embedding API key"
+msgstr ""
+
+#: paperless/models.py:376
 msgid "Sets the LLM embedding endpoint, optional"
 msgstr "Define o endpoint do embbeding LLM, opcional"
 
-#: paperless/models.py:376
+#: paperless/models.py:383
 msgid "Sets the LLM embedding chunk size"
 msgstr "Define o tamanho do chunk para o embbeding LLM"
 
-#: paperless/models.py:382
+#: paperless/models.py:389
 msgid "Sets the LLM context size"
 msgstr "Define o tamanho do contexto LLM"
 
-#: paperless/models.py:388
+#: paperless/models.py:395
 msgid "Sets the LLM backend"
 msgstr "Define o backend LLM"
 
-#: paperless/models.py:396
+#: paperless/models.py:403
 msgid "Sets the LLM model"
 msgstr "Define o modelo LLM"
 
-#: paperless/models.py:403
+#: paperless/models.py:410
 msgid "Sets the LLM API key"
 msgstr "Define a chave de API LLM"
 
-#: paperless/models.py:410
+#: paperless/models.py:417
 msgid "Sets the LLM endpoint, optional"
 msgstr "Define o endpoint LLM, opcional"
 
-#: paperless/models.py:417
+#: paperless/models.py:424
 msgid "Sets the LLM output language"
 msgstr "Define o idioma de saída do LLM"
 
-#: paperless/models.py:424
+#: paperless/models.py:431
 msgid "Sets the LLM timeout in seconds"
 msgstr "Define o tempo limite do LLM em segundos"
 
-#: paperless/models.py:430
+#: paperless/models.py:437
 msgid "paperless application settings"
 msgstr "configurações do aplicativo paperless"
 
-#: paperless/settings/__init__.py:558
+#: paperless/settings/__init__.py:559
 msgid "English (US)"
 msgstr "Inglês (EUA)"
 
-#: paperless/settings/__init__.py:559
+#: paperless/settings/__init__.py:560
 msgid "Arabic"
 msgstr "Árabe"
 
-#: paperless/settings/__init__.py:560
+#: paperless/settings/__init__.py:561
 msgid "Afrikaans"
 msgstr "Africanês"
 
-#: paperless/settings/__init__.py:561
+#: paperless/settings/__init__.py:562
 msgid "Belarusian"
 msgstr "Bielorrusso"
 
-#: paperless/settings/__init__.py:562
+#: paperless/settings/__init__.py:563
 msgid "Bulgarian"
 msgstr "Búlgaro"
 
-#: paperless/settings/__init__.py:563
+#: paperless/settings/__init__.py:564
 msgid "Catalan"
 msgstr "Catalão"
 
-#: paperless/settings/__init__.py:564
+#: paperless/settings/__init__.py:565
 msgid "Czech"
 msgstr "Tcheco"
 
-#: paperless/settings/__init__.py:565
+#: paperless/settings/__init__.py:566
 msgid "Danish"
 msgstr "Dinamarquês"
 
-#: paperless/settings/__init__.py:566
+#: paperless/settings/__init__.py:567
 msgid "German"
 msgstr "Alemão"
 
-#: paperless/settings/__init__.py:567
+#: paperless/settings/__init__.py:568
 msgid "Greek"
 msgstr "Grego"
 
-#: paperless/settings/__init__.py:568
+#: paperless/settings/__init__.py:569
 msgid "English (GB)"
 msgstr "Inglês (GB)"
 
-#: paperless/settings/__init__.py:569
+#: paperless/settings/__init__.py:570
 msgid "Spanish"
 msgstr "Espanhol"
 
-#: paperless/settings/__init__.py:570
+#: paperless/settings/__init__.py:571
 msgid "Persian"
 msgstr "Persa"
 
-#: paperless/settings/__init__.py:571
+#: paperless/settings/__init__.py:572
 msgid "Finnish"
 msgstr "Finlandês"
 
-#: paperless/settings/__init__.py:572
+#: paperless/settings/__init__.py:573
 msgid "French"
 msgstr "Francês"
 
-#: paperless/settings/__init__.py:573
+#: paperless/settings/__init__.py:574
 msgid "Hungarian"
 msgstr "Húngaro"
 
-#: paperless/settings/__init__.py:574
+#: paperless/settings/__init__.py:575
 msgid "Indonesian"
 msgstr "Indonésio"
 
-#: paperless/settings/__init__.py:575
+#: paperless/settings/__init__.py:576
 msgid "Italian"
 msgstr "Italiano"
 
-#: paperless/settings/__init__.py:576
+#: paperless/settings/__init__.py:577
 msgid "Japanese"
 msgstr "Japonês"
 
-#: paperless/settings/__init__.py:577
+#: paperless/settings/__init__.py:578
 msgid "Korean"
 msgstr "Coreano"
 
-#: paperless/settings/__init__.py:578
+#: paperless/settings/__init__.py:579
 msgid "Luxembourgish"
 msgstr "Luxemburguês"
 
-#: paperless/settings/__init__.py:579
+#: paperless/settings/__init__.py:580
 msgid "Norwegian"
 msgstr "Norueguês"
 
-#: paperless/settings/__init__.py:580
+#: paperless/settings/__init__.py:581
 msgid "Dutch"
 msgstr "Holandês"
 
-#: paperless/settings/__init__.py:581
+#: paperless/settings/__init__.py:582
 msgid "Polish"
 msgstr "Polonês"
 
-#: paperless/settings/__init__.py:582
+#: paperless/settings/__init__.py:583
 msgid "Portuguese (Brazil)"
 msgstr "Português (Brasil)"
 
-#: paperless/settings/__init__.py:583
+#: paperless/settings/__init__.py:584
 msgid "Portuguese"
 msgstr "Português"
 
-#: paperless/settings/__init__.py:584
+#: paperless/settings/__init__.py:585
 msgid "Romanian"
 msgstr "Romeno"
 
-#: paperless/settings/__init__.py:585
+#: paperless/settings/__init__.py:586
 msgid "Russian"
 msgstr "Russo"
 
-#: paperless/settings/__init__.py:586
+#: paperless/settings/__init__.py:587
 msgid "Slovak"
 msgstr "Eslovaco"
 
-#: paperless/settings/__init__.py:587
+#: paperless/settings/__init__.py:588
 msgid "Slovenian"
 msgstr "Esloveno"
 
-#: paperless/settings/__init__.py:588
+#: paperless/settings/__init__.py:589
 msgid "Serbian"
 msgstr "Sérvio"
 
-#: paperless/settings/__init__.py:589
+#: paperless/settings/__init__.py:590
 msgid "Swedish"
 msgstr "Sueco"
 
-#: paperless/settings/__init__.py:590
+#: paperless/settings/__init__.py:591
 msgid "Turkish"
 msgstr "Turco"
 
-#: paperless/settings/__init__.py:591
+#: paperless/settings/__init__.py:592
 msgid "Ukrainian"
 msgstr "Ucraniano"
 
-#: paperless/settings/__init__.py:592
+#: paperless/settings/__init__.py:593
 msgid "Vietnamese"
 msgstr "vietnamita"
 
-#: paperless/settings/__init__.py:593
+#: paperless/settings/__init__.py:594
 msgid "Chinese Simplified"
 msgstr "Chinês Simplificado"
 
-#: paperless/settings/__init__.py:594
+#: paperless/settings/__init__.py:595
 msgid "Chinese Traditional"
 msgstr "Chinês Tradicional"
 

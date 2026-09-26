@@ -571,7 +571,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
           <context context-type="linenumber">35</context>
         </context-group>
-        <target state="needs-translation">This value overrides <x id="INTERPOLATION" equiv-text="{{option.config_key}}"/>, which is set outside Paperless.</target>
+        <target state="translated">Dieser Wert überschreibt <x id="INTERPOLATION" equiv-text="{{option.config_key}}"/>, der außerhalb von Paperless festgelegt wird.</target>
       </trans-unit>
       <trans-unit id="7221396516204435584" datatype="html">
         <source><x id="INTERPOLATION" equiv-text="{{option.config_key}}"/> is set outside Paperless. Enter a value here to override it.</source>
@@ -579,7 +579,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
           <context context-type="linenumber">37</context>
         </context-group>
-        <target state="needs-translation"><x id="INTERPOLATION" equiv-text="{{option.config_key}}"/> is set outside Paperless. Enter a value here to override it.</target>
+        <target state="translated"><x id="INTERPOLATION" equiv-text="{{option.config_key}}"/> ist außerhalb von Paperless festgelegt. Geben Sie hier einen Wert ein, um ihn zu überschreiben.</target>
       </trans-unit>
       <trans-unit id="8318849619178340389" datatype="html">
         <source>Use the externally configured value</source>
@@ -587,7 +587,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
           <context context-type="linenumber">42</context>
         </context-group>
-        <target state="needs-translation">Use the externally configured value</target>
+        <target state="translated">Den extern konfigurierten Wert verwenden</target>
       </trans-unit>
       <trans-unit id="6032629623003430385" datatype="html">
         <source>Reset to external</source>
@@ -595,7 +595,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
           <context context-type="linenumber">43</context>
         </context-group>
-        <target state="needs-translation">Reset to external</target>
+        <target state="translated">Auf extern zurücksetzen</target>
       </trans-unit>
       <trans-unit id="7808756054397155068" datatype="html" approved="yes">
         <source>Reset</source>
@@ -1135,7 +1135,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">115,116</context>
         </context-group>
-        <target state="needs-translation">Sidebar items to show:</target>
+        <target state="translated">Anzuzeigende Elemente in der Seitenleiste:</target>
       </trans-unit>
       <trans-unit id="1356890996281769972" datatype="html" approved="yes">
         <source>Dark mode</source>
@@ -1397,13 +1397,13 @@
         </context-group>
         <target state="final">Posteingangs-Tag(s) beim Speichern automatisch entfernen</target>
       </trans-unit>
-      <trans-unit id="1043449647727456069" datatype="html">
+      <trans-unit id="1043449647727456069" datatype="html" approved="yes">
         <source>Automatically request suggestions for inbox documents</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">258</context>
         </context-group>
-        <target state="needs-translation">Automatically request suggestions for inbox documents</target>
+        <target state="final">Automatische Vorschläge für Posteingangsdokumente anfordern</target>
       </trans-unit>
       <trans-unit id="460700039378563125" datatype="html">
         <source>If un-checked, suggestions must be requested via the Suggest button.</source>
@@ -1411,7 +1411,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">258</context>
         </context-group>
-        <target state="needs-translation">If un-checked, suggestions must be requested via the Suggest button.</target>
+        <target state="translated">Wenn diese Option nicht aktiviert ist, müssen Vorschläge über die Schaltfläche Vorschläge angefordert werden.</target>
       </trans-unit>
       <trans-unit id="8793267604636304297" datatype="html" approved="yes">
         <source>Show document thumbnail during loading</source>
@@ -1607,7 +1607,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">329</context>
         </context-group>
-        <target state="translated"> Die Einstellungen gelten für dieses Benutzerkonto in Bezug auf Objekte (Tags, E-Mail-Regeln usw.), die über die Weboberfläche erstellt wurden. Diese Einstellungen gelten nicht für Dokumente. </target>
+        <target state="translated"> Die Einstellungen gelten für dieses Benutzerkonto in Bezug auf Objekte (Tags, E-Mail-Regeln, usw.), die über die Weboberfläche erstellt wurden. Diese Einstellungen gelten nicht für Dokumente. </target>
       </trans-unit>
       <trans-unit id="4292903881380648974" datatype="html" approved="yes">
         <source>Default Owner</source>
@@ -4531,7 +4531,7 @@
           <context context-type="sourcefile">src/app/components/common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component.html</context>
           <context context-type="linenumber">19</context>
         </context-group>
-        <target state="translated">Im Uhrzeigersinn Rotieren</target>
+        <target state="translated">Im Uhrzeigersinn rotieren</target>
       </trans-unit>
       <trans-unit id="8157388568390631653" datatype="html" approved="yes">
         <source>Note that only PDFs will be rotated.</source>
@@ -4799,7 +4799,7 @@
           <context context-type="sourcefile">src/app/components/common/dates-dropdown/dates-dropdown.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="needs-translation">Clear created relative date</target>
+        <target state="translated">Erstelltes relatives Datum löschen</target>
       </trans-unit>
       <trans-unit id="6312759212949884929" datatype="html" approved="yes">
         <source>Relative dates</source>
@@ -4819,7 +4819,7 @@
           <context context-type="sourcefile">src/app/components/common/dates-dropdown/dates-dropdown.component.html</context>
           <context context-type="linenumber">37</context>
         </context-group>
-        <target state="needs-translation">Clear created from date</target>
+        <target state="translated">Erstelltes von Datum löschen</target>
       </trans-unit>
       <trans-unit id="5203279511751768967" datatype="html" approved="yes">
         <source>From</source>
@@ -4839,7 +4839,7 @@
           <context context-type="sourcefile">src/app/components/common/dates-dropdown/dates-dropdown.component.html</context>
           <context context-type="linenumber">47</context>
         </context-group>
-        <target state="needs-translation">Open created from date picker</target>
+        <target state="translated">Erstellte von Datumsauswahl öffnen</target>
       </trans-unit>
       <trans-unit id="5714803496005897828" datatype="html">
         <source>Clear created to date</source>
@@ -4847,7 +4847,7 @@
           <context context-type="sourcefile">src/app/components/common/dates-dropdown/dates-dropdown.component.html</context>
           <context context-type="linenumber">61</context>
         </context-group>
-        <target state="needs-translation">Clear created to date</target>
+        <target state="translated">Erstellte bis Datumsauswahl löschen</target>
       </trans-unit>
       <trans-unit id="1640609344969975994" datatype="html" approved="yes">
         <source>To</source>
@@ -4867,7 +4867,7 @@
           <context context-type="sourcefile">src/app/components/common/dates-dropdown/dates-dropdown.component.html</context>
           <context context-type="linenumber">71</context>
         </context-group>
-        <target state="needs-translation">Open created to date picker</target>
+        <target state="translated">Erstellte bis Datumsauswahl öffnen</target>
       </trans-unit>
       <trans-unit id="231679111972850796" datatype="html" approved="yes">
         <source>Added</source>
@@ -4899,7 +4899,7 @@
           <context context-type="sourcefile">src/app/components/common/dates-dropdown/dates-dropdown.component.html</context>
           <context context-type="linenumber">89</context>
         </context-group>
-        <target state="needs-translation">Clear added relative date</target>
+        <target state="translated">Erstelltes relatives Datum löschen</target>
       </trans-unit>
       <trans-unit id="8527347906195580369" datatype="html">
         <source>Clear added from date</source>
@@ -4907,7 +4907,7 @@
           <context context-type="sourcefile">src/app/components/common/dates-dropdown/dates-dropdown.component.html</context>
           <context context-type="linenumber">114</context>
         </context-group>
-        <target state="needs-translation">Clear added from date</target>
+        <target state="translated">Hinzugefügt von Datum löschen</target>
       </trans-unit>
       <trans-unit id="5711531903664147782" datatype="html">
         <source>Open added from date picker</source>
@@ -4915,7 +4915,7 @@
           <context context-type="sourcefile">src/app/components/common/dates-dropdown/dates-dropdown.component.html</context>
           <context context-type="linenumber">124</context>
         </context-group>
-        <target state="needs-translation">Open added from date picker</target>
+        <target state="translated">Hinzugefügt von Datumsauswahl öffnen</target>
       </trans-unit>
       <trans-unit id="6559691063013749167" datatype="html">
         <source>Clear added to date</source>
@@ -4923,7 +4923,7 @@
           <context context-type="sourcefile">src/app/components/common/dates-dropdown/dates-dropdown.component.html</context>
           <context context-type="linenumber">138</context>
         </context-group>
-        <target state="needs-translation">Clear added to date</target>
+        <target state="translated">Hinzugefügt bis Datum löschen</target>
       </trans-unit>
       <trans-unit id="6072383085349258752" datatype="html">
         <source>Open added to date picker</source>
@@ -4931,7 +4931,7 @@
           <context context-type="sourcefile">src/app/components/common/dates-dropdown/dates-dropdown.component.html</context>
           <context context-type="linenumber">148</context>
         </context-group>
-        <target state="needs-translation">Open added to date picker</target>
+        <target state="translated">Hinzugefügt bis Datumsauswahl öffnen</target>
       </trans-unit>
       <trans-unit id="6052766076365105714" datatype="html" approved="yes">
         <source>now</source>
@@ -5837,13 +5837,13 @@
         </context-group>
         <target state="translated">Fehler beim Abrufen der Korrespondenten</target>
       </trans-unit>
-      <trans-unit id="3407606224361082860" datatype="html">
+      <trans-unit id="3407606224361082860" datatype="html" approved="yes">
         <source>Error retrieving document types</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">195</context>
         </context-group>
-        <target state="needs-translation">Error retrieving document types</target>
+        <target state="final">Fehler beim Abrufen der Dokumenttypen</target>
       </trans-unit>
       <trans-unit id="3147349817770432927" datatype="html" approved="yes">
         <source>Create new mail rule</source>
@@ -9625,29 +9625,29 @@
         </context-group>
         <target state="translated">Sie haben ungespeicherte Änderungen am Inhalt dieser Version.</target>
       </trans-unit>
-      <trans-unit id="85184271222513014" datatype="html">
+      <trans-unit id="85184271222513014" datatype="html" approved="yes">
         <source>Switching versions will discard them.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">1052</context>
         </context-group>
-        <target state="needs-translation">Switching versions will discard them.</target>
+        <target state="final">Beim Versionswechsel werden diese verworfen.</target>
       </trans-unit>
-      <trans-unit id="2565707334844767610" datatype="html">
+      <trans-unit id="2565707334844767610" datatype="html" approved="yes">
         <source>Discard and switch</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">1054</context>
         </context-group>
-        <target state="needs-translation">Discard and switch</target>
+        <target state="final">Verwerfen und wechseln</target>
       </trans-unit>
-      <trans-unit id="2109314380040637387" datatype="html">
+      <trans-unit id="2109314380040637387" datatype="html" approved="yes">
         <source>Save and switch</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">1056</context>
         </context-group>
-        <target state="needs-translation">Save and switch</target>
+        <target state="final">Speichern und wechseln</target>
       </trans-unit>
       <trans-unit id="3456881259945295697" datatype="html" approved="yes">
         <source>Error retrieving suggestions.</source>
@@ -10740,7 +10740,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">348</context>
+          <context context-type="linenumber">351</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-attributes/document-attributes.component.html</context>
@@ -10756,7 +10756,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">341</context>
+          <context context-type="linenumber">344</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-attributes/document-attributes.component.html</context>
@@ -11040,7 +11040,7 @@
         <source>Reset filters / selection</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">329</context>
+          <context context-type="linenumber">332</context>
         </context-group>
         <target state="final">Filter / Auswahl zurücksetzen</target>
       </trans-unit>
@@ -11048,7 +11048,7 @@
         <source>Open first [selected] document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">357</context>
+          <context context-type="linenumber">360</context>
         </context-group>
         <target state="final">Erstes [ausgewähltes] Dokument öffnen</target>
       </trans-unit>
@@ -11056,7 +11056,7 @@
         <source>Previous page</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">373</context>
+          <context context-type="linenumber">376</context>
         </context-group>
         <target state="final">Vorherige Seite</target>
       </trans-unit>
@@ -11064,7 +11064,7 @@
         <source>Next page</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">385</context>
+          <context context-type="linenumber">388</context>
         </context-group>
         <target state="final">Nächste Seite</target>
       </trans-unit>
@@ -11072,7 +11072,7 @@
         <source>View &quot;<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>&quot; saved successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">419</context>
+          <context context-type="linenumber">422</context>
         </context-group>
         <target state="final">Ansicht „<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>“ erfolgreich gespeichert.</target>
       </trans-unit>
@@ -11080,7 +11080,7 @@
         <source>Failed to save view &quot;<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>&quot;.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">425</context>
+          <context context-type="linenumber">428</context>
         </context-group>
         <target state="final">Fehler beim Speichern der Ansicht „<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>“.</target>
       </trans-unit>
@@ -11088,7 +11088,7 @@
         <source>View &quot;<x id="PH" equiv-text="savedView.name"/>&quot; created successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">494</context>
+          <context context-type="linenumber">497</context>
         </context-group>
         <target state="final">Ansicht „<x id="PH" equiv-text="savedView.name"/>“ erfolgreich erstellt.</target>
       </trans-unit>
@@ -11096,7 +11096,7 @@
         <source>View &quot;<x id="PH" equiv-text="savedView.name"/>&quot; created successfully, but could not update visibility settings.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">500</context>
+          <context context-type="linenumber">503</context>
         </context-group>
         <target state="translated">Ansicht „<x id="PH" equiv-text="savedView.name"/>“ wurde erfolgreich erstellt, die Sichtbarkeitseinstellungen konnten jedoch nicht aktualisiert werden.</target>
       </trans-unit>
@@ -12410,7 +12410,7 @@
           <context context-type="sourcefile">src/app/components/manage/share-links/share-link-list/share-link-list.component.html</context>
           <context context-type="linenumber">40,41</context>
         </context-group>
-        <target state="needs-translation">Expired</target>
+        <target state="translated">Abgelaufen</target>
       </trans-unit>
       <trans-unit id="2057574872309338088" datatype="html">
         <source>Copy share link</source>
@@ -12454,7 +12454,7 @@
           <context context-type="sourcefile">src/app/components/manage/share-links/share-link-bundle-list/share-link-bundle-list.component.html</context>
           <context context-type="linenumber">164,165</context>
         </context-group>
-        <target state="needs-translation">Share link bundles pagination</target>
+        <target state="translated">Freigabelink-Pakete Seitennummerierung</target>
       </trans-unit>
       <trans-unit id="1541995860059283227" datatype="html">
         <source>Failed to load share link bundles.</source>
@@ -12510,23 +12510,23 @@
           <context context-type="sourcefile">src/app/components/manage/share-links/share-link-list/share-link-list.component.html</context>
           <context context-type="linenumber">7,8</context>
         </context-group>
-        <target state="needs-translation"> No document share links currently exist. </target>
+        <target state="translated"> Derzeit gibt es keine Dokumenten-Freigabe-Links. </target>
       </trans-unit>
-      <trans-unit id="894965666917873756" datatype="html">
+      <trans-unit id="894965666917873756" datatype="html" approved="yes">
         <source>Document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/share-links/share-link-list/share-link-list.component.html</context>
           <context context-type="linenumber">15,16</context>
         </context-group>
-        <target state="needs-translation">Document</target>
+        <target state="final">Dokument</target>
       </trans-unit>
-      <trans-unit id="7420713064779772535" datatype="html">
+      <trans-unit id="7420713064779772535" datatype="html" approved="yes">
         <source>Delete share link</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/share-links/share-link-list/share-link-list.component.html</context>
           <context context-type="linenumber">75,76</context>
         </context-group>
-        <target state="needs-translation">Delete share link</target>
+        <target state="final">Freigabelink löschen</target>
       </trans-unit>
       <trans-unit id="5198271726831144068" datatype="html">
         <source>Share links pagination</source>
@@ -12534,39 +12534,39 @@
           <context context-type="sourcefile">src/app/components/manage/share-links/share-link-list/share-link-list.component.html</context>
           <context context-type="linenumber">104,105</context>
         </context-group>
-        <target state="needs-translation">Share links pagination</target>
+        <target state="translated">Freigabelinks-Seitennummerierung</target>
       </trans-unit>
-      <trans-unit id="2976350639944567244" datatype="html">
+      <trans-unit id="2976350639944567244" datatype="html" approved="yes">
         <source>Failed to load share links.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/share-links/share-link-list/share-link-list.component.ts</context>
           <context context-type="linenumber">105</context>
         </context-group>
-        <target state="needs-translation">Failed to load share links.</target>
+        <target state="final">Fehler beim Laden des Freigabelinks.</target>
       </trans-unit>
-      <trans-unit id="4100863040928608880" datatype="html">
+      <trans-unit id="4100863040928608880" datatype="html" approved="yes">
         <source>Error retrieving share links.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/share-links/share-link-list/share-link-list.component.ts</context>
           <context context-type="linenumber">107</context>
         </context-group>
-        <target state="needs-translation">Error retrieving share links.</target>
+        <target state="final">Fehler beim Abrufen des Freigabelinks.</target>
       </trans-unit>
-      <trans-unit id="326120283142363299" datatype="html">
+      <trans-unit id="326120283142363299" datatype="html" approved="yes">
         <source>Share link deleted.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/share-links/share-link-list/share-link-list.component.ts</context>
           <context context-type="linenumber">154</context>
         </context-group>
-        <target state="needs-translation">Share link deleted.</target>
+        <target state="final">Freigabelink gelöscht.</target>
       </trans-unit>
-      <trans-unit id="4964931417181298145" datatype="html">
+      <trans-unit id="4964931417181298145" datatype="html" approved="yes">
         <source>Error deleting share link.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/share-links/share-link-list/share-link-list.component.ts</context>
           <context context-type="linenumber">159</context>
         </context-group>
-        <target state="needs-translation">Error deleting share link.</target>
+        <target state="final">Fehler beim Löschen des Freigabelinks.</target>
       </trans-unit>
       <trans-unit id="3439104787814858626" datatype="html">
         <source>Manage public links to individual documents and document bundles.</source>
@@ -12582,15 +12582,15 @@
           <context context-type="sourcefile">src/app/components/manage/share-links/share-links.component.html</context>
           <context context-type="linenumber">18,19</context>
         </context-group>
-        <target state="needs-translation">Document links</target>
+        <target state="translated">Dokumentenlinks</target>
       </trans-unit>
-      <trans-unit id="8216780576869093031" datatype="html">
+      <trans-unit id="8216780576869093031" datatype="html" approved="yes">
         <source>Bundles</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/share-links/share-links.component.html</context>
           <context context-type="linenumber">26,27</context>
         </context-group>
-        <target state="needs-translation">Bundles</target>
+        <target state="final">Pakete</target>
       </trans-unit>
       <trans-unit id="1229748338333965418" datatype="html" approved="yes">
         <source>Use workflows to customize the behavior of Paperless-ngx when events &apos;trigger&apos; a workflow.</source>
@@ -13297,11 +13297,27 @@
         </context-group>
         <target state="translated">LLM-Einbettungsmodell</target>
       </trans-unit>
+      <trans-unit id="861068592166833023" datatype="html">
+        <source>LLM Embedding API Key</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
+          <context context-type="linenumber">358</context>
+        </context-group>
+        <target state="translated">LLM Einbettungs API Schlüssel</target>
+      </trans-unit>
+      <trans-unit id="2929108042259892948" datatype="html">
+        <source>Used for embeddings when set, otherwise LLM API key is used.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
+          <context context-type="linenumber">360</context>
+        </context-group>
+        <target state="translated">Wird für Einbettung genutzt, wenn gesetzt, ansonsten wird der LLM API Schlüssel verwendet.</target>
+      </trans-unit>
       <trans-unit id="3554114880473286122" datatype="html">
         <source>LLM Embedding Endpoint</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-          <context context-type="linenumber">358</context>
+          <context context-type="linenumber">366</context>
         </context-group>
         <target state="translated">LLM-Einbettungsendpunkt</target>
       </trans-unit>
@@ -13309,7 +13325,7 @@
         <source>LLM Embedding Chunk Size</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-          <context context-type="linenumber">365</context>
+          <context context-type="linenumber">373</context>
         </context-group>
         <target state="translated">LLM-Einbettungschunkgröße</target>
       </trans-unit>
@@ -13317,7 +13333,7 @@
         <source>LLM Context Size</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-          <context context-type="linenumber">372</context>
+          <context context-type="linenumber">380</context>
         </context-group>
         <target state="translated">LLM-Kontextgröße</target>
       </trans-unit>
@@ -13325,7 +13341,7 @@
         <source>LLM Backend</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-          <context context-type="linenumber">379</context>
+          <context context-type="linenumber">387</context>
         </context-group>
         <target state="final">LLM-Backend</target>
       </trans-unit>
@@ -13333,7 +13349,7 @@
         <source>LLM Model</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-          <context context-type="linenumber">387</context>
+          <context context-type="linenumber">395</context>
         </context-group>
         <target state="final">LLM-Modell</target>
       </trans-unit>
@@ -13341,7 +13357,7 @@
         <source>LLM API Key</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-          <context context-type="linenumber">394</context>
+          <context context-type="linenumber">402</context>
         </context-group>
         <target state="final">LLM API-Schlüssel</target>
       </trans-unit>
@@ -13349,7 +13365,7 @@
         <source>LLM Endpoint</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-          <context context-type="linenumber">401</context>
+          <context context-type="linenumber">409</context>
         </context-group>
         <target state="final">LLM-Endpunkt</target>
       </trans-unit>
@@ -13357,7 +13373,7 @@
         <source>LLM Output Language</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-          <context context-type="linenumber">408</context>
+          <context context-type="linenumber">416</context>
         </context-group>
         <target state="translated">LLM-Ausgabesprache</target>
       </trans-unit>
@@ -13365,7 +13381,7 @@
         <source>Language to use for generated AI suggestions. When unset, AI suggestions use the user&apos;s display language if explicitly set.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-          <context context-type="linenumber">412</context>
+          <context context-type="linenumber">420</context>
         </context-group>
         <target state="translated">Sprache, die für KI-Vorschläge verwendet werden soll. Wenn sie nicht gesetzt ist, verwenden KI-Vorschläge die Anzeigesprache des Benutzers, sofern diese explizit festgelegt ist.</target>
       </trans-unit>
@@ -13373,7 +13389,7 @@
         <source>LLM Request Timeout</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-          <context context-type="linenumber">416</context>
+          <context context-type="linenumber">424</context>
         </context-group>
         <target state="translated">LLM-Anfrage Zeitüberschreitung</target>
       </trans-unit>
@@ -13381,7 +13397,7 @@
         <source>Timeout in seconds for LLM requests.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-          <context context-type="linenumber">420</context>
+          <context context-type="linenumber">428</context>
         </context-group>
         <target state="translated">Zeiltimit in Sekunden für LLM-Anfragen.</target>
       </trans-unit>
