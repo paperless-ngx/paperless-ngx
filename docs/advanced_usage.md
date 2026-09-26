@@ -136,13 +136,15 @@ for suggested generation and embedding models.
 ### AI-assisted suggestions
 
 With AI enabled, Paperless-ngx can suggest a title, tags, correspondent, document type,
-storage path and dates by sending the document to the LLM. This is **opt-in per request**
-and surfaces through the "Suggest" control on the document detail page, alongside the
-classic classifier-based suggestions — it does not disable them. Suggestions are requested
-automatically when you open a document that carries an inbox tag unless "Automatically request
-suggestions for inbox documents" under Settings > Documents is disabled. Suggestion output
-language can be steered with
-[`PAPERLESS_AI_LLM_OUTPUT_LANGUAGE`](configuration.md#PAPERLESS_AI_LLM_OUTPUT_LANGUAGE)
+storage path and dates by sending the document to the LLM using "Suggest" button on the document
+detail page. You can choose which type of suggestions are requested by default under Settings >
+Documents, either ML (classifier-based) suggestions, AI suggestions, or both. When both are requested
+the results are combined.
+
+Suggestions are requested automatically when you open a document that carries an inbox tag
+unless "Automatically request suggestions for inbox documents" under Settings > Documents is disabled.
+
+Suggestion output language can be steered with [`PAPERLESS_AI_LLM_OUTPUT_LANGUAGE`](configuration.md#PAPERLESS_AI_LLM_OUTPUT_LANGUAGE)
 (otherwise it follows the user's UI language).
 
 ### The LLM index (RAG) and similar documents

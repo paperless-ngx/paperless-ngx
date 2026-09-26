@@ -253,6 +253,24 @@
               </div>
             </div>
 
+            @if (aiEnabled) {
+              <div class="row mb-3">
+                <div class="col-md-3 col-form-label pt-0">
+                  <span i18n>Suggestions default to</span>
+                </div>
+                <div class="col">
+                  <fieldset class="btn-group btn-group-sm">
+                    <input type="radio" class="btn-check" id="suggestionSourceBoth" [value]="SuggestionSource.Both" formControlName="documentEditingSuggestionSource">
+                    <label class="btn btn-outline-primary" for="suggestionSourceBoth"><ng-container i18n>Both</ng-container></label>
+                    <input type="radio" class="btn-check" id="suggestionSourceML" [value]="SuggestionSource.ML" formControlName="documentEditingSuggestionSource">
+                    <label class="btn btn-outline-primary" for="suggestionSourceML"><i-bs class="me-1" name="cpu"></i-bs><ng-container i18n>ML only</ng-container></label>
+                    <input type="radio" class="btn-check" id="suggestionSourceAI" [value]="SuggestionSource.AI" formControlName="documentEditingSuggestionSource">
+                    <label class="btn btn-outline-primary" for="suggestionSourceAI"><i-bs class="me-1" name="stars"></i-bs><ng-container i18n>AI only</ng-container></label>
+                  </fieldset>
+                </div>
+              </div>
+            }
+
             <div class="row">
               <div class="col">
                 <pngx-input-check i18n-title title="Automatically request suggestions for inbox documents" i18n-hint hint="If un-checked, suggestions must be requested via the Suggest button." formControlName="documentEditingAutoSuggest"></pngx-input-check>
