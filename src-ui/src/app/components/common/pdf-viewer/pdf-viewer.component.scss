@@ -163,6 +163,7 @@
     position: absolute;
     inset: 0;
     font-size: 1em;
+    transition: none;
   }
 
   & :is(.linkAnnotation, .buttonWidgetAnnotation.pushButton):not(.hasBorder)
