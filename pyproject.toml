@@ -19,7 +19,6 @@ classifiers = [
 dependencies = [
   "azure-ai-documentintelligence>=1.0.2",
   "babel>=2.17",
-  "bleach~=6.4.0",
   "celery[redis]~=5.6.2",
   "channels~=4.2",
   "channels-redis~=4.2",
@@ -77,6 +76,7 @@ dependencies = [
   "tantivy~=0.26.0",
   "tika-client[httpx]~=1.0",
   "torch>=2.13,<2.15",
+  "turbohtml~=1.10.0",
   "watchfiles>=1.2",
   "whitenoise~=6.11",
   "whoosh-compat[tantivy]==0.3",
@@ -136,7 +136,6 @@ typing = [
   "mypy",
   "mypy-baseline",
   "pyrefly",
-  "types-bleach",
   "types-channels",
   "types-colorama",
   "types-dateparser",
