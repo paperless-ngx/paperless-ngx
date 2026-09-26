@@ -10740,7 +10740,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">348</context>
+          <context context-type="linenumber">351</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-attributes/document-attributes.component.html</context>
@@ -10756,7 +10756,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">341</context>
+          <context context-type="linenumber">344</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-attributes/document-attributes.component.html</context>
@@ -11040,7 +11040,7 @@
         <source>Reset filters / selection</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">329</context>
+          <context context-type="linenumber">332</context>
         </context-group>
         <target state="translated">重置筛选 / 选择</target>
       </trans-unit>
@@ -11048,7 +11048,7 @@
         <source>Open first [selected] document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">357</context>
+          <context context-type="linenumber">360</context>
         </context-group>
         <target state="translated">打开第一个 [已选中] 文档</target>
       </trans-unit>
@@ -11056,7 +11056,7 @@
         <source>Previous page</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">373</context>
+          <context context-type="linenumber">376</context>
         </context-group>
         <target state="translated">上一頁</target>
       </trans-unit>
@@ -11064,7 +11064,7 @@
         <source>Next page</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">385</context>
+          <context context-type="linenumber">388</context>
         </context-group>
         <target state="translated">下一頁</target>
       </trans-unit>
@@ -11072,7 +11072,7 @@
         <source>View &quot;<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>&quot; saved successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">419</context>
+          <context context-type="linenumber">422</context>
         </context-group>
         <target state="translated">视图<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>保存成功。</target>
       </trans-unit>
@@ -11080,7 +11080,7 @@
         <source>Failed to save view &quot;<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>&quot;.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">425</context>
+          <context context-type="linenumber">428</context>
         </context-group>
         <target state="translated">无法保存视图 "<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>"。</target>
       </trans-unit>
@@ -11088,7 +11088,7 @@
         <source>View &quot;<x id="PH" equiv-text="savedView.name"/>&quot; created successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">494</context>
+          <context context-type="linenumber">497</context>
         </context-group>
         <target state="translated">视图：<x id="PH" equiv-text="savedView.name"/>创建成功。</target>
       </trans-unit>
@@ -11096,7 +11096,7 @@
         <source>View &quot;<x id="PH" equiv-text="savedView.name"/>&quot; created successfully, but could not update visibility settings.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">500</context>
+          <context context-type="linenumber">503</context>
         </context-group>
         <target state="translated">已成功创建视图“<x id="PH" equiv-text="savedView.name"/>”，但无法更新可见性设置。</target>
       </trans-unit>
@@ -13298,11 +13298,27 @@
         </context-group>
         <target state="translated">LLM 嵌入模型</target>
       </trans-unit>
+      <trans-unit id="861068592166833023" datatype="html">
+        <source>LLM Embedding API Key</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
+          <context context-type="linenumber">358</context>
+        </context-group>
+        <target state="needs-translation">LLM Embedding API Key</target>
+      </trans-unit>
+      <trans-unit id="2929108042259892948" datatype="html">
+        <source>Used for embeddings when set, otherwise LLM API key is used.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
+          <context context-type="linenumber">360</context>
+        </context-group>
+        <target state="needs-translation">Used for embeddings when set, otherwise LLM API key is used.</target>
+      </trans-unit>
       <trans-unit id="3554114880473286122" datatype="html">
         <source>LLM Embedding Endpoint</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-          <context context-type="linenumber">358</context>
+          <context context-type="linenumber">366</context>
         </context-group>
         <target state="translated">LLM 嵌入接口</target>
       </trans-unit>
@@ -13310,7 +13326,7 @@
         <source>LLM Embedding Chunk Size</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-          <context context-type="linenumber">365</context>
+          <context context-type="linenumber">373</context>
         </context-group>
         <target state="translated">LLM 嵌入块大小</target>
       </trans-unit>
@@ -13318,7 +13334,7 @@
         <source>LLM Context Size</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-          <context context-type="linenumber">372</context>
+          <context context-type="linenumber">380</context>
         </context-group>
         <target state="translated">LLM 上下文大小</target>
       </trans-unit>
@@ -13326,7 +13342,7 @@
         <source>LLM Backend</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-          <context context-type="linenumber">379</context>
+          <context context-type="linenumber">387</context>
         </context-group>
         <target state="translated">LLM 后端</target>
       </trans-unit>
@@ -13334,7 +13350,7 @@
         <source>LLM Model</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-          <context context-type="linenumber">387</context>
+          <context context-type="linenumber">395</context>
         </context-group>
         <target state="translated">LLM 模型</target>
       </trans-unit>
@@ -13342,7 +13358,7 @@
         <source>LLM API Key</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-          <context context-type="linenumber">394</context>
+          <context context-type="linenumber">402</context>
         </context-group>
         <target state="translated">LLM API 密钥</target>
       </trans-unit>
@@ -13350,7 +13366,7 @@
         <source>LLM Endpoint</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-          <context context-type="linenumber">401</context>
+          <context context-type="linenumber">409</context>
         </context-group>
         <target state="translated">LLM 接口</target>
       </trans-unit>
@@ -13358,7 +13374,7 @@
         <source>LLM Output Language</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-          <context context-type="linenumber">408</context>
+          <context context-type="linenumber">416</context>
         </context-group>
         <target state="translated">LLM 输出语言</target>
       </trans-unit>
@@ -13366,7 +13382,7 @@
         <source>Language to use for generated AI suggestions. When unset, AI suggestions use the user&apos;s display language if explicitly set.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-          <context context-type="linenumber">412</context>
+          <context context-type="linenumber">420</context>
         </context-group>
         <target state="translated">用于生成 AI 建议的语言。未设置时，如果用户明确设置了显示语言，AI 建议将使用该语言。</target>
       </trans-unit>
@@ -13374,7 +13390,7 @@
         <source>LLM Request Timeout</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-          <context context-type="linenumber">416</context>
+          <context context-type="linenumber">424</context>
         </context-group>
         <target state="translated">LLM 请求超时</target>
       </trans-unit>
@@ -13382,7 +13398,7 @@
         <source>Timeout in seconds for LLM requests.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-          <context context-type="linenumber">420</context>
+          <context context-type="linenumber">428</context>
         </context-group>
         <target state="translated">LLM 请求超时时间（秒）。</target>
       </trans-unit>

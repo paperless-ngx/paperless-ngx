@@ -17,7 +17,7 @@
           <context context-type="linenumber">129</context>
         </context-group>
         <note priority="1" from="description">Currently selected slide number read by screen reader</note>
-        <target state="needs-translation"> Slide <x id="INTERPOLATION"/> of <x id="INTERPOLATION_1"/> </target>
+        <target state="translated">Snímka <x id="INTERPOLATION"/> z <x id="INTERPOLATION_1"/></target>
       </trans-unit>
       <trans-unit id="ngb.carousel.previous" datatype="html">
         <source>Previous</source>
@@ -479,7 +479,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">201</context>
         </context-group>
-        <target state="needs-translation">Attributes like tags, correspondents, document types, storage paths and custom fields can all be managed here. They can also be created from the document edit view.</target>
+        <target state="translated">Tu možno spravovať atribúty, ako sú štítky, korešpondenti, typy dokumentov, cesty k úložisku a vlastné polia. Možno ich vytvárať aj v zobrazení úpravy dokumentu.</target>
       </trans-unit>
       <trans-unit id="7851939076947092983" datatype="html">
         <source>Manage e-mail accounts and rules for automatically importing documents.</source>
@@ -507,7 +507,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">225</context>
         </context-group>
-        <target state="needs-translation">Tasks helps you track background work, what needs attention, and what recently completed.</target>
+        <target state="translated">Funkcia Úlohy vám pomáha sledovať prácu na pozadí, záležitosti vyžadujúce pozornosť a nedávno dokončené úlohy.</target>
       </trans-unit>
       <trans-unit id="2755033621682206902" datatype="html">
         <source>Check out the settings for various tweaks to the web app.</source>
@@ -515,7 +515,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">233</context>
         </context-group>
-        <target state="needs-translation">Check out the settings for various tweaks to the web app.</target>
+        <target state="translated">Pozrite si nastavenia rôznych vylepšení webovej aplikácie.</target>
       </trans-unit>
       <trans-unit id="7172877665285340082" datatype="html">
         <source>Thank you! 🙏</source>
@@ -555,7 +555,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
           <context context-type="linenumber">4,5</context>
         </context-group>
-        <target state="needs-translation">Global app configuration options which apply to &lt;strong&gt;every&lt;/strong&gt; user of this install of Paperless-ngx. Options can also be set using environment variables or the configuration file but the value here will always take precedence.</target>
+        <target state="translated">Globálne možnosti konfigurácie aplikácie, ktoré sa vzťahujú na &lt;strong&gt;každého&lt;/strong&gt; používateľa tejto inštalácie Paperless-ngx. Možnosti možno nastaviť aj pomocou premenných prostredia alebo konfiguračného súboru, avšak tu uvedená hodnota bude mať vždy prednosť.</target>
       </trans-unit>
       <trans-unit id="7991430199894172363" datatype="html">
         <source>Read the documentation about this setting</source>
@@ -563,7 +563,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
           <context context-type="linenumber">30</context>
         </context-group>
-        <target state="needs-translation">Read the documentation about this setting</target>
+        <target state="translated">Prečítajte si dokumentáciu k tomuto nastaveniu.</target>
       </trans-unit>
       <trans-unit id="7057826840809102816" datatype="html">
         <source>This value overrides <x id="INTERPOLATION" equiv-text="{{option.config_key}}"/>, which is set outside Paperless.</source>
@@ -571,7 +571,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
           <context context-type="linenumber">35</context>
         </context-group>
-        <target state="needs-translation">This value overrides <x id="INTERPOLATION" equiv-text="{{option.config_key}}"/>, which is set outside Paperless.</target>
+        <target state="translated">Táto hodnota prepíše <x id="INTERPOLATION" equiv-text="{{option.config_key}}"/>, ktorá je nastavená mimo Paperless.</target>
       </trans-unit>
       <trans-unit id="7221396516204435584" datatype="html">
         <source><x id="INTERPOLATION" equiv-text="{{option.config_key}}"/> is set outside Paperless. Enter a value here to override it.</source>
@@ -579,7 +579,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
           <context context-type="linenumber">37</context>
         </context-group>
-        <target state="needs-translation"><x id="INTERPOLATION" equiv-text="{{option.config_key}}"/> is set outside Paperless. Enter a value here to override it.</target>
+        <target state="translated"><x id="INTERPOLATION" equiv-text="{{option.config_key}}"/> je nastavené mimo aplikácie Paperless. Zadajte sem hodnotu, ak chcete toto nastavenie prepísať.</target>
       </trans-unit>
       <trans-unit id="8318849619178340389" datatype="html">
         <source>Use the externally configured value</source>
@@ -587,7 +587,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
           <context context-type="linenumber">42</context>
         </context-group>
-        <target state="needs-translation">Use the externally configured value</target>
+        <target state="translated">Použite externe nakonfigurovanú hodnotu.</target>
       </trans-unit>
       <trans-unit id="6032629623003430385" datatype="html">
         <source>Reset to external</source>
@@ -595,7 +595,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
           <context context-type="linenumber">43</context>
         </context-group>
-        <target state="needs-translation">Reset to external</target>
+        <target state="translated">Obnoviť na externé</target>
       </trans-unit>
       <trans-unit id="7808756054397155068" datatype="html">
         <source>Reset</source>
@@ -1271,7 +1271,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">188</context>
         </context-group>
-        <target state="needs-translation"> Update checking works by pinging the public GitHub API for the latest release to determine whether a new version is available. Actual updating of the app must still be performed manually. </target>
+        <target state="translated">Kontrola aktualizácií funguje tak, že sa prostredníctvom verejného rozhrania GitHub API zisťuje najnovšie vydanie, čím sa overuje dostupnosť novej verzie. Samotnú aktualizáciu aplikácie je však stále nutné vykonať manuálne.</target>
       </trans-unit>
       <trans-unit id="8416061320800650487" datatype="html">
         <source>No tracking data is collected by the app in any way.</source>
@@ -1279,7 +1279,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">191,192</context>
         </context-group>
-        <target state="needs-translation">No tracking data is collected by the app in any way.</target>
+        <target state="translated">Aplikácia žiadnym spôsobom nezhromažďuje žiadne údaje o sledovaní.</target>
       </trans-unit>
       <trans-unit id="5775451530782446954" datatype="html">
         <source>Saved Views</source>
@@ -1323,7 +1323,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">201</context>
         </context-group>
-        <target state="needs-translation">Show document counts in sidebar saved views</target>
+        <target state="translated">Zobraziť počty dokumentov pri uložených zobrazeniach na bočnom paneli</target>
       </trans-unit>
       <trans-unit id="8939587804990976924" datatype="html">
         <source>Items per page</source>
@@ -1387,7 +1387,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">246,247</context>
         </context-group>
-        <target state="needs-translation">Only applies to the Paperless-ngx PDF viewer.</target>
+        <target state="translated">Vzťahuje sa len na prehliadač PDF v aplikácii Paperless-ngx.</target>
       </trans-unit>
       <trans-unit id="2959590948110714366" datatype="html">
         <source>Automatically remove inbox tag(s) on save</source>
@@ -1395,7 +1395,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">252</context>
         </context-group>
-        <target state="needs-translation">Automatically remove inbox tag(s) on save</target>
+        <target state="translated">Automaticky odstrániť štítky doručenej pošty pri uložení</target>
       </trans-unit>
       <trans-unit id="1043449647727456069" datatype="html">
         <source>Automatically request suggestions for inbox documents</source>
@@ -1403,7 +1403,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">258</context>
         </context-group>
-        <target state="needs-translation">Automatically request suggestions for inbox documents</target>
+        <target state="translated">Automaticky vyžiadať návrhy pre dokumenty v doručenej pošte</target>
       </trans-unit>
       <trans-unit id="460700039378563125" datatype="html">
         <source>If un-checked, suggestions must be requested via the Suggest button.</source>
@@ -1411,7 +1411,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">258</context>
         </context-group>
-        <target state="needs-translation">If un-checked, suggestions must be requested via the Suggest button.</target>
+        <target state="translated">Ak políčko nie je začiarknuté, o návrhy treba požiadať pomocou tlačidla „Navrhnúť“.</target>
       </trans-unit>
       <trans-unit id="8793267604636304297" datatype="html">
         <source>Show document thumbnail during loading</source>
@@ -1419,7 +1419,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">264</context>
         </context-group>
-        <target state="needs-translation">Show document thumbnail during loading</target>
+        <target state="translated">Zobraziť miniatúru dokumentu počas načítavania</target>
       </trans-unit>
       <trans-unit id="1783600598811723080" datatype="html">
         <source>Built-in fields to show:</source>
@@ -1427,7 +1427,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">270,271</context>
         </context-group>
-        <target state="needs-translation">Built-in fields to show:</target>
+        <target state="translated">Vstavané polia na zobrazenie:</target>
       </trans-unit>
       <trans-unit id="3467966318201103991" datatype="html">
         <source>Uncheck fields to hide them on the document details page.</source>
@@ -1435,7 +1435,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">282,283</context>
         </context-group>
-        <target state="needs-translation">Uncheck fields to hide them on the document details page.</target>
+        <target state="translated">Zrušením zaškrtnutia políčok ich skryjete na stránke s podrobnosťami o dokumente.</target>
       </trans-unit>
       <trans-unit id="8508424367627989968" datatype="html">
         <source>Bulk editing</source>
@@ -1483,7 +1483,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">299,300</context>
         </context-group>
-        <target state="needs-translation">Default editing mode</target>
+        <target state="translated">Predvolený režim úprav</target>
       </trans-unit>
       <trans-unit id="7273640930165035289" datatype="html">
         <source>Create new document(s)</source>
@@ -1607,7 +1607,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">329</context>
         </context-group>
-        <target state="needs-translation"> Settings apply to this user account for objects (Tags, Mail Rules, etc.) created via the web UI. These settings do not apply to documents. </target>
+        <target state="translated">Nastavenia sa pre tento používateľský účet vzťahujú na objekty (štítky, pravidlá pre poštu atď.) vytvorené prostredníctvom webového rozhrania. Tieto nastavenia sa nevzťahujú na dokumenty.</target>
       </trans-unit>
       <trans-unit id="4292903881380648974" datatype="html">
         <source>Default Owner</source>
@@ -2003,7 +2003,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">99,100</context>
         </context-group>
-        <target state="needs-translation">Share Links</target>
+        <target state="translated">Odkazy pre zdieľanie</target>
       </trans-unit>
       <trans-unit id="2889601918256567804" datatype="html">
         <source>Workflows</source>
@@ -2179,7 +2179,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.html</context>
           <context context-type="linenumber">4,5</context>
         </context-group>
-        <target state="needs-translation">Tasks shows detailed information about document consumption and system tasks.</target>
+        <target state="translated">Sekcia Úlohy zobrazuje podrobné informácie o spracovaní dokumentov a systémových úlohách.</target>
       </trans-unit>
       <trans-unit id="103921551219467537" datatype="html">
         <source>Clear selection</source>
@@ -2319,7 +2319,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.html</context>
           <context context-type="linenumber">122</context>
         </context-group>
-        <target state="needs-translation">{VAR_PLURAL, plural, =1 {1 task} other {<x id="INTERPOLATION"/> tasks}}</target>
+        <target state="translated">{VAR_PLURAL, plural, =1 {1 task} other {<x id="INTERPOLATION"/> tasks}}</target>
       </trans-unit>
       <trans-unit id="8953033926734869941" datatype="html">
         <source>Name</source>
@@ -2619,7 +2619,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.html</context>
           <context context-type="linenumber">207</context>
         </context-group>
-        <target state="needs-translation">View task details</target>
+        <target state="translated">Zobraziť podrobnosti úlohy</target>
       </trans-unit>
       <trans-unit id="1536087519743707362" datatype="html">
         <source>Dismiss</source>
@@ -2723,7 +2723,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.html</context>
           <context context-type="linenumber">285,287</context>
         </context-group>
-        <target state="needs-translation">No tasks match the current filters.</target>
+        <target state="translated">Žiadne úlohy nezodpovedajú aktuálnym filtrom.</target>
       </trans-unit>
       <trans-unit id="2525230676386818985" datatype="html">
         <source>Result</source>
@@ -2755,7 +2755,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">57</context>
         </context-group>
-        <target state="needs-translation">Recently completed</target>
+        <target state="translated">Nedávno dokončené</target>
       </trans-unit>
       <trans-unit id="2936452645673957909" datatype="html">
         <source>Consume File</source>
@@ -2855,7 +2855,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">104</context>
         </context-group>
-        <target state="needs-translation">Apply AI Suggestions</target>
+        <target state="translated">Použiť návrhy umelej inteligencie</target>
       </trans-unit>
       <trans-unit id="9172233176401579786" datatype="html">
         <source>Scheduled</source>
@@ -2999,7 +2999,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">412</context>
         </context-group>
-        <target state="needs-translation">Success. New document id <x id="PH" equiv-text="documentId"/> created</target>
+        <target state="translated">Úspešné. Vytvorené nové ID dokumentu <x id="PH" equiv-text="documentId"/>.</target>
       </trans-unit>
       <trans-unit id="8760066891202884337" datatype="html">
         <source>Duplicate of document #<x id="PH" equiv-text="duplicateOf"/></source>
@@ -3011,7 +3011,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">456</context>
         </context-group>
-        <target state="needs-translation">Duplicate of document #<x id="PH" equiv-text="duplicateOf"/></target>
+        <target state="translated">Kópia dokumentu č. <x id="PH" equiv-text="duplicateOf"/></target>
       </trans-unit>
       <trans-unit id="3418677553313974490" datatype="html">
         <source>Trash</source>
@@ -3035,7 +3035,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
           <context context-type="linenumber">4,5</context>
         </context-group>
-        <target state="needs-translation">Manage trashed documents that are pending deletion.</target>
+        <target state="translated">Spravujte dokumenty v koši, ktoré čakajú na odstránenie.</target>
       </trans-unit>
       <trans-unit id="3186604097120837257" datatype="html">
         <source>Restore selected</source>
@@ -3083,7 +3083,7 @@
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
           <context context-type="linenumber">65,66</context>
         </context-group>
-        <target state="needs-translation"><x id="INTERPOLATION" equiv-text="{{ getDaysRemaining(document) }}"/> days</target>
+        <target state="translated"><x id="INTERPOLATION" equiv-text="{{ getDaysRemaining(document) }}"/> dni</target>
       </trans-unit>
       <trans-unit id="6770769801335635194" datatype="html">
         <source>Restore</source>
@@ -10741,7 +10741,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">348</context>
+          <context context-type="linenumber">351</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-attributes/document-attributes.component.html</context>
@@ -10757,7 +10757,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">341</context>
+          <context context-type="linenumber">344</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-attributes/document-attributes.component.html</context>
@@ -11041,7 +11041,7 @@
         <source>Reset filters / selection</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">329</context>
+          <context context-type="linenumber">332</context>
         </context-group>
         <target state="needs-translation">Reset filters / selection</target>
       </trans-unit>
@@ -11049,7 +11049,7 @@
         <source>Open first [selected] document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">357</context>
+          <context context-type="linenumber">360</context>
         </context-group>
         <target state="needs-translation">Open first [selected] document</target>
       </trans-unit>
@@ -11057,7 +11057,7 @@
         <source>Previous page</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">373</context>
+          <context context-type="linenumber">376</context>
         </context-group>
         <target state="needs-translation">Previous page</target>
       </trans-unit>
@@ -11065,7 +11065,7 @@
         <source>Next page</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">385</context>
+          <context context-type="linenumber">388</context>
         </context-group>
         <target state="needs-translation">Next page</target>
       </trans-unit>
@@ -11073,7 +11073,7 @@
         <source>View &quot;<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>&quot; saved successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">419</context>
+          <context context-type="linenumber">422</context>
         </context-group>
         <target state="translated">Pohľad "<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>" úspešne uložený.</target>
       </trans-unit>
@@ -11081,7 +11081,7 @@
         <source>Failed to save view &quot;<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>&quot;.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">425</context>
+          <context context-type="linenumber">428</context>
         </context-group>
         <target state="needs-translation">Failed to save view "<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>".</target>
       </trans-unit>
@@ -11089,7 +11089,7 @@
         <source>View &quot;<x id="PH" equiv-text="savedView.name"/>&quot; created successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">494</context>
+          <context context-type="linenumber">497</context>
         </context-group>
         <target state="translated">Pohľad "<x id="PH" equiv-text="savedView.name"/>" úspešne vytvorený.</target>
       </trans-unit>
@@ -11097,7 +11097,7 @@
         <source>View &quot;<x id="PH" equiv-text="savedView.name"/>&quot; created successfully, but could not update visibility settings.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">500</context>
+          <context context-type="linenumber">503</context>
         </context-group>
         <target state="needs-translation">View "<x id="PH" equiv-text="savedView.name"/>" created successfully, but could not update visibility settings.</target>
       </trans-unit>
@@ -13298,11 +13298,27 @@
         </context-group>
         <target state="needs-translation">LLM Embedding Model</target>
       </trans-unit>
+      <trans-unit id="861068592166833023" datatype="html">
+        <source>LLM Embedding API Key</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
+          <context context-type="linenumber">358</context>
+        </context-group>
+        <target state="needs-translation">LLM Embedding API Key</target>
+      </trans-unit>
+      <trans-unit id="2929108042259892948" datatype="html">
+        <source>Used for embeddings when set, otherwise LLM API key is used.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
+          <context context-type="linenumber">360</context>
+        </context-group>
+        <target state="needs-translation">Used for embeddings when set, otherwise LLM API key is used.</target>
+      </trans-unit>
       <trans-unit id="3554114880473286122" datatype="html">
         <source>LLM Embedding Endpoint</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-          <context context-type="linenumber">358</context>
+          <context context-type="linenumber">366</context>
         </context-group>
         <target state="needs-translation">LLM Embedding Endpoint</target>
       </trans-unit>
@@ -13310,7 +13326,7 @@
         <source>LLM Embedding Chunk Size</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-          <context context-type="linenumber">365</context>
+          <context context-type="linenumber">373</context>
         </context-group>
         <target state="needs-translation">LLM Embedding Chunk Size</target>
       </trans-unit>
@@ -13318,7 +13334,7 @@
         <source>LLM Context Size</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-          <context context-type="linenumber">372</context>
+          <context context-type="linenumber">380</context>
         </context-group>
         <target state="needs-translation">LLM Context Size</target>
       </trans-unit>
@@ -13326,7 +13342,7 @@
         <source>LLM Backend</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-          <context context-type="linenumber">379</context>
+          <context context-type="linenumber">387</context>
         </context-group>
         <target state="needs-translation">LLM Backend</target>
       </trans-unit>
@@ -13334,7 +13350,7 @@
         <source>LLM Model</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-          <context context-type="linenumber">387</context>
+          <context context-type="linenumber">395</context>
         </context-group>
         <target state="needs-translation">LLM Model</target>
       </trans-unit>
@@ -13342,7 +13358,7 @@
         <source>LLM API Key</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-          <context context-type="linenumber">394</context>
+          <context context-type="linenumber">402</context>
         </context-group>
         <target state="needs-translation">LLM API Key</target>
       </trans-unit>
@@ -13350,7 +13366,7 @@
         <source>LLM Endpoint</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-          <context context-type="linenumber">401</context>
+          <context context-type="linenumber">409</context>
         </context-group>
         <target state="needs-translation">LLM Endpoint</target>
       </trans-unit>
@@ -13358,7 +13374,7 @@
         <source>LLM Output Language</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-          <context context-type="linenumber">408</context>
+          <context context-type="linenumber">416</context>
         </context-group>
         <target state="needs-translation">LLM Output Language</target>
       </trans-unit>
@@ -13366,7 +13382,7 @@
         <source>Language to use for generated AI suggestions. When unset, AI suggestions use the user&apos;s display language if explicitly set.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-          <context context-type="linenumber">412</context>
+          <context context-type="linenumber">420</context>
         </context-group>
         <target state="needs-translation">Language to use for generated AI suggestions. When unset, AI suggestions use the user's display language if explicitly set.</target>
       </trans-unit>
@@ -13374,7 +13390,7 @@
         <source>LLM Request Timeout</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-          <context context-type="linenumber">416</context>
+          <context context-type="linenumber">424</context>
         </context-group>
         <target state="needs-translation">LLM Request Timeout</target>
       </trans-unit>
@@ -13382,7 +13398,7 @@
         <source>Timeout in seconds for LLM requests.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
-          <context context-type="linenumber">420</context>
+          <context context-type="linenumber">428</context>
         </context-group>
         <target state="needs-translation">Timeout in seconds for LLM requests.</target>
       </trans-unit>
