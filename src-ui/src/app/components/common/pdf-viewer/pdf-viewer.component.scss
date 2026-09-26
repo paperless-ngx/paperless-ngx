@@ -154,8 +154,21 @@
   & section {
     position: absolute;
     text-align: initial;
+    pointer-events: auto;
     box-sizing: border-box;
     transform-origin: 0 0;
+  }
+
+  & :is(.linkAnnotation, .buttonWidgetAnnotation.pushButton) > a {
+    position: absolute;
+    inset: 0;
+    font-size: 1em;
+  }
+
+  & :is(.linkAnnotation, .buttonWidgetAnnotation.pushButton):not(.hasBorder)
+    > a:hover {
+    opacity: 0.2;
+    background-color: rgb(255 255 0);
   }
 
   & .annotationTextContent {

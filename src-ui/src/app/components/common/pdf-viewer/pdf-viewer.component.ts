@@ -21,6 +21,7 @@ import {
 } from 'pdfjs-dist/legacy/build/pdf.mjs'
 import {
   EventBus,
+  LinkTarget,
   PDFFindController,
   PDFLinkService,
   PDFSinglePageViewer,
@@ -75,7 +76,11 @@ export class PngxPdfViewerComponent
   private lastViewerPage?: number
 
   private readonly eventBus = new EventBus()
-  private readonly linkService = new PDFLinkService({ eventBus: this.eventBus })
+  private readonly linkService = new PDFLinkService({
+    eventBus: this.eventBus,
+    externalLinkTarget: LinkTarget.BLANK,
+    externalLinkRel: 'noopener noreferrer nofollow',
+  })
   private readonly findController = new PDFFindController({
     eventBus: this.eventBus,
     linkService: this.linkService,
