@@ -35,6 +35,9 @@ class DocumentMetadataOverrides:
     version_label: str | None = None
     actor_id: int | None = None
     remote_ocr: bool = False
+    # Detected barcodes to store with the document, filled by the barcode
+    # plugin: dicts with page (1-indexed), value and format
+    barcodes: list[dict] | None = None
 
     def update(self, other: "DocumentMetadataOverrides") -> "DocumentMetadataOverrides":
         """

@@ -47,6 +47,7 @@ class Barcode:
     page: int
     value: str
     settings: BarcodeConfig
+    format: str = ""
 
     @property
     def is_separator(self) -> bool:
@@ -98,6 +99,7 @@ class BarcodePlugin(ConsumeTaskPlugin):
             self.settings.barcode_enable_asn
             or self.settings.barcodes_enabled
             or self.settings.barcode_enable_tag
+            or self.settings.barcode_store_values
         ) and self.input_doc.mime_type in supported_mimes
 
     def get_settings(self) -> BarcodeConfig:
@@ -244,6 +246,10 @@ class BarcodePlugin(ConsumeTaskPlugin):
         if self.settings.barcode_enable_asn and (located_asn := self.asn) is not None:
             self._apply_detected_asn(located_asn)
 
+        # After splitting too, so each split document keeps its own barcodes
+        if self.settings.barcode_store_values:
+            self.metadata.barcodes = self.barcode_values or None
+
     def cleanup(self) -> None:
         self.temp_dir.cleanup()
 
@@ -263,7 +269,10 @@ class BarcodePlugin(ConsumeTaskPlugin):
         self._tiff_conversion_done = True
 
     @staticmethod
-    def read_barcodes_zxing(image: Image.Image) -> list[str]:
+    def read_barcodes_zxing(image: Image.Image) -> list[tuple[str, str]]:
+        """
+        Returns the text and format name of each barcode found in the image
+        """
         barcodes = []
 
         import zxingcpp
@@ -271,7 +280,7 @@ class BarcodePlugin(ConsumeTaskPlugin):
         detected_barcodes = zxingcpp.read_barcodes(image)
         for barcode in detected_barcodes:
             if barcode.text:
-                barcodes.append(barcode.text)
+                barcodes.append((barcode.text, str(barcode.format)))
                 logger.debug(
                     f"Barcode of type {barcode.format} found: {barcode.text}",
                 )
@@ -337,9 +346,14 @@ class BarcodePlugin(ConsumeTaskPlugin):
                     )
 
                 # Detect barcodes
-                for barcode_value in self.read_barcodes_zxing(page):
+                for barcode_value, barcode_format in self.read_barcodes_zxing(page):
                     self.barcodes.append(
-                        Barcode(current_page_number, barcode_value, self.settings),
+                        Barcode(
+                            current_page_number,
+                            barcode_value,
+                            self.settings,
+                            barcode_format,
+                        ),
                     )
 
                 # Delete temporary image file
@@ -357,6 +371,17 @@ class BarcodePlugin(ConsumeTaskPlugin):
             logger.warning(
                 f"Exception during barcode scanning: {e}",
             )
+
+    @property
+    def barcode_values(self) -> list[dict]:
+        """
+        The detected barcodes as stored with the document, pages 1-indexed
+        """
+        self.detect()
+        return [
+            {"page": x.page + 1, "value": x.value, "format": x.format}
+            for x in self.barcodes
+        ]
 
     @property
     def asn(self) -> int | None:
@@ -534,3 +559,25 @@ class BarcodePlugin(ConsumeTaskPlugin):
                 document_paths.append(savepath)
 
             return document_paths
+
+
+def read_barcode_values(path: Path, work_dir: Path, task_id: str) -> list[dict]:
+    """
+    Reads the barcodes of a file as they are stored with a document, outside
+    of the regular consumption plugins: for new versions, which skip the
+    barcode plugin, and when reprocessing.
+    """
+    reader = BarcodePlugin(
+        ConsumableDocument(DocumentSource.ConsumeFolder, original_file=path),
+        DocumentMetadataOverrides(),
+        ProgressManager(path.name),
+        work_dir,
+        task_id,
+    )
+    if not reader.able_to_run:
+        return []
+    reader.setup()
+    try:
+        return reader.barcode_values
+    finally:
+        reader.cleanup()

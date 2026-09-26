@@ -845,6 +845,16 @@ class EmailDocumentDetailSchema(EmailSerializer):
                         required=False,
                     ),
                     "lang": serializers.CharField(),
+                    "barcodes": serializers.ListField(
+                        child=inline_serializer(
+                            name="DocumentBarcodeEntry",
+                            fields={
+                                "page": serializers.IntegerField(),
+                                "value": serializers.CharField(),
+                                "format": serializers.CharField(),
+                            },
+                        ),
+                    ),
                 },
             ),
             HTTPStatus.BAD_REQUEST: None,
@@ -1201,6 +1211,9 @@ class DocumentViewSet(
             ),
             # NotesSerializer nests the author, this avoids query per note
             Prefetch("notes", queryset=Note.objects.select_related("user")),
+            "barcodes",
+            # the barcodes of the newest version, see get_effective_barcodes()
+            "versions__barcodes",
         ]
         if self._needs_effective_content_prefetch():
             prefetches.append(latest_version_content_prefetch())
@@ -1522,6 +1535,7 @@ class DocumentViewSet(
             "original_filename": doc.original_filename,
             "archive_size": archive_filesize,
             "archive_metadata": archive_metadata,
+            "barcodes": list(doc.barcodes.values("page", "value", "format")),
         }
 
         lang = "en"

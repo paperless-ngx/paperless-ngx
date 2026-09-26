@@ -366,6 +366,37 @@ class Document(SoftDeleteModel, ModelWithOwner):  # type: ignore[django-manager-
             res += f" {self.title}"
         return res
 
+    def get_effective_barcodes(self) -> list["DocumentBarcode"]:
+        """
+        Returns the stored barcodes for the document, like
+        get_effective_content(): for root documents those of the latest
+        version when there is one, as that is the file users see.
+        """
+        # Here to avoid circular import
+        from documents.versioning import sort_versions_newest_first
+        from documents.versioning import versions_newest_first
+
+        if self.root_document_id is not None or self.pk is None:
+            return list(self.barcodes.all())
+
+        prefetched_cache = getattr(self, "_prefetched_objects_cache", None)
+        prefetched_versions = (
+            prefetched_cache.get("versions")
+            if isinstance(prefetched_cache, dict)
+            else None
+        )
+        if prefetched_versions is not None:
+            latest = (
+                sort_versions_newest_first(prefetched_versions)[0]
+                if prefetched_versions
+                else None
+            )
+        else:
+            latest = versions_newest_first(
+                Document.objects.filter(root_document=self),
+            ).first()
+        return list((latest or self).barcodes.all())
+
     def get_effective_content(self) -> str | None:
         """
         Returns the effective content for the document.
@@ -967,6 +998,37 @@ class Note(SoftDeleteModel):
 
     def __str__(self):
         return self.note
+
+
+class DocumentBarcode(models.Model):
+    """
+    A barcode found in a document during consumption, kept so its content
+    can be shown and copied
+    """
+
+    document = models.ForeignKey(
+        Document,
+        related_name="barcodes",
+        on_delete=models.CASCADE,
+        verbose_name=_("document"),
+    )
+
+    page = models.PositiveIntegerField(
+        _("page"),
+        help_text=_("Page of the original file, starting at 1"),
+    )
+
+    value = models.TextField(_("value"))
+
+    format = models.CharField(_("format"), max_length=64, blank=True)
+
+    class Meta:
+        ordering = ("page", "id")
+        verbose_name = _("document barcode")
+        verbose_name_plural = _("document barcodes")
+
+    def __str__(self):
+        return self.value
 
 
 class ShareLink(SoftDeleteModel):

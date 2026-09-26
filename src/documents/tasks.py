@@ -20,6 +20,7 @@ from filelock import FileLock
 
 from documents import sanity_checker
 from documents.barcodes import BarcodePlugin
+from documents.barcodes import read_barcode_values
 from documents.bulk_download import ArchiveOnlyStrategy
 from documents.bulk_download import OriginalsOnlyStrategy
 from documents.caching import clear_document_caches
@@ -43,6 +44,7 @@ from documents.matching import prefilter_documents_by_workflowtrigger
 from documents.models import Correspondent
 from documents.models import CustomFieldInstance
 from documents.models import Document
+from documents.models import DocumentBarcode
 from documents.models import DocumentType
 from documents.models import PaperlessTask
 from documents.models import ShareLink
@@ -67,6 +69,7 @@ from documents.utils import identity
 from documents.versioning import annotate_effective_content
 from documents.workflows.utils import get_workflows_for_trigger
 from paperless.config import AIConfig
+from paperless.config import BarcodeConfig
 from paperless.config import RemoteOCRConfig
 from paperless.logging import consume_task_id
 from paperless.parsers import ParserContext
@@ -341,6 +344,34 @@ def bulk_update_documents(document_ids) -> None:
         )
 
 
+def _maybe_update_stored_barcodes(document: Document) -> None:
+    """
+    Reads the barcodes of the original again and replaces the stored ones,
+    e.g. for documents consumed before storing barcodes was enabled
+    """
+    if not BarcodeConfig().barcode_store_values:
+        return
+    try:
+        with TemporaryDirectory(dir=settings.SCRATCH_DIR) as tmpdir:
+            values = read_barcode_values(
+                document.source_path,
+                Path(tmpdir),
+                f"barcodes-{document.pk}",
+            )
+
+        if values == list(document.barcodes.values("page", "value", "format")):
+            return
+        with transaction.atomic():
+            document.barcodes.all().delete()
+            DocumentBarcode.objects.bulk_create(
+                DocumentBarcode(document=document, **value) for value in values
+            )
+            # the metadata response is cached by modification time
+            Document.objects.filter(pk=document.pk).update(modified=timezone.now())
+    except Exception as e:
+        logger.warning(f"Could not read barcodes of document {document}: {e}")
+
+
 @shared_task
 def update_document_content_maybe_archive_file(
     document_id,
@@ -386,6 +417,8 @@ def update_document_content_maybe_archive_file(
                 mime_type,
                 produce_archive=produce_archive,
             )
+
+            _maybe_update_stored_barcodes(document)
 
             thumbnail = parser.get_thumbnail(document.source_path, mime_type)
 

@@ -1061,6 +1061,21 @@ notes.user:alice notes.note:insurance
 
 The bare `notes:` prefix is shorthand for `notes.note:`.
 
+#### Searching barcodes
+
+When [storing barcode contents](advanced_usage.md#barcode-contents) is enabled, the barcodes of a
+document are included in the full-text index, but a plain search without a field name does not look
+at them. Use the advanced search syntax to search by barcode content or type:
+
+```
+barcodes.value:DE89370400440532013000
+barcodes.format:"qr code"
+barcodes:wifi barcodes:guest
+```
+
+The bare `barcodes:` prefix is shorthand for `barcodes.value:`. As with custom fields, separators
+are stripped, so each part of a barcode such as `WIFI:S:Guest;P:secret;;` can be searched on its own.
+
 All of these can be combined. Syntax not described here may not work as expected, and an unknown field name is searched as ordinary text.
 
 !!! note

@@ -129,6 +129,7 @@ class BarcodeConfig(BaseConfig):
     barcode_enable_tag: bool = dataclasses.field(init=False)
     barcode_tag_mapping: dict[str, str] = dataclasses.field(init=False)
     barcode_tag_split: bool = dataclasses.field(init=False)
+    barcode_store_values: bool = dataclasses.field(init=False)
 
     def __post_init__(self) -> None:
         app_config = self._get_config_instance()
@@ -178,6 +179,11 @@ class BarcodeConfig(BaseConfig):
             app_config.barcode_tag_split
             if app_config.barcode_tag_split is not None
             else settings.CONSUMER_TAG_BARCODE_SPLIT
+        )
+        self.barcode_store_values = (
+            app_config.barcode_store_values
+            if app_config.barcode_store_values is not None
+            else settings.CONSUMER_STORE_BARCODE_VALUES
         )
 
 

@@ -1,0 +1,47 @@
+<h6 i18n>Barcodes</h6>
+<table class="table table-borderless align-baseline">
+  <thead>
+    <tr>
+      <th i18n>Page</th>
+      <th i18n>Type</th>
+      <th i18n>Content</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (barcode of barcodes(); track $index) {
+      <tr>
+        <td>{{ barcode.page }}</td>
+        <td class="text-nowrap">{{ barcode.format }}</td>
+        <td class="barcode-value">
+          @if (isLink(barcode.value)) {
+            <a
+              [href]="barcode.value"
+              target="_blank"
+              rel="noopener noreferrer nofollow"
+              >{{ barcode.value }}</a
+            >
+          } @else {
+            {{ barcode.value }}
+          }
+        </td>
+        <td class="text-end">
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-primary"
+            (click)="copy($index)"
+            title="Copy content"
+            i18n-title
+          >
+            @if (copiedIndex() === $index) {
+              <i-bs name="clipboard-check"></i-bs>
+            } @else {
+              <i-bs name="clipboard"></i-bs>
+            }
+            <span class="visually-hidden" i18n>Copy content</span>
+          </button>
+        </td>
+      </tr>
+    }
+  </tbody>
+</table>

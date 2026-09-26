@@ -74,6 +74,7 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
                 "barcode_enable_tag": None,
                 "barcode_tag_mapping": None,
                 "barcode_tag_split": None,
+                "barcode_store_values": None,
                 "remote_ocr_engine": None,
                 "remote_ocr_api_key": None,
                 "remote_ocr_endpoint": None,

@@ -1796,6 +1796,17 @@ assigns or creates tags if a properly formatted barcode is detected.
 
     Defaults to false.
 
+#### [`PAPERLESS_CONSUMER_STORE_BARCODE_VALUES=<bool>`](#PAPERLESS_CONSUMER_STORE_BARCODE_VALUES) {#PAPERLESS_CONSUMER_STORE_BARCODE_VALUES}
+
+: Stores the content of every barcode found during consumption with the
+document, together with its page and type.
+
+    The barcodes are listed on the Metadata tab of the document details,
+    where their content can be copied. See
+    [Barcode Contents](advanced_usage.md#barcode-contents) for details.
+
+    Defaults to false.
+
 ## Audit Trail
 
 #### [`PAPERLESS_AUDIT_LOG_ENABLED=<bool>`](#PAPERLESS_AUDIT_LOG_ENABLED) {#PAPERLESS_AUDIT_LOG_ENABLED}

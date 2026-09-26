@@ -311,7 +311,14 @@ class WriteBatch:
         queryset = annotate_effective_content(
             Document.objects.filter(pk__in=ids)
             .select_related("correspondent", "document_type", "storage_path", "owner")
-            .prefetch_related("tags", "notes__user", "custom_fields__field"),
+            .prefetch_related(
+                "tags",
+                "notes__user",
+                "custom_fields__field",
+                "barcodes",
+                # get_effective_barcodes() reads the newest version's barcodes
+                "versions__barcodes",
+            ),
         )
         for document, grant in _DocumentViewerStream(queryset, chunk_size=1000):
             self.remove(document.pk)
@@ -601,6 +608,18 @@ class TantivyBackend:
                 {
                     "name": normalize_search_text(cfi.field.name),
                     "value": normalize_search_text(search_value),
+                },
+            )
+
+        # Barcodes: JSON for structured queries (barcodes.value:x,
+        # barcodes.format:y), like custom fields reachable only through the
+        # JSON field. Only filled when storing barcode contents is enabled.
+        for barcode in document.get_effective_barcodes():
+            doc.add_json(
+                "barcodes",
+                {
+                    "value": normalize_search_text(barcode.value),
+                    "format": normalize_search_text(barcode.format),
                 },
             )
 
