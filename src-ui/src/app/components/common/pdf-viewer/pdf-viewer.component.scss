@@ -162,3 +162,7 @@
     opacity: 0;
   }
 }
+
+:host ::ng-deep .textLayer.selecting ~ .annotationLayer section {
+  pointer-events: none;
+}
