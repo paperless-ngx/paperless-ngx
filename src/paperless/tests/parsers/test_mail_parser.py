@@ -735,33 +735,24 @@ class TestParser:
 
             assert expected_html == actual_html
 
-    def test_mail_to_html_bounds_email_linkification(
+    def test_mail_to_html_linkifies_email_in_long_text(
         self,
         mail_parser: MailDocumentParser,
     ) -> None:
         mail = mock.Mock(
-            subject="sender@example.com",
+            subject="",
             from_values=None,
             to_values=[],
             cc_values=[],
             bcc_values=[],
             attachments=[],
             date=timezone.now(),
-            text=("a." * 1500) + "@example.com",
+            text=("a." * 1500) + " sender@example.com",
         )
 
-        with mock.patch(
-            "paperless.parsers.mail.linkify",
-            side_effect=lambda text, **kwargs: text,
-        ) as mock_linkify:
-            mail_parser.mail_to_html(mail)
+        html_file = mail_parser.mail_to_html(mail)
 
-        parse_email_by_text = {
-            call.args[0]: call.kwargs["parse_email"]
-            for call in mock_linkify.call_args_list
-        }
-        assert parse_email_by_text["sender@example.com"] is True
-        assert parse_email_by_text[mail.text] is False
+        assert 'href="mailto:sender@example.com"' in html_file.read_text()
 
     def test_generate_pdf_from_mail(
         self,
