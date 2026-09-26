@@ -1008,6 +1008,28 @@ documents to both separate and categorize them in a single operation.
 **Example:** A 6-page scan with TAG:invoice on page 3 and TAG:receipt on page 5 will create
 three documents: pages 1-2 (no tags), pages 3-4 (tagged "invoice"), and pages 5-6 (tagged "receipt").
 
+### Barcode Contents {#barcode-contents}
+
+When scanning for barcodes, Paperless reads every barcode on a document, but by default only
+uses those needed for splitting, ASNs or tags. When
+[`PAPERLESS_CONSUMER_STORE_BARCODE_VALUES`](configuration.md#PAPERLESS_CONSUMER_STORE_BARCODE_VALUES)
+is enabled, the content of all barcodes is stored with the document instead, for example
+payment codes, customer numbers or the text of a QR code.
+
+- The barcodes are listed on the **Metadata** tab of the document details with their page,
+  type and content. A button copies the content to the clipboard, and web addresses can be
+  opened directly.
+- The barcodes are part of the document in the API (field `barcodes` of `/api/documents/`
+  and of the document metadata), and can be searched with the
+  [advanced search syntax](usage.md#searching-barcodes), e.g. `barcodes:DE8937…`, also through
+  the API with `/api/documents/?query=barcodes:DE8937…`.
+- The barcodes are read from the original file during consumption, subject to
+  [`PAPERLESS_CONSUMER_BARCODE_MAX_PAGES`](configuration.md#PAPERLESS_CONSUMER_BARCODE_MAX_PAGES).
+  Documents consumed before the setting was enabled get their barcodes when they are
+  reprocessed.
+- Each version of a document keeps its own barcodes, e.g. after rotating or removing pages.
+  The document shows and is searched by the barcodes of its newest version.
+
 ## Automatic collation of double-sided documents {#collate}
 
 !!! note

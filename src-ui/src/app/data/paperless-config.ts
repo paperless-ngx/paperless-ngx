@@ -331,6 +331,13 @@ export const PaperlessConfigOptions: ConfigOption[] = [
     category: ConfigCategory.Barcode,
   },
   {
+    key: 'barcode_store_values',
+    title: $localize`Store Barcode Contents`,
+    type: ConfigOptionType.Boolean,
+    config_key: 'PAPERLESS_CONSUMER_STORE_BARCODE_VALUES',
+    category: ConfigCategory.Barcode,
+  },
+  {
     key: 'ai_enabled',
     title: $localize`AI Enabled`,
     type: ConfigOptionType.Boolean,
@@ -458,6 +465,7 @@ export interface PaperlessConfig extends ObjectWithId {
   barcode_enable_tag: boolean
   barcode_tag_mapping: object
   barcode_tag_split: boolean
+  barcode_store_values: boolean
   remote_ocr_engine: string
   remote_ocr_api_key: string
   remote_ocr_endpoint: string

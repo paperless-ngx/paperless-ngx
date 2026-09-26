@@ -45,6 +45,7 @@ from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
+from documents.models import DocumentBarcode
 from documents.models import DocumentType
 from documents.models import Note
 from documents.models import SavedView
@@ -353,6 +354,7 @@ class Command(CryptMixin, PaperlessCommand):
             "workflows": Workflow.objects.all(),
             "custom_fields": CustomField.objects.all(),
             "custom_field_instances": CustomFieldInstance.global_objects.all(),
+            "document_barcodes": DocumentBarcode.objects.all(),
             "app_configs": ApplicationConfiguration.objects.all(),
             "notes": Note.global_objects.all(),
             "documents": Document.global_objects.order_by("id").all(),

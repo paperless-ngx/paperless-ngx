@@ -39,4 +39,9 @@ PUBLIC_FIELDS: tuple[FieldSpec, ...] = (
         FieldKind.JSON,
         subpaths={"name": SubpathSpec(), "value": SubpathSpec(default=True)},
     ),
+    FieldSpec(
+        "barcodes",
+        FieldKind.JSON,
+        subpaths={"value": SubpathSpec(default=True), "format": SubpathSpec()},
+    ),
 )
