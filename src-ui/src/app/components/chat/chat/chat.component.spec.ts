@@ -207,4 +207,18 @@ describe('ChatComponent', () => {
     component.searchInputKeyDown(event)
     expect(component.sendMessage).not.toHaveBeenCalled()
   })
+
+  it('should render markdown for assistant messages only', () => {
+    component.messages.set([
+      { role: 'user', content: '**user**' },
+      { role: 'assistant', content: '**assistant** <script>x</script>' },
+    ])
+    fixture.detectChanges()
+    const el: HTMLElement = fixture.nativeElement
+    expect(el.querySelector('.chat-markdown strong')?.textContent).toBe(
+      'assistant'
+    )
+    expect(el.querySelector('.chat-markdown script')).toBeNull()
+    expect(el.textContent).toContain('**user**')
+  })
 })
