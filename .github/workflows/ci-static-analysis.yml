@@ -44,7 +44,7 @@ jobs:
       - name: Run Semgrep
         run: semgrep scan --config auto --sarif-output results.sarif
       - name: Upload results to GitHub code scanning
-        uses: github/codeql-action/upload-sarif@b96794f015dfd88f77b49b1c93e0fa7110f94c63 # v4.38.0
+        uses: github/codeql-action/upload-sarif@1c5b675653bb5c22dbe9b12b556ec555138e09fd # v4.38.1
         if: always()
         with:
           sarif_file: results.sarif
