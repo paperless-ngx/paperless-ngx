@@ -651,13 +651,45 @@ Install your package into the same Python environment as Paperless-ngx (or
 add it to the Docker image), and the parser will be discovered automatically
 on the next startup. No configuration changes are needed.
 
+#### 3. Installing into a derived Docker image
+
+If you distribute your parser as a Docker image derived from the official one,
+install it by building on top of the published image:
+
+```dockerfile
+FROM ghcr.io/paperless-ngx/paperless-ngx:3.1.3
+
+RUN pip install --no-cache-dir my-paperless-parser
+```
+
+!!! warning "Do not set a non-root `USER` in a derived image"
+
+    The official image leaves `USER` unset on purpose. Its s6-overlay
+    entrypoint (`/init`) starts as root and then drops privileges to the
+    paperless account itself, honouring `USERMAP_UID`/`USERMAP_GID` from your
+    environment file.
+
+    Adding a trailing `USER paperless` (or any other non-root account) to a
+    derived image pre-empts that handoff. The container then exits
+    immediately with status `0`, logs no error, and restarts in a loop — the
+    restart count climbs while the logs stay empty, which makes it look like
+    an image problem rather than an entrypoint problem.
+
+    If you need root for the install step, you can leave `USER` unset or state
+    `USER root` explicitly; both mean the same thing. Just do not switch away
+    from root. To check what an image declares:
+
+    ```console
+    $ docker inspect my-paperless-image --format '{{.Config.User}}'
+    ```
+
 To verify discovery, check the application logs at startup for a line like:
 
 ```
 Loaded third-party parser 'My Format Parser' v1.0.0 by Acme Corp (entrypoint: 'my_parser').
 ```
 
-#### 3. Utilities
+#### 4. Utilities
 
 `paperless.parsers.utils` provides helpers you can import directly:
 
