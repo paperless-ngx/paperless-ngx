@@ -31,14 +31,14 @@ describe('DocumentBarcodesComponent', () => {
 
   it('should display all barcodes', () => {
     const rows = fixture.nativeElement.querySelectorAll('tbody tr')
-    expect(rows.length).toEqual(3)
+    expect(rows).toHaveLength(3)
     expect(rows[0].textContent).toContain('ASN00123')
     expect(rows[0].textContent).toContain('Code 128')
   })
 
   it('should only link http(s) values', () => {
     const links = fixture.nativeElement.querySelectorAll('tbody a')
-    expect(links.length).toEqual(1)
+    expect(links).toHaveLength(1)
     expect(links[0].getAttribute('href')).toEqual(
       'https://example.com/invoice/4711'
     )

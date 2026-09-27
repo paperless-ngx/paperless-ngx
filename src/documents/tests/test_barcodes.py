@@ -2,6 +2,7 @@ import shutil
 from collections.abc import Generator
 from contextlib import contextmanager
 from pathlib import Path
+from unittest import mock
 
 import pytest
 from django.conf import settings
@@ -13,11 +14,13 @@ from rest_framework.test import APIClient
 
 from documents import tasks
 from documents.barcodes import BarcodePlugin
+from documents.barcodes import read_barcode_values
 from documents.consumer import ConsumerError
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
 from documents.models import Document
+from documents.models import DocumentBarcode
 from documents.models import Tag
 from documents.plugins.base import StopConsumeTaskError
 from documents.tests.utils import ConsumeTaskMixin
@@ -1142,6 +1145,96 @@ class TestBarcodeValues(
         {"page": 1, "value": "javascript:alert(1)", "format": "QR Code"},
         {"page": 2, "value": "https://example.com/invoice/4711", "format": "QR Code"},
     ]
+
+    def _document_with_barcode(self) -> Document:
+        document = Document.objects.create(
+            title="doc",
+            checksum="barcode-values",
+            mime_type="application/pdf",
+        )
+        DocumentBarcode.objects.create(
+            document=document,
+            **self.SAMPLE_VALUES[1],
+        )
+        return document
+
+    def test_barcode_str(self) -> None:
+        """
+        GIVEN:
+            - A stored barcode
+        WHEN:
+            - It is converted to a string
+        THEN:
+            - Its value is returned
+        """
+        barcode = self._document_with_barcode().barcodes.get()
+        self.assertEqual(str(barcode), "https://example.com/invoice/4711")
+
+    @override_settings(CONSUMER_STORE_BARCODE_VALUES=True)
+    def test_read_values_unsupported_file(self) -> None:
+        """
+        GIVEN:
+            - An image file, which the barcode plugin does not scan
+        WHEN:
+            - Its barcodes are read
+        THEN:
+            - No barcodes are returned
+        """
+        self.assertEqual(
+            read_barcode_values(
+                self.SAMPLE_DIR / "simple.jpg",
+                self.dirs.scratch_dir,
+                "task-id",
+            ),
+            [],
+        )
+
+    @override_settings(CONSUMER_STORE_BARCODE_VALUES=True)
+    def test_reprocess_values_unchanged(self) -> None:
+        """
+        GIVEN:
+            - A document whose stored barcodes match its file
+        WHEN:
+            - The barcodes are read again when reprocessing
+        THEN:
+            - Nothing is changed, the document is not marked as modified
+        """
+        document = self._document_with_barcode()
+        modified = document.modified
+
+        with mock.patch(
+            "documents.tasks.read_barcode_values",
+            return_value=[self.SAMPLE_VALUES[1]],
+        ):
+            tasks._maybe_update_stored_barcodes(document)
+
+        document.refresh_from_db()
+        self.assertEqual(document.modified, modified)
+        self.assertEqual(document.barcodes.count(), 1)
+
+    @override_settings(CONSUMER_STORE_BARCODE_VALUES=True)
+    def test_reprocess_values_failure_is_not_fatal(self) -> None:
+        """
+        GIVEN:
+            - A document with stored barcodes
+        WHEN:
+            - Reading the barcodes fails when reprocessing
+        THEN:
+            - A warning is logged and the stored barcodes are kept
+        """
+        document = self._document_with_barcode()
+
+        with (
+            mock.patch(
+                "documents.tasks.read_barcode_values",
+                side_effect=RuntimeError("broken"),
+            ),
+            self.assertLogs("paperless.tasks", level="WARNING") as logs,
+        ):
+            tasks._maybe_update_stored_barcodes(document)
+
+        self.assertIn("Could not read barcodes", logs.output[0])
+        self.assertEqual(document.barcodes.count(), 1)
 
     @override_settings(CONSUMER_STORE_BARCODE_VALUES=True)
     def test_values_detected(self) -> None:
