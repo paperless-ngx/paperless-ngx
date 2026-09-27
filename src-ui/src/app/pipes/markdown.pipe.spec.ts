@@ -1,0 +1,70 @@
+import { MarkdownPipe } from './markdown.pipe'
+
+describe('MarkdownPipe', () => {
+  const pipe = new MarkdownPipe()
+
+  it('should return empty string for empty input', () => {
+    expect(pipe.transform(null)).toEqual('')
+    expect(pipe.transform(undefined)).toEqual('')
+    expect(pipe.transform('')).toEqual('')
+  })
+
+  it('should render basic markdown', () => {
+    const html = pipe.transform(
+      '**bold** _em_ `code`\n\n- one\n- two\n\n| a | b |\n|---|---|\n| 1 | 2 |'
+    )
+    expect(html).toContain('<strong>bold</strong>')
+    expect(html).toContain('<em>em</em>')
+    expect(html).toContain('<code>code</code>')
+    expect(html).toContain('<li>one</li>')
+    expect(html).toContain('<table>')
+  })
+
+  it('should escape raw html', () => {
+    const html = pipe.transform(
+      'hi <img src=x onerror="alert(1)"> <b>x</b>\n\n<script>alert(1)</script>'
+    )
+    expect(html).not.toContain('<img')
+    expect(html).not.toContain('<script')
+    expect(html).not.toContain('<b>')
+    expect(html).toContain('&lt;script&gt;')
+  })
+
+  it('should not render images', () => {
+    const html = pipe.transform('![secret](https://evil.example/x.png?d=1)')
+    expect(html).not.toContain('<img')
+    expect(html).not.toContain('evil.example')
+    expect(html).toContain('secret')
+  })
+
+  it('should render safe links with target and rel', () => {
+    const html = pipe.transform('[docs](https://docs.paperless-ngx.com "Docs")')
+    expect(html).toContain(
+      '<a href="https://docs.paperless-ngx.com/" title="Docs" target="_blank" rel="noopener noreferrer nofollow">docs</a>'
+    )
+    expect(pipe.transform('[mail](mailto:a@b.c)')).toContain(
+      'href="mailto:a@b.c"'
+    )
+  })
+
+  it('should drop unsafe or relative links but keep their text', () => {
+    for (const href of [
+      'javascript:alert(1)',
+      'JaVaScRiPt:alert(1)',
+      'data:text/html,<script>alert(1)</script>',
+      'vbscript:msgbox',
+      '/api/documents/',
+    ]) {
+      const html = pipe.transform(`[click](${href})`)
+      expect(html).not.toContain('<a')
+      expect(html).toContain('click')
+    }
+  })
+
+  it('should escape link titles', () => {
+    const html = pipe.transform(
+      '[x](https://a.example "a\\" onmouseover=\\"1")'
+    )
+    expect(html).not.toMatch(/"\s*onmouseover=/)
+  })
+})
