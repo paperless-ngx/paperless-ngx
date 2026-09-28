@@ -19,6 +19,7 @@ from documents.models import Document
 from documents.versioning import annotate_effective_content
 from documents.views import DocumentSelectionMixin
 from paperless_testing.dirs import DirectoriesMixin
+from paperless_testing.factories import DocumentFactory
 from paperless_testing.factories import UserFactory
 from paperless_testing.http import read_streaming_response
 from paperless_testing.permissions import grant_global
@@ -821,55 +822,23 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(resp.data["content"], "v1-content")
 
-    def _make_root_with_page_count_versions(self) -> tuple[Document, Document]:
-        root = Document.objects.create(
-            title="root",
-            checksum="root",
-            mime_type="application/pdf",
-            page_count=2,
-        )
-        v1 = Document.objects.create(
-            title="v1",
-            checksum="v1",
-            mime_type="application/pdf",
-            root_document=root,
-            version_index=1,
-            page_count=1,
-        )
-        return root, v1
+    def test_page_count_resolves_to_latest_version(self) -> None:
+        root = DocumentFactory(page_count=2)
+        DocumentFactory(root_document=root, version_index=1, page_count=1)
+        unversioned = DocumentFactory(page_count=5)
 
-    def test_retrieve_returns_latest_version_page_count(self) -> None:
-        root, _ = self._make_root_with_page_count_versions()
+        resp = self.client.get("/api/documents/?fields=id,page_count")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            {doc["id"]: doc["page_count"] for doc in resp.data["results"]},
+            {root.id: 1, unversioned.id: 5},
+        )
 
         resp = self.client.get(f"/api/documents/{root.id}/")
-
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(resp.data["page_count"], 1)
 
-    def test_list_returns_latest_version_page_count(self) -> None:
-        self._make_root_with_page_count_versions()
-        Document.objects.create(
-            title="unversioned",
-            checksum="unversioned",
-            mime_type="application/pdf",
-            page_count=5,
-        )
-
-        resp = self.client.get("/api/documents/?fields=title,page_count")
-
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertEqual(
-            {doc["title"]: doc["page_count"] for doc in resp.data["results"]},
-            {"root": 1, "unversioned": 5},
-        )
-
-    def test_retrieve_with_version_param_returns_selected_version_page_count(
-        self,
-    ) -> None:
-        root, _ = self._make_root_with_page_count_versions()
-
         resp = self.client.get(f"/api/documents/{root.id}/?version={root.id}")
-
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(resp.data["page_count"], 2)
 
