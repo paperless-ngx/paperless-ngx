@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-27 14:07+0000\n"
+"POT-Creation-Date: 2026-09-28 06:26+0000\n"
 "PO-Revision-Date: 2022-02-17 04:17\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -1632,7 +1632,7 @@ msgid "workflow runs"
 msgstr ""
 
 #: documents/serialisers.py:514 documents/serialisers.py:871
-#: documents/serialisers.py:2885 documents/views.py:342 documents/views.py:2725
+#: documents/serialisers.py:2895 documents/views.py:342 documents/views.py:2729
 #: paperless_mail/serialisers.py:156
 msgid "Insufficient permissions."
 msgstr ""
@@ -1641,39 +1641,39 @@ msgstr ""
 msgid "Invalid color."
 msgstr ""
 
-#: documents/serialisers.py:2352
+#: documents/serialisers.py:2362
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr ""
 
-#: documents/serialisers.py:2396
+#: documents/serialisers.py:2406
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
 msgstr ""
 
-#: documents/serialisers.py:2403
+#: documents/serialisers.py:2413
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
 msgstr ""
 
-#: documents/serialisers.py:2420 documents/serialisers.py:2430
+#: documents/serialisers.py:2430 documents/serialisers.py:2440
 msgid ""
 "Custom fields must be a list of integers or an object mapping ids to values."
 msgstr ""
 
-#: documents/serialisers.py:2425
+#: documents/serialisers.py:2435
 msgid "Some custom fields don't exist or were specified twice."
 msgstr ""
 
-#: documents/serialisers.py:2572
+#: documents/serialisers.py:2582
 msgid "Invalid variable detected."
 msgstr ""
 
-#: documents/serialisers.py:2941
+#: documents/serialisers.py:2951
 msgid "Duplicate document identifiers are not allowed."
 msgstr ""
 
-#: documents/serialisers.py:2971 documents/views.py:4780
+#: documents/serialisers.py:2981 documents/views.py:4784
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr ""
@@ -1941,40 +1941,40 @@ msgstr ""
 msgid "Unable to parse URI {value}"
 msgstr ""
 
-#: documents/views.py:335 documents/views.py:2722
+#: documents/views.py:335 documents/views.py:2726
 msgid "Invalid more_like_id"
 msgstr ""
 
-#: documents/views.py:1669
+#: documents/views.py:1673
 msgid "Invalid AI configuration."
 msgstr ""
 
-#: documents/views.py:1680
+#: documents/views.py:1684
 msgid "AI backend request timed out."
 msgstr ""
 
-#: documents/views.py:1692
+#: documents/views.py:1696
 msgid "AI backend rejected the request. Check logs for details."
 msgstr ""
 
-#: documents/views.py:2547 documents/views.py:2863
+#: documents/views.py:2551 documents/views.py:2867
 msgid "Specify only one of text, title_search, query, or more_like_id."
 msgstr ""
 
-#: documents/views.py:4793
+#: documents/views.py:4797
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr ""
 
-#: documents/views.py:4839
+#: documents/views.py:4843
 msgid "Bundle is already being processed."
 msgstr ""
 
-#: documents/views.py:4903
+#: documents/views.py:4907
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr ""
 
-#: documents/views.py:4917
+#: documents/views.py:4921
 msgid "The share link bundle is unavailable."
 msgstr ""
 
