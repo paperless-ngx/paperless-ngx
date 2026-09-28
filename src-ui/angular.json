@@ -91,6 +91,11 @@
                 "glob": "**/*",
                 "input": "node_modules/pdfjs-dist/iccs/",
                 "output": "/assets/iccs/"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/pdfjs-dist/cmaps/",
+                "output": "/assets/cmaps/"
               }
             ],
             "styles": [

@@ -190,6 +190,8 @@ export class PngxPdfViewerComponent
       withCredentials: true,
       wasmUrl: new URL('assets/wasm/', this.document.baseURI).toString(),
       iccUrl: new URL('assets/iccs/', this.document.baseURI).toString(),
+      cMapUrl: new URL('assets/cmaps/', this.document.baseURI).toString(),
+      cMapPacked: true,
     }
     this.loadingTask = getDocument(initOptions)
     try {
