@@ -2017,6 +2017,13 @@
       "severity": "error"
     },
     {
+      "column": 65,
+      "path": "src/documents/tests/test_api_bulk_download.py",
+      "name": "bad-argument-type",
+      "concise_description": "Argument `_MonkeyPatchedResponse` is not assignable to parameter `response` with type `StreamingHttpResponse` in function `paperless_testing.http.read_streaming_response`",
+      "severity": "error"
+    },
+    {
       "column": 21,
       "path": "src/documents/tests/test_api_chat.py",
       "name": "missing-attribute",
@@ -3431,6 +3438,13 @@
       "severity": "error"
     },
     {
+      "column": 27,
+      "path": "src/documents/tests/test_workflows.py",
+      "name": "bad-argument-type",
+      "concise_description": "Argument `int` is not assignable to parameter `trigger_type` with type `WorkflowTrigger.WorkflowTriggerType` in function `documents.signals.handlers.run_workflows`",
+      "severity": "error"
+    },
+    {
       "column": 23,
       "path": "src/documents/tests/test_workflows.py",
       "name": "bad-argument-type",
@@ -3854,7 +3868,7 @@
       "column": 33,
       "path": "src/documents/views.py",
       "name": "unbound-name",
-      "concise_description": "`old_documents` may be uninitialized",
+      "concise_description": "`old_values` may be uninitialized",
       "severity": "error"
     },
     {
@@ -4635,13 +4649,6 @@
       "severity": "error"
     },
     {
-      "column": 38,
-      "path": "src/paperless/parsers/utils.py",
-      "name": "no-matching-overload",
-      "concise_description": "No matching overload found for function `pikepdf._core.Object.get` called with arguments: (Literal['/Marked'], Literal[False])",
-      "severity": "error"
-    },
-    {
       "column": 16,
       "path": "src/paperless/serialisers.py",
       "name": "missing-attribute",
@@ -5199,6 +5206,13 @@
       "path": "src/paperless/tests/test_views.py",
       "name": "missing-attribute",
       "concise_description": "Object of class `_MonkeyPatchedWSGIResponse` has no attribute `streaming_content`",
+      "severity": "error"
+    },
+    {
+      "column": 20,
+      "path": "src/paperless/urls.py",
+      "name": "bad-assignment",
+      "concise_description": "`((request: HttpRequest, *args: Unknown, **kwargs: Unknown) -> HttpResponseRedirect | Unknown) | ((view_func: Unknown) -> (request: HttpRequest, *args: Unknown, **kwargs: Unknown) -> HttpResponseRedirect | Unknown)` is not assignable to attribute `login` with type `(request: HttpRequest, extra_context: dict[str, Any] | None = ...) -> HttpResponse`",
       "severity": "error"
     },
     {
