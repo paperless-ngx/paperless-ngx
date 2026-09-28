@@ -1079,6 +1079,16 @@ class DocumentSerializer(
     )
 
     def get_page_count(self, obj) -> int | None:
+        # Like content versions get their own page count from the newest version,
+        # use the prefetched versions cache to avoid an extra query
+        prefetched_cache = getattr(obj, "_prefetched_objects_cache", None)
+        prefetched_versions = (
+            prefetched_cache.get("versions")
+            if isinstance(prefetched_cache, dict)
+            else None
+        )
+        if obj.root_document_id is None and prefetched_versions:
+            return sort_versions_newest_first(prefetched_versions)[0].page_count
         return obj.page_count
 
     @extend_schema_field(DuplicateDocumentSummarySerializer(many=True))
