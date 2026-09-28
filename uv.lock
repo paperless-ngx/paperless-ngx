@@ -18,6 +18,9 @@ supported-markers = [
     "sys_platform == 'linux'",
 ]
 
+[options]
+prerelease-mode = "disallow"
+
 [[package]]
 name = "aiohappyeyeballs"
 version = "2.6.1"

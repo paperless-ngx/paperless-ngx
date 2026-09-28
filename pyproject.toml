@@ -150,6 +150,7 @@ typing = [
 
 [tool.uv]
 required-version = ">=0.9.0"
+prerelease = "disallow"
 environments = [
   "sys_platform == 'darwin'",
   "sys_platform == 'linux'",
