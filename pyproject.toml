@@ -84,7 +84,7 @@ dependencies = [
 ]
 [project.optional-dependencies]
 mariadb = [
-  "mysqlclient>=2.2.7,<2.4.0",
+  "mysqlclient>=2.2.7,<2.4",
 ]
 postgres = [
   "psycopg[c,pool]==3.3.4",
