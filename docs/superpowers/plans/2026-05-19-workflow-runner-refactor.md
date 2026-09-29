@@ -2,6 +2,14 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+> **Updated 2026-09-24:** line references below are refreshed against current
+> `dev`. More importantly: the motivating bugs (#12386 and the tag/m2m race)
+> are **already fixed** by #12389 and #13178, independently of this plan — see
+> "Status update (2026-09-24)" in the linked spec. This is now a structural
+> cleanup (kill `use_overrides` dual-mode branching and the `original_file`
+> parameter plumbing), not an active-bug fix. Task 7 is rescoped accordingly
+> (the regression test it originally asked for already exists).
+
 **Goal:** Replace the `use_overrides` dual-mode branching in `run_workflows` with a polymorphic `WorkflowRunContext`, and make the workflow-execution → file-rename sequence deterministic via a `ContextVar` guard.
 
 **Architecture:** A new `documents/workflows/context.py` module defines a `WorkflowRunContext` `Protocol` and two implementations — `ConsumptionContext` (wraps `ConsumableDocument` + `DocumentMetadataOverrides`) and `PersistedContext` (wraps a real `Document`). `run_workflows` becomes a flat match-and-dispatch loop with no mode flag. A module-level `ContextVar` guard suppresses `update_filename_and_move_files` for the duration of a workflow run; the file rename is invoked once, explicitly, after the run.
@@ -144,7 +152,7 @@ git commit -m "Add ContextVar guard for workflow runner"
 - Test: `src/documents/tests/test_workflow_context.py`
 
 The `ConsumptionContext` absorbs the `use_overrides=True` branches currently in
-`run_workflows` (`handlers.py:854-1010`) and `build_workflow_action_context`
+`run_workflows` (`handlers.py:862-1051`) and `build_workflow_action_context`
 (`actions.py:33,53-83`).
 
 - [ ] **Step 1: Write the failing test**
@@ -446,7 +454,7 @@ git commit -m "Add WorkflowRunContext protocol and ConsumptionContext"
 - Test: `src/documents/tests/test_workflow_context.py`
 
 `PersistedContext` absorbs the `use_overrides=False` branches of `run_workflows`
-(`handlers.py:896-1005`) and `build_workflow_action_context` (`actions.py:35-51`).
+(`handlers.py:904-1046`) and `build_workflow_action_context` (`actions.py:35-51`).
 
 - [ ] **Step 1: Write the failing test**
 
@@ -702,7 +710,7 @@ def build_workflow_context(
 > Note: `build_placeholder_context` here is moved verbatim from the
 > non-`use_overrides` branch of `build_workflow_action_context`
 > (`actions.py:35-51`). `_WORKFLOW_SAVE_FIELDS` and `persist()` reproduce the
-> save at `handlers.py:987-996` — keep the field list and the comment.
+> save at `handlers.py:1028-1037` — keep the field list and the comment.
 
 - [ ] **Step 4: Run test to verify it passes**
 
@@ -724,10 +732,17 @@ git commit -m "Add PersistedContext and build_workflow_context factory"
 
 **Files:**
 
-- Modify: `src/documents/signals/handlers.py:431-667`
+- Modify: `src/documents/signals/handlers.py:437-673`
 
 This task is a pure extraction — no behavior change yet. The guard check is
 added in Task 6.
+
+> **Note:** re-verify these line numbers against current `handlers.py` before
+> starting — this file also received a checksum-based "already moved" recovery
+> fix (#12389, `_path_matches_checksum` at `handlers.py:416-420` plus changes
+> inside `validate_move`) since this plan was written. That logic is unrelated
+> to this extraction and must be carried over unchanged inside the extracted
+> body — do not simplify or remove it.
 
 - [ ] **Step 1: Confirm the regression baseline is green**
 
@@ -737,8 +752,8 @@ Expected: PASS (records the pre-change baseline for the rename logic)
 - [ ] **Step 2: Split the function**
 
 In `src/documents/signals/handlers.py`, replace the `update_filename_and_move_files`
-definition (currently `def update_filename_and_move_files(...)` at line 434,
-through the end of its body at line 667) with two definitions:
+definition (currently `def update_filename_and_move_files(...)` at line 440,
+through the end of its body at line 673) with two definitions:
 
 ```python
 @receiver(models.signals.post_save, sender=CustomFieldInstance, weak=False)
@@ -758,13 +773,17 @@ def update_filename_and_move_files(
 
 
 def move_files_for_document(instance: Document) -> None:
-    def validate_move(instance, old_path: Path, new_path: Path, root: Path) -> None:
-        ...  # body unchanged from current lines 444-463
+    def validate_move(
+        instance, old_path: Path, new_path: Path, root: Path
+    ) -> None: ...  # body unchanged from current lines 444-463
 ```
 
-Move the entire body currently between line 444 (`def validate_move`) and line
-667 into `move_files_for_document`, **unchanged**, with one edit: the recursive
-call at the end (currently `handlers.py:660-667`) must call the new function:
+Move the entire body currently between line 450 (`def validate_move`) and line
+673 into `move_files_for_document`, **unchanged**, with one edit: the recursive
+call at the end (currently `handlers.py:665-673`, which today calls the whole
+receiver directly — `update_filename_and_move_files(Document, version_doc)`,
+passing a synthetic `Document` `sender` to satisfy the receiver's signature)
+must instead call the new function directly:
 
 ```python
     # Keep version files in sync with root
@@ -843,7 +862,7 @@ from documents.workflows.context import build_workflow_context
 
 and remove the now-unused `build_workflow_action_context` import.
 
-Replace the entire `run_workflows` function (`handlers.py:854-1010`) with:
+Replace the entire `run_workflows` function (`handlers.py:862-1051`) with:
 
 ```python
 def run_workflows(
@@ -949,7 +968,7 @@ staged_file` is exactly the constructor `staged_file` arg, which is
 
 - [ ] **Step 6: Update `run_workflows_added`**
 
-`run_workflows_added` (`handlers.py:803-816`) already forwards `original_file`
+`run_workflows_added` (`handlers.py:811-824`) already forwards `original_file`
 to `run_workflows`. Leave it as-is — it still receives `original_file` from the
 `document_consumption_finished` signal and passes it through; `run_workflows`
 now routes it into `PersistedContext` construction.
@@ -985,11 +1004,14 @@ git commit -m "Refactor run_workflows around WorkflowRunContext, drop use_overri
 
 - [ ] **Step 1: Write the failing test**
 
-Append a new test class to `src/documents/tests/test_workflows.py`. Use the
-existing helpers/fixtures already in that file for creating a `Document`, a
-`Workflow` with a `DOCUMENT_UPDATED` trigger, and an ASSIGNMENT action that
-assigns a correspondent. Model it on the existing `DOCUMENT_UPDATED` tests in
-that file (they call `run_workflows(...)` directly). The new test:
+Append a new test class to `src/documents/tests/test_workflows.py`. **The
+action must assign both a tag and a correspondent/storage-path** (not
+correspondent alone) — a correspondent-only assignment never fires
+`m2m_changed` mid-run, so it would call `move_files_for_document` exactly once
+even without the guard, and the test would pass vacuously. Use the same shape
+as the existing `test_document_updated_workflow_assignment_storage_path_persists_with_tag_assignment`
+(`test_workflows.py:3030`) for the Document/StoragePath/Workflow/ASSIGNMENT
+setup, and call `run_workflows(...)` directly as that test does. The new test:
 
 ```python
 class TestWorkflowRenameSequencing(TestCase):
@@ -1003,9 +1025,10 @@ class TestWorkflowRenameSequencing(TestCase):
 
         from documents.signals import handlers
 
-        # ... set up a Document, a storage path whose template depends on
-        # correspondent, and a DOCUMENT_UPDATED workflow with an ASSIGNMENT
-        # action assigning that correspondent (reuse this file's helpers) ...
+        # ... set up a Document, a StoragePath whose template depends on
+        # correspondent, and a DOCUMENT_UPDATED workflow with one ASSIGNMENT
+        # action assigning BOTH a tag and that correspondent (reuse the setup
+        # from test_document_updated_workflow_assignment_storage_path_persists_with_tag_assignment) ...
 
         with mock.patch.object(
             handlers,
@@ -1025,7 +1048,14 @@ class TestWorkflowRenameSequencing(TestCase):
 > The implementer should flesh out the document/workflow setup using the
 > patterns already present in `test_workflows.py`. The assertion that matters:
 > `move_files_for_document` is called exactly once, via the explicit
-> `finalize_file_location()`, not once-per-`save()` from signals.
+> `finalize_file_location()`, not once-per-`save()` from signals. Pre-guard,
+> current code (post-#13178) calls it **twice** for this setup: once from the
+> `m2m_changed` receiver when `apply_assignment_to_document` fetches a fresh
+> instance to add the tag (a self-consistent no-op move against still-current
+> DB state), and once from the final `document.save()`'s `post_save`. So this
+> test is a genuine (if narrower) regression check, not a vacuous one — it's
+> just checking call count / ordering discipline rather than a wrong final
+> path, since #13178 already ensures the final path is correct either way.
 
 - [ ] **Step 2: Run test to verify it fails**
 
@@ -1112,59 +1142,48 @@ git commit -m "Defer workflow file rename via ContextVar guard"
 
 ---
 
-## Task 7: Regression test for the metadata-vs-rename race (#12386)
+## Task 7: Confirm pre-existing metadata-vs-rename regression coverage still holds
 
-**Files:**
+**Files:** none (verification only — no new test)
 
-- Test: `src/documents/tests/test_workflows.py`
+> **Rescoped 2026-09-24:** this task originally asked for a new regression
+> test for the #12386 metadata-vs-rename race. That race was independently
+> fixed by #13178 (merged 2026-07-20, after this plan was written), whose only
+> added test is
+> `test_document_updated_workflow_assignment_storage_path_persists_with_tag_assignment`
+> in `test_workflows.py`. Writing another test asserting the same final-state
+> outcome would duplicate that coverage. Task 6's
+> `TestWorkflowRenameSequencing` already adds the piece that test doesn't
+> cover — call-count/ordering discipline on `move_files_for_document` — so
+> this task is now pure verification that nothing regressed.
 
-- [ ] **Step 1: Write the regression test**
+- [ ] **Step 1: Run the pre-existing regression tests by name**
 
-Append to `src/documents/tests/test_workflows.py` a test that reproduces the
-original bug: a workflow that assigns **both** tags (firing `m2m_changed`) and a
-correspondent, where the storage path template depends on the correspondent.
-Before the fix the `m2m_changed`-triggered rename ran with a stale (empty)
-correspondent and moved the file to the wrong path.
-
-```python
-class TestWorkflowMetadataRenameRace(TestCase):
-    @pytest.mark.django_db
-    def test_tag_and_correspondent_assignment_lands_file_at_final_path(
-        self,
-    ) -> None:
-        """
-        Regression for #12386: assigning tags (m2m_changed) plus a correspondent
-        used by the storage-path template must not move the file using stale
-        metadata. After the run the DB filename and the on-disk file agree.
-        """
-        # ... reuse this file's helpers to:
-        #   - create a StoragePath whose path template references {correspondent}
-        #   - create a Document assigned to that storage path with a real file
-        #     on disk at document.source_path
-        #   - create a DOCUMENT_UPDATED Workflow with one ASSIGNMENT action that
-        #     assigns BOTH a tag and a correspondent
-        #   - call run_workflows(DOCUMENT_UPDATED, document=document)
-        # Assert:
-        document.refresh_from_db()
-        assert document.correspondent is not None
-        assert Path(document.source_path).is_file()
-        # the path reflects the assigned correspondent, not an empty value
-        assert document.correspondent.name in str(document.filename)
-```
-
-- [ ] **Step 2: Run the test**
-
-Run: `uv run pytest documents/tests/test_workflows.py::TestWorkflowMetadataRenameRace -v`
-Expected: PASS (the guard from Task 6 fixes the race; this test locks it in)
-
-- [ ] **Step 3: Lint and commit**
+Run (all three are in the `TestWorkflows` class, `test_workflows.py:78-5123`):
 
 ```bash
-ruff check --fix src/documents/tests/test_workflows.py
-ruff format src/documents/tests/test_workflows.py
-git add src/documents/tests/test_workflows.py
-git commit -m "Add regression test for workflow metadata vs rename race"
+uv run pytest \
+  "documents/tests/test_workflows.py::TestWorkflows::test_document_updated_workflow_assignment_storage_path_persists_with_tag_assignment" \
+  "documents/tests/test_workflows.py::TestWorkflows::test_document_updated_workflow_assignment_persists_when_removing_trigger_tag" \
+  "documents/tests/test_workflows.py::TestWorkflows::test_workflow_document_updated_does_not_overwrite_filename" \
+  -v
 ```
+
+(Confirm the exact enclosing class name for each with
+`grep -n "class Test\|def test_" src/documents/tests/test_workflows.py` before
+running — class boundaries may have shifted since this plan was written.)
+
+Expected: PASS, **unchanged** — same assertions, no edits needed. If any of
+these needs modification to pass after the refactor, that is a behavior
+regression introduced by this plan, not an acceptable side effect — stop and
+investigate before continuing.
+
+- [ ] **Step 2: No commit**
+
+This task makes no code changes. If Step 1 required a fix elsewhere, that fix
+belongs to whichever earlier task's commit introduced the regression — amend
+that task's changes (as a new commit, not `--amend`) rather than committing
+here.
 
 ---
 
@@ -1207,7 +1226,7 @@ git commit -m "Clean up after workflow runner refactor"
 - **Spec coverage:** §1 Protocol → Tasks 2-3; §2 branch-free `run_workflows` →
   Task 5; §3 `source_file` / staged-path relocation → Tasks 3, 5; §4 guard +
   sequencing → Tasks 4, 6; deferred password-removal hook left as-is (Task 5
-  note); testing → Tasks 1-3, 6-8.
+  note); testing → Tasks 1-3, 6, 7 (rescoped), 8.
 - **`update_fields` exclusion kept** (`_WORKFLOW_SAVE_FIELDS` in Task 3) — per
   the design decision that it guards a cross-process hazard the guard does not
   cover. No task removes it.
@@ -1216,3 +1235,37 @@ git commit -m "Clean up after workflow runner refactor"
   `apply_removal`, `log_action`, `persist`, `record_run`,
   `finalize_file_location`) is identical across the Protocol, both
   implementations, and all call sites in the rewritten `run_workflows`.
+
+## 2026-09-24 status update
+
+- All line-number references throughout this plan were re-verified against
+  current `dev` and corrected (`handlers.py` shifted by ~6-8 lines throughout
+  due to unrelated intervening changes, chiefly #12389's
+  `_path_matches_checksum` addition).
+- The two concrete bugs motivating this refactor are already fixed
+  independently, by different mechanisms, without this plan: #12389
+  (cross-process already-moved-file race, checksum-based recovery in
+  `validate_move`) and #13178 (intra-workflow tag/`m2m_changed` clobbering
+  unsaved fields, fixed by fetching a fresh `Document` instance for tag
+  mutation — see `mutations.py:26-31`). Neither fix uses `WorkflowRunContext`
+  or the `ContextVar` guard.
+- Task 4 now calls out explicitly that the checksum-recovery logic inside
+  `validate_move` must be carried over unchanged during extraction, and that
+  the version-document recursive call site (`handlers.py:670-673`) needs
+  updating to call the extracted `move_files_for_document` directly, which the
+  original plan did not mention.
+- Task 6's test setup was corrected — a correspondent-only assignment doesn't
+  exercise the guard (no `m2m_changed` fires), so the test as originally
+  written would have passed vacuously, guard or no guard. It now requires a
+  combined tag + correspondent/storage-path assignment, matching the shape of
+  #13178's own regression test.
+- Task 7 was rescoped from "write a new regression test for #12386" to
+  "confirm #13178's existing regression tests still pass unchanged" — writing
+  a new test asserting the same final-state outcome would have duplicated
+  coverage that already exists and predates this plan's completion.
+- **Net effect on scope:** this plan still fully replaces `use_overrides`
+  dual-mode branching and the `original_file` parameter plumbing (real,
+  unfixed structural debt) with a cleaner `WorkflowRunContext` abstraction.
+  The `ContextVar` guard piece is now justified as consolidating two
+  independent point-fixes into one general mechanism, not as fixing an active
+  bug — worth doing, but not urgent.

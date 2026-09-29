@@ -58,21 +58,30 @@ def get_pdf_first_page_size_points(
 ) -> tuple[float, float] | None:
     """Return the first page's (width, height) in PDF points, post-rotation.
 
-    Uses ``page.cropbox`` (pikepdf 10.2.0, pinned in uv.lock) — this is a
-    read-only property, not a raw dict lookup, and already implements the
+    Uses ``page.cropbox`` (pikepdf, pinned at 10.13.0.post1 in uv.lock) — this
+    is a read-only property, not a raw dict lookup, and already implements the
     PDF-spec-correct fallback/inheritance to MediaBox when a page has no
-    ``/CropBox`` of its own (confirmed against pikepdf's own
-    ``_get_cropbox(True, False)`` implementation and by testing against
-    `src/documents/tests/samples/simple.pdf`, which has no ``/CropBox`` key
-    at all). This must match whatever box the renderer is told to use
-    (pdftoppm's ``-cropbox`` flag), or the computed DPI will target the
-    wrong box's dimensions. Swaps width/height when ``/Rotate`` is 90 or
-    270, since that's the orientation the page will actually be rendered
-    in — note ``page.rotate`` is a *mutator* method
-    (``rotate(angle, relative) -> None``) in this pikepdf version, not a
-    getter; the current rotation must be read via
-    ``page.obj.get("/Rotate", 0)`` instead (confirmed: returns ``None``
-    cleanly, not an exception, when the key is absent).
+    ``/CropBox`` of its own. Per pikepdf's release notes, box properties
+    (``mediabox``/``cropbox``/etc.) were reimplemented in C++ in 10.8.0 for
+    performance, with behavior explicitly unchanged — confirmed stable across
+    the range this project has used. This must match whatever box the
+    renderer is told to use (pdftoppm's ``-cropbox`` flag), or the computed
+    DPI will target the wrong box's dimensions.
+
+    Swaps width/height when the page's effective rotation is 90 or 270, since
+    that's the orientation the page will actually be rendered in. Uses
+    ``page.rotation`` (added in pikepdf 10.9.0, available at the pinned
+    10.13.0.post1) rather than a raw ``page.obj.get("/Rotate", 0)`` dict
+    lookup: ``/Rotate`` is one of the PDF spec's *inheritable* page
+    attributes — a page can take its rotation from an ancestor ``/Pages``
+    node rather than setting ``/Rotate`` on its own object dict — and
+    ``page.rotation`` is documented to resolve that inheritance and normalize
+    the result to ``[0, 360)``, defaulting to ``0`` when nothing is set
+    anywhere in the chain. A raw ``page.obj.get("/Rotate", 0)`` lookup would
+    silently miss an inherited rotation and compute DPI for the wrong
+    orientation on such a PDF. (Do not use ``page.rotate(...)`` — as of
+    10.9.0 that's a *mutator* method, and even before that it was never a
+    getter.)
 
     Parameters
     ----------
@@ -100,7 +109,7 @@ def get_pdf_first_page_size_points(
             height = abs(ury - lly)
             if width <= 0 or height <= 0:
                 return None
-            rotate = int(page.obj.get("/Rotate", 0)) % 360
+            rotate = page.rotation % 360
             if rotate in (90, 270):
                 width, height = height, width
             return width, height
@@ -113,7 +122,15 @@ def get_pdf_first_page_size_points(
         return None
 ```
 
-`page.cropbox`/`page.mediabox` returning `pikepdf.Array` (indexable, four numeric elements) and `page.obj.get("/Rotate", 0)` behavior were both confirmed directly against the pinned version rather than assumed — no further verification needed during implementation.
+> **Verify before implementing:** confirm `page.rotation` behaves as pikepdf's
+> release notes describe against the pinned 10.13.0.post1 — test with a PDF
+> that has no `/Rotate` at all (expect `0`, not an exception) and, if a
+> sample with inherited (ancestor-node) rotation is available, confirm it
+> resolves correctly. The VM (`paperless-vm`) is the only place pikepdf is
+> installed per this project's Windows/Linux split — do this check there
+> before relying on it.
+
+`page.cropbox`/`page.mediabox` returning `pikepdf.Array` (indexable, four numeric elements) is confirmed stable per pikepdf's own release notes (box properties moved to a C++ implementation in 10.8.0 with behavior explicitly unchanged). `page.rotation` (used above in place of the earlier draft's raw `page.obj.get("/Rotate", 0)`) was added in 10.9.0 and is documented to resolve inherited `/Rotate` values — **this one is worth a quick empirical check against the pinned 10.13.0.post1 on the VM before implementation**, since it wasn't available to test directly when this plan was last touched.
 
 - [ ] **Step 2: Add `rasterize_pdf_page_to_png()` to `documents/parsers.py`**
 
@@ -135,8 +152,12 @@ def rasterize_pdf_page_to_png(
     # -singlefile suppresses that so out_path is written exactly as given.
     args = [
         "pdftoppm",
-        "-f", "1", "-l", "1",
-        "-r", str(dpi),
+        "-f",
+        "1",
+        "-l",
+        "1",
+        "-r",
+        str(dpi),
         "-png",
         "-singlefile",
     ]
@@ -207,7 +228,9 @@ def make_thumbnail_from_pdf(in_path: Path, temp_dir: Path, logging_group=None) -
         encode_thumbnail_webp(png_path, out_path)
     except ParseError as e:
         logger.error(f"Unable to make thumbnail with pdftoppm: {e}")
-        out_path = make_thumbnail_from_pdf_qpdf_fallback(in_path, temp_dir, logging_group)
+        out_path = make_thumbnail_from_pdf_qpdf_fallback(
+            in_path, temp_dir, logging_group
+        )
 
     return out_path
 ```
@@ -244,7 +267,7 @@ def _compute_thumbnail_dpi(in_path: Path, logging_group=None) -> int:
 
 - [ ] **Step 5: Add tests for `get_pdf_first_page_size_points()`**
 
-Cover: a normal PDF (returns expected width/height for a known sample), a PDF with `/Rotate 90` (width/height swapped vs. the unrotated equivalent), and a nonexistent/corrupt path (returns `None`, doesn't raise). Use existing sample PDFs under `src/paperless/tests/parsers/samples/` or `src/documents/tests/samples/` where possible rather than adding new binary fixtures.
+Cover: a normal PDF (returns expected width/height for a known sample), a PDF with `/Rotate 90` set directly on the page (width/height swapped vs. the unrotated equivalent), and a nonexistent/corrupt path (returns `None`, doesn't raise). If a sample PDF with _inherited_ rotation (set on an ancestor `/Pages` node rather than the page itself) is easy to construct or already exists, add that case too — it's the specific gap `page.rotation` closes over a raw `/Rotate` dict lookup; if constructing one isn't cheap, skip it rather than manufacturing a fixture just for this, but don't skip verifying `page.rotation`'s basic no-rotation-set default (`0`) against the pinned pikepdf version. Use existing sample PDFs under `src/paperless/tests/parsers/samples/` or `src/documents/tests/samples/` where possible rather than adding new binary fixtures.
 
 - [ ] **Step 6: Add a dimension/format assertion to `TestGetThumbnail`**
 
@@ -303,14 +326,15 @@ git commit -m "refactor: rasterize PDF thumbnails with pdftoppm+pikepdf+Pillow i
 Replace `make_thumbnail_from_pdf_gs_fallback()` (`parsers.py:130-171`) with:
 
 ```python
-def make_thumbnail_from_pdf_qpdf_fallback(in_path, temp_dir, logging_group=None) -> Path:
+def make_thumbnail_from_pdf_qpdf_fallback(
+    in_path, temp_dir, logging_group=None
+) -> Path:
     png_path: Path = Path(temp_dir) / "page1_repaired.png"
     out_path: Path = Path(temp_dir) / "convert_qpdf.webp"
     repaired_path: Path = Path(temp_dir) / "repaired.pdf"
 
     logger.warning(
-        "Thumbnail generation with pdftoppm failed, attempting qpdf "
-        "repair and retry.",
+        "Thumbnail generation with pdftoppm failed, attempting qpdf repair and retry.",
         extra={"group": logging_group},
     )
 
