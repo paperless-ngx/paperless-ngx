@@ -37,6 +37,12 @@ export enum ColorConvertConfig {
   CMYK = 'CMYK',
 }
 
+export enum VideoContentModeConfig {
+  TRANSCRIPT = 'transcript',
+  SUMMARY = 'summary',
+  BOTH = 'both',
+}
+
 export enum ConfigOptionType {
   String = 'string',
   Number = 'number',
@@ -50,6 +56,7 @@ export const ConfigCategory = {
   General: $localize`General Settings`,
   OCR: $localize`OCR Settings`,
   Barcode: $localize`Barcode Settings`,
+  Video: $localize`Video Settings`,
 }
 
 export interface ConfigOption {
@@ -175,6 +182,18 @@ export const PaperlessConfigOptions: ConfigOption[] = [
     category: ConfigCategory.OCR,
   },
   {
+    key: 'video_content_mode',
+    title: $localize`Video content mode`,
+    type: ConfigOptionType.Select,
+    choices: [
+      { id: 'transcript', name: $localize`Transcript only` },
+      { id: 'summary', name: $localize`Summary only` },
+      { id: 'both', name: $localize`Summary and transcript` },
+    ],
+    config_key: 'PAPERLESS_VIDEO_CONTENT_MODE',
+    category: ConfigCategory.Video,
+  },
+  {
     key: 'app_logo',
     title: $localize`Application Logo`,
     type: ConfigOptionType.File,
@@ -282,6 +301,7 @@ export interface PaperlessConfig extends ObjectWithId {
   color_conversion_strategy: ColorConvertConfig
   user_args: object
   vlm_analysis_enabled: boolean
+  video_content_mode: VideoContentModeConfig
   app_logo: string
   app_title: string
   barcodes_enabled: boolean

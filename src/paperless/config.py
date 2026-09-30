@@ -163,6 +163,22 @@ class BarcodeConfig(BaseConfig):
 
 
 @dataclasses.dataclass
+class VideoConfig(BaseConfig):
+    """
+    Video processing settings
+    """
+
+    video_content_mode: str = dataclasses.field(init=False)
+
+    def __post_init__(self) -> None:
+        app_config = self._get_config_instance()
+
+        self.video_content_mode = (
+            app_config.video_content_mode or settings.VIDEO_CONTENT_MODE
+        )
+
+
+@dataclasses.dataclass
 class GeneralConfig(BaseConfig):
     """
     General application settings that require global scope

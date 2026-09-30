@@ -1161,6 +1161,8 @@ OCR_COLOR_CONVERSION_STRATEGY = os.getenv(
 
 OCR_USER_ARGS = os.getenv("PAPERLESS_OCR_USER_ARGS")
 
+VIDEO_CONTENT_MODE = os.getenv("PAPERLESS_VIDEO_CONTENT_MODE", "both")
+
 MAX_IMAGE_PIXELS: Final[int | None] = __get_optional_int(
     "PAPERLESS_MAX_IMAGE_PIXELS",
 )
