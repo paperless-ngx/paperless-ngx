@@ -43,7 +43,8 @@ def test_document_classifier_schema_declared_defaults():
         "matched_storage_paths": [],
         "storage_path_ids": [],
         "dates": [],
-    }
+        "custom_fields": {},
+        }
 
 
 def test_model_response_converts_names_to_internal_taxonomy_choices():
@@ -157,8 +158,9 @@ def test_document_classifier_schema_json_schema_is_self_contained():
     WHEN:
         - Its JSON schema is generated via model_json_schema()
     THEN:
-        - The schema contains no definitions, references, or nested objects
-        - Every response field is a scalar or flat array
+        - The schema contains no definitions or references
+        - Every response field is a scalar, a flat array, or the flat
+          custom_fields object (string keys, string values)
 
     This keeps the function declaration compatible with backends that reject
     JSON Schema references and with smaller models that struggle with nesting.
@@ -169,6 +171,7 @@ def test_document_classifier_schema_json_schema_is_self_contained():
     assert "$ref" not in json.dumps(schema)
     assert all(
         field_schema.get("type") != "object"
+        or "properties" not in field_schema
         for field_schema in schema["properties"].values()
     )
 
@@ -365,6 +368,7 @@ def test_internal_suggestions_convert_to_names_only_model():
             new_names=["Finance/Utilities"],
         ),
         dates=["2026-08-30"],
+        custom_fields={},
     )
 
     model = classification_suggestions_to_model(suggestions)
@@ -387,4 +391,5 @@ def test_internal_suggestions_convert_to_names_only_model():
             new_names=["Finance/Utilities"],
         ),
         dates=["2026-08-30"],
+        custom_fields={},
     )

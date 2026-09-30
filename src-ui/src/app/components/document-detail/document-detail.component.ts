@@ -1077,6 +1077,34 @@ export class DocumentDetailComponent
     return this.documentForm.get('custom_fields') as FormArray
   }
 
+  get appliedCustomFieldValues(): Record<number, any> {
+    const doc = this.document()
+    return (doc?.custom_fields ?? []).reduce((acc, instance) => {
+      acc[instance.field] = instance.value
+      return acc
+    }, {} as Record<number, any>)
+  }
+
+  applyCustomFieldSuggestion(suggestion: { id: number; value: any }): void {
+    const existing = (this.document().custom_fields ?? []).find(
+      (instance) => instance.field === suggestion.id
+    )
+    if (existing) {
+      existing.value = suggestion.value
+    } else {
+      this.document().custom_fields ??= []
+      this.document().custom_fields.push({
+        field: suggestion.id,
+        value: suggestion.value,
+        document: this.documentId(),
+        created: new Date(),
+      })
+    }
+    this.updateFormForCustomFields(true)
+    this.documentForm.get('custom_fields').markAsDirty()
+    this.documentForm.updateValueAndValidity()
+  }
+
   getSuggestions() {
     this.suggestionsLoading.set(true)
     const suggestionsObservable = this.aiEnabled

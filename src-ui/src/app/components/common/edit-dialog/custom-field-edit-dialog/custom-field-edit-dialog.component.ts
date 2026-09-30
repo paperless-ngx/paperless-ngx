@@ -26,6 +26,7 @@ import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { SelectComponent } from '../../input/select/select.component'
+import { TextAreaComponent } from '../../input/textarea/textarea.component'
 import { TextComponent } from '../../input/text/text.component'
 import { EditDialogComponent, EditDialogMode } from '../edit-dialog.component'
 
@@ -37,6 +38,7 @@ const SELECT_OPTION_PAGE_SIZE = 8
   styleUrls: ['./custom-field-edit-dialog.component.scss'],
   imports: [
     SelectComponent,
+    TextAreaComponent,
     TextComponent,
     FormsModule,
     ReactiveFormsModule,
@@ -126,6 +128,7 @@ export class CustomFieldEditDialogComponent
     return new FormGroup({
       name: new FormControl(null),
       data_type: new FormControl(null),
+      description: new FormControl(null),
       extra_data: new FormGroup({
         select_options: new FormArray([]),
         default_currency: new FormControl(null),

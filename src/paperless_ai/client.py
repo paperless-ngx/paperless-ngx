@@ -19,9 +19,7 @@ from paperless.network import PinnedHostHTTPTransport
 from paperless.network import create_pinned_async_httpx_client
 from paperless.network import create_pinned_httpx_client
 from paperless.network import validate_outbound_http_url
-from paperless_ai.base_model import ClassificationSuggestions
 from paperless_ai.base_model import DocumentClassifierSchema
-from paperless_ai.base_model import model_to_classification_suggestions
 from paperless_ai.exceptions import LLMProviderError
 from paperless_ai.exceptions import LLMTimeoutError
 
@@ -122,9 +120,7 @@ class AIClient:
     def run_llm_query(
         self,
         prompt: str,
-        *,
-        allowed_candidate_ids: dict[str, set[int]] | None = None,
-    ) -> ClassificationSuggestions:
+    ) -> DocumentClassifierSchema:
         logger.debug(
             "Running LLM query against %s with model %s",
             self.settings.llm_backend,
@@ -142,10 +138,7 @@ class AIClient:
                 )
             logger.debug("LLM query result: %s", result)
             parsed = DocumentClassifierSchema(**json.loads(result.message.content))
-            return model_to_classification_suggestions(
-                parsed,
-                allowed_candidate_ids,
-            )
+            return parsed
 
         from llama_index.core.program.function_program import get_function_tool
 
@@ -169,10 +162,7 @@ class AIClient:
             )
         logger.debug("LLM query result: %s", tool_calls)
         parsed = DocumentClassifierSchema(**tool_calls[0].tool_kwargs)
-        return model_to_classification_suggestions(
-            parsed,
-            allowed_candidate_ids,
-        )
+        return parsed
 
     @contextmanager
     def _normalize_errors(self) -> Iterator[None]:

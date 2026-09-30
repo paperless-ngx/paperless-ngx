@@ -5670,6 +5670,7 @@ SUGGESTIONS: ClassificationSuggestions = {
         "new_names": ["Suggested Storage Path"],
     },
     "dates": ["2024-03-05"],
+    "custom_fields": {},
 }
 
 ALL_SUGGESTION_FIELDS = [
@@ -6199,3 +6200,160 @@ class TestApplyAISuggestionsWorkflowAction(
         self.doc.refresh_from_db()
         self.assertEqual(changed, ["created"])
         self.assertEqual(self.doc.created, datetime.date(2019, 7, 4))
+
+
+@override_settings(AI_ENABLED=True)
+class TestApplyAISuggestionsCustomFieldsWorkflowAction(
+    DirectoriesMixin,
+    SampleDirMixin,
+    APITestCase,
+):
+    """AI suggestions for custom fields, applied via workflow action."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.user = User.objects.create(username="ai-cf-user")
+        self.doc = Document.objects.create(
+            title="original.pdf",
+            content="the document content",
+            checksum="ai-cf-checksum",
+            mime_type="application/pdf",
+            owner=self.user,
+        )
+        self.string_field = CustomField.objects.create(
+            name="Project",
+            data_type=CustomField.FieldDataType.STRING,
+            description="The project this document belongs to",
+        )
+        self.select_field = CustomField.objects.create(
+            name="Priority",
+            data_type=CustomField.FieldDataType.SELECT,
+            extra_data={
+                "select_options": [
+                    {"id": "low", "label": "Low"},
+                    {"id": "high", "label": "High"},
+                ],
+            },
+        )
+
+    def apply(
+        self,
+        action: WorkflowAction,
+        custom_fields: dict[int, Any],
+    ) -> list[str]:
+        with mock.patch(
+            "documents.workflows.ai.get_ai_document_classification",
+            return_value={**SUGGESTIONS, "custom_fields": custom_fields},
+        ):
+            changed = apply_ai_suggestions_to_document(action, self.doc)
+        self.doc.refresh_from_db()
+        return changed
+
+    def test_applies_suggested_values(self) -> None:
+        """
+        GIVEN:
+            - An action that applies AI suggestions for two custom fields
+        WHEN:
+            - The action runs with suggestions for both fields
+        THEN:
+            - Values are written to the document's custom field instances,
+              including the select option ID for the select field
+        """
+        action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.APPLY_AI_SUGGESTIONS,
+            ai_suggestion_fields=[WorkflowAction.AISuggestionField.TITLE],
+            ai_suggestion_custom_fields=[
+                self.string_field.pk,
+                self.select_field.pk,
+            ],
+        )
+
+        changed = self.apply(
+            action,
+            {
+                self.string_field.pk: "Website",
+                self.select_field.pk: "High",
+            },
+        )
+
+        self.assertIn("custom_fields", changed)
+        instance = CustomFieldInstance.objects.get(
+            document=self.doc,
+            field=self.string_field,
+        )
+        self.assertEqual(instance.value, "Website")
+        select_instance = CustomFieldInstance.objects.get(
+            document=self.doc,
+            field=self.select_field,
+        )
+        self.assertEqual(select_instance.value, "high")  # option ID, not label
+
+    def test_skips_fields_not_suggested(self) -> None:
+        """A field selected in the action but absent from the suggestions
+        is not written and not reported."""
+        action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.APPLY_AI_SUGGESTIONS,
+            ai_suggestion_fields=[WorkflowAction.AISuggestionField.TITLE],
+            ai_suggestion_custom_fields=[self.string_field.pk],
+        )
+
+        changed = self.apply(action, {})
+
+        self.assertNotIn("custom_fields", changed)
+        self.assertFalse(
+            CustomFieldInstance.objects.filter(
+                document=self.doc,
+                field=self.string_field,
+            ).exists(),
+        )
+
+    def test_respects_overwrite_existing(self) -> None:
+        """Without overwrite, a field that already has a value is left alone;
+        with overwrite, it is replaced."""
+        CustomFieldInstance.objects.create(
+            document=self.doc,
+            field=self.string_field,
+            value_text="Existing",
+        )
+        no_overwrite = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.APPLY_AI_SUGGESTIONS,
+            ai_suggestion_fields=[WorkflowAction.AISuggestionField.TITLE],
+            ai_suggestion_custom_fields=[self.string_field.pk],
+            ai_overwrite_existing=False,
+        )
+        changed = self.apply(no_overwrite, {self.string_field.pk: "New"})
+        self.assertNotIn("custom_fields", changed)
+        instance = CustomFieldInstance.objects.get(
+            document=self.doc,
+            field=self.string_field,
+        )
+        self.assertEqual(instance.value, "Existing")
+
+        overwrite = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.APPLY_AI_SUGGESTIONS,
+            ai_suggestion_fields=[WorkflowAction.AISuggestionField.TITLE],
+            ai_suggestion_custom_fields=[self.string_field.pk],
+            ai_overwrite_existing=True,
+        )
+        changed = self.apply(overwrite, {self.string_field.pk: "New"})
+        self.assertIn("custom_fields", changed)
+        instance = CustomFieldInstance.objects.get(
+            document=self.doc,
+            field=self.string_field,
+        )
+        self.assertEqual(instance.value, "New")
+
+    def test_no_custom_fields_selected_is_noop(self) -> None:
+        """An action without ai_suggestion_custom_fields writes nothing."""
+        action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.APPLY_AI_SUGGESTIONS,
+            ai_suggestion_fields=[WorkflowAction.AISuggestionField.TITLE],
+        )
+
+        changed = self.apply(action, {self.string_field.pk: "Website"})
+
+        self.assertNotIn("custom_fields", changed)
+        self.assertEqual(
+            CustomFieldInstance.objects.filter(document=self.doc).count(),
+            0,
+        )

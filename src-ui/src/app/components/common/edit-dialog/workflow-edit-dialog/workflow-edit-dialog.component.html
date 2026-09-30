@@ -477,6 +477,18 @@
               hint="Suggestions for fields that are not selected are discarded."
               i18n-hint
             ></pngx-input-select>
+            @if (aiSuggestionCustomFieldOptions.length > 0) {
+              <pngx-input-select
+                i18n-title
+                title="Apply AI suggestions for these custom fields"
+                [items]="aiSuggestionCustomFieldOptions"
+                [multiple]="true"
+                formControlName="ai_suggestion_custom_fields"
+                [error]="error?.actions?.[i]?.ai_suggestion_custom_fields"
+                hint="Suggested values are written to the selected custom fields."
+                i18n-hint
+              ></pngx-input-select>
+            }
           </div>
         </div>
         <div class="row">

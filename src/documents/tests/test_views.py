@@ -21,6 +21,7 @@ from documents.caching import get_llm_suggestion_cache
 from documents.caching import get_suggestion_cache_key
 from documents.caching import set_llm_suggestions_cache
 from documents.models import Correspondent
+from documents.models import CustomField
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import ShareLink
@@ -489,12 +490,56 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
                 "storage_paths": [self.path1.pk],
                 "suggested_storage_paths": [],
                 "dates": ["2023-01-01"],
+                "custom_fields": [],
             },
         )
         mock_get_ai_classification.assert_called_once_with(
             self.document,
             self.user,
             None,
+        )
+
+    @patch("documents.views.get_ai_document_classification")
+    @override_settings(
+        AI_ENABLED=True,
+        LLM_BACKEND="mock_backend",
+    )
+    def test_ai_suggestions_includes_suggested_custom_fields(
+        self,
+        mock_get_ai_classification,
+    ) -> None:
+        """
+        GIVEN:
+            - AI is enabled and suggestions contain custom field values,
+              including one for a field that no longer exists
+        WHEN:
+            - ai_suggestions is requested
+        THEN:
+            - The response contains the suggested custom fields with their
+              live field names and drops unknown field ids
+        """
+        field = CustomField.objects.create(
+            name="Project",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        mock_get_ai_classification.return_value = {
+            "title": "AI Title",
+            "tags": {"existing_ids": [], "new_names": []},
+            "correspondents": {"existing_ids": [], "new_names": []},
+            "document_types": {"existing_ids": [], "new_names": []},
+            "storage_paths": {"existing_ids": [], "new_names": []},
+            "dates": [],
+            "custom_fields": {field.pk: "Website", 999999: "Ghost"},
+        }
+
+        self.client.force_login(user=self.user)
+        response = self.client.get(
+            f"/api/documents/{self.document.pk}/ai_suggestions/",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            response.json()["custom_fields"],
+            [{"id": field.pk, "name": "Project", "value": "Website"}],
         )
 
     @patch("documents.views.get_ai_document_classification")

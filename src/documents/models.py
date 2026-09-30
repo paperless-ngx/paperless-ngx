@@ -1180,6 +1180,16 @@ class CustomField(models.Model):
         editable=False,
     )
 
+    description = models.TextField(
+        _("description"),
+        null=True,
+        blank=True,
+        help_text=_(
+            "What this field contains. Used by the AI to suggest values for this field; "
+            "falls back to the field name when empty.",
+        ),
+    )
+
     extra_data = models.JSONField(
         _("extra data"),
         null=True,
@@ -1959,6 +1969,15 @@ class WorkflowAction(models.Model):
         blank=True,
         help_text=_(
             "Which of the AI-suggested fields to apply to the document.",
+        ),
+    )
+
+    ai_suggestion_custom_fields = models.JSONField(
+        _("AI suggestion custom fields"),
+        null=True,
+        blank=True,
+        help_text=_(
+            "Which custom fields to apply AI-suggested values to (list of custom field IDs).",
         ),
     )
 

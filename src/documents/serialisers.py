@@ -772,6 +772,7 @@ class CustomFieldSerializer(serializers.ModelSerializer[CustomField]):
             "id",
             "name",
             "data_type",
+            "description",
             "extra_data",
             "document_count",
         ]
@@ -3307,6 +3308,7 @@ class WorkflowActionSerializer(serializers.ModelSerializer[WorkflowAction]):
             "webhook",
             "passwords",
             "ai_suggestion_fields",
+            "ai_suggestion_custom_fields",
             "ai_create_missing",
             "ai_overwrite_existing",
         ]
@@ -3382,6 +3384,36 @@ class WorkflowActionSerializer(serializers.ModelSerializer[WorkflowAction]):
                     "At least one valid field is required for apply AI "
                     f"suggestions actions, options are: {sorted(valid_fields)}",
                 )
+
+            # Custom field IDs are optional; if present they must be a
+            # non-empty list of integers.
+            custom_fields = attrs.get("ai_suggestion_custom_fields")
+            if custom_fields is not None:
+                if not isinstance(custom_fields, list) or len(custom_fields) == 0:
+                    raise serializers.ValidationError(
+                        "ai_suggestion_custom_fields must be a non-empty list of "
+                        "custom field IDs when provided.",
+                    )
+                if any(
+                    not isinstance(field_id, int) or isinstance(field_id, bool)
+                    for field_id in custom_fields
+                ):
+                    raise serializers.ValidationError(
+                        "ai_suggestion_custom_fields must only contain integers.",
+                    )
+                invalid_ids = [
+                    field_id
+                    for field_id in custom_fields
+                    if not CustomField.objects.filter(pk=field_id).exists()
+                ]
+                if invalid_ids:
+                    raise serializers.ValidationError(
+                        {
+                            "ai_suggestion_custom_fields": (
+                                f"Unknown custom field IDs: {invalid_ids}"
+                            ),
+                        },
+                    )
 
         return attrs
 

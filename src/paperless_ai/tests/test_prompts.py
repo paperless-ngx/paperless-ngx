@@ -35,6 +35,7 @@ _MINIMAL_CONTEXTS = {
         content="content",
         taxonomy_block="",
         has_candidates=False,
+        custom_fields_block="",
     ),
     PromptName.CLASSIFICATION_RAG_CONTEXT: RagContextPromptContext(
         base_prompt="base",

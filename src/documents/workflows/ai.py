@@ -1,11 +1,14 @@
 import logging
 from datetime import date
 from datetime import datetime
+from typing import Any
 from typing import TypeVar
 
 from django.contrib.auth.models import User
 
 from documents.models import Correspondent
+from documents.models import CustomField
+from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import MatchingModel
@@ -15,6 +18,7 @@ from documents.models import WorkflowAction
 from paperless.config import AIConfig
 from paperless_ai.ai_classifier import get_ai_document_classification
 from paperless_ai.ai_classifier import get_llm_output_language
+from paperless_ai.base_model import ClassificationSuggestions
 from paperless_ai.matching import extract_unmatched_names
 from paperless_ai.matching import match_correspondents_by_name
 from paperless_ai.matching import match_document_types_by_name
@@ -108,6 +112,84 @@ def resolve_tags(
             logger.info("Created tag '%s' from AI suggestion", tag.name)
         tags.append(tag)
     return tags
+
+
+def _resolve_select_value(field: "CustomField", label: str) -> str | None:
+    """Map a select label back to the option ID the instance stores, or None
+    when the label matches no option (already filtered, defensive only)."""
+    options = (field.extra_data or {}).get("select_options", []) or []
+    for option in options:
+        if option.get("label") == label:
+            return option.get("id")
+    return None
+
+
+def _write_custom_field_value(
+    document: Document,
+    field: "CustomField",
+    value: Any,
+) -> None:
+    """Write one coerced value to the document's custom field instance,
+    using the type-appropriate storage column. Mirrors modify_custom_fields()
+    in bulk_edit for a single document."""
+    value_field = CustomFieldInstance.TYPE_TO_DATA_STORE_NAME_MAP[field.data_type]
+    stored = value
+    if field.data_type == CustomField.FieldDataType.SELECT:
+        stored = _resolve_select_value(field, value)
+    CustomFieldInstance.objects.update_or_create(
+        document=document,
+        field=field,
+        defaults={value_field: stored},
+    )
+
+
+def apply_ai_suggestions_to_custom_fields(
+    action: WorkflowAction,
+    document: Document,
+    suggestions: ClassificationSuggestions,
+    logging_group=None,
+) -> list[int]:
+    """
+    Write AI-suggested custom field values to the document. Honors
+    ai_overwrite_existing: without it, only fields that currently have no
+    value are touched. Returns the custom field IDs that were changed.
+    """
+    selected_ids = action.ai_suggestion_custom_fields or []
+    if not selected_ids:
+        return []
+
+    suggested = suggestions["custom_fields"]
+    # Only write fields the model actually produced a value for.
+    to_apply = [fid for fid in selected_ids if fid in suggested]
+    if not to_apply:
+        return []
+
+    fields_by_id = CustomField.objects.in_bulk(to_apply)
+    current_values = {
+        instance.field_id: instance.value
+        for instance in document.custom_fields.all()
+        if instance.field_id in fields_by_id
+    }
+    overwrite = action.ai_overwrite_existing
+
+    updated: list[int] = []
+    for field_id in to_apply:
+        field = fields_by_id.get(field_id)
+        if field is None:
+            continue
+        if not overwrite and current_values.get(field_id) not in (None, ""):
+            continue
+        _write_custom_field_value(document, field, suggested[field_id])
+        updated.append(field_id)
+
+    if updated:
+        logger.info(
+            "Applied AI suggestions to custom fields %s for document %s",
+            updated,
+            document.pk,
+            extra={"group": logging_group},
+        )
+    return updated
 
 
 def apply_ai_suggestions_to_document(
@@ -251,6 +333,15 @@ def apply_ai_suggestions_to_document(
             # Suggested tags are always added, so overwrite_existing
             # does not really apply here
             updated_fields.append("tags")
+
+    updated_custom_field_ids = apply_ai_suggestions_to_custom_fields(
+        action,
+        document,
+        suggestions,
+        logging_group,
+    )
+    if updated_custom_field_ids:
+        updated_fields.append("custom_fields")
 
     if updated_fields:
         # save fields and update modified (excluding m2m tags from update_fields)

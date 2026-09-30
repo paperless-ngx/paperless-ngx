@@ -21,6 +21,8 @@ from paperless_ai.ai_classifier import build_prompt_without_rag
 from paperless_ai.ai_classifier import get_ai_document_classification
 from paperless_ai.ai_classifier import get_language_name
 from paperless_ai.ai_classifier import get_taxonomy_context
+from paperless_ai.base_model import DocumentClassifierSchema
+from paperless_ai.base_model import model_to_classification_suggestions
 from paperless_ai.taxonomy import SimilarDocument
 from paperless_ai.taxonomy import TaxonomyCandidate
 from paperless_ai.taxonomy import TaxonomyCandidates
@@ -69,14 +71,31 @@ def mock_document():
     return doc
 
 
-NESTED_SUGGESTIONS = {
+_FLAT_SUGGESTION_VALUES = {
     "title": "Test Title",
-    "tags": {"existing_ids": [], "new_names": ["test", "document"]},
-    "correspondents": {"existing_ids": [], "new_names": ["John Doe"]},
-    "document_types": {"existing_ids": [], "new_names": ["report"]},
-    "storage_paths": {"existing_ids": [], "new_names": ["Reports"]},
+    "tags": ["test", "document"],
+    "matched_tags": [],
+    "tag_ids": [],
+    "correspondents": ["John Doe"],
+    "matched_correspondents": [],
+    "correspondent_ids": [],
+    "document_types": ["report"],
+    "matched_document_types": [],
+    "document_type_ids": [],
+    "storage_paths": ["Reports"],
+    "matched_storage_paths": [],
+    "storage_path_ids": [],
     "dates": ["2023-01-01"],
+    "custom_fields": {},
 }
+
+
+def flat_suggestions(**overrides) -> DocumentClassifierSchema:
+    """A complete flat LLM response (what AIClient.run_llm_query returns)
+    with individual fields overridden."""
+    flat = dict(_FLAT_SUGGESTION_VALUES)
+    flat.update(overrides)
+    return DocumentClassifierSchema(**flat)
 
 
 @pytest.mark.django_db
@@ -97,15 +116,15 @@ def test_get_ai_document_classification_success(mock_run_llm_query, mock_documen
           localization prompt asks to rewrite only new_names/title
     """
     mock_run_llm_query.side_effect = [
-        NESTED_SUGGESTIONS,
-        {
-            "title": "Testtitel",
-            "tags": {"existing_ids": [], "new_names": ["Test", "Document"]},
-            "correspondents": {"existing_ids": [], "new_names": ["Jane Doe"]},
-            "document_types": {"existing_ids": [], "new_names": ["Bericht"]},
-            "storage_paths": {"existing_ids": [], "new_names": ["Berichte"]},
-            "dates": ["2024-01-01"],
-        },
+        flat_suggestions(),
+        flat_suggestions(
+            title="Testtitel",
+            tags=["Test", "Document"],
+            correspondents=["Jane Doe"],
+            document_types=["Bericht"],
+            storage_paths=["Berichte"],
+            dates=["2024-01-01"],
+        ),
     ]
 
     result = get_ai_document_classification(mock_document, output_language="de-de")
@@ -141,15 +160,15 @@ def test_get_ai_document_classification_keeps_originals_when_localization_empty(
         - The original (pre-localization) suggestions are kept for every field
     """
     mock_run_llm_query.side_effect = [
-        NESTED_SUGGESTIONS,
-        {
-            "title": "",
-            "tags": {"existing_ids": [], "new_names": []},
-            "correspondents": {"existing_ids": [], "new_names": []},
-            "document_types": {"existing_ids": [], "new_names": []},
-            "storage_paths": {"existing_ids": [], "new_names": []},
-            "dates": [],
-        },
+        flat_suggestions(),
+        flat_suggestions(
+            title="",
+            tags=[],
+            correspondents=[],
+            document_types=[],
+            storage_paths=[],
+            dates=[],
+        ),
     ]
 
     result = get_ai_document_classification(mock_document, output_language="de-de")
@@ -215,18 +234,10 @@ def test_use_rag_if_configured(
         storage_paths=[],
     )
     mock_build_prompt_with_rag.return_value = "Prompt with RAG"
-    mock_run_llm_query.return_value = NESTED_SUGGESTIONS
+    mock_run_llm_query.return_value = flat_suggestions()
     get_ai_document_classification(mock_document)
     mock_build_prompt_with_rag.assert_called_once()
-    mock_run_llm_query.assert_called_once_with(
-        "Prompt with RAG",
-        allowed_candidate_ids={
-            "tags": {12},
-            "document_types": set(),
-            "correspondents": set(),
-            "storage_paths": set(),
-        },
-    )
+    mock_run_llm_query.assert_called_once_with("Prompt with RAG")
 
 
 @pytest.mark.django_db
@@ -248,7 +259,7 @@ def test_use_rag_prompt_even_without_embedding_backend(
           fallback's context/candidates instead of the vector store's)
     """
     mock_build_prompt_with_rag.return_value = "Prompt with RAG"
-    mock_run_llm_query.return_value = NESTED_SUGGESTIONS
+    mock_run_llm_query.return_value = flat_suggestions()
     get_ai_document_classification(mock_document)
     mock_build_prompt_with_rag.assert_called_once()
 
@@ -285,7 +296,10 @@ def test_prompt_with_without_rag(mock_document):
     assert "Additional context from similar documents" in prompt
     assert "Context from similar documents" in prompt
 
-    prompt = build_localization_prompt(NESTED_SUGGESTIONS, output_language="de-de")
+    prompt = build_localization_prompt(
+        model_to_classification_suggestions(DocumentClassifierSchema(title="T")),
+        "de-de",
+    )
     assert "Rewrite only the" in prompt
     assert "Do not translate correspondents or dates" in prompt
     assert '"tag_ids":[]' in prompt
@@ -320,6 +334,7 @@ def test_build_localization_prompt_preserves_unicode_characters():
             "document_types": {"existing_ids": [], "new_names": []},
             "storage_paths": {"existing_ids": [], "new_names": []},
             "dates": [],
+            "custom_fields": {},
         },
         output_language="de-de",
     )
@@ -1020,24 +1035,21 @@ def test_get_ai_document_classification_localizes_only_new_names(
     )
     mock_client = mock_client_cls.return_value
     mock_client.run_llm_query.side_effect = [
-        {
-            "title": "Invoice",
-            "tags": {"existing_ids": [12], "new_names": ["Contractor Work"]},
-            "correspondents": {"existing_ids": [], "new_names": []},
-            "document_types": {"existing_ids": [], "new_names": []},
-            "storage_paths": {"existing_ids": [], "new_names": []},
-            "dates": [],
-        },
-        {
-            # The model's own localized-response existing_ids (999) must be
-            # discarded - the merge always keeps the ORIGINAL resolved id.
-            "title": "Rechnung",
-            "tags": {"existing_ids": [999], "new_names": ["Auftragsarbeit"]},
-            "correspondents": {"existing_ids": [], "new_names": []},
-            "document_types": {"existing_ids": [], "new_names": []},
-            "storage_paths": {"existing_ids": [], "new_names": []},
-            "dates": [],
-        },
+        flat_suggestions(
+            title="Invoice",
+            tags=["Contractor", "Contractor Work"],
+            matched_tags=["Contractor"],
+            tag_ids=[12],
+        ),
+        # The model's own localized-response existing_ids (999) must be
+        # discarded - the merge always keeps the ORIGINAL resolved id.
+        flat_suggestions(
+            title="Rechnung",
+            tags=["Auftragsarbeit"],
+            matched_tags=["Auftragsarbeit"],
+            tag_ids=[999],
+            dates=[],
+        ),
     ]
 
     result = get_ai_document_classification(document, output_language="de-de")

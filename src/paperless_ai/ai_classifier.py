@@ -9,9 +9,15 @@ from documents.permissions import restrict_queryset_to_visible
 from documents.permissions import user_is_unrestricted
 from paperless.config import AIConfig
 from paperless_ai.base_model import ClassificationSuggestions
+from paperless_ai.base_model import DocumentClassifierSchema
 from paperless_ai.base_model import TaxonomyChoiceDict
 from paperless_ai.base_model import classification_suggestions_to_model
+from paperless_ai.base_model import model_to_classification_suggestions
 from paperless_ai.client import AIClient
+from paperless_ai.custom_fields import coerce_custom_field_suggestions
+from paperless_ai.custom_fields import format_custom_fields_for_prompt
+from paperless_ai.custom_fields import get_ai_suggestable_custom_fields
+from paperless_ai.custom_fields import get_custom_field_prompt_data
 from paperless_ai.db import db_connection_released
 from paperless_ai.indexing import retrieve_similar_nodes
 from paperless_ai.indexing import truncate_content
@@ -110,6 +116,7 @@ def build_prompt_without_rag(
     document: Document,
     config: AIConfig,
     candidates: TaxonomyCandidates | None = None,
+    custom_fields_block: str = "",
 ) -> str:
     filename = document.filename or ""
     content = truncate_content(
@@ -129,6 +136,7 @@ def build_prompt_without_rag(
             content=content,
             taxonomy_block=taxonomy_block,
             has_candidates=has_candidates,
+            custom_fields_block=custom_fields_block,
         ),
     )
 
@@ -138,11 +146,13 @@ def build_prompt_with_rag(
     config: AIConfig,
     candidates: TaxonomyCandidates | None = None,
     context: str = "",
+    custom_fields_block: str = "",
 ) -> str:
     base_prompt = build_prompt_without_rag(
         document,
         config,
         candidates=candidates,
+        custom_fields_block=custom_fields_block,
     )
     truncated_context = truncate_content(
         context,
@@ -249,27 +259,15 @@ def get_taxonomy_context(
     return candidates, "\n\n".join(context_blocks)
 
 
-def parse_ai_response(raw: dict) -> ClassificationSuggestions:
-    """``raw`` is AIClient.run_llm_query()'s validated internal-shape result.
-    This gives the rest of the module a named, typed boundary instead of
-    passing the client's bare dict straight through everywhere.
+def parse_ai_response(
+    raw: DocumentClassifierSchema,
+    allowed_candidate_ids: dict[str, set[int]] | None = None,
+) -> ClassificationSuggestions:
+    """``raw`` is AIClient.run_llm_query()'s flat schema result. Convert it to
+    the named, typed internal shape this module works with, validating the
+    candidate mappings along the way.
     """
-
-    def _choice(value: dict | None) -> TaxonomyChoiceDict:
-        value = value or {}
-        return TaxonomyChoiceDict(
-            existing_ids=value.get("existing_ids", []),
-            new_names=value.get("new_names", []),
-        )
-
-    return ClassificationSuggestions(
-        title=raw.get("title", ""),
-        tags=_choice(raw.get("tags")),
-        correspondents=_choice(raw.get("correspondents")),
-        document_types=_choice(raw.get("document_types")),
-        storage_paths=_choice(raw.get("storage_paths")),
-        dates=raw.get("dates", []),
-    )
+    return model_to_classification_suggestions(raw, allowed_candidate_ids)
 
 
 def _candidate_id_allowlist(
@@ -295,23 +293,39 @@ def get_ai_document_classification(
 ) -> ClassificationSuggestions:
     ai_config = AIConfig()
 
+    # Custom field definitions are installation-wide, so there is no
+    # per-document/per-user variation in the prompt for them.
+    custom_field_definitions = get_ai_suggestable_custom_fields()
+    custom_fields_block = format_custom_fields_for_prompt(
+        get_custom_field_prompt_data(),
+    )
+
     candidates, context = get_taxonomy_context(document, user)
     prompt = build_prompt_with_rag(
         document,
         ai_config,
         candidates=candidates,
         context=context,
+        custom_fields_block=custom_fields_block,
     )
 
     client = AIClient()
     # Hand the pooled DB connection back while the (slow) LLM query runs so it
     # is not pinned for the call's duration; see paperless_ai.db and #12976.
     with db_connection_released():
-        result = client.run_llm_query(
-            prompt,
-            allowed_candidate_ids=_candidate_id_allowlist(candidates),
+        result = client.run_llm_query(prompt)
+        # Coerce the custom field values against the live field definitions
+        # BEFORE validation: invalid values are dropped here and cannot
+        # survive into suggestions.
+        custom_field_suggestions = coerce_custom_field_suggestions(
+            result.custom_fields,
+            custom_field_definitions,
         )
-        suggestions = parse_ai_response(result)
+        suggestions = parse_ai_response(
+            result,
+            _candidate_id_allowlist(candidates),
+        )
+        suggestions["custom_fields"] = custom_field_suggestions
         if output_language:
             localized = client.run_llm_query(
                 build_localization_prompt(suggestions, output_language),
@@ -337,5 +351,6 @@ def get_ai_document_classification(
                 document_types=_localized_choice("document_types"),
                 storage_paths=_localized_choice("storage_paths"),
                 dates=suggestions["dates"],
+                custom_fields=suggestions["custom_fields"],  # never localized
             )
     return suggestions

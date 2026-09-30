@@ -255,6 +255,7 @@ from paperless.views import StandardPagination
 from paperless_ai.ai_classifier import get_ai_document_classification
 from paperless_ai.ai_classifier import get_llm_output_language
 from paperless_ai.chat import stream_chat_with_documents
+from paperless_ai.custom_fields import get_ai_suggestable_custom_fields
 from paperless_ai.exceptions import LLMProviderError
 from paperless_ai.exceptions import LLMTimeoutError
 from paperless_ai.matching import extract_unmatched_names
@@ -1757,6 +1758,12 @@ class DocumentViewSet(
             match_storage_paths_by_name,
         )
 
+        # Resolve suggested custom field names against the live field
+        # definitions; ids the model invented for unknown fields are dropped.
+        fields_by_id = {
+            field.pk: field for field in get_ai_suggestable_custom_fields()
+        }
+
         resp_data = {
             "title": llm_suggestions["title"],
             "tags": [t.id for t in matched_tags],
@@ -1780,6 +1787,17 @@ class DocumentViewSet(
                 matched_paths,
             ),
             "dates": llm_suggestions["dates"],
+            "custom_fields": [
+                {
+                    "id": field_id,
+                    "name": fields_by_id[field_id].name,
+                    "value": value,
+                }
+                for field_id, value in sorted(
+                    (llm_suggestions.get("custom_fields") or {}).items(),
+                )
+                if field_id in fields_by_id
+            ],
         }
 
         return Response(resp_data)

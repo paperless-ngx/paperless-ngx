@@ -9,6 +9,8 @@
   </div>
   <div class="modal-body">
     <pngx-input-text i18n-title title="Name" formControlName="name" [error]="error?.name" autocomplete="off"></pngx-input-text>
+    <pngx-input-textarea i18n-title title="Description" formControlName="description"
+      i18n-hint hint="Used by the AI to suggest values for this field. Falls back to the field name when empty."></pngx-input-textarea>
     <pngx-input-select i18n-title title="Data type" [items]="getDataTypes()" formControlName="data_type"></pngx-input-select>
     @if (typeFieldDisabled) {
       <small class="d-block mt-n2" i18n>Data type cannot be changed after a field is created</small>

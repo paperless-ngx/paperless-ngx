@@ -116,6 +116,8 @@ export interface WorkflowAction extends ObjectWithId {
 
   ai_suggestion_fields?: AISuggestionField[]
 
+  ai_suggestion_custom_fields?: number[]
+
   ai_create_missing?: boolean
 
   ai_overwrite_existing?: boolean

@@ -60,6 +60,7 @@ export interface CustomField extends ObjectWithId {
   data_type: CustomFieldDataType
   name: string
   created?: Date
+  description?: string
   extra_data?: {
     select_options?: Array<{ label: string; id: string }>
     default_currency?: string

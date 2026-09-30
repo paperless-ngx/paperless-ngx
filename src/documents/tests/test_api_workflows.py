@@ -777,6 +777,79 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_api_create_apply_ai_suggestions_action_with_custom_fields(self) -> None:
+        """
+        GIVEN:
+            - API request to create an apply AI suggestions action that also
+              applies suggestions to existing custom fields
+        WHEN:
+            - API is called
+        THEN:
+            - The workflow is created with the selected custom field IDs
+        """
+        response = self._post_ai_suggestions_workflow(
+            trigger_types=[WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED],
+            action={
+                "ai_suggestion_fields": ["title"],
+                "ai_suggestion_custom_fields": [self.cf1.pk, self.cf2.pk],
+            },
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        action = Workflow.objects.get(name="Apply AI suggestions").actions.first()
+        self.assertEqual(
+            action.ai_suggestion_custom_fields,
+            [self.cf1.pk, self.cf2.pk],
+        )
+
+    def test_api_create_apply_ai_suggestions_action_rejects_unknown_custom_field(
+        self,
+    ) -> None:
+        """
+        GIVEN:
+            - API request to create an apply AI suggestions action naming a
+              custom field that does not exist
+        WHEN:
+            - API is called
+        THEN:
+            - Correct HTTP 400 response
+            - No objects are created
+        """
+        existing_count = Workflow.objects.count()
+
+        response = self._post_ai_suggestions_workflow(
+            trigger_types=[WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED],
+            action={
+                "ai_suggestion_fields": ["title"],
+                "ai_suggestion_custom_fields": [self.cf1.pk, 999999],
+            },
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(Workflow.objects.count(), existing_count)
+
+    def test_api_create_apply_ai_suggestions_action_rejects_empty_custom_fields(
+        self,
+    ) -> None:
+        """
+        GIVEN:
+            - API request to create an apply AI suggestions action with an
+              explicitly empty custom field list
+        WHEN:
+            - API is called
+        THEN:
+            - Correct HTTP 400 response
+        """
+        response = self._post_ai_suggestions_workflow(
+            trigger_types=[WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED],
+            action={
+                "ai_suggestion_fields": ["title"],
+                "ai_suggestion_custom_fields": [],
+            },
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_api_create_apply_ai_suggestions_action_rejects_consumption_only(
         self,
     ) -> None:

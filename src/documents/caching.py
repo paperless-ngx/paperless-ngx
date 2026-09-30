@@ -47,7 +47,8 @@ CLASSIFIER_MODIFIED_KEY: Final[str] = "classifier_modified"
 #          [...]} per taxonomy field (#13676)
 #   1002 - names are always generated and optional candidate mappings are
 #          validated separately, so candidate-anchored 1001 results are stale
-LLM_CACHE_CLASSIFIER_VERSION: Final[int] = 1002
+#   1003 - suggestions gained a "custom_fields" object (field_id -> value)
+LLM_CACHE_CLASSIFIER_VERSION: Final[int] = 1003
 
 CACHE_1_MINUTE: Final[int] = 60
 CACHE_5_MINUTES: Final[int] = 5 * CACHE_1_MINUTE
@@ -140,6 +141,30 @@ def _llm_generation_key(document_id: int) -> str:
     return f"{get_suggestion_cache_key(document_id)}_llm_generation"
 
 
+CUSTOM_FIELDS_GENERATION_KEY: Final[str] = "suggestions_llm_custom_fields_generation"
+
+
+def get_custom_fields_generation() -> str:
+    """Installation-wide token identifying the current set of custom field
+    definitions used in the AI prompt. Custom fields are global, so one token
+    covers them all; it is rotated on every custom field change."""
+    return cache.get_or_set(
+        CUSTOM_FIELDS_GENERATION_KEY,
+        lambda: uuid.uuid4().hex,
+        timeout=LLM_CACHE_GENERATION_TIMEOUT,
+    )
+
+
+def rotate_custom_fields_generation() -> None:
+    """Invalidate all cached LLM suggestions: the custom field definitions
+    that feed the AI prompt just changed."""
+    cache.set(
+        CUSTOM_FIELDS_GENERATION_KEY,
+        uuid.uuid4().hex,
+        timeout=LLM_CACHE_GENERATION_TIMEOUT,
+    )
+
+
 def _llm_variant_key(document_id: int, backend: str) -> str:
     """Cache key for one LLM configuration and permission scope.
 
@@ -157,7 +182,11 @@ def _llm_variant_key(document_id: int, backend: str) -> str:
     )
     cache.touch(generation_key, LLM_CACHE_GENERATION_TIMEOUT)
     backend_hash = hashlib.sha256(backend.encode()).hexdigest()[:16]
-    return f"{get_suggestion_cache_key(document_id)}_llm_{generation}_{backend_hash}"
+    custom_fields_generation = get_custom_fields_generation()
+    return (
+        f"{get_suggestion_cache_key(document_id)}_llm_{generation}_"
+        f"{backend_hash}_{custom_fields_generation}"
+    )
 
 
 def get_llm_suggestion_cache(

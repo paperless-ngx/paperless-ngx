@@ -1316,6 +1316,9 @@ export class WorkflowEditDialogComponent
         ai_suggestion_fields: new FormControl(
           action.ai_suggestion_fields ?? []
         ),
+        ai_suggestion_custom_fields: new FormControl(
+          action.ai_suggestion_custom_fields ?? []
+        ),
         ai_create_missing: new FormControl(!!action.ai_create_missing),
         ai_overwrite_existing: new FormControl(!!action.ai_overwrite_existing),
       }),
@@ -1410,6 +1413,13 @@ export class WorkflowEditDialogComponent
     return AI_SUGGESTION_FIELD_OPTIONS
   }
 
+  get aiSuggestionCustomFieldOptions() {
+    // Document link fields are never suggested by the AI
+    return (this.customFields() ?? []).filter(
+      (f) => f.data_type !== CustomFieldDataType.DocumentLink
+    )
+  }
+
   addAction() {
     if (!this.object) {
       this.object = Object.assign({}, this.objectForm.value)
@@ -1464,6 +1474,7 @@ export class WorkflowEditDialogComponent
       },
       passwords: [],
       ai_suggestion_fields: [],
+      ai_suggestion_custom_fields: [],
       ai_create_missing: false,
       ai_overwrite_existing: false,
     }

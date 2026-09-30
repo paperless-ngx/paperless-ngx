@@ -48,6 +48,15 @@
               <button type="button" class="list-group-item list-group-item-action bg-light" (click)="addCorrespondent.emit(correspondent)">{{ correspondent }}</button>
             }
           }
+          @if (suggestions()?.custom_fields?.length > 0) {
+            <div class="list-group-item text-uppercase text-muted small"><i-bs class="me-2" name="tag"></i-bs><ng-container i18n>Custom Fields</ng-container></div>
+            @for (field of suggestions().custom_fields; track field.id) {
+              <button type="button" class="list-group-item list-group-item-action bg-light d-flex justify-content-between align-items-center" (click)="applyCustomField.emit(field)">
+                <span>{{ field.name }}</span>
+                <span class="text-muted">{{ formatCustomFieldValue(field.value) }}</span>
+              </button>
+            }
+          }
           @if (reusableSuggestions > 0) {
             <div class="list-group-item text-muted fst-italic">
               <small class="text-muted small fst-italic" i18n>{reusableSuggestions, plural, =1 {1 existing value suggested below} other {{{reusableSuggestions}} existing values suggested below}}</small>

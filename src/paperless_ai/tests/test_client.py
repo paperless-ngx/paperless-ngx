@@ -139,13 +139,12 @@ def test_run_llm_query_ollama_uses_structured_json(mock_ai_config, mock_ollama_l
     )
 
     client = AIClient()
-    result = client.run_llm_query(
-        "test_prompt",
-        allowed_candidate_ids={"tags": {1}},
-    )
+    result = client.run_llm_query("test_prompt")
 
-    assert result["title"] == "Test Title"
-    assert result["tags"] == {"existing_ids": [1], "new_names": []}
+    assert result.title == "Test Title"
+    assert result.tags == ["document"]
+    assert result.matched_tags == ["document"]
+    assert result.tag_ids == [1]
     mock_llm_instance.chat.assert_called_once_with(
         [ANY],
         format=ANY,
@@ -182,13 +181,12 @@ def test_run_llm_query_openai_uses_tools(mock_ai_config, mock_openai_llm):
     mock_llm_instance.get_tool_calls_from_response.return_value = [tool_selection]
 
     client = AIClient()
-    result = client.run_llm_query(
-        "test_prompt",
-        allowed_candidate_ids={"tags": {1}},
-    )
+    result = client.run_llm_query("test_prompt")
 
-    assert result["title"] == "Test Title"
-    assert result["tags"] == {"existing_ids": [1], "new_names": []}
+    assert result.title == "Test Title"
+    assert result.tags == ["document"]
+    assert result.matched_tags == ["document"]
+    assert result.tag_ids == [1]
     mock_llm_instance.chat_with_tools.assert_called_once()
     kwargs = mock_llm_instance.chat_with_tools.call_args.kwargs
     offered_tool_name = kwargs["tools"][0].metadata.name

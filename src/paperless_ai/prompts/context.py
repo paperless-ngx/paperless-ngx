@@ -18,6 +18,7 @@ class ClassificationPromptContext(PromptContext):
     content: str
     taxonomy_block: str
     has_candidates: bool
+    custom_fields_block: str
 
 
 @dataclass(frozen=True, slots=True)

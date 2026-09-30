@@ -138,10 +138,12 @@
                 [appliedCorrespondent]="documentForm.value.correspondent"
                 [appliedDocumentType]="documentForm.value.document_type"
                 [appliedStoragePath]="documentForm.value.storage_path"
+                [appliedCustomFields]="appliedCustomFieldValues"
                 (getSuggestions)="getSuggestions()"
                 (addTag)="createTag($event)"
                 (addDocumentType)="createDocumentType($event)"
-                (addCorrespondent)="createCorrespondent($event)">
+                (addCorrespondent)="createCorrespondent($event)"
+                (applyCustomField)="applyCustomFieldSuggestion($event)">
               </pngx-suggestions-dropdown>
             </div>
 

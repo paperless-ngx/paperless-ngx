@@ -166,6 +166,15 @@ class DocumentClassifierSchema(BaseModel):
             "document was issued."
         ),
     )
+    custom_fields: dict[str, str] = Field(
+        default_factory=dict,
+        description=(
+            "Values for the installation's custom fields, keyed by the "
+            '"cf_<id>" identifier given for each field in the prompt. '
+            "Give each value as a single string, or omit the key when the "
+            "document does not clearly contain a value for that field."
+        ),
+    )
 
     @field_validator(
         "title",
@@ -205,17 +214,22 @@ class ClassificationSuggestions(TypedDict):
     document_types: TaxonomyChoiceDict
     storage_paths: TaxonomyChoiceDict
     dates: list[str]
+    custom_fields: dict[int, Any]
 
 
 def model_to_classification_suggestions(
     model: DocumentClassifierSchema,
     allowed_candidate_ids: dict[str, set[int]] | None = None,
+    custom_fields: dict[int, Any] | None = None,
 ) -> ClassificationSuggestions:
     """Validate optional candidate mappings and convert to the internal shape.
 
     A mapping is accepted only when its name is copied from the model's own
     complete suggestion list and its ID was actually shown for that category.
     Invalid or unpaired mappings leave the original name untouched.
+
+    ``custom_fields`` holds the already-coerced custom field values
+    (field_id -> value), pre-validated against the live field definitions.
     """
     allowed_candidate_ids = allowed_candidate_ids or {}
 
@@ -270,6 +284,7 @@ def model_to_classification_suggestions(
             "storage_paths",
         ),
         dates=model.dates,
+        custom_fields=custom_fields if custom_fields is not None else {},
     )
 
 

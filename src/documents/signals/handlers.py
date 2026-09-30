@@ -715,12 +715,23 @@ def check_paths_and_prune_custom_fields(
     ):  # Only select fields, for now
         process_cf_select_update.apply_async(kwargs={"custom_field": instance})
 
+    # Custom field definitions feed the AI classification prompt, so a
+    # change to any of them (name, description, select options) makes all
+    # cached LLM suggestions stale.
+    from documents.caching import rotate_custom_fields_generation
+
+    rotate_custom_fields_generation()
+
 
 @receiver(models.signals.post_delete, sender=CustomField)
 def cleanup_custom_field_deletion(sender, instance: CustomField, **kwargs) -> None:
     """
     When a custom field is deleted, ensure no saved views reference it.
     """
+    from documents.caching import rotate_custom_fields_generation
+
+    rotate_custom_fields_generation()
+
     field_identifier = SavedView.DisplayFields.CUSTOM_FIELD % instance.pk
     # remove field from display_fields of all saved views
     for view in SavedView.objects.filter(display_fields__isnull=False).distinct():
