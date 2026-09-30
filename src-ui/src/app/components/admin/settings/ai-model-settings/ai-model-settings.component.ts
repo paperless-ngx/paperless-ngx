@@ -232,8 +232,10 @@ export class AiModelSettingsComponent implements OnInit {
       model_type: raw.model_type,
       base_model: raw.base_model,
       api_domain: raw.api_domain,
-      api_key: raw.api_key,
       is_default: raw.is_default,
+    }
+    if (!payload.id || raw.api_key) {
+      payload.api_key = raw.api_key
     }
 
     const request$ = payload.id
