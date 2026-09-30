@@ -252,6 +252,7 @@ testpaths = [
   "src/paperless_tesseract/tests/",
   "src/paperless_tika/tests",
   "src/paperless_text/tests/",
+  "src/paperless_video/tests/",
 ]
 addopts = [
   "--pythonwarnings=all",
