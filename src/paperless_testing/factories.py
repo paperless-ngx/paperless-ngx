@@ -5,8 +5,7 @@ Factory-boy factories for documents app models.
 from __future__ import annotations
 
 import factory
-from django.contrib.auth import get_user_model
-from factory.django import DjangoModelFactory
+from django.contrib.auth.models import User
 
 from documents.models import Correspondent
 from documents.models import Document
@@ -16,11 +15,10 @@ from documents.models import MatchingModel
 from documents.models import PaperlessTask
 from documents.models import StoragePath
 from documents.models import Tag
+from paperless_testing.typed_factory import TypedModelFactory
 
-UserModelT = get_user_model()
 
-
-class CorrespondentFactory(DjangoModelFactory[Correspondent]):
+class CorrespondentFactory(TypedModelFactory[Correspondent]):
     class Meta:
         model = Correspondent
 
@@ -29,7 +27,7 @@ class CorrespondentFactory(DjangoModelFactory[Correspondent]):
     matching_algorithm = MatchingModel.MATCH_NONE
 
 
-class DocumentTypeFactory(DjangoModelFactory[DocumentType]):
+class DocumentTypeFactory(TypedModelFactory[DocumentType]):
     class Meta:
         model = DocumentType
 
@@ -38,7 +36,7 @@ class DocumentTypeFactory(DjangoModelFactory[DocumentType]):
     matching_algorithm = MatchingModel.MATCH_NONE
 
 
-class TagFactory(DjangoModelFactory[Tag]):
+class TagFactory(TypedModelFactory[Tag]):
     class Meta:
         model = Tag
 
@@ -48,7 +46,7 @@ class TagFactory(DjangoModelFactory[Tag]):
     is_inbox_tag = False
 
 
-class StoragePathFactory(DjangoModelFactory[StoragePath]):
+class StoragePathFactory(TypedModelFactory[StoragePath]):
     class Meta:
         model = StoragePath
 
@@ -60,7 +58,7 @@ class StoragePathFactory(DjangoModelFactory[StoragePath]):
     matching_algorithm = MatchingModel.MATCH_NONE
 
 
-class DocumentFactory(DjangoModelFactory[Document]):
+class DocumentFactory(TypedModelFactory[Document]):
     class Meta:
         model = Document
 
@@ -72,7 +70,7 @@ class DocumentFactory(DjangoModelFactory[Document]):
     storage_path = None
 
 
-class DocumentBarcodeFactory(DjangoModelFactory[DocumentBarcode]):
+class DocumentBarcodeFactory(TypedModelFactory[DocumentBarcode]):
     class Meta:
         model = DocumentBarcode
 
@@ -82,9 +80,9 @@ class DocumentBarcodeFactory(DjangoModelFactory[DocumentBarcode]):
     format = DocumentBarcode.Format.QR_CODE
 
 
-class UserFactory(DjangoModelFactory[UserModelT]):
+class UserFactory(TypedModelFactory[User]):
     class Meta:
-        model = UserModelT
+        model = User
 
     username = factory.Sequence(lambda n: f"user{n}")
     is_staff = False
@@ -99,7 +97,7 @@ class UserFactory(DjangoModelFactory[UserModelT]):
         staff = factory.Trait(is_staff=True)
 
 
-class PaperlessTaskFactory(DjangoModelFactory[PaperlessTask]):
+class PaperlessTaskFactory(TypedModelFactory[PaperlessTask]):
     class Meta:
         model = PaperlessTask
 

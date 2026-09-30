@@ -1194,6 +1194,7 @@ class DocumentViewSet(
                     "version_label",
                     "root_document_id",
                     "version_index",
+                    "page_count",
                 ),
             ),
             "tags",
@@ -1275,13 +1276,16 @@ class DocumentViewSet(
         if (
             "version" not in request.query_params
             or not isinstance(response.data, dict)
-            or "content" not in response.data
+            or not ({"content", "page_count"} & response.data.keys())
         ):
             return response
 
         root_doc = self.get_object()
         content_doc = self._resolve_file_doc(root_doc, request)
-        response.data["content"] = content_doc.content or ""
+        if "content" in response.data:
+            response.data["content"] = content_doc.content or ""
+        if "page_count" in response.data:
+            response.data["page_count"] = content_doc.page_count
         return response
 
     def update(self, request, *args, **kwargs):
