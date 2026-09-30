@@ -35,6 +35,25 @@
     </div>
   </div>
 
+  <div class="row mt-4">
+    <div class="col-xl-6 pe-xl-5">
+      <h5 i18n>视频语音摘要提示词 (VIDEO_ASR_SUMMARY)</h5>
+      <div class="mb-3">
+        <textarea
+          class="form-control"
+          rows="6"
+          [disabled]="loading || saving"
+          placeholder="Enter system prompt for summarizing video transcripts..."
+          i18n-placeholder
+          formControlName="videoAsrSummary"
+        ></textarea>
+        <small class="form-text text-muted" i18n>
+          Used as the system prompt when summarizing speech-to-text from videos.
+        </small>
+      </div>
+    </div>
+  </div>
+
   <div class="mt-3">
     <button
       type="button"

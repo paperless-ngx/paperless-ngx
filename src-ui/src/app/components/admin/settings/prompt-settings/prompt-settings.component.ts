@@ -29,10 +29,12 @@ export class PromptSettingsComponent implements OnInit {
 
   docReadPrompt: Prompt = null
   vlmPrompt: Prompt = null
+  videoAsrSummaryPrompt: Prompt = null
 
   form: FormGroup = this.fb.group({
     docRead: [''],
     vlmAnalysisImage: [''],
+    videoAsrSummary: [''],
   })
 
   ngOnInit(): void {
@@ -46,10 +48,13 @@ export class PromptSettingsComponent implements OnInit {
         this.docReadPrompt = prompts.find((p) => p.type === 'DOC_READ') || null
         this.vlmPrompt =
           prompts.find((p) => p.type === 'VLM_ANALYSIS_IMAGE') || null
+        this.videoAsrSummaryPrompt =
+          prompts.find((p) => p.type === 'VIDEO_ASR_SUMMARY') || null
 
         this.form.patchValue({
           docRead: this.docReadPrompt?.content || '',
           vlmAnalysisImage: this.vlmPrompt?.content || '',
+          videoAsrSummary: this.videoAsrSummaryPrompt?.content || '',
         })
 
         this.loading = false
@@ -65,7 +70,7 @@ export class PromptSettingsComponent implements OnInit {
     if (this.saving) return
     this.saving = true
 
-    const { docRead, vlmAnalysisImage } = this.form.getRawValue()
+    const { docRead, vlmAnalysisImage, videoAsrSummary } = this.form.getRawValue()
 
     const requests = []
     requests.push(
@@ -80,6 +85,13 @@ export class PromptSettingsComponent implements OnInit {
         'VLM_ANALYSIS_IMAGE',
         vlmAnalysisImage || '',
         this.vlmPrompt
+      )
+    )
+    requests.push(
+      this.promptService.upsertPrompt(
+        'VIDEO_ASR_SUMMARY',
+        videoAsrSummary || '',
+        this.videoAsrSummaryPrompt
       )
     )
 
