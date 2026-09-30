@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import shutil
 from contextlib import contextmanager
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 import pytest
@@ -34,7 +35,6 @@ from paperless_testing.fakes.progress import FakeProgressManager
 if TYPE_CHECKING:
     from collections.abc import Callable
     from collections.abc import Generator
-    from pathlib import Path
 
     from pytest_django.fixtures import Settings
     from pytest_mock import MockerFixture
@@ -1154,30 +1154,67 @@ SAMPLE_VALUES = [
 
 
 @pytest.fixture
+def samples_dir() -> Path:
+    return Path(__file__).parent / "samples"
+
+
+@pytest.fixture
+def barcode_samples_dir(samples_dir: Path) -> Path:
+    return samples_dir / "barcodes"
+
+
+@pytest.fixture
 def store_barcodes(settings: Settings) -> None:
     settings.CONSUMER_STORE_BARCODE_VALUES = True
 
 
 @pytest.fixture
+def barcode_reader(
+    paperless_dirs: PaperlessDirs,
+) -> Generator[Callable[[Path], BarcodePlugin], None, None]:
+    readers: list[BarcodePlugin] = []
+
+    def make(path: Path) -> BarcodePlugin:
+        reader = BarcodePlugin(
+            ConsumableDocument(DocumentSource.ConsumeFolder, original_file=path),
+            DocumentMetadataOverrides(),
+            FakeProgressManager(path.name, None),
+            paperless_dirs.scratch_dir,
+            "task-id",
+        )
+        reader.setup()
+        readers.append(reader)
+        return reader
+
+    yield make
+    for reader in readers:
+        reader.cleanup()
+
+
+@pytest.fixture
 def consume_sample(
     paperless_dirs: PaperlessDirs,
+    barcode_samples_dir: Path,
     fake_progress_manager: type[FakeProgressManager],
     settings: Settings,
-) -> Callable[..., None]:
+) -> Callable[..., Document]:
     settings.CELERY_TASK_ALWAYS_EAGER = True
     settings.OCR_MODE = "auto"
 
-    def consume(name: str, **kwargs) -> None:
+    def consume(name: str, *, root_document_id: int | None = None) -> Document:
         dst = paperless_dirs.scratch_dir / name
-        shutil.copy(SampleDirMixin.BARCODE_SAMPLE_DIR / name, dst)
+        shutil.copy(barcode_samples_dir / name, dst)
         tasks.consume_file(
             ConsumableDocument(
-                source=kwargs.pop("source", DocumentSource.ConsumeFolder),
+                source=DocumentSource.ApiUpload
+                if root_document_id
+                else DocumentSource.ConsumeFolder,
                 original_file=dst,
-                **kwargs,
+                root_document_id=root_document_id,
             ),
             None,
         )
+        return Document.objects.latest("id")
 
     return consume
 
@@ -1188,19 +1225,19 @@ def _stored(document: Document) -> list[dict]:
 
 def test_formats_cover_zxing() -> None:
     """
-    Every concrete format zxing-cpp can report has a DocumentBarcode.Format
+    DocumentBarcode.Format matches the concrete formats of zxing-cpp, so a
+    zxing-cpp update that adds or removes one fails here
     """
     members = zxingcpp.BarcodeFormat.__members__
     # skip NONE and the groups like AllLinear, including their aliases
     seen = {int(m) for n, m in members.items() if n == "NONE" or n.startswith("All")}
-    missing = []
+    concrete = set()
     for name, member in members.items():
-        if int(member) in seen:
-            continue
-        seen.add(int(member))
-        if name not in DocumentBarcode.Format.values:
-            missing.append(name)
-    assert missing == []
+        # aliases such as DataBarExpanded come after the name zxing reports
+        if int(member) not in seen:
+            seen.add(int(member))
+            concrete.add(name)
+    assert set(DocumentBarcode.Format.values) == concrete
 
 
 @pytest.mark.django_db
@@ -1220,6 +1257,7 @@ class TestBarcodeValues:
     def test_read_values_file_types(
         self,
         paperless_dirs: PaperlessDirs,
+        samples_dir: Path,
         settings: Settings,
         filename: str,
         mime_type: str,
@@ -1232,7 +1270,7 @@ class TestBarcodeValues:
         """
         settings.CONSUMER_BARCODE_TIFF_SUPPORT = tiff_support
         values = read_barcode_values(
-            SampleDirMixin.SAMPLE_DIR / filename,
+            samples_dir / filename,
             mime_type,
             BarcodeConfig(),
             paperless_dirs.scratch_dir,
@@ -1241,35 +1279,29 @@ class TestBarcodeValues:
 
     def test_values_detected(
         self,
-        paperless_dirs: PaperlessDirs,
+        barcode_reader: Callable[[Path], BarcodePlugin],
+        barcode_samples_dir: Path,
         store_barcodes: None,
     ) -> None:
-        test_file = SampleDirMixin.BARCODE_SAMPLE_DIR / "barcode-qr-url.pdf"
-        reader = BarcodePlugin(
-            ConsumableDocument(DocumentSource.ConsumeFolder, original_file=test_file),
-            DocumentMetadataOverrides(),
-            FakeProgressManager(test_file.name, None),
-            paperless_dirs.scratch_dir,
-            "task-id",
-        )
-        reader.setup()
-        try:
-            assert reader.able_to_run
-            reader.run()
-        finally:
-            reader.cleanup()
+        reader = barcode_reader(barcode_samples_dir / "barcode-qr-url.pdf")
+        assert reader.able_to_run
+        reader.run()
         assert reader.metadata.barcodes == SAMPLE_VALUES
 
     def test_values_disabled(
         self,
-        consume_sample: Callable[..., None],
+        barcode_reader: Callable[[Path], BarcodePlugin],
+        barcode_samples_dir: Path,
+        settings: Settings,
     ) -> None:
-        consume_sample("barcode-qr-url.pdf")
-        assert not DocumentBarcode.objects.exists()
+        settings.CONSUMER_ENABLE_ASN_BARCODE = True
+        reader = barcode_reader(barcode_samples_dir / "barcode-qr-url.pdf")
+        reader.run()
+        assert reader.metadata.barcodes is None
 
     def test_consume_and_reprocess(
         self,
-        consume_sample: Callable[..., None],
+        consume_sample: Callable[..., Document],
         admin_client: APIClient,
         store_barcodes: None,
     ) -> None:
@@ -1282,8 +1314,7 @@ class TestBarcodeValues:
             - The barcodes are stored, shown in the API and searchable
             - Reprocessing reads them again
         """
-        consume_sample("barcode-qr-url.pdf")
-        document = Document.objects.get()
+        document = consume_sample("barcode-qr-url.pdf")
         assert _stored(document) == SAMPLE_VALUES
 
         response = admin_client.get(f"/api/documents/{document.pk}/metadata/")
@@ -1312,7 +1343,7 @@ class TestBarcodeValues:
     )
     def test_reprocess_keeps_values(
         self,
-        consume_sample: Callable[..., None],
+        consume_sample: Callable[..., Document],
         mocker: MockerFixture,
         store_barcodes: None,
         read_values: dict,
@@ -1325,29 +1356,51 @@ class TestBarcodeValues:
         THEN:
             - The stored barcodes are kept
         """
-        consume_sample("barcode-qr-url.pdf")
-        document = Document.objects.get()
+        document = consume_sample("barcode-qr-url.pdf")
         mocker.patch("documents.tasks.read_barcode_values", **read_values)
 
         tasks.update_document_content_maybe_archive_file(document.pk)
 
         assert _stored(document) == SAMPLE_VALUES
 
-    def test_reprocess_values_disabled(
+    def test_reprocess_tiff_support_off_keeps_values(
         self,
-        consume_sample: Callable[..., None],
+        consume_sample: Callable[..., Document],
         settings: Settings,
         store_barcodes: None,
     ) -> None:
-        consume_sample("barcode-qr-url.pdf")
-        document = Document.objects.get()
+        """
+        GIVEN:
+            - A TIFF document with barcodes stored while TIFF support was on
+        WHEN:
+            - TIFF support is turned off and the document is reprocessed
+        THEN:
+            - The stored barcodes are kept
+        """
+        settings.CONSUMER_BARCODE_TIFF_SUPPORT = True
+        document = consume_sample("patch-code-t-middle.tiff")
+        stored = _stored(document)
+        assert stored
+
+        settings.CONSUMER_BARCODE_TIFF_SUPPORT = False
+        tasks.update_document_content_maybe_archive_file(document.pk)
+
+        assert _stored(document) == stored
+
+    def test_reprocess_values_disabled(
+        self,
+        consume_sample: Callable[..., Document],
+        settings: Settings,
+        store_barcodes: None,
+    ) -> None:
+        document = consume_sample("barcode-qr-url.pdf")
         settings.CONSUMER_STORE_BARCODE_VALUES = False
 
         assert tasks._read_barcodes_for_reprocess(document) is None
 
     def test_consume_version_stores_own_values(
         self,
-        consume_sample: Callable[..., None],
+        consume_sample: Callable[..., Document],
         admin_client: APIClient,
         store_barcodes: None,
     ) -> None:
@@ -1361,15 +1414,9 @@ class TestBarcodeValues:
             - The version keeps its own barcodes, the original ones are kept
             - The document API and the search use those of the newest version
         """
-        consume_sample("barcode-qr-url.pdf")
-        root = Document.objects.get()
-        consume_sample(
-            "barcode-128-custom.pdf",
-            source=DocumentSource.ApiUpload,
-            root_document_id=root.pk,
-        )
-
-        version = Document.objects.get(root_document=root)
+        root = consume_sample("barcode-qr-url.pdf")
+        version = consume_sample("barcode-128-custom.pdf", root_document_id=root.pk)
+        assert version.root_document == root
         assert _stored(version) == [
             {"page": 1, "value": "CUSTOM BARCODE", "format": "Code128"},
         ]
@@ -1385,24 +1432,18 @@ class TestBarcodeValues:
 
     def test_consume_version_scan_fails(
         self,
-        consume_sample: Callable[..., None],
+        consume_sample: Callable[..., Document],
         mocker: MockerFixture,
         store_barcodes: None,
     ) -> None:
         """
         A failed scan of a new version is logged and doesn't stop consumption
         """
-        consume_sample("barcode-qr-url.pdf")
-        root = Document.objects.get()
+        root = consume_sample("barcode-qr-url.pdf")
         mocker.patch(
             "documents.consumer.read_barcode_values",
             side_effect=RuntimeError("broken"),
         )
-        consume_sample(
-            "barcode-128-custom.pdf",
-            source=DocumentSource.ApiUpload,
-            root_document_id=root.pk,
-        )
-
-        version = Document.objects.get(root_document=root)
+        version = consume_sample("barcode-128-custom.pdf", root_document_id=root.pk)
+        assert version.root_document == root
         assert not version.barcodes.exists()
