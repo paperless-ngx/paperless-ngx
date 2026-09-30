@@ -1593,6 +1593,31 @@ processing. This only has an effect if
 
     Defaults to `0 1 * * *`, once per day.
 
+## Video (MP4) {#video}
+
+Phase 1 supports **MP4** uploads only (`video/mp4`). The parser extracts audio with **ffmpeg** (included in the Docker image via `RUNTIME_PACKAGES`), transcribes it through a default **ASR** AI model, optionally summarizes the transcript with the default **LLM**, and stores the result in `Document.content`. Title comes from the filename; tags from upload metadata (unchanged from other file types).
+
+### Setup
+
+1. **ffmpeg** — Required on the host or in the container image. The official Docker image already installs it.
+2. **Default ASR model** — In Settings → AI models, add a model with type `asr`, mark it default, and set your provider fields. Example (SiliconFlow):
+
+    - Supplier: `siliconflow`
+    - API domain: `https://api.siliconflow.cn/v1`
+    - Base model: `FunAudioLLM/SenseVoiceSmall`
+
+3. **Summary modes** — If content mode is `summary` or `both`, configure a default **LLM** model and the prompt **视频语音摘要提示词** (`VIDEO_ASR_SUMMARY`) under Prompt settings.
+
+#### [`PAPERLESS_VIDEO_CONTENT_MODE=<mode>`](#PAPERLESS_VIDEO_CONTENT_MODE) {#PAPERLESS_VIDEO_CONTENT_MODE}
+
+: Controls what is written to `Document.content` after ASR. Also configurable in the admin UI as **Video content mode** (UI takes precedence over this environment variable when set).
+
+    - `transcript` — Transcript only
+    - `summary` — LLM summary only (ASR still runs as input)
+    - `both` — Summary and transcript (default)
+
+    Defaults to `both`.
+
 ## Binaries
 
 There are a few external software packages that Paperless expects to

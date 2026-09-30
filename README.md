@@ -118,6 +118,12 @@
 
   * 对话体验：您可以一边浏览文件，一边进行智能问答，实现深度交互。
 
+#### **C. MP4 视频语音转写与摘要**
+
+  * **功能**：上传 MP4（`video/mp4`）后自动提取音频、ASR 转写，并可按配置写入仅转写、仅摘要或二者兼有到文档内容；标题取自文件名，标签与上传关联方式不变。
+
+  * **配置**：需 Docker 镜像中的 **ffmpeg**、默认 **ASR** 模型（如 SiliconFlow `FunAudioLLM/SenseVoiceSmall`），以及摘要模式下的默认 LLM 与 **视频语音摘要提示词**。详见 [docs/configuration.md](docs/configuration.md#video)（`PAPERLESS_VIDEO_CONTENT_MODE`：`transcript` | `summary` | `both`）。
+
  
 
 ## 架构要点
