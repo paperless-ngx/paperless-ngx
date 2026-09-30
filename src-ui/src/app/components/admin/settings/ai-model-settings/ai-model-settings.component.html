@@ -128,15 +128,13 @@
 
     <div class="mb-3">
       <label class="form-label" for="aiSupplier" i18n>Supplier</label>
-      <select
+      <input
         id="aiSupplier"
-        class="form-select"
+        type="text"
+        class="form-control"
         formControlName="supplier"
-      >
-        <option *ngFor="let s of supplierList" [value]="s.code">
-          {{ s.name }}
-        </option>
-      </select>
+      />
+      <small class="form-text text-muted" i18n>e.g. siliconflow, openai, deepseek</small>
     </div>
 
     <div class="mb-3">
@@ -157,18 +155,12 @@
 
     <div class="mb-3">
       <label class="form-label" for="aiBaseModel" i18n>Base model</label>
-      <select
+      <input
         id="aiBaseModel"
-        class="form-select"
+        type="text"
+        class="form-control"
         formControlName="base_model"
-      >
-        <option *ngFor="let o of modelOptions" [ngValue]="o.name">
-          {{ o.name }}
-        </option>
-      </select>
-      <small class="form-text text-muted" i18n>
-        Base model options depend on the selected supplier.
-      </small>
+      />
     </div>
 
     <div class="mb-3">
@@ -205,50 +197,6 @@
       <label class="form-check-label" for="aiDefault" i18n
         >Set as default model</label
       >
-    </div>
-
-    <h6 class="mt-3" i18n>Advanced parameters</h6>
-    <div class="table-responsive mb-2">
-      <table class="table table-sm">
-        <thead>
-          <tr>
-            <th i18n>Key</th>
-            <th i18n>Display name</th>
-            <th i18n>Value</th>
-            <th class="text-end">
-              <button
-                type="button"
-                class="btn btn-sm btn-outline-secondary"
-                (click)="onAddParamRow()"
-              >
-                <ng-container i18n>Add</ng-container>
-              </button>
-            </th>
-          </tr>
-        </thead>
-        <tbody formArrayName="params">
-          <tr *ngFor="let p of paramsArray.controls; let i = index" [formGroupName]="i">
-            <td>
-              <input type="text" class="form-control form-control-sm" formControlName="key" />
-            </td>
-            <td>
-              <input type="text" class="form-control form-control-sm" formControlName="label" />
-            </td>
-            <td>
-              <input type="text" class="form-control form-control-sm" formControlName="val" />
-            </td>
-            <td class="text-end">
-              <button
-                type="button"
-                class="btn btn-sm btn-outline-danger"
-                (click)="onRemoveParamRow(i)"
-              >
-                <ng-container i18n>Remove</ng-container>
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
     </div>
 
     <div class="modal-footer px-0">
