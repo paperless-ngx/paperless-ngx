@@ -2,8 +2,10 @@ import tempfile
 from pathlib import Path
 from unittest import mock
 
+import httpx
 from django.test import TestCase
 
+from paperless.asr import MAX_ASR_AUDIO_BYTES
 from paperless.asr import AsrClient
 from paperless.asr import AsrError
 from paperless.models import AIModel
@@ -60,3 +62,50 @@ class TestAsrClient(TestCase):
             instance.post.return_value = mock_response
             with self.assertRaises(AsrError):
                 client.transcribe(audio, self.model)
+
+    def test_transcribe_wraps_http_status_error(self):
+        client = AsrClient()
+        audio = Path(self._temp_audio())
+        request = httpx.Request(
+            "POST",
+            "https://api.siliconflow.cn/v1/audio/transcriptions",
+        )
+        response = httpx.Response(502, text="upstream boom", request=request)
+        mock_response = mock.Mock()
+        mock_response.raise_for_status.side_effect = httpx.HTTPStatusError(
+            "bad gateway",
+            request=request,
+            response=response,
+        )
+
+        with mock.patch("httpx.Client") as client_cls:
+            instance = client_cls.return_value.__enter__.return_value
+            instance.post.return_value = mock_response
+            with self.assertRaises(AsrError) as ctx:
+                client.transcribe(audio, self.model)
+
+        self.assertIn("502", str(ctx.exception))
+        self.assertIn("upstream boom", str(ctx.exception))
+
+    def test_transcribe_wraps_transport_error(self):
+        client = AsrClient()
+        audio = Path(self._temp_audio())
+
+        with mock.patch("httpx.Client") as client_cls:
+            instance = client_cls.return_value.__enter__.return_value
+            instance.post.side_effect = httpx.ConnectError("connection refused")
+            with self.assertRaises(AsrError) as ctx:
+                client.transcribe(audio, self.model)
+
+        self.assertIn("connection refused", str(ctx.exception))
+
+    def test_transcribe_rejects_audio_over_50mb(self):
+        client = AsrClient()
+        audio = Path(self._temp_audio())
+        oversized = mock.Mock(st_size=MAX_ASR_AUDIO_BYTES + 1)
+
+        with mock.patch.object(Path, "stat", return_value=oversized):
+            with self.assertRaises(AsrError) as ctx:
+                client.transcribe(audio, self.model)
+
+        self.assertIn("50MB", str(ctx.exception))

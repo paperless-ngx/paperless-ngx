@@ -1,3 +1,4 @@
+import subprocess
 from pathlib import Path
 from unittest import mock
 
@@ -46,6 +47,28 @@ def test_extract_audio_wraps_subprocess_error(mock_run, tmp_path):
 
 
 @mock.patch("paperless_video.ffmpeg_utils.run_subprocess")
+def test_extract_audio_includes_stderr_on_ffmpeg_failure(mock_run, tmp_path):
+    video = tmp_path / "a.mp4"
+    video.write_bytes(b"fake")
+    error = subprocess.CalledProcessError(1, ["ffmpeg"])
+    error.stderr = b"Encoder libmp3lame not found"
+    mock_run.side_effect = error
+    with pytest.raises(ParseError, match="libmp3lame not found"):
+        extract_audio_mp3(video, tmp_path)
+
+
+@mock.patch("paperless_video.ffmpeg_utils.run_subprocess")
+def test_extract_audio_no_stream_message(mock_run, tmp_path):
+    video = tmp_path / "a.mp4"
+    video.write_bytes(b"fake")
+    error = subprocess.CalledProcessError(1, ["ffmpeg"])
+    error.stderr = b"Output file #0 does not contain any stream"
+    mock_run.side_effect = error
+    with pytest.raises(ParseError, match="No audio track extracted from video"):
+        extract_audio_mp3(video, tmp_path)
+
+
+@mock.patch("paperless_video.ffmpeg_utils.run_subprocess")
 def test_extract_thumbnail_webp(mock_run, tmp_path):
     video = tmp_path / "a.mp4"
     video.write_bytes(b"fake")
@@ -80,3 +103,17 @@ def test_extract_thumbnail_retries_at_zero(mock_run, tmp_path):
     assert len(calls) == 2
     assert calls[0][calls[0].index("-ss") + 1] == "00:00:01"
     assert calls[1][calls[1].index("-ss") + 1] == "00:00:00"
+
+
+@mock.patch("PIL.Image.open", side_effect=OSError("broken png"))
+@mock.patch("paperless_video.ffmpeg_utils.run_subprocess")
+def test_extract_thumbnail_wraps_pillow_error(mock_run, _mock_open, tmp_path):
+    video = tmp_path / "a.mp4"
+    video.write_bytes(b"fake")
+
+    def _fake(cmd, **kwargs):
+        Path(cmd[-1]).write_bytes(b"not-a-png")
+
+    mock_run.side_effect = _fake
+    with pytest.raises(ParseError, match="thumbnail image conversion failed"):
+        extract_thumbnail_webp(video, tmp_path)
