@@ -11,6 +11,7 @@ from typing import TYPE_CHECKING
 import pytest
 
 from documents.models import DocumentBarcode
+from paperless_testing.factories import DocumentBarcodeFactory
 from paperless_testing.factories import DocumentFactory
 
 if TYPE_CHECKING:
@@ -26,17 +27,15 @@ class TestBarcodeSearch:
     @pytest.fixture
     def with_barcodes(self, backend: TantivyBackend) -> Document:
         document = DocumentFactory(title="Letter", content="x")
-        DocumentBarcode.objects.create(
+        DocumentBarcodeFactory(
             document=document,
-            page=1,
             value="WIFI:T:WPA;S:Guest-WLAN;P:crocodile123;;",
-            format="QR Code",
         )
-        DocumentBarcode.objects.create(
+        DocumentBarcodeFactory(
             document=document,
             page=2,
             value="DE89370400440532013000",
-            format="Code 128",
+            format=DocumentBarcode.Format.CODE128,
         )
         backend.add_or_update(document)
         return document
@@ -77,7 +76,7 @@ class TestBarcodeSearch:
         THEN:
             - The document is found by its barcode formats
         """
-        assert matched_ids('barcodes.format:"qr code"') == {with_barcodes.pk}
+        assert matched_ids("barcodes.format:qrcode") == {with_barcodes.pk}
         assert matched_ids("barcodes.format:aztec") == set()
 
     def test_plain_query_ignores_barcodes(

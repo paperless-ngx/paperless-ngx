@@ -37,6 +37,7 @@ from documents.data_models import ConsumeFileDuplicateResult
 from documents.data_models import ConsumeFileStoppedResult
 from documents.data_models import ConsumeFileSuccessResult
 from documents.data_models import DocumentMetadataOverrides
+from documents.data_models import StoredBarcode
 from documents.double_sided import CollatePlugin
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import generate_unique_filename
@@ -344,32 +345,27 @@ def bulk_update_documents(document_ids) -> None:
         )
 
 
-def _maybe_update_stored_barcodes(document: Document) -> None:
+def _read_barcodes_for_reprocess(document: Document) -> list[StoredBarcode] | None:
     """
-    Reads the barcodes of the original again and replaces the stored ones,
-    e.g. for documents consumed before storing barcodes was enabled
+    Reads the barcodes of the original again, e.g. for documents consumed
+    before storing them was enabled. Returns None if they should be left as
+    they are: storing is off, the file can't be scanned with the current
+    settings, or the scan failed.
     """
-    if not BarcodeConfig().barcode_store_values:
-        return
+    barcode_settings = BarcodeConfig()
+    if not barcode_settings.barcode_store_values:
+        return None
     try:
         with TemporaryDirectory(dir=settings.SCRATCH_DIR) as tmpdir:
-            values = read_barcode_values(
+            return read_barcode_values(
                 document.source_path,
+                document.mime_type,
+                barcode_settings,
                 Path(tmpdir),
-                f"barcodes-{document.pk}",
             )
-
-        if values == list(document.barcodes.values("page", "value", "format")):
-            return
-        with transaction.atomic():
-            document.barcodes.all().delete()
-            DocumentBarcode.objects.bulk_create(
-                DocumentBarcode(document=document, **value) for value in values
-            )
-            # the metadata response is cached by modification time
-            Document.objects.filter(pk=document.pk).update(modified=timezone.now())
     except Exception as e:
         logger.warning(f"Could not read barcodes of document {document}: {e}")
+        return None
 
 
 @shared_task
@@ -418,7 +414,7 @@ def update_document_content_maybe_archive_file(
                 produce_archive=produce_archive,
             )
 
-            _maybe_update_stored_barcodes(document)
+            barcodes = _read_barcodes_for_reprocess(document)
 
             thumbnail = parser.get_thumbnail(document.source_path, mime_type)
 
@@ -475,6 +471,17 @@ def update_document_content_maybe_archive_file(
                             },
                             action=LogEntry.Action.UPDATE,
                         )
+
+                if barcodes is not None:
+                    document.barcodes.all().delete()
+                    DocumentBarcode.objects.bulk_create(
+                        DocumentBarcode(document=document, **barcode)
+                        for barcode in barcodes
+                    )
+                    # metadata_etag includes modified
+                    Document.objects.filter(pk=document.pk).update(
+                        modified=timezone.now(),
+                    )
 
                 with FileLock(settings.MEDIA_LOCK):
                     if parser.get_archive_path():

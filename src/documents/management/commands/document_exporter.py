@@ -413,6 +413,7 @@ class Command(CryptMixin, PaperlessCommand):
                     elif self.split_manifest and key in (
                         "notes",
                         "custom_field_instances",
+                        "document_barcodes",
                     ):
                         # Written per-document in _write_split_manifest
                         pass
@@ -651,6 +652,12 @@ class Command(CryptMixin, PaperlessCommand):
             serializers.serialize(
                 "python",
                 CustomFieldInstance.global_objects.filter(document=document),
+            ),
+        )
+        content.extend(
+            serializers.serialize(
+                "python",
+                DocumentBarcode.objects.filter(document=document),
             ),
         )
         manifest_name = base_name.with_name(f"{base_name.stem}-manifest.json")

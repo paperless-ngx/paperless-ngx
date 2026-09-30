@@ -1069,7 +1069,7 @@ at them. Use the advanced search syntax to search by barcode content or type:
 
 ```
 barcodes.value:DE89370400440532013000
-barcodes.format:"qr code"
+barcodes.format:qrcode
 barcodes:wifi barcodes:guest
 ```
 

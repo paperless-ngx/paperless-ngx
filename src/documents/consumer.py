@@ -511,16 +511,8 @@ class ConsumerPlugin(
                 if (
                     self.input_doc.root_document_id is not None
                     and self.metadata.barcodes is None
-                    and BarcodeConfig().barcode_store_values
                 ):
-                    self.metadata.barcodes = (
-                        read_barcode_values(
-                            self.working_copy,
-                            Path(tmpdir),
-                            self.task_id,
-                        )
-                        or None
-                    )
+                    self._read_version_barcodes(mime_type, Path(tmpdir))
 
                 # Parse the document. This may take some time.
 
@@ -983,6 +975,23 @@ class ConsumerPlugin(
                 CustomFieldInstance.objects.create(**args)  # adds to document
 
         self._store_barcodes(document)
+
+    def _read_version_barcodes(self, mime_type: str, work_dir: Path) -> None:
+        barcode_settings = BarcodeConfig()
+        if not barcode_settings.barcode_store_values:
+            return
+        try:
+            self.metadata.barcodes = (
+                read_barcode_values(
+                    self.working_copy,
+                    mime_type,
+                    barcode_settings,
+                    work_dir,
+                )
+                or None
+            )
+        except Exception as e:
+            self.log.warning(f"Could not read barcodes of {self.filename}: {e}")
 
     def _store_barcodes(self, document: Document) -> None:
         if self.metadata.barcodes:

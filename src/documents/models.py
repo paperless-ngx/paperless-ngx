@@ -372,29 +372,9 @@ class Document(SoftDeleteModel, ModelWithOwner):  # type: ignore[django-manager-
         get_effective_content(): for root documents those of the latest
         version when there is one, as that is the file users see.
         """
-        from documents.versioning import sort_versions_newest_first
-        from documents.versioning import versions_newest_first
+        from documents.versioning import latest_version
 
-        if self.root_document_id is not None or self.pk is None:
-            return list(self.barcodes.all())
-
-        prefetched_cache = getattr(self, "_prefetched_objects_cache", None)
-        prefetched_versions = (
-            prefetched_cache.get("versions")
-            if isinstance(prefetched_cache, dict)
-            else None
-        )
-        if prefetched_versions is not None:
-            latest = (
-                sort_versions_newest_first(prefetched_versions)[0]
-                if prefetched_versions
-                else None
-            )
-        else:
-            latest = versions_newest_first(
-                Document.objects.filter(root_document=self),
-            ).first()
-        return list((latest or self).barcodes.all())
+        return list(latest_version(self).barcodes.all())
 
     def get_effective_content(self) -> str | None:
         """
@@ -1019,7 +999,56 @@ class DocumentBarcode(models.Model):
 
     value = models.TextField(_("value"))
 
-    format = models.CharField(_("format"), max_length=64, blank=True)
+    class Format(models.TextChoices):
+        """
+        The concrete barcode formats of zxing-cpp, keyed on the enum name
+        """
+
+        CODABAR = "Codabar", _("Codabar")
+        CODE39 = "Code39", _("Code 39")
+        CODE39_STD = "Code39Std", _("Code 39 Standard")
+        CODE39_EXT = "Code39Ext", _("Code 39 Extended")
+        CODE32 = "Code32", _("Code 32")
+        PZN = "PZN", _("Pharmazentralnummer")
+        CODE93 = "Code93", _("Code 93")
+        CODE128 = "Code128", _("Code 128")
+        ITF = "ITF", _("ITF")
+        ITF14 = "ITF14", _("ITF-14")
+        DATA_BAR = "DataBar", _("DataBar")
+        DATA_BAR_OMNI = "DataBarOmni", _("DataBar Omni")
+        DATA_BAR_STK = "DataBarStk", _("DataBar Stacked")
+        DATA_BAR_STK_OMNI = "DataBarStkOmni", _("DataBar Stacked Omni")
+        DATA_BAR_LTD = "DataBarLtd", _("DataBar Limited")
+        DATA_BAR_EXP = "DataBarExp", _("DataBar Expanded")
+        DATA_BAR_EXP_STK = "DataBarExpStk", _("DataBar Expanded Stacked")
+        EANUPC = "EANUPC", _("EAN/UPC")
+        EAN13 = "EAN13", _("EAN-13")
+        EAN8 = "EAN8", _("EAN-8")
+        EAN5 = "EAN5", _("EAN-5")
+        EAN2 = "EAN2", _("EAN-2")
+        ISBN = "ISBN", _("ISBN")
+        UPCA = "UPCA", _("UPC-A")
+        UPCE = "UPCE", _("UPC-E")
+        TELEPEN = "Telepen", _("Telepen")
+        TELEPEN_ALPHA = "TelepenAlpha", _("Telepen Alpha")
+        TELEPEN_NUMERIC = "TelepenNumeric", _("Telepen Numeric")
+        OTHER_BARCODE = "OtherBarcode", _("Other barcode")
+        DX_FILM_EDGE = "DXFilmEdge", _("DX Film Edge")
+        PDF417 = "PDF417", _("PDF417")
+        COMPACT_PDF417 = "CompactPDF417", _("Compact PDF417")
+        MICRO_PDF417 = "MicroPDF417", _("MicroPDF417")
+        AZTEC = "Aztec", _("Aztec")
+        AZTEC_CODE = "AztecCode", _("Aztec Code")
+        AZTEC_RUNE = "AztecRune", _("Aztec Rune")
+        QR_CODE = "QRCode", _("QR Code")
+        QR_CODE_MODEL1 = "QRCodeModel1", _("QR Code Model 1")
+        QR_CODE_MODEL2 = "QRCodeModel2", _("QR Code Model 2")
+        MICRO_QR_CODE = "MicroQRCode", _("Micro QR Code")
+        RMQR_CODE = "RMQRCode", _("rMQR Code")
+        DATA_MATRIX = "DataMatrix", _("Data Matrix")
+        MAXI_CODE = "MaxiCode", _("MaxiCode")
+
+    format = models.CharField(_("format"), max_length=32, choices=Format.choices)
 
     class Meta:
         ordering = ("page", "id")

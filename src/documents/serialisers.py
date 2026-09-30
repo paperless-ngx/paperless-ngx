@@ -1061,7 +1061,11 @@ class DocumentSerializer(
     duplicate_documents = SerializerMethodField()
 
     notes = NotesSerializer(many=True, required=False, read_only=True)
-    barcodes = SerializerMethodField(read_only=True)
+    barcodes = DocumentBarcodeSerializer(
+        source="get_effective_barcodes",
+        many=True,
+        read_only=True,
+    )
     root_document: RelatedField[Document, Document, Any] | ManyRelatedField = (
         serializers.PrimaryKeyRelatedField(read_only=True)
     )
@@ -1299,10 +1303,6 @@ class DocumentSerializer(
             kwargs["full_perms"] = True
 
         super().__init__(*args, **kwargs)
-
-    @extend_schema_field(DocumentBarcodeSerializer(many=True))
-    def get_barcodes(self, obj: Document) -> list[dict]:
-        return DocumentBarcodeSerializer(obj.get_effective_barcodes(), many=True).data
 
     class Meta:
         model = Document

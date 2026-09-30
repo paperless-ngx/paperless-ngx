@@ -4,9 +4,9 @@ import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { DocumentBarcodesComponent } from './document-barcodes.component'
 
 const barcodes = [
-  { page: 1, value: 'ASN00123', format: 'Code 128' },
-  { page: 2, value: 'https://example.com/invoice/4711', format: 'QR Code' },
-  { page: 2, value: 'javascript:alert(1)', format: 'QR Code' },
+  { page: 1, value: 'ASN00123', format: 'Code128' },
+  { page: 2, value: 'https://example.com/invoice/4711', format: 'QRCode' },
+  { page: 2, value: 'javascript:alert(1)', format: 'QRCode' },
 ]
 
 describe('DocumentBarcodesComponent', () => {
@@ -33,7 +33,7 @@ describe('DocumentBarcodesComponent', () => {
     const rows = fixture.nativeElement.querySelectorAll('tbody tr')
     expect(rows).toHaveLength(3)
     expect(rows[0].textContent).toContain('ASN00123')
-    expect(rows[0].textContent).toContain('Code 128')
+    expect(rows[0].textContent).toContain('Code128')
   })
 
   it('should only link http(s) values', () => {

@@ -25,9 +25,9 @@ from whoosh_compat import FieldKind
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
-from documents.models import DocumentBarcode
 from documents.models import Note
 from documents.search._fields import PUBLIC_FIELDS
+from paperless_testing.factories import DocumentBarcodeFactory
 from paperless_testing.factories import UserFactory
 
 if TYPE_CHECKING:
@@ -67,12 +67,7 @@ class TestJsonSubpathsAreWrittenAtIndexTime:
             field=field,
             value_text="a value",
         )
-        DocumentBarcode.objects.create(
-            document=doc,
-            page=1,
-            value="a barcode",
-            format="QR Code",
-        )
+        DocumentBarcodeFactory(document=doc, value="a barcode")
         backend.add_or_update(doc)
 
         index = backend._index

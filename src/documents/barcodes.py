@@ -18,6 +18,7 @@ from documents.converters import convert_from_tiff_to_pdf
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
+from documents.data_models import StoredBarcode
 from documents.models import Document
 from documents.models import PaperlessTask
 from documents.models import Tag
@@ -79,6 +80,12 @@ class Barcode:
                 return True
         return False
 
+    def stored(self) -> StoredBarcode:
+        """
+        The barcode as it is stored with a document, page 1-indexed
+        """
+        return {"page": self.page + 1, "value": self.value, "format": self.format}
+
 
 class BarcodePlugin(ConsumeTaskPlugin):
     NAME: str = "BarcodePlugin"
@@ -90,17 +97,12 @@ class BarcodePlugin(ConsumeTaskPlugin):
           - ASN from barcode detection is enabled or
           - Barcode support is enabled and the mime type is supported
         """
-        if self.settings.barcode_enable_tiff_support:
-            supported_mimes: set[str] = {"application/pdf", "image/tiff"}
-        else:
-            supported_mimes = {"application/pdf"}
-
         return (
             self.settings.barcode_enable_asn
             or self.settings.barcodes_enabled
             or self.settings.barcode_enable_tag
             or self.settings.barcode_store_values
-        ) and self.input_doc.mime_type in supported_mimes
+        ) and self.input_doc.mime_type in scannable_mime_types(self.settings)
 
     def get_settings(self) -> BarcodeConfig:
         """
@@ -248,7 +250,7 @@ class BarcodePlugin(ConsumeTaskPlugin):
 
         # After splitting too, so each split document keeps its own barcodes
         if self.settings.barcode_store_values:
-            self.metadata.barcodes = self.barcode_values or None
+            self.metadata.barcodes = [x.stored() for x in self.barcodes] or None
 
     def cleanup(self) -> None:
         self.temp_dir.cleanup()
@@ -271,7 +273,8 @@ class BarcodePlugin(ConsumeTaskPlugin):
     @staticmethod
     def read_barcodes_zxing(image: Image.Image) -> list[tuple[str, str]]:
         """
-        Returns the text and format name of each barcode found in the image
+        Returns the text and format (zxing enum name) of each barcode found in
+        the image
         """
         barcodes = []
 
@@ -280,7 +283,7 @@ class BarcodePlugin(ConsumeTaskPlugin):
         detected_barcodes = zxingcpp.read_barcodes(image)
         for barcode in detected_barcodes:
             if barcode.text:
-                barcodes.append((barcode.text, str(barcode.format)))
+                barcodes.append((barcode.text, barcode.format.name))
                 logger.debug(
                     f"Barcode of type {barcode.format} found: {barcode.text}",
                 )
@@ -300,64 +303,11 @@ class BarcodePlugin(ConsumeTaskPlugin):
         self.convert_from_tiff_to_pdf()
 
         try:
-            # Read number of pages from pdf
-            with Pdf.open(self.pdf_file) as pdf:
-                num_of_pages = len(pdf.pages)
-            logger.debug(f"PDF has {num_of_pages} pages")
-
-            # Get limit from configuration
-            barcode_max_pages: int = (
-                num_of_pages
-                if self.settings.barcode_max_pages == 0
-                else self.settings.barcode_max_pages
+            self.barcodes = scan_pdf(
+                self.pdf_file,
+                self.settings,
+                Path(self.temp_dir.name),
             )
-
-            if barcode_max_pages < num_of_pages:  # pragma: no cover
-                logger.debug(
-                    f"Barcodes detection will be limited to the first {barcode_max_pages} pages",
-                )
-
-            # Loop al page
-            for current_page_number in range(min(num_of_pages, barcode_max_pages)):
-                logger.debug(f"Processing page {current_page_number}")
-
-                # Convert page to image
-                page = convert_from_path(
-                    self.pdf_file,
-                    dpi=self.settings.barcode_dpi,
-                    output_folder=self.temp_dir.name,
-                    first_page=current_page_number + 1,
-                    last_page=current_page_number + 1,
-                )[0]
-
-                # Remember filename, since it is lost by upscaling
-                page_filepath = Path(page.filename)
-                logger.debug(f"Image is at {page_filepath}")
-
-                # Upscale image if configured
-                factor = self.settings.barcode_upscale
-                if factor > 1.0:
-                    logger.debug(
-                        f"Upscaling image by {factor} for better barcode detection",
-                    )
-                    x, y = page.size
-                    page = page.resize(
-                        (round(x * factor), (round(y * factor))),
-                    )
-
-                # Detect barcodes
-                for barcode_value, barcode_format in self.read_barcodes_zxing(page):
-                    self.barcodes.append(
-                        Barcode(
-                            current_page_number,
-                            barcode_value,
-                            self.settings,
-                            barcode_format,
-                        ),
-                    )
-
-                # Delete temporary image file
-                page_filepath.unlink()
 
         # Password protected files can't be checked
         # This is the exception raised for those
@@ -371,17 +321,6 @@ class BarcodePlugin(ConsumeTaskPlugin):
             logger.warning(
                 f"Exception during barcode scanning: {e}",
             )
-
-    @property
-    def barcode_values(self) -> list[dict]:
-        """
-        The detected barcodes as stored with the document, pages 1-indexed
-        """
-        self.detect()
-        return [
-            {"page": x.page + 1, "value": x.value, "format": x.format}
-            for x in self.barcodes
-        ]
 
     @property
     def asn(self) -> int | None:
@@ -561,23 +500,89 @@ class BarcodePlugin(ConsumeTaskPlugin):
             return document_paths
 
 
-def read_barcode_values(path: Path, work_dir: Path, task_id: str) -> list[dict]:
+def scannable_mime_types(settings: BarcodeConfig) -> set[str]:
     """
-    Reads the barcodes of a file as they are stored with a document, outside
-    of the regular consumption plugins: for new versions, which skip the
-    barcode plugin, and when reprocessing.
+    The file types the barcode scan supports with the current settings
     """
-    reader = BarcodePlugin(
-        ConsumableDocument(DocumentSource.ConsumeFolder, original_file=path),
-        DocumentMetadataOverrides(),
-        ProgressManager(path.name),
-        work_dir,
-        task_id,
+    if settings.barcode_enable_tiff_support:
+        return {"application/pdf", "image/tiff"}
+    return {"application/pdf"}
+
+
+def scan_pdf(pdf_path: Path, settings: BarcodeConfig, work_dir: Path) -> list[Barcode]:
+    """
+    Scans the pages of a PDF as images for barcodes. Errors are not caught,
+    so callers can tell a failed scan from one that found nothing.
+    """
+    barcodes: list[Barcode] = []
+
+    with Pdf.open(pdf_path) as pdf:
+        num_of_pages = len(pdf.pages)
+    logger.debug(f"PDF has {num_of_pages} pages")
+
+    # Get limit from configuration
+    barcode_max_pages: int = (
+        num_of_pages if settings.barcode_max_pages == 0 else settings.barcode_max_pages
     )
-    if not reader.able_to_run:
-        return []
-    reader.setup()
-    try:
-        return reader.barcode_values
-    finally:
-        reader.cleanup()
+
+    if barcode_max_pages < num_of_pages:  # pragma: no cover
+        logger.debug(
+            f"Barcodes detection will be limited to the first {barcode_max_pages} pages",
+        )
+
+    for current_page_number in range(min(num_of_pages, barcode_max_pages)):
+        logger.debug(f"Processing page {current_page_number}")
+
+        # Convert page to image
+        page = convert_from_path(
+            pdf_path,
+            dpi=settings.barcode_dpi,
+            output_folder=work_dir,
+            first_page=current_page_number + 1,
+            last_page=current_page_number + 1,
+        )[0]
+
+        # Remember filename, since it is lost by upscaling
+        page_filepath = Path(page.filename)
+        logger.debug(f"Image is at {page_filepath}")
+
+        # Upscale image if configured
+        factor = settings.barcode_upscale
+        if factor > 1.0:
+            logger.debug(
+                f"Upscaling image by {factor} for better barcode detection",
+            )
+            x, y = page.size
+            page = page.resize(
+                (round(x * factor), (round(y * factor))),
+            )
+
+        for barcode_value, barcode_format in BarcodePlugin.read_barcodes_zxing(page):
+            barcodes.append(
+                Barcode(current_page_number, barcode_value, settings, barcode_format),
+            )
+
+        # Delete temporary image file
+        page_filepath.unlink()
+
+    return barcodes
+
+
+def read_barcode_values(
+    path: Path,
+    mime_type: str,
+    settings: BarcodeConfig,
+    work_dir: Path,
+) -> list[StoredBarcode] | None:
+    """
+    Reads the barcodes of a file outside of the consumption plugins: for new
+    versions, which skip the barcode plugin, and when reprocessing.
+
+    Returns None if the file can't be scanned with the current settings.
+    Errors while scanning are raised.
+    """
+    if mime_type not in scannable_mime_types(settings):
+        return None
+    if mime_type == "image/tiff":
+        path = convert_from_tiff_to_pdf(path, work_dir)
+    return [x.stored() for x in scan_pdf(path, settings, work_dir)]

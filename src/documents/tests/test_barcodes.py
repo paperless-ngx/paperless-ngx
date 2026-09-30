@@ -1,16 +1,15 @@
+from __future__ import annotations
+
 import shutil
-from collections.abc import Generator
 from contextlib import contextmanager
-from pathlib import Path
-from unittest import mock
+from typing import TYPE_CHECKING
 
 import pytest
+import zxingcpp
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.test import TestCase
 from django.test import override_settings
 from rest_framework import status
-from rest_framework.test import APIClient
 
 from documents import tasks
 from documents.barcodes import BarcodePlugin
@@ -25,10 +24,23 @@ from documents.models import Tag
 from documents.plugins.base import StopConsumeTaskError
 from documents.tests.utils import ConsumeTaskMixin
 from documents.tests.utils import SampleDirMixin
+from paperless.config import BarcodeConfig
 from paperless.models import ApplicationConfiguration
 from paperless_testing.assertions import FileSystemAssertsMixin
 from paperless_testing.dirs import DirectoriesMixin
+from paperless_testing.factories import DocumentBarcodeFactory
 from paperless_testing.fakes.progress import FakeProgressManager
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+    from collections.abc import Generator
+    from pathlib import Path
+
+    from pytest_django.fixtures import Settings
+    from pytest_mock import MockerFixture
+    from rest_framework.test import APIClient
+
+    from paperless_testing.dirs import PaperlessDirs
 
 
 class GetReaderPluginMixin:
@@ -1135,240 +1147,213 @@ class TestTagBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
             self.assertEqual(len(document_list), 3)
 
 
-class TestBarcodeValues(
-    DirectoriesMixin,
-    SampleDirMixin,
-    GetReaderPluginMixin,
-    TestCase,
-):
-    SAMPLE_VALUES = [
-        {"page": 1, "value": "javascript:alert(1)", "format": "QR Code"},
-        {"page": 2, "value": "https://example.com/invoice/4711", "format": "QR Code"},
-    ]
+SAMPLE_VALUES = [
+    {"page": 1, "value": "javascript:alert(1)", "format": "QRCode"},
+    {"page": 2, "value": "https://example.com/invoice/4711", "format": "QRCode"},
+]
 
-    def _document_with_barcode(self) -> Document:
-        document = Document.objects.create(
-            title="doc",
-            checksum="barcode-values",
-            mime_type="application/pdf",
-        )
-        DocumentBarcode.objects.create(
-            document=document,
-            **self.SAMPLE_VALUES[1],
-        )
-        return document
 
+@pytest.fixture
+def store_barcodes(settings: Settings) -> None:
+    settings.CONSUMER_STORE_BARCODE_VALUES = True
+
+
+@pytest.fixture
+def consume_sample(
+    paperless_dirs: PaperlessDirs,
+    fake_progress_manager: type[FakeProgressManager],
+    settings: Settings,
+) -> Callable[..., None]:
+    settings.CELERY_TASK_ALWAYS_EAGER = True
+    settings.OCR_MODE = "auto"
+
+    def consume(name: str, **kwargs) -> None:
+        dst = paperless_dirs.scratch_dir / name
+        shutil.copy(SampleDirMixin.BARCODE_SAMPLE_DIR / name, dst)
+        tasks.consume_file(
+            ConsumableDocument(
+                source=kwargs.pop("source", DocumentSource.ConsumeFolder),
+                original_file=dst,
+                **kwargs,
+            ),
+            None,
+        )
+
+    return consume
+
+
+def _stored(document: Document) -> list[dict]:
+    return list(document.barcodes.values("page", "value", "format"))
+
+
+def test_formats_cover_zxing() -> None:
+    """
+    Every concrete format zxing-cpp can report has a DocumentBarcode.Format
+    """
+    members = zxingcpp.BarcodeFormat.__members__
+    # skip NONE and the groups like AllLinear, including their aliases
+    seen = {int(m) for n, m in members.items() if n == "NONE" or n.startswith("All")}
+    missing = []
+    for name, member in members.items():
+        if int(member) in seen:
+            continue
+        seen.add(int(member))
+        if name not in DocumentBarcode.Format.values:
+            missing.append(name)
+    assert missing == []
+
+
+@pytest.mark.django_db
+class TestBarcodeValues:
     def test_barcode_str(self) -> None:
-        """
-        GIVEN:
-            - A stored barcode
-        WHEN:
-            - It is converted to a string
-        THEN:
-            - Its value is returned
-        """
-        barcode = self._document_with_barcode().barcodes.get()
-        self.assertEqual(str(barcode), "https://example.com/invoice/4711")
+        barcode = DocumentBarcodeFactory(value="https://example.com/invoice/4711")
+        assert str(barcode) == "https://example.com/invoice/4711"
 
-    @override_settings(CONSUMER_STORE_BARCODE_VALUES=True)
-    def test_read_values_unsupported_file(self) -> None:
-        """
-        GIVEN:
-            - An image file, which the barcode plugin does not scan
-        WHEN:
-            - Its barcodes are read
-        THEN:
-            - No barcodes are returned
-        """
-        self.assertEqual(
-            read_barcode_values(
-                self.SAMPLE_DIR / "simple.jpg",
-                self.dirs.scratch_dir,
-                "task-id",
-            ),
-            [],
-        )
-
-    @override_settings(CONSUMER_STORE_BARCODE_VALUES=True)
-    def test_reprocess_values_unchanged(self) -> None:
-        """
-        GIVEN:
-            - A document whose stored barcodes match its file
-        WHEN:
-            - The barcodes are read again when reprocessing
-        THEN:
-            - Nothing is changed, the document is not marked as modified
-        """
-        document = self._document_with_barcode()
-        modified = document.modified
-
-        with mock.patch(
-            "documents.tasks.read_barcode_values",
-            return_value=[self.SAMPLE_VALUES[1]],
-        ):
-            tasks._maybe_update_stored_barcodes(document)
-
-        document.refresh_from_db()
-        self.assertEqual(document.modified, modified)
-        self.assertEqual(document.barcodes.count(), 1)
-
-    @override_settings(CONSUMER_STORE_BARCODE_VALUES=True)
-    def test_reprocess_values_failure_is_not_fatal(self) -> None:
-        """
-        GIVEN:
-            - A document with stored barcodes
-        WHEN:
-            - Reading the barcodes fails when reprocessing
-        THEN:
-            - A warning is logged and the stored barcodes are kept
-        """
-        document = self._document_with_barcode()
-
-        with (
-            mock.patch(
-                "documents.tasks.read_barcode_values",
-                side_effect=RuntimeError("broken"),
-            ),
-            self.assertLogs("paperless.tasks", level="WARNING") as logs,
-        ):
-            tasks._maybe_update_stored_barcodes(document)
-
-        self.assertIn("Could not read barcodes", logs.output[0])
-        self.assertEqual(document.barcodes.count(), 1)
-
-    @override_settings(CONSUMER_STORE_BARCODE_VALUES=True)
-    def test_values_detected(self) -> None:
-        """
-        GIVEN:
-            - PDF with a QR code on each of its two pages
-            - Storing barcode values enabled
-        WHEN:
-            - The barcode plugin runs
-        THEN:
-            - Both barcodes are remembered with page, value and format
-        """
-        test_file = self.BARCODE_SAMPLE_DIR / "barcode-qr-url.pdf"
-
-        with self.get_reader(test_file) as reader:
-            self.assertTrue(reader.able_to_run)
-            reader.run()
-            self.assertEqual(reader.metadata.barcodes, self.SAMPLE_VALUES)
-
-    def test_values_disabled(self) -> None:
-        """
-        GIVEN:
-            - PDF with QR codes
-            - Storing barcode values not enabled
-        WHEN:
-            - The barcode plugin runs
-        THEN:
-            - No barcodes are remembered
-        """
-        test_file = self.BARCODE_SAMPLE_DIR / "barcode-qr-url.pdf"
-
-        with self.get_reader(test_file) as reader:
-            reader.run()
-            self.assertIsNone(reader.metadata.barcodes)
-
-    @override_settings(
-        CONSUMER_STORE_BARCODE_VALUES=True,
-        CELERY_TASK_ALWAYS_EAGER=True,
-        OCR_MODE="auto",
+    @pytest.mark.parametrize(
+        ("filename", "mime_type", "tiff_support", "expected"),
+        [
+            pytest.param("simple.jpg", "image/jpeg", True, None, id="jpeg"),
+            pytest.param("simple.tiff", "image/tiff", False, None, id="tiff-off"),
+            pytest.param("simple.tiff", "image/tiff", True, [], id="tiff-on"),
+        ],
     )
-    @pytest.mark.usefixtures("fake_progress_manager")
-    def test_consume_file_stores_values(self) -> None:
+    def test_read_values_file_types(
+        self,
+        paperless_dirs: PaperlessDirs,
+        settings: Settings,
+        filename: str,
+        mime_type: str,
+        tiff_support: bool,  # noqa: FBT001
+        expected: list | None,
+    ) -> None:
+        """
+        Files the scan doesn't support return None, so stored barcodes are
+        kept instead of being replaced with an empty list
+        """
+        settings.CONSUMER_BARCODE_TIFF_SUPPORT = tiff_support
+        values = read_barcode_values(
+            SampleDirMixin.SAMPLE_DIR / filename,
+            mime_type,
+            BarcodeConfig(),
+            paperless_dirs.scratch_dir,
+        )
+        assert values == expected
+
+    def test_values_detected(
+        self,
+        paperless_dirs: PaperlessDirs,
+        store_barcodes: None,
+    ) -> None:
+        test_file = SampleDirMixin.BARCODE_SAMPLE_DIR / "barcode-qr-url.pdf"
+        reader = BarcodePlugin(
+            ConsumableDocument(DocumentSource.ConsumeFolder, original_file=test_file),
+            DocumentMetadataOverrides(),
+            FakeProgressManager(test_file.name, None),
+            paperless_dirs.scratch_dir,
+            "task-id",
+        )
+        reader.setup()
+        try:
+            assert reader.able_to_run
+            reader.run()
+        finally:
+            reader.cleanup()
+        assert reader.metadata.barcodes == SAMPLE_VALUES
+
+    def test_values_disabled(
+        self,
+        consume_sample: Callable[..., None],
+    ) -> None:
+        consume_sample("barcode-qr-url.pdf")
+        assert not DocumentBarcode.objects.exists()
+
+    def test_consume_and_reprocess(
+        self,
+        consume_sample: Callable[..., None],
+        admin_client: APIClient,
+        store_barcodes: None,
+    ) -> None:
         """
         GIVEN:
             - PDF with a QR code on each of its two pages
-            - Storing barcode values enabled
         WHEN:
             - File is consumed, the values are lost, and the document is reprocessed
         THEN:
-            - The barcodes are stored with the document and shown in its metadata
+            - The barcodes are stored, shown in the API and searchable
             - Reprocessing reads them again
         """
-        test_file = self.BARCODE_SAMPLE_DIR / "barcode-qr-url.pdf"
-        dst = settings.SCRATCH_DIR / "barcode-qr-url.pdf"
-        shutil.copy(test_file, dst)
-
-        tasks.consume_file(
-            ConsumableDocument(
-                source=DocumentSource.ConsumeFolder,
-                original_file=dst,
-            ),
-            None,
-        )
-
+        consume_sample("barcode-qr-url.pdf")
         document = Document.objects.get()
-        self.assertEqual(
-            list(document.barcodes.values("page", "value", "format")),
-            self.SAMPLE_VALUES,
-        )
+        assert _stored(document) == SAMPLE_VALUES
 
-        user = User.objects.create_superuser(username="admin")
-        client = APIClient()
-        client.force_authenticate(user=user)
-        response = client.get(f"/api/documents/{document.pk}/metadata/")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        barcodes = response.data["barcodes"]
-        self.assertEqual(barcodes, self.SAMPLE_VALUES)
-
-        response = client.get(f"/api/documents/{document.pk}/")
-        self.assertEqual(response.data["barcodes"], barcodes)
-        response = client.get("/api/documents/?query=barcodes:invoice")
-        self.assertEqual([x["id"] for x in response.data["results"]], [document.pk])
-        response = client.get("/api/documents/?query=invoice")
-        self.assertEqual(response.data["results"], [])
+        response = admin_client.get(f"/api/documents/{document.pk}/metadata/")
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data["barcodes"] == SAMPLE_VALUES
+        response = admin_client.get(f"/api/documents/{document.pk}/")
+        assert response.data["barcodes"] == SAMPLE_VALUES
+        response = admin_client.get("/api/documents/?query=barcodes:invoice")
+        assert [x["id"] for x in response.data["results"]] == [document.pk]
+        response = admin_client.get("/api/documents/?query=invoice")
+        assert response.data["results"] == []
 
         document.barcodes.all().delete()
+        modified = Document.objects.get(pk=document.pk).modified
         tasks.update_document_content_maybe_archive_file(document.pk)
 
-        self.assertEqual(
-            list(document.barcodes.values("page", "value", "format")),
-            self.SAMPLE_VALUES,
-        )
+        assert _stored(document) == SAMPLE_VALUES
+        assert Document.objects.get(pk=document.pk).modified > modified
 
-    @override_settings(
-        CELERY_TASK_ALWAYS_EAGER=True,
-        OCR_MODE="auto",
+    @pytest.mark.parametrize(
+        "read_values",
+        [
+            pytest.param({"side_effect": RuntimeError("broken")}, id="scan-fails"),
+            pytest.param({"return_value": None}, id="not-scannable"),
+        ],
     )
-    @pytest.mark.usefixtures("fake_progress_manager")
-    def test_consume_file_values_disabled(self) -> None:
-        """
-        GIVEN:
-            - PDF with QR codes
-            - Storing barcode values not enabled
-        WHEN:
-            - File is consumed
-        THEN:
-            - Nothing is stored and the metadata lists no barcodes
-        """
-        test_file = self.BARCODE_SAMPLE_DIR / "barcode-qr-url.pdf"
-        dst = settings.SCRATCH_DIR / "barcode-qr-url.pdf"
-        shutil.copy(test_file, dst)
-
-        tasks.consume_file(
-            ConsumableDocument(
-                source=DocumentSource.ConsumeFolder,
-                original_file=dst,
-            ),
-            None,
-        )
-
-        document = Document.objects.get()
-        self.assertFalse(document.barcodes.exists())
-
-    @override_settings(
-        CONSUMER_STORE_BARCODE_VALUES=True,
-        CELERY_TASK_ALWAYS_EAGER=True,
-        OCR_MODE="auto",
-    )
-    @pytest.mark.usefixtures("fake_progress_manager")
-    def test_consume_version_stores_own_values(self) -> None:
+    def test_reprocess_keeps_values(
+        self,
+        consume_sample: Callable[..., None],
+        mocker: MockerFixture,
+        store_barcodes: None,
+        read_values: dict,
+    ) -> None:
         """
         GIVEN:
             - A document with stored barcodes
-            - Storing barcode values enabled
+        WHEN:
+            - It is reprocessed, but the barcodes can't be read
+        THEN:
+            - The stored barcodes are kept
+        """
+        consume_sample("barcode-qr-url.pdf")
+        document = Document.objects.get()
+        mocker.patch("documents.tasks.read_barcode_values", **read_values)
+
+        tasks.update_document_content_maybe_archive_file(document.pk)
+
+        assert _stored(document) == SAMPLE_VALUES
+
+    def test_reprocess_values_disabled(
+        self,
+        consume_sample: Callable[..., None],
+        settings: Settings,
+        store_barcodes: None,
+    ) -> None:
+        consume_sample("barcode-qr-url.pdf")
+        document = Document.objects.get()
+        settings.CONSUMER_STORE_BARCODE_VALUES = False
+
+        assert tasks._read_barcodes_for_reprocess(document) is None
+
+    def test_consume_version_stores_own_values(
+        self,
+        consume_sample: Callable[..., None],
+        admin_client: APIClient,
+        store_barcodes: None,
+    ) -> None:
+        """
+        GIVEN:
+            - A document with stored barcodes
         WHEN:
             - A new version with a different barcode is consumed, like after
               rotating or removing pages
@@ -1376,46 +1361,48 @@ class TestBarcodeValues(
             - The version keeps its own barcodes, the original ones are kept
             - The document API and the search use those of the newest version
         """
-        test_file = self.BARCODE_SAMPLE_DIR / "barcode-qr-url.pdf"
-        dst = settings.SCRATCH_DIR / "barcode-qr-url.pdf"
-        shutil.copy(test_file, dst)
-        tasks.consume_file(
-            ConsumableDocument(source=DocumentSource.ConsumeFolder, original_file=dst),
-            None,
-        )
+        consume_sample("barcode-qr-url.pdf")
         root = Document.objects.get()
-
-        version_file = settings.SCRATCH_DIR / "barcode-128-custom.pdf"
-        shutil.copy(self.BARCODE_SAMPLE_DIR / "barcode-128-custom.pdf", version_file)
-        tasks.consume_file(
-            ConsumableDocument(
-                source=DocumentSource.ApiUpload,
-                original_file=version_file,
-                root_document_id=root.pk,
-            ),
-            None,
+        consume_sample(
+            "barcode-128-custom.pdf",
+            source=DocumentSource.ApiUpload,
+            root_document_id=root.pk,
         )
 
         version = Document.objects.get(root_document=root)
-        self.assertEqual(
-            list(version.barcodes.values("page", "value", "format")),
-            [{"page": 1, "value": "CUSTOM BARCODE", "format": "Code 128"}],
+        assert _stored(version) == [
+            {"page": 1, "value": "CUSTOM BARCODE", "format": "Code128"},
+        ]
+        assert root.barcodes.count() == 2
+        assert [x.value for x in root.get_effective_barcodes()] == ["CUSTOM BARCODE"]
+
+        response = admin_client.get(f"/api/documents/{root.pk}/")
+        assert [x["value"] for x in response.data["barcodes"]] == ["CUSTOM BARCODE"]
+        response = admin_client.get('/api/documents/?query=barcodes:"custom barcode"')
+        assert [x["id"] for x in response.data["results"]] == [root.pk]
+        response = admin_client.get("/api/documents/?query=barcodes:invoice")
+        assert response.data["results"] == []
+
+    def test_consume_version_scan_fails(
+        self,
+        consume_sample: Callable[..., None],
+        mocker: MockerFixture,
+        store_barcodes: None,
+    ) -> None:
+        """
+        A failed scan of a new version is logged and doesn't stop consumption
+        """
+        consume_sample("barcode-qr-url.pdf")
+        root = Document.objects.get()
+        mocker.patch(
+            "documents.consumer.read_barcode_values",
+            side_effect=RuntimeError("broken"),
         )
-        self.assertEqual(root.barcodes.count(), 2)
-        self.assertEqual(
-            [x.value for x in root.get_effective_barcodes()],
-            ["CUSTOM BARCODE"],
+        consume_sample(
+            "barcode-128-custom.pdf",
+            source=DocumentSource.ApiUpload,
+            root_document_id=root.pk,
         )
 
-        user = User.objects.create_superuser(username="admin")
-        client = APIClient()
-        client.force_authenticate(user=user)
-        response = client.get(f"/api/documents/{root.pk}/")
-        self.assertEqual(
-            [x["value"] for x in response.data["barcodes"]],
-            ["CUSTOM BARCODE"],
-        )
-        response = client.get('/api/documents/?query=barcodes:"custom barcode"')
-        self.assertEqual([x["id"] for x in response.data["results"]], [root.pk])
-        response = client.get("/api/documents/?query=barcodes:invoice")
-        self.assertEqual(response.data["results"], [])
+        version = Document.objects.get(root_document=root)
+        assert not version.barcodes.exists()
