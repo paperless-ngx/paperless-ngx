@@ -46,7 +46,12 @@ services:
       MARIADB_PASSWORD: paperless
       MARIADB_ROOT_PASSWORD: paperless
   webserver:
-    image: fallshere/paperless-ngx:latest
+    # 本地开发：使用项目根目录的 Dockerfile 构建镜像
+    # 镜像构建完成后，service 名称 `webserver` 即对应本地构建的镜像
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    image: paperless-ngx:local
     restart: unless-stopped
     depends_on:
       - db

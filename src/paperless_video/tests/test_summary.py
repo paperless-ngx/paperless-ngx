@@ -47,6 +47,7 @@ class TestSummarizeTranscript(TestCase):
         )
         self.assertEqual(kwargs["json"]["stream"], False)
         self.assertEqual(kwargs["json"]["model"], "gpt-4o-mini")
+        self.assertEqual(kwargs["json"]["thinking"], {"type": "disabled"})
         self.assertEqual(
             kwargs["json"]["messages"][0]["content"],
             "Custom summary prompt",

@@ -28,6 +28,8 @@ def summarize_transcript(transcript: str) -> str:
             {"role": "user", "content": transcript},
         ],
         "stream": False,
+        # 关闭 MiniMax M3 的推理模式，避免 reasoning_content 进入 content
+        "thinking": {"type": "disabled"},
     }
     headers = {
         "Content-Type": "application/json",
