@@ -171,7 +171,6 @@ class ApplicationConfiguration(AbstractSingletonModel):
         verbose_name=_("Video content mode"),
         max_length=16,
         choices=VideoContentModeChoices.choices,
-        default=VideoContentModeChoices.BOTH,
         null=True,
         blank=True,
     )

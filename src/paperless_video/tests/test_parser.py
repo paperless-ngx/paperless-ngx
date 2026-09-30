@@ -4,6 +4,7 @@ from pathlib import Path
 from unittest import mock
 
 from django.test import TestCase
+from django.test import override_settings
 
 from documents.parsers import ParseError
 from documents.parsers import is_mime_type_supported
@@ -107,6 +108,30 @@ class TestVideoDocumentParser(TestCase):
         self.assertIn("短摘要", parser.text)
         self.assertIn("【转写】", parser.text)
         self.assertIn("全转写", parser.text)
+        mock_summarize.assert_called_once_with("全转写")
+
+    @override_settings(VIDEO_CONTENT_MODE=VideoContentModeChoices.SUMMARY)
+    @mock.patch("paperless_video.summary.summarize_transcript")
+    @mock.patch("paperless.asr.AsrClient")
+    @mock.patch("paperless_video.ffmpeg_utils.extract_audio_mp3")
+    def test_parse_uses_settings_when_db_mode_unset(
+        self,
+        mock_extract,
+        mock_asr_cls,
+        mock_summarize,
+    ):
+        cfg = ApplicationConfiguration.objects.first()
+        cfg.video_content_mode = None
+        cfg.save()
+
+        mock_extract.return_value = Path(self._parser().tempdir) / "audio.mp3"
+        mock_asr_cls.return_value.transcribe.return_value = "全转写"
+        mock_summarize.return_value = "短摘要"
+
+        parser = self._parser()
+        parser.parse(self.video_path, "video/mp4")
+
+        self.assertEqual(parser.text, "短摘要")
         mock_summarize.assert_called_once_with("全转写")
 
     @mock.patch("paperless_video.ffmpeg_utils.extract_audio_mp3")

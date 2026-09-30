@@ -1,4 +1,5 @@
 from django.test import TestCase
+from django.test import override_settings
 
 from paperless.models import AIModel
 from paperless.models import ApplicationConfiguration
@@ -20,6 +21,18 @@ class TestAIModelSupplierFreeText(TestCase):
 
 
 class TestVideoContentMode(TestCase):
-    def test_default_is_both(self):
+    def test_default_is_unset(self):
         cfg = ApplicationConfiguration.objects.first()
-        self.assertEqual(cfg.video_content_mode, VideoContentModeChoices.BOTH)
+        self.assertIsNone(cfg.video_content_mode)
+
+    @override_settings(VIDEO_CONTENT_MODE=VideoContentModeChoices.TRANSCRIPT)
+    def test_video_config_uses_settings_when_db_unset(self):
+        from paperless.config import VideoConfig
+
+        cfg = ApplicationConfiguration.objects.first()
+        cfg.video_content_mode = None
+        cfg.save()
+        self.assertEqual(
+            VideoConfig().video_content_mode,
+            VideoContentModeChoices.TRANSCRIPT,
+        )

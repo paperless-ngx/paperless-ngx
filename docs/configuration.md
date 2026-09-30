@@ -1610,7 +1610,7 @@ Phase 1 supports **MP4** uploads only (`video/mp4`). The parser extracts audio w
 
 #### [`PAPERLESS_VIDEO_CONTENT_MODE=<mode>`](#PAPERLESS_VIDEO_CONTENT_MODE) {#PAPERLESS_VIDEO_CONTENT_MODE}
 
-: Controls what is written to `Document.content` after ASR. Also configurable in the admin UI as **Video content mode** (UI takes precedence over this environment variable when set).
+: Controls what is written to `Document.content` after ASR. Also configurable in the admin UI as **Video content mode**. A saved UI value takes precedence; while that setting is left unset, this environment variable applies.
 
     - `transcript` — Transcript only
     - `summary` — LLM summary only (ASR still runs as input)

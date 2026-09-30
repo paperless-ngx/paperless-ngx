@@ -13,15 +13,14 @@ class VideoDocumentParser(DocumentParser):
     def parse(self, document_path: Path, mime_type, file_name=None):
         from paperless.asr import AsrClient
         from paperless.asr import AsrError
+        from paperless.config import VideoConfig
         from paperless.models import AIModel
-        from paperless.models import ApplicationConfiguration
         from paperless.models import VideoContentModeChoices
         from paperless_video.content import assemble_video_content
         from paperless_video.ffmpeg_utils import extract_audio_mp3
         from paperless_video.summary import summarize_transcript
 
-        cfg = ApplicationConfiguration.objects.first()
-        mode = (cfg.video_content_mode if cfg else None) or VideoContentModeChoices.BOTH
+        mode = VideoConfig().video_content_mode or VideoContentModeChoices.BOTH
 
         asr_model = AIModel.objects.filter(model_type="asr", is_default=True).first()
         if not asr_model:
