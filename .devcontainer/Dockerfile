@@ -66,6 +66,7 @@ ARG RUNTIME_PACKAGES="\
   # Barcode splitter
   libzbar0 \
   poppler-utils \
+  ffmpeg \
   htop \
   sudo"
 

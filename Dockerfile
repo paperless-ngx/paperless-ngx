@@ -166,7 +166,8 @@ ARG RUNTIME_PACKAGES="\
   zlib1g \
   # Barcode splitter
   libzbar0 \
-  poppler-utils"
+  poppler-utils \
+  ffmpeg"
 
 # Install basic runtime packages.
 # These change very infrequently
