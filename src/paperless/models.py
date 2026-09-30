@@ -74,6 +74,12 @@ class ColorConvertChoices(models.TextChoices):
     CMYK = ("CMYK", _("CMYK"))
 
 
+class VideoContentModeChoices(models.TextChoices):
+    TRANSCRIPT = ("transcript", _("transcript"))
+    SUMMARY = ("summary", _("summary"))
+    BOTH = ("both", _("both"))
+
+
 class ApplicationConfiguration(AbstractSingletonModel):
     """
     Settings which are common across more than 1 parser
@@ -157,6 +163,15 @@ class ApplicationConfiguration(AbstractSingletonModel):
     # Enable VLM-based image understanding to extract text
     vlm_analysis_enabled = models.BooleanField(
         verbose_name=_("Enable VLM image understanding"),
+        null=True,
+        blank=True,
+    )
+
+    video_content_mode = models.CharField(
+        verbose_name=_("Video content mode"),
+        max_length=16,
+        choices=VideoContentModeChoices.choices,
+        default=VideoContentModeChoices.BOTH,
         null=True,
         blank=True,
     )
@@ -297,7 +312,6 @@ class AIModel(models.Model):
     supplier = models.CharField(
         verbose_name=_("supplier"),
         max_length=64,
-        choices=SupplierChoices.choices,
     )
 
     model_type = models.CharField(
