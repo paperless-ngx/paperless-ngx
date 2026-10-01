@@ -1413,22 +1413,21 @@ export class WorkflowEditDialogComponent
   // carried with a string id of the form "cf_<id>"; built-in fields keep their
   // plain enum value. This is only a UI-level encoding — save() splits it back
   // into ai_suggestion_fields / ai_suggestion_custom_fields for the API.
-  get aiSuggestionFieldOptions() {
-    return AI_SUGGESTION_FIELD_OPTIONS
-  }
-
-  get aiSuggestionTargets() {
-    return [
-      ...AI_SUGGESTION_FIELD_OPTIONS,
-      // Document link fields are never suggested by the AI
-      ...(this.customFields() ?? [])
-        .filter((f) => f.data_type !== CustomFieldDataType.DocumentLink)
-        .map((f) => ({
-          id: this.customFieldTargetId(f.id),
-          name: f.name,
-        })),
-    ]
-  }
+  //
+  // Must be a computed (not a getter): a getter returns a fresh array with new
+  // object identities on every change-detection cycle, and ng-select drops its
+  // selection when the [items] reference keeps changing. A computed memoizes
+  // and only rebuilds when customFields() changes, keeping the reference stable.
+  readonly aiSuggestionTargets = computed(() => [
+    ...AI_SUGGESTION_FIELD_OPTIONS,
+    // Document link fields are never suggested by the AI
+    ...(this.customFields() ?? [])
+      .filter((f) => f.data_type !== CustomFieldDataType.DocumentLink)
+      .map((f) => ({
+        id: this.customFieldTargetId(f.id),
+        name: f.name,
+      })),
+  ])
 
   private customFieldTargetId(id: number) {
     return `cf_${id}`

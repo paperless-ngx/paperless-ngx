@@ -493,7 +493,7 @@ describe('WorkflowEditDialogComponent', () => {
     ])
     expect(action.get('ai_create_missing').value).toBeTruthy()
     expect(action.get('ai_overwrite_existing').value).toBeTruthy()
-    expect(component.aiSuggestionTargets.length).toBe(8)
+    expect(component.aiSuggestionTargets().length).toBe(8)
   })
 
   it('should default apply AI suggestions options on a new action', () => {

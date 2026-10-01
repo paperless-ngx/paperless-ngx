@@ -470,7 +470,7 @@
             <pngx-input-select
               i18n-title
               title="Apply suggestions for"
-              [items]="aiSuggestionTargets"
+              [items]="aiSuggestionTargets()"
               [multiple]="true"
               formControlName="ai_suggestion_targets"
               [error]="error?.actions?.[i]?.ai_suggestion_fields || error?.actions?.[i]?.ai_suggestion_custom_fields"
