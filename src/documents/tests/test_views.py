@@ -21,6 +21,7 @@ from documents.caching import get_llm_suggestion_cache
 from documents.caching import get_suggestion_cache_key
 from documents.caching import set_llm_suggestions_cache
 from documents.models import Correspondent
+from documents.models import CustomField
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import ShareLink
@@ -456,6 +457,10 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
         self,
         mock_get_ai_classification,
     ) -> None:
+        invoice_number_field = CustomField.objects.create(
+            name="Invoice Number",
+            data_type=CustomField.FieldDataType.STRING,
+        )
         mock_get_ai_classification.return_value = {
             "title": "AI Title",
             "tags": {"existing_ids": [self.tag1.pk], "new_names": ["tag2"]},
@@ -469,6 +474,7 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
             },
             "storage_paths": {"existing_ids": [self.path1.pk], "new_names": []},
             "dates": ["2023-01-01"],
+            "custom_fields": {"Invoice Number": "ABC123"},
         }
 
         self.client.force_login(user=self.user)
@@ -489,12 +495,114 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
                 "storage_paths": [self.path1.pk],
                 "suggested_storage_paths": [],
                 "dates": ["2023-01-01"],
+                "custom_fields": {
+                    str(invoice_number_field.pk): "ABC123",
+                },
             },
         )
         mock_get_ai_classification.assert_called_once_with(
             self.document,
             self.user,
             None,
+        )
+
+    @patch("documents.views.get_ai_document_classification")
+    @override_settings(
+        AI_ENABLED=True,
+        LLM_BACKEND="mock_backend",
+    )
+    def test_ai_suggestions_custom_field_type_conversion(
+        self,
+        mock_get_ai_classification,
+    ) -> None:
+        fields = {
+            "Date": CustomField.objects.create(
+                name="Date",
+                data_type=CustomField.FieldDataType.DATE,
+            ),
+            "Invalid Date": CustomField.objects.create(
+                name="Invalid Date",
+                data_type=CustomField.FieldDataType.DATE,
+            ),
+            "Boolean": CustomField.objects.create(
+                name="Boolean",
+                data_type=CustomField.FieldDataType.BOOL,
+            ),
+            "Invalid Boolean": CustomField.objects.create(
+                name="Invalid Boolean",
+                data_type=CustomField.FieldDataType.BOOL,
+            ),
+            "Integer": CustomField.objects.create(
+                name="Integer",
+                data_type=CustomField.FieldDataType.INT,
+            ),
+            "Invalid Integer": CustomField.objects.create(
+                name="Invalid Integer",
+                data_type=CustomField.FieldDataType.INT,
+            ),
+            "Float": CustomField.objects.create(
+                name="Float",
+                data_type=CustomField.FieldDataType.FLOAT,
+            ),
+            "Total": CustomField.objects.create(
+                name="Total",
+                data_type=CustomField.FieldDataType.MONETARY,
+            ),
+            "Choice": CustomField.objects.create(
+                name="Choice",
+                data_type=CustomField.FieldDataType.SELECT,
+                extra_data={"select_options": [{"id": "ok", "label": "Okay"}]},
+            ),
+            "Invalid Choice": CustomField.objects.create(
+                name="Invalid Choice",
+                data_type=CustomField.FieldDataType.SELECT,
+                extra_data={"select_options": [{"id": "ok", "label": "Okay"}]},
+            ),
+            "Document Link": CustomField.objects.create(
+                name="Document Link",
+                data_type=CustomField.FieldDataType.DOCUMENTLINK,
+            ),
+        }
+        mock_get_ai_classification.return_value = {
+            "title": "AI Title",
+            "tags": {"existing_ids": [], "new_names": []},
+            "correspondents": {"existing_ids": [], "new_names": []},
+            "document_types": {"existing_ids": [], "new_names": []},
+            "storage_paths": {"existing_ids": [], "new_names": []},
+            "dates": [],
+            "custom_fields": {
+                "Date": "2026-09-29",
+                "Invalid Date": "not-a-date",
+                "Boolean": "true",
+                "Invalid Boolean": "sometimes",
+                "Integer": "42",
+                "Invalid Integer": "not-an-integer",
+                "Float": "2.5",
+                "Total": "49.95",
+                "Choice": "Okay",
+                "Invalid Choice": "Maybe",
+                "Document Link": "1",
+                "Unknown": "ignored",
+                "Empty": "",
+            },
+        }
+
+        self.client.force_login(user=self.user)
+        response = self.client.get(
+            f"/api/documents/{self.document.pk}/ai_suggestions/",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            response.json()["custom_fields"],
+            {
+                str(fields["Date"].pk): "2026-09-29",
+                str(fields["Boolean"].pk): True,
+                str(fields["Integer"].pk): 42,
+                str(fields["Float"].pk): 2.5,
+                str(fields["Total"].pk): "49.95",
+                str(fields["Choice"].pk): "ok",
+            },
         )
 
     @patch("documents.views.get_ai_document_classification")

@@ -1,11 +1,15 @@
 import logging
 from datetime import date
 from datetime import datetime
+from decimal import Decimal
+from decimal import InvalidOperation
 from typing import TypeVar
 
 from django.contrib.auth.models import User
 
 from documents.models import Correspondent
+from documents.models import CustomField
+from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import MatchingModel
@@ -262,6 +266,69 @@ def apply_ai_suggestions_to_document(
     # Tags at the end so m2m_changed doesn't trigger db and overwrite other changes
     if tags_to_add:
         document.add_nested_tags(tags_to_add)
+
+    if AISuggestionField.CUSTOM_FIELDS in selected:
+        fields_by_name = {
+            field.name: field
+            for field in CustomField.objects.exclude(
+                data_type=CustomField.FieldDataType.DOCUMENTLINK,
+            )
+        }
+        for field_name, raw_value in suggestions.get("custom_fields", {}).items():
+            field = fields_by_name.get(field_name)
+            if field is None or raw_value in (None, ""):
+                continue
+            existing = CustomFieldInstance.objects.filter(
+                document=document,
+                field=field,
+            ).first()
+            if existing and not overwrite and existing.value not in (None, ""):
+                continue
+            try:
+                if field.data_type == CustomField.FieldDataType.DATE:
+                    value = date.fromisoformat(str(raw_value))
+                elif field.data_type == CustomField.FieldDataType.BOOL:
+                    if str(raw_value).lower() not in ("true", "false"):
+                        continue
+                    value = str(raw_value).lower() == "true"
+                elif field.data_type == CustomField.FieldDataType.INT:
+                    value = int(raw_value)
+                elif field.data_type == CustomField.FieldDataType.FLOAT:
+                    value = float(raw_value)
+                elif field.data_type == CustomField.FieldDataType.MONETARY:
+                    value = Decimal(str(raw_value))
+                    if not value.is_finite():
+                        continue
+                elif field.data_type == CustomField.FieldDataType.SELECT:
+                    options = (field.extra_data or {}).get("select_options", [])
+                    option = next(
+                        (
+                            option
+                            for option in options
+                            if option["id"] == raw_value or option["label"] == raw_value
+                        ),
+                        None,
+                    )
+                    if option is None:
+                        continue
+                    value = option["id"]
+                else:
+                    value = str(raw_value)
+
+                value_field = CustomFieldInstance.get_value_field_name(
+                    field.data_type,
+                )
+                CustomFieldInstance.objects.update_or_create(
+                    document=document,
+                    field=field,
+                    defaults={value_field: value},
+                )
+                updated_fields.append(f"custom_fields.{field.name}")
+            except (InvalidOperation, TypeError, ValueError):
+                logger.debug(
+                    "Ignoring invalid AI value for custom field %s",
+                    field.name,
+                )
 
     logger.info(
         "Applied AI suggestions %s to document %s",

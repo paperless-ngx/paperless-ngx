@@ -136,9 +136,12 @@ for suggested generation and embedding models.
 ### AI-assisted suggestions
 
 With AI enabled, Paperless-ngx can suggest a title, tags, correspondent, document type,
-storage path and dates by sending the document to the LLM. This is **opt-in per request**
-and surfaces through the "Suggest" control on the document detail page, alongside the
-classic classifier-based suggestions — it does not disable them. Suggestions are requested
+storage path, dates, and custom field values by sending the document to the LLM. Custom field
+suggestions use the field names and types configured in Paperless-ngx. All field types except
+document links can be suggested; values that cannot be converted to the configured type or that
+do not match a select field option are ignored. This is **opt-in per request** and surfaces
+through the "Suggest" control on the document detail page, alongside the classic
+classifier-based suggestions — it does not disable them. Suggestions are requested
 automatically when you open a document that carries an inbox tag unless "Automatically request
 suggestions for inbox documents" under Settings > Documents is disabled. Suggestion output
 language can be steered with

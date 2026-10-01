@@ -185,6 +185,10 @@ export const AI_SUGGESTION_FIELD_OPTIONS = [
     id: AISuggestionField.Created,
     name: $localize`Created date`,
   },
+  {
+    id: AISuggestionField.CustomFields,
+    name: $localize`Custom fields`,
+  },
 ]
 
 export enum TriggerFilterType {

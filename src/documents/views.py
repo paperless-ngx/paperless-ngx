@@ -931,6 +931,9 @@ class EmailDocumentDetailSchema(EmailSerializer):
                         child=serializers.CharField(),
                     ),
                     "dates": serializers.ListField(child=serializers.CharField()),
+                    "custom_fields": serializers.DictField(
+                        child=serializers.JSONField(),
+                    ),
                 },
             ),
             400: None,
@@ -1757,6 +1760,57 @@ class DocumentViewSet(
             match_storage_paths_by_name,
         )
 
+        custom_fields = {}
+        fields_by_name = {
+            field.name: field
+            for field in CustomField.objects.exclude(
+                data_type=CustomField.FieldDataType.DOCUMENTLINK,
+            )
+        }
+        for field_name, raw_value in llm_suggestions.get("custom_fields", {}).items():
+            field = fields_by_name.get(field_name)
+            if field is None or raw_value in (None, ""):
+                continue
+            try:
+                if field.data_type == CustomField.FieldDataType.DATE:
+                    value = (
+                        datetime.strptime(str(raw_value), "%Y-%m-%d").date().isoformat()
+                    )
+                elif field.data_type == CustomField.FieldDataType.BOOL:
+                    normalized_bool = str(raw_value).strip().lower()
+                    if (
+                        raw_value is not True
+                        and raw_value is not False
+                        and normalized_bool not in ("true", "false")
+                    ):
+                        continue
+                    value = raw_value is True or normalized_bool == "true"
+                elif field.data_type == CustomField.FieldDataType.INT:
+                    value = int(raw_value)
+                elif field.data_type == CustomField.FieldDataType.FLOAT:
+                    value = float(raw_value)
+                elif field.data_type == CustomField.FieldDataType.SELECT:
+                    options = (field.extra_data or {}).get("select_options", [])
+                    option = next(
+                        (
+                            option
+                            for option in options
+                            if option["id"] == raw_value or option["label"] == raw_value
+                        ),
+                        None,
+                    )
+                    if option is None:
+                        continue
+                    value = option["id"]
+                else:
+                    value = str(raw_value)
+                custom_fields[str(field.pk)] = value
+            except (TypeError, ValueError):
+                logger.debug(
+                    "Ignoring invalid AI value for custom field %s",
+                    field.name,
+                )
+
         resp_data = {
             "title": llm_suggestions["title"],
             "tags": [t.id for t in matched_tags],
@@ -1780,6 +1834,7 @@ class DocumentViewSet(
                 matched_paths,
             ),
             "dates": llm_suggestions["dates"],
+            "custom_fields": custom_fields,
         }
 
         return Response(resp_data)

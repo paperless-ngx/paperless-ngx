@@ -11,6 +11,14 @@ Analyze the following document and fill in these fields:
 - document_types: what kind of document it is, e.g. invoice, contract, letter
 - storage_paths: a folder-style filing location for the document
 - dates: up to 3 relevant dates in YYYY-MM-DD format
+- custom_field_names: exact custom field names for suggested values
+- custom_field_values: suggested values as text, in the same order as custom_field_names
+{% if custom_fields != "[]" %}
+
+Available custom fields (JSON; each entry gives the exact name, type, and any allowed options):
+{{ custom_fields }}
+Only suggest custom field values when the document clearly supports them. Omit fields without a clear value. Return one value for each name, in matching order. Use ISO YYYY-MM-DD for date values, `true` or `false` for booleans, a decimal number without a currency code or symbol for monetary values, and the exact allowed option ID for select fields. Do not suggest document links. For example, `custom_field_names: ["Invoice Number"]` and `custom_field_values: ["ABC123"]`.
+{% endif %}
 {% if has_candidates %}
 
 First produce the complete name suggestions from the document itself in tags, correspondents, document_types, and storage_paths. Always include every suggested name in those fields, even when an available candidate represents the same value. Then, as a separate reconciliation step, copy each name that means the same thing as an available candidate into the matching matched_* field and put that candidate's ID at the same position in the corresponding *_ids field. Candidates must not create, replace, or suppress suggestions. Do not match a candidate that is merely related.

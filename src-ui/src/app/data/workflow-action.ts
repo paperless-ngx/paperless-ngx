@@ -19,6 +19,7 @@ export enum AISuggestionField {
   DocumentType = 'document_type',
   StoragePath = 'storage_path',
   Created = 'created',
+  CustomFields = 'custom_fields',
 }
 
 export interface WorkflowActionEmail extends ObjectWithId {

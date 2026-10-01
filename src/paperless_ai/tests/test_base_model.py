@@ -43,6 +43,8 @@ def test_document_classifier_schema_declared_defaults():
         "matched_storage_paths": [],
         "storage_path_ids": [],
         "dates": [],
+        "custom_field_names": [],
+        "custom_field_values": [],
     }
 
 
@@ -62,6 +64,8 @@ def test_model_response_converts_names_to_internal_taxonomy_choices():
         correspondents=["Power Company"],
         document_types=["Utility Bill"],
         storage_paths=["Finance/Utilities"],
+        custom_field_names=["Invoice Number", "Total"],
+        custom_field_values=["ABC123", "49.95"],
     )
     suggestions = model_to_classification_suggestions(parsed)
 
@@ -80,6 +84,10 @@ def test_model_response_converts_names_to_internal_taxonomy_choices():
     assert suggestions["storage_paths"] == {
         "existing_ids": [],
         "new_names": ["Finance/Utilities"],
+    }
+    assert suggestions["custom_fields"] == {
+        "Invoice Number": "ABC123",
+        "Total": "49.95",
     }
 
 
@@ -365,6 +373,7 @@ def test_internal_suggestions_convert_to_names_only_model():
             new_names=["Finance/Utilities"],
         ),
         dates=["2026-08-30"],
+        custom_fields={"Invoice Number": "ABC123", "Total": "49.95"},
     )
 
     model = classification_suggestions_to_model(suggestions)
@@ -387,4 +396,5 @@ def test_internal_suggestions_convert_to_names_only_model():
             new_names=["Finance/Utilities"],
         ),
         dates=["2026-08-30"],
+        custom_fields={"Invoice Number": "ABC123", "Total": "49.95"},
     )

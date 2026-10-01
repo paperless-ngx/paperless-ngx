@@ -1092,6 +1092,27 @@ export class DocumentDetailComponent
       .subscribe({
         next: (result) => {
           this.suggestions.set(result)
+          if (this.aiEnabled && result.custom_fields) {
+            let changedCustomFields = false
+            this.document().custom_fields?.forEach((fieldInstance, index) => {
+              const suggestedValue = result.custom_fields[fieldInstance.field]
+              const valueControl = this.customFieldFormFields
+                .at(index)
+                ?.get('value')
+              if (
+                suggestedValue !== undefined &&
+                suggestedValue !== null &&
+                valueControl &&
+                (valueControl.value === null || valueControl.value === '')
+              ) {
+                valueControl.setValue(suggestedValue)
+                changedCustomFields = true
+              }
+            })
+            if (changedCustomFields) {
+              this.customFieldFormFields.markAsDirty()
+            }
+          }
         },
         error: (error) => {
           this.suggestions.set(null)

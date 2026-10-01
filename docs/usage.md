@@ -336,9 +336,11 @@ See [AI features](advanced_usage.md#ai-features) for how to enable and configure
 ### AI-Enhanced Suggestions
 
 If enabled, Paperless-ngx can use an AI LLM model to suggest document titles, dates, tags,
-correspondents and document types for documents. This feature will always be "opt-in" and does not
-disable the existing classifier-based suggestion system. Currently, both remote
-(via OpenAI-compatible APIs) and local (via Ollama) models are supported, see
+correspondents, document types, storage paths, and custom field values for documents. Custom field
+suggestions are matched by field name and support every custom field type except document links;
+values that do not match the field type or a select field's available options are ignored. This feature
+will always be "opt-in" and does not disable the existing classifier-based suggestion system. Currently,
+both remote (via OpenAI-compatible APIs) and local (via Ollama) models are supported, see
 [configuration](configuration.md#ai) for details.
 
 ### Document Chat
@@ -675,19 +677,23 @@ processed locally instead and a warning is written to the log.
 the same as the AI suggestions shown on the document detail page, except applied automatically and in bulk.
 It requires [AI features](configuration.md#ai) to be enabled. You can specify:
 
-- Which suggestions to apply: title, tags, correspondent, document type, storage path and / or created
-  date. Suggestions for fields you did not select are discarded.
+- Which suggestions to apply: title, tags, correspondent, document type, storage path, created date,
+  and / or custom fields. Selecting custom fields applies valid suggestions for the configured
+  custom fields; document link fields are not supported. Custom field instances do not need to be
+  added by an earlier Assignment action. Suggestions for categories you did not select are discarded.
 - Whether to create missing items. By default only tags, correspondents and document types that
   already exist are assigned and any other suggestion is dropped. With this enabled, suggested items
   that do not exist are created. Storage paths are never created.
 - Whether to overwrite existing values. By default a field is only filled in if it is currently empty.
   Note that documents almost always already have a title and created date, so if you select those you
-  will usually want to enable this too. Tags are an exception: suggested tags are always added and
-  never replace the document's existing tags.
+  will usually want to enable this too. Custom fields follow the same rule, including fields that
+  already have a value. Tags are an exception: suggested tags are always added and never replace the
+  document's existing tags.
 
 The action works with every trigger **except Consumption Started**, because suggestions are made from
-the document's text, which does not exist until after the document has been processed. Documents whose
-processed text is empty or contains only whitespace are skipped.
+the document's processed text (including OCR text), which does not exist until after the document has
+been processed. No separate OCR workflow action is needed. Documents whose processed text is empty or
+contains only whitespace are skipped.
 
 Because the query to the AI service is slow, the action is queued and runs in the background rather
 than as part of the workflow run itself. The document is updated once the suggestions come back.

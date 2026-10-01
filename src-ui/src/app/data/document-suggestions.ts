@@ -14,4 +14,6 @@ export interface DocumentSuggestions {
   suggested_storage_paths?: string[]
 
   dates?: string[] // ISO-formatted date string e.g. 2022-11-03
+
+  custom_fields?: Record<string, string | number | boolean>
 }

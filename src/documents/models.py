@@ -1715,6 +1715,7 @@ class WorkflowAction(models.Model):
         DOCUMENT_TYPE = ("document_type", _("Document type"))
         STORAGE_PATH = ("storage_path", _("Storage path"))
         CREATED = ("created", _("Created date"))
+        CUSTOM_FIELDS = ("custom_fields", _("Custom fields"))
 
     type = models.PositiveSmallIntegerField(
         _("Workflow Action Type"),

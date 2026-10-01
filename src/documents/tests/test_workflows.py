@@ -5670,6 +5670,7 @@ SUGGESTIONS: ClassificationSuggestions = {
         "new_names": ["Suggested Storage Path"],
     },
     "dates": ["2024-03-05"],
+    "custom_fields": {},
 }
 
 ALL_SUGGESTION_FIELDS = [
@@ -5679,6 +5680,7 @@ ALL_SUGGESTION_FIELDS = [
     WorkflowAction.AISuggestionField.DOCUMENT_TYPE,
     WorkflowAction.AISuggestionField.STORAGE_PATH,
     WorkflowAction.AISuggestionField.CREATED,
+    WorkflowAction.AISuggestionField.CUSTOM_FIELDS,
 ]
 
 
@@ -5730,6 +5732,218 @@ class TestApplyAISuggestionsWorkflowAction(
             changed = apply_ai_suggestions_to_document(action, self.doc)
         self.doc.refresh_from_db()
         return changed
+
+    def test_custom_field_suggestions_create_missing_instances(self) -> None:
+        invoice_number = CustomField.objects.create(
+            name="Invoice Number",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        invoice_date = CustomField.objects.create(
+            name="Invoice Date",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        action = self.make_action(
+            ai_suggestion_fields=[WorkflowAction.AISuggestionField.CUSTOM_FIELDS],
+        )
+
+        changed = self.apply(
+            action,
+            {
+                **SUGGESTIONS,
+                "custom_fields": {
+                    "Invoice Number": "ABC123",
+                    "Invoice Date": "2026-09-29",
+                },
+            },
+        )
+
+        self.assertCountEqual(
+            changed,
+            ["custom_fields.Invoice Number", "custom_fields.Invoice Date"],
+        )
+        self.assertEqual(
+            CustomFieldInstance.objects.get(
+                document=self.doc,
+                field=invoice_number,
+            ).value,
+            "ABC123",
+        )
+        self.assertEqual(
+            CustomFieldInstance.objects.get(
+                document=self.doc,
+                field=invoice_date,
+            ).value,
+            "2026-09-29",
+        )
+
+    def test_custom_field_suggestions_convert_typed_values(self) -> None:
+        fields = {
+            "Invoice Date": CustomField.objects.create(
+                name="Invoice Date",
+                data_type=CustomField.FieldDataType.DATE,
+            ),
+            "Paid": CustomField.objects.create(
+                name="Paid",
+                data_type=CustomField.FieldDataType.BOOL,
+            ),
+            "Quantity": CustomField.objects.create(
+                name="Quantity",
+                data_type=CustomField.FieldDataType.INT,
+            ),
+            "Rate": CustomField.objects.create(
+                name="Rate",
+                data_type=CustomField.FieldDataType.FLOAT,
+            ),
+            "Total": CustomField.objects.create(
+                name="Total",
+                data_type=CustomField.FieldDataType.MONETARY,
+            ),
+            "Status": CustomField.objects.create(
+                name="Status",
+                data_type=CustomField.FieldDataType.SELECT,
+                extra_data={
+                    "select_options": [
+                        {"id": "paid", "label": "Paid"},
+                        {"id": "due", "label": "Due"},
+                    ],
+                },
+            ),
+        }
+        action = self.make_action(
+            ai_suggestion_fields=[WorkflowAction.AISuggestionField.CUSTOM_FIELDS],
+        )
+
+        changed = self.apply(
+            action,
+            {
+                **SUGGESTIONS,
+                "custom_fields": {
+                    "Invoice Date": "2026-09-29",
+                    "Paid": "TRUE",
+                    "Quantity": "12",
+                    "Rate": "1.25",
+                    "Total": "49.95",
+                    "Status": "Paid",
+                },
+            },
+        )
+
+        self.assertCountEqual(
+            changed,
+            [f"custom_fields.{name}" for name in fields],
+        )
+        expected_values = {
+            "Invoice Date": datetime.date(2026, 9, 29),
+            "Paid": True,
+            "Quantity": 12,
+            "Rate": 1.25,
+            "Total": "49.95",
+            "Status": "paid",
+        }
+        for name, expected in expected_values.items():
+            with self.subTest(field=name):
+                instance = CustomFieldInstance.objects.get(
+                    document=self.doc,
+                    field=fields[name],
+                )
+                self.assertEqual(instance.value, expected)
+
+    def test_custom_field_suggestions_skip_unknown_and_invalid_values(self) -> None:
+        fields = {
+            "Invalid Date": CustomField.objects.create(
+                name="Invalid Date",
+                data_type=CustomField.FieldDataType.DATE,
+            ),
+            "Invalid Boolean": CustomField.objects.create(
+                name="Invalid Boolean",
+                data_type=CustomField.FieldDataType.BOOL,
+            ),
+            "Invalid Integer": CustomField.objects.create(
+                name="Invalid Integer",
+                data_type=CustomField.FieldDataType.INT,
+            ),
+            "Invalid Float": CustomField.objects.create(
+                name="Invalid Float",
+                data_type=CustomField.FieldDataType.FLOAT,
+            ),
+            "Invalid Amount": CustomField.objects.create(
+                name="Invalid Amount",
+                data_type=CustomField.FieldDataType.MONETARY,
+            ),
+            "Nonfinite Amount": CustomField.objects.create(
+                name="Nonfinite Amount",
+                data_type=CustomField.FieldDataType.MONETARY,
+            ),
+            "Invalid Select": CustomField.objects.create(
+                name="Invalid Select",
+                data_type=CustomField.FieldDataType.SELECT,
+                extra_data={"select_options": [{"id": "yes", "label": "Yes"}]},
+            ),
+            "Document Link": CustomField.objects.create(
+                name="Document Link",
+                data_type=CustomField.FieldDataType.DOCUMENTLINK,
+            ),
+        }
+        action = self.make_action(
+            ai_suggestion_fields=[WorkflowAction.AISuggestionField.CUSTOM_FIELDS],
+        )
+
+        changed = self.apply(
+            action,
+            {
+                **SUGGESTIONS,
+                "custom_fields": {
+                    "Unknown Field": "ignored",
+                    "Invalid Date": "not-a-date",
+                    "Invalid Boolean": "yes",
+                    "Invalid Integer": "twelve",
+                    "Invalid Float": "fast",
+                    "Invalid Amount": "not-money",
+                    "Nonfinite Amount": "Infinity",
+                    "Invalid Select": "Maybe",
+                    "Document Link": "123",
+                    "Invalid Integer Empty": "",
+                },
+            },
+        )
+
+        self.assertEqual(changed, [])
+        for field in fields.values():
+            with self.subTest(field=field.name):
+                self.assertFalse(
+                    CustomFieldInstance.objects.filter(
+                        document=self.doc,
+                        field=field,
+                    ).exists(),
+                )
+
+    def test_custom_field_suggestions_only_overwrite_when_enabled(self) -> None:
+        field = CustomField.objects.create(
+            name="Invoice Number",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        instance = CustomFieldInstance.objects.create(
+            document=self.doc,
+            field=field,
+            value_text="OLD-123",
+        )
+        suggestions = {**SUGGESTIONS, "custom_fields": {field.name: "NEW-456"}}
+
+        action = self.make_action(
+            ai_suggestion_fields=[WorkflowAction.AISuggestionField.CUSTOM_FIELDS],
+        )
+        self.assertEqual(self.apply(action, suggestions), [])
+        instance.refresh_from_db()
+        self.assertEqual(instance.value, "OLD-123")
+
+        action.ai_overwrite_existing = True
+        action.save(update_fields=["ai_overwrite_existing"])
+        self.assertEqual(
+            self.apply(action, suggestions),
+            ["custom_fields.Invoice Number"],
+        )
+        instance.refresh_from_db()
+        self.assertEqual(instance.value, "NEW-456")
 
     def test_fields_persist_when_tags_are_applied_in_the_same_run(self) -> None:
         """

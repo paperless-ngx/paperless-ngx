@@ -1,8 +1,10 @@
+import json
 import logging
 
 from django.conf import settings
 from django.contrib.auth.models import User
 
+from documents.models import CustomField
 from documents.models import Document
 from documents.permissions import permitted_object_ids
 from documents.permissions import restrict_queryset_to_visible
@@ -123,12 +125,25 @@ def build_prompt_without_rag(
     )
     has_candidates = candidates is not None and any(candidates.values())
 
+    custom_fields = [
+        {
+            "name": field.name,
+            "type": field.data_type,
+            "options": (field.extra_data or {}).get("select_options", [])
+            if field.data_type == CustomField.FieldDataType.SELECT
+            else None,
+        }
+        for field in CustomField.objects.exclude(
+            data_type=CustomField.FieldDataType.DOCUMENTLINK,
+        )
+    ]
     return render_prompt(
         ClassificationPromptContext(
             filename=filename,
             content=content,
             taxonomy_block=taxonomy_block,
             has_candidates=has_candidates,
+            custom_fields=json.dumps(custom_fields, ensure_ascii=False),
         ),
     )
 
@@ -269,6 +284,7 @@ def parse_ai_response(raw: dict) -> ClassificationSuggestions:
         document_types=_choice(raw.get("document_types")),
         storage_paths=_choice(raw.get("storage_paths")),
         dates=raw.get("dates", []),
+        custom_fields=raw.get("custom_fields", {}),
     )
 
 
@@ -337,5 +353,6 @@ def get_ai_document_classification(
                 document_types=_localized_choice("document_types"),
                 storage_paths=_localized_choice("storage_paths"),
                 dates=suggestions["dates"],
+                custom_fields=suggestions["custom_fields"],
             )
     return suggestions

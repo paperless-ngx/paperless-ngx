@@ -28,6 +28,19 @@ class TestRenderPrompt:
 
         assert result == ""
 
+    def test_classification_prompt_explains_monetary_custom_field_values(self) -> None:
+        context = ClassificationPromptContext(
+            filename="invoice.pdf",
+            content="Total due: USD 49.95",
+            taxonomy_block="",
+            has_candidates=False,
+            custom_fields='[{"name":"Total","type":"monetary"}]',
+        )
+
+        result = render_prompt(context)
+
+        assert "decimal number without a currency code or symbol" in result
+
 
 _MINIMAL_CONTEXTS = {
     PromptName.CLASSIFICATION: ClassificationPromptContext(

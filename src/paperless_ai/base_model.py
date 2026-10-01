@@ -13,6 +13,7 @@ MAX_EXISTING_IDS: Final = 10
 MAX_NEW_NAMES: Final = 8
 MAX_SINGLE_VALUE_NAMES: Final = 4
 MAX_DATES: Final = 3
+MAX_CUSTOM_FIELDS: Final = 50
 # Matches documents.models.Document.title's CharField(max_length=128).
 MAX_TITLE_LENGTH: Final = 128
 
@@ -166,6 +167,23 @@ class DocumentClassifierSchema(BaseModel):
             "document was issued."
         ),
     )
+    custom_field_names: list[str] = Field(
+        default_factory=list,
+        max_length=MAX_CUSTOM_FIELDS,
+        description=(
+            "Exact custom field names for which you are suggesting values. "
+            "Each entry corresponds by position to custom_field_values. "
+            "Omit fields without a clear value."
+        ),
+    )
+    custom_field_values: list[str] = Field(
+        default_factory=list,
+        max_length=MAX_CUSTOM_FIELDS,
+        description=(
+            "Suggested custom field values as text, in the same order as "
+            "custom_field_names. Return one value for each name."
+        ),
+    )
 
     @field_validator(
         "title",
@@ -182,6 +200,8 @@ class DocumentClassifierSchema(BaseModel):
         "matched_storage_paths",
         "storage_path_ids",
         "dates",
+        "custom_field_names",
+        "custom_field_values",
         mode="before",
     )
     @classmethod
@@ -205,6 +225,7 @@ class ClassificationSuggestions(TypedDict):
     document_types: TaxonomyChoiceDict
     storage_paths: TaxonomyChoiceDict
     dates: list[str]
+    custom_fields: dict[str, str]
 
 
 def model_to_classification_suggestions(
@@ -270,6 +291,15 @@ def model_to_classification_suggestions(
             "storage_paths",
         ),
         dates=model.dates,
+        custom_fields={
+            name: value
+            for name, value in zip(
+                model.custom_field_names,
+                model.custom_field_values,
+                strict=False,
+            )
+            if name.strip() and value.strip()
+        },
     )
 
 
@@ -292,4 +322,8 @@ def classification_suggestions_to_model(
         matched_storage_paths=[],
         storage_path_ids=[],
         dates=suggestions["dates"],
+        custom_field_names=list(suggestions.get("custom_fields", {}).keys()),
+        custom_field_values=[
+            str(value) for value in suggestions.get("custom_fields", {}).values()
+        ],
     )

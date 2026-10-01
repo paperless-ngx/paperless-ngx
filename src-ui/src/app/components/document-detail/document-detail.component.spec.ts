@@ -300,13 +300,13 @@ describe('DocumentDetailComponent', () => {
     jest.useRealTimers()
   })
 
-  function initNormally() {
+  function initNormally(document: Document = doc) {
     jest
       .spyOn(activatedRoute, 'paramMap', 'get')
       .mockReturnValue(of(convertToParamMap({ id: 3, section: 'details' })))
     jest
       .spyOn(documentService, 'get')
-      .mockReturnValueOnce(of(Object.assign({}, doc)))
+      .mockReturnValueOnce(of(Object.assign({}, document)))
     jest.spyOn(openDocumentsService, 'getOpenDocument').mockReturnValue(null)
     jest
       .spyOn(openDocumentsService, 'openDocument')
@@ -1477,6 +1477,89 @@ describe('DocumentDetailComponent', () => {
       suggested_document_types: [],
       suggested_correspondents: [],
     })
+  })
+
+  it('should apply AI custom field suggestions to empty fields', () => {
+    settingsService.set(SETTINGS_KEYS.DOCUMENT_EDITING_AUTO_SUGGEST, false)
+    const getSetting = settingsService.get.bind(settingsService)
+    jest
+      .spyOn(settingsService, 'get')
+      .mockImplementation((key) =>
+        key === SETTINGS_KEYS.AI_ENABLED ? true : getSetting(key)
+      )
+    jest.spyOn(documentService, 'getAiSuggestions').mockReturnValue(
+      of({
+        custom_fields: {
+          0: 'Suggested text',
+          1: 42,
+          2: 'Replacement text',
+          99: 'No matching field',
+        },
+      })
+    )
+    initNormally({
+      ...doc,
+      custom_fields: [
+        { field: 0, value: null },
+        { field: 1, value: '' },
+        { field: 2, value: 'Existing text' },
+      ] as CustomFieldInstance[],
+    })
+
+    component.getSuggestions()
+
+    expect(component.customFieldFormFields.at(0).get('value').value).toEqual(
+      'Suggested text'
+    )
+    expect(component.customFieldFormFields.at(1).get('value').value).toEqual(42)
+    expect(component.customFieldFormFields.at(2).get('value').value).toEqual(
+      'Existing text'
+    )
+    expect(component.customFieldFormFields.dirty).toBe(true)
+  })
+
+  it('should leave custom fields unchanged when AI has no usable values', () => {
+    settingsService.set(SETTINGS_KEYS.DOCUMENT_EDITING_AUTO_SUGGEST, false)
+    const getSetting = settingsService.get.bind(settingsService)
+    jest
+      .spyOn(settingsService, 'get')
+      .mockImplementation((key) =>
+        key === SETTINGS_KEYS.AI_ENABLED ? true : getSetting(key)
+      )
+    jest
+      .spyOn(documentService, 'getAiSuggestions')
+      .mockReturnValue(of({ custom_fields: { 0: null, 1: undefined } } as any))
+    initNormally({
+      ...doc,
+      custom_fields: [
+        { field: 0, value: 'Existing text' },
+        { field: 1, value: null },
+      ] as CustomFieldInstance[],
+    })
+
+    component.getSuggestions()
+
+    expect(component.customFieldFormFields.at(0).get('value').value).toEqual(
+      'Existing text'
+    )
+    expect(component.customFieldFormFields.at(1).get('value').value).toBeNull()
+    expect(component.customFieldFormFields.dirty).toBe(false)
+  })
+
+  it('should not apply AI custom field suggestions when AI is disabled', () => {
+    settingsService.set(SETTINGS_KEYS.DOCUMENT_EDITING_AUTO_SUGGEST, false)
+    jest
+      .spyOn(documentService, 'getSuggestions')
+      .mockReturnValue(of({ custom_fields: { 0: 'Classifier value' } }))
+    initNormally({
+      ...doc,
+      custom_fields: [{ field: 0, value: null }] as CustomFieldInstance[],
+    })
+
+    component.getSuggestions()
+
+    expect(component.customFieldFormFields.at(0).get('value').value).toBeNull()
+    expect(component.customFieldFormFields.dirty).toBe(false)
   })
 
   it('should not automatically get suggestions if auto-suggest is disabled', () => {

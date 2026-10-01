@@ -76,6 +76,7 @@ NESTED_SUGGESTIONS = {
     "document_types": {"existing_ids": [], "new_names": ["report"]},
     "storage_paths": {"existing_ids": [], "new_names": ["Reports"]},
     "dates": ["2023-01-01"],
+    "custom_fields": {"Invoice Number": "ABC123", "Total": "49.95"},
 }
 
 
@@ -118,6 +119,10 @@ def test_get_ai_document_classification_success(mock_run_llm_query, mock_documen
     assert result["document_types"]["new_names"] == ["Bericht"]
     assert result["storage_paths"]["new_names"] == ["Berichte"]
     assert result["dates"] == ["2023-01-01"]
+    assert result["custom_fields"] == {
+        "Invoice Number": "ABC123",
+        "Total": "49.95",
+    }
     classification_prompt = mock_run_llm_query.call_args_list[0].args[0]
     localization_prompt = mock_run_llm_query.call_args_list[1].args[0]
     assert "Write suggested titles" not in classification_prompt
