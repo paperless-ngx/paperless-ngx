@@ -1798,12 +1798,8 @@ assigns or creates tags if a properly formatted barcode is detected.
 
 #### [`PAPERLESS_CONSUMER_STORE_BARCODE_VALUES=<bool>`](#PAPERLESS_CONSUMER_STORE_BARCODE_VALUES) {#PAPERLESS_CONSUMER_STORE_BARCODE_VALUES}
 
-: Stores the content of every barcode found during consumption with the
-document, together with its page and type.
-
-    The barcodes are listed on the Metadata tab of the document details,
-    where their content can be copied. See
-    [Barcode Contents](advanced_usage.md#barcode-contents) for details.
+: Stores the content of every barcode found during consumption, see
+[Barcode Contents](advanced_usage.md#barcode-contents).
 
     Defaults to false.
 

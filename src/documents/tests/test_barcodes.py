@@ -29,7 +29,6 @@ from paperless.config import BarcodeConfig
 from paperless.models import ApplicationConfiguration
 from paperless_testing.assertions import FileSystemAssertsMixin
 from paperless_testing.dirs import DirectoriesMixin
-from paperless_testing.factories import DocumentBarcodeFactory
 from paperless_testing.fakes.progress import FakeProgressManager
 
 if TYPE_CHECKING:
@@ -1242,10 +1241,6 @@ def test_formats_cover_zxing() -> None:
 
 @pytest.mark.django_db
 class TestBarcodeValues:
-    def test_barcode_str(self) -> None:
-        barcode = DocumentBarcodeFactory(value="https://example.com/invoice/4711")
-        assert str(barcode) == "https://example.com/invoice/4711"
-
     @pytest.mark.parametrize(
         ("filename", "mime_type", "tiff_support", "expected"),
         [

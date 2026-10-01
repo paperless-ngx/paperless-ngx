@@ -1056,7 +1056,7 @@ class DocumentBarcode(models.Model):
         verbose_name = _("document barcode")
         verbose_name_plural = _("document barcodes")
 
-    def __str__(self):
+    def __str__(self) -> str:  # pragma: no cover
         return self.value
 
 

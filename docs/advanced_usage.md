@@ -1010,25 +1010,16 @@ three documents: pages 1-2 (no tags), pages 3-4 (tagged "invoice"), and pages 5-
 
 ### Barcode Contents {#barcode-contents}
 
-When scanning for barcodes, Paperless reads every barcode on a document, but by default only
-uses those needed for splitting, ASNs or tags. When
+By default, Paperless only uses barcodes for splitting, ASNs and tags. With
 [`PAPERLESS_CONSUMER_STORE_BARCODE_VALUES`](configuration.md#PAPERLESS_CONSUMER_STORE_BARCODE_VALUES)
-is enabled, the content of all barcodes is stored with the document instead, for example
-payment codes, customer numbers or the text of a QR code.
+enabled, it stores the content of every barcode with the document, e.g. payment codes or QR codes.
 
-- The barcodes are listed on the **Metadata** tab of the document details with their page,
-  type and content. A button copies the content to the clipboard, and web addresses can be
-  opened directly.
-- The barcodes are part of the document in the API (field `barcodes` of `/api/documents/`
-  and of the document metadata), and can be searched with the
-  [advanced search syntax](usage.md#searching-barcodes), e.g. `barcodes:DE8937…`, also through
-  the API with `/api/documents/?query=barcodes:DE8937…`.
-- The barcodes are read from the original file during consumption, subject to
-  [`PAPERLESS_CONSUMER_BARCODE_MAX_PAGES`](configuration.md#PAPERLESS_CONSUMER_BARCODE_MAX_PAGES).
-  Documents consumed before the setting was enabled get their barcodes when they are
-  reprocessed.
-- Each version of a document keeps its own barcodes, e.g. after rotating or removing pages.
-  The document shows and is searched by the barcodes of its newest version.
+- Barcodes are listed on the **Metadata** tab with page, type and content, and can be copied.
+- The API includes them in the `barcodes` field of documents and their metadata.
+- They can be [searched](usage.md#searching-barcodes), e.g. `barcodes:DE89370400440532013000`.
+- Only the first [`PAPERLESS_CONSUMER_BARCODE_MAX_PAGES`](configuration.md#PAPERLESS_CONSUMER_BARCODE_MAX_PAGES)
+  pages are scanned. Reprocessing reads the barcodes of existing documents.
+- Each version keeps its own barcodes, and the newest version's are shown and searched.
 
 ## Automatic collation of double-sided documents {#collate}
 

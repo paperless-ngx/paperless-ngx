@@ -270,26 +270,6 @@ class BarcodePlugin(ConsumeTaskPlugin):
         )
         self._tiff_conversion_done = True
 
-    @staticmethod
-    def read_barcodes_zxing(image: Image.Image) -> list[tuple[str, str]]:
-        """
-        Returns the text and format (zxing enum name) of each barcode found in
-        the image
-        """
-        barcodes = []
-
-        import zxingcpp
-
-        detected_barcodes = zxingcpp.read_barcodes(image)
-        for barcode in detected_barcodes:
-            if barcode.text:
-                barcodes.append((barcode.text, barcode.format.name))
-                logger.debug(
-                    f"Barcode of type {barcode.format} found: {barcode.text}",
-                )
-
-        return barcodes
-
     def detect(self) -> None:
         """
         Scan all pages of the PDF as images, updating barcodes and the pages
@@ -509,6 +489,26 @@ def scannable_mime_types(settings: BarcodeConfig) -> set[str]:
     return {"application/pdf"}
 
 
+def read_barcodes_zxing(image: Image.Image) -> list[tuple[str, str]]:
+    """
+    Returns the text and format (zxing enum name) of each barcode found in
+    the image
+    """
+    barcodes = []
+
+    import zxingcpp
+
+    detected_barcodes = zxingcpp.read_barcodes(image)
+    for barcode in detected_barcodes:
+        if barcode.text:
+            barcodes.append((barcode.text, barcode.format.name))
+            logger.debug(
+                f"Barcode of type {barcode.format} found: {barcode.text}",
+            )
+
+    return barcodes
+
+
 def scan_pdf(pdf_path: Path, settings: BarcodeConfig, work_dir: Path) -> list[Barcode]:
     """
     Scans the pages of a PDF as images for barcodes. Errors are not caught,
@@ -557,7 +557,7 @@ def scan_pdf(pdf_path: Path, settings: BarcodeConfig, work_dir: Path) -> list[Ba
                 (round(x * factor), (round(y * factor))),
             )
 
-        for barcode_value, barcode_format in BarcodePlugin.read_barcodes_zxing(page):
+        for barcode_value, barcode_format in read_barcodes_zxing(page):
             barcodes.append(
                 Barcode(current_page_number, barcode_value, settings, barcode_format),
             )
