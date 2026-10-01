@@ -51,7 +51,6 @@ import { TagsComponent } from '../../input/tags/tags.component'
 import { TextComponent } from '../../input/text/text.component'
 import { EditDialogMode } from '../edit-dialog.component'
 import {
-  AI_SUGGESTION_FIELD_OPTIONS,
   DOCUMENT_SOURCE_OPTIONS,
   SCHEDULE_DATE_FIELD_OPTIONS,
   TriggerFilterType,
@@ -476,6 +475,7 @@ describe('WorkflowEditDialogComponent', () => {
             AISuggestionField.Title,
             AISuggestionField.Tags,
           ],
+          ai_suggestion_custom_fields: [1, 2],
           ai_create_missing: true,
           ai_overwrite_existing: true,
         },
@@ -484,15 +484,16 @@ describe('WorkflowEditDialogComponent', () => {
     component.ngOnInit()
 
     const action = component.actionFields.at(0)
-    expect(action.get('ai_suggestion_fields').value).toEqual([
+    // The combined control merges built-in fields and custom field ids.
+    expect(action.get('ai_suggestion_targets').value).toEqual([
       AISuggestionField.Title,
       AISuggestionField.Tags,
+      'cf_1',
+      'cf_2',
     ])
     expect(action.get('ai_create_missing').value).toBeTruthy()
     expect(action.get('ai_overwrite_existing').value).toBeTruthy()
-    expect(component.aiSuggestionFieldOptions).toEqual(
-      AI_SUGGESTION_FIELD_OPTIONS
-    )
+    expect(component.aiSuggestionTargets.length).toBe(8)
   })
 
   it('should default apply AI suggestions options on a new action', () => {
@@ -506,9 +507,44 @@ describe('WorkflowEditDialogComponent', () => {
     component.addAction()
 
     const action = component.actionFields.at(component.actionFields.length - 1)
-    expect(action.get('ai_suggestion_fields').value).toEqual([])
+    expect(action.get('ai_suggestion_targets').value).toEqual([])
     expect(action.get('ai_create_missing').value).toBeFalsy()
     expect(action.get('ai_overwrite_existing').value).toBeFalsy()
+  })
+
+  it('should split combined AI suggestion targets into built-in and custom on save', () => {
+    const aiAction: WorkflowAction = {
+      id: 1,
+      type: WorkflowActionType.ApplyAiSuggestions,
+      ai_suggestion_fields: [AISuggestionField.Title],
+      ai_suggestion_custom_fields: [1, 2],
+    }
+    component.object = {
+      name: 'Workflow with AI suggestions',
+      id: 1,
+      order: 1,
+      enabled: true,
+      triggers: [],
+      actions: [aiAction],
+    }
+    component.ngOnInit()
+
+    // The combined control carries built-in enum values and cf_<id> strings.
+    const formActions = component.objectForm.get('actions') as FormArray
+    expect(formActions.value[0].ai_suggestion_targets).toEqual([
+      AISuggestionField.Title,
+      'cf_1',
+      'cf_2',
+    ])
+
+    component.save()
+
+    // save() splits the combined control back into the two API fields.
+    expect(formActions.value[0].ai_suggestion_fields).toEqual([
+      AISuggestionField.Title,
+    ])
+    expect(formActions.value[0].ai_suggestion_custom_fields).toEqual([1, 2])
+    expect(formActions.value[0].ai_suggestion_targets).toBeUndefined()
   })
 
   it('should support add and remove triggers and actions', () => {

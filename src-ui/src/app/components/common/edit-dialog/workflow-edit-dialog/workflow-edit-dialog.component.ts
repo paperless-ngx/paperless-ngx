@@ -1313,11 +1313,10 @@ export class WorkflowEditDialogComponent
         passwords: new FormControl(
           this.formatPasswords(action.passwords ?? [])
         ),
-        ai_suggestion_fields: new FormControl(
-          action.ai_suggestion_fields ?? []
-        ),
-        ai_suggestion_custom_fields: new FormControl(
-          action.ai_suggestion_custom_fields ?? []
+        // Single combined UI control (built-in fields + custom field ids).
+        // Split into ai_suggestion_fields / ai_suggestion_custom_fields in save().
+        ai_suggestion_targets: new FormControl(
+          this.aiSuggestionTargetsFor(action)
         ),
         ai_create_missing: new FormControl(!!action.ai_create_missing),
         ai_overwrite_existing: new FormControl(!!action.ai_overwrite_existing),
@@ -1409,15 +1408,46 @@ export class WorkflowEditDialogComponent
     return this.actionTypeOptions.find((t) => t.id === type)?.name ?? ''
   }
 
+  // A single combined multi-select: built-in suggestion fields plus custom
+  // fields, so the user picks everything in one list. Custom field values are
+  // carried with a string id of the form "cf_<id>"; built-in fields keep their
+  // plain enum value. This is only a UI-level encoding — save() splits it back
+  // into ai_suggestion_fields / ai_suggestion_custom_fields for the API.
   get aiSuggestionFieldOptions() {
     return AI_SUGGESTION_FIELD_OPTIONS
   }
 
-  get aiSuggestionCustomFieldOptions() {
-    // Document link fields are never suggested by the AI
-    return (this.customFields() ?? []).filter(
-      (f) => f.data_type !== CustomFieldDataType.DocumentLink
+  get aiSuggestionTargets() {
+    return [
+      ...AI_SUGGESTION_FIELD_OPTIONS,
+      // Document link fields are never suggested by the AI
+      ...(this.customFields() ?? [])
+        .filter((f) => f.data_type !== CustomFieldDataType.DocumentLink)
+        .map((f) => ({
+          id: this.customFieldTargetId(f.id),
+          name: f.name,
+        })),
+    ]
+  }
+
+  private customFieldTargetId(id: number) {
+    return `cf_${id}`
+  }
+
+  private customFieldTargetIdFrom(value: any): number | null {
+    if (typeof value !== 'string' || !value.startsWith('cf_')) {
+      return null
+    }
+    const id = Number(value.slice(3))
+    return Number.isInteger(id) ? id : null
+  }
+
+  private aiSuggestionTargetsFor(action: WorkflowAction) {
+    const fields: any[] = [...(action.ai_suggestion_fields ?? [])]
+    const custom: any[] = (action.ai_suggestion_custom_fields ?? []).map((id) =>
+      this.customFieldTargetId(id)
     )
+    return [...fields, ...custom]
   }
 
   addAction() {
@@ -1506,7 +1536,7 @@ export class WorkflowEditDialogComponent
   save(): void {
     this.objectForm
       .get('actions')
-      .value.forEach((action: WorkflowAction, i) => {
+      .value.forEach((action: any, i) => {
         if (action.type !== WorkflowActionType.Webhook) {
           action.webhook = null
         }
@@ -1514,6 +1544,18 @@ export class WorkflowEditDialogComponent
           action.email = null
         }
         action.passwords = this.parsePasswords(action.passwords as any)
+        // Split the combined ai_suggestion_targets control back into the two
+        // API fields: built-in enum values and custom field ids.
+        const targets: any[] = action.ai_suggestion_targets ?? []
+        const builtIn = targets.filter(
+          (t) => this.customFieldTargetIdFrom(t) === null
+        )
+        const customIds = targets
+          .map((t) => this.customFieldTargetIdFrom(t))
+          .filter((id): id is number => id !== null)
+        action.ai_suggestion_fields = builtIn
+        action.ai_suggestion_custom_fields = customIds
+        delete action.ai_suggestion_targets
       })
     super.save()
   }
