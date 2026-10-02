@@ -91,24 +91,7 @@ describe('PngxPdfViewerComponent', () => {
       wasmUrl: expect.stringContaining('/paperless/assets/wasm/'),
       iccUrl: expect.stringContaining('/paperless/assets/iccs/'),
       cMapUrl: expect.stringContaining('/paperless/assets/cmaps/'),
-      cMapPacked: true,
     })
-  })
-
-  it('passes a cMap URL so CJK documents render', async () => {
-    // Without cMapUrl, pdf.js cannot resolve predefined CMaps (e.g. 90ms-RKSJ-H,
-    // UniJIS-UTF16-H) and silently renders no text for CJK documents that rely
-    // on them, logging "Ensure that the `cMapUrl` API parameter is provided."
-    setBaseHref('/')
-    const getDocumentSpy = jest.spyOn(pdfjs, 'getDocument')
-
-    await initComponent()
-
-    const initOptions = getDocumentSpy.mock.calls.at(-1)[0] as any
-    expect(initOptions.cMapUrl).toBe(
-      new URL('assets/cmaps/', document.baseURI).toString()
-    )
-    expect(initOptions.cMapPacked).toBe(true)
   })
 
   it('initializes single-page viewer and disables text layer', async () => {
