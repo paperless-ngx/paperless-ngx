@@ -1430,11 +1430,11 @@ msgstr "Κωδικός"
 msgid "Cancel"
 msgstr "Ακύρωση"
 
-#: documents/templates/paperless-ngx/base.html:58
+#: documents/templates/datakit/base.html:58
 msgid "Share link was not found."
 msgstr "Δεν βρέθηκε σύνδεσμος κοινοποίησης."
 
-#: documents/templates/paperless-ngx/base.html:62
+#: documents/templates/datakit/base.html:62
 msgid "Share link has expired."
 msgstr "Ο σύνδεσμος κοινοποίησης έχει λήξει."
 

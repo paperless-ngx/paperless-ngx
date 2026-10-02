@@ -53,7 +53,7 @@ describe('EmailDocumentDialogComponent', () => {
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
     const toastSuccessSpy = jest.spyOn(toastService, 'showInfo')
     component.documentIds = [1]
-    component.emailAddress = 'hello@paperless-ngx.com'
+    component.emailAddress = 'hello@datakit.app'
     component.emailSubject = 'Hello'
     component.emailMessage = 'World'
     jest
@@ -74,7 +74,7 @@ describe('EmailDocumentDialogComponent', () => {
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
     const toastSuccessSpy = jest.spyOn(toastService, 'showInfo')
     component.documentIds = [1, 2, 3]
-    component.emailAddress = 'hello@paperless-ngx.com'
+    component.emailAddress = 'hello@datakit.app'
     component.emailSubject = 'Hello'
     component.emailMessage = 'World'
     jest

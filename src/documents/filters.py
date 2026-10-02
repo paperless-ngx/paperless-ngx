@@ -173,7 +173,7 @@ class SharedByUser(Filter):
         ctype = ContentType.objects.get_for_model(self.model)
         UserObjectPermission = get_user_obj_perms_model()
         GroupObjectPermission = get_group_obj_perms_model()
-        # see https://github.com/paperless-ngx/paperless-ngx/issues/5392, we limit subqueries
+        # see https://github.com/datakit-ai/datakit/issues/5392, we limit subqueries
         # to 1 because Postgres doesn't like returning > 1 row, but all we care about is > 0
         return (
             qs.filter(
@@ -605,7 +605,7 @@ class CustomFieldQueryParser:
             field.allow_null = False
 
             # Need to set allow_blank manually because of the inconsistency in CustomFieldInstance validation.
-            # See https://github.com/paperless-ngx/paperless-ngx/issues/7361.
+            # See https://github.com/datakit-ai/datakit/issues/7361.
             if isinstance(field, serializers.CharField):
                 field.allow_blank = True
 

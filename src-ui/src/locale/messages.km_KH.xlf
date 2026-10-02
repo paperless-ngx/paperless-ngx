@@ -55,13 +55,13 @@
         <target state="needs-translation">Document <x id="PH" equiv-text="status.filename"/> is being processed by paperless.</target>
       </trans-unit>
       <trans-unit id="2173456130768795374" datatype="html">
-        <source>Paperless-ngx</source>
+        <source>DataKit</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">11</context>
         </context-group>
         <note priority="1" from="description">app title</note>
-        <target state="needs-translation">Paperless-ngx</target>
+        <target state="needs-translation">DataKit</target>
       </trans-unit>
       <trans-unit id="7100953725264790651" datatype="html">
         <source>Search documents</source>
@@ -506,20 +506,20 @@
         <target state="needs-translation">Please select an object</target>
       </trans-unit>
       <trans-unit id="5412339817978503936" datatype="html">
-        <source>Hello <x id="PH" equiv-text="this.displayName"/>, welcome to Paperless-ngx!</source>
+        <source>Hello <x id="PH" equiv-text="this.displayName"/>, welcome to DataKit!</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.ts</context>
           <context context-type="linenumber">33</context>
         </context-group>
-        <target state="needs-translation">Hello <x id="PH" equiv-text="this.displayName"/>, welcome to Paperless-ngx!</target>
+        <target state="needs-translation">Hello <x id="PH" equiv-text="this.displayName"/>, welcome to DataKit!</target>
       </trans-unit>
       <trans-unit id="795745990148149834" datatype="html">
-        <source>Welcome to Paperless-ngx!</source>
+        <source>Welcome to DataKit!</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.ts</context>
           <context context-type="linenumber">35</context>
         </context-group>
-        <target state="needs-translation">Welcome to Paperless-ngx!</target>
+        <target state="needs-translation">Welcome to DataKit!</target>
       </trans-unit>
       <trans-unit id="2946624699882754313" datatype="html">
         <source>Show all</source>

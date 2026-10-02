@@ -3236,7 +3236,7 @@ class TestWorkflows(
         webhook_action = WorkflowActionWebhook.objects.create(
             use_params=False,
             body="Test message: {{doc_url}}",
-            url="http://paperless-ngx.com",
+            url="http://datakit.app",
             include_document=False,
         )
         self.assertEqual(
@@ -3264,7 +3264,7 @@ class TestWorkflows(
         run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc)
 
         mock_post.assert_called_once_with(
-            url="http://paperless-ngx.com",
+            url="http://datakit.app",
             data=f"Test message: http://localhost:8000/paperless/documents/{doc.id}/",
             headers={},
             files=None,
@@ -3295,7 +3295,7 @@ class TestWorkflows(
         webhook_action = WorkflowActionWebhook.objects.create(
             use_params=False,
             body="Test message: {{doc_url}}",
-            url="http://paperless-ngx.com",
+            url="http://datakit.app",
             include_document=True,
         )
         action = WorkflowAction.objects.create(
@@ -3326,7 +3326,7 @@ class TestWorkflows(
         run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc)
 
         mock_post.assert_called_once_with(
-            url="http://paperless-ngx.com",
+            url="http://datakit.app",
             data=f"Test message: http://localhost:8000/documents/{doc.id}/",
             headers={},
             files={"file": ("simple.pdf", mock.ANY, "application/pdf")},
@@ -3355,7 +3355,7 @@ class TestWorkflows(
                 "title": "Test webhook: {doc_title}",
                 "body": "Test message: {doc_url}",
             },
-            url="http://paperless-ngx.com",
+            url="http://datakit.app",
             include_document=True,
         )
         action = WorkflowAction.objects.create(
@@ -3397,7 +3397,7 @@ class TestWorkflows(
             type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
         )
         webhook_action = WorkflowActionWebhook.objects.create(
-            url="http://paperless-ngx.com",
+            url="http://datakit.app",
             use_params=True,
             params="invalid",
             headers="invalid",
@@ -3438,14 +3438,14 @@ class TestWorkflows(
 
         with self.assertLogs("paperless.handlers") as cm:
             send_webhook(
-                url="http://paperless-ngx.com",
+                url="http://datakit.app",
                 data="Test message",
                 headers={},
                 files=None,
             )
 
             mock_post.assert_called_once_with(
-                url="http://paperless-ngx.com",
+                url="http://datakit.app",
                 content="Test message",
                 headers={},
                 files=None,
@@ -3453,18 +3453,18 @@ class TestWorkflows(
                 timeout=5,
             )
 
-            expected_str = "Webhook sent to http://paperless-ngx.com"
+            expected_str = "Webhook sent to http://datakit.app"
             self.assertIn(expected_str, cm.output[0])
 
             # with dict
             send_webhook(
-                url="http://paperless-ngx.com",
+                url="http://datakit.app",
                 data={"message": "Test message"},
                 headers={},
                 files=None,
             )
             mock_post.assert_called_with(
-                url="http://paperless-ngx.com",
+                url="http://datakit.app",
                 data={"message": "Test message"},
                 headers={},
                 files=None,
@@ -3485,7 +3485,7 @@ class TestWorkflows(
         with self.assertLogs("paperless.handlers") as cm:
             with self.assertRaises(HTTPStatusError):
                 send_webhook(
-                    url="http://paperless-ngx.com",
+                    url="http://datakit.app",
                     data="Test message",
                     headers={},
                     files=None,
@@ -3494,7 +3494,7 @@ class TestWorkflows(
                 self.assertEqual(mock_http.call_count, 1)
 
                 expected_str = (
-                    "Failed attempt sending webhook to http://paperless-ngx.com"
+                    "Failed attempt sending webhook to http://datakit.app"
                 )
                 self.assertIn(expected_str, cm.output[0])
 
@@ -3519,7 +3519,7 @@ class TestWorkflows(
         webhook_action = WorkflowActionWebhook.objects.create(
             use_params=False,
             body="Test message: {doc_url}",
-            url="http://paperless-ngx.com",
+            url="http://datakit.app",
             include_document=False,
         )
         action = WorkflowAction.objects.create(
@@ -3570,7 +3570,7 @@ class TestWebhookSend:
         )
 
         send_webhook(
-            url="http://paperless-ngx.com",
+            url="http://datakit.app",
             data="Test message",
             headers={},
             files=None,
@@ -3583,7 +3583,7 @@ class TestWebhookSend:
             json={"status": "ok"},
         )
         send_webhook(
-            url="http://paperless-ngx.com",
+            url="http://datakit.app",
             data={"message": "Test message"},
             headers={},
             files=None,
@@ -3647,7 +3647,7 @@ class TestWebhookSecurity:
         """
         with pytest.raises(ValueError):
             send_webhook(
-                "http://paperless-ngx.com:8080",
+                "http://datakit.app:8080",
                 data="",
                 headers={},
                 files=None,
@@ -3670,7 +3670,7 @@ class TestWebhookSecurity:
         resolve_to("127.0.0.1")
         with pytest.raises(ValueError):
             send_webhook(
-                "http://paperless-ngx.com",
+                "http://datakit.app",
                 data="",
                 headers={},
                 files=None,
@@ -3690,7 +3690,7 @@ class TestWebhookSecurity:
         httpx_mock.add_response(content=b"ok")
 
         send_webhook(
-            url="http://paperless-ngx.com",
+            url="http://datakit.app",
             data="hi",
             headers={},
             files=None,
@@ -3698,7 +3698,7 @@ class TestWebhookSecurity:
         )
 
         req = httpx_mock.get_request()
-        assert req.url.host == "paperless-ngx.com"
+        assert req.url.host == "datakit.app"
 
     def test_follow_redirects_disabled(self, httpx_mock: HTTPXMock, resolve_to):
         """
@@ -3719,7 +3719,7 @@ class TestWebhookSecurity:
 
         with pytest.raises(HTTPError):
             send_webhook(
-                "http://paperless-ngx.com",
+                "http://datakit.app",
                 data="",
                 headers={},
                 files=None,
@@ -3741,7 +3741,7 @@ class TestWebhookSecurity:
         httpx_mock.add_response(content=b"ok")
 
         send_webhook(
-            url="http://paperless-ngx.com",
+            url="http://datakit.app",
             data="ok",
             headers={"Host": "evil.test"},
             files=None,
@@ -3749,7 +3749,7 @@ class TestWebhookSecurity:
         )
 
         req = httpx_mock.get_request()
-        assert req.headers["Host"] == "paperless-ngx.com"
+        assert req.headers["Host"] == "datakit.app"
         assert "evil.test" not in req.headers.get("Host", "")
 
 

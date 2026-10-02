@@ -16,7 +16,7 @@ exists_hint = "Create a directory at {}"
 writeable_message = "{} is not writeable"
 writeable_hint = (
     "Set the permissions of {} to be writeable by the user running the "
-    "Paperless services"
+    "DataKit services"
 )
 
 
@@ -73,11 +73,11 @@ def paths_check(app_configs, **kwargs) -> list[Error]:
 @register()
 def binaries_check(app_configs, **kwargs):
     """
-    Paperless requires the existence of a few binaries, so we do some checks
+    DataKit requires the existence of a few binaries, so we do some checks
     for those here.
     """
 
-    error = "Paperless can't find {}. Without it, consumption is impossible."
+    error = "DataKit can't find {}. Without it, consumption is impossible."
     hint = "Either it's not in your ${PATH} or it's not installed."
 
     binaries = (settings.CONVERT_BINARY, "tesseract", "gs")

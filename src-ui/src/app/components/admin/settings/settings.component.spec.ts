@@ -68,7 +68,7 @@ const status: SystemStatus = {
   storage: { total: 494384795648, available: 13573525504 },
   database: {
     type: 'sqlite',
-    url: '/paperless-ngx/data/db.sqlite3',
+    url: '/datakit/data/db.sqlite3',
     status: SystemStatusItemStatus.ERROR,
     error: null,
     migration_status: {

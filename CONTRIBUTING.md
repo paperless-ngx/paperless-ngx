@@ -9,7 +9,7 @@ If you want to implement something big:
 - As above, please start with a discussion! Maybe something similar is already in development and we can make it happen together.
 - When making additions to the project, consider if the majority of users will benefit from your change. If not, you're probably better of forking the project.
 - Also consider if your change will get in the way of other users. A good change is a change that enhances the experience of some users who want that change and does not affect users who do not care about the change.
-- Please see the [paperless-ngx merge process](#merging-prs) below.
+- Please see the [datakit merge process](#merging-prs) below.
 
 ## Python
 
@@ -29,11 +29,11 @@ Please format and test your code! I know it's a hassle, but it makes sure that y
 
 To test your code, execute `pytest` in the src/ directory. This also generates a html coverage report, which you can use to see if you missed anything important during testing.
 
-Before you can run `pytest`, ensure to [properly set up your local environment](https://docs.paperless-ngx.com/development/#initial-setup-and-first-start).
+Before you can run `pytest`, ensure to [properly set up your local environment](https://docs.datakit.com/development/#initial-setup-and-first-start).
 
 ## More info:
 
-... is available [in the documentation](https://docs.paperless-ngx.com/development).
+... is available [in the documentation](https://docs.datakit.com/development).
 
 # Merging PRs
 
@@ -54,10 +54,10 @@ Examples of `non-trivial` PRs might include:
 Our community review process for `non-trivial` PRs is the following:
 
 1. Must pass usual automated code tests and formatting checks.
-2. The PR will be assigned and pinged to the appropriately experienced team (i.e. @paperless-ngx/backend for backend changes).
+2. The PR will be assigned and pinged to the appropriately experienced team (i.e. @datakit/backend for backend changes).
 3. Development team will check and test code manually (possibly over several days).
    - You may be asked to make changes or rebase.
-   - The team may ask for additional testing done by @paperless-ngx/test
+   - The team may ask for additional testing done by @datakit/test
 4. **At least two** members of the team will approve and finally merge the request into `dev` 🎉.
 
 This process might be slow as community members have different schedules and time to dedicate to the Paperless project. However it ensures community code reviews are as brilliantly thorough as they once were with @jonaswinkler.
@@ -69,7 +69,7 @@ This project does not specifically prohibit the use of AI-generated code _during
 1. Any code present in the final PR that was generated using AI sources should be clearly attributed as such and must not violate copyright protections.
 2. We will not accept PRs that are entirely or mostly AI-derived.
 
-# Translating Paperless-ngx
+# Translating DataKit
 
 Some notes about translation:
 
@@ -85,7 +85,7 @@ Some notes about translation:
 
 If a language has already been added, and you would like to contribute new translations or change existing translations, please read the "Translation" section in the README.md file for further details on that.
 
-If you would like the project to be translated to another language, first head over to https://crowdin.com/project/paperless-ngx to check if that language has already been enabled for translation.
+If you would like the project to be translated to another language, first head over to https://crowdin.com/project/datakit to check if that language has already been enabled for translation.
 If not, please request the language to be added by creating an issue on GitHub. The issue should contain:
 
 - English name of the language (the localized name can be added on Crowdin).
@@ -109,11 +109,11 @@ If not, let us know in the issue you created for the language, so that another d
 
 # Organization Structure & Membership
 
-Paperless-ngx is a community project. We do our best to delegate permission and responsibility among a team of people to ensure the longevity of the project.
+DataKit is a community project. We do our best to delegate permission and responsibility among a team of people to ensure the longevity of the project.
 
 ## Structure
 
-There are currently 2 members in paperless-ngx with complete administrative privileges to the repo:
+There are currently 2 members in datakit with complete administrative privileges to the repo:
 
 - [@shamoon](https://github.com/shamoon)
 - [@stumpylog](https://github.com/stumpylog)
@@ -128,7 +128,7 @@ The admins occasionally invite contributors directly if we believe having them o
 
 # Automatic Repository Maintenance
 
-The Paperless-ngx team appreciates all effort and interest from the community in filing bug reports, creating feature requests, sharing ideas and helping other
+The DataKit team appreciates all effort and interest from the community in filing bug reports, creating feature requests, sharing ideas and helping other
 community members. That said, in an effort to keep the repository organized and manageable the project uses automatic handling of certain areas:
 
 - Issues that cannot be reproduced will be marked 'stale' after 7 days of inactivity and closed after 14 further days of inactivity.

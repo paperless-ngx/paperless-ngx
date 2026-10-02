@@ -359,7 +359,7 @@ it('should call appropriate api endpoint for email document', () => {
   subscription = service
     .emailDocuments(
       [documents[0].id],
-      'hello@paperless-ngx.com',
+      'hello@datakit.app',
       'hello',
       'world',
       true

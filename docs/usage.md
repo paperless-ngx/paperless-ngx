@@ -1,7 +1,7 @@
 # Usage Overview
 
-Paperless-ngx is an application that manages your personal documents. With
-the (optional) help of a document scanner (see [the scanners wiki](https://github.com/paperless-ngx/paperless-ngx/wiki/Scanner-&-Software-Recommendations)), Paperless-ngx transforms your unwieldy
+DataKit is an application that manages your personal documents. With
+the (optional) help of a document scanner (see [the scanners wiki](https://github.com/datakit/datakit/wiki/Scanner-&-Software-Recommendations)), DataKit transforms your unwieldy
 physical documents into a searchable archive and provides many utilities
 for finding and managing your documents.
 
@@ -44,12 +44,12 @@ Each document has data fields that you can assign to them:
 -   The _content_ of a document is the text that was OCR'ed from the
     document. This text is fed into the search engine and is used for
     matching tags, correspondents and document types.
--   Paperless-ngx also supports _custom fields_ which can be used to
+-   DataKit also supports _custom fields_ which can be used to
     store additional metadata about a document.
 
 ## The Web UI
 
-The web UI is the primary way to interact with Paperless-ngx. It is a
+The web UI is the primary way to interact with DataKit. It is a
 single-page application that is built with modern web technologies and
 is designed to be fast and responsive. The web UI includes a robust
 interface for filtering, viewing, searching and editing documents.
@@ -65,7 +65,7 @@ some of the key features of the web UI and can be useful for new users.
 The dashboard is the first page you see when you log in. By default, it
 does not show any documents, but you can add saved views to the dashboard
 to show documents that match certain criteria. The dashboard also includes
-a button to upload documents to Paperless-ngx but you can also drag and
+a button to upload documents to DataKit but you can also drag and
 drop files anywhere in the app to initiate the consumption process.
 
 ### Document List
@@ -87,14 +87,14 @@ download the document or share it via a share link.
 
 ### Management Lists
 
-Paperless-ngx includes management lists for tags, correspondents, document types
+DataKit includes management lists for tags, correspondents, document types
 and more. These areas allow you to view, add, edit, delete and manage permissions
 for these objects. You can also manage saved views, mail accounts, mail rules,
 workflows and more from the management sections.
 
 ### Nested Tags
 
-Paperless-ngx v2.19 introduces support for nested tags, allowing you to create a
+DataKit v2.19 introduces support for nested tags, allowing you to create a
 hierarchy of tags, which may be useful for organizing your documents. Tags can
 have a 'parent' tag, creating a tree-like structure, to a maximum depth of 5. When
 a tag is added to a document, all of its parent tags are also added automatically
@@ -102,7 +102,7 @@ and similarly, when a tag is removed from a document, all of its child tags are
 also removed. Additionally, assigning a parent to an existing tag will automatically
 update all documents that have this tag assigned, adding the parent tag as well.
 
-## Adding documents to Paperless-ngx
+## Adding documents to DataKit
 
 Once you've got Paperless setup, you need to start feeding documents
 into it. When adding documents to paperless, it will perform the
@@ -131,7 +131,7 @@ following operations on your documents:
     mail and will never overwrite that document (except when using certain
     document actions, which make that clear). Archived versions are
     stored alongside the original versions. Any files found in the
-    consumption directory will stored inside the Paperless-ngx file
+    consumption directory will stored inside the DataKit file
     structure and will not be retained in the consumption directory.
 
 ### The consumption directory
@@ -142,7 +142,7 @@ for new additions to this directory. When it finds them,
 the consumer goes about the process of parsing them with the OCR,
 indexing what it finds, and storing it in the media directory. You should
 think of this folder as a temporary location, as files will be re-created
-inside Paperless-ngx and removed from the consumption folder.
+inside DataKit and removed from the consumption folder.
 
 Getting stuff into this directory is up to you. If you're running
 Paperless on your local computer, you might just want to drag and drop
@@ -157,7 +157,7 @@ Typically, you're looking at an FTP server like
 
     Files found in the consumption directory that are consumed will be
     removed from the consumption directory and stored inside the
-    Paperless-ngx file structure using any settings / storage paths
+    DataKit file structure using any settings / storage paths
     you have specified. This action is performed as safely as possible
     but this means it is expected that files in the consumption
     directory will no longer exist (there) after being consumed.
@@ -170,12 +170,12 @@ process.
 
 ### Mobile upload {#usage-mobile_upload}
 
-Please see [the wiki](https://github.com/paperless-ngx/paperless-ngx/wiki/Related-Projects) for a user-maintained list of related projects and
-software (e.g. for mobile devices) that is compatible with Paperless-ngx.
+Please see [the wiki](https://github.com/datakit/datakit/wiki/Related-Projects) for a user-maintained list of related projects and
+software (e.g. for mobile devices) that is compatible with DataKit.
 
 ### Incoming Email {#incoming-mail}
 
-You can tell paperless-ngx to consume documents from your email
+You can tell datakit to consume documents from your email
 accounts. This is a very flexible and powerful feature, if you regularly
 received documents via mail that you need to archive. The mail consumer
 can be configured via the frontend settings (/settings/mail) in the following
@@ -263,24 +263,24 @@ configured via [`PAPERLESS_EMAIL_TASK_CRON`](configuration.md#PAPERLESS_EMAIL_TA
 
 #### Processed Mail
 
-Paperless keeps track of emails it has processed in order to avoid processing the same mail multiple times. This uses the message `UID` provided by the mail server, which should be unique for each message. You can view and manage processed mails from the web UI under Mail > Processed Mails. If you need to re-process a message, you can delete the corresponding processed mail entry, which will allow Paperless-ngx to process the email again the next time the mail fetch task runs.
+Paperless keeps track of emails it has processed in order to avoid processing the same mail multiple times. This uses the message `UID` provided by the mail server, which should be unique for each message. You can view and manage processed mails from the web UI under Mail > Processed Mails. If you need to re-process a message, you can delete the corresponding processed mail entry, which will allow DataKit to process the email again the next time the mail fetch task runs.
 
 #### OAuth Email Setup
 
-Paperless-ngx supports OAuth2 authentication for Gmail and Outlook email accounts. To set up an email account with OAuth2, you will need to create a 'developer' app with the respective provider and obtain the client ID and client secret and set the appropriate [configuration variables](configuration.md#email_oauth). You will also need to set either [`PAPERLESS_OAUTH_CALLBACK_BASE_URL`](configuration.md#PAPERLESS_OAUTH_CALLBACK_BASE_URL) or [`PAPERLESS_URL`](configuration.md#PAPERLESS_URL) to the correct value for the OAuth2 flow to work correctly.
+DataKit supports OAuth2 authentication for Gmail and Outlook email accounts. To set up an email account with OAuth2, you will need to create a 'developer' app with the respective provider and obtain the client ID and client secret and set the appropriate [configuration variables](configuration.md#email_oauth). You will also need to set either [`PAPERLESS_OAUTH_CALLBACK_BASE_URL`](configuration.md#PAPERLESS_OAUTH_CALLBACK_BASE_URL) or [`PAPERLESS_URL`](configuration.md#PAPERLESS_URL) to the correct value for the OAuth2 flow to work correctly.
 
-Specific instructions for setting up the required 'developer' app with Google or Microsoft are beyond the scope of this documentation, but you can find user-maintained instructions in [the wiki](https://github.com/paperless-ngx/paperless-ngx/wiki/Email-OAuth-App-Setup) or by searching the web.
+Specific instructions for setting up the required 'developer' app with Google or Microsoft are beyond the scope of this documentation, but you can find user-maintained instructions in [the wiki](https://github.com/datakit/datakit/wiki/Email-OAuth-App-Setup) or by searching the web.
 
-Once setup, navigating to the email settings page in Paperless-ngx will allow you to add an email account for Gmail or Outlook using OAuth2. After authenticating, you will be presented with the newly-created account where you will need to enter and save your email address. After this, the account will work as any other email account in Paperless-ngx and refreshing tokens will be handled automatically.
+Once setup, navigating to the email settings page in DataKit will allow you to add an email account for Gmail or Outlook using OAuth2. After authenticating, you will be presented with the newly-created account where you will need to enter and save your email address. After this, the account will work as any other email account in DataKit and refreshing tokens will be handled automatically.
 
 ### REST API
 
 You can also submit a document using the REST API, see [POSTing documents](api.md#file-uploads)
 for details.
 
-## Sharing documents from Paperless-ngx
+## Sharing documents from DataKit
 
-Paperless-ngx supports sharing documents with other users by assigning them [permissions](#object-permissions)
+DataKit supports sharing documents with other users by assigning them [permissions](#object-permissions)
 to the document. Document files can also be shared externally via [share links](#share-links), [email](#email-sharing)
 or using [email](#workflow-action-email) or [webhook](#workflow-action-webhook) actions in workflows.
 
@@ -291,25 +291,25 @@ or using [email](#workflow-action-email) or [webhook](#workflow-action-webhook) 
 -   Share links do not require a user to login and thus link directly to a file.
 -   Links are unique and are of the form `{paperless-url}/share/{randomly-generated-slug}`.
 -   Links can optionally have an expiration time set.
--   After a link expires or is deleted users will be redirected to the regular paperless-ngx login.
+-   After a link expires or is deleted users will be redirected to the regular datakit login.
 
 !!! tip
 
-    If your paperless-ngx instance is behind a reverse-proxy you may want to create an exception to bypass any authentication layers that are part of your setup in order to make links truly publicly-accessible. Of course, do so with caution.
+    If your datakit instance is behind a reverse-proxy you may want to create an exception to bypass any authentication layers that are part of your setup in order to make links truly publicly-accessible. Of course, do so with caution.
 
 ### Email Sharing {#email-sharing}
 
-Paperless-ngx supports directly sending documents via email. If an email server has been [configured](configuration.md#email-sending)
+DataKit supports directly sending documents via email. If an email server has been [configured](configuration.md#email-sending)
 the "Send" button on the document detail page will include an "Email" option. You can also share files via email automatically by using
 a [workflow action](#workflow-action-email).
 
 ## Permissions
 
-Permissions in Paperless-ngx are based around ['global' permissions](#global-permissions) as well as
+Permissions in DataKit are based around ['global' permissions](#global-permissions) as well as
 ['object-level' permissions](#object-permissions). Global permissions determine which parts of the
 application a user can access (e.g. Documents, Tags, Settings) and object-level determine which
 objects are visible or editable. All objects have an 'owner' and 'view' and 'edit' permissions which
-can be granted to other users or groups. The paperless-ngx permissions system uses the built-in user
+can be granted to other users or groups. The datakit permissions system uses the built-in user
 model of the backend framework, Django.
 
 !!! tip
@@ -331,7 +331,7 @@ Documents consumed via the consumption directory do not have an owner or additio
 
 ### Users and Groups
 
-Paperless-ngx supports editing users and groups via the 'frontend' UI, which can be found under
+DataKit supports editing users and groups via the 'frontend' UI, which can be found under
 Settings > Users & Groups, assuming the user has access. If a user is designated
 as a member of a group those permissions will be inherited and this is reflected in the UI. Explicit
 permissions can be granted to limit access to certain parts of the UI (and corresponding API endpoints).
@@ -401,7 +401,7 @@ Should a user lose access to their 2FA device and all recovery codes, a superuse
 
     v2.3 added "Workflows" and existing "Consumption Templates" were converted automatically to the new more powerful format.
 
-Workflows allow hooking into the Paperless-ngx document pipeline, for example to alter what metadata (tags, doc types) and
+Workflows allow hooking into the DataKit document pipeline, for example to alter what metadata (tags, doc types) and
 permissions (owner, privileges) are assigned to documents. Workflows can have multiple 'triggers' and 'actions'. Triggers
 are events (with optional filtering rules) that will cause the workflow to be run and actions are the set of sequential
 actions to apply.
@@ -447,7 +447,7 @@ flowchart TD
     consumption --> |Yes| C[Workflow Actions Run]
     consumption --> |No| D
     C --> D[Document Added]
-    D -- Paperless-ngx 'matching' of tags, etc. --> added
+    D -- DataKit 'matching' of tags, etc. --> added
     added --> |Yes| F[Workflow Actions Run]
     added --> |No| G
     F --> G[Document Finalized]
@@ -589,9 +589,9 @@ documents (and superusers who can always access all parts of the app).
 
 ## Custom Fields {#custom-fields}
 
-Paperless-ngx supports the use of custom fields for documents as of v2.0, allowing a user
+DataKit supports the use of custom fields for documents as of v2.0, allowing a user
 to optionally attach data to documents which does not fit in the existing set of fields
-Paperless-ngx provides.
+DataKit provides.
 
 1. First, create a custom field (under "Manage"), with a given name and data type. This could be something like "Invoice Number" or "Date Paid", with a data type of "Number", "Date", "String", etc.
 2. Once created, a field can be used with documents and data stored. To do so, use the "Custom Fields" menu on the document detail page, choose your existing field from the dropdown. Once the field is visible in the form you can enter the appropriate data which will be validated according to the custom field "data type".
@@ -622,7 +622,7 @@ The following custom field types are supported:
 
 ## PDF Actions
 
-Paperless-ngx supports basic editing operations for PDFs (these operations currently cannot be performed on non-PDF files). When viewing an individual document you can
+DataKit supports basic editing operations for PDFs (these operations currently cannot be performed on non-PDF files). When viewing an individual document you can
 open the 'PDF Editor' to use a simple UI for re-arranging, rotating, deleting pages and splitting documents.
 
 -   Merging documents: available when selecting multiple documents for 'bulk editing'.
@@ -633,11 +633,11 @@ open the 'PDF Editor' to use a simple UI for re-arranging, rotating, deleting pa
 
 !!! important
 
-    Note that rotation and deleting pages alter the Paperless-ngx _original_ file, which would, for example, invalidate a digital signature.
+    Note that rotation and deleting pages alter the DataKit _original_ file, which would, for example, invalidate a digital signature.
 
 ## Document History
 
-As of version 2.7, Paperless-ngx automatically records all changes to a document and records this in an audit log. The feature requires [`PAPERLESS_AUDIT_LOG_ENABLED`](configuration.md#PAPERLESS_AUDIT_LOG_ENABLED) be enabled, which it is by default as of version 2.7.
+As of version 2.7, DataKit automatically records all changes to a document and records this in an audit log. The feature requires [`PAPERLESS_AUDIT_LOG_ENABLED`](configuration.md#PAPERLESS_AUDIT_LOG_ENABLED) be enabled, which it is by default as of version 2.7.
 Changes to documents are visible under the "History" tab. Note that certain changes such as those made by workflows, record the 'actor'
 as "System".
 
@@ -725,7 +725,7 @@ collection.
 ### Global search
 
 The top search bar in the web UI performs a "global" search of the various
-objects Paperless-ngx uses, including documents, tags, workflows, etc. Only
+objects DataKit uses, including documents, tags, workflows, etc. Only
 objects for which the user has appropriate permissions are returned. For
 documents, if there are < 3 results, "advanced" search results (which use
 the document index) will also be included. This can be disabled under settings.
@@ -791,7 +791,7 @@ parsing](https://whoosh.readthedocs.io/en/latest/dates.html#parsing-date-queries
 
 A list of available hotkeys can be shown on any page using <kbd>Shift</kbd> +
 <kbd>?</kbd>. The help dialog shows only the keys that are currently available
-based on which area of Paperless-ngx you are using.
+based on which area of DataKit you are using.
 
 ## The recommended workflow {#usage-recommended-workflow}
 
@@ -894,7 +894,7 @@ how regularly you intend to scan documents and use paperless.
 
 ## Architecture
 
-Paperless-ngx consists of the following components:
+DataKit consists of the following components:
 
 -   **The webserver:** This serves the administration pages, the API,
     and the new frontend. This is the main tool you'll be using to interact

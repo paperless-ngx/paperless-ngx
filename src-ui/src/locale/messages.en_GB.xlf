@@ -31,7 +31,7 @@
         <target state="new">Started<x id="START_BLOCK_IF" equiv-text="@if (tasksService.startedFileTasks.length &gt; 0) {"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge bg-secondary ms-2&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{tasksService.startedFileTasks.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_BLOCK_IF" equiv-text="}"/></target>
       </trans-unit>
       <trans-unit id="3527354815023530656" datatype="html">
-        <source>Document <x id="PH" equiv-text="status.filename"/> was added to Paperless-ngx.</source>
+        <source>Document <x id="PH" equiv-text="status.filename"/> was added to DataKit.</source>
         <target state="new">Document <x id="PH" equiv-text="status.filename"/> was added to paperless.</target>
       </trans-unit>
       <trans-unit id="35277754987868961" datatype="html">
@@ -87,7 +87,7 @@
         <target state="new">Error executing bulk operation</target>
       </trans-unit>
       <trans-unit id="1218124467712564468" datatype="html">
-        <source>Document <x id="PH" equiv-text="status.filename"/> is being processed by Paperless-ngx.</source>
+        <source>Document <x id="PH" equiv-text="status.filename"/> is being processed by DataKit.</source>
         <target state="new">Document <x id="PH" equiv-text="status.filename"/> is being processed by paperless.</target>
       </trans-unit>
       <trans-unit id="1222152280703048012" datatype="html">
@@ -95,8 +95,8 @@
         <target state="new">Email recipients</target>
       </trans-unit>
       <trans-unit id="1229748338333965418" datatype="html">
-        <source>Use workflows to customize the behavior of Paperless-ngx when events &apos;trigger&apos; a workflow.</source>
-        <target state="new">Use workflows to customize the behavior of Paperless-ngx when events &apos;trigger&apos; a workflow.</target>
+        <source>Use workflows to customize the behavior of DataKit when events &apos;trigger&apos; a workflow.</source>
+        <target state="new">Use workflows to customize the behavior of DataKit when events &apos;trigger&apos; a workflow.</target>
       </trans-unit>
       <trans-unit id="4733307402565258070" datatype="html">
         <source>Documents</source>
@@ -539,8 +539,8 @@
         <target state="new">Do you really want to delete document &quot;<x id="PH" equiv-text="this.document.title"/>&quot;?</target>
       </trans-unit>
       <trans-unit id="7019985100624067992" datatype="html">
-        <source>Only applies to the Paperless-ngx PDF viewer.</source>
-        <target state="new">Only applies to the Paperless-ngx PDF viewer.</target>
+        <source>Only applies to the DataKit PDF viewer.</source>
+        <target state="new">Only applies to the DataKit PDF viewer.</target>
       </trans-unit>
       <trans-unit id="7022070615528435141" datatype="html">
         <source>Delete</source>
@@ -883,8 +883,8 @@
         <target state="new">Results</target>
       </trans-unit>
       <trans-unit id="5973078531069712831" datatype="html">
-        <source>Paperless-ngx Version</source>
-        <target state="new">Paperless-ngx Version</target>
+        <source>DataKit Version</source>
+        <target state="new">DataKit Version</target>
       </trans-unit>
       <trans-unit id="5981429299543258715" datatype="html">
         <source>Error deleting mail account &quot;<x id="PH" equiv-text="account.name"/>&quot;.</source>
@@ -1083,8 +1083,8 @@
         <target state="new">Boolean</target>
       </trans-unit>
       <trans-unit id="9811291095862612" datatype="html">
-        <source>Paperless-ngx can automatically check for updates</source>
-        <target state="new">Paperless-ngx can automatically check for updates</target>
+        <source>DataKit can automatically check for updates</source>
+        <target state="new">DataKit can automatically check for updates</target>
       </trans-unit>
       <trans-unit id="991066160113599649" datatype="html">
         <source>Remaining</source>
@@ -1736,8 +1736,8 @@
         <target state="needs-translation">Items per page</target>
       </trans-unit>
       <trans-unit id="9075755296812854717" datatype="html">
-        <source>Drag-and-drop documents here to start uploading or place them in the consume folder. You can also drag-and-drop documents anywhere on all other pages of the web app. Once you do, Paperless-ngx will start training its machine learning algorithms.</source>
-        <target state="new">Drag-and-drop documents here to start uploading or place them in the consume folder. You can also drag-and-drop documents anywhere on all other pages of the web app. Once you do, Paperless-ngx will start training its machine learning algorithms.</target>
+        <source>Drag-and-drop documents here to start uploading or place them in the consume folder. You can also drag-and-drop documents anywhere on all other pages of the web app. Once you do, DataKit will start training its machine learning algorithms.</source>
+        <target state="new">Drag-and-drop documents here to start uploading or place them in the consume folder. You can also drag-and-drop documents anywhere on all other pages of the web app. Once you do, DataKit will start training its machine learning algorithms.</target>
       </trans-unit>
       <trans-unit id="908152367861642592" datatype="html">
         <source>Document editing</source>
@@ -1904,8 +1904,8 @@
         <target state="new">Rotate Pages Threshold</target>
       </trans-unit>
       <trans-unit id="8528041182664173532" datatype="html">
-        <source>Global app configuration options which apply to &lt;strong&gt;every&lt;/strong&gt; user of this install of Paperless-ngx. Options can also be set using environment variables or the configuration file but the value here will always take precedence.</source>
-        <target state="new">Global app configuration options which apply to &lt;strong&gt;every&lt;/strong&gt; user of this install of Paperless-ngx. Options can also be set using environment variables or the configuration file but the value here will always take precedence.</target>
+        <source>Global app configuration options which apply to &lt;strong&gt;every&lt;/strong&gt; user of this install of DataKit. Options can also be set using environment variables or the configuration file but the value here will always take precedence.</source>
+        <target state="new">Global app configuration options which apply to &lt;strong&gt;every&lt;/strong&gt; user of this install of DataKit. Options can also be set using environment variables or the configuration file but the value here will always take precedence.</target>
       </trans-unit>
       <trans-unit id="8542568275115626925" datatype="html">
         <source>7 days</source>
@@ -2320,8 +2320,8 @@
         <target state="new">API domain</target>
       </trans-unit>
       <trans-unit id="7931334600001636863" datatype="html">
-        <source>by Paperless-ngx</source>
-        <target state="new">Paperless-ngx</target>
+        <source>by DataKit</source>
+        <target state="new">DataKit</target>
       </trans-unit>
       <trans-unit id="7934833136974560675" datatype="html">
         <source>Retry</source>
@@ -2809,8 +2809,8 @@
         <target state="new">True</target>
       </trans-unit>
       <trans-unit id="4474647174688421179" datatype="html">
-        <source>More detail on how to use and configure Paperless-ngx is always available in the <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://docs.paperless-ngx.com&quot; target=&quot;_blank&quot;&gt;"/>documentation<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.</source>
-        <target state="new">More detail on how to use and configure Paperless-ngx is always available in the <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://docs.paperless-ngx.com&quot; target=&quot;_blank&quot;&gt;"/>documentation<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.</target>
+        <source>More detail on how to use and configure DataKit is always available in the <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://docs.datakit.app&quot; target=&quot;_blank&quot;&gt;"/>documentation<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.</source>
+        <target state="new">More detail on how to use and configure DataKit is always available in the <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://docs.datakit.app&quot; target=&quot;_blank&quot;&gt;"/>documentation<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.</target>
       </trans-unit>
       <trans-unit id="448882439049417053" datatype="html">
         <source>Error saving document</source>
@@ -3093,8 +3093,8 @@
         <target state="new">Loading directories...</target>
       </trans-unit>
       <trans-unit id="4270528545616947218" datatype="html">
-        <source>Lastly, on behalf of every contributor to this community-supported project, thank you for using Paperless-ngx!</source>
-        <target state="new">Lastly, on behalf of every contributor to this community-supported project, thank you for using Paperless-ngx!</target>
+        <source>Lastly, on behalf of every contributor to this community-supported project, thank you for using DataKit!</source>
+        <target state="new">Lastly, on behalf of every contributor to this community-supported project, thank you for using DataKit!</target>
       </trans-unit>
       <trans-unit id="4272436583644511364" datatype="html">
         <source>Just now</source>
@@ -3117,8 +3117,8 @@
         <target state="new">Default Owner</target>
       </trans-unit>
       <trans-unit id="4294899532887357745" datatype="html">
-        <source>Thanks for being a part of the Paperless-ngx community!</source>
-        <target state="new">Thanks for being a part of the Paperless-ngx community!</target>
+        <source>Thanks for being a part of the DataKit community!</source>
+        <target state="new">Thanks for being a part of the DataKit community!</target>
       </trans-unit>
       <trans-unit id="7890599006071681081" datatype="html">
         <source>Remove all</source>
@@ -4058,8 +4058,8 @@
         <target state="needs-translation">Yes</target>
       </trans-unit>
       <trans-unit id="2816147949408898105" datatype="html">
-        <source>See &lt;a target=&apos;_blank&apos; href=&apos;https://docs.paperless-ngx.com/advanced_usage/#file-name-handling&apos;&gt;the documentation&lt;/a&gt;.</source>
-        <target state="new">See &lt;a target=&apos;_blank&apos; href=&apos;https://docs.paperless-ngx.com/advanced_usage/#file-name-handling&apos;&gt;the documentation&lt;/a&gt;.</target>
+        <source>See &lt;a target=&apos;_blank&apos; href=&apos;https://docs.datakit.app/advanced_usage/#file-name-handling&apos;&gt;the documentation&lt;/a&gt;.</source>
+        <target state="new">See &lt;a target=&apos;_blank&apos; href=&apos;https://docs.datakit.app/advanced_usage/#file-name-handling&apos;&gt;the documentation&lt;/a&gt;.</target>
       </trans-unit>
       <trans-unit id="2818183879511244335" datatype="html">
         <source>Do not include advanced search results</source>
@@ -4278,8 +4278,8 @@
         <target state="new">Unable to delete directory.</target>
       </trans-unit>
       <trans-unit id="7915903586014997661" datatype="html">
-        <source>Paperless-ngx is running!</source>
-        <target state="new">Paperless-ngx is running!</target>
+        <source>DataKit is running!</source>
+        <target state="new">DataKit is running!</target>
       </trans-unit>
       <trans-unit id="7916910101279824329" datatype="html">
         <source>Attach document</source>
@@ -4478,8 +4478,8 @@
         <target state="new">Custom field to use for date.</target>
       </trans-unit>
       <trans-unit id="1098196422099517191" datatype="html">
-        <source>Can include some placeholders, see &lt;a target=&apos;_blank&apos; href=&apos;https://docs.paperless-ngx.com/usage/#workflows&apos;&gt;documentation&lt;/a&gt;.</source>
-        <target state="new">Can include some placeholders, see &lt;a target=&apos;_blank&apos; href=&apos;https://docs.paperless-ngx.com/usage/#workflows&apos;&gt;documentation&lt;/a&gt;.</target>
+        <source>Can include some placeholders, see &lt;a target=&apos;_blank&apos; href=&apos;https://docs.datakit.app/usage/#workflows&apos;&gt;documentation&lt;/a&gt;.</source>
+        <target state="new">Can include some placeholders, see &lt;a target=&apos;_blank&apos; href=&apos;https://docs.datakit.app/usage/#workflows&apos;&gt;documentation&lt;/a&gt;.</target>
       </trans-unit>
       <trans-unit id="3200733026060976258" datatype="html">
         <source>Document changes detected</source>

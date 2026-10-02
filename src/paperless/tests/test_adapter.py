@@ -111,7 +111,7 @@ class TestCustomAccountAdapter(TestCase):
         form = mock.Mock(
             cleaned_data={
                 "username": "testuser",
-                "email": "user@paperless-ngx.com",
+                "email": "user@datakit.app",
             },
         )
         user = adapter.save_user(HttpRequest(), User(), form, commit=True)
@@ -121,7 +121,7 @@ class TestCustomAccountAdapter(TestCase):
         form = mock.Mock(
             cleaned_data={
                 "username": "testuser2",
-                "email": "user2@paperless-ngx.com",
+                "email": "user2@datakit.app",
             },
         )
         user2 = adapter.save_user(HttpRequest(), User(), form, commit=True)

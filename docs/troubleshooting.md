@@ -35,7 +35,7 @@ then you might need to install the [Tesseract language
 files](https://packages.ubuntu.com/search?keywords=tesseract-ocr)
 matching your document's languages.
 
-As an example, if you are running Paperless-ngx from any Ubuntu or
+As an example, if you are running DataKit from any Ubuntu or
 Debian box, and your documents are written in Spanish you may need to
 run:
 
@@ -335,7 +335,7 @@ You may see errors when deleting documents like:
 Data too long for column 'transaction_id' at row 1
 ```
 
-This error can occur in installations which have upgraded from a version of Paperless-ngx that used Django 4 (Paperless-ngx versions prior to v2.13.0) with a MariaDB/MySQL database. Due to the backwards-incompatible change in Django 5, the column "documents_document.transaction_id" will need to be re-created, which can be done with a one-time run of the following management command:
+This error can occur in installations which have upgraded from a version of DataKit that used Django 4 (DataKit versions prior to v2.13.0) with a MariaDB/MySQL database. Due to the backwards-incompatible change in Django 5, the column "documents_document.transaction_id" will need to be re-created, which can be done with a one-time run of the following management command:
 
 ```shell-session
 $ python3 manage.py convert_mariadb_uuid
@@ -343,4 +343,4 @@ $ python3 manage.py convert_mariadb_uuid
 
 ## Platform-Specific Deployment Troubleshooting
 
-A user-maintained wiki page is available to help troubleshoot issues that may arise when trying to deploy Paperless-ngx on specific platforms, for example SELinux. Please see [the wiki](https://github.com/paperless-ngx/paperless-ngx/wiki/Platform%E2%80%90Specific-Troubleshooting).
+A user-maintained wiki page is available to help troubleshoot issues that may arise when trying to deploy DataKit on specific platforms, for example SELinux. Please see [the wiki](https://github.com/datakit/datakit/wiki/Platform%E2%80%90Specific-Troubleshooting).

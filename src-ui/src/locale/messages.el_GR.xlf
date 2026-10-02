@@ -127,8 +127,8 @@
         <target state="new"><x id="INTERPOLATION" equiv-text="barConfig); pu"/></target>
       </trans-unit>
       <trans-unit id="3527354815023530656" datatype="html">
-        <source>Document <x id="PH" equiv-text="status.filename"/> was added to Paperless-ngx.</source>
-        <target state="translated">Το έγγραφο <x id="PH" equiv-text="status.filename"/> προστέθηκε στο Paperless-ngx.</target>
+        <source>Document <x id="PH" equiv-text="status.filename"/> was added to DataKit.</source>
+        <target state="translated">Το έγγραφο <x id="PH" equiv-text="status.filename"/> προστέθηκε στο DataKit.</target>
       </trans-unit>
       <trans-unit id="1931214133925051574" datatype="html">
         <source>Open document</source>
@@ -139,8 +139,8 @@
         <target state="translated">Δεν ήταν δυνατή η προσθήκη του <x id="PH" equiv-text="status.filename"/>: <x id="PH_1" equiv-text="status.message"/></target>
       </trans-unit>
       <trans-unit id="1218124467712564468" datatype="html">
-        <source>Document <x id="PH" equiv-text="status.filename"/> is being processed by Paperless-ngx.</source>
-        <target state="translated">Το έγγραφο <x id="PH" equiv-text="status.filename"/> επεξεργάζεται από το Paperless-ngx.</target>
+        <source>Document <x id="PH" equiv-text="status.filename"/> is being processed by DataKit.</source>
+        <target state="translated">Το έγγραφο <x id="PH" equiv-text="status.filename"/> επεξεργάζεται από το DataKit.</target>
       </trans-unit>
       <trans-unit id="6570363013146073520" datatype="html">
         <source>Dashboard</source>
@@ -175,8 +175,8 @@
         <target state="translated">Ο πίνακας ελέγχου μπορεί να χρησιμοποιηθεί για την εμφάνιση αποθηκευμένων προβολών, όπως το &apos;Εισερχόμενα&apos;. Οι Προβολές μπορούν να βρεθούν στο μενού Διαχείριση Προβολών &gt; Αποθηκευμένες Προβολές μόλις τις δημιουργήσετε........</target>
       </trans-unit>
       <trans-unit id="9075755296812854717" datatype="html">
-        <source>Drag-and-drop documents here to start uploading or place them in the consume folder. You can also drag-and-drop documents anywhere on all other pages of the web app. Once you do, Paperless-ngx will start training its machine learning algorithms.</source>
-        <target state="translated">Σύρετε και αποθέστε έγγραφα εδώ για να ξεκινήσει το ανέβασμα ή τοποθετήστε τα στο φάκελο κατανάλωσης. Μπορείτε επίσης να σύρετε και να αποθέσετε έγγραφα οπουδήποτε σε όλες τις άλλες σελίδες της εφαρμογής. Μόλις το κάνετε, το Paperless-ngx θα ξεκινήσει την εκπαίδευση αλγορίθμων μηχανικής μάθησης του.</target>
+        <source>Drag-and-drop documents here to start uploading or place them in the consume folder. You can also drag-and-drop documents anywhere on all other pages of the web app. Once you do, DataKit will start training its machine learning algorithms.</source>
+        <target state="translated">Σύρετε και αποθέστε έγγραφα εδώ για να ξεκινήσει το ανέβασμα ή τοποθετήστε τα στο φάκελο κατανάλωσης. Μπορείτε επίσης να σύρετε και να αποθέσετε έγγραφα οπουδήποτε σε όλες τις άλλες σελίδες της εφαρμογής. Μόλις το κάνετε, το DataKit θα ξεκινήσει την εκπαίδευση αλγορίθμων μηχανικής μάθησης του.</target>
       </trans-unit>
       <trans-unit id="7495498057594070122" datatype="html">
         <source>The documents list shows all of your documents and allows for filtering as well as bulk-editing. There are three different view styles: list, small cards and large cards. A list of documents currently opened for editing is shown in the sidebar.</source>
@@ -223,16 +223,16 @@
         <target state="new">Loading directories...</target>
       </trans-unit>
       <trans-unit id="4270528545616947218" datatype="html">
-        <source>Lastly, on behalf of every contributor to this community-supported project, thank you for using Paperless-ngx!</source>
-        <target state="translated">Τέλος, εκ μέρους κάθε συνεισφέροντος σε αυτό το έργο που υποστηρίζεται από την κοινότητα, σας ευχαριστούμε που χρησιμοποιείτε το Paperless-ngx!</target>
+        <source>Lastly, on behalf of every contributor to this community-supported project, thank you for using DataKit!</source>
+        <target state="translated">Τέλος, εκ μέρους κάθε συνεισφέροντος σε αυτό το έργο που υποστηρίζεται από την κοινότητα, σας ευχαριστούμε που χρησιμοποιείτε το DataKit!</target>
       </trans-unit>
       <trans-unit id="9063918187161876141" datatype="html">
         <source>Application Configuration</source>
         <target state="translated">Διαμόρφωση Εφαρμογής</target>
       </trans-unit>
       <trans-unit id="8528041182664173532" datatype="html">
-        <source>Global app configuration options which apply to &lt;strong&gt;every&lt;/strong&gt; user of this install of Paperless-ngx. Options can also be set using environment variables or the configuration file but the value here will always take precedence.</source>
-        <target state="needs-translation">Global app configuration options which apply to &lt;strong&gt;every&lt;/strong&gt; user of this install of Paperless-ngx. Options can also be set using environment variables or the configuration file but the value here will always take precedence.</target>
+        <source>Global app configuration options which apply to &lt;strong&gt;every&lt;/strong&gt; user of this install of DataKit. Options can also be set using environment variables or the configuration file but the value here will always take precedence.</source>
+        <target state="needs-translation">Global app configuration options which apply to &lt;strong&gt;every&lt;/strong&gt; user of this install of DataKit. Options can also be set using environment variables or the configuration file but the value here will always take precedence.</target>
       </trans-unit>
       <trans-unit id="7991430199894172363" datatype="html">
         <source>Read the documentation about this setting</source>
@@ -455,7 +455,7 @@
         <target state="new">Error updating default AI model</target>
       </trans-unit>
       <trans-unit id="7019985100624067992" datatype="html">
-        <source>Only applies to the Paperless-ngx PDF viewer.</source>
+        <source>Only applies to the DataKit PDF viewer.</source>
         <target state="translated">Ισχύει μόνο για τον προβολέα PDF του προγράμματος.</target>
       </trans-unit>
       <trans-unit id="2959590948110714366" datatype="html">
@@ -935,8 +935,8 @@
         <target state="needs-translation">Error deleting group &quot;<x id="PH" equiv-text="group.name"/>&quot;.</target>
       </trans-unit>
       <trans-unit id="7931334600001636863" datatype="html">
-        <source>by Paperless-ngx</source>
-        <target state="needs-translation">by Paperless-ngx</target>
+        <source>by DataKit</source>
+        <target state="needs-translation">by DataKit</target>
       </trans-unit>
       <trans-unit id="7934833136974560675" datatype="html">
         <source>Retry</source>
@@ -1027,8 +1027,8 @@
         <target state="translated">Κάνε κλικ για προβολή.</target>
       </trans-unit>
       <trans-unit id="9811291095862612" datatype="html">
-        <source>Paperless-ngx can automatically check for updates</source>
-        <target state="translated">Το Paperless-ngx μπορεί να ελέγξει αυτόματα για ενημερώσεις</target>
+        <source>DataKit can automatically check for updates</source>
+        <target state="translated">Το DataKit μπορεί να ελέγξει αυτόματα για ενημερώσεις</target>
       </trans-unit>
       <trans-unit id="894819944961861800" datatype="html">
         <source> How does this work? </source>
@@ -1667,8 +1667,8 @@
         <target state="translated">Διαδρομή</target>
       </trans-unit>
       <trans-unit id="2816147949408898105" datatype="html">
-        <source>See &lt;a target=&apos;_blank&apos; href=&apos;https://docs.paperless-ngx.com/advanced_usage/#file-name-handling&apos;&gt;the documentation&lt;/a&gt;.</source>
-        <target state="needs-translation">See &lt;a target=&apos;_blank&apos; href=&apos;https://docs.paperless-ngx.com/advanced_usage/#file-name-handling&apos;&gt;the documentation&lt;/a&gt;.</target>
+        <source>See &lt;a target=&apos;_blank&apos; href=&apos;https://docs.datakit.app/advanced_usage/#file-name-handling&apos;&gt;the documentation&lt;/a&gt;.</source>
+        <target state="needs-translation">See &lt;a target=&apos;_blank&apos; href=&apos;https://docs.datakit.app/advanced_usage/#file-name-handling&apos;&gt;the documentation&lt;/a&gt;.</target>
       </trans-unit>
       <trans-unit id="1295614462098694869" datatype="html">
         <source>Preview</source>
@@ -1915,8 +1915,8 @@
         <target state="needs-translation">Assign title</target>
       </trans-unit>
       <trans-unit id="1098196422099517191" datatype="html">
-        <source>Can include some placeholders, see &lt;a target=&apos;_blank&apos; href=&apos;https://docs.paperless-ngx.com/usage/#workflows&apos;&gt;documentation&lt;/a&gt;.</source>
-        <target state="needs-translation">Can include some placeholders, see &lt;a target=&apos;_blank&apos; href=&apos;https://docs.paperless-ngx.com/usage/#workflows&apos;&gt;documentation&lt;/a&gt;.</target>
+        <source>Can include some placeholders, see &lt;a target=&apos;_blank&apos; href=&apos;https://docs.datakit.app/usage/#workflows&apos;&gt;documentation&lt;/a&gt;.</source>
+        <target state="needs-translation">Can include some placeholders, see &lt;a target=&apos;_blank&apos; href=&apos;https://docs.datakit.app/usage/#workflows&apos;&gt;documentation&lt;/a&gt;.</target>
       </trans-unit>
       <trans-unit id="6528897010417701530" datatype="html">
         <source>Assign tags</source>
@@ -2657,8 +2657,8 @@
         <target state="needs-translation">Environment</target>
       </trans-unit>
       <trans-unit id="5973078531069712831" datatype="html">
-        <source>Paperless-ngx Version</source>
-        <target state="needs-translation">Paperless-ngx Version</target>
+        <source>DataKit Version</source>
+        <target state="needs-translation">DataKit Version</target>
       </trans-unit>
       <trans-unit id="6269705781013540301" datatype="html">
         <source>Install Type</source>
@@ -2887,20 +2887,20 @@
         <note priority="1" from="description">this string is used to separate processing, failed and added on the file upload widget</note>
       </trans-unit>
       <trans-unit id="7915903586014997661" datatype="html">
-        <source>Paperless-ngx is running!</source>
-        <target state="translated">Το Paperless-ngx λειτουργεί!</target>
+        <source>DataKit is running!</source>
+        <target state="translated">Το DataKit λειτουργεί!</target>
       </trans-unit>
       <trans-unit id="3326049540711826572" datatype="html">
         <source>You&apos;re ready to start uploading documents! Explore the various features of this web app on your own, or start a quick tour using the button below.</source>
         <target state="translated">Είστε έτοιμοι να ξεκινήσετε τη μεταφόρτωση εγγράφων! Εξερευνήστε τα διάφορα χαρακτηριστικά αυτής της εφαρμογής μόνοι σας, ή ξεκινήστε μια γρήγορη περιήγηση χρησιμοποιώντας το παρακάτω κουμπί.</target>
       </trans-unit>
       <trans-unit id="4474647174688421179" datatype="html">
-        <source>More detail on how to use and configure Paperless-ngx is always available in the <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://docs.paperless-ngx.com&quot; target=&quot;_blank&quot;&gt;"/>documentation<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.</source>
-        <target state="translated">Περισσότερες λεπτομέρειες σχετικά με τον τρόπο χρήσης και ρύθμισης παραμέτρων του Paperless-ngx είναι πάντα διαθέσιμες στην τεκμηρίωση <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://docs.paperless-ngx.com&quot; target=&quot;_blank&quot;&gt;"/><x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.</target>
+        <source>More detail on how to use and configure DataKit is always available in the <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://docs.datakit.app&quot; target=&quot;_blank&quot;&gt;"/>documentation<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.</source>
+        <target state="translated">Περισσότερες λεπτομέρειες σχετικά με τον τρόπο χρήσης και ρύθμισης παραμέτρων του DataKit είναι πάντα διαθέσιμες στην τεκμηρίωση <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://docs.datakit.app&quot; target=&quot;_blank&quot;&gt;"/><x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.</target>
       </trans-unit>
       <trans-unit id="4294899532887357745" datatype="html">
-        <source>Thanks for being a part of the Paperless-ngx community!</source>
-        <target state="translated">Ευχαριστούμε που είστε μέρος της κοινότητας Paperless-ngx!</target>
+        <source>Thanks for being a part of the DataKit community!</source>
+        <target state="translated">Ευχαριστούμε που είστε μέρος της κοινότητας DataKit!</target>
       </trans-unit>
       <trans-unit id="1415832194529539652" datatype="html">
         <source>Start the tour</source>
@@ -4197,8 +4197,8 @@
         <target state="translated">Θέλετε πραγματικά να διαγράψετε την ετικέτα &quot;<x id="PH" equiv-text="object.name"/>&quot;;</target>
       </trans-unit>
       <trans-unit id="1229748338333965418" datatype="html">
-        <source>Use workflows to customize the behavior of Paperless-ngx when events &apos;trigger&apos; a workflow.</source>
-        <target state="needs-translation">Use workflows to customize the behavior of Paperless-ngx when events &apos;trigger&apos; a workflow.</target>
+        <source>Use workflows to customize the behavior of DataKit when events &apos;trigger&apos; a workflow.</source>
+        <target state="needs-translation">Use workflows to customize the behavior of DataKit when events &apos;trigger&apos; a workflow.</target>
       </trans-unit>
       <trans-unit id="2437630016855517844" datatype="html">
         <source>Add Workflow</source>

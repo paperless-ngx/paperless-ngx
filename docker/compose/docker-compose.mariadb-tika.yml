@@ -51,7 +51,7 @@ services:
     build:
       context: ../..
       dockerfile: Dockerfile
-    image: paperless-ngx:local
+    image: datakit:local
     restart: unless-stopped
     depends_on:
       - db

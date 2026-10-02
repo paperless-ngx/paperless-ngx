@@ -1430,11 +1430,11 @@ msgstr "Mã"
 msgid "Cancel"
 msgstr "Hủy bỏ"
 
-#: documents/templates/paperless-ngx/base.html:58
+#: documents/templates/datakit/base.html:58
 msgid "Share link was not found."
 msgstr "Không tìm thấy liên kết chia sẻ."
 
-#: documents/templates/paperless-ngx/base.html:62
+#: documents/templates/datakit/base.html:62
 msgid "Share link has expired."
 msgstr "Liên kết chia sẻ đã hết hạn."
 

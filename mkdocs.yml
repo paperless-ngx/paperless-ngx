@@ -1,4 +1,4 @@
-site_name: Paperless-ngx
+site_name: DataKit
 theme:
   name: material
   logo: assets/logo.svg
@@ -31,8 +31,8 @@ theme:
   icon:
     repo: fontawesome/brands/github
   favicon: assets/favicon.png
-repo_url: https://github.com/paperless-ngx/paperless-ngx
-repo_name: paperless-ngx/paperless-ngx
+repo_url: https://github.com/datakit/datakit
+repo_name: datakit/datakit
 edit_uri: blob/main/docs/
 extra_css:
   - assets/extra.css
@@ -70,13 +70,13 @@ nav:
   - 'FAQs': faq.md
   - troubleshooting.md
   - changelog.md
-copyright: Copyright &copy; 2016 - 2023 Daniel Quinn, Jonas Winkler, and the Paperless-ngx team
+copyright: Copyright &copy; 2016 - 2023 Daniel Quinn, Jonas Winkler, and the DataKit team
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/paperless-ngx/paperless-ngx
+      link: https://github.com/datakit/datakit
     - icon: fontawesome/brands/docker
-      link: https://hub.docker.com/r/paperlessngx/paperless-ngx
+      link: https://hub.docker.com/r/datakit/datakit
     - icon: material/chat
       link: https://matrix.to/#/#paperless:matrix.org
 plugins:

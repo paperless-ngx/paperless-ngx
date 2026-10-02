@@ -63,7 +63,7 @@ $grid-breakpoints: (
   }
 }
 
-// Paperless-ngx styles
+// DataKit styles
 body {
   --pngx-body-font-size: 0.875rem;
   font-size: var(--pngx-body-font-size);
@@ -81,16 +81,13 @@ body {
 }
 
 svg.logo {
-  .leaf {
-    fill: var(--bs-primary) !important;
-  }
   .text {
     fill: var(--bs-body-color) !important;
   }
 }
 
 .navbar.bg-primary {
-  --bs-primary: hsl(var(--pngx-primary),var(--pngx-primary-lightness));
+  --bs-primary: hsl(var(--pngx-primary-hue), var(--pngx-primary-saturation), var(--pngx-primary-lightness));
   --bs-primary-rgb: var(--bs-primary);
 }
 

@@ -54,7 +54,7 @@ appropriate data.
 
 ### Automatic matching {#automatic-matching}
 
-Paperless-ngx comes with a new matching algorithm called _Auto_. This
+DataKit comes with a new matching algorithm called _Auto_. This
 matching algorithm tries to assign tags, correspondents, document types,
 and storage paths to your documents based on how you have already
 assigned these on existing documents. It uses a neural network under the
@@ -219,7 +219,7 @@ will need to pass the scripts into the container via a host mount
 in your `docker-compose.yml`.
 
 Assuming you have
-`/home/paperless-ngx/scripts/post-consumption-example.sh` as a
+`/home/datakit/scripts/post-consumption-example.sh` as a
 script which you'd like to run.
 
 You can pass that script into the consumer container via a host mount:
@@ -230,7 +230,7 @@ webserver:
   ...
   volumes:
     ...
-    - /home/paperless-ngx/scripts:/path/in/container/scripts/ # (1)!
+    - /home/datakit/scripts:/path/in/container/scripts/ # (1)!
   environment: # (3)!
     ...
     PAPERLESS_POST_CONSUME_SCRIPT: /path/in/container/scripts/post-consumption-example.sh # (2)!
@@ -244,7 +244,7 @@ webserver:
 Troubleshooting:
 
 -   Monitor the Docker Compose log
-    `cd ~/paperless-ngx; docker compose logs -f`
+    `cd ~/datakit; docker compose logs -f`
 -   Check your script's permission e.g. in case of permission error
     `sudo chmod 755 post-consumption-example.sh`
 -   Pipe your scripts's output to a log file e.g.
@@ -740,7 +740,7 @@ existing tables) with:
 !!! warning
 
     Using mariadb version 10.4+ is recommended. Using the `utf8mb3` character set on
-    an older system may fix issues that can arise while setting up Paperless-ngx but
+    an older system may fix issues that can arise while setting up DataKit but
     `utf8mb3` can cause issues with consumption (where `utf8mb4` does not).
 
 For more information on this topic, you can refer to [this](https://code.djangoproject.com/ticket/9682) Django issue.
@@ -877,9 +877,9 @@ whatever else was on the backside of the split marker page.) You can work around
 a split marker page that has the split barcode on _both_ sides. This way, the extra page will
 get automatically removed.
 
-## SSO and third party authentication with Paperless-ngx
+## SSO and third party authentication with DataKit
 
-Paperless-ngx has a built-in authentication system from Django but you can easily integrate an
+DataKit has a built-in authentication system from Django but you can easily integrate an
 external authentication solution using one of the following methods:
 
 ### Remote User authentication
@@ -892,14 +892,14 @@ and [PAPERLESS_LOGOUT_REDIRECT_URL](configuration.md#PAPERLESS_LOGOUT_REDIRECT_U
 
 ### OpenID Connect and social authentication
 
-Version 2.5.0 of Paperless-ngx added support for integrating other authentication systems via
+Version 2.5.0 of DataKit added support for integrating other authentication systems via
 the [django-allauth](https://github.com/pennersr/django-allauth) package. Once set up, users
 can either log in or (optionally) sign up using any third party systems you integrate. See the
 relevant [configuration settings](configuration.md#PAPERLESS_SOCIALACCOUNT_PROVIDERS) and
 [django-allauth docs](https://docs.allauth.org/en/latest/socialaccount/configuration.html)
 for more information.
 
-To associate an existing Paperless-ngx account with a social account, first login with your
+To associate an existing DataKit account with a social account, first login with your
 regular credentials and then choose "My Profile" from the user dropdown in the app and you
 will see options to connect social account(s). If enabled, signup options will be available
 on the login page.
@@ -929,7 +929,7 @@ redirected with the [PAPERLESS_REDIRECT_LOGIN_TO_SSO](configuration.md#PAPERLESS
 
 ## Decryption of encrypted emails before consumption {#gpg-decryptor}
 
-Paperless-ngx can be configured to decrypt gpg encrypted emails before consumption.
+DataKit can be configured to decrypt gpg encrypted emails before consumption.
 
 ### Requirements
 

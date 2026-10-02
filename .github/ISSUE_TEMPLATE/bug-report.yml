@@ -7,22 +7,22 @@ body:
     attributes:
       value: |
         ### ⚠️ Please remember: issues are for *bugs* only! ⚠️
-        That is, something you believe affects every single user of Paperless-ngx (and the demo, for example), not just you. If you are not sure, start with one of the other options below.
+        That is, something you believe affects every single user of DataKit (and the demo, for example), not just you. If you are not sure, start with one of the other options below.
 
-        Also, note that **Paperless-ngx does not perform OCR or archive file creation itself**, those are handled by other tools. Problems with OCR or archive versions of specific files should likely be raised 'upstream', see https://github.com/ocrmypdf/OCRmyPDF/issues or https://github.com/tesseract-ocr/tesseract/issues
+        Also, note that **DataKit does not perform OCR or archive file creation itself**, those are handled by other tools. Problems with OCR or archive versions of specific files should likely be raised 'upstream', see https://github.com/ocrmypdf/OCRmyPDF/issues or https://github.com/tesseract-ocr/tesseract/issues
   - type: markdown
     attributes:
       value: |
-        #### Have a question? 👉 [Start a new discussion](https://github.com/paperless-ngx/paperless-ngx/discussions/new) or [ask in chat](https://matrix.to/#/#paperlessngx:matrix.org).
+        #### Have a question? 👉 [Start a new discussion](https://github.com/datakit/datakit/discussions/new) or [ask in chat](https://matrix.to/#/#paperlessngx:matrix.org).
 
         #### Before opening an issue, please double check:
 
-        - [The troubleshooting documentation](https://docs.paperless-ngx.com/troubleshooting/).
-        - [The installation instructions](https://docs.paperless-ngx.com/setup/#installation).
-        - [Existing issues and discussions](https://github.com/paperless-ngx/paperless-ngx/search?q=&type=issues).
+        - [The troubleshooting documentation](https://docs.datakit.com/troubleshooting/).
+        - [The installation instructions](https://docs.datakit.com/setup/#installation).
+        - [Existing issues and discussions](https://github.com/datakit/datakit/search?q=&type=issues).
         - Disable any custom container initialization scripts, if using
 
-        If you encounter issues while installing or configuring Paperless-ngx, please post in the ["Support" section of the discussions](https://github.com/paperless-ngx/paperless-ngx/discussions/new?category=support).
+        If you encounter issues while installing or configuring DataKit, please post in the ["Support" section of the discussions](https://github.com/datakit/datakit/discussions/new?category=support).
   - type: textarea
     id: description
     attributes:
@@ -68,7 +68,7 @@ body:
   - type: input
     id: version
     attributes:
-      label: Paperless-ngx version
+      label: DataKit version
       placeholder: e.g. 1.6.0
     validations:
       required: true
@@ -76,7 +76,7 @@ body:
     id: host-os
     attributes:
       label: Host OS
-      description: Host OS of the machine running paperless-ngx. Please add the architecture (uname -m) if applicable.
+      description: Host OS of the machine running datakit. Please add the architecture (uname -m) if applicable.
       placeholder: e.g. Archlinux / Ubuntu 20.04 / Raspberry Pi `arm64`
     validations:
       required: true
@@ -114,7 +114,7 @@ body:
     attributes:
       label: Please confirm the following
       options:
-        - label: I believe this issue is a bug that affects all users of Paperless-ngx, not something specific to my installation.
+        - label: I believe this issue is a bug that affects all users of DataKit, not something specific to my installation.
           required: true
         - label: This issue is not about the OCR or archive creation of a specific file(s). Otherwise, please see above regarding OCR tools.
           required: true

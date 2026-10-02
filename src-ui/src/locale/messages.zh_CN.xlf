@@ -127,8 +127,8 @@
         <target state="new"><x id="INTERPOLATION" equiv-text="barConfig); pu"/></target>
       </trans-unit>
       <trans-unit id="3527354815023530656" datatype="html">
-        <source>Document <x id="PH" equiv-text="status.filename"/> was added to Paperless-ngx.</source>
-        <target state="translated">文档 <x id="PH" equiv-text="status.filename"/> 被添加至 Paperless-ngx.</target>
+        <source>Document <x id="PH" equiv-text="status.filename"/> was added to DataKit.</source>
+        <target state="translated">文档 <x id="PH" equiv-text="status.filename"/> 被添加至 DataKit.</target>
       </trans-unit>
       <trans-unit id="1931214133925051574" datatype="html">
         <source>Open document</source>
@@ -139,8 +139,8 @@
         <target state="translated">无法添加 <x id="PH" equiv-text="status.filename"/>: <x id="PH_1" equiv-text="status.message"/></target>
       </trans-unit>
       <trans-unit id="1218124467712564468" datatype="html">
-        <source>Document <x id="PH" equiv-text="status.filename"/> is being processed by Paperless-ngx.</source>
-        <target state="translated">文件 <x id="PH" equiv-text="status.filename"/> 正在被 Paperless-ngx 处理中.</target>
+        <source>Document <x id="PH" equiv-text="status.filename"/> is being processed by DataKit.</source>
+        <target state="translated">文件 <x id="PH" equiv-text="status.filename"/> 正在被 DataKit 处理中.</target>
       </trans-unit>
       <trans-unit id="6570363013146073520" datatype="html">
         <source>Dashboard</source>
@@ -171,7 +171,7 @@
         <target state="translated">仪表盘可以用于显示保存的视图，例如收件箱。 一旦您创建了一些视图，就能在设置 &gt; 保存的视图中找到它们。</target>
       </trans-unit>
       <trans-unit id="9075755296812854717" datatype="html">
-        <source>Drag-and-drop documents here to start uploading or place them in the consume folder. You can also drag-and-drop documents anywhere on all other pages of the web app. Once you do, Paperless-ngx will start training its machine learning algorithms.</source>
+        <source>Drag-and-drop documents here to start uploading or place them in the consume folder. You can also drag-and-drop documents anywhere on all other pages of the web app. Once you do, DataKit will start training its machine learning algorithms.</source>
         <target state="translated">拖放文档到此处开始上传或将其放置在消费文件夹中。 您也可以在网页所有其他页面上随时拖放文档。一旦您这样做，Paperless ngx将开始培训它的机器学习算法。</target>
       </trans-unit>
       <trans-unit id="7495498057594070122" datatype="html">
@@ -215,7 +215,7 @@
         <target state="translated">这里还有&lt;em&gt;大量&lt;/em&gt;我们未涉及的功能和信息，但这些应该足以让您入门。请查看文档或访问 GitHub 上的项目以了解更多信息或报告问题。</target>
       </trans-unit>
       <trans-unit id="4270528545616947218" datatype="html">
-        <source>Lastly, on behalf of every contributor to this community-supported project, thank you for using Paperless-ngx!</source>
+        <source>Lastly, on behalf of every contributor to this community-supported project, thank you for using DataKit!</source>
         <target state="translated">最后，代表社区支持项目的每个贡献者，感谢您使用无纸版！</target>
       </trans-unit>
       <trans-unit id="9063918187161876141" datatype="html">
@@ -223,8 +223,8 @@
         <target state="translated">应用配置</target>
       </trans-unit>
       <trans-unit id="8528041182664173532" datatype="html">
-        <source>Global app configuration options which apply to &lt;strong&gt;every&lt;/strong&gt; user of this install of Paperless-ngx. Options can also be set using environment variables or the configuration file but the value here will always take precedence.</source>
-        <target state="translated">适用于 &lt;strong&gt;的全局应用程序配置选项。此安装的 Paperless-ngx 的每个&lt;/strong&gt; 用户。 也可以使用环境变量或配置文件来设置选项，但此处的值总是优先。</target>
+        <source>Global app configuration options which apply to &lt;strong&gt;every&lt;/strong&gt; user of this install of DataKit. Options can also be set using environment variables or the configuration file but the value here will always take precedence.</source>
+        <target state="translated">适用于 &lt;strong&gt;的全局应用程序配置选项。此安装的 DataKit 的每个&lt;/strong&gt; 用户。 也可以使用环境变量或配置文件来设置选项，但此处的值总是优先。</target>
       </trans-unit>
       <trans-unit id="7991430199894172363" datatype="html">
         <source>Read the documentation about this setting</source>
@@ -443,8 +443,8 @@
         <target state="translated">适应页面</target>
       </trans-unit>
       <trans-unit id="7019985100624067992" datatype="html">
-        <source>Only applies to the Paperless-ngx PDF viewer.</source>
-        <target state="translated">仅适用于Paperless-ngx PDF 查看器。</target>
+        <source>Only applies to the DataKit PDF viewer.</source>
+        <target state="translated">仅适用于DataKit PDF 查看器。</target>
       </trans-unit>
       <trans-unit id="2959590948110714366" datatype="html">
         <source>Automatically remove inbox tag(s) on save</source>
@@ -911,8 +911,8 @@
         <target state="translated">删除群组 &quot;<x id="PH" equiv-text="group.name"/> &quot;时发生错误。</target>
       </trans-unit>
       <trans-unit id="7931334600001636863" datatype="html">
-        <source>by Paperless-ngx</source>
-        <target state="translated">by Paperless-ngx</target>
+        <source>by DataKit</source>
+        <target state="translated">by DataKit</target>
       </trans-unit>
       <trans-unit id="2448391510242468907" datatype="html">
         <source>Logged in as <x id="INTERPOLATION" equiv-text="{{this.settingsService.displayName}}"/></source>
@@ -999,8 +999,8 @@
         <target state="translated">点击查看</target>
       </trans-unit>
       <trans-unit id="9811291095862612" datatype="html">
-        <source>Paperless-ngx can automatically check for updates</source>
-        <target state="translated">Paperless-ngx 可以自动检查更新</target>
+        <source>DataKit can automatically check for updates</source>
+        <target state="translated">DataKit 可以自动检查更新</target>
       </trans-unit>
       <trans-unit id="894819944961861800" datatype="html">
         <source> How does this work? </source>
@@ -1412,7 +1412,7 @@
       </trans-unit>
       <trans-unit id="4348351765075925931" datatype="html">
         <source>Paperless will only process mails that match <x id="START_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;em&gt;"/>all<x id="CLOSE_EMPHASISED_TEXT" ctype="x-em" equiv-text="&lt;/em&gt;"/> of the criteria specified below.</source>
-        <target state="translated">Paperless-ngx 只会处理符合以下所有过滤规则的邮件。</target>
+        <target state="translated">DataKit 只会处理符合以下所有过滤规则的邮件。</target>
       </trans-unit>
       <trans-unit id="7046259383943324039" datatype="html">
         <source>Folder</source>
@@ -1603,8 +1603,8 @@
         <target state="translated">路径</target>
       </trans-unit>
       <trans-unit id="2816147949408898105" datatype="html">
-        <source>See &lt;a target=&apos;_blank&apos; href=&apos;https://docs.paperless-ngx.com/advanced_usage/#file-name-handling&apos;&gt;the documentation&lt;/a&gt;.</source>
-        <target state="translated">请参阅 &lt;a target=&apos;_blank&apos; href=&apos;https://docs.paperless-ngx.com/advanced_usage/#file-name-handling&apos;&gt;文档&lt;/a&gt;。</target>
+        <source>See &lt;a target=&apos;_blank&apos; href=&apos;https://docs.datakit.app/advanced_usage/#file-name-handling&apos;&gt;the documentation&lt;/a&gt;.</source>
+        <target state="translated">请参阅 &lt;a target=&apos;_blank&apos; href=&apos;https://docs.datakit.app/advanced_usage/#file-name-handling&apos;&gt;文档&lt;/a&gt;。</target>
       </trans-unit>
       <trans-unit id="1295614462098694869" datatype="html">
         <source>Preview</source>
@@ -1847,8 +1847,8 @@
         <target state="translated">指定标题</target>
       </trans-unit>
       <trans-unit id="1098196422099517191" datatype="html">
-        <source>Can include some placeholders, see &lt;a target=&apos;_blank&apos; href=&apos;https://docs.paperless-ngx.com/usage/#workflows&apos;&gt;documentation&lt;/a&gt;.</source>
-        <target state="translated">可以包含一些占位符，请参阅 &lt;a target=&apos;_blank&apos; href=&apos;https://docs.paperless-ngx.com/usage/#workflows&apos;&gt;文档&lt;/a&gt;。</target>
+        <source>Can include some placeholders, see &lt;a target=&apos;_blank&apos; href=&apos;https://docs.datakit.app/usage/#workflows&apos;&gt;documentation&lt;/a&gt;.</source>
+        <target state="translated">可以包含一些占位符，请参阅 &lt;a target=&apos;_blank&apos; href=&apos;https://docs.datakit.app/usage/#workflows&apos;&gt;文档&lt;/a&gt;。</target>
       </trans-unit>
       <trans-unit id="6528897010417701530" datatype="html">
         <source>Assign tags</source>
@@ -2553,8 +2553,8 @@
         <target state="translated">系统环境</target>
       </trans-unit>
       <trans-unit id="5973078531069712831" datatype="html">
-        <source>Paperless-ngx Version</source>
-        <target state="translated">Paperless-ngx 版本</target>
+        <source>DataKit Version</source>
+        <target state="translated">DataKit 版本</target>
       </trans-unit>
       <trans-unit id="6269705781013540301" datatype="html">
         <source>Install Type</source>
@@ -2775,20 +2775,20 @@
         <note priority="1" from="description">this string is used to separate processing, failed and added on the file upload widget</note>
       </trans-unit>
       <trans-unit id="7915903586014997661" datatype="html">
-        <source>Paperless-ngx is running!</source>
-        <target state="translated">Paperless-ngx 正在运行！</target>
+        <source>DataKit is running!</source>
+        <target state="translated">DataKit 正在运行！</target>
       </trans-unit>
       <trans-unit id="3326049540711826572" datatype="html">
         <source>You&apos;re ready to start uploading documents! Explore the various features of this web app on your own, or start a quick tour using the button below.</source>
         <target state="translated">您可以开始上传文档了！请自行探索此网页应用的各种功能，或使用下面的按钮开始快速导览。</target>
       </trans-unit>
       <trans-unit id="4474647174688421179" datatype="html">
-        <source>More detail on how to use and configure Paperless-ngx is always available in the <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://docs.paperless-ngx.com&quot; target=&quot;_blank&quot;&gt;"/>documentation<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.</source>
-        <target state="translated">更多关于如何使用和配置Paperless-ngx的详细信息可以在 <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://docs.paperless-ngx.com&quot; target=&quot;_blank&quot;&gt;"/>文档<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> 中找到。</target>
+        <source>More detail on how to use and configure DataKit is always available in the <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://docs.datakit.app&quot; target=&quot;_blank&quot;&gt;"/>documentation<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/>.</source>
+        <target state="translated">更多关于如何使用和配置DataKit的详细信息可以在 <x id="START_LINK" ctype="x-a" equiv-text="&lt;a href=&quot;https://docs.datakit.app&quot; target=&quot;_blank&quot;&gt;"/>文档<x id="CLOSE_LINK" ctype="x-a" equiv-text="&lt;/a&gt;"/> 中找到。</target>
       </trans-unit>
       <trans-unit id="4294899532887357745" datatype="html">
-        <source>Thanks for being a part of the Paperless-ngx community!</source>
-        <target state="translated">感谢您成为 Paperless-ngx 社区的一部分！</target>
+        <source>Thanks for being a part of the DataKit community!</source>
+        <target state="translated">感谢您成为 DataKit 社区的一部分！</target>
       </trans-unit>
       <trans-unit id="1415832194529539652" datatype="html">
         <source>Start the tour</source>
@@ -4037,8 +4037,8 @@
         <target state="translated">您真的想要删除标签“<x id="PH" equiv-text="object.name"/> ”吗？</target>
       </trans-unit>
       <trans-unit id="1229748338333965418" datatype="html">
-        <source>Use workflows to customize the behavior of Paperless-ngx when events &apos;trigger&apos; a workflow.</source>
-        <target state="translated">使用工作流来自定义当事件触发工作流时 Paperless-ngx 的行为。</target>
+        <source>Use workflows to customize the behavior of DataKit when events &apos;trigger&apos; a workflow.</source>
+        <target state="translated">使用工作流来自定义当事件触发工作流时 DataKit 的行为。</target>
       </trans-unit>
       <trans-unit id="2437630016855517844" datatype="html">
         <source>Add Workflow</source>

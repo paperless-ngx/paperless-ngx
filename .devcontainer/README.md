@@ -1,8 +1,8 @@
-# Paperless-ngx Development Environment
+# DataKit Development Environment
 
 ## Overview
 
-Welcome to the Paperless-ngx development environment! This setup uses VSCode DevContainers to provide a consistent and seamless development experience.
+Welcome to the DataKit development environment! This setup uses VSCode DevContainers to provide a consistent and seamless development experience.
 
 ### What are DevContainers?
 
@@ -17,7 +17,7 @@ DevContainers are a feature in VSCode that allows you to develop within a Docker
 
 ## DevContainer Setup
 
-The DevContainer configuration provides up all the necessary services for Paperless-ngx, including:
+The DevContainer configuration provides up all the necessary services for DataKit, including:
 
 - Redis
 - Gotenberg

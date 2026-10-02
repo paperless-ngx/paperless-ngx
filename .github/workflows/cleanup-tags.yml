@@ -15,12 +15,12 @@ concurrency:
 jobs:
   cleanup-images:
     name: Cleanup Image Tags for ${{ matrix.primary-name }}
-    if: github.repository_owner == 'paperless-ngx'
+    if: github.repository_owner == 'datakit'
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
-        primary-name: ["paperless-ngx", "paperless-ngx/builder/cache/app"]
+        primary-name: ["datakit", "datakit/builder/cache/app"]
     env:
       # Requires a personal access token with the OAuth scope delete:packages
       TOKEN: ${{ secrets.GHA_CONTAINER_DELETE_TOKEN }}
@@ -34,19 +34,19 @@ jobs:
           is_org: "true"
           package_name: "${{ matrix.primary-name }}"
           scheme: "branch"
-          repo_name: "paperless-ngx"
+          repo_name: "datakit"
           match_regex: "(feature|fix)"
           do_delete: "true"
   cleanup-untagged-images:
     name: Cleanup Untagged Images Tags for ${{ matrix.primary-name }}
-    if: github.repository_owner == 'paperless-ngx'
+    if: github.repository_owner == 'datakit'
     runs-on: ubuntu-24.04
     needs:
       - cleanup-images
     strategy:
       fail-fast: false
       matrix:
-        primary-name: ["paperless-ngx", "paperless-ngx/builder/cache/app"]
+        primary-name: ["datakit", "datakit/builder/cache/app"]
     env:
       # Requires a personal access token with the OAuth scope delete:packages
       TOKEN: ${{ secrets.GHA_CONTAINER_DELETE_TOKEN }}

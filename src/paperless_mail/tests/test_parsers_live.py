@@ -68,7 +68,7 @@ class TestUrlCanary:
         available anymore.
         """
         resp = httpx.get(
-            "https://docs.paperless-ngx.com/assets/non-existent.png",
+            "https://docs.datakit.app/assets/non-existent.png",
         )
         with pytest.raises(httpx.HTTPStatusError) as exec_info:
             resp.raise_for_status()
@@ -91,7 +91,7 @@ class TestUrlCanary:
 
         # Now check the URL used in samples/sample.html
         resp = httpx.get(
-            "https://docs.paperless-ngx.com/assets/logo_full_white.svg",
+            "https://docs.datakit.app/assets/logo_full_white.svg",
         )
         resp.raise_for_status()
 

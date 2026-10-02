@@ -92,10 +92,10 @@ COPY ./docker/rootfs/usr/local/bin/*   /usr/local/bin/
 #  - Don't leave anything extra in here
 FROM s6-overlay-base AS main-app
 
-LABEL org.opencontainers.image.authors="paperless-ngx team <hello@paperless-ngx.com>"
-LABEL org.opencontainers.image.documentation="https://docs.paperless-ngx.com/"
-LABEL org.opencontainers.image.source="https://github.com/paperless-ngx/paperless-ngx"
-LABEL org.opencontainers.image.url="https://github.com/paperless-ngx/paperless-ngx"
+LABEL org.opencontainers.image.authors="DataKit team <hello@datakit.app>"
+LABEL org.opencontainers.image.documentation="https://docs.datakit.app/"
+LABEL org.opencontainers.image.source="https://github.com/datakit-ai/datakit"
+LABEL org.opencontainers.image.url="https://github.com/datakit-ai/datakit"
 LABEL org.opencontainers.image.licenses="GPL-3.0-only"
 
 ARG DEBIAN_FRONTEND=noninteractive

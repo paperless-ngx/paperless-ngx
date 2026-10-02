@@ -2,11 +2,11 @@
 ![image](assets/logo_full_black.svg#only-light){.index-logo}
 ![image](assets/logo_full_white.svg#only-dark){.index-logo}
 
-**Paperless-ngx** is a _community-supported_ open-source document management system that transforms your
+**DataKit** is a _community-supported_ open-source document management system that transforms your
 physical documents into a searchable online archive so you can keep, well, _less paper_.
 
 [Get started](setup.md){ .md-button .md-button--primary .index-callout }
-[Demo](https://demo.paperless-ngx.com){ .md-button .md-button--secondary target=\_blank }
+[Demo](https://demo.datakit.com){ .md-button .md-button--secondary target=\_blank }
 
 <div style="display: flex; justify-content: end; margin-top: -1.5rem;">
   <a href="https://m.do.co/c/8d70b916d462" target="_blank">
@@ -50,21 +50,21 @@ physical documents into a searchable online archive so you can keep, well, _less
     -   After processing, paperless can perform actions on the messages such as marking as read, deleting and more.
 -   A built-in robust **multi-user permissions** system that supports 'global' permissions as well as per document or object.
 -   A powerful workflow system that gives you even more control.
--   **Optimized** for multi core systems: Paperless-ngx consumes multiple documents in parallel.
+-   **Optimized** for multi core systems: DataKit consumes multiple documents in parallel.
 -   The integrated sanity checker makes sure that your document archive is in good health.
 
-[^1]: Office document and email consumption support is optional and provided by Apache Tika (see [configuration](https://docs.paperless-ngx.com/configuration/#tika))
+[^1]: Office document and email consumption support is optional and provided by Apache Tika (see [configuration](https://docs.datakit.com/configuration/#tika))
 
 ## Paperless, a history
 
-Paperless-ngx is the official successor to the original [Paperless](https://github.com/the-paperless-project/paperless) & [Paperless-ng](https://github.com/jonaswinkler/paperless-ng) projects and is designed to distribute the responsibility of advancing and supporting the project among a team of people. [Consider joining us!](https://github.com/paperless-ngx/paperless-ngx#community-support)
+DataKit is the official successor to the original [Paperless](https://github.com/the-paperless-project/paperless) & [Paperless-ng](https://github.com/jonaswinkler/paperless-ng) projects and is designed to distribute the responsibility of advancing and supporting the project among a team of people. [Consider joining us!](https://github.com/datakit/datakit#community-support)
 
 Further discussion of the transition between these projects can be found at
 [ng#1599](https://github.com/jonaswinkler/paperless-ng/issues/1599) and [ng#1632](https://github.com/jonaswinkler/paperless-ng/issues/1632).
 
 ## Screenshots
 
-Paperless-ngx aims to be as nice to use as it is useful. Check out some screenshots below.
+DataKit aims to be as nice to use as it is useful. Check out some screenshots below.
 
 <div class="grid-flipped-left" markdown>
   ![image](assets/screenshots/dashboard.png)
@@ -90,7 +90,7 @@ The document list provides three different styles to browse your documents.
 </div>
 <div class="clear"></div>
 
-Of course, Paperless-ngx also supports dark mode:
+Of course, DataKit also supports dark mode:
 
 ![image](assets/screenshots/documents-smallcards-dark.png)
 
@@ -181,24 +181,24 @@ Mobile devices are supported.
 
 ## Support
 
-Community support is available via [GitHub Discussions](https://github.com/paperless-ngx/paperless-ngx/discussions/) and [the Matrix chat room](https://matrix.to/#/#paperless:matrix.org).
+Community support is available via [GitHub Discussions](https://github.com/datakit/datakit/discussions/) and [the Matrix chat room](https://matrix.to/#/#paperless:matrix.org).
 
 ### Feature Requests
 
-Feature requests can be submitted via [GitHub Discussions](https://github.com/paperless-ngx/paperless-ngx/discussions/categories/feature-requests) where you can search for existing ideas, add your own and vote for the ones you care about.
+Feature requests can be submitted via [GitHub Discussions](https://github.com/datakit/datakit/discussions/categories/feature-requests) where you can search for existing ideas, add your own and vote for the ones you care about.
 
 ### Bugs
 
-For bugs please [open an issue](https://github.com/paperless-ngx/paperless-ngx/issues) or [start a discussion](https://github.com/paperless-ngx/paperless-ngx/discussions/categories/support) if you have questions.
+For bugs please [open an issue](https://github.com/datakit/datakit/issues) or [start a discussion](https://github.com/datakit/datakit/discussions/categories/support) if you have questions.
 
 ## Contributing
 
-People interested in continuing the work on paperless-ngx are encouraged to reach out on [GitHub](https://github.com/paperless-ngx/paperless-ngx) or [the Matrix chat room](https://matrix.to/#/#paperless:matrix.org). If you would like to contribute to the project on an ongoing basis there are multiple teams (frontend, ci/cd, etc) that could use your help so please reach out!
+People interested in continuing the work on datakit are encouraged to reach out on [GitHub](https://github.com/datakit/datakit) or [the Matrix chat room](https://matrix.to/#/#paperless:matrix.org). If you would like to contribute to the project on an ongoing basis there are multiple teams (frontend, ci/cd, etc) that could use your help so please reach out!
 
 ### Translation
 
-Paperless-ngx is available in many languages that are coordinated on [Crowdin](https://crowdin.com/project/paperless-ngx). If you want to help out by translating paperless-ngx into your language, please head over to the [Paperless-ngx project at Crowdin](https://crowdin.com/project/paperless-ngx), and thank you!
+DataKit is available in many languages that are coordinated on [Crowdin](https://crowdin.com/project/datakit). If you want to help out by translating datakit into your language, please head over to the [DataKit project at Crowdin](https://crowdin.com/project/datakit), and thank you!
 
 ## Scanners & Software
 
-Paperless-ngx is compatible with many different scanners and scanning tools. A user-maintained list of scanners and other software is available on [the wiki](https://github.com/paperless-ngx/paperless-ngx/wiki/Scanner-&-Software-Recommendations).
+DataKit is compatible with many different scanners and scanning tools. A user-maintained list of scanners and other software is available on [the wiki](https://github.com/datakit/datakit/wiki/Scanner-&-Software-Recommendations).

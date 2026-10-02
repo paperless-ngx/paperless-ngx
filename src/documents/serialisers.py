@@ -1782,7 +1782,7 @@ class PostDocumentSerializer(serializers.Serializer):
     )
 
     from_webui = serializers.BooleanField(
-        label="Documents are from Paperless-ngx WebUI",
+        label="Documents are from DataKit WebUI",
         write_only=True,
         required=False,
     )

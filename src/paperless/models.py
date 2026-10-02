@@ -287,7 +287,7 @@ class ApplicationConfiguration(AbstractSingletonModel):
     )
 
     class Meta:
-        verbose_name = _("paperless application settings")
+        verbose_name = _("DataKit application settings")
 
     def __str__(self) -> str:  # pragma: no cover
         return "ApplicationConfiguration"

@@ -1430,11 +1430,11 @@ msgstr "验证码"
 msgid "Cancel"
 msgstr "取消"
 
-#: documents/templates/paperless-ngx/base.html:58
+#: documents/templates/datakit/base.html:58
 msgid "Share link was not found."
 msgstr "未找到共享链接。"
 
-#: documents/templates/paperless-ngx/base.html:62
+#: documents/templates/datakit/base.html:62
 msgid "Share link has expired."
 msgstr "分享链接已失效！"
 

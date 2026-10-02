@@ -774,7 +774,7 @@ class DocumentViewSet(
         except Exception as e:
             if "Data too long for column" in str(e):
                 logger.warning(
-                    "Detected a possible incompatible database column. See https://docs.paperless-ngx.com/troubleshooting/#convert-uuid-field",
+                    "Detected a possible incompatible database column. See https://docs.datakit.app/troubleshooting/#convert-uuid-field",
                 )
             logger.error(f"Error deleting document: {e!s}")
             return HttpResponseBadRequest(
@@ -1628,7 +1628,7 @@ class SavedViewViewSet(ModelViewSet, PassUserMixin):
         description="Perform a bulk edit operation on a list of documents",
         external_docs={
             "description": "Further documentation",
-            "url": "https://docs.paperless-ngx.com/api/#bulk-editing",
+            "url": "https://docs.datakit.app/api/#bulk-editing",
         },
         responses={
             200: inline_serializer(
@@ -1804,7 +1804,7 @@ class BulkEditView(PassUserMixin):
         description="Upload a document via the API",
         external_docs={
             "description": "Further documentation",
-            "url": "https://docs.paperless-ngx.com/api/#file-uploads",
+            "url": "https://docs.datakit.app/api/#file-uploads",
         },
         responses={
             (200, "application/json"): OpenApiTypes.STR,
@@ -2599,7 +2599,7 @@ class UiSettingsView(GenericAPIView):
 
 @extend_schema_view(
     get=extend_schema(
-        description="Get the current version of the Paperless-NGX server",
+        description="Get the current version of the DataKit server",
         responses={
             (200, "application/json"): OpenApiTypes.OBJECT,
         },
@@ -2614,7 +2614,7 @@ class RemoteVersionView(GenericAPIView):
         if remote_version is None:
             try:
                 resp = httpx.get(
-                    "https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest",
+                    "https://api.github.com/repos/datakit-ai/datakit/releases/latest",
                     headers={"Accept": "application/json"},
                 )
                 resp.raise_for_status()
@@ -2831,7 +2831,7 @@ def serve_file(*, doc: Document, use_archive: bool, disposition: str):
         description="Perform a bulk edit operation on a list of objects",
         external_docs={
             "description": "Further documentation",
-            "url": "https://docs.paperless-ngx.com/api/#objects",
+            "url": "https://docs.datakit.app/api/#objects",
         },
         responses={
             200: inline_serializer(
@@ -3017,7 +3017,7 @@ class CustomFieldViewSet(ModelViewSet):
 
 @extend_schema_view(
     get=extend_schema(
-        description="Get the current system status of the Paperless-NGX server",
+        description="Get the current system status of the DataKit server",
         responses={
             (200, "application/json"): inline_serializer(
                 name="SystemStatus",

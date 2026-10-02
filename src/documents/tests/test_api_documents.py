@@ -3173,7 +3173,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.client.post(
             f"/api/documents/{doc.pk}/email/",
             {
-                "addresses": "hello@paperless-ngx.com",
+                "addresses": "hello@datakit.app",
                 "subject": "test",
                 "message": "hello",
             },
@@ -3186,7 +3186,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         self.client.post(
             f"/api/documents/{doc2.pk}/email/",
             {
-                "addresses": "hello@paperless-ngx.com",
+                "addresses": "hello@datakit.app",
                 "subject": "test",
                 "message": "hello",
                 "use_archive_version": False,
@@ -3238,7 +3238,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         resp = self.client.post(
             f"/api/documents/{doc2.pk}/email/",
             {
-                "addresses": "hello@paperless-ngx.com",
+                "addresses": "hello@datakit.app",
                 "subject": "test",
                 "message": "hello",
             },
@@ -3248,7 +3248,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         resp = self.client.post(
             "/api/documents/999/email/",
             {
-                "addresses": "hello@paperless-ngx.com",
+                "addresses": "hello@datakit.app",
                 "subject": "test",
                 "message": "hello",
             },
@@ -3258,7 +3258,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         resp = self.client.post(
             f"/api/documents/{doc.pk}/email/",
             {
-                "addresses": "hello@paperless-ngx.com",
+                "addresses": "hello@datakit.app",
             },
         )
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
@@ -3266,7 +3266,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         resp = self.client.post(
             f"/api/documents/{doc.pk}/email/",
             {
-                "addresses": "hello@paperless-ngx.com,hello",
+                "addresses": "hello@datakit.app,hello",
                 "subject": "test",
                 "message": "hello",
             },
@@ -3276,7 +3276,7 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
         resp = self.client.post(
             f"/api/documents/{doc.pk}/email/",
             {
-                "addresses": "hello@paperless-ngx.com",
+                "addresses": "hello@datakit.app",
                 "subject": "test",
                 "message": "hello",
             },

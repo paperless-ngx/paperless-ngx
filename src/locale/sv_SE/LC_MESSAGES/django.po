@@ -1430,11 +1430,11 @@ msgstr "Kod"
 msgid "Cancel"
 msgstr "Avbryt"
 
-#: documents/templates/paperless-ngx/base.html:58
+#: documents/templates/datakit/base.html:58
 msgid "Share link was not found."
 msgstr ""
 
-#: documents/templates/paperless-ngx/base.html:62
+#: documents/templates/datakit/base.html:62
 msgid "Share link has expired."
 msgstr "Delningslänken har upphört att gälla."
 

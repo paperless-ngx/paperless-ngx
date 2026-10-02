@@ -87,10 +87,10 @@ set -e
 
 echo ""
 echo "#############################################"
-echo "###   paperless-ngx docker installation   ###"
+echo "###   datakit docker installation   ###"
 echo "#############################################"
 echo ""
-echo "This script will download, configure and start paperless-ngx."
+echo "This script will download, configure and start datakit."
 
 echo ""
 echo "1. Application configuration"
@@ -177,7 +177,7 @@ echo "You will need this folder whenever you want to start, stop, update or "
 echo "maintain your paperless instance."
 echo ""
 
-ask "Target folder" "$(pwd)/paperless-ngx"
+ask "Target folder" "$(pwd)/datakit"
 TARGET_FOLDER=$ask_result
 
 echo ""
@@ -322,8 +322,8 @@ if [[ $TIKA_ENABLED == "yes" ]] ; then
 	DOCKER_COMPOSE_VERSION="$DOCKER_COMPOSE_VERSION-tika"
 fi
 
-wget "https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/docker/compose/docker-compose.$DOCKER_COMPOSE_VERSION.yml" -O docker-compose.yml
-wget "https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/docker/compose/.env" -O .env
+wget "https://raw.githubusercontent.com/datakit/datakit/main/docker/compose/docker-compose.$DOCKER_COMPOSE_VERSION.yml" -O docker-compose.yml
+wget "https://raw.githubusercontent.com/datakit/datakit/main/docker/compose/.env" -O .env
 
 SECRET_KEY=$(LC_ALL=C tr -dc 'a-zA-Z0-9!#$%&()*+,-./:;<=>?@[\]^_`{|}~' < /dev/urandom | dd bs=1 count=64 2>/dev/null)
 

@@ -47,7 +47,7 @@ class CustomAccountAdapter(DefaultAccountAdapter):
     def is_safe_url(self, url):
         """
         Check if the URL is a safe URL.
-        See https://github.com/paperless-ngx/paperless-ngx/issues/5780
+        See https://github.com/datakit-ai/datakit/issues/5780
         """
         from django.utils.http import url_has_allowed_host_and_scheme
 

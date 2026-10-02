@@ -42,7 +42,7 @@ services:
       MARIADB_PASSWORD: paperless
       MARIADB_ROOT_PASSWORD: paperless
   webserver:
-    image: ghcr.io/paperless-ngx/paperless-ngx:latest
+    image: ghcr.io/datakit/datakit:latest
     restart: unless-stopped
     depends_on:
       - db

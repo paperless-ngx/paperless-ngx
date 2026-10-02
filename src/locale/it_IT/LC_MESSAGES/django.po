@@ -1430,11 +1430,11 @@ msgstr "Codice"
 msgid "Cancel"
 msgstr "Annulla"
 
-#: documents/templates/paperless-ngx/base.html:58
+#: documents/templates/datakit/base.html:58
 msgid "Share link was not found."
 msgstr "Link di condivisione non trovato."
 
-#: documents/templates/paperless-ngx/base.html:62
+#: documents/templates/datakit/base.html:62
 msgid "Share link has expired."
 msgstr "Il link di condivisione è scaduto."
 

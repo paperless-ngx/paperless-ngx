@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "paperless-ui": {
+    "datakit-ui": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -60,7 +60,7 @@
             "customWebpackConfig": {
                 "path": "./extra-webpack.config.ts"
             },
-            "outputPath": "dist/paperless-ui",
+            "outputPath": "dist/datakit-ui",
             "main": "src/main.ts",
             "outputHashing": "none",
             "index": "src/index.html",
@@ -137,18 +137,18 @@
         "serve": {
           "builder": "@angular-builders/custom-webpack:dev-server",
           "options": {
-            "buildTarget": "paperless-ui:build:en-US"
+            "buildTarget": "datakit-ui:build:en-US"
           },
           "configurations": {
             "production": {
-              "buildTarget": "paperless-ui:build:production"
+              "buildTarget": "datakit-ui:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-builders/custom-webpack:extract-i18n",
           "options": {
-            "buildTarget": "paperless-ui:build"
+            "buildTarget": "datakit-ui:build"
           }
         },
         "test": {

@@ -17,7 +17,8 @@ export enum GlobalSearchType {
   TITLE_CONTENT = 'title-content',
 }
 
-export const PAPERLESS_GREEN_HEX = '#17541f'
+// 默认主题色：Gemini Blue (调色板源自 theme.scss)
+export const DATAKIT_BLUE_HEX = '#4285F4'
 
 export const SETTINGS_KEYS = {
   VERSION: 'version',

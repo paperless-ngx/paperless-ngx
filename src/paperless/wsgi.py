@@ -20,4 +20,4 @@ import logging  # noqa: E402
 from paperless.version import __full_version_str__  # noqa: E402
 
 logger = logging.getLogger("paperless.wsgi")
-logger.info(f"[init] Paperless-ngx version: v{__full_version_str__}")
+logger.info(f"[init] DataKit version: v{__full_version_str__}")

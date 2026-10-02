@@ -111,7 +111,7 @@ self.assertEqual(cfg.video_content_mode, VideoContentModeChoices.BOTH)
 - [ ] **Step 2: Run tests — expect fail**
 
 ```bash
-cd c:\Users\Administrator\Desktop\aigc\paperless-ngx-ai
+cd c:\Users\Administrator\Desktop\aigc\datakit-ai
 uv run pytest src/paperless/tests/test_aimodel_supplier.py -v --no-cov -n0
 ```
 

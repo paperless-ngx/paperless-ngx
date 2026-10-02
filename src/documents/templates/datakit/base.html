@@ -5,7 +5,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <meta name="author" content="Paperless-ngx project and contributors">
+        <meta name="author" content="DataKit project and contributors">
         <meta name="robots" content="noindex,nofollow">
 
         <title>
@@ -21,19 +21,19 @@
             <form class="form-accounts" id="form-account" method="post">
                 {% csrf_token %}
                 {% if not APP_LOGO and not APP_TITLE %}
-                    {% include "paperless-ngx/snippets/svg_logo.html" with extra_attrs="width='300' class='logo mb-4'" %}
+                    {% include "datakit/snippets/svg_logo.html" with extra_attrs="width='300' class='logo mb-4'" %}
                 {% else %}
                     {% if APP_LOGO %}
                         <img src="{{APP_LOGO}}" width="300" class="logo mb-1" />
                         <div class="d-flex flex-column align-items-end mb-4">
-                            <span class="byline text-uppercase font-monospace">by Paperless-ngx</span>
+                            <span class="byline text-uppercase font-monospace">powered by DataKit</span>
                         </div>
                     {% else %}
                         <h1 class="font-weight-normal text-primary mb-1 d-flex justify-content-center align-items-start">
-                            {% include "paperless-ngx/snippets/svg_leaf.html" with extra_attrs="width='30' class='mt-2'" %}
+                            {% include "datakit/snippets/svg_logo.html" with extra_attrs="width='30' class='mt-2'" %}
                             <div class="d-flex flex-column align-items-end mb-4">
                                 <span class="ms-2">{{ APP_TITLE }}</span>
-                                <span class="byline text-uppercase font-monospace">by Paperless-ngx</span>
+                                <span class="byline text-uppercase font-monospace">powered by DataKit</span>
                             </div>
                         </h1>
                     {% endif %}

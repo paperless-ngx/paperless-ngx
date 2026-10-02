@@ -1430,11 +1430,11 @@ msgstr "Kod"
 msgid "Cancel"
 msgstr "Otkaži"
 
-#: documents/templates/paperless-ngx/base.html:58
+#: documents/templates/datakit/base.html:58
 msgid "Share link was not found."
 msgstr "Link za deljenje nije pronađen."
 
-#: documents/templates/paperless-ngx/base.html:62
+#: documents/templates/datakit/base.html:62
 msgid "Share link has expired."
 msgstr "Link za deljene je istekao."
 

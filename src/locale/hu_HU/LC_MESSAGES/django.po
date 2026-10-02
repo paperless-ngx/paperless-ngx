@@ -1429,11 +1429,11 @@ msgstr "Kód"
 msgid "Cancel"
 msgstr "Mégse"
 
-#: documents/templates/paperless-ngx/base.html:58
+#: documents/templates/datakit/base.html:58
 msgid "Share link was not found."
 msgstr "A megosztási linket nem találtuk."
 
-#: documents/templates/paperless-ngx/base.html:62
+#: documents/templates/datakit/base.html:62
 msgid "Share link has expired."
 msgstr "A megosztási link lejárt."
 

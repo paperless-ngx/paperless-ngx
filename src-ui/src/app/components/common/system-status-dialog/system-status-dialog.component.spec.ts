@@ -4,7 +4,7 @@ jest.mock('src/environments/environment', () => ({
     production: true,
     apiBaseUrl: 'http://localhost:8000/api/',
     apiVersion: '9',
-    appTitle: 'Paperless-ngx',
+    appTitle: 'DataKit',
     tag: 'prod',
     version: '2.4.3',
     webSocketHost: 'localhost:8000',
@@ -44,7 +44,7 @@ const status: SystemStatus = {
   storage: { total: 494384795648, available: 13573525504 },
   database: {
     type: 'sqlite',
-    url: '/paperless-ngx/data/db.sqlite3',
+    url: '/datakit/data/db.sqlite3',
     status: SystemStatusItemStatus.ERROR,
     error: null,
     migration_status: {

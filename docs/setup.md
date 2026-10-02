@@ -5,8 +5,8 @@ You can go multiple routes to setup and run Paperless:
 -   [Use the script to setup a Docker install](#docker_script)
 -   [Use the Docker compose templates](#docker)
 -   [Build the Docker image yourself](#docker_build)
--   [Install Paperless-ngx directly on your system manually ("bare metal")](#bare_metal)
--   A user-maintained list of commercial hosting providers can be found [in the wiki](https://github.com/paperless-ngx/paperless-ngx/wiki/Related-Projects)
+-   [Install DataKit directly on your system manually ("bare metal")](#bare_metal)
+-   A user-maintained list of commercial hosting providers can be found [in the wiki](https://github.com/datakit/datakit/wiki/Related-Projects)
 
 The Docker routes are quick & easy. These are the recommended routes.
 This configures all the stuff from the above automatically so that it
@@ -22,7 +22,7 @@ above mentioned components yourself.
 
 Paperless provides an interactive installation script to setup a Docker Compose
 installation. The script asks for a couple configuration options, and will then create the
-necessary configuration files, pull the docker image, start Paperless-ngx and create your superuser
+necessary configuration files, pull the docker image, start DataKit and create your superuser
 account. The script essentially automatically performs the steps described in [Docker setup](#docker).
 
 1.  Make sure that Docker and Docker Compose are [installed](https://docs.docker.com/engine/install/){:target="\_blank"}.
@@ -30,7 +30,7 @@ account. The script essentially automatically performs the steps described in [D
 2.  Download and run the installation script:
 
     ```shell-session
-    bash -c "$(curl --location --silent --show-error https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/install-paperless-ngx.sh)"
+    bash -c "$(curl --location --silent --show-error https://raw.githubusercontent.com/datakit/datakit/main/install-datakit.sh)"
     ```
 
     !!! note
@@ -43,7 +43,7 @@ account. The script essentially automatically performs the steps described in [D
 1.  Make sure that Docker and Docker Compose are [installed](https://docs.docker.com/engine/install/){:target="\_blank"}.
 
 2.  Go to the [/docker/compose directory on the project
-    page](https://github.com/paperless-ngx/paperless-ngx/tree/main/docker/compose){:target="\_blank"}
+    page](https://github.com/datakit/datakit/tree/main/docker/compose){:target="\_blank"}
     and download one of the `docker-compose.*.yml` files, depending on which database backend
     you want to use. Place the files in a local directory and rename it `docker-compose.yml`. Download the
     `docker-compose.env` file and the `.env` file as well in the same directory.
@@ -97,7 +97,7 @@ account. The script essentially automatically performs the steps described in [D
 
     > ```
     > webserver:
-    >   image: ghcr.io/paperless-ngx/paperless-ngx:latest
+    >   image: ghcr.io/datakit/datakit:latest
     >   user: <user_id>
     > ```
 
@@ -129,11 +129,11 @@ account. The script essentially automatically performs the steps described in [D
 
 5.  Run `docker compose pull`. This will pull the image from the GitHub container registry
     by default but you can change the image to pull from Docker Hub by changing the `image`
-    line to `image: paperlessngx/paperless-ngx:latest`.
+    line to `image: paperlessngx/datakit:latest`.
 
 6.  Run `docker compose up -d`. This will create and start the necessary containers.
 
-7.  Congratulations! Your Paperless-ngx instance should now be accessible at `http://127.0.0.1:8000`
+7.  Congratulations! Your DataKit instance should now be accessible at `http://127.0.0.1:8000`
     (or similar, depending on your configuration). When you first access the web interface, you will be
     prompted to create a superuser account.
 
@@ -142,7 +142,7 @@ account. The script essentially automatically performs the steps described in [D
 1.  Clone the entire repository of paperless:
 
     ```shell-session
-    git clone https://github.com/paperless-ngx/paperless-ngx
+    git clone https://github.com/datakit/datakit
     ```
 
     The main branch always reflects the latest stable version.
@@ -157,7 +157,7 @@ account. The script essentially automatically performs the steps described in [D
 
     ```yaml
     webserver:
-        image: ghcr.io/paperless-ngx/paperless-ngx:latest
+        image: ghcr.io/datakit/datakit:latest
     ```
 
     and replace it with a line that instructs Docker Compose to build
@@ -272,16 +272,16 @@ are released, dependency support is confirmed, etc.
     ```
 
 5.  Get the release archive from
-    <https://github.com/paperless-ngx/paperless-ngx/releases> for example with
+    <https://github.com/datakit/datakit/releases> for example with
 
     ```shell-session
-    curl -O -L https://github.com/paperless-ngx/paperless-ngx/releases/download/v1.10.2/paperless-ngx-v1.10.2.tar.xz
+    curl -O -L https://github.com/datakit/datakit/releases/download/v1.10.2/datakit-v1.10.2.tar.xz
     ```
 
     Extract the archive with
 
     ```shell-session
-    tar -xf paperless-ngx-v1.10.2.tar.xz
+    tar -xf datakit-v1.10.2.tar.xz
     ```
 
     and copy the contents to the
@@ -429,7 +429,7 @@ are released, dependency support is confirmed, etc.
     !!! note
 
         For instructions on using a reverse proxy,
-        [see the wiki](https://github.com/paperless-ngx/paperless-ngx/wiki/Using-a-Reverse-Proxy-with-Paperless-ngx#).
+        [see the wiki](https://github.com/datakit/datakit/wiki/Using-a-Reverse-Proxy-with-DataKit#).
 
     !!! warning
 
@@ -473,14 +473,14 @@ are released, dependency support is confirmed, etc.
     instructions](https://www.nltk.org/data.html) for details on how to
     download the data.
 
-# Migrating to Paperless-ngx
+# Migrating to DataKit
 
 Migration is possible both from Paperless-ng or directly from the
 'original' Paperless.
 
 ## Migrating from Paperless-ng
 
-Paperless-ngx is meant to be a drop-in replacement for Paperless-ng and
+DataKit is meant to be a drop-in replacement for Paperless-ng and
 thus upgrading should be trivial for most users, especially when using
 docker. However, as with any major change, it is recommended to take a
 full backup first. Once you are ready, simply change the docker image to
@@ -494,21 +494,21 @@ image: jonaswinkler/paperless-ng:latest
 to
 
 ```
-image: ghcr.io/paperless-ngx/paperless-ngx:latest
+image: ghcr.io/datakit/datakit:latest
 ```
 
 and then run `docker compose up -d` which will pull the new image
 recreate the container. That's it!
 
 Users who installed with the bare-metal route should also update their
-Git clone to point to `https://github.com/paperless-ngx/paperless-ngx`,
+Git clone to point to `https://github.com/datakit/datakit`,
 e.g. using the command
-`git remote set-url origin https://github.com/paperless-ngx/paperless-ngx`
+`git remote set-url origin https://github.com/datakit/datakit`
 and then pull the latest version.
 
 ## Migrating from Paperless
 
-At its core, paperless-ngx is still paperless and fully compatible.
+At its core, datakit is still paperless and fully compatible.
 However, some things have changed under the hood, so you need to adapt
 your setup depending on how you installed paperless.
 
@@ -529,9 +529,9 @@ installation. The important things to keep in mind are as follows:
     Docker Compose route takes care of that.
 -   The layout of the folder structure for your documents and data
     remains the same, so you can just plug your old docker volumes into
-    paperless-ngx and expect it to find everything where it should be.
+    datakit and expect it to find everything where it should be.
 
-Migration to paperless-ngx is then performed in a few simple steps:
+Migration to datakit is then performed in a few simple steps:
 
 1.  Stop paperless.
 
@@ -541,23 +541,23 @@ Migration to paperless-ngx is then performed in a few simple steps:
     ```
 
 2.  Do a backup for two purposes: If something goes wrong, you still
-    have your data. Second, if you don't like paperless-ngx, you can
+    have your data. Second, if you don't like datakit, you can
     switch back to paperless.
 
-3.  Download the latest release of paperless-ngx. You can either go with
+3.  Download the latest release of datakit. You can either go with
     the Docker Compose files from
-    [here](https://github.com/paperless-ngx/paperless-ngx/tree/main/docker/compose)
+    [here](https://github.com/datakit/datakit/tree/main/docker/compose)
     or clone the repository to build the image yourself (see
     [above](#docker_build)). You can
-    either replace your current paperless folder or put paperless-ngx in
+    either replace your current paperless folder or put datakit in
     a different location.
 
     !!! warning
 
-        Paperless-ngx includes a `.env` file. This will set the project name
+        DataKit includes a `.env` file. This will set the project name
         for docker compose to `paperless`, which will also define the name
-        of the volumes by paperless-ngx. However, if you experience that
-        paperless-ngx is not using your old paperless volumes, verify the
+        of the volumes by datakit. However, if you experience that
+        datakit is not using your old paperless volumes, verify the
         names of your volumes with
 
         ``` shell-session
@@ -588,7 +588,7 @@ Migration to paperless-ngx is then performed in a few simple steps:
     This will migrate your database and create the search index. After
     that, paperless will take care of maintaining the index by itself.
 
-8.  Start paperless-ngx.
+8.  Start datakit.
 
     ```bash
     docker compose up -d
@@ -620,7 +620,7 @@ commands as well.
 
     1. Otherwise, in the `docker-compose.yml` add a new service for
        Redis, following [the example compose
-       files](https://github.com/paperless-ngx/paperless-ngx/tree/main/docker/compose)
+       files](https://github.com/datakit/datakit/tree/main/docker/compose)
 
     1. Set the environment variable [`PAPERLESS_REDIS`](configuration.md#PAPERLESS_REDIS) so it points to
        the new Redis container
@@ -646,23 +646,23 @@ commands as well.
        value as `TZ`
 
 8.  Modify the `image:` to point to
-    `ghcr.io/paperless-ngx/paperless-ngx:latest` or a specific version
+    `ghcr.io/datakit/datakit:latest` or a specific version
     if preferred.
 9.  Start the containers as before, using `docker compose`.
 
 ## Moving data from SQLite to PostgreSQL or MySQL/MariaDB {#sqlite_to_psql}
 
 The best way to migrate between database types is to perform an [export](administration.md#exporter) and then
-[import](administration.md#importer) into a clean installation of Paperless-ngx.
+[import](administration.md#importer) into a clean installation of DataKit.
 
 ## Moving back to Paperless
 
-Lets say you migrated to Paperless-ngx and used it for a while, but
+Lets say you migrated to DataKit and used it for a while, but
 decided that you don't like it and want to move back (If you do, send
 me a mail about what part you didn't like!), you can totally do that
 with a few simple steps.
 
-Paperless-ngx modified the database schema slightly, however, these
+DataKit modified the database schema slightly, however, these
 changes can be reverted while keeping your current data, so that your
 current data will be compatible with original Paperless. Thumbnails
 were also changed from PNG to WEBP format and will need to be
@@ -683,7 +683,7 @@ $ python3 manage.py migrate documents 0023
 ```
 
 After regenerating thumbnails, you'll need to clear your cookies
-(Paperless-ngx comes with updated dependencies that do cookie-processing
+(DataKit comes with updated dependencies that do cookie-processing
 differently) and probably your cache as well.
 
 # Considerations for less powerful devices {#less-powerful-devices}
@@ -736,8 +736,8 @@ For details, refer to [configuration](configuration.md).
 
 # Using nginx as a reverse proxy {#nginx}
 
-Please see [the wiki](https://github.com/paperless-ngx/paperless-ngx/wiki/Using-a-Reverse-Proxy-with-Paperless-ngx#nginx) for user-maintained documentation of using nginx with Paperless-ngx.
+Please see [the wiki](https://github.com/datakit/datakit/wiki/Using-a-Reverse-Proxy-with-DataKit#nginx) for user-maintained documentation of using nginx with DataKit.
 
 # Enhancing security {#security}
 
-Please see [the wiki](https://github.com/paperless-ngx/paperless-ngx/wiki/Using-Security-Tools-with-Paperless-ngx) for user-maintained documentation of how to configure security tools like Fail2ban with Paperless-ngx.
+Please see [the wiki](https://github.com/datakit/datakit/wiki/Using-Security-Tools-with-DataKit) for user-maintained documentation of how to configure security tools like Fail2ban with DataKit.

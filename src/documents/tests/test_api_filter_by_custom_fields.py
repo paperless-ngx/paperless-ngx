@@ -70,15 +70,15 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
         # CustomField.FieldDataType.URL
         self._create_document(url_field=None)
         self._create_document(url_field="")
-        self._create_document(url_field="https://docs.paperless-ngx.com/")
+        self._create_document(url_field="https://docs.datakit.app/")
         self._create_document(url_field="https://www.django-rest-framework.org/")
         self._create_document(url_field="http://example.com/")
 
         # A document to check if the filter correctly associates field names with values.
-        # E.g., ["url_field", "exact", "https://docs.paperless-ngx.com/"] should not
+        # E.g., ["url_field", "exact", "https://docs.datakit.app/"] should not
         # yield this document.
         self._create_document(
-            string_field="https://docs.paperless-ngx.com/",
+            string_field="https://docs.datakit.app/",
             url_field="http://example.com/",
         )
 
@@ -243,23 +243,23 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
     def test_name_value_association(self):
         """
         GIVEN:
-            - A document with `{"string_field": "https://docs.paperless-ngx.com/",
+            - A document with `{"string_field": "https://docs.datakit.app/",
               "url_field": "http://example.com/"}`
         WHEN:
-            - Filtering by `["url_field", "exact", "https://docs.paperless-ngx.com/"]`
+            - Filtering by `["url_field", "exact", "https://docs.datakit.app/"]`
         THEN:
             - That document should not get matched.
         """
         self._assert_query_match_predicate(
-            ["url_field", "exact", "https://docs.paperless-ngx.com/"],
+            ["url_field", "exact", "https://docs.datakit.app/"],
             lambda document: "url_field" in document
-            and document["url_field"] == "https://docs.paperless-ngx.com/",
+            and document["url_field"] == "https://docs.datakit.app/",
         )
 
     def test_filter_by_multiple_fields(self):
         """
         GIVEN:
-            - A document with `{"string_field": "https://docs.paperless-ngx.com/",
+            - A document with `{"string_field": "https://docs.datakit.app/",
               "url_field": "http://example.com/"}`
         WHEN:
             - Filtering by `['AND', [["string_field", "exists", True], ["url_field", "exists", True]]]`

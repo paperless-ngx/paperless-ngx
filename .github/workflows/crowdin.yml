@@ -9,7 +9,7 @@ on:
 jobs:
   synchronize-with-crowdin:
     name: Crowdin Sync
-    if: github.repository_owner == 'paperless-ngx'
+    if: github.repository_owner == 'datakit'
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout

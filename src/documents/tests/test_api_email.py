@@ -74,7 +74,7 @@ class TestEmail(DirectoriesMixin, SampleDirMixin, APITestCase):
             json.dumps(
                 {
                     "documents": [self.doc1.pk, self.doc2.pk],
-                    "addresses": "hello@paperless-ngx.com,test@example.com",
+                    "addresses": "hello@datakit.app,test@example.com",
                     "subject": "Bulk email test",
                     "message": "Here are your documents",
                 },
@@ -87,7 +87,7 @@ class TestEmail(DirectoriesMixin, SampleDirMixin, APITestCase):
         self.assertEqual(len(mail.outbox), 1)
 
         email = mail.outbox[0]
-        self.assertEqual(email.to, ["hello@paperless-ngx.com", "test@example.com"])
+        self.assertEqual(email.to, ["hello@datakit.app", "test@example.com"])
         self.assertEqual(email.subject, "Bulk email test")
         self.assertEqual(email.body, "Here are your documents")
         self.assertEqual(len(email.attachments), 2)

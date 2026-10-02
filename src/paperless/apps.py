@@ -8,7 +8,7 @@ from paperless.signals import handle_social_account_updated
 class PaperlessConfig(AppConfig):
     name = "paperless"
 
-    verbose_name = _("Paperless")
+    verbose_name = _("DataKit")
 
     def ready(self):
         from django.contrib.auth.signals import user_login_failed

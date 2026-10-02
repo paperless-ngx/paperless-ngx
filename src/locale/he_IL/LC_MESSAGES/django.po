@@ -1431,11 +1431,11 @@ msgstr "קוד"
 msgid "Cancel"
 msgstr "בטל"
 
-#: documents/templates/paperless-ngx/base.html:58
+#: documents/templates/datakit/base.html:58
 msgid "Share link was not found."
 msgstr "קישור לשיתוף הקובץ לא נמצא"
 
-#: documents/templates/paperless-ngx/base.html:62
+#: documents/templates/datakit/base.html:62
 msgid "Share link has expired."
 msgstr "לינק לקישור הקובץ פג תוקף"
 

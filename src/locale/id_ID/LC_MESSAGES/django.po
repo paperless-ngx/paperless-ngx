@@ -1430,11 +1430,11 @@ msgstr "Kode"
 msgid "Cancel"
 msgstr "Batal"
 
-#: documents/templates/paperless-ngx/base.html:58
+#: documents/templates/datakit/base.html:58
 msgid "Share link was not found."
 msgstr "Tautan tidak ditemukan."
 
-#: documents/templates/paperless-ngx/base.html:62
+#: documents/templates/datakit/base.html:62
 msgid "Share link has expired."
 msgstr "Tautan telah kedaluwarsa."
 

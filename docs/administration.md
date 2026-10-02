@@ -54,7 +54,7 @@ Options available to bare-metal and non-docker installations:
 
 ### Restoring {#migrating-restoring}
 
-If you've backed-up Paperless-ngx using the [document exporter](#exporter),
+If you've backed-up DataKit using the [document exporter](#exporter),
 restoring can simply be done with the [document importer](#importer).
 
 Of course, other backup strategies require restoring any volumes, folders and database
@@ -64,10 +64,10 @@ copies you created in the steps above.
 
 ### Docker Route {#docker-updating}
 
-If a new release of paperless-ngx is available, upgrading depends on how
-you installed paperless-ngx in the first place. The releases are
+If a new release of datakit is available, upgrading depends on how
+you installed datakit in the first place. The releases are
 available at the [release
-page](https://github.com/paperless-ngx/paperless-ngx/releases).
+page](https://github.com/datakit/datakit/releases).
 
 First of all, make sure no active processes (like consumption) are running, then [make a backup](#backup).
 
@@ -98,7 +98,7 @@ $ docker compose down
 
 Running `docker compose up` will also apply any new database migrations.
 If you see everything working, press CTRL+C once to gracefully stop
-paperless. Then you can start paperless-ngx with `-d` to have it run in
+paperless. Then you can start datakit with `-d` to have it run in
 the background.
 
 !!! note
@@ -108,17 +108,17 @@ the background.
     won't automatically update to newer versions. In order to enable
     updates as described above, either get the new `docker-compose.yml`
     file from
-    [here](https://github.com/paperless-ngx/paperless-ngx/tree/main/docker/compose)
+    [here](https://github.com/datakit/datakit/tree/main/docker/compose)
     or edit the `docker-compose.yml` file, find the line that says
 
     ```
-    image: ghcr.io/paperless-ngx/paperless-ngx:0.9.x
+    image: ghcr.io/datakit/datakit:0.9.x
     ```
 
     and replace the version with `latest`:
 
     ```
-    image: ghcr.io/paperless-ngx/paperless-ngx:latest
+    image: ghcr.io/datakit/datakit:latest
     ```
 
 !!! note
@@ -131,14 +131,14 @@ the background.
     `docker-compose.yml` find the line that says
 
     ```
-    image: ghcr.io/paperless-ngx/paperless-ngx:latest
+    image: ghcr.io/datakit/datakit:latest
     ```
 
     and replace the version with the series you want to track, for
     example:
 
     ```
-    image: ghcr.io/paperless-ngx/paperless-ngx:1.7
+    image: ghcr.io/datakit/datakit:1.7
     ```
 
 ### Bare Metal Route {#bare-metal-updating}
@@ -179,13 +179,13 @@ following:
 
 ### Database Upgrades
 
-Paperless-ngx is compatible with Django-supported versions of PostgreSQL and MariaDB and it is generally
+DataKit is compatible with Django-supported versions of PostgreSQL and MariaDB and it is generally
 safe to update them to newer versions. However, you should always take a backup and follow
 the instructions from your database's documentation for how to upgrade between major versions.
 
 !!! note
 
-    As of Paperless-ngx v2.18, the minimum supported version of PostgreSQL is 14.
+    As of DataKit v2.18, the minimum supported version of PostgreSQL is 14.
 
 For PostgreSQL, refer to [Upgrading a PostgreSQL Cluster](https://www.postgresql.org/docs/current/upgrading.html).
 
@@ -362,7 +362,7 @@ the `export` folder in your paperless source directory. Specify
 
 !!! warning
 
-    The importer should be run against a completely empty installation (database and directories) of Paperless-ngx.
+    The importer should be run against a completely empty installation (database and directories) of DataKit.
     If using a data only import, only the database must be empty.
 
 ### Document retagger {#retagger}
@@ -640,7 +640,7 @@ document_fuzzy_match [--ratio] [--processes N]
 
 ### Prune history (audit log) entries {#prune-history}
 
-If the audit log is enabled Paperless-ngx keeps an audit log of all changes made to documents. Functionality to automatically remove entries for deleted documents was added but
+If the audit log is enabled DataKit keeps an audit log of all changes made to documents. Functionality to automatically remove entries for deleted documents was added but
 entries created prior to this are not removed. This command allows you to prune the audit log of entries that are no longer needed.
 
 ```shell

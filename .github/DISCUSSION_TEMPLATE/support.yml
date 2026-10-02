@@ -22,7 +22,7 @@ body:
   - type: input
     id: version
     attributes:
-      label: Paperless-ngx version
+      label: DataKit version
       placeholder: e.g. 1.14.0
     validations:
       required: true

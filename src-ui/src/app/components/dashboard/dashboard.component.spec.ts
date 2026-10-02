@@ -131,11 +131,11 @@ describe('DashboardComponent', () => {
   })
 
   it('should show a welcome message', () => {
-    expect(component.subtitle).toEqual(`Hello Foo, welcome to Paperless-ngx`)
+    expect(component.subtitle).toEqual(`Hello Foo, welcome to DataKit`)
     settingsService.currentUser = {
       id: 1,
     }
-    expect(component.subtitle).toEqual(`Welcome to Paperless-ngx`)
+    expect(component.subtitle).toEqual(`Welcome to DataKit`)
   })
 
   it('should show dashboard widgets', () => {

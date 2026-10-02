@@ -243,7 +243,7 @@ configure their endpoints, and enable the feature.
 
 If you run paperless on docker, you can add those services to the
 Docker Compose file (see the provided
-[`docker-compose.sqlite-tika.yml`](https://github.com/paperless-ngx/paperless-ngx/blob/main/docker/compose/docker-compose.sqlite-tika.yml)
+[`docker-compose.sqlite-tika.yml`](https://github.com/datakit/datakit/blob/main/docker/compose/docker-compose.sqlite-tika.yml)
 file for reference).
 
 Add all three configuration parameters to your configuration. If using
@@ -401,7 +401,7 @@ not include a trailing slash. E.g. <https://paperless.domain.com>
     !!! note
 
         This value cannot contain a path (e.g. domain.com/path), even if
-        you are installing paperless-ngx at a subpath.
+        you are installing datakit at a subpath.
 
 #### [`PAPERLESS_CSRF_TRUSTED_ORIGINS=<comma-separated-list>`](#PAPERLESS_CSRF_TRUSTED_ORIGINS) {#PAPERLESS_CSRF_TRUSTED_ORIGINS}
 
@@ -615,7 +615,7 @@ This is for use with self-signed certificates against local IMAP servers.
 
 #### [`PAPERLESS_ACCOUNT_ALLOW_SIGNUPS=<bool>`](#PAPERLESS_ACCOUNT_ALLOW_SIGNUPS) {#PAPERLESS_ACCOUNT_ALLOW_SIGNUPS}
 
-: Allow users to signup for a new Paperless-ngx account.
+: Allow users to signup for a new DataKit account.
 
     Defaults to False
 
@@ -644,13 +644,13 @@ system. See the corresponding
 
 #### [`PAPERLESS_SOCIALACCOUNT_ALLOW_SIGNUPS=<bool>`](#PAPERLESS_SOCIALACCOUNT_ALLOW_SIGNUPS) {#PAPERLESS_SOCIALACCOUNT_ALLOW_SIGNUPS}
 
-: Allow users to signup for a new Paperless-ngx account using any setup third party authentication systems.
+: Allow users to signup for a new DataKit account using any setup third party authentication systems.
 
     Defaults to True
 
 #### [`PAPERLESS_SOCIAL_ACCOUNT_SYNC_GROUPS=<bool>`](#PAPERLESS_SOCIAL_ACCOUNT_SYNC_GROUPS) {#PAPERLESS_SOCIAL_ACCOUNT_SYNC_GROUPS}
 
-: Sync groups from the third party authentication system (e.g. OIDC) to Paperless-ngx. When enabled, users will be added or removed from groups based on their group membership in the third party authentication system. Groups must already exist in Paperless-ngx and have the same name as in the third party authentication system. Groups are updated upon logging in via the third party authentication system, see the corresponding [django-allauth documentation](https://docs.allauth.org/en/dev/socialaccount/signals.html).
+: Sync groups from the third party authentication system (e.g. OIDC) to DataKit. When enabled, users will be added or removed from groups based on their group membership in the third party authentication system. Groups must already exist in DataKit and have the same name as in the third party authentication system. Groups are updated upon logging in via the third party authentication system, see the corresponding [django-allauth documentation](https://docs.allauth.org/en/dev/socialaccount/signals.html).
 
 : In order to pass groups from the authentication system you will need to update your [PAPERLESS_SOCIALACCOUNT_PROVIDERS](#PAPERLESS_SOCIALACCOUNT_PROVIDERS) setting by adding a top-level "SCOPES" setting which includes "groups", e.g.:
 
@@ -693,7 +693,7 @@ If both the [PAPERLESS_ACCOUNT_DEFAULT_GROUPS](#PAPERLESS_ACCOUNT_DEFAULT_GROUPS
 
 #### [`PAPERLESS_DISABLE_REGULAR_LOGIN=<bool>`](#PAPERLESS_DISABLE_REGULAR_LOGIN) {#PAPERLESS_DISABLE_REGULAR_LOGIN}
 
-: Disables the regular frontend username / password login, i.e. once you have setup SSO. Note that this setting does not disable the Django admin login nor logging in with local credentials via the API. To prevent access to the Django admin, consider blocking `/admin/` in your [web server or reverse proxy configuration](https://github.com/paperless-ngx/paperless-ngx/wiki/Using-a-Reverse-Proxy-with-Paperless-ngx).
+: Disables the regular frontend username / password login, i.e. once you have setup SSO. Note that this setting does not disable the Django admin login nor logging in with local credentials via the API. To prevent access to the Django admin, consider blocking `/admin/` in your [web server or reverse proxy configuration](https://github.com/datakit/datakit/wiki/Using-a-Reverse-Proxy-with-DataKit).
 
     You can optionally also automatically redirect users to the SSO login with [PAPERLESS_REDIRECT_LOGIN_TO_SSO](#PAPERLESS_REDIRECT_LOGIN_TO_SSO)
 
@@ -1767,7 +1767,7 @@ started by the container.
 
 #### [`PAPERLESS_APP_TITLE=<str>`](#PAPERLESS_APP_TITLE) {#PAPERLESS_APP_TITLE}
 
-: If set, overrides the default name "Paperless-ngx"
+: If set, overrides the default name "DataKit"
 
 #### [`PAPERLESS_APP_LOGO=<path>`](#PAPERLESS_APP_LOGO) {#PAPERLESS_APP_LOGO}
 

@@ -1,10 +1,10 @@
 body {
   --bs-body-bg: #f5f5f5;
-  --bs-link-color-rgb: 23, 84, 31; /* #17541f */
-  --bs-link-hover-color-rgb: 15, 56, 20;
-  --pngx-primary: #17541f;
-  --pngx-primary-hover: #0f3614;
-  --pngx-primary-active: #0c2c10;
+  --bs-link-color-rgb: 26, 115, 232; /* #1A73E8 — Gemini Blue */
+  --bs-link-hover-color-rgb: 13, 71, 161;
+  --pngx-primary: #1A73E8;
+  --pngx-primary-hover: #174EA6;
+  --pngx-primary-active: #174EA6;
 }
 
 .logo {
@@ -28,9 +28,9 @@ body {
   --bs-btn-bg: var(--pngx-primary);
   --bs-btn-border-color: var(--pngx-primary);
   --bs-btn-hover-bg: var(--pngx-primary-hover);
-  --bs-btn-hover-border-color: #0c2c10;
+  --bs-btn-hover-border-color: #174EA6;
   --bs-btn-active-bg: var(--pngx-primary-active);
-  --bs-btn-active-border-color: #09220d;
+  --bs-btn-active-border-color: #174EA6;
 }
 
 .btn-link {

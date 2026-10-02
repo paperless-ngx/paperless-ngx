@@ -18,7 +18,7 @@ class TestApiRemoteVersion:
         httpx_mock: HTTPXMock,
     ):
         httpx_mock.add_response(
-            url="https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest",
+            url="https://api.github.com/repos/datakit-ai/datakit/releases/latest",
             json={"tag_name": "ngx-1.6.0"},
         )
 
@@ -37,7 +37,7 @@ class TestApiRemoteVersion:
         httpx_mock: HTTPXMock,
     ):
         httpx_mock.add_response(
-            url="https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest",
+            url="https://api.github.com/repos/datakit-ai/datakit/releases/latest",
             json={"tag_name": version.__full_version_str__},
         )
 
@@ -63,7 +63,7 @@ class TestApiRemoteVersion:
         new_version_str = ".".join(map(str, new_version))
 
         httpx_mock.add_response(
-            url="https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest",
+            url="https://api.github.com/repos/datakit-ai/datakit/releases/latest",
             json={"tag_name": new_version_str},
         )
 

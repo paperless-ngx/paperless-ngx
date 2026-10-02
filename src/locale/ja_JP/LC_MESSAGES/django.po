@@ -1430,11 +1430,11 @@ msgstr "コード"
 msgid "Cancel"
 msgstr "キャンセル"
 
-#: documents/templates/paperless-ngx/base.html:58
+#: documents/templates/datakit/base.html:58
 msgid "Share link was not found."
 msgstr "共有リンクが見つかりませんでした。"
 
-#: documents/templates/paperless-ngx/base.html:62
+#: documents/templates/datakit/base.html:62
 msgid "Share link has expired."
 msgstr "共有リンクの有効期限を過ぎています。"
 

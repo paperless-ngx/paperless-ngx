@@ -28,7 +28,7 @@ services:
       - ./redisdata:/data
   # No ports need to be exposed; the VSCode DevContainer plugin manages them.
   paperless-development:
-    image: paperless-ngx
+    image: datakit
     build:
       context: ../ # Dockerfile cannot access files from parent directories if context is not set.
       dockerfile: ./.devcontainer/Dockerfile
@@ -38,17 +38,17 @@ services:
       - gotenberg
       - tika
     volumes:
-      - ..:/usr/src/paperless/paperless-ngx:delegated
-      - ../.devcontainer/vscode:/usr/src/paperless/paperless-ngx/.vscode:delegated # VSCode config files
-      - virtualenv:/usr/src/paperless/paperless-ngx/.venv # Virtual environment persisted in volume
-      - /usr/src/paperless/paperless-ngx/src/documents/static/frontend # Static frontend files exist only in container
-      - /usr/src/paperless/paperless-ngx/src/.pytest_cache
-      - /usr/src/paperless/paperless-ngx/.ruff_cache
-      - /usr/src/paperless/paperless-ngx/htmlcov
-      - /usr/src/paperless/paperless-ngx/.coverage
-      - ./data:/usr/src/paperless/paperless-ngx/data
-      - ./media:/usr/src/paperless/paperless-ngx/media
-      - ./consume:/usr/src/paperless/paperless-ngx/consume
+      - ..:/usr/src/paperless/datakit:delegated
+      - ../.devcontainer/vscode:/usr/src/paperless/datakit/.vscode:delegated # VSCode config files
+      - virtualenv:/usr/src/paperless/datakit/.venv # Virtual environment persisted in volume
+      - /usr/src/paperless/datakit/src/documents/static/frontend # Static frontend files exist only in container
+      - /usr/src/paperless/datakit/src/.pytest_cache
+      - /usr/src/paperless/datakit/.ruff_cache
+      - /usr/src/paperless/datakit/htmlcov
+      - /usr/src/paperless/datakit/.coverage
+      - ./data:/usr/src/paperless/datakit/data
+      - ./media:/usr/src/paperless/datakit/media
+      - ./consume:/usr/src/paperless/datakit/consume
     environment:
       PAPERLESS_REDIS: redis://broker:6379
       PAPERLESS_TIKA_ENABLED: 1
@@ -57,7 +57,7 @@ services:
       PAPERLESS_STATICDIR: ./src/documents/static
       PAPERLESS_DEBUG: true
     # Overrides default command so things don't shut down after the process ends.
-    command: /bin/sh -c "chown -R paperless:paperless /usr/src/paperless/paperless-ngx/src/documents/static/frontend && chown -R paperless:paperless /usr/src/paperless/paperless-ngx/.ruff_cache && while sleep 1000; do :; done"
+    command: /bin/sh -c "chown -R paperless:paperless /usr/src/paperless/datakit/src/documents/static/frontend && chown -R paperless:paperless /usr/src/paperless/datakit/.ruff_cache && while sleep 1000; do :; done"
   gotenberg:
     image: docker.io/gotenberg/gotenberg:8.17
     restart: unless-stopped

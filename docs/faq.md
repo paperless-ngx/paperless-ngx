@@ -1,11 +1,11 @@
 # Frequently Asked Questions
 
-## _What's the general plan for Paperless-ngx?_
+## _What's the general plan for DataKit?_
 
-**A:** While Paperless-ngx is already considered largely
+**A:** While DataKit is already considered largely
 "feature-complete", it is a community-driven project and development
 will be guided in this way. New features can be submitted via
-[GitHub discussions](https://github.com/paperless-ngx/paperless-ngx/discussions)
+[GitHub discussions](https://github.com/datakit/datakit/discussions)
 and "up-voted" by the community, but this is not a
 guarantee that the feature will be implemented. This project will always be
 open to collaboration in the form of PRs, ideas etc.
@@ -40,7 +40,7 @@ system. On Linux, chances are high that this location is
 You can always drag those files out of that folder to use them
 elsewhere. Here are a couple notes about that.
 
--   Paperless-ngx never modifies your original documents. It keeps
+-   DataKit never modifies your original documents. It keeps
     checksums of all documents and uses a scheduled sanity checker to
     check that they remain the same.
 -   By default, paperless uses the internal ID of each document as its
@@ -51,7 +51,7 @@ elsewhere. Here are a couple notes about that.
     another easy way to get your files out of paperless with reasonable
     file names.
 
-## _What file types does paperless-ngx support?_
+## _What file types does datakit support?_
 
 **A:** Currently, the following files are supported:
 
@@ -59,14 +59,14 @@ elsewhere. Here are a couple notes about that.
     WebP images are processed with OCR and converted into PDF documents.
 -   Plain text documents are supported as well and are added verbatim to
     paperless.
--   With the optional Tika integration enabled (see [Tika configuration](https://docs.paperless-ngx.com/configuration#tika)),
+-   With the optional Tika integration enabled (see [Tika configuration](https://docs.datakit.com/configuration#tika)),
     Paperless also supports various Office documents (.docx, .doc, odt,
     .ppt, .pptx, .odp, .xls, .xlsx, .ods).
 
-Paperless-ngx determines the type of a file by inspecting its content.
+DataKit determines the type of a file by inspecting its content.
 The file extensions do not matter.
 
-## _Will paperless-ngx run on Raspberry Pi?_
+## _Will datakit run on Raspberry Pi?_
 
 **A:** The short answer is yes. I've tested it on a Raspberry Pi 3 B.
 The long answer is that certain parts of Paperless will run very slow,
@@ -80,10 +80,10 @@ has to do much less work to serve the data.
     You can adjust some of the settings so that paperless uses less
     processing power. See [setup](setup.md#less-powerful-devices) for details.
 
-## _How do I install paperless-ngx on Raspberry Pi?_
+## _How do I install datakit on Raspberry Pi?_
 
 **A:** Docker images are available for arm64 hardware, so just
-follow the [Docker Compose instructions](https://docs.paperless-ngx.com/setup/#installation). Apart from more required disk
+follow the [Docker Compose instructions](https://docs.datakit.com/setup/#installation). Apart from more required disk
 space compared to a bare metal installation, docker comes with close to
 zero overhead, even on Raspberry Pi.
 
@@ -101,8 +101,8 @@ libraries and compilation will take a long time.
 
 ## _How do I run this on Unraid?_
 
-**A:** Paperless-ngx is available as [community
-app](https://unraid.net/community/apps?q=paperless-ngx) in Unraid. [Uli
+**A:** DataKit is available as [community
+app](https://unraid.net/community/apps?q=datakit) in Unraid. [Uli
 Fahrer](https://github.com/Tooa) created a container template for that.
 
 ## _How do I run this on my toaster?_

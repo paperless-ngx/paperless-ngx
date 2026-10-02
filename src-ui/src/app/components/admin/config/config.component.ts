@@ -156,7 +156,7 @@ export class ConfigComponent
   }
 
   getDocsUrl(key: string) {
-    return `https://docs.paperless-ngx.com/configuration/#${key}`
+    return `https://docs.datakit.app/configuration/#${key}`
   }
 
   public saveConfig() {
