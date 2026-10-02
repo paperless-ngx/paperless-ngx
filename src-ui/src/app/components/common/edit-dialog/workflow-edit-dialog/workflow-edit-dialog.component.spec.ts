@@ -537,14 +537,23 @@ describe('WorkflowEditDialogComponent', () => {
       'cf_2',
     ])
 
-    component.save()
-
-    // save() splits the combined control back into the two API fields.
-    expect(formActions.value[0].ai_suggestion_fields).toEqual([
+    // getFormValues() splits the combined control into the two API fields in
+    // the payload it returns.
+    const payload = (component as any).getFormValues()
+    expect(payload.actions[0].ai_suggestion_fields).toEqual([
       AISuggestionField.Title,
     ])
-    expect(formActions.value[0].ai_suggestion_custom_fields).toEqual([1, 2])
-    expect(formActions.value[0].ai_suggestion_targets).toBeUndefined()
+    expect(payload.actions[0].ai_suggestion_custom_fields).toEqual([1, 2])
+    expect(payload.actions[0].ai_suggestion_targets).toBeUndefined()
+
+    // Crucially, the split must not mutate the live form: a failed save
+    // (e.g. missing name/order) used to wipe the selection, so the combined
+    // control must still hold its value for the next attempt.
+    expect(formActions.value[0].ai_suggestion_targets).toEqual([
+      AISuggestionField.Title,
+      'cf_1',
+      'cf_2',
+    ])
   })
 
   it('should support add and remove triggers and actions', () => {

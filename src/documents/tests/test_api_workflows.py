@@ -828,17 +828,18 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(Workflow.objects.count(), existing_count)
 
-    def test_api_create_apply_ai_suggestions_action_rejects_empty_custom_fields(
+    def test_api_create_apply_ai_suggestions_action_accepts_empty_custom_fields(
         self,
     ) -> None:
         """
         GIVEN:
-            - API request to create an apply AI suggestions action with an
-              explicitly empty custom field list
+            - API request to create an apply AI suggestions action with a
+              built-in field selected and an explicitly empty custom field list
         WHEN:
             - API is called
         THEN:
-            - Correct HTTP 400 response
+            - The action is created; a built-in field alone is sufficient and
+              an empty custom field list is accepted
         """
         response = self._post_ai_suggestions_workflow(
             trigger_types=[WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED],
@@ -848,7 +849,36 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
             },
         )
 
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        action = Workflow.objects.get(name="Apply AI suggestions").actions.first()
+        self.assertEqual(action.ai_suggestion_fields, ["title"])
+        self.assertFalse(action.ai_suggestion_custom_fields)
+
+    def test_api_create_apply_ai_suggestions_action_accepts_custom_fields_only(
+        self,
+    ) -> None:
+        """
+        GIVEN:
+            - API request to create an apply AI suggestions action with no
+              built-in fields but at least one custom field selected (the
+              combined-list UI allows selecting only custom fields)
+        WHEN:
+            - API is called
+        THEN:
+            - The action is created; custom fields count as valid targets
+        """
+        response = self._post_ai_suggestions_workflow(
+            trigger_types=[WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED],
+            action={
+                "ai_suggestion_fields": [],
+                "ai_suggestion_custom_fields": [self.cf1.pk],
+            },
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        action = Workflow.objects.get(name="Apply AI suggestions").actions.first()
+        self.assertFalse(action.ai_suggestion_fields)
+        self.assertEqual(action.ai_suggestion_custom_fields, [self.cf1.pk])
 
     def test_api_create_apply_ai_suggestions_action_rejects_consumption_only(
         self,

@@ -866,6 +866,27 @@ export class WorkflowEditDialogComponent
       )
     }
 
+    // Split the combined ai_suggestion_targets UI control back into the two
+    // API fields: built-in enum values and custom field ids. Build fresh
+    // action objects (the shallow copy shares each action reference with the
+    // form) so a failed save never mutates the live form and a retry still
+    // submits the current selection.
+    if (formValues?.actions?.length) {
+      formValues.actions = formValues.actions.map((action: any) => {
+        const { ai_suggestion_targets, ...rest } = action
+        const targets: any[] = ai_suggestion_targets ?? []
+        return {
+          ...rest,
+          ai_suggestion_fields: targets.filter(
+            (t) => this.customFieldTargetIdFrom(t) === null
+          ),
+          ai_suggestion_custom_fields: targets
+            .map((t) => this.customFieldTargetIdFrom(t))
+            .filter((id): id is number => id !== null),
+        }
+      })
+    }
+
     return formValues
   }
 
@@ -1543,18 +1564,9 @@ export class WorkflowEditDialogComponent
           action.email = null
         }
         action.passwords = this.parsePasswords(action.passwords as any)
-        // Split the combined ai_suggestion_targets control back into the two
-        // API fields: built-in enum values and custom field ids.
-        const targets: any[] = action.ai_suggestion_targets ?? []
-        const builtIn = targets.filter(
-          (t) => this.customFieldTargetIdFrom(t) === null
-        )
-        const customIds = targets
-          .map((t) => this.customFieldTargetIdFrom(t))
-          .filter((id): id is number => id !== null)
-        action.ai_suggestion_fields = builtIn
-        action.ai_suggestion_custom_fields = customIds
-        delete action.ai_suggestion_targets
+        // The combined ai_suggestion_targets control is split back into the
+        // two API fields inside getFormValues() (on the payload copy), so a
+        // failed save here never corrupts the live form.
       })
     super.save()
   }
