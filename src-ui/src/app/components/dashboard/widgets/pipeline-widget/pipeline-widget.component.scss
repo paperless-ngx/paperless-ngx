@@ -336,44 +336,80 @@
   &.output-vector i-bs    { color: #34A853; }
 }
 
-/* ---- Pipeline footer (stats band) ---- */
+/* ---- Pipeline footer (stats cards) ---- */
 .pipeline-footer {
   position: relative;
   z-index: 1;
   margin-top: 1rem;
-  padding-top: 0.875rem;
+  padding-top: 1rem;
   border-top: 1px solid var(--bs-border-color);
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 1rem;
+  gap: 0.625rem;
+}
 
-  .footer-stat {
-    display: flex;
-    flex-direction: column;
-    gap: 0.125rem;
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.625rem 0.75rem;
+  border-radius: 0.625rem;
+  background: var(--pngx-bg-alt);
+  border: 1px solid transparent;
+  transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.15s ease;
 
-    .footer-stat-num {
-      font-size: 1.05rem;
-      font-weight: 700;
-      line-height: 1.1;
-      letter-spacing: -0.02em;
-      font-feature-settings: "tnum";
-      color: var(--bs-body-color);
-    }
-
-    .footer-stat-label {
-      font-size: 0.65rem;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--bs-secondary-color);
-    }
-
-    .footer-stat-num.color-blue   { color: #4285F4; }
-    .footer-stat-num.color-green  { color: #34A853; }
-    .footer-stat-num.color-purple { color: #A142F4; }
-    .footer-stat-num.color-orange { color: #F9AB00; }
+  &:hover {
+    transform: translateY(-1px);
+    background: var(--bs-body-bg);
   }
+
+  .stat-icon {
+    flex: 0 0 auto;
+    width: 1.875rem;
+    height: 1.875rem;
+    border-radius: 0.4375rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    line-height: 1;
+    color: #fff;
+  }
+
+  .stat-body {
+    flex: 1 1 auto;
+    min-width: 0;
+    line-height: 1.15;
+  }
+
+  .stat-num {
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    font-feature-settings: "tnum";
+    line-height: 1.05;
+    color: var(--bs-body-color);
+  }
+
+  .stat-label {
+    font-size: 0.65rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--bs-secondary-color);
+    margin-top: 0.125rem;
+    line-height: 1.1;
+  }
+
+  &.stat-blue   .stat-icon { background: #4285F4; }
+  &.stat-green  .stat-icon { background: #34A853; }
+  &.stat-purple .stat-icon { background: #A142F4; }
+  &.stat-orange .stat-icon { background: #F9AB00; }
+
+  &.stat-blue:hover   { border-color: rgba(66, 133, 244, 0.45); }
+  &.stat-green:hover  { border-color: rgba(52, 168, 83, 0.45); }
+  &.stat-purple:hover { border-color: rgba(161, 66, 244, 0.45); }
+  &.stat-orange:hover { border-color: rgba(249, 171, 0, 0.45); }
 }
 
 /* ---- Dark mode polish ---- */

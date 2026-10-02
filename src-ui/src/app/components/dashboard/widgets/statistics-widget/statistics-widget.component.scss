@@ -13,6 +13,7 @@
   box-shadow: 0 4px 20px rgba(23, 78, 166, 0.22);
   overflow: hidden;
   isolation: isolate;
+  margin-bottom: 0;
 }
 
 /* soft radial glow in the corner */
@@ -103,19 +104,20 @@
   }
 }
 
-/* ----- Section card ----- */
-.card-section {
-  background: var(--pngx-bg-alt);
-  border-radius: 0.75rem;
-  padding: 1rem;
+/* ----- Donut section (sits inside the unified right pane) ----- */
+.donut-section {
+  padding-top: 1.125rem;
+  margin-top: 1.125rem;
+  border-top: 1px solid var(--bs-border-color);
+}
 
-  .section-title {
-    font-size: 0.7rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--bs-secondary-color);
-  }
+.section-title {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--bs-secondary-color);
+  margin-bottom: 0.75rem;
 }
 
 /* ----- Donut chart + legend ----- */
@@ -213,10 +215,6 @@
 :host-context([data-bs-theme='dark']) {
   .kpi-hero {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-  }
-
-  .card-section {
-    background: rgba(255, 255, 255, 0.03);
   }
 
   .donut-legend-item:hover {

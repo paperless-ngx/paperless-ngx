@@ -7,7 +7,7 @@
       </div>
     } @else {
       <!-- Hero KPI: Total Documents (big & visually rich) -->
-      <div class="kpi-hero mb-3">
+      <div class="kpi-hero">
         <div class="kpi-hero-glow"></div>
         <div class="kpi-hero-grid"></div>
         <div class="kpi-hero-content">
@@ -28,7 +28,7 @@
 
       <!-- File Type Distribution (Donut Chart) -->
       @if (statistics?.document_file_type_counts?.length > 1) {
-        <div class="card-section">
+        <div class="donut-section">
           <h6 class="section-title" i18n>File Type Distribution</h6>
           <div class="donut-wrapper">
             <svg class="donut-svg" viewBox="0 0 42 42" width="100%" height="180">
