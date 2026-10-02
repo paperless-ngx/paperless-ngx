@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { SuggestionSource } from 'src/app/data/ui-settings'
 import { SuggestionsDropdownComponent } from './suggestions-dropdown.component'
 
 describe('SuggestionsDropdownComponent', () => {
@@ -179,14 +180,71 @@ describe('SuggestionsDropdownComponent', () => {
 
   it('should toggle dropdown when clickSuggest is called and suggestions are not null', () => {
     fixture.componentRef.setInput('aiEnabled', true)
+    fixture.componentRef.setInput('fetchedSources', [SuggestionSource.ML])
     fixture.detectChanges()
     fixture.componentRef.setInput('suggestions', {
       suggested_correspondents: [],
       suggested_tags: [],
       suggested_document_types: [],
     })
+    fixture.detectChanges()
     component.clickSuggest()
-    expect(component.dropdown.open).toBeTruthy()
+    expect(component.dropdown.isOpen()).toBeTruthy()
     expect(fixture.nativeElement.textContent).toContain('No novel suggestions')
+  })
+
+  it('should fetch unfetched sources and show existing suggestions', () => {
+    jest.spyOn(component.getSuggestions, 'emit')
+    fixture.componentRef.setInput('aiEnabled', true)
+    fixture.componentRef.setInput('source', SuggestionSource.Both)
+    fixture.componentRef.setInput('fetchedSources', [SuggestionSource.ML])
+    fixture.componentRef.setInput('suggestions', { tags: [1] })
+    fixture.detectChanges()
+    component.clickSuggest()
+    expect(component.getSuggestions.emit).toHaveBeenCalledWith(
+      SuggestionSource.Both
+    )
+    expect(component.dropdown.isOpen()).toBeTruthy()
+  })
+
+  it('should only show source options when AI is enabled', () => {
+    expect(
+      fixture.nativeElement.querySelector('#suggestionSourceML')
+    ).toBeNull()
+    fixture.componentRef.setInput('aiEnabled', true)
+    fixture.detectChanges()
+    fixture.nativeElement
+      .querySelector('button[title="Suggestion options"]')
+      .click()
+    fixture.detectChanges()
+    expect(
+      fixture.nativeElement.querySelector('#suggestionSourceML')
+    ).not.toBeNull()
+  })
+
+  it('should emit source changes and never allow no source', () => {
+    const emitSpy = jest.spyOn(component.sourceChange, 'emit')
+    component.setSources(true, true)
+    expect(emitSpy).toHaveBeenCalledWith(SuggestionSource.Both)
+    component.setSources(true, false)
+    expect(emitSpy).toHaveBeenCalledWith(SuggestionSource.ML)
+    component.setSources(false, true)
+    expect(emitSpy).toHaveBeenCalledWith(SuggestionSource.AI)
+
+    emitSpy.mockClear()
+    component.setSources(false, false)
+    expect(emitSpy).not.toHaveBeenCalled()
+  })
+
+  it('should indicate a non-default source', () => {
+    fixture.componentRef.setInput('aiEnabled', true)
+    fixture.componentRef.setInput('source', SuggestionSource.AI)
+    fixture.componentRef.setInput('defaultSource', SuggestionSource.AI)
+    fixture.detectChanges()
+    expect(fixture.nativeElement.textContent).not.toContain('Not using default')
+
+    fixture.componentRef.setInput('source', SuggestionSource.Both)
+    fixture.detectChanges()
+    expect(fixture.nativeElement.textContent).toContain('Not using default')
   })
 })
