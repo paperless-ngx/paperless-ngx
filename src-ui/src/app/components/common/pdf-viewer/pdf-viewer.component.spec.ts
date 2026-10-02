@@ -90,6 +90,7 @@ describe('PngxPdfViewerComponent', () => {
       withCredentials: true,
       wasmUrl: expect.stringContaining('/paperless/assets/wasm/'),
       iccUrl: expect.stringContaining('/paperless/assets/iccs/'),
+      cMapUrl: expect.stringContaining('/paperless/assets/cmaps/'),
     })
   })
 
