@@ -8,3 +8,6 @@
 pyproject.toml @paperless-ngx/backend
 uv.lock @paperless-ngx/backend
 *.py @paperless-ngx/backend
+
+# Coursework fork owners. Keep this last so local reviewers override upstream teams.
+* @vuong123s @1convitt @elgthinhnguyen @HubertPhung

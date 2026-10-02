@@ -1,3 +1,22 @@
+# Software Testing Coursework - R08 + K01
+
+This fork is used by a four-person QA team for the **Software Testing** course:
+
+- **Repository R08:** `paperless-ngx/paperless-ngx`
+- **Technique K01:** Property-Based Testing with generated inputs, shrinking, and reproducible counterexamples
+- **Project board:** <https://github.com/users/0Yaam/projects/2>
+- **Current work:** <https://github.com/0Yaam/paperless-ngx/issues>
+- **Pinned baseline:** `da3de299f` on branch `dev`
+
+| Member | GitHub | Initial responsibility |
+| --- | --- | --- |
+| Phan Khánh Vương | [@vuong123s](https://github.com/vuong123s) | Environment, architecture, validation/normalization property |
+| Vũ Thế Huỳnh | [@1convitt](https://github.com/1convitt) | K01 theory, criteria, metadata/filtering property |
+| Nguyễn Hưng Thịnh | [@elgthinhnguyen](https://github.com/elgthinhnguyen) | Module survey, generators, parser/file property |
+| Phùng Nguyễn Hoài Bo | [@HubertPhung](https://github.com/HubertPhung) | Evidence, report, reproducibility, CI integration |
+
+See [`docs/software-testing-project.md`](docs/software-testing-project.md) before starting coursework changes. The upstream Paperless-ngx documentation continues below.
+
 [![ci](https://github.com/paperless-ngx/paperless-ngx/workflows/ci/badge.svg)](https://github.com/paperless-ngx/paperless-ngx/actions)
 [![Crowdin](https://badges.crowdin.net/paperless-ngx/localized.svg)](https://crowdin.com/project/paperless-ngx)
 [![Documentation Status](https://img.shields.io/github/deployments/paperless-ngx/paperless-ngx/github-pages?label=docs)](https://docs.paperless-ngx.com)
