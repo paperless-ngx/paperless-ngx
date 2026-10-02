@@ -61,10 +61,13 @@
           <i-bs class="me-2" name="door-open"></i-bs><ng-container i18n>Logout</ng-container>
         </a>
         <div class="dropdown-divider"></div>
+        <!-- Hidden per UI simplification: Documentation link -->
+        <!--
         <a ngbDropdownItem class="nav-link" target="_blank" rel="noopener noreferrer"
           href="https://docs.datakit.app">
           <i-bs class="me-2" name="question-circle"></i-bs><ng-container i18n>Documentation</ng-container>
         </a>
+        -->
       </div>
     </li>
   </ul>
@@ -100,6 +103,8 @@
           </pngx-documents-tree>
         </ul>
 
+        <!-- Saved views (sidebar) — hidden per UI simplification -->
+        <!--
         <div class="nav-group mt-3 mb-1" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }">
           @if (savedViewService.loading) {
             <h6 class="sidebar-heading px-3 text-muted">
@@ -139,6 +144,7 @@
             </ul>
           }
         </div>
+        -->
 
         <div class="nav-group mt-3 mb-1" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
           @if (openDocuments.length > 0) {
@@ -177,6 +183,8 @@
             <span i18n>Manage</span>
           </h6>
           <ul class="nav flex-column mb-2">
+            <!-- Hidden per UI simplification: Correspondents / Tags / Document Types / Storage Paths / Saved Views / Mail -->
+            <!--
             <li class="nav-item app-link"
               *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Correspondent }">
               <a class="nav-link" routerLink="correspondents" routerLinkActive="active" (click)="closeMenu()"
@@ -208,6 +216,7 @@
                 <i-bs class="me-1" name="folder"></i-bs><span>&nbsp;<ng-container i18n>Storage Paths</ng-container></span>
               </a>
             </li>
+            -->
             <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.CustomField }">
               <a class="nav-link" routerLink="customfields" routerLinkActive="active" (click)="closeMenu()"
                 ngbPopover="Custom Fields" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end"
@@ -215,6 +224,7 @@
                 <i-bs class="me-1" name="ui-radios"></i-bs><span>&nbsp;<ng-container i18n>Custom Fields</ng-container></span>
               </a>
             </li>
+            <!--
             <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }">
               <a class="nav-link" routerLink="savedviews" routerLinkActive="active" (click)="closeMenu()"
                 ngbPopover="Saved Views" i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end"
@@ -222,6 +232,7 @@
                 <i-bs class="me-1" name="window-stack"></i-bs><span>&nbsp;<ng-container i18n>Saved Views</ng-container></span>
               </a>
             </li>
+            -->
             <li class="nav-item app-link"
               *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Workflow }"
               tourAnchor="tour.workflows">
@@ -231,6 +242,7 @@
                 <i-bs class="me-1" name="boxes"></i-bs><span>&nbsp;<ng-container i18n>Workflows</ng-container></span>
               </a>
             </li>
+            <!--
             <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.MailAccount }"
               tourAnchor="tour.mail">
               <a class="nav-link" routerLink="mail" routerLinkActive="active" (click)="closeMenu()" ngbPopover="Mail"
@@ -239,6 +251,7 @@
                 <i-bs class="me-1" name="envelope"></i-bs><span>&nbsp;<ng-container i18n>Mail</ng-container></span>
               </a>
             </li>
+            -->
             <li class="nav-item app-link" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Document }">
               <a class="nav-link" routerLink="trash" routerLinkActive="active" (click)="closeMenu()" ngbPopover="Trash"
                 i18n-ngbPopover [disablePopover]="!slimSidebarEnabled" placement="end" container="body"
@@ -299,6 +312,8 @@
                 </a>
               </li>
             }
+            <!-- Hidden per UI simplification: Documentation link -->
+            <!--
             <li class="nav-item mt-2" tourAnchor="tour.outro">
               <a class="px-3 py-2 text-muted small d-flex align-items-center flex-wrap text-decoration-none"
                 target="_blank" rel="noopener noreferrer" href="https://docs.datakit.app" ngbPopover="Documentation"
@@ -307,6 +322,7 @@
                 <i-bs class="d-flex" name="question-circle"></i-bs><span class="ms-1">&nbsp;<ng-container i18n>Documentation</ng-container></span>
               </a>
             </li>
+            -->
             <li class="nav-item" [class.visually-hidden]="slimSidebarEnabled">
               <div class="px-3 py-0 text-muted small d-flex align-items-center flex-wrap">
                 <div class="me-3">
