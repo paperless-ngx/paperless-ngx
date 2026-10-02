@@ -69,7 +69,9 @@ export class ConfigComponent
   public errors = {}
 
   get optionCategories(): string[] {
-    return Object.values(ConfigCategory)
+    // Hidden per UI simplification: General Settings, Barcode Settings
+    const HIDDEN = [ConfigCategory.General, ConfigCategory.Barcode]
+    return Object.values(ConfigCategory).filter((c) => !HIDDEN.includes(c))
   }
 
   getCategoryOptions(category: string): ConfigOption[] {
