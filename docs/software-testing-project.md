@@ -1,48 +1,30 @@
-# Software Testing Project: R08 + K01
+# Kế hoạch kiểm thử R08 + K01
 
-## Scope
+## Phạm vi
 
-The team tests a pinned Paperless-ngx baseline as an independent QA team. The selected technique is K01 Property-Based Testing. Keep the implementation narrow: one or two deterministic modules with rich input domains, at least three explicit properties, automatic input generation, shrinking, and reproducible counterexamples.
+Nhóm kiểm thử một baseline cố định của Paperless-ngx như QA độc lập. Không kiểm thử toàn bộ hệ thống; mỗi thành viên phụ trách một hàm hoặc module xác định, chạy local/CI và không tác động server công khai.
 
-Do not attempt to test the whole repository. Do not target public/demo systems.
+## Năm suite
 
-## Required Deliverables
-
-The course brief requires:
-
-1. System purpose, actors, use cases, module/dependency tree, and data flow.
-2. At least one component/container diagram and explanations of three to five relevant modules.
-3. Reproducible environment, versions, build/run commands, services, seed data, and at least three working business flows.
-4. K01 theory, scope, assumptions, risks, and measurable pass/fail criteria.
-5. A test model describing input, precondition, invariant/oracle, and test data.
-6. Automated tests or a harness with dependencies and one-command execution.
-7. Logs, metrics, defects or anomalous behavior, and root-cause analysis. If no defect is found, provide coverage/score/threshold evidence.
-8. The pinned commit/tag, test configuration, and instructions for reproducing results on a clean machine.
-
-K01 specifically requires at least three properties, generated tests, and saved counterexamples.
-
-## Cycles
-
-| Cycle | Dates | Goal |
+| Suite | Target | Property tối thiểu |
 | --- | --- | --- |
-| 1 | 02/10/2026-09/10/2026 | Onboarding, pinned baseline, architecture, candidate modules, report skeleton |
-| 2 | 10/10/2026-20/10/2026 | Property design, generators, criteria, and midterm package |
-| 3 | 21/10/2026-20/11/2026 | Automation, execution, shrinking, metrics, defects, and analysis |
-| 4 | 21/11/2026-final defense | Reproduction, final report, demo, and peer review |
+| PBT-01 Text normalization | `paperless.parsers.utils.post_process_text` | Idempotence; loại NUL; chuẩn hóa khoảng trắng nhưng giữ ranh giới dòng |
+| PBT-02 Unicode search | `documents.search._query.normalize_search_text` | NFC idempotence; chuỗi Unicode tương đương cho cùng kết quả; input NFC không đổi nghĩa |
+| PBT-03 Path security | `documents.file_handling.validate_path_in_root` | Path trong root hợp lệ; traversal/path ngoài root bị chặn; resolve/symlink không vượt biên |
+| PBT-04 MIME-extension | `documents.parsers` | MIME hỗ trợ có extension; extension không phân biệt hoa thường; registry và supported set nhất quán |
+| PBT-05 Parser selection | `ParserRegistry.get_parser_for_file` | Score cao nhất thắng; external thắng khi hòa; remote bị loại khi `allow_remote=false` |
 
-The official midterm is **20/10/2026**. The final-defense date follows the university schedule.
+Mỗi suite phải có ít nhất 3 property độc lập, strategy có giới hạn, shrinking, seed tái lập và counterexample tối thiểu.
 
-## Team Workflow
+## Review chéo
 
-- Pick an issue from the project board and move it to `In Progress`.
-- Create a short branch from `dev`; do not work directly on `dev`.
-- Keep each pull request focused on one issue and request the reviewer named in that issue.
-- Run the narrowest relevant checks locally before opening the pull request.
-- Attach evidence to the issue or pull request: command, seed, counterexample, log, metric, screenshot, or report section.
-- Squash merge after one approval. Delete the merged branch.
+- Dân và Thịnh review lẫn nhau.
+- Vương review Huỳnh; Huỳnh review Bo; Bo review Vương.
+- Owner không tự merge khi reviewer chưa xác nhận property, bằng chứng chạy và phạm vi.
 
-The repository already includes upstream GitHub Actions for backend, frontend, lint, documentation, Docker, and static analysis. Reuse those workflows. Add a coursework-specific job only if the K01 tests are not covered by the backend workflow.
+## Deliverables theo cycle
 
-## Current Assignment
-
-Each member owns two issues of comparable scope: one analysis/design deliverable and one implementation/integration deliverable. The project board is the source of truth for owner, cycle, size, status, and deliverable.
+1. **Design:** invariant, strategy, precondition, oracle, giới hạn input và pass/fail.
+2. **Implementation:** Hypothesis tests, dependency, lệnh chạy độc lập và CI.
+3. **Evidence:** log, metrics, seed, minimized counterexample, defect/coverage và RCA.
+4. **Final:** báo cáo theo Phần A-H, demo máy sạch và peer-review evidence.
