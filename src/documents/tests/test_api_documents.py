@@ -463,6 +463,11 @@ class TestDocumentApi(DirectoriesMixin, DocumentConsumeDelayMixin, APITestCase):
             json=mock.ANY,
             stream=True,
         )
+        upstream_payload = mock_client.post.call_args.kwargs["json"]
+        self.assertEqual(upstream_payload["thinking"], {"type": "disabled"})
+        self.assertEqual(
+            upstream_payload["extra_body"], {"enable_thinking": False}
+        )
 
     def test_doc_read_requires_permissions(self):
         owner = User.objects.create_user(username="owner")

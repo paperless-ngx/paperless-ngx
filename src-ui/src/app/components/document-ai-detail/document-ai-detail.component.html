@@ -131,7 +131,14 @@
                       }
                     </div>
                     <div class="docread-message__content">
-                      {{ message.content }}
+                      @if (message.role === 'assistant') {
+                        <div
+                          class="docread-markdown"
+                          [innerHTML]="message.content | markdown"
+                        ></div>
+                      } @else {
+                        {{ message.content }}
+                      }
                     </div>
                     @if (message.streaming) {
                       <div class="docread-message__status">

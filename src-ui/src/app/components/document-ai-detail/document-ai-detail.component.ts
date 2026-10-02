@@ -67,6 +67,7 @@ import { IfPermissionsDirective } from 'src/app/directives/if-permissions.direct
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
 import { FileSizePipe } from 'src/app/pipes/file-size.pipe'
+import { MarkdownPipe } from 'src/app/pipes/markdown.pipe'
 import { SafeUrlPipe } from 'src/app/pipes/safeurl.pipe'
 import { ComponentRouterService } from 'src/app/services/component-router.service'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
@@ -186,6 +187,7 @@ interface DocReadMessage {
     CustomDatePipe,
     FileSizePipe,
     IfPermissionsDirective,
+    MarkdownPipe,
     AsyncPipe,
     FormsModule,
     ReactiveFormsModule,

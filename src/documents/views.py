@@ -1132,6 +1132,17 @@ class DocumentViewSet(
             "stream": True,
         }
         payload.update(self._prepare_model_params(ai_model))
+        # Force-disable upstream "thinking" / "reasoning" so the model
+        # does not emit <think>...</think> blocks that would leak into
+        # the streamed answer. We send both the Anthropic-style and the
+        # Qwen/DashScope-style switches — providers ignore the one they
+        # don't understand.
+        payload.update(
+            {
+                "thinking": {"type": "disabled"},
+                "extra_body": {"enable_thinking": False},
+            }
+        )
         headers = self._build_ai_headers(ai_model)
         url = f"{ai_model.api_domain.rstrip('/')}/chat/completions"
 
