@@ -1,140 +1,82 @@
-<pngx-widget-frame title="Statistics" [loading]="loading" i18n-title>
+<pngx-widget-frame title="" [loading]="loading" [cardless]="true">
   <ng-container content>
-    <div class="list-group border-light placeholder-glow">
-      @if (loading) {
-        <div class="list-group-item d-flex">
-          <div class="placeholder w-50"></div>
-          <span class="placeholder badge rounded-pill ms-auto" style="width: 25px;">&nbsp;</span>
-        </div>
-        <div class="list-group-item d-flex">
-          <div class="placeholder w-25"></div>
-          <span class="placeholder badge rounded-pill ms-auto" style="width: 25px;">&nbsp;</span>
-        </div>
-        <div class="list-group-item d-flex">
-          <div class="placeholder w-25"></div>
-          <span class="placeholder badge rounded-pill ms-auto" style="width: 25px;">&nbsp;</span>
-        </div>
-        <div class="list-group-item d-flex">
-          <div class="placeholder w-25"></div>
-          <span class="placeholder badge rounded-pill ms-auto" style="width: 25px;">&nbsp;</span>
-        </div>
-        <div class="list-group-item filetypes">
-          <div class="placeholder w-100 d-block mb-2"></div>
-          <div class="placeholder w-100 d-block mb-2"></div>
-          <div class="placeholder w-100 d-block"></div>
-        </div>
-      } @else {
-        @if (statistics?.documents_inbox !== null) {
-          <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" title="Go to inbox" i18n-title href="javascript:void(0)" (click)="goToInbox()">
-            <ng-container i18n>Documents in inbox</ng-container>:
-            <span class="badge rounded-pill" [class.bg-primary]="statistics?.documents_inbox > 0" [class.bg-muted]="statistics?.documents_inbox === 0">{{statistics?.documents_inbox}}</span>
-          </a>
-        }
-        <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" title="Go to documents" i18n-title routerLink="/documents/">
-          <ng-container i18n>Total documents</ng-container>:
-          <span class="badge bg-primary rounded-pill">{{statistics?.documents_total}}</span>
-        </a>
-        <div class="list-group-item d-flex justify-content-between align-items-center" routerLink="/documents/">
-          <ng-container i18n>Total characters</ng-container>:
-          <span class="badge bg-secondary text-light rounded-pill">{{statistics?.character_count | number}}</span>
-        </div>
-        @if (statistics?.current_asn) {
-          <div class="list-group-item d-flex justify-content-between align-items-center" routerLink="/documents/">
-            <ng-container i18n>Current ASN</ng-container>:
-            <span class="badge bg-secondary text-light rounded-pill">{{statistics?.current_asn}}</span>
+    @if (loading) {
+      <div class="placeholder-glow">
+        <div class="placeholder w-100 mb-3" style="height: 120px;"></div>
+        <div class="placeholder w-100" style="height: 180px;"></div>
+      </div>
+    } @else {
+      <!-- Hero KPI: Total Documents (big & visually rich) -->
+      <div class="kpi-hero mb-3">
+        <div class="kpi-hero-glow"></div>
+        <div class="kpi-hero-grid"></div>
+        <div class="kpi-hero-content">
+          <div class="kpi-hero-icon">
+            <i-bs name="files"></i-bs>
           </div>
-        }
-      }
-      @if (statistics?.document_file_type_counts?.length > 1) {
-        <div class="list-group-item filetypes">
-          <div class="d-flex justify-content-between align-items-center my-2">
-            <div class="progress flex-grow-1">
-              @for (filetype of statistics?.document_file_type_counts; track filetype; let i = $index; let last = $last) {
-                <div
-                  class="progress-bar bg-primary"
-                  role="progressbar"
-                  [ngbPopover]="getFileTypeName(filetype)"
-                  i18n-ngbPopover
-                  triggers="mouseenter:mouseleave"
-                  (click)="filterByFileType(filetype)"
-                  [attr.aria-label]="getFileTypeName(filetype)"
-                  [class.me-1px]="!last"
-                  [style.width]="getFileTypePercent(filetype) + '%'"
-                  [style.opacity]="getItemOpacity(i)"
-                  [attr.aria-valuenow]="getFileTypePercent(filetype)"
-                  aria-valuemin="0"
-                  aria-valuemax="100">
-                </div>
-              }
+          <div class="kpi-hero-body">
+            <div class="kpi-hero-label" i18n>Total Documents</div>
+            <div class="kpi-hero-value">{{ statistics?.documents_total ?? 0 | number }}</div>
+            <div class="kpi-hero-sub">
+              <i-bs name="type"></i-bs>
+              <span>{{ statistics?.character_count ?? 0 | number }}</span>
+              <span class="ms-1" i18n>characters indexed</span>
             </div>
           </div>
-          <div class="d-flex flex-wrap align-items-start">
-            @for (filetype of statistics?.document_file_type_counts; track filetype; let i = $index) {
-              <div class="d-flex">
-                <div class="text-nowrap me-2" [class.cursor-pointer]="!filetype.is_other" (click)="filterByFileType(filetype)">
-                  <span class="badge rounded-pill bg-primary d-inline-block p-0 me-1" [style.opacity]="getItemOpacity(i)"></span>
-                  <small class="text-nowrap"><span class="fw-bold">{{ getFileTypeExtension(filetype) }}</span>&nbsp;<span class="text-muted">({{getFileTypePercent(filetype) | number: '1.0-1'}}%)</span></small>
-                </div>
-              </div>
-            }
+        </div>
+      </div>
+
+      <!-- File Type Distribution (Donut Chart) -->
+      @if (statistics?.document_file_type_counts?.length > 1) {
+        <div class="card-section">
+          <h6 class="section-title" i18n>File Type Distribution</h6>
+          <div class="donut-wrapper">
+            <svg class="donut-svg" viewBox="0 0 42 42" width="100%" height="180">
+              <circle class="donut-ring" cx="21" cy="21" r="15.915" fill="transparent"
+                stroke="var(--pngx-bg-alt2)" stroke-width="6"></circle>
+              @for (seg of donutSegments(); track seg.mime_type; let i = $index) {
+                <circle
+                  class="donut-segment"
+                  cx="21" cy="21" r="15.915"
+                  fill="transparent"
+                  [attr.stroke]="seg.color"
+                  stroke-width="6"
+                  [attr.stroke-dasharray]="seg.dasharray"
+                  [attr.stroke-dashoffset]="seg.offset"
+                  (click)="filterByFileType(seg.filetype)"
+                  [style.cursor]="seg.filetype.is_other ? 'default' : 'pointer'"
+                  (mouseenter)="hoveredIdx = i"
+                  (mouseleave)="hoveredIdx = -1"
+                  [attr.opacity]="hoveredIdx === -1 || hoveredIdx === i ? 1 : 0.4">
+                  <title>{{ seg.name }}: {{ seg.filetype.mime_type_count }}</title>
+                </circle>
+              }
+              <text x="21" y="20" text-anchor="middle" class="donut-center-num">
+                {{ statistics?.documents_total | number }}
+              </text>
+              <text x="21" y="25" text-anchor="middle" class="donut-center-label" i18n>
+                Documents
+              </text>
+            </svg>
+
+            <ul class="donut-legend">
+              @for (seg of donutSegments(); track seg.mime_type; let i = $index) {
+                <li
+                  class="donut-legend-item"
+                  [class.clickable]="!seg.filetype.is_other"
+                  (click)="filterByFileType(seg.filetype)"
+                  (mouseenter)="hoveredIdx = i"
+                  (mouseleave)="hoveredIdx = -1">
+                  <span class="legend-swatch" [style.background]="seg.color"></span>
+                  <span class="legend-label">{{ seg.name }}</span>
+                  <span class="legend-value">{{ seg.filetype.mime_type_count | number }}</span>
+                  <span class="legend-pct">({{ seg.percent | number:'1.0-1' }}%)</span>
+                </li>
+              }
+            </ul>
           </div>
         </div>
       }
-    </div>
-
-    <div class="list-group border-light mt-3">
-      <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Tag }">
-        @if (loading) {
-          <div class="placeholder-glow list-group-item">
-            <span class="placeholder w-100"></span>
-          </div>
-        }
-        @if (statistics?.tag_count > 0) {
-          <a class="list-group-item d-flex justify-content-between align-items-center" routerLink="/tags/">
-            <ng-container i18n>Tags</ng-container>:
-            <span class="badge bg-secondary text-light rounded-pill">{{statistics?.tag_count | number}}</span>
-          </a>
-        }
-      </ng-container>
-      <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Correspondent }">
-        @if (loading) {
-          <div class="placeholder-glow list-group-item">
-            <span class="placeholder w-100"></span>
-          </div>
-        }
-        @if (statistics?.correspondent_count > 0) {
-          <a class="list-group-item d-flex justify-content-between align-items-center" routerLink="/correspondents/">
-            <ng-container i18n>Correspondents</ng-container>:
-            <span class="badge bg-secondary text-light rounded-pill">{{statistics?.correspondent_count | number}}</span>
-          </a>
-        }
-      </ng-container>
-      <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.DocumentType }">
-        @if (loading) {
-          <div class="placeholder-glow list-group-item">
-            <span class="placeholder w-100"></span>
-          </div>
-        }
-        @if (statistics?.document_type_count > 0) {
-          <a class="list-group-item d-flex justify-content-between align-items-center" routerLink="/documenttypes/">
-            <ng-container i18n>Document Types</ng-container>:
-            <span class="badge bg-secondary text-light rounded-pill">{{statistics?.document_type_count | number}}</span>
-          </a>
-        }
-      </ng-container>
-      <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.StoragePath }">
-        @if (loading) {
-          <div class="placeholder-glow list-group-item">
-            <span class="placeholder w-100"></span>
-          </div>
-        }
-        @if (statistics?.storage_path_count > 0) {
-          <a class="list-group-item d-flex justify-content-between align-items-center" routerLink="/storagepaths/">
-            <ng-container i18n>Storage Paths</ng-container>:
-            <span class="badge bg-secondary text-light rounded-pill">{{statistics?.storage_path_count | number}}</span>
-          </a>
-        }
-      </ng-container>
-    </div>
+    }
   </ng-container>
 </pngx-widget-frame>

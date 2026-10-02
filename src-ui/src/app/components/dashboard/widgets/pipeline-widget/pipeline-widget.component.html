@@ -1,0 +1,174 @@
+<div class="pipeline-card shadow-sm">
+  <div class="pipeline-header">
+    <h5 class="pipeline-title">
+      <i-bs name="diagram-3-fill"></i-bs>
+      <span i18n>Multi-source Heterogeneous Data Processing</span>
+    </h5>
+    <p class="pipeline-subtitle" i18n>
+      Ingest documents in any format — text, image, video, audio — and DataKit extracts, classifies and indexes them through one unified AI workflow.
+    </p>
+  </div>
+
+  <div class="pipeline-body">
+    <!-- ====== INPUTS (left) ====== -->
+    <div class="pipeline-col inputs-col">
+      <div class="col-label">
+          <i-bs name="cloud-arrow-up-fill"></i-bs>
+          <span i18n>Sources</span>
+        </div>
+      <div class="input-list">
+        @for (type of inputTypes; track type.label) {
+          <button
+            type="button"
+            class="input-chip input-{{ type.tone }}"
+            [attr.title]="type.hint"
+            (click)="openType(type)">
+            <i-bs [name]="type.icon"></i-bs>
+            <span class="chip-label">{{ type.label }}</span>
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- ====== FLOW CONNECTOR (center) ====== -->
+    <div class="pipeline-col flow-col">
+      <svg viewBox="0 0 80 240" preserveAspectRatio="none" class="flow-svg" aria-hidden="true">
+        <defs>
+          <linearGradient id="pipe-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#8AB4F8" stop-opacity="0.4"/>
+            <stop offset="50%" stop-color="#4285F4" stop-opacity="0.9"/>
+            <stop offset="100%" stop-color="#174EA6" stop-opacity="0.6"/>
+          </linearGradient>
+        </defs>
+        <!-- 7 input lines merging to 1 -->
+        <g fill="none" stroke="url(#pipe-grad)" stroke-width="2" stroke-linecap="round">
+          <path d="M 0 12 C 30 12, 50 120, 80 100" />
+          <path d="M 0 44 C 30 44, 50 120, 80 105" />
+          <path d="M 0 76 C 30 76, 50 120, 80 110" />
+          <path d="M 0 108 C 30 108, 50 120, 80 115" />
+          <path d="M 0 140 C 30 140, 50 120, 80 120" />
+          <path d="M 0 172 C 30 172, 50 120, 80 125" />
+          <path d="M 0 204 C 30 204, 50 120, 80 130" />
+        </g>
+        <!-- 1 output line -->
+        <path d="M 80 120 C 65 120, 50 120, 50 120" stroke="url(#pipe-grad)" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <!-- arrows -->
+        <g fill="#174EA6">
+          <polygon points="80,100 76,96 76,103" />
+          <polygon points="80,105 76,101 76,108" />
+          <polygon points="80,110 76,106 76,113" />
+          <polygon points="80,115 76,111 76,118" />
+          <polygon points="80,120 76,116 76,123" />
+          <polygon points="80,125 76,121 76,128" />
+          <polygon points="80,130 76,126 76,133" />
+        </g>
+        <!-- output arrow -->
+        <polygon points="50,120 80,124 80,116" fill="#174EA6"/>
+      </svg>
+    </div>
+
+    <!-- ====== ENGINE (center) ====== -->
+    <div class="pipeline-col engine-col">
+      <div class="engine-card">
+        <div class="engine-header">
+          <i-bs name="cpu-fill"></i-bs>
+          <div>
+            <div class="engine-title" i18n>AI Engine</div>
+            <div class="engine-sub" i18n>Unified pipeline</div>
+          </div>
+        </div>
+        <ul class="stage-list">
+          @for (stage of pipelineStages; track stage.label; let i = $index) {
+            <li class="stage-item" [style.animation-delay]="(i * 120) + 'ms'">
+              <span class="stage-num">{{ i + 1 }}</span>
+              <span class="stage-icon"><i-bs [name]="stage.icon"></i-bs></span>
+              <span class="stage-label">{{ stage.label }}</span>
+            </li>
+          }
+        </ul>
+      </div>
+    </div>
+
+    <!-- ====== FLOW CONNECTOR (right) ====== -->
+    <div class="pipeline-col flow-col">
+      <svg viewBox="0 0 80 240" preserveAspectRatio="none" class="flow-svg" aria-hidden="true">
+        <defs>
+          <linearGradient id="pipe-grad-out" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#34A853" stop-opacity="0.6"/>
+            <stop offset="100%" stop-color="#1E8E3E" stop-opacity="0.9"/>
+          </linearGradient>
+        </defs>
+        <g fill="none" stroke="url(#pipe-grad-out)" stroke-width="3" stroke-linecap="round">
+          <path d="M 0 120 C 25 120, 50 60, 80 60" />
+          <path d="M 0 120 C 25 120, 50 100, 80 100" />
+          <path d="M 0 120 C 25 120, 50 140, 80 140" />
+          <path d="M 0 120 C 25 120, 50 180, 80 180" />
+        </g>
+        <g fill="#1E8E3E">
+          <polygon points="80,60 76,56 76,63" />
+          <polygon points="80,100 76,96 76,103" />
+          <polygon points="80,140 76,136 76,143" />
+          <polygon points="80,180 76,176 76,183" />
+        </g>
+      </svg>
+    </div>
+
+    <!-- ====== OUTPUTS (right) ====== -->
+    <div class="pipeline-col outputs-col">
+      <div class="col-label">
+          <i-bs name="database-check"></i-bs>
+          <span i18n>Indexed</span>
+        </div>
+      <div class="output-list">
+        <div class="output-chip output-doc">
+          <i-bs name="file-earmark-text-fill"></i-bs>
+          <div>
+            <div class="output-title" i18n>Searchable</div>
+            <div class="output-sub" i18n>Full-text + OCR</div>
+          </div>
+        </div>
+        <div class="output-chip output-tag">
+          <i-bs name="tags-fill"></i-bs>
+          <div>
+            <div class="output-title" i18n>Tagged</div>
+            <div class="output-sub" i18n>LLM auto-tags</div>
+          </div>
+        </div>
+        <div class="output-chip output-class">
+          <i-bs name="diagram-3-fill"></i-bs>
+          <div>
+            <div class="output-title" i18n>Classified</div>
+            <div class="output-sub" i18n>Correspondent & type</div>
+          </div>
+        </div>
+        <div class="output-chip output-vector">
+          <i-bs name="search"></i-bs>
+          <div>
+            <div class="output-title" i18n>Semantic</div>
+            <div class="output-sub" i18n>Vector index</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer stats band — fills remaining vertical space -->
+  <div class="pipeline-footer">
+    <div class="footer-stat">
+      <div class="footer-stat-num color-blue">{{ supportedFormats }}</div>
+      <div class="footer-stat-label" i18n>Formats</div>
+    </div>
+    <div class="footer-stat">
+      <div class="footer-stat-num color-green">5</div>
+      <div class="footer-stat-label" i18n>Pipeline stages</div>
+    </div>
+    <div class="footer-stat">
+      <div class="footer-stat-num color-purple">1</div>
+      <div class="footer-stat-label" i18n>Unified engine</div>
+    </div>
+    <div class="footer-stat">
+      <div class="footer-stat-num color-orange">∞</div>
+      <div class="footer-stat-label" i18n>Extensible</div>
+    </div>
+  </div>
+</div>

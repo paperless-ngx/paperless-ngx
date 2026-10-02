@@ -1,32 +1,30 @@
-<pngx-page-header title="Dashboard" [subTitle]="subtitle" i18n-title tourAnchor="tour.dashboard">
-  <pngx-logo extra_classes="d-none d-md-block mt-n2" height="3.5rem"></pngx-logo>
-</pngx-page-header>
-
 <div class="row">
+  <div class="col-12 mb-4">
+    <div class="unified-card shadow-sm">
+      <div class="unified-grid">
+
+        <!-- Multi-source heterogeneous data processing pipeline -->
+        <div class="unified-pane pipeline-pane">
+          <pngx-pipeline-widget></pngx-pipeline-widget>
+        </div>
+
+        <div class="unified-divider d-none d-lg-block" aria-hidden="true"></div>
+
+        <!-- Insights: Total Documents + File Type Distribution -->
+        <div class="unified-pane stats-pane">
+          <pngx-statistics-widget *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.UISettings }"></pngx-statistics-widget>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
   <div class="col-12 col-lg-8 col-xl-9 mb-4">
     <div class="row row-cols-1 g-4"
       cdkDropList
       [cdkDropListDisabled]="settingsService.globalDropzoneActive"
       (cdkDropListDropped)="onDrop($event)"
       >
-      @if (savedViewService.loading) {
-        <div class="col">
-          <div class="card shadow-sm bg-light">
-            <div class="card-header">
-              <div class="d-flex justify-content-between align-items-center">
-                <div class="d-flex">
-                  <div class="ms-n2 me-1">
-                    <i-bs name="grip-vertical"></i-bs>
-                  </div>
-                  <h6 class="card-title mb-0"></h6>
-                </div>
-              </div>
-            </div>
-            <div class="card-body">&nbsp;</div>
-          </div>
-        </div>
-      }
-
       @if (settingsService.offerTour()) {
         <div class="col">
           <pngx-welcome-widget (dismiss)="completeTour()"></pngx-welcome-widget>
@@ -34,6 +32,8 @@
       }
 
       <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }">
+        <!-- Hidden per UI simplification: empty-state hint -->
+        <!--
         @if (!settingsService.offerTour() && savedViewService.allViews.length === 0) {
           <div class="col">
             <div class="card shadow-sm bg-light opacity-50">
@@ -45,6 +45,7 @@
             </div>
           </div>
         }
+        -->
         @for (v of dashboardViews; track v.id) {
           <div class="col">
             <pngx-saved-view-widget
@@ -56,12 +57,6 @@
           </div>
         }
       </ng-container>
-    </div>
-  </div>
-  <div class="col-12 col-lg-4 col-xl-3 col-sidebar">
-    <div class="row row-cols-1 g-4 mb-4 sticky-lg-top z-0">
-      <pngx-upload-file-widget></pngx-upload-file-widget>
-      <pngx-statistics-widget *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.UISettings }"></pngx-statistics-widget>
     </div>
   </div>
 </div>

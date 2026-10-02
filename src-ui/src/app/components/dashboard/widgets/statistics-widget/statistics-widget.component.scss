@@ -1,10 +1,225 @@
-.filetypes {
-    .progress {
-        height: 0.6rem;
+/* ============================================================================
+   Statistics widget — DataKit Insights
+   Hero KPI card + SVG donut chart
+   ============================================================================ */
+
+/* ----- Hero KPI (Total Documents) ----- */
+.kpi-hero {
+  position: relative;
+  border-radius: 0.875rem;
+  padding: 1.25rem 1.25rem 1.125rem;
+  background: linear-gradient(135deg, #4285F4 0%, #1A73E8 50%, #174EA6 100%);
+  color: #fff;
+  box-shadow: 0 4px 20px rgba(23, 78, 166, 0.22);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* soft radial glow in the corner */
+.kpi-hero-glow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(255, 255, 255, 0.22), transparent 55%),
+    radial-gradient(circle at 0% 100%, rgba(0, 0, 0, 0.15), transparent 55%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* subtle dot grid overlay */
+.kpi-hero-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.12) 1px, transparent 0);
+  background-size: 14px 14px;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.4), transparent 80%);
+  -webkit-mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.4), transparent 80%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.kpi-hero-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.kpi-hero-icon {
+  flex: 0 0 auto;
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.65rem;
+  line-height: 1;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+.kpi-hero-body {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.kpi-hero-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.85;
+}
+
+.kpi-hero-value {
+  font-size: 2.5rem;
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  font-feature-settings: "tnum";
+  margin-top: 0.25rem;
+  background: linear-gradient(180deg, #ffffff 0%, #E8F0FE 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
+}
+
+.kpi-hero-sub {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  opacity: 0.8;
+  margin-top: 0.5rem;
+
+  i-bs {
+    font-size: 0.85em;
+    line-height: 1;
+  }
+}
+
+/* ----- Section card ----- */
+.card-section {
+  background: var(--pngx-bg-alt);
+  border-radius: 0.75rem;
+  padding: 1rem;
+
+  .section-title {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--bs-secondary-color);
+  }
+}
+
+/* ----- Donut chart + legend ----- */
+.donut-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.donut-svg {
+  display: block;
+  margin: 0 auto;
+  max-width: 220px;
+
+  .donut-segment {
+    transition: opacity 0.2s ease, stroke-width 0.2s ease;
+    transform-origin: center;
+    transform-box: fill-box;
+  }
+
+  .donut-center-num {
+    fill: var(--bs-body-color);
+    font-size: 5px;
+    font-weight: 700;
+    letter-spacing: -0.05px;
+  }
+
+  .donut-center-label {
+    fill: var(--bs-secondary-color);
+    font-size: 2.2px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.2px;
+  }
+}
+
+.donut-legend {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+
+  .donut-legend-item {
+    display: grid;
+    grid-template-columns: 14px 1fr auto auto;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.375rem;
+    border-radius: 0.375rem;
+    font-size: 0.8rem;
+    transition: background-color 0.15s ease;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.03);
     }
 
-    .badge {
-        height: 0.6rem;
-        width: 0.6rem;
+    &.clickable {
+      cursor: pointer;
     }
+
+    .legend-swatch {
+      width: 0.75rem;
+      height: 0.75rem;
+      border-radius: 2px;
+      display: inline-block;
+    }
+
+    .legend-label {
+      font-weight: 500;
+      color: var(--bs-body-color);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .legend-value {
+      font-variant-numeric: tabular-nums;
+      color: var(--bs-body-color);
+      font-weight: 600;
+    }
+
+    .legend-pct {
+      font-size: 0.7rem;
+      color: var(--bs-secondary-color);
+      font-variant-numeric: tabular-nums;
+      min-width: 3.5rem;
+      text-align: right;
+    }
+  }
+}
+
+/* ----- Dark mode polish ----- */
+:host-context([data-bs-theme='dark']) {
+  .kpi-hero {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  }
+
+  .card-section {
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  .donut-legend-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+  }
 }

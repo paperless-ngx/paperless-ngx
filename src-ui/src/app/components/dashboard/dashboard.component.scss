@@ -1,3 +1,79 @@
-.col-sidebar .row {
-    top: 3.5rem;
+/* ============================================================================
+   Unified dashboard card — Pipeline (left) + Insights (right)
+   ============================================================================ */
+
+.unified-card {
+  background: var(--bs-body-bg);
+  border: 1px solid var(--bs-border-color);
+  border-radius: 0.875rem;
+  padding: 1.25rem 1.5rem;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+
+  // Soft blue tint glow at the top
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 25% 0%, rgba(66, 133, 244, 0.06), transparent 55%),
+      radial-gradient(ellipse at 75% 100%, rgba(52, 168, 83, 0.04), transparent 55%);
+    pointer-events: none;
+    z-index: 0;
+  }
+}
+
+.unified-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) 1px minmax(0, 1fr);
+  gap: 0;
+  align-items: stretch;
+  min-height: 380px;
+}
+
+.unified-pane {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+.pipeline-pane {
+  padding-right: 1.5rem;
+}
+
+.stats-pane {
+  padding-left: 1.5rem;
+}
+
+.unified-divider {
+  background: var(--bs-border-color);
+  align-self: stretch;
+  opacity: 0.6;
+}
+
+/* Stack on narrow screens */
+@media (max-width: 991.98px) {
+  .unified-grid {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
+  .unified-divider {
+    display: none;
+  }
+
+  .pipeline-pane,
+  .stats-pane {
+    padding: 0;
+  }
+
+  .pipeline-pane {
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--bs-border-color);
+    margin-bottom: 1.25rem;
+  }
 }

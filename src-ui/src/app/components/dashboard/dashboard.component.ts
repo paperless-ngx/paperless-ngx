@@ -14,22 +14,19 @@ import { IfPermissionsDirective } from 'src/app/directives/if-permissions.direct
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
-import { environment } from 'src/environments/environment'
-import { LogoComponent } from '../common/logo/logo.component'
-import { PageHeaderComponent } from '../common/page-header/page-header.component'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
 import { SavedViewWidgetComponent } from './widgets/saved-view-widget/saved-view-widget.component'
 import { StatisticsWidgetComponent } from './widgets/statistics-widget/statistics-widget.component'
 import { UploadFileWidgetComponent } from './widgets/upload-file-widget/upload-file-widget.component'
 import { WelcomeWidgetComponent } from './widgets/welcome-widget/welcome-widget.component'
+import { PipelineWidgetComponent } from './widgets/pipeline-widget/pipeline-widget.component'
 
 @Component({
   selector: 'pngx-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
   imports: [
-    LogoComponent,
-    PageHeaderComponent,
+    PipelineWidgetComponent,
     SavedViewWidgetComponent,
     StatisticsWidgetComponent,
     UploadFileWidgetComponent,
@@ -57,11 +54,8 @@ export class DashboardComponent extends ComponentWithPermissions {
   }
 
   get subtitle() {
-    if (this.settingsService.displayName) {
-      return $localize`Hello ${this.settingsService.displayName}, welcome to ${environment.appTitle}`
-    } else {
-      return $localize`Welcome to ${environment.appTitle}`
-    }
+    // Hidden per UI simplification
+    return ''
   }
 
   completeTour() {
