@@ -1556,20 +1556,18 @@ export class WorkflowEditDialogComponent
   }
 
   save(): void {
-    this.objectForm
-      .get('actions')
-      .value.forEach((action: any, i) => {
-        if (action.type !== WorkflowActionType.Webhook) {
-          action.webhook = null
-        }
-        if (action.type !== WorkflowActionType.Email) {
-          action.email = null
-        }
-        action.passwords = this.parsePasswords(action.passwords as any)
-        // The combined ai_suggestion_targets control is split back into the
-        // two API fields inside getFormValues() (on the payload copy), so a
-        // failed save here never corrupts the live form.
-      })
+    this.objectForm.get('actions').value.forEach((action: any, i) => {
+      if (action.type !== WorkflowActionType.Webhook) {
+        action.webhook = null
+      }
+      if (action.type !== WorkflowActionType.Email) {
+        action.email = null
+      }
+      action.passwords = this.parsePasswords(action.passwords as any)
+      // The combined ai_suggestion_targets control is split back into the
+      // two API fields inside getFormValues() (on the payload copy), so a
+      // failed save here never corrupts the live form.
+    })
     super.save()
   }
 

@@ -5,7 +5,6 @@ from django.db import models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("documents", "0026_alter_document_archive_checksum_and_more"),
     ]
@@ -14,6 +13,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="customfield",
             name="description",
-            field=models.TextField(blank=True, help_text="What this field contains. Used by the AI to suggest values for this field; falls back to the field name when empty.", null=True, verbose_name="description"),
+            field=models.TextField(
+                blank=True,
+                help_text="What this field contains. Used by the AI to suggest values for this field; falls back to the field name when empty.",
+                null=True,
+                verbose_name="description",
+            ),
         ),
     ]

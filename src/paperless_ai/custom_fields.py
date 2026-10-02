@@ -20,7 +20,7 @@ TRUE_LITERALS: Final[frozenset[str]] = frozenset(
     {"true", "yes", "1", "ja", "oui", "sí", "si", "wahr", "sì"},
 )
 FALSE_LITERALS: Final[frozenset[str]] = frozenset(
-    {"false", "no", "0", "nein", "non", "falsch", "falso"},
+    {"false", "no", "0", "nein", "non", "falsch", "false"},
 )
 
 
@@ -60,8 +60,7 @@ def get_custom_field_prompt_data() -> list[CustomFieldPromptData]:
                 [
                     option["label"]
                     for option in (
-                        (field.extra_data or {}).get("select_options", [])
-                        or []
+                        (field.extra_data or {}).get("select_options", []) or []
                     )
                 ]
                 if field.data_type == CustomField.FieldDataType.SELECT
@@ -160,9 +159,7 @@ def _coerce(
 
     if data_type == CustomField.FieldDataType.SELECT:
         options = (field.extra_data or {}).get("select_options", []) or []
-        labels = [
-            (option.get("label") or "").strip() for option in options
-        ]
+        labels = [(option.get("label") or "").strip() for option in options]
         if value in labels:
             return value
         # Tolerate case/whitespace differences against the allowed options.

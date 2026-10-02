@@ -323,13 +323,16 @@ def test_get_ai_document_classification_returns_coerced_custom_fields(db):
         },
     )
 
-    with patch(
-        "paperless_ai.ai_classifier.get_taxonomy_context",
-        return_value=(empty_taxonomy_candidates(), ""),
-    ), patch(
-        "paperless_ai.client.AIClient.run_llm_query",
-        return_value=flat_response,
-    ) as mock_llm:
+    with (
+        patch(
+            "paperless_ai.ai_classifier.get_taxonomy_context",
+            return_value=(empty_taxonomy_candidates(), ""),
+        ),
+        patch(
+            "paperless_ai.client.AIClient.run_llm_query",
+            return_value=flat_response,
+        ) as mock_llm,
+    ):
         result = get_ai_document_classification(mock_document)
 
     prompt = mock_llm.call_args.args[0]

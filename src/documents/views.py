@@ -1760,9 +1760,7 @@ class DocumentViewSet(
 
         # Resolve suggested custom field names against the live field
         # definitions; ids the model invented for unknown fields are dropped.
-        fields_by_id = {
-            field.pk: field for field in get_ai_suggestable_custom_fields()
-        }
+        fields_by_id = {field.pk: field for field in get_ai_suggestable_custom_fields()}
 
         resp_data = {
             "title": llm_suggestions["title"],

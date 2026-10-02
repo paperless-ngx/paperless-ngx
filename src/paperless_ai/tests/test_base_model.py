@@ -44,7 +44,7 @@ def test_document_classifier_schema_declared_defaults():
         "storage_path_ids": [],
         "dates": [],
         "custom_fields": {},
-        }
+    }
 
 
 def test_model_response_converts_names_to_internal_taxonomy_choices():
@@ -170,8 +170,7 @@ def test_document_classifier_schema_json_schema_is_self_contained():
     assert "$defs" not in schema
     assert "$ref" not in json.dumps(schema)
     assert all(
-        field_schema.get("type") != "object"
-        or "properties" not in field_schema
+        field_schema.get("type") != "object" or "properties" not in field_schema
         for field_schema in schema["properties"].values()
     )
 

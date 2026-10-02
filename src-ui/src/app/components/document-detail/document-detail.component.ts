@@ -1079,10 +1079,13 @@ export class DocumentDetailComponent
 
   get appliedCustomFieldValues(): Record<number, any> {
     const doc = this.document()
-    return (doc?.custom_fields ?? []).reduce((acc, instance) => {
-      acc[instance.field] = instance.value
-      return acc
-    }, {} as Record<number, any>)
+    return (doc?.custom_fields ?? []).reduce(
+      (acc, instance) => {
+        acc[instance.field] = instance.value
+        return acc
+      },
+      {} as Record<number, any>
+    )
   }
 
   applyCustomFieldSuggestion(suggestion: { id: number; value: any }): void {

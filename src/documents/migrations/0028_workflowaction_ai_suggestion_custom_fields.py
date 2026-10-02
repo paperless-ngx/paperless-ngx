@@ -5,7 +5,6 @@ from django.db import models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("documents", "0027_customfield_description"),
     ]
@@ -14,6 +13,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="workflowaction",
             name="ai_suggestion_custom_fields",
-            field=models.JSONField(blank=True, help_text="Which custom fields to apply AI-suggested values to (list of custom field IDs).", null=True, verbose_name="AI suggestion custom fields"),
+            field=models.JSONField(
+                blank=True,
+                help_text="Which custom fields to apply AI-suggested values to (list of custom field IDs).",
+                null=True,
+                verbose_name="AI suggestion custom fields",
+            ),
         ),
     ]

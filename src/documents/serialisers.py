@@ -3374,12 +3374,9 @@ class WorkflowActionSerializer(serializers.ModelSerializer[WorkflowAction]):
         ):
             fields = attrs.get("ai_suggestion_fields")
             valid_fields = set(WorkflowAction.AISuggestionField.values)
-            if (
-                fields is not None
-                and (
-                    not isinstance(fields, list)
-                    or any(field not in valid_fields for field in fields)
-                )
+            if fields is not None and (
+                not isinstance(fields, list)
+                or any(field not in valid_fields for field in fields)
             ):
                 raise serializers.ValidationError(
                     "At least one valid field is required for apply AI "
