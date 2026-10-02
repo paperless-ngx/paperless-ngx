@@ -1335,7 +1335,8 @@ export class WorkflowEditDialogComponent
           this.formatPasswords(action.passwords ?? [])
         ),
         // Single combined UI control (built-in fields + custom field ids).
-        // Split into ai_suggestion_fields / ai_suggestion_custom_fields in save().
+        // Split into ai_suggestion_fields / ai_suggestion_custom_fields in
+        // getFormValues() when building the payload.
         ai_suggestion_targets: new FormControl(
           this.aiSuggestionTargetsFor(action)
         ),
@@ -1432,8 +1433,9 @@ export class WorkflowEditDialogComponent
   // A single combined multi-select: built-in suggestion fields plus custom
   // fields, so the user picks everything in one list. Custom field values are
   // carried with a string id of the form "cf_<id>"; built-in fields keep their
-  // plain enum value. This is only a UI-level encoding — save() splits it back
-  // into ai_suggestion_fields / ai_suggestion_custom_fields for the API.
+  // plain enum value. This is only a UI-level encoding — getFormValues()
+  // splits it back into ai_suggestion_fields / ai_suggestion_custom_fields
+  // for the API.
   //
   // Must be a computed (not a getter): a getter returns a fresh array with new
   // object identities on every change-detection cycle, and ng-select drops its
