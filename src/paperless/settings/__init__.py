@@ -796,7 +796,7 @@ def default_threads_per_worker(task_workers) -> int:
         return 1
 
 
-THREADS_PER_WORKER = os.getenv(
+THREADS_PER_WORKER = get_int_from_env(
     "PAPERLESS_THREADS_PER_WORKER",
     default_threads_per_worker(CELERY_WORKER_CONCURRENCY),
 )
