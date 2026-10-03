@@ -377,7 +377,7 @@ class TestEmail(DirectoriesMixin, SampleDirMixin, APITestCase):
             checksum="3",
             filename="test3.pdf",
         )
-        shutil.copy(self.SAMPLE_DIR / "simple.pdf", doc3.source_path)
+        shutil.copy(self.SIMPLE_PDF, doc3.source_path)
 
         doc4 = Document.objects.create(
             title="test1",
@@ -386,7 +386,7 @@ class TestEmail(DirectoriesMixin, SampleDirMixin, APITestCase):
             checksum="4",
             filename="test4.pdf",
         )
-        shutil.copy(self.SAMPLE_DIR / "simple.pdf", doc4.source_path)
+        shutil.copy(self.SIMPLE_PDF, doc4.source_path)
 
         response = self.client.post(
             self.ENDPOINT,

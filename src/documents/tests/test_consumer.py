@@ -39,6 +39,7 @@ from paperless_testing.factories import TagFactory
 from paperless_testing.factories import UserFactory
 from paperless_testing.fakes.progress import FakeProgressManager
 from paperless_testing.permissions import grant_object
+from paperless_testing.samples import SIMPLE_DIGITAL_PDF
 
 
 class _BaseNewStyleParser:
@@ -1124,7 +1125,7 @@ class TestConsumer(
     @mock.patch("documents.consumer.get_parser_registry")
     def test_similar_filenames(self, m) -> None:
         shutil.copy(
-            Path(__file__).parent / "samples" / "simple.pdf",
+            SIMPLE_DIGITAL_PDF,
             settings.CONSUMPTION_DIR / "simple.pdf",
         )
         shutil.copy(
