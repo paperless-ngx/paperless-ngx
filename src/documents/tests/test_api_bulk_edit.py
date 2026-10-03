@@ -1843,6 +1843,36 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         m.assert_called_once()
         self.assertEqual(m.call_args.kwargs["pages"], [[1], [2, 3, 4], [5]])
 
+    @mock.patch("documents.serialisers.bulk_edit.delete_pages")
+    def test_bulk_edit_delete_pages_rejects_pages_below_one(self, m) -> None:
+        """
+        GIVEN:
+            - A legacy delete_pages bulk edit
+        WHEN:
+            - API to bulk edit is called with a page number below 1
+        THEN:
+            - API returns HTTP 400
+            - delete_pages is not called
+        """
+        self.setup_mock(m, "delete_pages")
+
+        for pages in ([0], [-1], [1, 0]):
+            with self.subTest(pages=pages):
+                response = self.client.post(
+                    "/api/documents/bulk_edit/",
+                    json.dumps(
+                        {
+                            "documents": [self.doc2.id],
+                            "method": "delete_pages",
+                            "parameters": {"pages": pages},
+                        },
+                    ),
+                    content_type="application/json",
+                )
+                self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+                self.assertIn(b"pages must be positive integers", response.content)
+        m.assert_not_called()
+
     @mock.patch("documents.views.bulk_edit.rotate")
     def test_rotate_insufficient_permissions(self, m) -> None:
         self.doc1.owner = User.objects.get(username="temp_admin")

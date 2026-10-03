@@ -2144,6 +2144,8 @@ class BulkEditSerializer(
             raise serializers.ValidationError("pages must be a list")
         if not all(isinstance(i, int) for i in parameters["pages"]):
             raise serializers.ValidationError("pages must be a list of integers")
+        if any(i < 1 for i in parameters["pages"]):
+            raise serializers.ValidationError("pages must be positive integers")
 
     def _validate_parameters_merge(self, parameters) -> None:
         if "delete_originals" in parameters:

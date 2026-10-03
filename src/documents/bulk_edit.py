@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 import tempfile
 import uuid
+from functools import partial
 from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Literal
@@ -17,6 +18,7 @@ from django.db.models import Max
 from django.db.models import Q
 from django.utils import timezone
 
+from documents import pdf_ops
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
@@ -114,6 +116,11 @@ def _resolve_root_and_source_doc(
         root_doc=root_doc,
         source_doc=get_latest_version_for_root(root_doc),
     )
+
+
+def _scratch_path(name: str) -> Path:
+    """A path inside a fresh directory under SCRATCH_DIR."""
+    return Path(tempfile.mkdtemp(dir=settings.SCRATCH_DIR)) / name
 
 
 def set_correspondent(
@@ -474,8 +481,6 @@ def rotate(
         pair = _resolve_root_and_source_doc(doc, source_mode=source_mode)
         docs_by_root_id.setdefault(pair.root_doc.id, pair)
 
-    import pikepdf
-
     for pair in docs_by_root_id.values():
         if pair.source_doc.mime_type != "application/pdf":
             logger.warning(
@@ -488,11 +493,7 @@ def rotate(
                 Path(tempfile.mkdtemp(dir=settings.SCRATCH_DIR))
                 / f"{pair.root_doc.id}_rotated.pdf"
             )
-            with pikepdf.open(pair.source_doc.source_path) as pdf:
-                for page in pdf.pages:
-                    page.rotate(degrees, relative=True)
-                pdf.remove_unreferenced_resources()
-                pdf.save(filepath)
+            pdf_ops.rotate_pdf(pair.source_doc.source_path, filepath, degrees)
 
             # Preserve metadata/permissions via overrides; mark as new version
             overrides = DocumentMetadataOverrides().from_document(pair.root_doc)
@@ -535,48 +536,45 @@ def merge(
     qs = Document.objects.select_related("root_document").filter(id__in=doc_ids)
     docs_by_id = {doc.id: doc for doc in qs}
     affected_docs: list[int] = []
-    import pikepdf
-
-    merged_pdf = pikepdf.new()
-    version: str = merged_pdf.pdf_version
     handoff_asn: int | None = None
-    # use doc_ids to preserve order
-    for doc_id in doc_ids:
-        doc = docs_by_id.get(doc_id)
-        if doc is None:
-            continue
-        pair = _resolve_root_and_source_doc(doc, source_mode=source_mode)
-        try:
-            doc_path = (
-                pair.source_doc.archive_path
-                if archive_fallback
-                and pair.source_doc.mime_type != "application/pdf"
-                and pair.source_doc.has_archive_version
-                else pair.source_doc.source_path
-            )
-            with pikepdf.open(str(doc_path)) as pdf:
-                version = max(version, pdf.pdf_version)
-                merged_pdf.pages.extend(pdf.pages)
-            affected_docs.append(doc.id)
-            if handoff_asn is None and doc.archive_serial_number is not None:
-                handoff_asn = doc.archive_serial_number
-        except Exception as e:
-            logger.exception(
-                f"Error merging document {doc.id}, it will not be included in the merge: {e}",
-            )
-    if len(affected_docs) == 0:
-        logger.warning("No documents were merged")
-        return "OK"
+    with pdf_ops.PdfMerger() as merger:
+        # use doc_ids to preserve order
+        for doc_id in doc_ids:
+            doc = docs_by_id.get(doc_id)
+            if doc is None:
+                continue
+            pair = _resolve_root_and_source_doc(doc, source_mode=source_mode)
+            try:
+                # archive_path is None when there is no archive version
+                archive_path = (
+                    pair.source_doc.archive_path
+                    if archive_fallback
+                    and pair.source_doc.mime_type != "application/pdf"
+                    else None
+                )
+                merger.add(
+                    archive_path
+                    if archive_path is not None
+                    else pair.source_doc.source_path,
+                )
+                affected_docs.append(doc.id)
+                if handoff_asn is None and doc.archive_serial_number is not None:
+                    handoff_asn = doc.archive_serial_number
+            except Exception as e:
+                logger.exception(
+                    f"Error merging document {doc.id}, it will not be included in the merge: {e}",
+                )
+        if len(affected_docs) == 0:
+            logger.warning("No documents were merged")
+            return "OK"
 
-    filepath = (
-        Path(
-            tempfile.mkdtemp(dir=settings.SCRATCH_DIR),
+        filepath = (
+            Path(
+                tempfile.mkdtemp(dir=settings.SCRATCH_DIR),
+            )
+            / f"{'_'.join([str(doc_id) for doc_id in affected_docs])[:100]}_merged.pdf"
         )
-        / f"{'_'.join([str(doc_id) for doc_id in affected_docs])[:100]}_merged.pdf"
-    )
-    merged_pdf.remove_unreferenced_resources()
-    merged_pdf.save(filepath, min_version=version)
-    merged_pdf.close()
+        merger.save(filepath)
 
     if metadata_document_id:
         metadata_document = qs.get(id=metadata_document_id)
@@ -752,64 +750,60 @@ def split(
     )
     doc = Document.objects.select_related("root_document").get(id=doc_ids[0])
     pair = _resolve_root_and_source_doc(doc, source_mode=source_mode)
-    import pikepdf
 
     consume_tasks = []
 
     try:
-        with pikepdf.open(pair.source_doc.source_path) as pdf:
-            for idx, split_doc in enumerate(pages):
-                dst: pikepdf.Pdf = pikepdf.new()
-                for page in split_doc:
-                    dst.pages.append(pdf.pages[page - 1])
-                filepath: Path = (
-                    Path(
-                        tempfile.mkdtemp(dir=settings.SCRATCH_DIR),
-                    )
-                    / f"{doc.id}_{split_doc[0]}-{split_doc[-1]}.pdf"
-                )
-                dst.remove_unreferenced_resources()
-                dst.save(filepath)
-                dst.close()
+        outputs = [
+            (
+                [pdf_ops.PageSpec(page) for page in split_doc],
+                partial(_scratch_path, f"{doc.id}_{split_doc[0]}-{split_doc[-1]}.pdf"),
+            )
+            for split_doc in pages
+        ]
+        filepaths = pdf_ops.build_pdfs(pair.source_doc.source_path, outputs)
 
-                overrides: DocumentMetadataOverrides = (
-                    DocumentMetadataOverrides().from_document(doc)
-                )
-                overrides.title = f"{doc.title} (split {idx + 1})"
-                if user is not None:
-                    overrides.owner_id = user.id
-                if not delete_originals:
-                    overrides.skip_asn_if_exists = True
-                logger.info(
-                    f"Adding split document with pages {split_doc} to the task queue.",
-                )
-                consume_tasks.append(
-                    consume_file.s(
-                        input_doc=ConsumableDocument(
-                            source=DocumentSource.ConsumeFolder,
-                            original_file=filepath,
-                        ),
-                        overrides=overrides,
-                    ).set(headers={"trigger_source": trigger_source}),
-                )
+        for idx, (split_doc, filepath) in enumerate(
+            zip(pages, filepaths, strict=True),
+        ):
+            overrides: DocumentMetadataOverrides = (
+                DocumentMetadataOverrides().from_document(doc)
+            )
+            overrides.title = f"{doc.title} (split {idx + 1})"
+            if user is not None:
+                overrides.owner_id = user.id
+            if not delete_originals:
+                overrides.skip_asn_if_exists = True
+            logger.info(
+                f"Adding split document with pages {split_doc} to the task queue.",
+            )
+            consume_tasks.append(
+                consume_file.s(
+                    input_doc=ConsumableDocument(
+                        source=DocumentSource.ConsumeFolder,
+                        original_file=filepath,
+                    ),
+                    overrides=overrides,
+                ).set(headers={"trigger_source": trigger_source}),
+            )
 
-            if delete_originals:
-                backup = release_archive_serial_numbers([doc.id])
-                logger.info(
-                    "Queueing removal of original document after consumption of the split documents",
-                )
-                try:
-                    chord(
-                        header=consume_tasks,
-                        body=delete.si([doc.id]),
-                    ).on_error(
-                        restore_archive_serial_numbers_task.s(backup),
-                    ).apply_async()
-                except Exception:
-                    restore_archive_serial_numbers(backup)
-                    raise
-            else:
-                group(consume_tasks).delay()
+        if delete_originals:
+            backup = release_archive_serial_numbers([doc.id])
+            logger.info(
+                "Queueing removal of original document after consumption of the split documents",
+            )
+            try:
+                chord(
+                    header=consume_tasks,
+                    body=delete.si([doc.id]),
+                ).on_error(
+                    restore_archive_serial_numbers_task.s(backup),
+                ).apply_async()
+            except Exception:
+                restore_archive_serial_numbers(backup)
+                raise
+        else:
+            group(consume_tasks).delay()
 
     except Exception as e:
         logger.exception(f"Error splitting document {doc.id}: {e}")
@@ -830,8 +824,7 @@ def delete_pages(
     )
     doc = Document.objects.select_related("root_document").get(id=doc_ids[0])
     pair = _resolve_root_and_source_doc(doc, source_mode=source_mode)
-    pages = sorted(pages)  # sort pages to avoid index issues
-    import pikepdf
+    pages = sorted(set(pages))
 
     try:
         # Produce edited PDF to a temp file and create a new version
@@ -839,13 +832,7 @@ def delete_pages(
             Path(tempfile.mkdtemp(dir=settings.SCRATCH_DIR))
             / f"{pair.root_doc.id}_pages_deleted.pdf"
         )
-        with pikepdf.open(pair.source_doc.source_path) as pdf:
-            offset = 1  # pages are 1-indexed
-            for page_num in pages:
-                pdf.pages.remove(pdf.pages[page_num - offset])
-                offset += 1  # remove() changes the index of the pages
-            pdf.remove_unreferenced_resources()
-            pdf.save(filepath)
+        pdf_ops.remove_pages(pair.source_doc.source_path, filepath, pages)
 
         overrides = DocumentMetadataOverrides().from_document(pair.root_doc)
         if user is not None:
@@ -894,47 +881,28 @@ def edit_pdf(
     )
     doc = Document.objects.select_related("root_document").get(id=doc_ids[0])
     pair = _resolve_root_and_source_doc(doc, source_mode=source_mode)
-    import pikepdf
-
-    pdf_docs: list[pikepdf.Pdf] = []
-
     try:
-        if not operations:
-            raise ValueError("Output document index is out of bounds")
-
-        max_idx = max(op.get("doc", 0) for op in operations)
-        if update_document and max_idx > 0:
-            logger.error(
-                "Update requested but multiple output documents specified",
+        output_count = pdf_ops.validate_page_operations(
+            operations,
+            single_output=update_document,
+        )
+        page_specs: list[list[pdf_ops.PageSpec]] = [[] for _ in range(output_count)]
+        for op in operations:
+            page_specs[op.get("doc", 0)].append(
+                pdf_ops.PageSpec(op["page"], op.get("rotate", 0)),
             )
-            raise ValueError("Multiple output documents specified")
-
-        if any(
-            op.get("doc", 0) < 0 or op.get("doc", 0) >= len(operations)
-            for op in operations
-        ):
-            raise ValueError("Output document index is out of bounds")
-
-        with pikepdf.open(pair.source_doc.source_path) as src:
-            # prepare output documents
-            pdf_docs = [pikepdf.new() for _ in range(max_idx + 1)]
-
-            for op in operations:
-                dst = pdf_docs[op.get("doc", 0)]
-                page = src.pages[op["page"] - 1]
-                dst.pages.append(page)
-                if op.get("rotate"):
-                    dst.pages[-1].rotate(op["rotate"], relative=True)
 
         if update_document:
             # Create a new version from the edited PDF rather than replacing in-place
-            pdf = pdf_docs[0]
-            pdf.remove_unreferenced_resources()
-            filepath: Path = (
-                Path(tempfile.mkdtemp(dir=settings.SCRATCH_DIR))
-                / f"{pair.root_doc.id}_edited.pdf"
+            (filepath,) = pdf_ops.build_pdfs(
+                pair.source_doc.source_path,
+                [
+                    (
+                        page_specs[0],
+                        partial(_scratch_path, f"{pair.root_doc.id}_edited.pdf"),
+                    ),
+                ],
             )
-            pdf.save(filepath)
             overrides = (
                 DocumentMetadataOverrides().from_document(pair.root_doc)
                 if include_metadata
@@ -955,6 +923,19 @@ def edit_pdf(
                 headers={"trigger_source": trigger_source},
             )
         else:
+            version_filepaths = pdf_ops.build_pdfs(
+                pair.source_doc.source_path,
+                [
+                    (
+                        specs,
+                        partial(
+                            _scratch_path,
+                            f"{pair.root_doc.id}_edit_{idx}.pdf",
+                        ),
+                    )
+                    for idx, specs in enumerate(page_specs, start=1)
+                ],
+            )
             consume_tasks = []
             overrides = (
                 DocumentMetadataOverrides().from_document(pair.root_doc)
@@ -966,15 +947,9 @@ def edit_pdf(
                 overrides.actor_id = user.id
             if not delete_original:
                 overrides.skip_asn_if_exists = True
-            if delete_original and len(pdf_docs) == 1:
+            if delete_original and output_count == 1:
                 overrides.asn = pair.root_doc.archive_serial_number
-            for idx, pdf in enumerate(pdf_docs, start=1):
-                version_filepath: Path = (
-                    Path(tempfile.mkdtemp(dir=settings.SCRATCH_DIR))
-                    / f"{pair.root_doc.id}_edit_{idx}.pdf"
-                )
-                pdf.remove_unreferenced_resources()
-                pdf.save(version_filepath)
+            for version_filepath in version_filepaths:
                 consume_tasks.append(
                     consume_file.s(
                         input_doc=ConsumableDocument(
@@ -1024,8 +999,6 @@ def remove_password(
     """
     Remove password protection from PDF documents.
     """
-    import pikepdf
-
     for doc_id in doc_ids:
         doc = Document.objects.select_related("root_document").get(id=doc_id)
         pair = _resolve_root_and_source_doc(doc, source_mode=source_mode)
@@ -1039,76 +1012,69 @@ def remove_password(
                 doc.id,
                 pair.source_doc.source_path,
             )
-            try:
-                with pikepdf.open(source_path) as pdf:
-                    if not pdf.is_encrypted:
-                        logger.info(
-                            "Skipping password removal for document %s because the "
-                            "source PDF is not encrypted",
-                            pair.root_doc.id,
-                        )
-                        continue
-            except pikepdf.PasswordError:
-                # Password-protected PDFs need the supplied password below.
-                pass
-
-            with pikepdf.open(source_path, password=password) as pdf:
-                filepath: Path = (
-                    Path(tempfile.mkdtemp(dir=settings.SCRATCH_DIR))
-                    / f"{pair.root_doc.id}_unprotected.pdf"
+            if not pdf_ops.needs_decrypt(source_path):
+                logger.info(
+                    "Skipping password removal for document %s because the "
+                    "source PDF is not encrypted",
+                    pair.root_doc.id,
                 )
-                pdf.remove_unreferenced_resources()
-                pdf.save(filepath)
+                continue
 
-                if update_document:
-                    # Create a new version rather than modifying the root/original in place.
-                    overrides = (
-                        DocumentMetadataOverrides().from_document(pair.root_doc)
-                        if include_metadata
-                        else DocumentMetadataOverrides()
-                    )
-                    if user is not None:
-                        overrides.owner_id = user.id
-                        overrides.actor_id = user.id
-                    consume_file.apply_async(
-                        kwargs={
-                            "input_doc": ConsumableDocument(
-                                source=DocumentSource.ConsumeFolder,
-                                original_file=filepath,
-                                root_document_id=pair.root_doc.id,
-                            ),
-                            "overrides": overrides,
-                        },
-                        headers={"trigger_source": trigger_source},
-                    )
+            filepath = pdf_ops.decrypt_pdf(
+                source_path,
+                partial(_scratch_path, f"{pair.root_doc.id}_unprotected.pdf"),
+                password,
+            )
+
+            if update_document:
+                # Create a new version rather than modifying the root/original in place.
+                overrides = (
+                    DocumentMetadataOverrides().from_document(pair.root_doc)
+                    if include_metadata
+                    else DocumentMetadataOverrides()
+                )
+                if user is not None:
+                    overrides.owner_id = user.id
+                    overrides.actor_id = user.id
+                consume_file.apply_async(
+                    kwargs={
+                        "input_doc": ConsumableDocument(
+                            source=DocumentSource.ConsumeFolder,
+                            original_file=filepath,
+                            root_document_id=pair.root_doc.id,
+                        ),
+                        "overrides": overrides,
+                    },
+                    headers={"trigger_source": trigger_source},
+                )
+            else:
+                consume_tasks = []
+                overrides = (
+                    DocumentMetadataOverrides().from_document(pair.root_doc)
+                    if include_metadata
+                    else DocumentMetadataOverrides()
+                )
+                if user is not None:
+                    overrides.owner_id = user.id
+                    overrides.actor_id = user.id
+
+                consume_tasks.append(
+                    consume_file.s(
+                        input_doc=ConsumableDocument(
+                            source=DocumentSource.ConsumeFolder,
+                            original_file=filepath,
+                        ),
+                        overrides=overrides,
+                    ).set(headers={"trigger_source": trigger_source}),
+                )
+
+                if delete_original:
+                    chord(
+                        header=consume_tasks,
+                        body=delete.si([doc.id]),
+                    ).delay()
                 else:
-                    consume_tasks = []
-                    overrides = (
-                        DocumentMetadataOverrides().from_document(pair.root_doc)
-                        if include_metadata
-                        else DocumentMetadataOverrides()
-                    )
-                    if user is not None:
-                        overrides.owner_id = user.id
-                        overrides.actor_id = user.id
-
-                    consume_tasks.append(
-                        consume_file.s(
-                            input_doc=ConsumableDocument(
-                                source=DocumentSource.ConsumeFolder,
-                                original_file=filepath,
-                            ),
-                            overrides=overrides,
-                        ).set(headers={"trigger_source": trigger_source}),
-                    )
-
-                    if delete_original:
-                        chord(
-                            header=consume_tasks,
-                            body=delete.si([doc.id]),
-                        ).delay()
-                    else:
-                        group(consume_tasks).delay()
+                    group(consume_tasks).delay()
 
         except Exception as e:
             logger.exception(

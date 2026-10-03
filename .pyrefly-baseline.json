@@ -92,13 +92,6 @@
       "severity": "error"
     },
     {
-      "column": 33,
-      "path": "src/documents/bulk_edit.py",
-      "name": "missing-argument",
-      "concise_description": "Missing argument `p` in function `pikepdf._core.PageList.remove`",
-      "severity": "error"
-    },
-    {
       "column": 25,
       "path": "src/documents/caching.py",
       "name": "bad-argument-type",
