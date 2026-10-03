@@ -322,6 +322,7 @@ INSTALLED_APPS = [
     "paperless_tesseract.apps.PaperlessTesseractConfig",
     "paperless_text.apps.PaperlessTextConfig",
     "paperless_video.apps.PaperlessVideoConfig",
+    "paperless_bim.apps.PaperlessBimConfig",
     "paperless_mail.apps.PaperlessMailConfig",
     "django.contrib.admin",
     "rest_framework",
@@ -1163,6 +1164,27 @@ OCR_COLOR_CONVERSION_STRATEGY = os.getenv(
 OCR_USER_ARGS = os.getenv("PAPERLESS_OCR_USER_ARGS")
 
 VIDEO_CONTENT_MODE = os.getenv("PAPERLESS_VIDEO_CONTENT_MODE", "both")
+
+# BIM (IFC) parsing. Enable to register the BIM consumer; disable to skip
+# the heavy ifcopenshell + matplotlib imports entirely.
+PAPERLESS_BIM_ENABLED: Final[bool] = __get_boolean(
+    "PAPERLESS_BIM_ENABLED",
+    "yes",
+)
+
+# Cap individual IFC files to keep worker memory bounded; complex models
+# regularly exceed 100 MB and parser time grows super-linearly.
+PAPERLESS_BIM_MAX_FILE_SIZE: Final[int] = __get_int(
+    "PAPERLESS_BIM_MAX_FILE_SIZE",
+    500 * 1024 * 1024,
+)
+
+# Cap on tessellated elements used for the iso thumbnail; once we exceed
+# this we stop adding geometry and just emit what we have.
+PAPERLESS_BIM_THUMBNAIL_ELEMENT_CAP: Final[int] = __get_int(
+    "PAPERLESS_BIM_THUMBNAIL_ELEMENT_CAP",
+    200_000,
+)
 
 MAX_IMAGE_PIXELS: Final[int | None] = __get_optional_int(
     "PAPERLESS_MAX_IMAGE_PIXELS",
