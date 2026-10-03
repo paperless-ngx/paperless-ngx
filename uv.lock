@@ -5372,15 +5372,15 @@ wheels = [
 
 [[package]]
 name = "types-channels"
-version = "4.3.0.20260408"
+version = "4.3.0.20260518"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "asgiref" },
     { name = "django-stubs" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/a6/b0/f5104254ea6cb193fa3d01f473a34a6262e10782a35b7779633fbe2a70cd/types_channels-4.3.0.20260408.tar.gz", hash = "sha256:0abc00c87f7df0770580e1f28a562987c691ce7a3cd38bd86633d0c68058a380", size = 15421, upload-time = "2026-04-08T04:36:32.888Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/16/35/e1048eb8dc607873682a60bb034870b5135b34ee7c788c77012b04e179fa/types_channels-4.3.0.20260518.tar.gz", hash = "sha256:c1045a7f6e36b127e0c1c776a1727734cbbd1e36c4340414985ad4c3dde48d20", size = 15549, upload-time = "2026-05-18T06:06:16.092Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/3e/f7/f246612d79681ad6520559190bcb5ec436f26e2413acdf23746e4a8ba727/types_channels-4.3.0.20260408-py3-none-any.whl", hash = "sha256:757f708c18196fcf2f84261427ade0e2b7ca4554a8896b8f329c9067fdabb263", size = 21089, upload-time = "2026-04-08T04:36:32.032Z" },
+    { url = "https://files.pythonhosted.org/packages/fc/e3/939312e5a5f184fe54f17e323a81426d19eddde0ed25ed745fcba5c8e515/types_channels-4.3.0.20260518-py3-none-any.whl", hash = "sha256:98443bd8a5892d87b535b3b54a409441d401a60df3c426f82a79faae12bdd8e7", size = 21120, upload-time = "2026-05-18T06:06:15.045Z" },
 ]
 
 [[package]]
