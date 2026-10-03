@@ -1204,8 +1204,6 @@ class DocumentViewSet(
             ),
             # NotesSerializer nests the author, this avoids query per note
             Prefetch("notes", queryset=Note.objects.select_related("user")),
-            "barcodes",
-            "versions__barcodes",
         ]
         if self._needs_effective_content_prefetch():
             prefetches.append(latest_version_content_prefetch())

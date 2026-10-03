@@ -1316,7 +1316,7 @@ class TestBarcodeValues:
         assert response.status_code == status.HTTP_200_OK
         assert response.data["barcodes"] == SAMPLE_VALUES
         response = admin_client.get(f"/api/documents/{document.pk}/")
-        assert response.data["barcodes"] == SAMPLE_VALUES
+        assert "barcodes" not in response.data
         response = admin_client.get("/api/documents/?query=barcodes:invoice")
         assert [x["id"] for x in response.data["results"]] == [document.pk]
         response = admin_client.get("/api/documents/?query=invoice")
@@ -1407,7 +1407,7 @@ class TestBarcodeValues:
               rotating or removing pages
         THEN:
             - The version keeps its own barcodes, the original ones are kept
-            - The document API and the search use those of the newest version
+            - The metadata and the search use those of the newest version
         """
         root = consume_sample("barcode-qr-url.pdf")
         version = consume_sample("barcode-128-custom.pdf", root_document_id=root.pk)
@@ -1418,7 +1418,7 @@ class TestBarcodeValues:
         assert root.barcodes.count() == 2
         assert [x.value for x in root.get_effective_barcodes()] == ["CUSTOM BARCODE"]
 
-        response = admin_client.get(f"/api/documents/{root.pk}/")
+        response = admin_client.get(f"/api/documents/{root.pk}/metadata/")
         assert [x["value"] for x in response.data["barcodes"]] == ["CUSTOM BARCODE"]
         response = admin_client.get('/api/documents/?query=barcodes:"custom barcode"')
         assert [x["id"] for x in response.data["results"]] == [root.pk]

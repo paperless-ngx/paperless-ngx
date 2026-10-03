@@ -1061,11 +1061,6 @@ class DocumentSerializer(
     duplicate_documents = SerializerMethodField()
 
     notes = NotesSerializer(many=True, required=False, read_only=True)
-    barcodes = DocumentBarcodeSerializer(
-        source="get_effective_barcodes",
-        many=True,
-        read_only=True,
-    )
     root_document: RelatedField[Document, Document, Any] | ManyRelatedField = (
         serializers.PrimaryKeyRelatedField(read_only=True)
     )
@@ -1340,7 +1335,6 @@ class DocumentSerializer(
             "set_permissions",
             "notes",
             "custom_fields",
-            "barcodes",
             "remove_inbox_tags",
             "page_count",
             "mime_type",

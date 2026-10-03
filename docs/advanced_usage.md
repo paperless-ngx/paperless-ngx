@@ -1015,7 +1015,7 @@ By default, Paperless only uses barcodes for splitting, ASNs and tags. With
 enabled, it stores the content of every barcode with the document, e.g. payment codes or QR codes.
 
 - Barcodes are listed on the **Metadata** tab with page, type and content, and can be copied.
-- The API includes them in the `barcodes` field of documents and their metadata.
+- The API returns them in the `barcodes` field of `/api/documents/{id}/metadata/`.
 - They can be [searched](usage.md#searching-barcodes), e.g. `barcodes:DE89370400440532013000`.
 - Only the first [`PAPERLESS_CONSUMER_BARCODE_MAX_PAGES`](configuration.md#PAPERLESS_CONSUMER_BARCODE_MAX_PAGES)
   pages are scanned. Reprocessing reads the barcodes of existing documents.

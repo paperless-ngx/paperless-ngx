@@ -1,5 +1,4 @@
 import { CustomFieldInstance } from './custom-field-instance'
-import { DocumentBarcode } from './document-barcode'
 import { DocumentNote } from './document-note'
 import { ObjectWithPermissions } from './object-with-permissions'
 
@@ -150,8 +149,6 @@ export interface Document extends ObjectWithPermissions {
   archive_serial_number?: number
 
   notes?: DocumentNote[]
-
-  barcodes?: DocumentBarcode[]
 
   __search_hit__?: SearchHit
 

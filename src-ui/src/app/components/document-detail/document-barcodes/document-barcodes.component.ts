@@ -6,7 +6,6 @@ import { DocumentBarcode } from 'src/app/data/document-barcode'
 @Component({
   selector: 'pngx-document-barcodes',
   templateUrl: './document-barcodes.component.html',
-  styleUrls: ['./document-barcodes.component.scss'],
   imports: [NgxBootstrapIconsModule],
 })
 export class DocumentBarcodesComponent implements OnDestroy {
