@@ -8,7 +8,7 @@ queryable-but-always-empty -- syntactically valid, silently matching
 nothing -- with no test failure anywhere.
 
 This indexes one real document carrying values for every JSON field
-(a Note, a CustomFieldInstance) and inspects the document's own stored
+(a Note, a CustomFieldInstance, a DocumentBarcode) and inspects the document's own stored
 JSON payload, rather than running field-specific queries: that way a
 future JSON field's subpaths are covered automatically, without a new
 per-subpath query having to be added by hand each time.
@@ -27,6 +27,7 @@ from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import Note
 from documents.search._fields import PUBLIC_FIELDS
+from paperless_testing.factories import DocumentBarcodeFactory
 from paperless_testing.factories import UserFactory
 
 if TYPE_CHECKING:
@@ -42,11 +43,12 @@ class TestJsonSubpathsAreWrittenAtIndexTime:
     ) -> None:
         """
         GIVEN:
-            - A document with a Note and a CustomFieldInstance attached
+            - A document with a Note, a CustomFieldInstance and a
+              DocumentBarcode attached
         WHEN:
             - The document is indexed via TantivyBackend.add_or_update
         THEN:
-            - Every subpath PUBLIC_FIELDS declares for notes/custom_fields
+            - Every subpath PUBLIC_FIELDS declares for notes/custom_fields/barcodes
               is present as a key in the document's stored JSON payload
         """
         user = UserFactory(username="completeness-user")
@@ -65,6 +67,7 @@ class TestJsonSubpathsAreWrittenAtIndexTime:
             field=field,
             value_text="a value",
         )
+        DocumentBarcodeFactory(document=doc, value="a barcode")
         backend.add_or_update(doc)
 
         index = backend._index

@@ -9,6 +9,7 @@ from django.contrib.auth.models import User
 
 from documents.models import Correspondent
 from documents.models import Document
+from documents.models import DocumentBarcode
 from documents.models import DocumentType
 from documents.models import MatchingModel
 from documents.models import PaperlessTask
@@ -67,6 +68,16 @@ class DocumentFactory(TypedModelFactory[Document]):
     correspondent = None
     document_type = None
     storage_path = None
+
+
+class DocumentBarcodeFactory(TypedModelFactory[DocumentBarcode]):
+    class Meta:
+        model = DocumentBarcode
+
+    document = factory.SubFactory(DocumentFactory)
+    page = 1
+    value = factory.Faker("uri")
+    format = DocumentBarcode.Format.QR_CODE
 
 
 class UserFactory(TypedModelFactory[User]):

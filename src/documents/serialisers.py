@@ -60,6 +60,7 @@ from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
+from documents.models import DocumentBarcode
 from documents.models import DocumentType
 from documents.models import MatchingModel
 from documents.models import Note
@@ -987,6 +988,12 @@ class BasicUserSerializer(serializers.ModelSerializer[User]):
         fields = ["id", "username", "first_name", "last_name"]
 
 
+class DocumentBarcodeSerializer(serializers.ModelSerializer[DocumentBarcode]):
+    class Meta:
+        model = DocumentBarcode
+        fields = ["page", "value", "format"]
+
+
 class NotesSerializer(serializers.ModelSerializer[Note]):
     user = BasicUserSerializer(read_only=True)
 
@@ -1054,6 +1061,11 @@ class DocumentSerializer(
     duplicate_documents = SerializerMethodField()
 
     notes = NotesSerializer(many=True, required=False, read_only=True)
+    barcodes = DocumentBarcodeSerializer(
+        source="get_effective_barcodes",
+        many=True,
+        read_only=True,
+    )
     root_document: RelatedField[Document, Document, Any] | ManyRelatedField = (
         serializers.PrimaryKeyRelatedField(read_only=True)
     )
@@ -1328,6 +1340,7 @@ class DocumentSerializer(
             "set_permissions",
             "notes",
             "custom_fields",
+            "barcodes",
             "remove_inbox_tags",
             "page_count",
             "mime_type",

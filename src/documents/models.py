@@ -366,6 +366,16 @@ class Document(SoftDeleteModel, ModelWithOwner):  # type: ignore[django-manager-
             res += f" {self.title}"
         return res
 
+    def get_effective_barcodes(self) -> list["DocumentBarcode"]:
+        """
+        Returns the stored barcodes for the document, like
+        get_effective_content(): for root documents those of the latest
+        version when there is one, as that is the file users see.
+        """
+        from documents.versioning import latest_version
+
+        return list(latest_version(self).barcodes.all())
+
     def get_effective_content(self) -> str | None:
         """
         Returns the effective content for the document.
@@ -967,6 +977,87 @@ class Note(SoftDeleteModel):
 
     def __str__(self):
         return self.note
+
+
+class DocumentBarcode(models.Model):
+    """
+    A barcode found in a document during consumption, kept so its content
+    can be shown and copied
+    """
+
+    document = models.ForeignKey(
+        Document,
+        related_name="barcodes",
+        on_delete=models.CASCADE,
+        verbose_name=_("document"),
+    )
+
+    page = models.PositiveIntegerField(
+        _("page"),
+        help_text=_("Page of the original file, starting at 1"),
+    )
+
+    value = models.TextField(_("value"))
+
+    class Format(models.TextChoices):
+        """
+        The concrete barcode formats of zxing-cpp, keyed on the enum name.
+        The labels are symbology names and aren't translated.
+        """
+
+        CODABAR = "Codabar", "Codabar"
+        CODE39 = "Code39", "Code 39"
+        CODE39_STD = "Code39Std", "Code 39 Standard"
+        CODE39_EXT = "Code39Ext", "Code 39 Extended"
+        CODE32 = "Code32", "Code 32"
+        PZN = "PZN", "Pharmazentralnummer"
+        CODE93 = "Code93", "Code 93"
+        CODE128 = "Code128", "Code 128"
+        ITF = "ITF", "ITF"
+        ITF14 = "ITF14", "ITF-14"
+        DATA_BAR = "DataBar", "DataBar"
+        DATA_BAR_OMNI = "DataBarOmni", "DataBar Omni"
+        DATA_BAR_STK = "DataBarStk", "DataBar Stacked"
+        DATA_BAR_STK_OMNI = "DataBarStkOmni", "DataBar Stacked Omni"
+        DATA_BAR_LTD = "DataBarLtd", "DataBar Limited"
+        DATA_BAR_EXP = "DataBarExp", "DataBar Expanded"
+        DATA_BAR_EXP_STK = "DataBarExpStk", "DataBar Expanded Stacked"
+        EANUPC = "EANUPC", "EAN/UPC"
+        EAN13 = "EAN13", "EAN-13"
+        EAN8 = "EAN8", "EAN-8"
+        EAN5 = "EAN5", "EAN-5"
+        EAN2 = "EAN2", "EAN-2"
+        ISBN = "ISBN", "ISBN"
+        UPCA = "UPCA", "UPC-A"
+        UPCE = "UPCE", "UPC-E"
+        TELEPEN = "Telepen", "Telepen"
+        TELEPEN_ALPHA = "TelepenAlpha", "Telepen Alpha"
+        TELEPEN_NUMERIC = "TelepenNumeric", "Telepen Numeric"
+        OTHER_BARCODE = "OtherBarcode", "Other barcode"
+        DX_FILM_EDGE = "DXFilmEdge", "DX Film Edge"
+        PDF417 = "PDF417", "PDF417"
+        COMPACT_PDF417 = "CompactPDF417", "Compact PDF417"
+        MICRO_PDF417 = "MicroPDF417", "MicroPDF417"
+        AZTEC = "Aztec", "Aztec"
+        AZTEC_CODE = "AztecCode", "Aztec Code"
+        AZTEC_RUNE = "AztecRune", "Aztec Rune"
+        QR_CODE = "QRCode", "QR Code"
+        QR_CODE_MODEL1 = "QRCodeModel1", "QR Code Model 1"
+        QR_CODE_MODEL2 = "QRCodeModel2", "QR Code Model 2"
+        MICRO_QR_CODE = "MicroQRCode", "Micro QR Code"
+        RMQR_CODE = "RMQRCode", "rMQR Code"
+        DATA_MATRIX = "DataMatrix", "Data Matrix"
+        MAXI_CODE = "MaxiCode", "MaxiCode"
+
+    format = models.CharField(_("format"), max_length=32, choices=Format.choices)
+
+    class Meta:
+        ordering = ("page", "id")
+        verbose_name = _("document barcode")
+        verbose_name_plural = _("document barcodes")
+
+    def __str__(self) -> str:  # pragma: no cover
+        return self.value
 
 
 class ShareLink(SoftDeleteModel):

@@ -32,6 +32,7 @@ from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
+from documents.models import DocumentBarcode
 from documents.models import DocumentType
 from documents.models import Note
 from documents.models import ShareLink
@@ -50,6 +51,7 @@ from paperless_mail.models import MailAccount
 from paperless_testing.assertions import FileSystemAssertsMixin
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.dirs import paperless_environment
+from paperless_testing.factories import DocumentBarcodeFactory
 from paperless_testing.permissions import grant_object
 
 
@@ -855,6 +857,37 @@ class TestExportImport(
             )
             self.assertEqual(Document.objects.count(), 4)
             self.assertEqual(CustomFieldInstance.objects.count(), 1)
+
+    def _export_import_barcodes(self, *, split_manifest: bool) -> None:
+        shutil.rmtree(Path(self.dirs.media_dir) / "documents")
+        shutil.copytree(
+            Path(__file__).parent / "samples" / "documents",
+            Path(self.dirs.media_dir) / "documents",
+        )
+        DocumentBarcodeFactory(document=self.d1, value="https://example.com")
+        DocumentBarcodeFactory(document=self.d2, page=2, value="DE8937")
+
+        self._do_export(split_manifest=split_manifest)
+
+        with paperless_environment():
+            Document.objects.all().delete()
+            self.assertEqual(DocumentBarcode.objects.count(), 0)
+            call_command(
+                "document_importer",
+                "--no-progress-bar",
+                self.target,
+                skip_checks=True,
+            )
+            self.assertEqual(
+                set(DocumentBarcode.objects.values_list("document", "page", "value")),
+                {(self.d1.pk, 1, "https://example.com"), (self.d2.pk, 2, "DE8937")},
+            )
+
+    def test_export_import_barcodes(self) -> None:
+        self._export_import_barcodes(split_manifest=False)
+
+    def test_export_import_barcodes_split_manifest(self) -> None:
+        self._export_import_barcodes(split_manifest=True)
 
     def test_folder_prefix(self) -> None:
         """

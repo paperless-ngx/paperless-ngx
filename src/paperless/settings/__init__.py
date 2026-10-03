@@ -229,6 +229,7 @@ SPECTACULAR_SETTINGS = {
     },
     "ENUM_NAME_OVERRIDES": {
         "MatchingAlgorithm": "documents.models.MatchingModel.MATCHING_ALGORITHMS",
+        "BarcodeFormatEnum": "documents.models.DocumentBarcode.Format",
     },
     "SCHEMA_PATH_PREFIX_INSERT": FORCE_SCRIPT_NAME or "",
 }
@@ -904,6 +905,10 @@ CONSUMER_TAG_BARCODE_MAPPING = dict(
 
 CONSUMER_TAG_BARCODE_SPLIT: Final[bool] = get_bool_from_env(
     "PAPERLESS_CONSUMER_TAG_BARCODE_SPLIT",
+)
+
+CONSUMER_STORE_BARCODE_VALUES: Final[bool] = get_bool_from_env(
+    "PAPERLESS_CONSUMER_STORE_BARCODE_VALUES",
 )
 
 CONSUMER_ENABLE_COLLATE_DOUBLE_SIDED: Final[bool] = get_bool_from_env(

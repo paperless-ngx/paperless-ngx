@@ -193,6 +193,7 @@ from documents.serialisers import BulkEditSerializer
 from documents.serialisers import CorrespondentSerializer
 from documents.serialisers import CustomFieldSerializer
 from documents.serialisers import DeleteDocumentsSerializer
+from documents.serialisers import DocumentBarcodeSerializer
 from documents.serialisers import DocumentSelectionSerializer
 from documents.serialisers import DocumentSerializer
 from documents.serialisers import DocumentTypeSerializer
@@ -845,6 +846,7 @@ class EmailDocumentDetailSchema(EmailSerializer):
                         required=False,
                     ),
                     "lang": serializers.CharField(),
+                    "barcodes": DocumentBarcodeSerializer(many=True),
                 },
             ),
             HTTPStatus.BAD_REQUEST: None,
@@ -1202,6 +1204,8 @@ class DocumentViewSet(
             ),
             # NotesSerializer nests the author, this avoids query per note
             Prefetch("notes", queryset=Note.objects.select_related("user")),
+            "barcodes",
+            "versions__barcodes",
         ]
         if self._needs_effective_content_prefetch():
             prefetches.append(latest_version_content_prefetch())
@@ -1526,6 +1530,7 @@ class DocumentViewSet(
             "original_filename": doc.original_filename,
             "archive_size": archive_filesize,
             "archive_metadata": archive_metadata,
+            "barcodes": DocumentBarcodeSerializer(doc.barcodes.all(), many=True).data,
         }
 
         lang = "en"
