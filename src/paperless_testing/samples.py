@@ -1,7 +1,8 @@
-"""Test sample files that more than one app's tests need.
+"""Test sample files shared across tests.
 
 A sample used by a single app stays in that app's ``tests/samples`` tree.
-Only a file that two or more apps need lives here, exactly once.
+Samples needed by more than one app, or stored under more than one name, live
+here exactly once.
 """
 
 import shutil
