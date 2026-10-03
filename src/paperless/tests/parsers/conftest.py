@@ -433,30 +433,6 @@ def tesseract_samples_dir(parser_samples_dir: Path) -> Path:
 
 
 @pytest.fixture(scope="session")
-def multi_page_images_pdf_file(tesseract_samples_dir: Path) -> Path:
-    """Path to a multi-page PDF with images.
-
-    Returns
-    -------
-    Path
-        Absolute path to ``tesseract/multi-page-images.pdf``.
-    """
-    return tesseract_samples_dir / "multi-page-images.pdf"
-
-
-@pytest.fixture(scope="session")
-def simple_digital_pdf_file(tesseract_samples_dir: Path) -> Path:
-    """Path to a simple digital PDF sample file.
-
-    Returns
-    -------
-    Path
-        Absolute path to ``tesseract/simple-digital.pdf``.
-    """
-    return tesseract_samples_dir / "simple-digital.pdf"
-
-
-@pytest.fixture(scope="session")
 def simple_no_dpi_png_file(tesseract_samples_dir: Path) -> Path:
     """Path to a simple PNG without DPI information.
 
