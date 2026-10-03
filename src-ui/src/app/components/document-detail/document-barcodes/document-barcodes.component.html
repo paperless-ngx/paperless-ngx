@@ -12,7 +12,7 @@
       <tr>
         <td>{{ barcode.page }}</td>
         <td class="text-nowrap">{{ barcode.format }}</td>
-        <td class="barcode-value">
+        <td class="text-break">
           @if (isLink(barcode.value)) {
             <a
               [href]="barcode.value"
