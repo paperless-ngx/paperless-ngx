@@ -57,6 +57,7 @@ from paperless_testing.permissions import grant_all_global
 from paperless_testing.permissions import grant_global
 from paperless_testing.permissions import grant_object
 from paperless_testing.samples import SIMPLE_DIGITAL_PDF
+from paperless_testing.samples import THUMBNAIL_WEBP
 
 
 class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
@@ -2531,13 +2532,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             archive_filename="archive.pdf",
         )
 
-        source_file: Path = (
-            Path(__file__).parent
-            / "samples"
-            / "documents"
-            / "thumbnails"
-            / "0000001.webp"
-        )
+        source_file: Path = THUMBNAIL_WEBP
         archive_file: Path = SIMPLE_DIGITAL_PDF
 
         shutil.copy(source_file, doc.source_path)

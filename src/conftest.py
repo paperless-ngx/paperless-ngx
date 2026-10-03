@@ -181,3 +181,9 @@ def with_form_pdf_file() -> Path:
 def multi_page_images_pdf_file() -> Path:
     """Multi-page PDF of scanned images, no text layer."""
     return samples.MULTI_PAGE_IMAGES_PDF
+
+
+@pytest.fixture(scope="session")
+def thumbnail_webp_file() -> Path:
+    """Small WebP thumbnail."""
+    return samples.THUMBNAIL_WEBP
