@@ -21,6 +21,7 @@ from documents.tests.helpers import dummy_preprocess
 from paperless_testing.assertions import FileSystemAssertsMixin
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import DocumentFactory
+from paperless_testing.samples import SIMPLE_DIGITAL_PDF
 
 
 @pytest.mark.django_db
@@ -229,20 +230,12 @@ class TestUpdateContent(DirectoriesMixin, TestCase):
         """
         sample1 = self.dirs.scratch_dir / "sample.pdf"
         shutil.copy(
-            Path(__file__).parent
-            / "samples"
-            / "documents"
-            / "originals"
-            / "0000001.pdf",
+            SIMPLE_DIGITAL_PDF,
             sample1,
         )
         sample1_archive = self.dirs.archive_dir / "sample_archive.pdf"
         shutil.copy(
-            Path(__file__).parent
-            / "samples"
-            / "documents"
-            / "originals"
-            / "0000001.pdf",
+            SIMPLE_DIGITAL_PDF,
             sample1_archive,
         )
         doc = Document.objects.create(
@@ -270,11 +263,7 @@ class TestUpdateContent(DirectoriesMixin, TestCase):
         """
         sample1 = self.dirs.scratch_dir / "sample.pdf"
         shutil.copy(
-            Path(__file__).parent
-            / "samples"
-            / "documents"
-            / "originals"
-            / "0000001.pdf",
+            SIMPLE_DIGITAL_PDF,
             sample1,
         )
         doc = Document.objects.create(

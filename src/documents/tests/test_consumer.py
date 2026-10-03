@@ -39,6 +39,8 @@ from paperless_testing.factories import TagFactory
 from paperless_testing.factories import UserFactory
 from paperless_testing.fakes.progress import FakeProgressManager
 from paperless_testing.permissions import grant_object
+from paperless_testing.samples import MULTI_PAGE_DIGITAL_PDF
+from paperless_testing.samples import MULTI_PAGE_IMAGES_PDF
 from paperless_testing.samples import SIMPLE_DIGITAL_PDF
 
 
@@ -116,9 +118,7 @@ class _BaseNewStyleParser:
 
 
 class DummyParser(_BaseNewStyleParser):
-    _ARCHIVE_SRC = (
-        Path(__file__).parent / "samples" / "documents" / "archive" / "0000001.pdf"
-    )
+    _ARCHIVE_SRC = MULTI_PAGE_IMAGES_PDF
 
     def parse(self, document_path, mime_type, *, produce_archive: bool = True) -> None:
         self._text = "The Text"
@@ -204,33 +204,19 @@ class TestConsumer(
         self.addCleanup(patcher.stop)
 
     def get_test_file(self):
-        src = (
-            Path(__file__).parent
-            / "samples"
-            / "documents"
-            / "originals"
-            / "0000001.pdf"
-        )
+        src = SIMPLE_DIGITAL_PDF
         dst = self.dirs.scratch_dir / "sample.pdf"
         shutil.copy(src, dst)
         return dst
 
     def get_test_file2(self):
-        src = (
-            Path(__file__).parent
-            / "samples"
-            / "documents"
-            / "originals"
-            / "0000002.pdf"
-        )
+        src = MULTI_PAGE_DIGITAL_PDF
         dst = self.dirs.scratch_dir / "sample2.pdf"
         shutil.copy(src, dst)
         return dst
 
     def get_test_archive_file(self):
-        src = (
-            Path(__file__).parent / "samples" / "documents" / "archive" / "0000001.pdf"
-        )
+        src = MULTI_PAGE_IMAGES_PDF
         dst = self.dirs.scratch_dir / "sample_archive.pdf"
         shutil.copy(src, dst)
         return dst
@@ -1666,13 +1652,7 @@ class TestConsumerRemoteOCR(
         self.addCleanup(patcher.stop)
 
     def _consume(self, *, overrides: DocumentMetadataOverrides | None = None) -> bool:
-        src = (
-            Path(__file__).parent
-            / "samples"
-            / "documents"
-            / "originals"
-            / "0000001.pdf"
-        )
+        src = SIMPLE_DIGITAL_PDF
         dst = self.dirs.scratch_dir / "sample.pdf"
         shutil.copy(src, dst)
 
