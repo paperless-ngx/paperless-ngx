@@ -1951,7 +1951,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
 
         payload = SimpleUploadedFile(
             "../../outside.pdf",
-            (SIMPLE_DIGITAL_PDF).read_bytes(),
+            SIMPLE_DIGITAL_PDF.read_bytes(),
             content_type="application/pdf",
         )
 
@@ -1980,7 +1980,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             id=str(uuid.uuid4()),
         )
 
-        pdf_bytes = (SIMPLE_DIGITAL_PDF).read_bytes()
+        pdf_bytes = SIMPLE_DIGITAL_PDF.read_bytes()
         boundary = "paperless-boundary"
         payload = (
             (
@@ -2056,7 +2056,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
     def test_upload_insufficient_permissions(self) -> None:
         self.client.force_authenticate(user=UserFactory(username="testuser2"))
 
-        with (SIMPLE_DIGITAL_PDF).open("rb") as f:
+        with SIMPLE_DIGITAL_PDF.open("rb") as f:
             response = self.client.post(
                 "/api/documents/post_document/",
                 {"document": f},
@@ -2106,7 +2106,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             id=str(uuid.uuid4()),
         )
 
-        with (SIMPLE_DIGITAL_PDF).open("rb") as f:
+        with SIMPLE_DIGITAL_PDF.open("rb") as f:
             response = self.client.post(
                 "/api/documents/post_document/",
                 {"documenst": f},
@@ -2132,7 +2132,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             id=str(uuid.uuid4()),
         )
 
-        with (SIMPLE_DIGITAL_PDF).open("rb") as f:
+        with SIMPLE_DIGITAL_PDF.open("rb") as f:
             response = self.client.post(
                 "/api/documents/post_document/",
                 {"document": f, "title": "my custom title"},
@@ -2152,7 +2152,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         )
 
         c = Correspondent.objects.create(name="test-corres")
-        with (SIMPLE_DIGITAL_PDF).open("rb") as f:
+        with SIMPLE_DIGITAL_PDF.open("rb") as f:
             response = self.client.post(
                 "/api/documents/post_document/",
                 {"document": f, "correspondent": c.id},
@@ -2171,7 +2171,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             id=str(uuid.uuid4()),
         )
 
-        with (SIMPLE_DIGITAL_PDF).open("rb") as f:
+        with SIMPLE_DIGITAL_PDF.open("rb") as f:
             response = self.client.post(
                 "/api/documents/post_document/",
                 {"document": f, "correspondent": 3456},
@@ -2186,7 +2186,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         )
 
         dt = DocumentType.objects.create(name="invoice")
-        with (SIMPLE_DIGITAL_PDF).open("rb") as f:
+        with SIMPLE_DIGITAL_PDF.open("rb") as f:
             response = self.client.post(
                 "/api/documents/post_document/",
                 {"document": f, "document_type": dt.id},
@@ -2205,7 +2205,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             id=str(uuid.uuid4()),
         )
 
-        with (SIMPLE_DIGITAL_PDF).open("rb") as f:
+        with SIMPLE_DIGITAL_PDF.open("rb") as f:
             response = self.client.post(
                 "/api/documents/post_document/",
                 {"document": f, "document_type": 34578},
@@ -2220,7 +2220,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         )
 
         sp = StoragePath.objects.create(name="invoices")
-        with (SIMPLE_DIGITAL_PDF).open("rb") as f:
+        with SIMPLE_DIGITAL_PDF.open("rb") as f:
             response = self.client.post(
                 "/api/documents/post_document/",
                 {"document": f, "storage_path": sp.id},
@@ -2239,7 +2239,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             id=str(uuid.uuid4()),
         )
 
-        with (SIMPLE_DIGITAL_PDF).open("rb") as f:
+        with SIMPLE_DIGITAL_PDF.open("rb") as f:
             response = self.client.post(
                 "/api/documents/post_document/",
                 {"document": f, "storage_path": 34578},
@@ -2255,7 +2255,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
 
         t1 = Tag.objects.create(name="tag1")
         t2 = Tag.objects.create(name="tag2")
-        with (SIMPLE_DIGITAL_PDF).open("rb") as f:
+        with SIMPLE_DIGITAL_PDF.open("rb") as f:
             response = self.client.post(
                 "/api/documents/post_document/",
                 {"document": f, "tags": [t2.id, t1.id]},
@@ -2276,7 +2276,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
 
         t1 = Tag.objects.create(name="tag1")
         t2 = Tag.objects.create(name="tag2")
-        with (SIMPLE_DIGITAL_PDF).open("rb") as f:
+        with SIMPLE_DIGITAL_PDF.open("rb") as f:
             response = self.client.post(
                 "/api/documents/post_document/",
                 {"document": f, "tags": [t2.id, t1.id, 734563]},
@@ -2300,7 +2300,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             0,
             tzinfo=zoneinfo.ZoneInfo("America/Los_Angeles"),
         )
-        with (SIMPLE_DIGITAL_PDF).open("rb") as f:
+        with SIMPLE_DIGITAL_PDF.open("rb") as f:
             response = self.client.post(
                 "/api/documents/post_document/",
                 {"document": f, "created": created},
@@ -2406,7 +2406,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         w1.actions.add(action1)
         w1.save()
 
-        with (SIMPLE_DIGITAL_PDF).open("rb") as f:
+        with SIMPLE_DIGITAL_PDF.open("rb") as f:
             response = self.client.post(
                 "/api/documents/post_document/",
                 {
@@ -2500,7 +2500,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         ]
 
         for payload in error_payloads:
-            with (SIMPLE_DIGITAL_PDF).open("rb") as f:
+            with SIMPLE_DIGITAL_PDF.open("rb") as f:
                 data = {"document": f, **payload}
                 response = self.client.post(
                     "/api/documents/post_document/",
@@ -2558,7 +2558,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             id=str(uuid.uuid4()),
         )
 
-        with (SIMPLE_DIGITAL_PDF).open("rb") as f:
+        with SIMPLE_DIGITAL_PDF.open("rb") as f:
             response = self.client.post(
                 "/api/documents/post_document/",
                 {"document": f, "from_webui": True},
