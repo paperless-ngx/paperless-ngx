@@ -4,7 +4,7 @@ on:
     types: [opened]
 jobs:
   Anti-slop:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     permissions:
       contents: read
       issues: read
@@ -24,7 +24,7 @@ jobs:
             ASLOP-PR-VERIFY
   pr-bot:
     name: Automated PR Bot
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     # Runs after Anti-slop so the welcome comment can see whether the PR was closed
     # instead of racing it. Still runs if that job fails, so labeling is not lost.
     needs: Anti-slop
