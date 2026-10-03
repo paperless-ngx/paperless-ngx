@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-18 01:29+0000\n"
-"PO-Revision-Date: 2026-09-18 01:30\n"
+"POT-Creation-Date: 2026-10-02 23:09+0000\n"
+"PO-Revision-Date: 2026-10-02 23:10\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
@@ -249,23 +249,23 @@ msgstr "實體紙本文件的存放位置。"
 
 #: documents/models.py:321
 msgid "root document for this version"
-msgstr ""
+msgstr "此版本的根文件"
 
 #: documents/models.py:325
 msgid "version index"
-msgstr ""
+msgstr "版本索引"
 
 #: documents/models.py:329
 msgid "Index of this version within the root document."
-msgstr ""
+msgstr "此版本在根文件中的索引。"
 
 #: documents/models.py:333
 msgid "version label"
-msgstr ""
+msgstr "版本標籤"
 
 #: documents/models.py:337
 msgid "Optional short label for a document version."
-msgstr ""
+msgstr "文件版本的簡短標籤（選填）"
 
 #: documents/models.py:342 documents/models.py:951 documents/models.py:1005
 #: documents/models.py:2035
@@ -282,119 +282,119 @@ msgstr "封存"
 
 #: documents/models.py:553
 msgid "Bank"
-msgstr ""
+msgstr "銀行"
 
 #: documents/models.py:554
 msgid "Basket"
-msgstr ""
+msgstr "購物籃"
 
 #: documents/models.py:555
 msgid "Bell"
-msgstr ""
+msgstr "鈴鐺"
 
 #: documents/models.py:556
 msgid "Bookmark"
-msgstr ""
+msgstr "書籤"
 
 #: documents/models.py:557
 msgid "Boxes"
-msgstr ""
+msgstr "箱子"
 
 #: documents/models.py:558
 msgid "Briefcase"
-msgstr ""
+msgstr "公事包"
 
 #: documents/models.py:559
 msgid "Building"
-msgstr ""
+msgstr "大樓"
 
 #: documents/models.py:560
 msgid "Calculator"
-msgstr ""
+msgstr "計算機"
 
 #: documents/models.py:561
 msgid "Calendar"
-msgstr ""
+msgstr "行事曆"
 
 #: documents/models.py:562
 msgid "Camera"
-msgstr ""
+msgstr "相機"
 
 #: documents/models.py:563
 msgid "Checklist"
-msgstr ""
+msgstr "檢查表"
 
 #: documents/models.py:564
 msgid "Cash"
-msgstr ""
+msgstr "現金"
 
 #: documents/models.py:565
 msgid "Chat"
-msgstr ""
+msgstr "聊天"
 
 #: documents/models.py:566
 msgid "Check"
-msgstr ""
+msgstr "打勾"
 
 #: documents/models.py:567
 msgid "Clipboard"
-msgstr ""
+msgstr "剪貼板"
 
 #: documents/models.py:568
 msgid "Clock"
-msgstr ""
+msgstr "時鐘"
 
 #: documents/models.py:569
 msgid "Credit card"
-msgstr ""
+msgstr "信用卡"
 
 #: documents/models.py:570
 msgid "Download"
-msgstr ""
+msgstr "下載"
 
 #: documents/models.py:571
 msgid "Envelope"
-msgstr ""
+msgstr "信封"
 
 #: documents/models.py:572
 msgid "Warning"
-msgstr ""
+msgstr "警告"
 
 #: documents/models.py:573
 msgid "File"
-msgstr ""
+msgstr "檔案"
 
 #: documents/models.py:574
 msgid "Checked file"
-msgstr ""
+msgstr "已檢查的檔案"
 
 #: documents/models.py:575
 msgid "Locked file"
-msgstr ""
+msgstr "已鎖定的檔案"
 
 #: documents/models.py:576
 msgid "Medical file"
-msgstr ""
+msgstr "醫療檔案"
 
 #: documents/models.py:577
 msgid "Person file"
-msgstr ""
+msgstr "人物檔案"
 
 #: documents/models.py:580
 msgid "Spreadsheet"
-msgstr ""
+msgstr "試算表"
 
 #: documents/models.py:582
 msgid "Text file"
-msgstr ""
+msgstr "文字檔案"
 
 #: documents/models.py:583
 msgid "Files"
-msgstr ""
+msgstr "檔案"
 
 #: documents/models.py:584
 msgid "Folder"
-msgstr ""
+msgstr "檔案夾"
 
 #: documents/models.py:585 paperless_mail/admin.py:58
 msgid "Filter"
@@ -402,87 +402,87 @@ msgstr "篩選器"
 
 #: documents/models.py:586
 msgid "Gear"
-msgstr ""
+msgstr "齒輪"
 
 #: documents/models.py:587
 msgid "Globe"
-msgstr ""
+msgstr "地球"
 
 #: documents/models.py:588
 msgid "Hash"
-msgstr ""
+msgstr "井字號"
 
 #: documents/models.py:589
 msgid "Heart"
-msgstr ""
+msgstr "愛心"
 
 #: documents/models.py:590
 msgid "House"
-msgstr ""
+msgstr "房子"
 
 #: documents/models.py:591
 msgid "Inbox"
-msgstr ""
+msgstr "收件匣"
 
 #: documents/models.py:592
 msgid "Journals"
-msgstr ""
+msgstr "日記"
 
 #: documents/models.py:593
 msgid "Task list"
-msgstr ""
+msgstr "任務清單"
 
 #: documents/models.py:594
 msgid "Newspaper"
-msgstr ""
+msgstr "報紙"
 
 #: documents/models.py:595
 msgid "Attachment"
-msgstr ""
+msgstr "附加檔案"
 
 #: documents/models.py:596
 msgid "People"
-msgstr ""
+msgstr "人物"
 
 #: documents/models.py:597
 msgid "Person"
-msgstr ""
+msgstr "個人"
 
 #: documents/models.py:598
 msgid "Printer"
-msgstr ""
+msgstr "印表機"
 
 #: documents/models.py:599
 msgid "Receipt"
-msgstr ""
+msgstr "收據"
 
 #: documents/models.py:600
 msgid "Safe"
-msgstr ""
+msgstr "保險箱"
 
 #: documents/models.py:601
 msgid "Search"
-msgstr ""
+msgstr "搜尋"
 
 #: documents/models.py:602
 msgid "Send"
-msgstr ""
+msgstr "傳送"
 
 #: documents/models.py:603
 msgid "Shop"
-msgstr ""
+msgstr "商店"
 
 #: documents/models.py:604
 msgid "Stack"
-msgstr ""
+msgstr "堆疊"
 
 #: documents/models.py:605
 msgid "Stars"
-msgstr ""
+msgstr "星星"
 
 #: documents/models.py:606
 msgid "Tag"
-msgstr ""
+msgstr "標籤"
 
 #: documents/models.py:607 documents/models.py:622 documents/models.py:1713
 msgid "Tags"
@@ -490,19 +490,19 @@ msgstr "標籤"
 
 #: documents/models.py:608
 msgid "Telephone"
-msgstr ""
+msgstr "電話"
 
 #: documents/models.py:609
 msgid "Truck"
-msgstr ""
+msgstr "卡車"
 
 #: documents/models.py:610
 msgid "Barcode"
-msgstr ""
+msgstr "條碼"
 
 #: documents/models.py:611
 msgid "Wallet"
-msgstr ""
+msgstr "錢包"
 
 #: documents/models.py:614
 msgid "Table"
@@ -562,7 +562,7 @@ msgstr "頁面"
 
 #: documents/models.py:636
 msgid "icon"
-msgstr ""
+msgstr "圖示"
 
 #: documents/models.py:643
 msgid "sort field"
@@ -786,15 +786,15 @@ msgstr "MIME 類型為"
 
 #: documents/models.py:730
 msgid "simple title search"
-msgstr ""
+msgstr "標題簡易搜尋"
 
 #: documents/models.py:731
 msgid "simple text search"
-msgstr ""
+msgstr "文字簡易搜尋"
 
 #: documents/models.py:732
 msgid "has duplicates"
-msgstr ""
+msgstr "具有重複項目"
 
 #: documents/models.py:742
 msgid "rule type"
@@ -814,23 +814,23 @@ msgstr "篩選規則"
 
 #: documents/models.py:778 documents/models.py:1034
 msgid "Pending"
-msgstr ""
+msgstr "待處理"
 
 #: documents/models.py:779 documents/models.py:857
 msgid "Started"
-msgstr ""
+msgstr "已開始"
 
 #: documents/models.py:780
 msgid "Success"
-msgstr ""
+msgstr "成功"
 
 #: documents/models.py:781
 msgid "Failure"
-msgstr ""
+msgstr "失敗"
 
 #: documents/models.py:782
 msgid "Revoked"
-msgstr ""
+msgstr "已撤銷"
 
 #: documents/models.py:785
 msgid "Consume File"
@@ -842,7 +842,7 @@ msgstr "分類器訓練"
 
 #: documents/models.py:787
 msgid "Sanity Check"
-msgstr ""
+msgstr "系統健全性檢查"
 
 #: documents/models.py:788
 msgid "Index Optimize"
@@ -854,35 +854,35 @@ msgstr "郵件擷取"
 
 #: documents/models.py:790
 msgid "LLM Index"
-msgstr ""
+msgstr "LLM 索引"
 
 #: documents/models.py:791
 msgid "Empty Trash"
-msgstr ""
+msgstr "清空垃圾桶"
 
 #: documents/models.py:792
 msgid "Check Workflows"
-msgstr ""
+msgstr "檢查工作流程"
 
 #: documents/models.py:793
 msgid "Bulk Update"
-msgstr ""
+msgstr "批次更新"
 
 #: documents/models.py:794
 msgid "Reprocess Document"
-msgstr ""
+msgstr "重新處理文件"
 
 #: documents/models.py:795
 msgid "Build Share Link"
-msgstr ""
+msgstr "建立共用連結"
 
 #: documents/models.py:796
 msgid "Bulk Delete"
-msgstr ""
+msgstr "批次刪除"
 
 #: documents/models.py:797
 msgid "Apply AI Suggestions"
-msgstr ""
+msgstr "套用 AI 建議"
 
 #: documents/models.py:806 documents/models.py:1377
 msgid "Scheduled"
@@ -894,23 +894,23 @@ msgstr "網頁介面"
 
 #: documents/models.py:808
 msgid "API Upload"
-msgstr ""
+msgstr "API 上傳"
 
 #: documents/models.py:809
 msgid "Folder Consume"
-msgstr ""
+msgstr "檔案夾處理量"
 
 #: documents/models.py:810
 msgid "Email Consume"
-msgstr ""
+msgstr "電子郵件處理量"
 
 #: documents/models.py:811
 msgid "System"
-msgstr ""
+msgstr "系統"
 
 #: documents/models.py:812
 msgid "Manual"
-msgstr ""
+msgstr "手動"
 
 #: documents/models.py:818
 msgid "Task ID"
@@ -918,7 +918,7 @@ msgstr "任務 ID"
 
 #: documents/models.py:819
 msgid "Celery task ID"
-msgstr ""
+msgstr "Celery 任務 ID"
 
 #: documents/models.py:825
 msgid "Task Type"
@@ -926,47 +926,47 @@ msgstr "任務類型"
 
 #: documents/models.py:826
 msgid "The kind of work being performed"
-msgstr ""
+msgstr "執行中的任務"
 
 #: documents/models.py:833
 msgid "Trigger Source"
-msgstr ""
+msgstr "觸發來源"
 
 #: documents/models.py:834
 msgid "What initiated this task"
-msgstr ""
+msgstr "此任務的觸發原因"
 
 #: documents/models.py:843
 msgid "Status"
-msgstr ""
+msgstr "狀態"
 
 #: documents/models.py:863
 msgid "Completed"
-msgstr ""
+msgstr "已完成"
 
 #: documents/models.py:871
 msgid "Duration (seconds)"
-msgstr ""
+msgstr "持續時間（秒）"
 
 #: documents/models.py:872
 msgid "Elapsed time from start to completion"
-msgstr ""
+msgstr "完成總耗時"
 
 #: documents/models.py:878
 msgid "Wait Time (seconds)"
-msgstr ""
+msgstr "等待時間（秒）"
 
 #: documents/models.py:879
 msgid "Time from task creation to worker pickup"
-msgstr ""
+msgstr "等待接手時間"
 
 #: documents/models.py:886
 msgid "Input Data"
-msgstr ""
+msgstr "輸入資料"
 
 #: documents/models.py:887
 msgid "Structured input parameters for the task"
-msgstr ""
+msgstr "此任務的結構化輸入參數"
 
 #: documents/models.py:893
 msgid "Result Data"
@@ -974,7 +974,7 @@ msgstr "結果資料"
 
 #: documents/models.py:894
 msgid "Structured result data from task execution"
-msgstr ""
+msgstr "任務執行產生的結構化結果資料"
 
 #: documents/models.py:900
 msgid "Acknowledged"
@@ -982,11 +982,11 @@ msgstr "已確認"
 
 #: documents/models.py:905
 msgid "Task"
-msgstr ""
+msgstr "任務"
 
 #: documents/models.py:906
 msgid "Tasks"
-msgstr ""
+msgstr "任務"
 
 #: documents/models.py:936
 msgid "Note for the document"
@@ -1042,7 +1042,7 @@ msgstr "大小（字節）"
 
 #: documents/models.py:1090
 msgid "last error"
-msgstr ""
+msgstr "最新錯誤"
 
 #: documents/models.py:1097
 msgid "file path"
@@ -1050,20 +1050,20 @@ msgstr "檔案路徑"
 
 #: documents/models.py:1103
 msgid "built at"
-msgstr ""
+msgstr "建立於"
 
 #: documents/models.py:1116
 msgid "share link bundle"
-msgstr ""
+msgstr "共用連結組合"
 
 #: documents/models.py:1117
 msgid "share link bundles"
-msgstr ""
+msgstr "共用連結組合"
 
 #: documents/models.py:1120
 #, python-format
 msgid "Share link bundle %(slug)s"
-msgstr ""
+msgstr "共用連結組合 %(slug)s"
 
 #: documents/models.py:1156
 msgid "String"
@@ -1147,7 +1147,7 @@ msgstr "已更新文件"
 
 #: documents/models.py:1380
 msgid "Consume Folder"
-msgstr "處理資料夾"
+msgstr "處理檔案夾"
 
 #: documents/models.py:1381
 msgid "Api Upload"
@@ -1203,7 +1203,7 @@ msgstr "具有此文件類型"
 
 #: documents/models.py:1477
 msgid "has one of these document types"
-msgstr ""
+msgstr "包含其中一種文件類型"
 
 #: documents/models.py:1484
 msgid "does not have these document type(s)"
@@ -1219,7 +1219,7 @@ msgstr "關聯方不包含"
 
 #: documents/models.py:1506
 msgid "has one of these correspondents"
-msgstr ""
+msgstr "包含其中一個關聯方"
 
 #: documents/models.py:1514
 msgid "has this storage path"
@@ -1227,7 +1227,7 @@ msgstr "使用此儲存路徑"
 
 #: documents/models.py:1521
 msgid "has one of these storage paths"
-msgstr ""
+msgstr "包含其中一個儲存路徑"
 
 #: documents/models.py:1528
 msgid "does not have these storage path(s)"
@@ -1375,31 +1375,31 @@ msgstr "Webhook"
 
 #: documents/models.py:1696
 msgid "Password removal"
-msgstr ""
+msgstr "移除密碼"
 
 #: documents/models.py:1700
 msgid "Move to trash"
-msgstr ""
+msgstr "移至垃圾桶"
 
 #: documents/models.py:1704
 msgid "Remote OCR"
-msgstr ""
+msgstr "移除 OCR"
 
 #: documents/models.py:1708
 msgid "Apply AI suggestions"
-msgstr ""
+msgstr "套用 AI 建議"
 
 #: documents/models.py:1715
 msgid "Document type"
-msgstr ""
+msgstr "文件類型"
 
 #: documents/models.py:1716
 msgid "Storage path"
-msgstr ""
+msgstr "儲存路徑"
 
 #: documents/models.py:1717
 msgid "Created date"
-msgstr ""
+msgstr "建立日期"
 
 #: documents/models.py:1720
 msgid "Workflow Action Type"
@@ -1544,35 +1544,35 @@ msgstr "Webhook"
 
 #: documents/models.py:1948
 msgid "passwords"
-msgstr ""
+msgstr "密碼"
 
 #: documents/models.py:1952
 msgid "Passwords to try when removing PDF protection. Separate with commas or new lines."
-msgstr ""
+msgstr "解除 PDF 保護時要嘗試的密碼。請以逗號或換行分隔。"
 
 #: documents/models.py:1957
 msgid "AI suggestion fields"
-msgstr ""
+msgstr "AI 建議欄位"
 
 #: documents/models.py:1961
 msgid "Which of the AI-suggested fields to apply to the document."
-msgstr ""
+msgstr "要套用至文件的 AI 建議欄位。"
 
 #: documents/models.py:1966
 msgid "create missing objects"
-msgstr ""
+msgstr "建立缺少的物件"
 
 #: documents/models.py:1969
 msgid "Create suggested tags, correspondents, document types and storage paths that do not already exist instead of skipping them."
-msgstr ""
+msgstr "若建議的標籤、通訊對象、文件類型與儲存路徑尚不存在，則自動建立，而非跳過。"
 
 #: documents/models.py:1975
 msgid "overwrite existing values"
-msgstr ""
+msgstr "取代現有的參數值"
 
 #: documents/models.py:1978
 msgid "Apply suggestions even if the document already has a value for that field. Tags are always added to, never replaced."
-msgstr ""
+msgstr "即使該欄位已有內容，仍會將建議套用至文件。標籤僅會累加，絕不覆蓋替換。"
 
 #: documents/models.py:1984
 msgid "workflow action"
@@ -1592,7 +1592,7 @@ msgstr "動作"
 
 #: documents/models.py:2010 paperless_mail/models.py:154
 msgid "enabled"
-msgstr "已啟用"
+msgstr "啟用"
 
 #: documents/models.py:2021
 msgid "workflow"
@@ -1615,50 +1615,50 @@ msgid "workflow runs"
 msgstr "執行工作流程"
 
 #: documents/serialisers.py:514 documents/serialisers.py:871
-#: documents/serialisers.py:2883 documents/views.py:343 documents/views.py:2726
+#: documents/serialisers.py:2895 documents/views.py:342 documents/views.py:2729
 #: paperless_mail/serialisers.py:156
 msgid "Insufficient permissions."
-msgstr ""
+msgstr "權限不足。"
 
 #: documents/serialisers.py:707
 msgid "Invalid color."
 msgstr "無效的顏色。"
 
-#: documents/serialisers.py:2350
+#: documents/serialisers.py:2362
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "不支援檔案類型 %(type)s"
 
-#: documents/serialisers.py:2394
+#: documents/serialisers.py:2406
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
 msgstr "自定欄位 ID 必須是整數：%(id)s"
 
-#: documents/serialisers.py:2401
+#: documents/serialisers.py:2413
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
 msgstr "自定欄位 ID %(id)s 不存在"
 
-#: documents/serialisers.py:2418 documents/serialisers.py:2428
+#: documents/serialisers.py:2430 documents/serialisers.py:2440
 msgid "Custom fields must be a list of integers or an object mapping ids to values."
-msgstr "自定欄位必須為整數列表，或是將 ID 對應到數值的物件。"
+msgstr "自定欄位必須為整數列表，或是將 ID 對應到參數值的物件。"
 
-#: documents/serialisers.py:2423
+#: documents/serialisers.py:2435
 msgid "Some custom fields don't exist or were specified twice."
 msgstr "部分自定欄位不存在或重復指定。"
 
-#: documents/serialisers.py:2570
+#: documents/serialisers.py:2582
 msgid "Invalid variable detected."
 msgstr "偵測到無效的變數。"
 
-#: documents/serialisers.py:2939
+#: documents/serialisers.py:2951
 msgid "Duplicate document identifiers are not allowed."
-msgstr ""
+msgstr "文件識別碼不得重複。"
 
-#: documents/serialisers.py:2969 documents/views.py:4763
+#: documents/serialisers.py:2981 documents/views.py:4784
 #, python-format
 msgid "Documents not found: %(ids)s"
-msgstr ""
+msgstr "找不到文件：%(ids)s"
 
 #: documents/templates/account/account_inactive.html:5
 msgid "Paperless-ngx account inactive"
@@ -1698,7 +1698,7 @@ msgstr "請登入。"
 
 #: documents/templates/account/login.html:12
 msgid "Don't have an account yet?"
-msgstr ""
+msgstr "還沒有帳號？"
 
 #: documents/templates/account/login.html:12
 #: documents/templates/account/signup.html:43
@@ -1794,7 +1794,7 @@ msgstr "密碼重設完成。"
 
 #: documents/templates/account/password_reset_from_key_done.html:14
 msgid "Your new password has been set. You can now"
-msgstr ""
+msgstr "您的新密碼已設定完成。您現在可以"
 
 #: documents/templates/account/password_reset_from_key_done.html:14
 msgid "log in"
@@ -1864,7 +1864,7 @@ msgstr "Paperless-ngx 社群帳號登入"
 
 #: documents/templates/socialaccount/authentication_error.html:10
 msgid "An error occurred while attempting to login via your social network account. Back to the"
-msgstr ""
+msgstr "嘗試使用您的社群網路帳號登入時發生錯誤。返回"
 
 #: documents/templates/socialaccount/authentication_error.html:10
 msgid "login page"
@@ -1911,42 +1911,42 @@ msgstr "URI 協定「{parts.scheme}」不被允許。允許的協定有：{', '.
 msgid "Unable to parse URI {value}"
 msgstr "無法解析 URI {value}"
 
-#: documents/views.py:336 documents/views.py:2723
+#: documents/views.py:335 documents/views.py:2726
 msgid "Invalid more_like_id"
-msgstr ""
+msgstr "無效的 more_like_id"
 
-#: documents/views.py:1670
+#: documents/views.py:1673
 msgid "Invalid AI configuration."
-msgstr ""
+msgstr "無效的 AI 配置。"
 
-#: documents/views.py:1681
+#: documents/views.py:1684
 msgid "AI backend request timed out."
-msgstr ""
+msgstr "AI 後端請求逾時。"
 
-#: documents/views.py:1693
+#: documents/views.py:1696
 msgid "AI backend rejected the request. Check logs for details."
-msgstr ""
+msgstr "AI 後端拒絕了請求。請檢查日誌以取得詳細資訊。"
 
-#: documents/views.py:2548 documents/views.py:2864
+#: documents/views.py:2551 documents/views.py:2867
 msgid "Specify only one of text, title_search, query, or more_like_id."
-msgstr ""
+msgstr "只能指定 text、title_search、query 或 more_like_id 的其中一項。"
 
-#: documents/views.py:4776
+#: documents/views.py:4797
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
-msgstr ""
+msgstr "權限不足，無法共用文件：%(id)s"
 
-#: documents/views.py:4822
+#: documents/views.py:4843
 msgid "Bundle is already being processed."
-msgstr ""
+msgstr "組合已在處理中。"
 
-#: documents/views.py:4886
+#: documents/views.py:4907
 msgid "The share link bundle is still being prepared. Please try again later."
-msgstr ""
+msgstr "共用連結組合仍在準備中，請稍後再試。"
 
-#: documents/views.py:4900
+#: documents/views.py:4921
 msgid "The share link bundle is unavailable."
-msgstr ""
+msgstr "共用連結組合無法使用。"
 
 #: paperless/apps.py:11
 msgid "Paperless"
@@ -1974,7 +1974,7 @@ msgstr "pdfa-3"
 
 #: paperless/models.py:39 paperless/models.py:50
 msgid "auto"
-msgstr ""
+msgstr "自動"
 
 #: paperless/models.py:40
 msgid "force"
@@ -1986,7 +1986,7 @@ msgstr "重做"
 
 #: paperless/models.py:42
 msgid "off"
-msgstr ""
+msgstr "關閉"
 
 #: paperless/models.py:51
 msgid "always"
@@ -2030,27 +2030,27 @@ msgstr "CMYK"
 
 #: paperless/models.py:82
 msgid "Azure AI Document Intelligence"
-msgstr ""
+msgstr "Azure AI 文件智慧服務"
 
 #: paperless/models.py:90
 msgid "All supported documents"
-msgstr ""
+msgstr "所有支援的文件"
 
 #: paperless/models.py:91
 msgid "Only when a workflow enables it"
-msgstr ""
+msgstr "僅在工作流程啟用時"
 
 #: paperless/models.py:95 paperless/models.py:105
 msgid "OpenAI-compatible"
-msgstr ""
+msgstr "OpenAI 相容"
 
 #: paperless/models.py:96
 msgid "Huggingface"
-msgstr ""
+msgstr "Hugging Face"
 
 #: paperless/models.py:97 paperless/models.py:106
 msgid "Ollama"
-msgstr ""
+msgstr "Ollama"
 
 #: paperless/models.py:115
 msgid "Sets the output PDF type"
@@ -2070,7 +2070,7 @@ msgstr "設定 OCR 模式"
 
 #: paperless/models.py:148
 msgid "Controls archive file generation"
-msgstr ""
+msgstr "控制封存檔案的產生"
 
 #: paperless/models.py:156
 msgid "Sets image DPI fallback value"
@@ -2158,23 +2158,23 @@ msgstr "設定標籤條碼對應"
 
 #: paperless/models.py:302
 msgid "Enables splitting on tag barcodes"
-msgstr ""
+msgstr "啟用依標籤條碼進行拆分"
 
 #: paperless/models.py:312
 msgid "Sets the remote OCR engine"
-msgstr ""
+msgstr "設定遠端 OCR 引擎"
 
 #: paperless/models.py:321
 msgid "Sets the remote OCR API key"
-msgstr ""
+msgstr "設定遠端 OCR API 金鑰"
 
 #: paperless/models.py:329
 msgid "Sets the remote OCR endpoint"
-msgstr ""
+msgstr "設定遠端 OCR 端點"
 
 #: paperless/models.py:337
 msgid "Sets which documents are sent to the remote OCR engine"
-msgstr ""
+msgstr "設定哪些文件會傳送至遠端 OCR 引擎"
 
 #: paperless/models.py:349
 msgid "Enables AI features"
@@ -2182,201 +2182,205 @@ msgstr "啟用 AI 功能"
 
 #: paperless/models.py:354
 msgid "Sets the LLM embedding backend"
-msgstr ""
+msgstr "設定 LLM 嵌入後端"
 
 #: paperless/models.py:362
 msgid "Sets the LLM embedding model"
-msgstr ""
+msgstr "設定 LLM 嵌入模型"
 
 #: paperless/models.py:369
-msgid "Sets the LLM embedding endpoint, optional"
-msgstr ""
+msgid "Sets the LLM embedding API key"
+msgstr "設定 LLM 嵌入 API 金鑰"
 
 #: paperless/models.py:376
+msgid "Sets the LLM embedding endpoint, optional"
+msgstr "設定 LLM 嵌入端點（選填）"
+
+#: paperless/models.py:383
 msgid "Sets the LLM embedding chunk size"
-msgstr ""
+msgstr "設定 LLM 嵌入區塊大小"
 
-#: paperless/models.py:382
+#: paperless/models.py:389
 msgid "Sets the LLM context size"
-msgstr ""
+msgstr "設定 LLM 上下文大小"
 
-#: paperless/models.py:388
+#: paperless/models.py:395
 msgid "Sets the LLM backend"
-msgstr ""
-
-#: paperless/models.py:396
-msgid "Sets the LLM model"
-msgstr ""
+msgstr "設定 LLM 後端"
 
 #: paperless/models.py:403
-msgid "Sets the LLM API key"
-msgstr ""
+msgid "Sets the LLM model"
+msgstr "設定 LLM 模型"
 
 #: paperless/models.py:410
-msgid "Sets the LLM endpoint, optional"
-msgstr ""
+msgid "Sets the LLM API key"
+msgstr "設定 LLM API 金鑰"
 
 #: paperless/models.py:417
-msgid "Sets the LLM output language"
-msgstr ""
+msgid "Sets the LLM endpoint, optional"
+msgstr "設定 LLM 端點（選填）"
 
 #: paperless/models.py:424
-msgid "Sets the LLM timeout in seconds"
-msgstr ""
+msgid "Sets the LLM output language"
+msgstr "設定 LLM 輸出語言"
 
-#: paperless/models.py:430
+#: paperless/models.py:431
+msgid "Sets the LLM timeout in seconds"
+msgstr "設定 LLM 逾時秒數"
+
+#: paperless/models.py:437
 msgid "paperless application settings"
 msgstr "Paperless 應用程式設定"
 
-#: paperless/settings/__init__.py:558
+#: paperless/settings/__init__.py:560
 msgid "English (US)"
 msgstr "英文（美國）"
 
-#: paperless/settings/__init__.py:559
+#: paperless/settings/__init__.py:561
 msgid "Arabic"
 msgstr "阿拉伯文"
 
-#: paperless/settings/__init__.py:560
+#: paperless/settings/__init__.py:562
 msgid "Afrikaans"
 msgstr "南非荷蘭文"
 
-#: paperless/settings/__init__.py:561
+#: paperless/settings/__init__.py:563
 msgid "Belarusian"
 msgstr "白俄羅斯文"
 
-#: paperless/settings/__init__.py:562
+#: paperless/settings/__init__.py:564
 msgid "Bulgarian"
 msgstr "保加利亞文"
 
-#: paperless/settings/__init__.py:563
+#: paperless/settings/__init__.py:565
 msgid "Catalan"
 msgstr "加泰羅尼亞文"
 
-#: paperless/settings/__init__.py:564
+#: paperless/settings/__init__.py:566
 msgid "Czech"
 msgstr "捷克文"
 
-#: paperless/settings/__init__.py:565
+#: paperless/settings/__init__.py:567
 msgid "Danish"
 msgstr "丹麥文"
 
-#: paperless/settings/__init__.py:566
+#: paperless/settings/__init__.py:568
 msgid "German"
 msgstr "德文"
 
-#: paperless/settings/__init__.py:567
+#: paperless/settings/__init__.py:569
 msgid "Greek"
 msgstr "希臘文"
 
-#: paperless/settings/__init__.py:568
+#: paperless/settings/__init__.py:570
 msgid "English (GB)"
 msgstr "英文（英國）"
 
-#: paperless/settings/__init__.py:569
+#: paperless/settings/__init__.py:571
 msgid "Spanish"
 msgstr "西班牙文"
 
-#: paperless/settings/__init__.py:570
+#: paperless/settings/__init__.py:572
 msgid "Persian"
 msgstr "波斯文"
 
-#: paperless/settings/__init__.py:571
+#: paperless/settings/__init__.py:573
 msgid "Finnish"
 msgstr "芬蘭文"
 
-#: paperless/settings/__init__.py:572
+#: paperless/settings/__init__.py:574
 msgid "French"
 msgstr "法文"
 
-#: paperless/settings/__init__.py:573
+#: paperless/settings/__init__.py:575
 msgid "Hungarian"
 msgstr "匈牙利文"
 
-#: paperless/settings/__init__.py:574
+#: paperless/settings/__init__.py:576
 msgid "Indonesian"
-msgstr ""
+msgstr "印尼文"
 
-#: paperless/settings/__init__.py:575
+#: paperless/settings/__init__.py:577
 msgid "Italian"
 msgstr "義大利文"
 
-#: paperless/settings/__init__.py:576
+#: paperless/settings/__init__.py:578
 msgid "Japanese"
 msgstr "日文"
 
-#: paperless/settings/__init__.py:577
+#: paperless/settings/__init__.py:579
 msgid "Korean"
 msgstr "韓文"
 
-#: paperless/settings/__init__.py:578
+#: paperless/settings/__init__.py:580
 msgid "Luxembourgish"
 msgstr "盧森堡文"
 
-#: paperless/settings/__init__.py:579
+#: paperless/settings/__init__.py:581
 msgid "Norwegian"
 msgstr "挪威文"
 
-#: paperless/settings/__init__.py:580
+#: paperless/settings/__init__.py:582
 msgid "Dutch"
 msgstr "荷蘭文"
 
-#: paperless/settings/__init__.py:581
+#: paperless/settings/__init__.py:583
 msgid "Polish"
 msgstr "波蘭文"
 
-#: paperless/settings/__init__.py:582
+#: paperless/settings/__init__.py:584
 msgid "Portuguese (Brazil)"
 msgstr "葡萄牙文（巴西）"
 
-#: paperless/settings/__init__.py:583
+#: paperless/settings/__init__.py:585
 msgid "Portuguese"
 msgstr "葡萄牙文"
 
-#: paperless/settings/__init__.py:584
+#: paperless/settings/__init__.py:586
 msgid "Romanian"
 msgstr "羅馬尼亞文"
 
-#: paperless/settings/__init__.py:585
+#: paperless/settings/__init__.py:587
 msgid "Russian"
 msgstr "俄文"
 
-#: paperless/settings/__init__.py:586
+#: paperless/settings/__init__.py:588
 msgid "Slovak"
 msgstr "斯洛伐克文"
 
-#: paperless/settings/__init__.py:587
+#: paperless/settings/__init__.py:589
 msgid "Slovenian"
 msgstr "斯洛維尼亞文"
 
-#: paperless/settings/__init__.py:588
+#: paperless/settings/__init__.py:590
 msgid "Serbian"
 msgstr "塞爾維亞文"
 
-#: paperless/settings/__init__.py:589
+#: paperless/settings/__init__.py:591
 msgid "Swedish"
 msgstr "瑞典文"
 
-#: paperless/settings/__init__.py:590
+#: paperless/settings/__init__.py:592
 msgid "Turkish"
 msgstr "土耳其文"
 
-#: paperless/settings/__init__.py:591
+#: paperless/settings/__init__.py:593
 msgid "Ukrainian"
 msgstr "烏克蘭文"
 
-#: paperless/settings/__init__.py:592
+#: paperless/settings/__init__.py:594
 msgid "Vietnamese"
 msgstr "越南文"
 
-#: paperless/settings/__init__.py:593
+#: paperless/settings/__init__.py:595
 msgid "Chinese Simplified"
 msgstr "簡體中文"
 
-#: paperless/settings/__init__.py:594
+#: paperless/settings/__init__.py:596
 msgid "Chinese Traditional"
 msgstr "繁體中文"
 
-#: paperless/urls.py:435
+#: paperless/urls.py:438
 msgid "Paperless-ngx administration"
 msgstr "Paperless-ngx 系統管理"
 
@@ -2547,7 +2551,7 @@ msgstr "刪除"
 
 #: paperless_mail/models.py:127
 msgid "Move to specified folder"
-msgstr "移至指定資料夾"
+msgstr "移至指定檔案夾"
 
 #: paperless_mail/models.py:128
 msgid "Mark as read, don't process read mails"
@@ -2595,11 +2599,11 @@ msgstr "帳號"
 
 #: paperless_mail/models.py:157 paperless_mail/models.py:326
 msgid "folder"
-msgstr "資料夾"
+msgstr "檔案夾"
 
 #: paperless_mail/models.py:161
 msgid "Subfolders must be separated by a delimiter, often a dot ('.') or slash ('/'), but it varies by mail server."
-msgstr "子資料夾必須使用分隔符號分開，通常是句點 ('.') 或斜線 ('/')，但會因郵件伺服器而異。"
+msgstr "子檔案夾必須使用分隔符號分開，通常是句點 ('.') 或斜線 ('/')，但會因郵件伺服器而異。"
 
 #: paperless_mail/models.py:167
 msgid "filter from"
@@ -2663,7 +2667,7 @@ msgstr "動作參數"
 
 #: paperless_mail/models.py:258
 msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action. Subfolders must be separated by dots."
-msgstr "所選取動作的額外參數，例如「移至資料夾」動作的目標資料夾。子資料夾必須用句點 \".\" 來分隔。"
+msgstr "所選取動作的額外參數，例如「移至檔案夾」動作的目標資料夾。子檔案夾必須用句點 \".\" 來分隔。"
 
 #: paperless_mail/models.py:266
 msgid "assign title from"
@@ -2679,11 +2683,11 @@ msgstr "將規則擁有者指派給文件"
 
 #: paperless_mail/models.py:305
 msgid "Stop processing further rules"
-msgstr ""
+msgstr "停止處理後續規則"
 
 #: paperless_mail/models.py:308
 msgid "If True, no further rules will be processed after this one if any document is queued."
-msgstr ""
+msgstr "如果設為「是」，當有任何文件排入佇列時，在此規則之後將不再處理後續規則。"
 
 #: paperless_mail/models.py:334
 msgid "uid"
@@ -2691,7 +2695,7 @@ msgstr "UID"
 
 #: paperless_mail/models.py:342
 msgid "uid validity"
-msgstr ""
+msgstr "UID 有效性"
 
 #: paperless_mail/models.py:350
 msgid "subject"
