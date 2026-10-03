@@ -1,3 +1,10 @@
 i-bs {
     cursor: move;
 }
+
+// Make the host element participate in flex/grid layout so a cardless
+// frame inside a flex column can stretch to fill the available height.
+:host {
+    display: block;
+    height: 100%;
+}

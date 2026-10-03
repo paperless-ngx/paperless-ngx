@@ -19,44 +19,32 @@
     </div>
   </div>
 
-  <div class="col-12 col-lg-8 col-xl-9 mb-4">
-    <div class="row row-cols-1 g-4"
-      cdkDropList
-      [cdkDropListDisabled]="settingsService.globalDropzoneActive"
-      (cdkDropListDropped)="onDrop($event)"
-      >
-      @if (settingsService.offerTour()) {
-        <div class="col">
-          <pngx-welcome-widget (dismiss)="completeTour()"></pngx-welcome-widget>
-        </div>
-      }
+  @if (settingsService.offerTour() || dashboardViews.length > 0) {
+    <div class="col-12 col-lg-8 col-xl-9 mb-4">
+      <div class="row row-cols-1 g-4"
+        cdkDropList
+        [cdkDropListDisabled]="settingsService.globalDropzoneActive"
+        (cdkDropListDropped)="onDrop($event)"
+        >
+        @if (settingsService.offerTour()) {
+          <div class="col">
+            <pngx-welcome-widget (dismiss)="completeTour()"></pngx-welcome-widget>
+          </div>
+        }
 
-      <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }">
-        <!-- Hidden per UI simplification: empty-state hint -->
-        <!--
-        @if (!settingsService.offerTour() && savedViewService.allViews.length === 0) {
-          <div class="col">
-            <div class="card shadow-sm bg-light opacity-50">
-              <div class="card-body">
-                <div class="text-center">
-                  <p class="mb-0 fst-italic"><i-bs name="info-circle" class="me-2"></i-bs><ng-container i18n>Hint: saved views can be created from the <a routerLink="/documents">documents list</a></ng-container></p>
-                </div>
-              </div>
+        <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }">
+          @for (v of dashboardViews; track v.id) {
+            <div class="col">
+              <pngx-saved-view-widget
+                [savedView]="v"
+                (cdkDragStarted)="onDragStart($event)"
+                (cdkDragEnded)="onDragEnd($event)"
+                >
+              </pngx-saved-view-widget>
             </div>
-          </div>
-        }
-        -->
-        @for (v of dashboardViews; track v.id) {
-          <div class="col">
-            <pngx-saved-view-widget
-              [savedView]="v"
-              (cdkDragStarted)="onDragStart($event)"
-              (cdkDragEnded)="onDragEnd($event)"
-              >
-            </pngx-saved-view-widget>
-          </div>
-        }
-      </ng-container>
+          }
+        </ng-container>
+      </div>
     </div>
-  </div>
+  }
 </div>

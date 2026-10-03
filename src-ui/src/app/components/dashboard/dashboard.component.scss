@@ -10,6 +10,9 @@
   position: relative;
   overflow: hidden;
   isolation: isolate;
+  // Stretch the unified card to fill the visible viewport so the right
+  // stats pane has room to expand; subtract a small header allowance.
+  min-height: calc(100vh - 8.5rem);
 
   // Soft blue tint glow at the top
   &::before {
@@ -31,7 +34,7 @@
   grid-template-columns: minmax(0, 3fr) 1px minmax(0, 1fr);
   gap: 0;
   align-items: stretch;
-  min-height: 380px;
+  min-height: calc(100vh - 10.5rem);
 }
 
 .unified-pane {
