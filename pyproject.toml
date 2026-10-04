@@ -90,7 +90,7 @@ postgres = [
   "psycopg[c,pool]==3.3.4",
   # Direct dependency for proper resolution of the pre-built wheels
   "psycopg-c==3.3.4",
-  "psycopg-pool==3.3.2",
+  "psycopg-pool==3.3.3",
 ]
 webserver = [
   "granian[uvloop]>=2.7,<2.9",
