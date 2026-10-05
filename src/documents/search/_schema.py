@@ -25,7 +25,8 @@ logger = logging.getLogger("paperless.search")
 #      order, and the write-only correspondent/document_type/storage_path/tag id
 #      columns dropped. tantivy compares schemas by ordered field list, so an
 #      index built by v1 rejects every write against the v2 schema.
-SCHEMA_VERSION: Final[int] = 2
+# v3 - barcodes JSON field for stored barcode contents
+SCHEMA_VERSION: Final[int] = 3
 
 
 class FieldDescriptor(NamedTuple):

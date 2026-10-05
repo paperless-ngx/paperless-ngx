@@ -354,6 +354,10 @@
               </table>
             }
 
+            @if (metadata()?.barcodes?.length > 0) {
+              <h6 i18n>Barcodes</h6>
+              <pngx-document-barcodes [barcodes]="metadata().barcodes"></pngx-document-barcodes>
+            }
             @if (metadata()?.original_metadata?.length > 0) {
               <pngx-metadata-collapse i18n-title title="Original document metadata" [metadata]="metadata()?.original_metadata"></pngx-metadata-collapse>
             }

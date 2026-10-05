@@ -176,6 +176,14 @@ PINNED_DESCRIPTORS: tuple[FieldDescriptor, ...] = (
         tokenizer="paperless_text",
     ),
     FieldDescriptor(
+        "barcodes",
+        "json",
+        stored=True,
+        indexed=True,
+        fast=False,
+        tokenizer="paperless_text",
+    ),
+    FieldDescriptor(
         "title_sort",
         "text",
         stored=False,

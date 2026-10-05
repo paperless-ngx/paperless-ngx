@@ -166,6 +166,25 @@ def get_latest_version_for_root(
     return latest or root_doc
 
 
+def latest_version(document: Document) -> Document:
+    """
+    The newest version of a root document, or the document itself if it has
+    no versions or is a version. Reads a prefetched "versions" lookup when
+    there is one and queries otherwise.
+    """
+    if document.root_document_id is not None or document.pk is None:
+        return document
+    prefetched_cache = getattr(document, "_prefetched_objects_cache", None)
+    prefetched_versions = (
+        prefetched_cache.get("versions") if isinstance(prefetched_cache, dict) else None
+    )
+    if prefetched_versions is None:
+        return get_latest_version_for_root(document)
+    if not prefetched_versions:
+        return document
+    return sort_versions_newest_first(list(prefetched_versions))[0]
+
+
 def resolve_requested_version_for_root(
     root_doc: Document,
     request: Request,

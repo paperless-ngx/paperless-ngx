@@ -303,6 +303,12 @@ class ApplicationConfiguration(AbstractSingletonModel):
         null=True,
     )
 
+    # PAPERLESS_CONSUMER_STORE_BARCODE_VALUES
+    barcode_store_values = models.BooleanField(
+        verbose_name=_("Stores the values of detected barcodes"),
+        null=True,
+    )
+
     """
     Settings for the remote OCR parser
     """

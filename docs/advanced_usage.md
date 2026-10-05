@@ -1010,6 +1010,19 @@ documents to both separate and categorize them in a single operation.
 **Example:** A 6-page scan with TAG:invoice on page 3 and TAG:receipt on page 5 will create
 three documents: pages 1-2 (no tags), pages 3-4 (tagged "invoice"), and pages 5-6 (tagged "receipt").
 
+### Barcode Contents {#barcode-contents}
+
+By default, Paperless only uses barcodes for splitting, ASNs and tags. With
+[`PAPERLESS_CONSUMER_STORE_BARCODE_VALUES`](configuration.md#PAPERLESS_CONSUMER_STORE_BARCODE_VALUES)
+enabled, it stores the content of every barcode with the document, e.g. payment codes or QR codes.
+
+- Barcodes are listed on the **Metadata** tab with page, type and content, and can be copied.
+- The API returns them in the `barcodes` field of `/api/documents/{id}/metadata/`.
+- They can be [searched](usage.md#searching-barcodes), e.g. `barcodes:DE89370400440532013000`.
+- Only the first [`PAPERLESS_CONSUMER_BARCODE_MAX_PAGES`](configuration.md#PAPERLESS_CONSUMER_BARCODE_MAX_PAGES)
+  pages are scanned. Reprocessing reads the barcodes of existing documents.
+- Each version keeps its own barcodes, and the newest version's are shown and searched.
+
 ## Automatic collation of double-sided documents {#collate}
 
 !!! note

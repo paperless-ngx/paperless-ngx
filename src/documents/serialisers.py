@@ -60,6 +60,7 @@ from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
+from documents.models import DocumentBarcode
 from documents.models import DocumentType
 from documents.models import MatchingModel
 from documents.models import Note
@@ -985,6 +986,12 @@ class BasicUserSerializer(serializers.ModelSerializer[User]):
     class Meta:
         model = User
         fields = ["id", "username", "first_name", "last_name"]
+
+
+class DocumentBarcodeSerializer(serializers.ModelSerializer[DocumentBarcode]):
+    class Meta:
+        model = DocumentBarcode
+        fields = ["page", "value", "format"]
 
 
 class NotesSerializer(serializers.ModelSerializer[Note]):

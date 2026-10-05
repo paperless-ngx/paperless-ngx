@@ -1061,6 +1061,20 @@ notes.user:alice notes.note:insurance
 
 The bare `notes:` prefix is shorthand for `notes.note:`.
 
+#### Searching barcodes
+
+If [barcode contents are stored](advanced_usage.md#barcode-contents), they can be searched by
+content or type, but only with a field name:
+
+```
+barcodes.value:DE89370400440532013000
+barcodes.format:qrcode
+barcodes:wifi barcodes:guest
+```
+
+`barcodes:` is shorthand for `barcodes.value:`. Separators are stripped, so each part of e.g.
+`WIFI:S:Guest;P:secret;;` can be searched on its own.
+
 All of these can be combined. Syntax not described here may not work as expected, and an unknown field name is searched as ordinary text.
 
 !!! note
