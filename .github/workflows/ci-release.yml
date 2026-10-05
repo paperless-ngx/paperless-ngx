@@ -70,9 +70,10 @@ jobs:
         run: |
           uv sync --python "${PYTHON_VERSION}" --dev --frozen
       - name: Install system dependencies
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -qq --no-install-recommends gettext liblept5
+        timeout-minutes: 12
+        uses: $/.github/actions/apt-install
+        with:
+          packages: gettext liblept5
       # ---- Build Documentation ----
       - name: Build documentation
         env:

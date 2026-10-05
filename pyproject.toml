@@ -33,7 +33,7 @@ dependencies = [
   "django-compression-middleware~=0.5.0",
   "django-cors-headers~=4.9.0",
   "django-extensions~=4.1",
-  "django-filter~=25.1",
+  "django-filter>=25.1,<27",
   "django-guardian>=3.3.3,<3.6",
   "django-multiselectfield~=1.0.1",
   "django-rich~=2.2.0",
@@ -90,7 +90,7 @@ postgres = [
   "psycopg[c,pool]==3.3.4",
   # Direct dependency for proper resolution of the pre-built wheels
   "psycopg-c==3.3.4",
-  "psycopg-pool==3.3.2",
+  "psycopg-pool==3.3.3",
 ]
 webserver = [
   "granian[uvloop]>=2.7,<2.9",
