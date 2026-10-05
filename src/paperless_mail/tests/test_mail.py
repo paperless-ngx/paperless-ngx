@@ -384,8 +384,10 @@ class TestMail(
         )
 
         account = MailAccount.objects.create()
+        owner = UserFactory()
         rule = MailRule.objects.create(
             account=account,
+            owner=owner,
             consumption_scope=MailRule.ConsumptionScope.ATTACHMENTS_ONLY,
         )
 
@@ -400,6 +402,7 @@ class TestMail(
             folder=rule.folder,
         )
         self.assertEqual(processed.status, "PROCESSED_WO_CONSUMPTION")
+        self.assertEqual(processed.owner, owner)
 
         # Calling it again must not create a second row
         self.mail_account_handler._handle_message(message, rule)
@@ -1843,7 +1846,8 @@ class TestErrorCallback:
         THEN:
             - Only one ProcessedMail row is created for that mail
         """
-        rule = MailRuleFactory()
+        owner = UserFactory()
+        rule = MailRuleFactory(owner=owner)
         message_uid = "12345"
 
         for _ in range(2):
@@ -1866,6 +1870,7 @@ class TestErrorCallback:
         )
         assert processed_mails.count() == 1
         assert processed_mails.get().status == "FAILED"
+        assert processed_mails.get().owner == owner
 
 
 class TestManagementCommand(TestCase):
