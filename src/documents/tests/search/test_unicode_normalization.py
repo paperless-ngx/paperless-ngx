@@ -12,6 +12,9 @@ import unicodedata
 from typing import TYPE_CHECKING
 
 import pytest
+from hypothesis import given
+from hypothesis import settings
+from hypothesis import strategies as st
 
 from documents.models import Correspondent
 from documents.models import CustomField
@@ -39,6 +42,26 @@ _NFD_WORD = unicodedata.normalize("NFD", _NFC_WORD)
 
 
 class TestTheNormalizer:
+    @given(st.text())
+    @settings(max_examples=200)
+    def test_normalization_is_idempotent(self, text: str) -> None:
+        normalized = normalize_search_text(text)
+
+        assert normalize_search_text(normalized) == normalized
+
+    @given(st.text())
+    @settings(max_examples=200)
+    def test_normalization_matches_nfc_oracle(self, text: str) -> None:
+        assert normalize_search_text(text) == unicodedata.normalize("NFC", text)
+
+    @given(st.text())
+    @settings(max_examples=200)
+    def test_canonical_equivalents_normalize_equally(self, text: str) -> None:
+        nfc = unicodedata.normalize("NFC", text)
+        nfd = unicodedata.normalize("NFD", text)
+
+        assert normalize_search_text(nfc) == normalize_search_text(nfd)
+
     def test_it_composes_decomposed_kana(self) -> None:
         """
         GIVEN:
