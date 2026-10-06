@@ -3,10 +3,14 @@
 from __future__ import annotations
 
 import codecs
+import re
 from pathlib import Path
 from typing import TYPE_CHECKING
 
 import pytest
+from hypothesis import given
+from hypothesis import settings
+from hypothesis import strategies as st
 
 from paperless.parsers.utils import is_tagged_pdf
 from paperless.parsers.utils import pdf_born_digital_text
@@ -100,6 +104,28 @@ class TestPostProcessText:
         expected: str | None,
     ) -> None:
         assert post_process_text(source) == expected
+
+    @given(st.one_of(st.none(), st.text()))
+    @settings(max_examples=200, deadline=None)
+    def test_is_idempotent(self, source: str | None) -> None:
+        result = post_process_text(source)
+        assert post_process_text(result) == result
+
+    @given(st.text())
+    @settings(max_examples=200, deadline=None)
+    def test_removes_nul_characters(self, source: str) -> None:
+        result = post_process_text(source)
+        assert result is None or "\0" not in result
+
+    @given(st.text(alphabet=st.characters(exclude_characters="\0")))
+    @settings(max_examples=200, deadline=None)
+    def test_preserves_internal_line_boundaries(self, source: str) -> None:
+        result = post_process_text(source)
+        if result is not None:
+            assert re.findall(r"[\r\n]+", result) == re.findall(
+                r"[\r\n]+",
+                source.strip(),
+            )
 
 
 class TestPdfBornDigitalText:

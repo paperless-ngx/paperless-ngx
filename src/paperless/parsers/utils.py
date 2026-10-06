@@ -120,13 +120,13 @@ def post_process_text(text: str | None) -> str | None:
     if not text:
         return None
 
+    # Replace NUL before collapsing whitespace so normalization is idempotent.
+    text = text.replace("\0", " ")
     collapsed_spaces = re.sub(r"([^\S\r\n]+)", " ", text)
     no_leading_whitespace = re.sub(r"([\n\r]+)([^\S\n\r]+)", "\\1", collapsed_spaces)
     no_trailing_whitespace = re.sub(r"([^\S\n\r]+)$", "", no_leading_whitespace)
 
-    # replace \0 prevents issues with saving to postgres.
-    # text may contain \0 when this character is present in PDF files.
-    result = no_trailing_whitespace.strip().replace("\0", " ")
+    result = no_trailing_whitespace.strip()
     return result or None
 
 

@@ -9,22 +9,22 @@
 
 ## Nhóm
 
-| Thành viên | GitHub | Suite K01 | Reviewer |
-| --- | --- | --- | --- |
-| Nguyễn Ngọc Trường Dân | [@0Yaam](https://github.com/0Yaam) | PBT-01 Text normalization | Thịnh |
-| Nguyễn Hưng Thịnh | [@elgthinhnguyen](https://github.com/elgthinhnguyen) | PBT-02 Unicode search | Dân |
-| Phan Khánh Vương | [@vuong123s](https://github.com/vuong123s) | PBT-03 Path security | Bo |
-| Vũ Thế Huỳnh | [@1convitt](https://github.com/1convitt) | PBT-04 MIME-extension | Vương |
-| Phùng Nguyễn Hoài Bo | [@HubertPhung](https://github.com/HubertPhung) | PBT-05 Parser selection | Huỳnh |
+| Thành viên             | GitHub                                               | Suite K01                 | Reviewer |
+| ---------------------- | ---------------------------------------------------- | ------------------------- | -------- |
+| Nguyễn Ngọc Trường Dân | [@0Yaam](https://github.com/0Yaam)                   | PBT-01 Text normalization | Thịnh    |
+| Nguyễn Hưng Thịnh      | [@elgthinhnguyen](https://github.com/elgthinhnguyen) | PBT-02 Unicode search     | Dân      |
+| Phan Khánh Vương       | [@vuong123s](https://github.com/vuong123s)           | PBT-03 Path security      | Bo       |
+| Vũ Thế Huỳnh           | [@1convitt](https://github.com/1convitt)             | PBT-04 MIME-extension     | Vương    |
+| Phùng Nguyễn Hoài Bo   | [@HubertPhung](https://github.com/HubertPhung)       | PBT-05 Parser selection   | Huỳnh    |
 
 ## Kế hoạch
 
-| Cycle | Nội dung | Trạng thái |
-| --- | --- | --- |
-| 1 | Chốt invariant, strategy, oracle và tiêu chí pass/fail | **Đang mở** |
-| 2 | Viết Hypothesis tests và lệnh chạy độc lập | Backlog |
-| 3 | Chạy test, lưu counterexample, metrics, defect và RCA | Backlog |
-| 4 | Báo cáo, demo tái lập và peer review | Backlog |
+| Cycle | Nội dung                                               | Trạng thái  |
+| ----- | ------------------------------------------------------ | ----------- |
+| 1     | Chốt invariant, strategy, oracle và tiêu chí pass/fail | **Đang mở** |
+| 2     | Viết Hypothesis tests và lệnh chạy độc lập             | Backlog     |
+| 3     | Chạy test, lưu counterexample, metrics, defect và RCA  | Backlog     |
+| 4     | Báo cáo, demo tái lập và peer review                   | Backlog     |
 
 ## Quy trình
 
