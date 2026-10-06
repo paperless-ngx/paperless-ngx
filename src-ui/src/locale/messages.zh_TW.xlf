@@ -761,7 +761,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">461,462</context>
+          <context context-type="linenumber">463,464</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/custom-fields-bulk-edit-dialog/custom-fields-bulk-edit-dialog.component.html</context>
@@ -945,7 +945,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">480</context>
+          <context context-type="linenumber">482</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
@@ -1505,7 +1505,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1903</context>
+          <context context-type="linenumber">1907</context>
         </context-group>
         <target state="translated">PDF 編輯器</target>
       </trans-unit>
@@ -1589,7 +1589,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">406,407</context>
+          <context context-type="linenumber">408,409</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
@@ -1857,7 +1857,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">177</context>
+          <context context-type="linenumber">179</context>
         </context-group>
         <target state="translated">封存序號</target>
       </trans-unit>
@@ -1873,7 +1873,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">182</context>
+          <context context-type="linenumber">184</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
@@ -1909,7 +1909,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">186</context>
+          <context context-type="linenumber">188</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
@@ -1945,7 +1945,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">190</context>
+          <context context-type="linenumber">192</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
@@ -3661,11 +3661,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1517</context>
+          <context context-type="linenumber">1521</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1904</context>
+          <context context-type="linenumber">1908</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -4345,7 +4345,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1470</context>
+          <context context-type="linenumber">1474</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -4505,7 +4505,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1957</context>
+          <context context-type="linenumber">1961</context>
         </context-group>
         <target state="translated">移除密碼保護</target>
       </trans-unit>
@@ -4517,7 +4517,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1958</context>
+          <context context-type="linenumber">1962</context>
         </context-group>
         <target state="translated">建立未受保護的副本，或取代現有文件。</target>
       </trans-unit>
@@ -4529,7 +4529,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1959</context>
+          <context context-type="linenumber">1963</context>
         </context-group>
         <target state="translated">開始</target>
       </trans-unit>
@@ -5921,7 +5921,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">372,373</context>
+          <context context-type="linenumber">374,375</context>
         </context-group>
         <target state="translated">預覽</target>
       </trans-unit>
@@ -6913,7 +6913,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1474</context>
+          <context context-type="linenumber">1478</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -6949,7 +6949,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">175</context>
+          <context context-type="linenumber">177</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
@@ -8519,14 +8519,13 @@
         </context-group>
         <target state="translated">文件類型</target>
       </trans-unit>
-      <trans-unit id="5700628356844396417" datatype="html">
-        <source>{VAR_PLURAL, plural, =1 {1 existing value suggested below} other {<x id="INTERPOLATION"/> existing values suggested below}}</source>
+      <trans-unit id="5377184518735933155" datatype="html">
+        <source>{VAR_PLURAL, plural, =1 {1 suggestion available below} other {<x id="INTERPOLATION"/> suggestions available below}}</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/suggestions-dropdown/suggestions-dropdown.component.html</context>
           <context context-type="linenumber">54</context>
         </context-group>
-        <target state="translated">{VAR_PLURAL, plural, =1 {下方建議 1 個現有值} other {下方建議 <x id="INTERPOLATION"/> 個現有值}}
-</target>
+        <target state="needs-translation">{VAR_PLURAL, plural, =1 {1 suggestion available below} other {<x id="INTERPOLATION"/> suggestions available below}}</target>
       </trans-unit>
       <trans-unit id="4169875112244042673" datatype="html">
         <source>Suggestion options</source>
@@ -9206,7 +9205,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">298,299</context>
+          <context context-type="linenumber">300,301</context>
         </context-group>
         <target state="translated">內容</target>
       </trans-unit>
@@ -9366,7 +9365,7 @@
         <source>Details</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">172,173</context>
+          <context context-type="linenumber">174,175</context>
         </context-group>
         <target state="translated">詳細資訊</target>
       </trans-unit>
@@ -9374,7 +9373,7 @@
         <source>Date created</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">179</context>
+          <context context-type="linenumber">181</context>
         </context-group>
         <target state="translated">建立日期</target>
       </trans-unit>
@@ -9382,7 +9381,7 @@
         <source>Default</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">191</context>
+          <context context-type="linenumber">193</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/saved-views/saved-views.component.html</context>
@@ -9394,7 +9393,7 @@
         <source>Metadata</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">307,308</context>
+          <context context-type="linenumber">309,310</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/metadata-collapse/metadata-collapse.component.ts</context>
@@ -9406,7 +9405,7 @@
         <source>Date modified</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">314,315</context>
+          <context context-type="linenumber">316,317</context>
         </context-group>
         <target state="translated">修改日期</target>
       </trans-unit>
@@ -9414,7 +9413,7 @@
         <source>Date added</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">318,319</context>
+          <context context-type="linenumber">320,321</context>
         </context-group>
         <target state="translated">新增日期</target>
       </trans-unit>
@@ -9422,7 +9421,7 @@
         <source>Media filename</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">322,323</context>
+          <context context-type="linenumber">324,325</context>
         </context-group>
         <target state="translated">媒體檔案名稱</target>
       </trans-unit>
@@ -9430,7 +9429,7 @@
         <source>Original filename</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">326,327</context>
+          <context context-type="linenumber">328,329</context>
         </context-group>
         <target state="translated">原始檔案名稱</target>
       </trans-unit>
@@ -9438,7 +9437,7 @@
         <source>Original SHA256 checksum</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">330,331</context>
+          <context context-type="linenumber">332,333</context>
         </context-group>
         <target state="translated">原始 SHA256 總和檢查碼</target>
       </trans-unit>
@@ -9446,7 +9445,7 @@
         <source>Original file size</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">334,335</context>
+          <context context-type="linenumber">336,337</context>
         </context-group>
         <target state="translated">原始檔案大小</target>
       </trans-unit>
@@ -9454,7 +9453,7 @@
         <source>Original mime type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">338,339</context>
+          <context context-type="linenumber">340,341</context>
         </context-group>
         <target state="translated">原始 MIME 類型</target>
       </trans-unit>
@@ -9462,7 +9461,7 @@
         <source>Archive SHA256 checksum</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">343,344</context>
+          <context context-type="linenumber">345,346</context>
         </context-group>
         <target state="translated">封存 SHA256 總和檢查碼</target>
       </trans-unit>
@@ -9470,7 +9469,7 @@
         <source>Archive file size</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">349,350</context>
+          <context context-type="linenumber">351,352</context>
         </context-group>
         <target state="translated">封存檔案大小</target>
       </trans-unit>
@@ -9478,7 +9477,7 @@
         <source>Barcodes</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">358,359</context>
+          <context context-type="linenumber">360,361</context>
         </context-group>
         <target state="needs-translation">Barcodes</target>
       </trans-unit>
@@ -9486,7 +9485,7 @@
         <source>Original document metadata</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">362</context>
+          <context context-type="linenumber">364</context>
         </context-group>
         <target state="translated">原始文件詮釋資料</target>
       </trans-unit>
@@ -9494,7 +9493,7 @@
         <source>Archived document metadata</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">365</context>
+          <context context-type="linenumber">367</context>
         </context-group>
         <target state="translated">封存文件詮釋資料</target>
       </trans-unit>
@@ -9502,7 +9501,7 @@
         <source>Notes <x id="START_BLOCK_IF" equiv-text="@if (document()?.notes.length) {"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge text-bg-secondary ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{document().notes.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_BLOCK_IF" equiv-text="}"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">384,387</context>
+          <context context-type="linenumber">386,389</context>
         </context-group>
         <target state="translated">註解 <x id="START_BLOCK_IF" equiv-text="@if (document()?.notes.length) {"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge text-bg-secondary ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{document().notes.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_BLOCK_IF" equiv-text="}"/></target>
       </trans-unit>
@@ -9510,7 +9509,7 @@
         <source>History</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">395,396</context>
+          <context context-type="linenumber">397,398</context>
         </context-group>
         <target state="translated">歷史紀錄</target>
       </trans-unit>
@@ -9518,7 +9517,7 @@
         <source> Duplicates <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge text-bg-secondary ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{ document().duplicate_documents.length }}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">418,421</context>
+          <context context-type="linenumber">420,423</context>
         </context-group>
         <target state="translated"> 重複文件 <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge text-bg-secondary ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{ document().duplicate_documents.length }}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
       </trans-unit>
@@ -9526,7 +9525,7 @@
         <source>Duplicate documents detected:</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">423,424</context>
+          <context context-type="linenumber">425,426</context>
         </context-group>
         <target state="translated">偵測到重複文件：</target>
       </trans-unit>
@@ -9534,7 +9533,7 @@
         <source>In trash</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">434,435</context>
+          <context context-type="linenumber">436,437</context>
         </context-group>
         <target state="translated">在垃圾桶內</target>
       </trans-unit>
@@ -9542,7 +9541,7 @@
         <source>Save &amp; next</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">463</context>
+          <context context-type="linenumber">465</context>
         </context-group>
         <target state="translated">儲存 &amp; 下一個</target>
       </trans-unit>
@@ -9550,7 +9549,7 @@
         <source>Save &amp; close</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">465</context>
+          <context context-type="linenumber">467</context>
         </context-group>
         <target state="translated">標題與內容</target>
       </trans-unit>
@@ -9558,7 +9557,7 @@
         <source>Discard</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">467,468</context>
+          <context context-type="linenumber">469,470</context>
         </context-group>
         <target state="translated">放棄變更</target>
       </trans-unit>
@@ -9566,7 +9565,7 @@
         <source>Document loading...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">475</context>
+          <context context-type="linenumber">477</context>
         </context-group>
         <target state="translated">文件讀取中⋯</target>
       </trans-unit>
@@ -9574,7 +9573,7 @@
         <source>Enter Password</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">529</context>
+          <context context-type="linenumber">531</context>
         </context-group>
         <target state="translated">輸入密碼</target>
       </trans-unit>
@@ -9766,11 +9765,11 @@
         <source>Document &quot;<x id="PH" equiv-text="newValues.title"/>&quot; saved successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1349</context>
+          <context context-type="linenumber">1353</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1377</context>
+          <context context-type="linenumber">1381</context>
         </context-group>
         <target state="translated">文件「<x id="PH" equiv-text="newValues.title"/>」儲存成功。</target>
       </trans-unit>
@@ -9778,7 +9777,7 @@
         <source>Error saving document &quot;<x id="PH" equiv-text="this.document().title"/>&quot;</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1383</context>
+          <context context-type="linenumber">1387</context>
         </context-group>
         <target state="translated">文件「<x id="PH" equiv-text="this.document().title"/>」儲存時發生錯誤</target>
       </trans-unit>
@@ -9786,7 +9785,7 @@
         <source>Error saving document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1438</context>
+          <context context-type="linenumber">1442</context>
         </context-group>
         <target state="translated">儲存文件時發生錯誤</target>
       </trans-unit>
@@ -9794,7 +9793,7 @@
         <source>Do you really want to move the document &quot;<x id="PH" equiv-text="this.document().title"/>&quot; to the trash?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1471</context>
+          <context context-type="linenumber">1475</context>
         </context-group>
         <target state="translated">確定要將文件「<x id="PH" equiv-text="this.document().title"/>」移至垃圾桶？</target>
       </trans-unit>
@@ -9802,7 +9801,7 @@
         <source>Documents can be restored prior to permanent deletion.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1472</context>
+          <context context-type="linenumber">1476</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -9814,7 +9813,7 @@
         <source>Error deleting document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1493</context>
+          <context context-type="linenumber">1497</context>
         </context-group>
         <target state="translated">刪除文件時發生錯誤</target>
       </trans-unit>
@@ -9822,7 +9821,7 @@
         <source>Reprocess confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1513</context>
+          <context context-type="linenumber">1517</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -9834,7 +9833,7 @@
         <source>This operation will permanently recreate the archive file for this document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1514</context>
+          <context context-type="linenumber">1518</context>
         </context-group>
         <target state="translated">將永久重新建立此文件的封存檔案。</target>
       </trans-unit>
@@ -9842,7 +9841,7 @@
         <source>The archive file will be re-generated with the current settings.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1515</context>
+          <context context-type="linenumber">1519</context>
         </context-group>
         <target state="translated">封存檔案將以目前設定重新產生。</target>
       </trans-unit>
@@ -9850,7 +9849,7 @@
         <source>Reprocess operation for &quot;<x id="PH" equiv-text="this.document().title"/>&quot; will begin in the background.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1528</context>
+          <context context-type="linenumber">1532</context>
         </context-group>
         <target state="translated">「<x id="PH" equiv-text="this.document().title"/>」的重新處理作業將會在背景開始。</target>
       </trans-unit>
@@ -9858,7 +9857,7 @@
         <source>Error executing operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1539</context>
+          <context context-type="linenumber">1543</context>
         </context-group>
         <target state="translated">執行作業時發生錯誤</target>
       </trans-unit>
@@ -9866,7 +9865,7 @@
         <source>Error downloading document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1603</context>
+          <context context-type="linenumber">1607</context>
         </context-group>
         <target state="translated">下載文件時發生錯誤</target>
       </trans-unit>
@@ -9874,7 +9873,7 @@
         <source>Page Fit</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1681</context>
+          <context context-type="linenumber">1685</context>
         </context-group>
         <target state="translated">符合頁面大小</target>
       </trans-unit>
@@ -9882,7 +9881,7 @@
         <source>PDF edit operation for &quot;<x id="PH" equiv-text="this.document().title"/>&quot; will begin in the background.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1924</context>
+          <context context-type="linenumber">1928</context>
         </context-group>
         <target state="translated">「<x id="PH" equiv-text="this.document().title"/>」的 PDF 編輯作業將於背景開始執行。</target>
       </trans-unit>
@@ -9890,7 +9889,7 @@
         <source>Error executing PDF edit operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1936</context>
+          <context context-type="linenumber">1940</context>
         </context-group>
         <target state="translated">執行 PDF 編輯時時發生錯誤</target>
       </trans-unit>
@@ -9898,7 +9897,7 @@
         <source>Please enter the current password before attempting to remove it.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1947</context>
+          <context context-type="linenumber">1951</context>
         </context-group>
         <target state="translated">請先輸入目前的密碼，才能將其移除。</target>
       </trans-unit>
@@ -9906,7 +9905,7 @@
         <source>Password removal operation for &quot;<x id="PH" equiv-text="this.document().title"/>&quot; will begin in the background.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1981</context>
+          <context context-type="linenumber">1985</context>
         </context-group>
         <target state="translated">「<x id="PH" equiv-text="this.document().title"/>」的密碼移除作業將於背景開始執行。</target>
       </trans-unit>
@@ -9914,7 +9913,7 @@
         <source>Error executing password removal operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1995</context>
+          <context context-type="linenumber">1999</context>
         </context-group>
         <target state="translated">執行密碼移除作業時發生錯誤</target>
       </trans-unit>
@@ -9922,7 +9921,7 @@
         <source>Print failed.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">2045</context>
+          <context context-type="linenumber">2049</context>
         </context-group>
         <target state="translated">列印失敗。</target>
       </trans-unit>
@@ -9930,7 +9929,7 @@
         <source>Error loading document for printing.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">2054</context>
+          <context context-type="linenumber">2058</context>
         </context-group>
         <target state="translated">載入列印文件時發生錯誤</target>
       </trans-unit>
@@ -9938,11 +9937,11 @@
         <source>An error occurred loading tiff: <x id="PH" equiv-text="err.toString()"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">2137</context>
+          <context context-type="linenumber">2141</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">2143</context>
+          <context context-type="linenumber">2147</context>
         </context-group>
         <target state="translated">讀取 TIFF 檔時發生錯誤：<x id="PH" equiv-text="err.toString()"/></target>
       </trans-unit>
