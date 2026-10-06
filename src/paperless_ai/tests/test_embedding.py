@@ -17,6 +17,7 @@ from paperless_ai.embedding import get_embedding_model
 @pytest.fixture
 def mock_ai_config():
     with patch("paperless_ai.embedding.AIConfig") as MockAIConfig:
+        MockAIConfig.return_value.llm_embedding_api_key = None
         MockAIConfig.return_value.llm_embedding_endpoint = None
         MockAIConfig.return_value.llm_allow_internal_endpoints = True
         MockAIConfig.return_value.llm_context_size = 8192
@@ -63,6 +64,7 @@ def mock_document():
 def test_get_embedding_model_openai(mock_ai_config):
     mock_ai_config.return_value.llm_embedding_backend = LLMEmbeddingBackend.OPENAI_LIKE
     mock_ai_config.return_value.llm_embedding_model = "text-embedding-3-small"
+    mock_ai_config.return_value.llm_embedding_api_key = "test_embedding_api_key"
     mock_ai_config.return_value.llm_api_key = "test_api_key"
     mock_ai_config.return_value.llm_endpoint = "http://test-url"
 
@@ -72,13 +74,27 @@ def test_get_embedding_model_openai(mock_ai_config):
         model = get_embedding_model(mock_ai_config.return_value)
         MockOpenAIEmbedding.assert_called_once_with(
             model_name="text-embedding-3-small",
-            api_key="test_api_key",
+            api_key="test_embedding_api_key",
             api_base="http://test-url",
             timeout=120,
             http_client=ANY,
             async_http_client=ANY,
         )
         assert model == MockOpenAIEmbedding.return_value
+
+
+def test_get_embedding_model_openai_falls_back_to_llm_api_key(mock_ai_config):
+    mock_ai_config.return_value.llm_embedding_backend = LLMEmbeddingBackend.OPENAI_LIKE
+    mock_ai_config.return_value.llm_embedding_model = "text-embedding-3-small"
+    mock_ai_config.return_value.llm_api_key = "test_api_key"
+    mock_ai_config.return_value.llm_endpoint = "http://test-url"
+
+    with patch(
+        "llama_index.embeddings.openai_like.OpenAILikeEmbedding",
+    ) as MockOpenAIEmbedding:
+        get_embedding_model(mock_ai_config.return_value)
+
+    assert MockOpenAIEmbedding.call_args.kwargs["api_key"] == "test_api_key"
 
 
 @pytest.mark.parametrize("configured_key", [None, ""])
@@ -89,6 +105,7 @@ def test_get_embedding_model_openai_without_api_key_sends_placeholder(
     """Same required key handling as the LLM client, see #13831."""
     mock_ai_config.return_value.llm_embedding_backend = LLMEmbeddingBackend.OPENAI_LIKE
     mock_ai_config.return_value.llm_embedding_model = "text-embedding-3-small"
+    mock_ai_config.return_value.llm_embedding_api_key = configured_key
     mock_ai_config.return_value.llm_api_key = configured_key
     mock_ai_config.return_value.llm_endpoint = "http://test-url"
 

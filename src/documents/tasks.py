@@ -20,6 +20,7 @@ from filelock import FileLock
 
 from documents import sanity_checker
 from documents.barcodes import BarcodePlugin
+from documents.barcodes import read_barcode_values
 from documents.bulk_download import ArchiveOnlyStrategy
 from documents.bulk_download import OriginalsOnlyStrategy
 from documents.caching import clear_document_caches
@@ -36,6 +37,7 @@ from documents.data_models import ConsumeFileDuplicateResult
 from documents.data_models import ConsumeFileStoppedResult
 from documents.data_models import ConsumeFileSuccessResult
 from documents.data_models import DocumentMetadataOverrides
+from documents.data_models import StoredBarcode
 from documents.double_sided import CollatePlugin
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import generate_unique_filename
@@ -43,6 +45,7 @@ from documents.matching import prefilter_documents_by_workflowtrigger
 from documents.models import Correspondent
 from documents.models import CustomFieldInstance
 from documents.models import Document
+from documents.models import DocumentBarcode
 from documents.models import DocumentType
 from documents.models import PaperlessTask
 from documents.models import ShareLink
@@ -67,6 +70,7 @@ from documents.utils import identity
 from documents.versioning import annotate_effective_content
 from documents.workflows.utils import get_workflows_for_trigger
 from paperless.config import AIConfig
+from paperless.config import BarcodeConfig
 from paperless.config import RemoteOCRConfig
 from paperless.logging import consume_task_id
 from paperless.parsers import ParserContext
@@ -341,6 +345,29 @@ def bulk_update_documents(document_ids) -> None:
         )
 
 
+def _read_barcodes_for_reprocess(document: Document) -> list[StoredBarcode] | None:
+    """
+    Reads the barcodes of the original again, e.g. for documents consumed
+    before storing them was enabled. Returns None if they should be left as
+    they are: storing is off, the file can't be scanned with the current
+    settings, or the scan failed.
+    """
+    barcode_settings = BarcodeConfig()
+    if not barcode_settings.barcode_store_values:
+        return None
+    try:
+        with TemporaryDirectory(dir=settings.SCRATCH_DIR) as tmpdir:
+            return read_barcode_values(
+                document.source_path,
+                document.mime_type,
+                barcode_settings,
+                Path(tmpdir),
+            )
+    except Exception as e:
+        logger.warning(f"Could not read barcodes of document {document}: {e}")
+        return None
+
+
 @shared_task
 def update_document_content_maybe_archive_file(
     document_id,
@@ -386,6 +413,8 @@ def update_document_content_maybe_archive_file(
                 mime_type,
                 produce_archive=produce_archive,
             )
+
+            barcodes = _read_barcodes_for_reprocess(document)
 
             thumbnail = parser.get_thumbnail(document.source_path, mime_type)
 
@@ -442,6 +471,17 @@ def update_document_content_maybe_archive_file(
                             },
                             action=LogEntry.Action.UPDATE,
                         )
+
+                if barcodes is not None:
+                    document.barcodes.all().delete()
+                    DocumentBarcode.objects.bulk_create(
+                        DocumentBarcode(document=document, **barcode)
+                        for barcode in barcodes
+                    )
+                    # metadata_etag includes modified
+                    Document.objects.filter(pk=document.pk).update(
+                        modified=timezone.now(),
+                    )
 
                 with FileLock(settings.MEDIA_LOCK):
                     if parser.get_archive_path():

@@ -45,6 +45,7 @@ from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
+from documents.models import DocumentBarcode
 from documents.models import DocumentType
 from documents.models import Note
 from documents.models import SavedView
@@ -353,6 +354,7 @@ class Command(CryptMixin, PaperlessCommand):
             "workflows": Workflow.objects.all(),
             "custom_fields": CustomField.objects.all(),
             "custom_field_instances": CustomFieldInstance.global_objects.all(),
+            "document_barcodes": DocumentBarcode.objects.all(),
             "app_configs": ApplicationConfiguration.objects.all(),
             "notes": Note.global_objects.all(),
             "documents": Document.global_objects.order_by("id").all(),
@@ -411,6 +413,7 @@ class Command(CryptMixin, PaperlessCommand):
                     elif self.split_manifest and key in (
                         "notes",
                         "custom_field_instances",
+                        "document_barcodes",
                     ):
                         # Written per-document in _write_split_manifest
                         pass
@@ -649,6 +652,12 @@ class Command(CryptMixin, PaperlessCommand):
             serializers.serialize(
                 "python",
                 CustomFieldInstance.global_objects.filter(document=document),
+            ),
+        )
+        content.extend(
+            serializers.serialize(
+                "python",
+                DocumentBarcode.objects.filter(document=document),
             ),
         )
         manifest_name = base_name.with_name(f"{base_name.stem}-manifest.json")

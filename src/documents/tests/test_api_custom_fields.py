@@ -4,23 +4,24 @@ from unittest import mock
 from unittest.mock import ANY
 
 from django.contrib.auth.models import Permission
-from django.contrib.auth.models import User
 from django.test import override_settings
-from guardian.shortcuts import assign_perm
 from rest_framework import status
 from rest_framework.test import APITestCase
 
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
-from documents.tests.utils import DirectoriesMixin
+from paperless_testing.dirs import DirectoriesMixin
+from paperless_testing.factories import UserFactory
+from paperless_testing.permissions import grant_global
+from paperless_testing.permissions import grant_object
 
 
 class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
     ENDPOINT = "/api/custom_fields/"
 
     def setUp(self) -> None:
-        self.user = User.objects.create_superuser(username="temp_admin")
+        self.user = UserFactory(username="temp_admin", superuser=True)
         self.client.force_authenticate(user=self.user)
         return super().setUp()
 
@@ -1174,11 +1175,9 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
     def test_documentlink_patch_requires_change_permission_on_target_documents(
         self,
     ) -> None:
-        source_owner = User.objects.create_user(username="source-owner")
-        source_owner.user_permissions.add(
-            Permission.objects.get(codename="change_document"),
-        )
-        other_user = User.objects.create_user(username="other-user")
+        source_owner = UserFactory(username="source-owner")
+        grant_global(source_owner, "change_document")
+        other_user = UserFactory(username="other-user")
 
         source_doc = Document.objects.create(
             title="Source",
@@ -1221,11 +1220,9 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
     def test_documentlink_patch_allowed_with_change_permission_on_target_documents(
         self,
     ) -> None:
-        source_owner = User.objects.create_user(username="source-owner")
-        source_owner.user_permissions.add(
-            Permission.objects.get(codename="change_document"),
-        )
-        other_user = User.objects.create_user(username="other-user")
+        source_owner = UserFactory(username="source-owner")
+        grant_global(source_owner, "change_document")
+        other_user = UserFactory(username="other-user")
 
         source_doc = Document.objects.create(
             title="Source",
@@ -1244,7 +1241,7 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
             data_type=CustomField.FieldDataType.DOCUMENTLINK,
         )
 
-        assign_perm("change_document", source_owner, target_doc)
+        grant_object(source_owner, target_doc, "change_document")
         self.client.force_authenticate(user=source_owner)
 
         resp = self.client.patch(
@@ -1337,7 +1334,7 @@ class TestCustomFieldsAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(results[0]["document_count"], 1)
 
         # Test as user without access to the document
-        non_superuser = User.objects.create_user(username="non_superuser")
+        non_superuser = UserFactory(username="non_superuser")
         non_superuser.user_permissions.add(
             *Permission.objects.exclude(codename="view_global_statistics"),
         )

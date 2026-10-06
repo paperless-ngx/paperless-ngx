@@ -3,8 +3,8 @@ from pathlib import Path
 
 import pytest
 
-from documents.tests.utils import util_call_with_backoff
 from paperless.parsers.tika import TikaDocumentParser
+from paperless_testing.retry import util_call_with_backoff
 
 
 @pytest.mark.skipif(

@@ -2,27 +2,30 @@ import json
 from unittest import mock
 
 from auditlog.models import LogEntry
-from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.test import override_settings
-from guardian.shortcuts import assign_perm
 from rest_framework import status
 from rest_framework.test import APITestCase
 
 from documents.models import Correspondent
 from documents.models import CustomField
+from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import StoragePath
 from documents.models import Tag
-from documents.tests.utils import DirectoriesMixin
+from paperless_testing.dirs import DirectoriesMixin
+from paperless_testing.factories import UserFactory
+from paperless_testing.permissions import grant_all_global
+from paperless_testing.permissions import grant_global
+from paperless_testing.permissions import grant_object
 
 
 class TestBulkEditAPI(DirectoriesMixin, APITestCase):
     def setUp(self) -> None:
         super().setUp()
 
-        user = User.objects.create_superuser(username="temp_admin")
+        user = UserFactory(username="temp_admin", superuser=True)
         self.user = user
         self.client.force_authenticate(user=user)
 
@@ -284,9 +287,9 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         m,
     ) -> None:
         self.setup_mock(m, "modify_custom_fields")
-        user = User.objects.create_user(username="doc-owner")
-        user.user_permissions.add(Permission.objects.get(codename="change_document"))
-        other_user = User.objects.create_user(username="other-user")
+        user = UserFactory(username="doc-owner")
+        grant_global(user, "change_document")
+        other_user = UserFactory(username="other-user")
         source_doc = Document.objects.create(
             checksum="source",
             title="Source",
@@ -787,10 +790,8 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
     @mock.patch("documents.serialisers.bulk_edit.set_storage_path")
     def test_api_bulk_edit_with_all_true_resolves_owned_duplicates(self, m) -> None:
         self.setup_mock(m, "set_storage_path")
-        user = User.objects.create_user(username="duplicate-owner")
-        user.user_permissions.add(
-            Permission.objects.get(codename="change_document"),
-        )
+        user = UserFactory(username="duplicate-owner")
+        grant_global(user, "change_document")
         first_duplicate = Document.objects.create(
             checksum="owned-duplicate",
             title="First duplicate",
@@ -1178,7 +1179,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         user1 = User.objects.create(username="user1")
         self.client.force_authenticate(user=user1)
 
-        assign_perm("view_document", user1, self.doc2)
+        grant_object(user1, self.doc2, "view_document")
 
         response = self.client.post(
             "/api/documents/selection_data/",
@@ -1188,9 +1189,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-        user1.user_permissions.add(
-            Permission.objects.get(codename="view_document"),
-        )
+        grant_global(user1, "view_document")
         user1 = User.objects.get(pk=user1.pk)
         self.client.force_authenticate(user=user1)
         response = self.client.post(
@@ -1533,7 +1532,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.doc1.owner = User.objects.get(username="temp_admin")
         self.doc1.save()
         user1 = User.objects.create(username="user1")
-        user1.user_permissions.add(*Permission.objects.all())
+        grant_all_global(user1)
         user1.save()
         self.client.force_authenticate(user=user1)
 
@@ -1587,8 +1586,8 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.doc1.owner = User.objects.get(username="temp_admin")
         self.doc1.save()
         user1 = User.objects.create(username="user1")
-        assign_perm("view_document", user1, self.doc1)
-        user1.user_permissions.add(*Permission.objects.all())
+        grant_object(user1, self.doc1, "view_document")
+        grant_all_global(user1)
         user1.save()
         self.client.force_authenticate(user=user1)
 
@@ -1609,7 +1608,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         m.assert_not_called()
         self.assertEqual(response.content, b"Insufficient permissions")
 
-        assign_perm("change_document", user1, self.doc1)
+        grant_object(user1, self.doc1, "change_document")
 
         response = self.client.post(
             "/api/documents/bulk_edit/",
@@ -1787,6 +1786,36 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         m.assert_not_called()
 
     @mock.patch("documents.serialisers.bulk_edit.split")
+    def test_bulk_edit_split_rejects_unknown_page_count(self, m) -> None:
+        """
+        GIVEN:
+            - A legacy split bulk edit of a document without a page count
+        WHEN:
+            - API to bulk edit is called
+        THEN:
+            - API returns HTTP 400
+            - split is not called
+        """
+        self.setup_mock(m, "split")
+
+        for pages in ("1", "1-5000000"):
+            with self.subTest(pages=pages):
+                response = self.client.post(
+                    "/api/documents/bulk_edit/",
+                    json.dumps(
+                        {
+                            "documents": [self.doc1.id],
+                            "method": "split",
+                            "parameters": {"pages": pages},
+                        },
+                    ),
+                    content_type="application/json",
+                )
+                self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+                self.assertIn(b"document page count is unknown", response.content)
+        m.assert_not_called()
+
+    @mock.patch("documents.serialisers.bulk_edit.split")
     def test_bulk_edit_split_parses_pages(self, m) -> None:
         """
         GIVEN:
@@ -1819,7 +1848,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.doc1.owner = User.objects.get(username="temp_admin")
         self.doc1.save()
         user1 = User.objects.create(username="user1")
-        user1.user_permissions.add(*Permission.objects.all())
+        grant_all_global(user1)
         user1.save()
         self.client.force_authenticate(user=user1)
 
@@ -1880,7 +1909,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.doc1.owner = User.objects.get(username="temp_admin")
         self.doc1.save()
         user1 = User.objects.create(username="user1")
-        user1.user_permissions.add(*Permission.objects.all())
+        grant_all_global(user1)
         user1.save()
         self.client.force_authenticate(user=user1)
 
@@ -1919,11 +1948,8 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
     @mock.patch("documents.views.bulk_edit.merge")
     def test_merge_and_delete_requires_change_permission(self, m) -> None:
         self.setup_mock(m, "merge")
-        user = User.objects.create_user(username="no-change")
-        user.user_permissions.add(
-            Permission.objects.get(codename="add_document"),
-            Permission.objects.get(codename="delete_document"),
-        )
+        user = UserFactory(username="no-change")
+        grant_global(user, "add_document", "delete_document")
         self.client.force_authenticate(user=user)
 
         response = self.client.post(
@@ -2310,7 +2336,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.doc1.owner = User.objects.get(username="temp_admin")
         self.doc1.save()
         user1 = User.objects.create(username="user1")
-        user1.user_permissions.add(*Permission.objects.all())
+        grant_all_global(user1)
         user1.save()
         self.client.force_authenticate(user=user1)
 
@@ -2345,7 +2371,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
     @mock.patch("documents.views.bulk_edit.edit_pdf")
     def test_edit_pdf_update_requires_change_permission(self, m) -> None:
         self.setup_mock(m, "edit_pdf")
-        user = User.objects.create_user(username="no-change")
+        user = UserFactory(username="no-change")
         self.client.force_authenticate(user=user)
 
         response = self.client.post(
@@ -2372,11 +2398,8 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
     ) -> None:
         self.setup_mock(edit_pdf_mock, "edit_pdf")
         self.setup_mock(remove_password_mock, "remove_password")
-        user = User.objects.create_user(username="no-delete")
-        user.user_permissions.add(
-            Permission.objects.get(codename="add_document"),
-            Permission.objects.get(codename="change_document"),
-        )
+        user = UserFactory(username="no-delete")
+        grant_global(user, "add_document", "change_document")
         self.client.force_authenticate(user=user)
 
         cases = [
@@ -2463,7 +2486,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.doc1.owner = User.objects.get(username="temp_admin")
         self.doc1.save()
         user1 = User.objects.create(username="user1")
-        user1.user_permissions.add(*Permission.objects.all())
+        grant_all_global(user1)
         user1.save()
         self.client.force_authenticate(user=user1)
 
@@ -2503,7 +2526,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         WHEN:
             - API to bulk edit documents is called
         THEN:
-            - Audit log is created
+            - Audit log is created with the old and new correspondent
         """
         LogEntry.objects.all().delete()
         response = self.client.post(
@@ -2519,7 +2542,8 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(LogEntry.objects.filter(object_pk=self.doc1.id).count(), 1)
+        entry = LogEntry.objects.get_for_object(self.doc1).get()
+        self.assertEqual(entry.changes, {"correspondent": [None, self.c2.id]})
 
     @override_settings(AUDIT_LOG_ENABLED=True)
     def test_bulk_edit_audit_log_enabled_tags(self) -> None:
@@ -2527,16 +2551,18 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         GIVEN:
             - Audit log is enabled
         WHEN:
-            - API to bulk edit tags is called
+            - API to bulk edit tags is called on an untagged document and a
+              document with several tags
         THEN:
-            - Audit log is created
+            - Audit log is created for each document with its full tag list
+              before and after the edit
         """
         LogEntry.objects.all().delete()
         response = self.client.post(
             "/api/documents/bulk_edit/",
             json.dumps(
                 {
-                    "documents": [self.doc1.id],
+                    "documents": [self.doc1.id, self.doc4.id],
                     "method": "modify_tags",
                     "parameters": {
                         "add_tags": [self.t1.id],
@@ -2548,18 +2574,32 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(LogEntry.objects.filter(object_pk=self.doc1.id).count(), 1)
+        entry = LogEntry.objects.get_for_object(self.doc1).get()
+        self.assertEqual(entry.changes, {"tags": [[], [self.t1.id]]})
+        entry = LogEntry.objects.get_for_object(self.doc4).get()
+        self.assertEqual(
+            entry.changes,
+            {"tags": [[self.t1.id, self.t2.id], [self.t1.id]]},
+        )
 
     @override_settings(AUDIT_LOG_ENABLED=True)
     def test_bulk_edit_audit_log_enabled_custom_fields(self) -> None:
         """
         GIVEN:
             - Audit log is enabled
+            - A document with two custom fields
         WHEN:
-            - API to bulk edit custom fields is called
+            - API to bulk edit custom fields is called to add a third
         THEN:
-            - Audit log is created
+            - Audit log is created with every custom field instance before and
+              after the edit
+            - Audit log is created for the new custom field instance
         """
+        cf3 = CustomField.objects.create(name="cf3", data_type="string")
+        existing = [
+            CustomFieldInstance.objects.create(document=self.doc1, field=field)
+            for field in (self.cf2, cf3)
+        ]
         LogEntry.objects.all().delete()
         response = self.client.post(
             "/api/documents/bulk_edit/",
@@ -2577,7 +2617,14 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(LogEntry.objects.filter(object_pk=self.doc1.id).count(), 2)
+        added = CustomFieldInstance.objects.get(document=self.doc1, field=self.cf1)
+        existing_ids = [instance.id for instance in existing]
+        entry = LogEntry.objects.get_for_object(self.doc1).get()
+        self.assertEqual(
+            entry.changes,
+            {"custom_fields": [existing_ids, [*existing_ids, added.id]]},
+        )
+        self.assertEqual(LogEntry.objects.get_for_object(added).count(), 1)
 
     def test_api_bulk_edit_with_bad_search_query_returns_400(self) -> None:
         """

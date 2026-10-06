@@ -394,7 +394,11 @@ class RasterisedDocumentParser:
 
         plain_pdf_path = Path(self.tempdir) / "image_plain.pdf"
         try:
-            convert_kwargs: dict = {}
+            convert_kwargs: dict = {
+                # Ignore invalid EXIF orientation values (e.g. 0) instead of
+                # aborting the conversion; valid values are still applied
+                "rotation": img2pdf.Rotation.ifvalid,
+            }
             if self.settings.image_dpi is not None:
                 convert_kwargs["layout_fun"] = img2pdf.get_fixed_dpi_layout_fun(
                     (self.settings.image_dpi, self.settings.image_dpi),

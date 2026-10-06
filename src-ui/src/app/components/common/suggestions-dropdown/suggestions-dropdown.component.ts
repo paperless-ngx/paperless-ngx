@@ -8,6 +8,7 @@ import {
 import { NgbDropdown, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { DocumentSuggestions } from 'src/app/data/document-suggestions'
+import { SuggestionSource } from 'src/app/data/ui-settings'
 import { pngxPopperOptions } from 'src/app/utils/popper-options'
 
 @Component({
@@ -18,21 +19,29 @@ import { pngxPopperOptions } from 'src/app/utils/popper-options'
 })
 export class SuggestionsDropdownComponent {
   public popperOptions = pngxPopperOptions
+  public readonly SuggestionSource = SuggestionSource
 
   @ViewChild('dropdown') dropdown: NgbDropdown
   readonly suggestions = input<DocumentSuggestions>(null)
   readonly aiEnabled = input(false)
   readonly loading = input(false)
   readonly disabled = input(false)
+  readonly source = input<SuggestionSource>(SuggestionSource.ML)
+  readonly defaultSource = input<SuggestionSource>(SuggestionSource.ML)
+  readonly fetchedSources = input<SuggestionSource[]>([])
 
   readonly appliedTags = input<number[]>([])
   readonly appliedCorrespondent = input<number>(null)
   readonly appliedDocumentType = input<number>(null)
   readonly appliedStoragePath = input<number>(null)
+  readonly appliedTitle = input<string>(null)
+  readonly appliedCreated = input<string>(null)
 
   @Output()
-  getSuggestions: EventEmitter<SuggestionsDropdownComponent> =
-    new EventEmitter()
+  getSuggestions: EventEmitter<SuggestionSource> = new EventEmitter()
+
+  @Output()
+  sourceChange: EventEmitter<SuggestionSource> = new EventEmitter()
 
   @Output()
   addTag: EventEmitter<string> = new EventEmitter()
@@ -53,9 +62,39 @@ export class SuggestionsDropdownComponent {
     }
 
     if (!this.suggestions()) {
-      this.getSuggestions.emit(this)
+      this.getSuggestions.emit(this.source())
+    } else if (this.hasUnfetchedSources) {
+      // sources changed, fetch the rest and show what we have meanwhile
+      this.getSuggestions.emit(this.source())
+      this.dropdown?.open()
     } else {
       this.dropdown?.toggle()
+    }
+  }
+
+  get useML(): boolean {
+    return this.source() !== SuggestionSource.AI
+  }
+
+  get useAI(): boolean {
+    return this.source() !== SuggestionSource.ML
+  }
+
+  get hasUnfetchedSources(): boolean {
+    const fetched = this.fetchedSources()
+    return (
+      (this.useML && !fetched.includes(SuggestionSource.ML)) ||
+      (this.useAI && !fetched.includes(SuggestionSource.AI))
+    )
+  }
+
+  public setSources(ml: boolean, ai: boolean) {
+    if (ml && ai) {
+      this.sourceChange.emit(SuggestionSource.Both)
+    } else if (ml) {
+      this.sourceChange.emit(SuggestionSource.ML)
+    } else if (ai) {
+      this.sourceChange.emit(SuggestionSource.AI)
     }
   }
 
@@ -91,7 +130,28 @@ export class SuggestionsDropdownComponent {
   }
 
   get totalSuggestions(): number {
-    return this.novelSuggestions + this.reusableSuggestions
+    return this.novelSuggestions + this.fieldSuggestions
+  }
+
+  get fieldSuggestions(): number {
+    return (
+      this.reusableSuggestions +
+      this.unappliedTitleSuggestions +
+      this.unappliedDateSuggestions
+    )
+  }
+
+  // hide a title or date suggestion equal to the current value
+  private get unappliedTitleSuggestions(): number {
+    const title = this.suggestions()?.title
+    return title && title !== this.appliedTitle() ? 1 : 0
+  }
+
+  private get unappliedDateSuggestions(): number {
+    const created = this.appliedCreated()
+    return (this.suggestions()?.dates ?? []).filter(
+      (date) => !created || date !== created
+    ).length
   }
 
   private countUnapplied(suggested: number[], applied: number[]): number {
@@ -102,6 +162,7 @@ export class SuggestionsDropdownComponent {
   get noSuggestions(): boolean {
     const suggestions = this.suggestions()
     return (
+      !this.loading() &&
       suggestions != null &&
       !suggestions.title &&
       !suggestions.tags?.length &&

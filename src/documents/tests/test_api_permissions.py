@@ -5,9 +5,7 @@ from unittest import mock
 from allauth.mfa.models import Authenticator
 from allauth.mfa.totp.internal import auth as totp_auth
 from django.contrib.auth.models import Group
-from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
-from guardian.shortcuts import assign_perm
 from guardian.shortcuts import get_perms
 from guardian.shortcuts import get_users_with_perms
 from rest_framework import status
@@ -19,7 +17,11 @@ from documents.models import DocumentType
 from documents.models import MatchingModel
 from documents.models import StoragePath
 from documents.models import Tag
-from documents.tests.utils import DirectoriesMixin
+from paperless_testing.dirs import DirectoriesMixin
+from paperless_testing.factories import UserFactory
+from paperless_testing.permissions import grant_all_global
+from paperless_testing.permissions import grant_global
+from paperless_testing.permissions import grant_object
 
 
 class TestApiAuth(DirectoriesMixin, APITestCase):
@@ -93,14 +95,14 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
         self.assertNotIn("X-Version", response)
 
     def test_api_version_with_auth(self) -> None:
-        user = User.objects.create_superuser(username="test")
+        user = UserFactory(username="test", superuser=True)
         self.client.force_authenticate(user)
         response = self.client.get("/api/documents/")
         self.assertIn("X-Api-Version", response)
         self.assertIn("X-Version", response)
 
     def test_api_insufficient_permissions(self) -> None:
-        user = User.objects.create_user(username="test")
+        user = UserFactory(username="test")
         self.client.force_authenticate(user)
 
         Document.objects.create(title="Test")
@@ -137,8 +139,8 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
         )
 
     def test_api_sufficient_permissions(self) -> None:
-        user = User.objects.create_user(username="test")
-        user.user_permissions.add(*Permission.objects.all())
+        user = UserFactory(username="test")
+        grant_all_global(user)
         user.is_staff = True
         self.client.force_authenticate(user)
 
@@ -166,9 +168,9 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
         )
 
     def test_api_get_object_permissions(self) -> None:
-        user1 = User.objects.create_user(username="test1")
-        user2 = User.objects.create_user(username="test2")
-        user1.user_permissions.add(*Permission.objects.filter(codename="view_document"))
+        user1 = UserFactory(username="test1")
+        user2 = UserFactory(username="test2")
+        grant_global(user1, "view_document")
         self.client.force_authenticate(user1)
 
         self.assertEqual(
@@ -205,7 +207,7 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
         THEN:
             - Object created with current user as owner
         """
-        user1 = User.objects.create_superuser(username="user1")
+        user1 = UserFactory(username="user1", superuser=True)
 
         self.client.force_authenticate(user1)
 
@@ -234,7 +236,7 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
         THEN:
             - Object created with no owner
         """
-        user1 = User.objects.create_superuser(username="user1")
+        user1 = UserFactory(username="user1", superuser=True)
 
         self.client.force_authenticate(user1)
 
@@ -265,7 +267,7 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
         THEN:
             - Object permissions are set appropriately
         """
-        user1 = User.objects.create_superuser(username="user1")
+        user1 = UserFactory(username="user1", superuser=True)
         user2 = User.objects.create(username="user2")
         group1 = Group.objects.create(name="group1")
 
@@ -313,7 +315,7 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
         THEN:
             - Object permissions are set appropriately
         """
-        user1 = User.objects.create_superuser(username="user1")
+        user1 = UserFactory(username="user1", superuser=True)
         user2 = User.objects.create(username="user2")
         group1 = Group.objects.create(name="group1")
 
@@ -363,7 +365,7 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
             mime_type="application/pdf",
             content="this is a document",
         )
-        user1 = User.objects.create_superuser(username="user1")
+        user1 = UserFactory(username="user1", superuser=True)
         user2 = User.objects.create(username="user2")
         group1 = Group.objects.create(name="group1")
 
@@ -413,16 +415,16 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
             mime_type="application/pdf",
             content="this is a document",
         )
-        user1 = User.objects.create_superuser(username="user1")
+        user1 = UserFactory(username="user1", superuser=True)
         user2 = User.objects.create(username="user2")
         group1 = Group.objects.create(name="group1")
         doc.owner = user1
         doc.save()
 
-        assign_perm("view_document", user2, doc)
-        assign_perm("change_document", user2, doc)
-        assign_perm("view_document", group1, doc)
-        assign_perm("change_document", group1, doc)
+        grant_object(user2, doc, "view_document")
+        grant_object(user2, doc, "change_document")
+        grant_object(group1, doc, "view_document")
+        grant_object(group1, doc, "change_document")
 
         self.client.force_authenticate(user1)
 
@@ -446,11 +448,9 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
         self.assertIn("change_document", get_perms(group1, doc))
 
     def test_document_permissions_change_requires_owner(self) -> None:
-        owner = User.objects.create_user(username="owner")
-        editor = User.objects.create_user(username="editor")
-        editor.user_permissions.add(
-            *Permission.objects.all(),
-        )
+        owner = UserFactory(username="owner")
+        editor = UserFactory(username="editor")
+        grant_all_global(editor)
 
         doc = Document.objects.create(
             title="Ownered doc",
@@ -460,8 +460,8 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
             owner=owner,
         )
 
-        assign_perm("view_document", editor, doc)
-        assign_perm("change_document", editor, doc)
+        grant_object(editor, doc, "view_document")
+        grant_object(editor, doc, "change_document")
 
         self.client.force_authenticate(editor)
         response = self.client.patch(
@@ -499,9 +499,9 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_dynamic_permissions_fields(self) -> None:
-        user1 = User.objects.create_user(username="user1")
-        user1.user_permissions.add(*Permission.objects.filter(codename="view_document"))
-        user2 = User.objects.create_user(username="user2")
+        user1 = UserFactory(username="user1")
+        grant_global(user1, "view_document")
+        user2 = UserFactory(username="user2")
 
         Document.objects.create(title="Test", content="content 1", checksum="1")
         doc2 = Document.objects.create(
@@ -523,10 +523,10 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
             owner=user1,
         )
 
-        assign_perm("view_document", user1, doc2)
-        assign_perm("view_document", user1, doc3)
-        assign_perm("change_document", user1, doc3)
-        assign_perm("view_document", user2, doc4)
+        grant_object(user1, doc2, "view_document")
+        grant_object(user1, doc3, "view_document")
+        grant_object(user1, doc3, "change_document")
+        grant_object(user2, doc4, "view_document")
 
         self.client.force_authenticate(user1)
 
@@ -574,8 +574,8 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
         owned by someone else with no explicit guardian grant -- mirrors
         guardian's own ObjectPermissionChecker.has_perm() superuser shortcut.
         """
-        superuser = User.objects.create_superuser(username="admin")
-        other_user = User.objects.create_user(username="user2")
+        superuser = UserFactory(username="admin", superuser=True)
+        other_user = UserFactory(username="user2")
         Document.objects.create(
             title="Test",
             content="content",
@@ -602,7 +602,7 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
         THEN:
             - MFA required error is returned
         """
-        user1 = User.objects.create_user(username="user1")
+        user1 = UserFactory(username="user1")
         user1.set_password("password")
         user1.save()
 
@@ -626,7 +626,7 @@ class TestApiAuth(DirectoriesMixin, APITestCase):
         THEN:
             - MFA code is required
         """
-        user1 = User.objects.create_user(username="user1")
+        user1 = UserFactory(username="user1")
         user1.set_password("password")
         user1.save()
 
@@ -688,7 +688,7 @@ class TestApiUser(DirectoriesMixin, APITestCase):
     def setUp(self) -> None:
         super().setUp()
 
-        self.user = User.objects.create_superuser(username="temp_admin")
+        self.user = UserFactory(username="temp_admin", superuser=True)
         self.client.force_authenticate(user=self.user)
 
     def test_get_users(self) -> None:
@@ -858,10 +858,8 @@ class TestApiUser(DirectoriesMixin, APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-        regular_user = User.objects.create_user(username="regular_user")
-        regular_user.user_permissions.add(
-            *Permission.objects.all(),
-        )
+        regular_user = UserFactory(username="regular_user")
+        grant_all_global(regular_user)
         self.client.force_authenticate(regular_user)
         Authenticator.objects.create(
             user=user1,
@@ -885,9 +883,9 @@ class TestApiUser(DirectoriesMixin, APITestCase):
             - Only superusers can change superuser status
         """
 
-        user1 = User.objects.create_user(username="user1")
-        user1.user_permissions.add(*Permission.objects.all())
-        user2 = User.objects.create_superuser(username="user2")
+        user1 = UserFactory(username="user1")
+        grant_all_global(user1)
+        user2 = UserFactory(username="user2", superuser=True)
 
         self.client.force_authenticate(user1)
 
@@ -972,9 +970,9 @@ class TestApiUser(DirectoriesMixin, APITestCase):
             - Only superusers can change staff status
         """
 
-        user1 = User.objects.create_user(username="user1")
-        user1.user_permissions.add(*Permission.objects.all())
-        user2 = User.objects.create_superuser(username="user2")
+        user1 = UserFactory(username="user1")
+        grant_all_global(user1)
+        user2 = UserFactory(username="user2", superuser=True)
 
         self.client.force_authenticate(user1)
 
@@ -1027,7 +1025,7 @@ class TestApiGroup(DirectoriesMixin, APITestCase):
     def setUp(self) -> None:
         super().setUp()
 
-        self.user = User.objects.create_superuser(username="temp_admin")
+        self.user = UserFactory(username="temp_admin", superuser=True)
         self.client.force_authenticate(user=self.user)
 
     def test_get_groups(self) -> None:
@@ -1128,7 +1126,7 @@ class TestBulkEditObjectPermissions(APITestCase):
     def setUp(self) -> None:
         super().setUp()
 
-        self.temp_admin = User.objects.create_superuser(username="temp_admin")
+        self.temp_admin = UserFactory(username="temp_admin", superuser=True)
         self.client.force_authenticate(user=self.temp_admin)
 
         self.t1 = Tag.objects.create(name="t1")
@@ -1276,7 +1274,7 @@ class TestBulkEditObjectPermissions(APITestCase):
             },
         }
 
-        assign_perm("view_tag", self.user3, self.t1)
+        grant_object(self.user3, self.t1, "view_tag")
         self.t1.owner = self.user3
         self.t1.save()
 
@@ -1373,13 +1371,9 @@ class TestBulkEditObjectPermissions(APITestCase):
         """
         self.t1.owner = self.user2
         self.t1.save()
-        assign_perm("view_tag", self.user1, self.t1)
-        assign_perm("change_tag", self.user1, self.t1)
-        self.user1.user_permissions.add(
-            *Permission.objects.filter(
-                codename__in=["view_tag", "change_tag"],
-            ),
-        )
+        grant_object(self.user1, self.t1, "view_tag")
+        grant_object(self.user1, self.t1, "change_tag")
+        grant_global(self.user1, "view_tag", "change_tag")
         user1 = User.objects.get(pk=self.user1.pk)
         self.client.force_authenticate(user=user1)
 
@@ -1426,13 +1420,9 @@ class TestBulkEditObjectPermissions(APITestCase):
         """
         owned = Tag.objects.create(name="owned", owner=self.user1)
         shared = Tag.objects.create(name="shared", owner=self.user2)
-        assign_perm("view_tag", self.user1, shared)
-        assign_perm("change_tag", self.user1, shared)
-        self.user1.user_permissions.add(
-            *Permission.objects.filter(
-                codename__in=["view_tag", "change_tag"],
-            ),
-        )
+        grant_object(self.user1, shared, "view_tag")
+        grant_object(self.user1, shared, "change_tag")
+        grant_global(self.user1, "view_tag", "change_tag")
         user1 = User.objects.get(pk=self.user1.pk)
         self.client.force_authenticate(user=user1)
 
@@ -1473,14 +1463,10 @@ class TestBulkEditObjectPermissions(APITestCase):
         """
         self.t1.owner = self.user2
         self.t1.save()
-        assign_perm("view_tag", self.user1, self.t1)
-        assign_perm("change_tag", self.user1, self.t1)
-        assign_perm("delete_tag", self.user1, self.t1)
-        self.user1.user_permissions.add(
-            *Permission.objects.filter(
-                codename__in=["view_tag", "change_tag", "delete_tag"],
-            ),
-        )
+        grant_object(self.user1, self.t1, "view_tag")
+        grant_object(self.user1, self.t1, "change_tag")
+        grant_object(self.user1, self.t1, "delete_tag")
+        grant_global(self.user1, "view_tag", "change_tag", "delete_tag")
         user1 = User.objects.get(pk=self.user1.pk)
         self.client.force_authenticate(user=user1)
 
@@ -1585,7 +1571,7 @@ class TestBulkEditObjectPermissions(APITestCase):
             - Request succeeds and null is treated as an empty user list,
               so the existing view permission is removed
         """
-        assign_perm("view_tag", self.user1, self.t1)
+        grant_object(self.user1, self.t1, "view_tag")
 
         response = self.client.post(
             "/api/bulk_edit_objects/",
@@ -1680,7 +1666,7 @@ class TestFullPermissionsFlag(APITestCase):
     def setUp(self) -> None:
         super().setUp()
 
-        self.admin = User.objects.create_superuser(username="admin")
+        self.admin = UserFactory(username="admin", superuser=True)
 
     def test_full_perms_flag(self) -> None:
         """

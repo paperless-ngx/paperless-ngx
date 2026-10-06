@@ -33,7 +33,7 @@ class TestSearchQueryErrorStillBecomesA400:
         self,
         admin_client: APIClient,
         monkeypatch: pytest.MonkeyPatch,
-        indexed_document: Document,
+        searchable_document: Document,
     ) -> None:
         """
         GIVEN:
@@ -68,7 +68,7 @@ class TestLibraryDefectsPropagate:
         self,
         admin_client: APIClient,
         monkeypatch: pytest.MonkeyPatch,
-        indexed_document: Document,
+        searchable_document: Document,
     ) -> None:
         """
         GIVEN:
@@ -98,7 +98,7 @@ class TestLibraryDefectsPropagate:
         self,
         admin_client: APIClient,
         monkeypatch: pytest.MonkeyPatch,
-        indexed_document: Document,
+        searchable_document: Document,
     ) -> None:
         """
         GIVEN:
@@ -141,7 +141,7 @@ class TestSelectionPathsAgreeWithSearch:
         self,
         admin_client: APIClient,
         monkeypatch: pytest.MonkeyPatch,
-        indexed_document: Document,
+        searchable_document: Document,
     ) -> None:
         """
         GIVEN:
@@ -181,7 +181,7 @@ class TestSelectionPathsAgreeWithSearch:
         self,
         admin_client: APIClient,
         monkeypatch: pytest.MonkeyPatch,
-        indexed_document: Document,
+        searchable_document: Document,
     ) -> None:
         """
         GIVEN:
@@ -221,7 +221,7 @@ class TestSelectionPathsAgreeWithSearch:
         self,
         admin_client: APIClient,
         monkeypatch: pytest.MonkeyPatch,
-        indexed_document: Document,
+        searchable_document: Document,
     ) -> None:
         """
         GIVEN:
@@ -259,7 +259,7 @@ class TestSelectionPathsAgreeWithSearch:
         self,
         admin_client: APIClient,
         monkeypatch: pytest.MonkeyPatch,
-        indexed_document: Document,
+        searchable_document: Document,
     ) -> None:
         """
         GIVEN:
@@ -287,7 +287,7 @@ class TestSelectionPathsAgreeWithSearch:
             {
                 "documents": [],
                 "all": True,
-                "filters": {"more_like_id": indexed_document.pk},
+                "filters": {"more_like_id": searchable_document.pk},
             },
             format="json",
         )
@@ -298,7 +298,7 @@ class TestSelectionPathsAgreeWithSearch:
         self,
         admin_client: APIClient,
         monkeypatch: pytest.MonkeyPatch,
-        indexed_document: Document,
+        searchable_document: Document,
     ) -> None:
         """
         GIVEN:
@@ -328,7 +328,7 @@ class TestSelectionPathsAgreeWithSearch:
                 {
                     "documents": [],
                     "all": True,
-                    "filters": {"more_like_id": indexed_document.pk},
+                    "filters": {"more_like_id": searchable_document.pk},
                 },
                 format="json",
             )

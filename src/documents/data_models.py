@@ -9,6 +9,16 @@ from guardian.shortcuts import get_groups_with_perms
 from guardian.shortcuts import get_users_with_perms
 
 
+class StoredBarcode(TypedDict):
+    """
+    A detected barcode as it is stored with a document
+    """
+
+    page: int  # 1-indexed
+    value: str
+    format: str  # a DocumentBarcode.Format value
+
+
 @dataclasses.dataclass
 class DocumentMetadataOverrides:
     """
@@ -35,6 +45,7 @@ class DocumentMetadataOverrides:
     version_label: str | None = None
     actor_id: int | None = None
     remote_ocr: bool = False
+    barcodes: list[StoredBarcode] | None = None
 
     def update(self, other: "DocumentMetadataOverrides") -> "DocumentMetadataOverrides":
         """

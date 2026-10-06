@@ -13,10 +13,10 @@ from documents.search._schema import needs_rebuild
 from documents.search._schema import schema_fingerprint
 
 if TYPE_CHECKING:
-    from pathlib import Path
-
     import tantivy
     from pytest_django.fixtures import Settings
+
+    from paperless_testing.dirs import PaperlessDirs
 
 
 pytestmark = pytest.mark.search
@@ -25,16 +25,19 @@ pytestmark = pytest.mark.search
 class TestNeedsRebuild:
     """needs_rebuild covers all sentinel-file states that require a full reindex."""
 
-    def test_returns_true_when_settings_file_missing(self, index_dir: Path) -> None:
-        assert needs_rebuild(index_dir) is True
+    def test_returns_true_when_settings_file_missing(
+        self,
+        paperless_dirs: PaperlessDirs,
+    ) -> None:
+        assert needs_rebuild(paperless_dirs.index_dir) is True
 
     def test_returns_false_when_version_and_language_match(
         self,
-        index_dir: Path,
+        paperless_dirs: PaperlessDirs,
         settings: Settings,
     ) -> None:
         settings.SEARCH_LANGUAGE = "en"
-        (index_dir / ".index_settings.json").write_text(
+        (paperless_dirs.index_dir / ".index_settings.json").write_text(
             json.dumps(
                 {
                     "schema_version": SCHEMA_VERSION,
@@ -43,51 +46,51 @@ class TestNeedsRebuild:
                 },
             ),
         )
-        assert needs_rebuild(index_dir) is False
+        assert needs_rebuild(paperless_dirs.index_dir) is False
 
     def test_returns_true_on_schema_version_mismatch(
         self,
-        index_dir: Path,
+        paperless_dirs: PaperlessDirs,
         settings: Settings,
     ) -> None:
         settings.SEARCH_LANGUAGE = None
-        (index_dir / ".index_settings.json").write_text(
+        (paperless_dirs.index_dir / ".index_settings.json").write_text(
             json.dumps({"schema_version": SCHEMA_VERSION - 1, "language": None}),
         )
-        assert needs_rebuild(index_dir) is True
+        assert needs_rebuild(paperless_dirs.index_dir) is True
 
     def test_returns_true_when_version_is_not_an_integer(
         self,
-        index_dir: Path,
+        paperless_dirs: PaperlessDirs,
         settings: Settings,
     ) -> None:
         settings.SEARCH_LANGUAGE = None
-        (index_dir / ".index_settings.json").write_text(
+        (paperless_dirs.index_dir / ".index_settings.json").write_text(
             json.dumps({"schema_version": "not-a-number", "language": None}),
         )
-        assert needs_rebuild(index_dir) is True
+        assert needs_rebuild(paperless_dirs.index_dir) is True
 
     def test_returns_true_when_language_key_missing(
         self,
-        index_dir: Path,
+        paperless_dirs: PaperlessDirs,
         settings: Settings,
     ) -> None:
         settings.SEARCH_LANGUAGE = "en"
-        (index_dir / ".index_settings.json").write_text(
+        (paperless_dirs.index_dir / ".index_settings.json").write_text(
             json.dumps({"schema_version": SCHEMA_VERSION}),
         )
-        assert needs_rebuild(index_dir) is True
+        assert needs_rebuild(paperless_dirs.index_dir) is True
 
     def test_returns_true_when_language_differs(
         self,
-        index_dir: Path,
+        paperless_dirs: PaperlessDirs,
         settings: Settings,
     ) -> None:
         settings.SEARCH_LANGUAGE = "de"
-        (index_dir / ".index_settings.json").write_text(
+        (paperless_dirs.index_dir / ".index_settings.json").write_text(
             json.dumps({"schema_version": SCHEMA_VERSION, "language": "en"}),
         )
-        assert needs_rebuild(index_dir) is True
+        assert needs_rebuild(paperless_dirs.index_dir) is True
 
 
 def _schema_fields(schema: tantivy.Schema) -> dict[str, dict]:

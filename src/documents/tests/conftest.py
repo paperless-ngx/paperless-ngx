@@ -1,88 +1,41 @@
 import shutil
-import zoneinfo
-from collections.abc import Generator
-from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING
 
 import filelock
 import pytest
-from django.contrib.auth import get_user_model
-from django.contrib.contenttypes.models import ContentType
-from guardian.shortcuts import clear_ct_cache
-from pytest_django.fixtures import Settings
-from rest_framework.test import APIClient
 
-from documents.tests.factories import DocumentFactory
-
-UserModelT = get_user_model()
+from paperless_testing.factories import DocumentFactory
 
 if TYPE_CHECKING:
     from documents.models import Document
-
-
-@dataclass(frozen=True, slots=True)
-class PaperlessDirs:
-    """Standard Paperless-ngx directory layout for tests."""
-
-    media: Path
-    originals: Path
-    archive: Path
-    thumbnails: Path
+    from paperless_testing.dirs import PaperlessDirs
 
 
 @pytest.fixture(scope="session")
-def samples_dir() -> Path:
+def document_samples_dir() -> Path:
     """Path to the shared test sample documents."""
     return Path(__file__).parent / "samples" / "documents"
 
 
 @pytest.fixture()
-def paperless_dirs(tmp_path: Path) -> PaperlessDirs:
-    """Create and return the directory structure for testing."""
-    media = tmp_path / "media"
-    dirs = PaperlessDirs(
-        media=media,
-        originals=media / "documents" / "originals",
-        archive=media / "documents" / "archive",
-        thumbnails=media / "documents" / "thumbnails",
-    )
-    for d in (dirs.originals, dirs.archive, dirs.thumbnails):
-        d.mkdir(parents=True)
-    return dirs
-
-
-@pytest.fixture()
-def _media_settings(paperless_dirs: PaperlessDirs, settings) -> None:
-    """Configure Django settings to point at temp directories."""
-    settings.MEDIA_ROOT = paperless_dirs.media
-    settings.ORIGINALS_DIR = paperless_dirs.originals
-    settings.ARCHIVE_DIR = paperless_dirs.archive
-    settings.THUMBNAIL_DIR = paperless_dirs.thumbnails
-    settings.MEDIA_LOCK = paperless_dirs.media / "media.lock"
-    settings.IGNORABLE_FILES = {".DS_Store", "Thumbs.db", "desktop.ini"}
-    settings.APP_LOGO = ""
-
-
-@pytest.fixture()
 def sample_doc(
-    paperless_dirs: PaperlessDirs,
-    _media_settings: None,
-    samples_dir: Path,
+    paperless_dirs: "PaperlessDirs",
+    document_samples_dir: Path,
 ) -> "Document":
     """Create a document with valid files and matching checksums."""
-    with filelock.FileLock(paperless_dirs.media / "media.lock"):
+    with filelock.FileLock(paperless_dirs.media_lock):
         shutil.copy(
-            samples_dir / "originals" / "0000001.pdf",
-            paperless_dirs.originals / "0000001.pdf",
+            document_samples_dir / "originals" / "0000001.pdf",
+            paperless_dirs.originals_dir / "0000001.pdf",
         )
         shutil.copy(
-            samples_dir / "archive" / "0000001.pdf",
-            paperless_dirs.archive / "0000001.pdf",
+            document_samples_dir / "archive" / "0000001.pdf",
+            paperless_dirs.archive_dir / "0000001.pdf",
         )
         shutil.copy(
-            samples_dir / "thumbnails" / "0000001.webp",
-            paperless_dirs.thumbnails / "0000001.webp",
+            document_samples_dir / "thumbnails" / "0000001.webp",
+            paperless_dirs.thumbnail_dir / "0000001.webp",
         )
 
     return DocumentFactory(
@@ -97,95 +50,17 @@ def sample_doc(
     )
 
 
-@pytest.fixture()
-def _search_index(
-    tmp_path: Path,
-    settings: Settings,
-) -> Generator[None, None, None]:
-    """Create a temp index directory and point INDEX_DIR at it.
+@pytest.fixture
+def _search_index(paperless_dirs: "PaperlessDirs") -> None:
+    """Point the search backend at a fresh, empty index directory.
 
-    Resets the backend singleton before and after so each test gets a clean
-    index rather than reusing a stale singleton from another test.
+    paperless_dirs owns INDEX_DIR and resets the backend singleton on both
+    sides of the test, so requesting it is all that is needed.
     """
-    from documents.search import reset_backend
-
-    index_dir = tmp_path / "index"
-    index_dir.mkdir()
-    settings.INDEX_DIR = index_dir
-    reset_backend()
-    yield
-    reset_backend()
-
-
-@pytest.fixture()
-def settings_timezone(settings: Settings) -> zoneinfo.ZoneInfo:
-    return zoneinfo.ZoneInfo(settings.TIME_ZONE)
 
 
 @pytest.fixture
-def rest_api_client():
-    """
-    The basic DRF ApiClient
-    """
-    yield APIClient()
-
-
-@pytest.fixture()
-def regular_user(django_user_model: type[UserModelT]) -> UserModelT:
-    """Unprivileged authenticated user for permission boundary tests."""
-    return django_user_model.objects.create_user(username="regular", password="regular")
-
-
-@pytest.fixture()
-def admin_client(rest_api_client: APIClient, admin_user: UserModelT) -> APIClient:
-    """Admin client pre-authenticated and sending the v10 Accept header."""
-    rest_api_client.force_authenticate(user=admin_user)
-    rest_api_client.credentials(HTTP_ACCEPT="application/json; version=10")
-    return rest_api_client
-
-
-@pytest.fixture()
-def v9_client(rest_api_client: APIClient, admin_user: UserModelT) -> APIClient:
-    """Admin client pre-authenticated and sending the v9 Accept header."""
-    rest_api_client.force_authenticate(user=admin_user)
-    rest_api_client.credentials(HTTP_ACCEPT="application/json; version=9")
-    return rest_api_client
-
-
-@pytest.fixture()
-def user_client(rest_api_client: APIClient, regular_user: UserModelT) -> APIClient:
-    """Regular-user client pre-authenticated and sending the v10 Accept header."""
-    rest_api_client.force_authenticate(user=regular_user)
-    rest_api_client.credentials(HTTP_ACCEPT="application/json; version=10")
-    return rest_api_client
-
-
-@pytest.fixture(autouse=True)
-def _clear_content_type_caches() -> None:
-    """Clear Django's ContentType cache and guardian's lru_cache before each test.
-
-    Tests that delete and reinsert ContentType/Permission rows (e.g. the
-    importer) corrupt both caches. Without this fixture a subsequent test on
-    the same xdist worker sees stale ContentType objects and guardian raises
-    MixedContentTypeError.
-    """
-    ContentType.objects.clear_cache()
-    clear_ct_cache()
-
-
-@pytest.fixture(scope="session", autouse=True)
-def faker_session_locale():
-    """Set Faker locale for reproducibility."""
-    return "en_US"
-
-
-@pytest.fixture(scope="session", autouse=True)
-def faker_seed():
-    return 12345
-
-
-@pytest.fixture
-def indexed_document(_search_index: None) -> "Document":
+def searchable_document(_search_index: None) -> "Document":
     """One searchable document, for tests about what the search endpoint
     returns rather than about what it finds.
     """

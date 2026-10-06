@@ -331,6 +331,13 @@ export const PaperlessConfigOptions: ConfigOption[] = [
     category: ConfigCategory.Barcode,
   },
   {
+    key: 'barcode_store_values',
+    title: $localize`Store Barcode Contents`,
+    type: ConfigOptionType.Boolean,
+    config_key: 'PAPERLESS_CONSUMER_STORE_BARCODE_VALUES',
+    category: ConfigCategory.Barcode,
+  },
+  {
     key: 'ai_enabled',
     title: $localize`AI Enabled`,
     type: ConfigOptionType.Boolean,
@@ -351,6 +358,14 @@ export const PaperlessConfigOptions: ConfigOption[] = [
     title: $localize`LLM Embedding Model`,
     type: ConfigOptionType.String,
     config_key: 'PAPERLESS_AI_LLM_EMBEDDING_MODEL',
+    category: ConfigCategory.AI,
+  },
+  {
+    key: 'llm_embedding_api_key',
+    title: $localize`LLM Embedding API Key`,
+    type: ConfigOptionType.Password,
+    note: $localize`Used for embeddings when set, otherwise LLM API key is used.`,
+    config_key: 'PAPERLESS_AI_LLM_EMBEDDING_API_KEY',
     category: ConfigCategory.AI,
   },
   {
@@ -450,6 +465,7 @@ export interface PaperlessConfig extends ObjectWithId {
   barcode_enable_tag: boolean
   barcode_tag_mapping: object
   barcode_tag_split: boolean
+  barcode_store_values: boolean
   remote_ocr_engine: string
   remote_ocr_api_key: string
   remote_ocr_endpoint: string
@@ -457,6 +473,7 @@ export interface PaperlessConfig extends ObjectWithId {
   ai_enabled: boolean
   llm_embedding_backend: string
   llm_embedding_model: string
+  llm_embedding_api_key: string
   llm_embedding_endpoint: string
   llm_embedding_chunk_size: number
   llm_context_size: number

@@ -1,7 +1,11 @@
 import { SimpleChange } from '@angular/core'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import * as pdfjs from 'pdfjs-dist/legacy/build/pdf.mjs'
-import { PDFSinglePageViewer, PDFViewer } from 'pdfjs-dist/web/pdf_viewer.mjs'
+import {
+  LinkTarget,
+  PDFSinglePageViewer,
+  PDFViewer,
+} from 'pdfjs-dist/web/pdf_viewer.mjs'
 import { PngxPdfViewerComponent } from './pdf-viewer.component'
 import { PdfRenderMode, PdfZoomLevel, PdfZoomScale } from './pdf-viewer.types'
 
@@ -58,6 +62,16 @@ describe('PngxPdfViewerComponent', () => {
     expect((component as any).pdfViewer).toBeInstanceOf(PDFViewer)
   })
 
+  it('opens external links in a new tab', () => {
+    const linkService = (component as any).linkService
+    expect(linkService.options).toEqual(
+      expect.objectContaining({
+        externalLinkTarget: LinkTarget.BLANK,
+        externalLinkRel: 'noopener noreferrer nofollow',
+      })
+    )
+  })
+
   it('resolves the worker source relative to the document base URI', async () => {
     setBaseHref('/paperless/')
     const getDocumentSpy = jest.spyOn(pdfjs, 'getDocument')
@@ -76,6 +90,7 @@ describe('PngxPdfViewerComponent', () => {
       withCredentials: true,
       wasmUrl: expect.stringContaining('/paperless/assets/wasm/'),
       iccUrl: expect.stringContaining('/paperless/assets/iccs/'),
+      cMapUrl: expect.stringContaining('/paperless/assets/cmaps/'),
     })
   })
 

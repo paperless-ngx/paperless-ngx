@@ -1,4 +1,4 @@
-from documents.tests.utils import TestMigrations
+from paperless_testing.migrations import TestMigrations
 
 
 class TestMigrateSkipArchiveFile(TestMigrations):

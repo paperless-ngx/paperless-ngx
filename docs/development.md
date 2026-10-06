@@ -150,6 +150,7 @@ pnpm ng build --configuration production
   is loaded as well. However, the tests rely on the default
   configuration. This is not ideal. But for now, make sure no settings
   except for DEBUG are overridden when testing.
+- Tests run in a random order each session, so that one test cannot quietly depend on another having run first. The seed is printed at the top of the run; pass `--randomly-seed=<seed>` to replay that exact order, or `--randomly-seed=last` to repeat the previous run.
 
 !!! note
 

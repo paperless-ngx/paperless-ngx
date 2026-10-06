@@ -29,7 +29,7 @@ from rest_framework import status
 
 from documents.search._backend import SearchMode
 from documents.search._query import parse_simple_text_highlight_query
-from documents.tests.factories import DocumentFactory
+from paperless_testing.factories import DocumentFactory
 
 if TYPE_CHECKING:
     from rest_framework.test import APIClient

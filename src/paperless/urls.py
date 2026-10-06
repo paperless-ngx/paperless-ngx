@@ -1,4 +1,5 @@
 from allauth.account import views as allauth_account_views
+from allauth.account.decorators import secure_admin_login
 from allauth.mfa.base import views as allauth_mfa_views
 from allauth.socialaccount import views as allauth_social_account_views
 from allauth.urls import build_provider_urlpatterns
@@ -67,6 +68,8 @@ from paperless_mail.views import MailAccountViewSet
 from paperless_mail.views import MailRuleViewSet
 from paperless_mail.views import OauthCallbackView
 from paperless_mail.views import ProcessedMailViewSet
+
+admin.site.login = secure_admin_login(admin.site.login)
 
 api_router = DefaultRouter()
 api_router.register(r"correspondents", CorrespondentViewSet)
@@ -297,7 +300,7 @@ urlpatterns = [
     ),
     re_path(r"^share/(?P<slug>\w+)/?$", SharedLinkView.as_view()),
     re_path(r"^favicon.ico$", FaviconView.as_view(), name="favicon"),
-    re_path(r"admin/", admin.site.urls),
+    re_path(r"^admin/", admin.site.urls),
     re_path(
         r"^fetch/",
         include(

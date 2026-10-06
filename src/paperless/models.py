@@ -303,6 +303,12 @@ class ApplicationConfiguration(AbstractSingletonModel):
         null=True,
     )
 
+    # PAPERLESS_CONSUMER_STORE_BARCODE_VALUES
+    barcode_store_values = models.BooleanField(
+        verbose_name=_("Stores the values of detected barcodes"),
+        null=True,
+    )
+
     """
     Settings for the remote OCR parser
     """
@@ -363,6 +369,13 @@ class ApplicationConfiguration(AbstractSingletonModel):
         blank=True,
         null=True,
         max_length=128,
+    )
+
+    llm_embedding_api_key = models.CharField(
+        verbose_name=_("Sets the LLM embedding API key"),
+        blank=True,
+        null=True,
+        max_length=1024,
     )
 
     llm_embedding_endpoint = models.CharField(

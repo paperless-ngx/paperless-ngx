@@ -23,7 +23,6 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import DataError
 from django.test import override_settings
 from django.utils import timezone
-from guardian.shortcuts import assign_perm
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -48,18 +47,22 @@ from documents.models import Workflow
 from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
 from documents.signals.handlers import run_workflows
-from documents.tests.factories import DocumentFactory
-from documents.tests.factories import TagFactory
 from documents.tests.utils import ConsumeTaskMixin
-from documents.tests.utils import DirectoriesMixin
-from documents.tests.utils import read_streaming_response
+from paperless_testing.dirs import DirectoriesMixin
+from paperless_testing.factories import DocumentFactory
+from paperless_testing.factories import TagFactory
+from paperless_testing.factories import UserFactory
+from paperless_testing.http import read_streaming_response
+from paperless_testing.permissions import grant_all_global
+from paperless_testing.permissions import grant_global
+from paperless_testing.permissions import grant_object
 
 
 class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
     def setUp(self) -> None:
         super().setUp()
 
-        self.user = User.objects.create_superuser(username="temp_admin")
+        self.user = UserFactory(username="temp_admin", superuser=True)
         self.client.force_authenticate(user=self.user)
         cache.clear()
 
@@ -357,10 +360,10 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         with Path(filename).open("wb") as f:
             f.write(content)
 
-        user1 = User.objects.create_user(username="test1")
-        user2 = User.objects.create_user(username="test2")
-        user1.user_permissions.add(*Permission.objects.filter(codename="view_document"))
-        user2.user_permissions.add(*Permission.objects.filter(codename="view_document"))
+        user1 = UserFactory(username="test1")
+        user2 = UserFactory(username="test2")
+        grant_global(user1, "view_document")
+        grant_global(user2, "view_document")
 
         self.client.force_authenticate(user2)
 
@@ -383,7 +386,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         response = self.client.get(f"/api/documents/{doc.pk}/thumb/")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-        assign_perm("view_document", user2, doc)
+        grant_object(user2, doc, "view_document")
 
         response = self.client.get(f"/api/documents/{doc.pk}/download/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -760,8 +763,8 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             - History is returned
         """
         # No auditlog permissions
-        user = User.objects.create_user(username="test")
-        user.user_permissions.add(*Permission.objects.filter(codename="view_document"))
+        user = UserFactory(username="test")
+        grant_global(user, "view_document")
         self.client.force_authenticate(user=user)
         doc = Document.objects.create(
             title="First title",
@@ -776,7 +779,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         # superuser
         user.is_superuser = True
         user.save()
-        user2 = User.objects.create_user(username="test2")
+        user2 = UserFactory(username="test2")
         doc2 = Document.objects.create(
             title="Second title",
             checksum="456",
@@ -1073,11 +1076,9 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         self.assertEqual(response.data["duplicate_documents"], [])
 
     def test_has_duplicates_filter_respects_document_permissions(self) -> None:
-        owner = User.objects.create_user(username="duplicate-owner")
-        requester = User.objects.create_user(username="duplicate-requester")
-        requester.user_permissions.add(
-            Permission.objects.get(codename="view_document"),
-        )
+        owner = UserFactory(username="duplicate-owner")
+        requester = UserFactory(username="duplicate-requester")
+        grant_global(requester, "view_document")
         visible_document = Document.objects.create(
             title="visible document",
             checksum="permission-match",
@@ -1096,7 +1097,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             [document["id"] for document in response.data["results"]],
         )
 
-        assign_perm("view_document", requester, hidden_duplicate)
+        grant_object(requester, hidden_duplicate, "view_document")
         response = self.client.get("/api/documents/?has_duplicates=true")
         self.assertIn(
             visible_document.id,
@@ -1317,10 +1318,10 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         THEN:
             - Owner filters work correctly but still respect permissions
         """
-        u1 = User.objects.create_user("user1")
-        u2 = User.objects.create_user("user2")
-        u1.user_permissions.add(*Permission.objects.filter(codename="view_document"))
-        u2.user_permissions.add(*Permission.objects.filter(codename="view_document"))
+        u1 = UserFactory(username="user1")
+        u2 = UserFactory(username="user2")
+        grant_global(u1, "view_document")
+        grant_global(u2, "view_document")
 
         u1_doc1 = Document.objects.create(
             title="none1",
@@ -1353,7 +1354,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         )
 
         self.client.force_authenticate(user=u1)
-        assign_perm("view_document", u1, u2_doc2)
+        grant_object(u1, u2_doc2, "view_document")
 
         # Will not show any u1 docs or u2_doc1 which isn't shared
         response = self.client.get(f"/api/documents/?owner__id__none={u1.id}")
@@ -1400,7 +1401,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             [u1_doc1.id, u1_doc2.id, u2_doc2.id],
         )
 
-        assign_perm("view_document", u2, u1_doc1)
+        grant_object(u2, u1_doc1, "view_document")
 
         # Will show only documents shared by user
         response = self.client.get(f"/api/documents/?shared_by__id={u1.id}")
@@ -1424,8 +1425,8 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             - The document is returned exactly once, not once per permission path
             (regression test for https://github.com/paperless-ngx/paperless-ngx/issues/13331)
         """
-        user = User.objects.create_user("user1")
-        user.user_permissions.add(*Permission.objects.filter(codename="view_document"))
+        user = UserFactory(username="user1")
+        grant_global(user, "view_document")
         group = Group.objects.create(name="group1")
         user.groups.add(group)
 
@@ -1433,7 +1434,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         tag2 = TagFactory()
         doc = DocumentFactory(title="shared", owner=user)
         doc.tags.add(tag1, tag2)
-        assign_perm("view_document", group, doc)
+        grant_object(group, doc, "view_document")
 
         self.client.force_authenticate(user=user)
         response = self.client.get(
@@ -1452,11 +1453,9 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         THEN:
             - The document does not appear in their results
         """
-        owner = User.objects.create_user("owner1")
-        stranger = User.objects.create_user("stranger1")
-        stranger.user_permissions.add(
-            *Permission.objects.filter(codename="view_document"),
-        )
+        owner = UserFactory(username="owner1")
+        stranger = UserFactory(username="stranger1")
+        grant_global(stranger, "view_document")
 
         DocumentFactory(title="private", owner=owner)
 
@@ -1474,17 +1473,17 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         THEN:
             - Only the group member sees the document
         """
-        owner = User.objects.create_user("owner2")
-        member = User.objects.create_user("member1")
-        non_member = User.objects.create_user("nonmember1")
+        owner = UserFactory(username="owner2")
+        member = UserFactory(username="member1")
+        non_member = UserFactory(username="nonmember1")
         for u in (member, non_member):
-            u.user_permissions.add(*Permission.objects.filter(codename="view_document"))
+            grant_global(u, "view_document")
 
         group = Group.objects.create(name="group2")
         member.groups.add(group)
 
         doc = DocumentFactory(title="shared2", owner=owner)
-        assign_perm("view_document", group, doc)
+        grant_object(group, doc, "view_document")
 
         self.client.force_authenticate(user=member)
         response = self.client.get("/api/documents/")
@@ -1785,8 +1784,8 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         THEN:
             - Statistics only include inbox counts for tags accessible by the user
         """
-        u1 = User.objects.create_user("user1")
-        u2 = User.objects.create_user("user2")
+        u1 = UserFactory(username="user1")
+        u2 = UserFactory(username="user2")
         inbox_tag_u1 = Tag.objects.create(name="inbox_u1", is_inbox_tag=True, owner=u1)
         Tag.objects.create(name="inbox_u2", is_inbox_tag=True, owner=u2)
         doc_u1 = Document.objects.create(
@@ -1816,11 +1815,9 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         self.assertEqual(response.data["documents_inbox"], 0)
 
     def test_statistics_with_statistics_permission(self) -> None:
-        owner = User.objects.create_user("owner")
-        stats_user = User.objects.create_user("stats-user")
-        stats_user.user_permissions.add(
-            Permission.objects.get(codename="view_global_statistics"),
-        )
+        owner = UserFactory(username="owner")
+        stats_user = UserFactory(username="stats-user")
+        grant_global(stats_user, "view_global_statistics")
 
         inbox_tag = Tag.objects.create(
             name="stats_inbox",
@@ -1986,7 +1983,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def test_upload_insufficient_permissions(self) -> None:
-        self.client.force_authenticate(user=User.objects.create_user("testuser2"))
+        self.client.force_authenticate(user=UserFactory(username="testuser2"))
 
         with (Path(__file__).parent / "samples" / "simple.pdf").open("rb") as f:
             response = self.client.post(
@@ -2782,9 +2779,9 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         mock_get_date_parser.assert_not_called()
 
     def test_saved_views(self) -> None:
-        u1 = User.objects.create_user("user1")
-        u2 = User.objects.create_user("user2")
-        u3 = User.objects.create_user("user3")
+        u1 = UserFactory(username="user1")
+        u2 = UserFactory(username="user2")
+        u3 = UserFactory(username="user3")
 
         view_perm = Permission.objects.get(codename="view_savedview")
         change_perm = Permission.objects.get(codename="change_savedview")
@@ -2807,9 +2804,9 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             sort_field="",
         )
 
-        assign_perm("view_savedview", u1, v2)
-        assign_perm("change_savedview", u1, v2)
-        assign_perm("view_savedview", u1, v3)
+        grant_object(u1, v2, "view_savedview")
+        grant_object(u1, v2, "change_savedview")
+        grant_object(u1, v3, "view_savedview")
 
         self.client.force_authenticate(user=u1)
 
@@ -3064,7 +3061,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         self.assertListEqual(saved_view_settings["sidebar_views_visible_ids"], [v2.id])
 
     def test_saved_view_create_update_patch(self) -> None:
-        User.objects.create_user("user1")
+        UserFactory(username="user1")
 
         view = {
             "name": "test",
@@ -3127,7 +3124,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             - Display options are updated
             - Display fields are validated
         """
-        User.objects.create_user("user1")
+        UserFactory(username="user1")
 
         view = {
             "name": "test",
@@ -3568,11 +3565,11 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         THEN:
             - Notes are neither created nor deleted
         """
-        user1 = User.objects.create_user(username="test1")
-        user1.user_permissions.add(*Permission.objects.all())
+        user1 = UserFactory(username="test1")
+        grant_all_global(user1)
         user1.save()
 
-        user2 = User.objects.create_user(username="test2")
+        user2 = UserFactory(username="test2")
         user2.save()
 
         doc = Document.objects.create(
@@ -3592,7 +3589,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         self.assertEqual(resp.content, b"Insufficient permissions to view notes")
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
 
-        assign_perm("view_document", user1, doc)
+        grant_object(user1, doc, "view_document")
 
         resp = self.client.post(
             f"/api/documents/{doc.pk}/notes/",
@@ -3616,12 +3613,8 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_notes_require_global_document_permissions(self) -> None:
-        user = User.objects.create_user(username="note_editor")
-        user.user_permissions.add(
-            *Permission.objects.filter(
-                codename__in=["view_note", "add_note", "delete_note"],
-            ),
-        )
+        user = UserFactory(username="note_editor")
+        grant_global(user, "view_note", "add_note", "delete_note")
         doc = Document.objects.create(
             title="test",
             mime_type="application/pdf",
@@ -3634,9 +3627,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         response = self.client.get(f"/api/documents/{doc.pk}/notes/")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-        user.user_permissions.add(
-            Permission.objects.get(codename="view_document"),
-        )
+        grant_global(user, "view_document")
         user = User.objects.get(pk=user.pk)
         self.client.force_authenticate(user)
         response = self.client.get(f"/api/documents/{doc.pk}/notes/")
@@ -3648,9 +3639,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-        user.user_permissions.add(
-            Permission.objects.get(codename="change_document"),
-        )
+        grant_global(user, "change_document")
         user = User.objects.get(pk=user.pk)
         self.client.force_authenticate(user)
         response = self.client.post(
@@ -3797,12 +3786,12 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             - Unique items are created
             - Non-unique items are not allowed
         """
-        user1 = User.objects.create_user(username="test1")
-        user1.user_permissions.add(*Permission.objects.filter(codename="add_tag"))
+        user1 = UserFactory(username="test1")
+        grant_global(user1, "add_tag")
         user1.save()
 
-        user2 = User.objects.create_user(username="test2")
-        user2.user_permissions.add(*Permission.objects.filter(codename="add_tag"))
+        user2 = UserFactory(username="test2")
+        grant_global(user2, "add_tag")
         user2.save()
 
         # User 1 creates tag 1 owned by user 1 by default
@@ -3857,12 +3846,12 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             - Unique items are created
             - Non-unique items are not allowed on update
         """
-        user1 = User.objects.create_user(username="test1")
-        user1.user_permissions.add(*Permission.objects.filter(codename="change_tag"))
+        user1 = UserFactory(username="test1")
+        grant_global(user1, "change_tag")
         user1.save()
 
-        user2 = User.objects.create_user(username="test2")
-        user2.user_permissions.add(*Permission.objects.filter(codename="change_tag"))
+        user2 = UserFactory(username="test2")
+        grant_global(user2, "change_tag")
         user2.save()
 
         # Create name tag 1 owned by user 1
@@ -3993,11 +3982,11 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         THEN:
             - Links only shown if user has permissions
         """
-        user1 = User.objects.create_user(username="test1")
-        user1.user_permissions.add(*Permission.objects.all())
+        user1 = UserFactory(username="test1")
+        grant_all_global(user1)
         user1.save()
 
-        user2 = User.objects.create_user(username="test2")
+        user2 = UserFactory(username="test2")
         user2.save()
 
         doc = Document.objects.create(
@@ -4017,7 +4006,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         self.assertEqual(resp.content, b"Insufficient permissions to add share link")
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
 
-        assign_perm("change_document", user1, doc)
+        grant_object(user1, doc, "change_document")
 
         resp = self.client.get(
             f"/api/documents/{doc.pk}/share_links/",
@@ -4034,11 +4023,11 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         THEN:
             - Share link creation is denied until view permission is granted
         """
-        user1 = User.objects.create_user(username="test1")
-        user1.user_permissions.add(*Permission.objects.filter(codename="add_sharelink"))
+        user1 = UserFactory(username="test1")
+        grant_global(user1, "add_sharelink")
         user1.save()
 
-        user2 = User.objects.create_user(username="test2")
+        user2 = UserFactory(username="test2")
         user2.save()
 
         doc = Document.objects.create(
@@ -4060,7 +4049,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         )
         self.assertEqual(create_resp.status_code, status.HTTP_403_FORBIDDEN)
 
-        assign_perm("view_document", user1, doc)
+        grant_object(user1, doc, "view_document")
 
         create_resp = self.client.post(
             "/api/share_links/",
@@ -4072,9 +4061,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         )
         self.assertEqual(create_resp.status_code, status.HTTP_403_FORBIDDEN)
 
-        user1.user_permissions.add(
-            Permission.objects.get(codename="view_document"),
-        )
+        grant_global(user1, "view_document")
         user1 = User.objects.get(pk=user1.pk)
         self.client.force_authenticate(user1)
         create_resp = self.client.post(
@@ -4097,11 +4084,11 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         THEN:
             - ASN +1 from user2's doc is returned for user1
         """
-        user1 = User.objects.create_user(username="test1")
-        user1.user_permissions.add(*Permission.objects.all())
+        user1 = UserFactory(username="test1")
+        grant_all_global(user1)
         user1.save()
 
-        user2 = User.objects.create_user(username="test2")
+        user2 = UserFactory(username="test2")
         user2.save()
 
         doc1 = Document.objects.create(
@@ -4141,8 +4128,8 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         THEN:
             - ASN 1 is returned
         """
-        user1 = User.objects.create_user(username="test1")
-        user1.user_permissions.add(*Permission.objects.all())
+        user1 = UserFactory(username="test1")
+        grant_all_global(user1)
         user1.save()
 
         doc1 = Document.objects.create(
@@ -4170,7 +4157,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         THEN:
             - Explicit error is returned
         """
-        user1 = User.objects.create_superuser(username="test1")
+        user1 = UserFactory(username="test1", superuser=True)
 
         self.client.force_authenticate(user1)
 
@@ -4348,8 +4335,8 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         THEN:
             - Error response is returned
         """
-        user1 = User.objects.create_user(username="test1")
-        user1.user_permissions.add(*Permission.objects.all())
+        user1 = UserFactory(username="test1")
+        grant_all_global(user1)
         user1.save()
 
         doc = Document.objects.create(
@@ -4454,7 +4441,7 @@ class TestDocumentApiTagColors(DirectoriesMixin, APITestCase):
     def setUp(self) -> None:
         super().setUp()
 
-        self.user = User.objects.create_superuser(username="temp_admin")
+        self.user = UserFactory(username="temp_admin", superuser=True)
 
         self.client.force_authenticate(user=self.user)
 
@@ -4534,7 +4521,7 @@ class TestDocumentApiCustomFieldsSorting(DirectoriesMixin, APITestCase):
     def setUp(self) -> None:
         super().setUp()
 
-        self.user = User.objects.create_superuser(username="temp_admin")
+        self.user = UserFactory(username="temp_admin", superuser=True)
         self.client.force_authenticate(user=self.user)
 
         self.doc1 = Document.objects.create(

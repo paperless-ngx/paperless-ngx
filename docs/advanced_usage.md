@@ -136,13 +136,15 @@ for suggested generation and embedding models.
 ### AI-assisted suggestions
 
 With AI enabled, Paperless-ngx can suggest a title, tags, correspondent, document type,
-storage path and dates by sending the document to the LLM. This is **opt-in per request**
-and surfaces through the "Suggest" control on the document detail page, alongside the
-classic classifier-based suggestions — it does not disable them. Suggestions are requested
-automatically when you open a document that carries an inbox tag unless "Automatically request
-suggestions for inbox documents" under Settings > Documents is disabled. Suggestion output
-language can be steered with
-[`PAPERLESS_AI_LLM_OUTPUT_LANGUAGE`](configuration.md#PAPERLESS_AI_LLM_OUTPUT_LANGUAGE)
+storage path and dates by sending the document to the LLM using "Suggest" button on the document
+detail page. You can choose which type of suggestions are requested by default under Settings >
+Documents, either ML (classifier-based) suggestions, AI suggestions, or both. When both are requested
+the results are combined.
+
+Suggestions are requested automatically when you open a document that carries an inbox tag
+unless "Automatically request suggestions for inbox documents" under Settings > Documents is disabled.
+
+Suggestion output language can be steered with [`PAPERLESS_AI_LLM_OUTPUT_LANGUAGE`](configuration.md#PAPERLESS_AI_LLM_OUTPUT_LANGUAGE)
 (otherwise it follows the user's UI language).
 
 ### The LLM index (RAG) and similar documents
@@ -153,8 +155,11 @@ in similar existing documents, and the document chat can retrieve relevant conte
 
 Enable it by setting
 [`PAPERLESS_AI_LLM_EMBEDDING_BACKEND`](configuration.md#PAPERLESS_AI_LLM_EMBEDDING_BACKEND)
-(`huggingface` for fully-local embeddings, or `ollama` / `openai-like`). The index is only
-built when AI is enabled **and** an embedding backend is set.
+(`huggingface` for fully-local embeddings, or `ollama` / `openai-like`). By default, the main
+LLM API key and endpoint are used, but an optional embedding-specific[API key](configuration.md#PAPERLESS_AI_LLM_EMBEDDING_API_KEY)
+and [endpoint](configuration.md#PAPERLESS_AI_LLM_EMBEDDING_ENDPOINT) can be configured.
+
+The index is only built when AI is enabled **and** an embedding backend is set.
 
 The index is updated automatically on a schedule controlled by
 [`PAPERLESS_LLM_INDEX_TASK_CRON`](configuration.md#PAPERLESS_LLM_INDEX_TASK_CRON) (daily by
@@ -1004,6 +1009,19 @@ documents to both separate and categorize them in a single operation.
 
 **Example:** A 6-page scan with TAG:invoice on page 3 and TAG:receipt on page 5 will create
 three documents: pages 1-2 (no tags), pages 3-4 (tagged "invoice"), and pages 5-6 (tagged "receipt").
+
+### Barcode Contents {#barcode-contents}
+
+By default, Paperless only uses barcodes for splitting, ASNs and tags. With
+[`PAPERLESS_CONSUMER_STORE_BARCODE_VALUES`](configuration.md#PAPERLESS_CONSUMER_STORE_BARCODE_VALUES)
+enabled, it stores the content of every barcode with the document, e.g. payment codes or QR codes.
+
+- Barcodes are listed on the **Metadata** tab with page, type and content, and can be copied.
+- The API returns them in the `barcodes` field of `/api/documents/{id}/metadata/`.
+- They can be [searched](usage.md#searching-barcodes), e.g. `barcodes:DE89370400440532013000`.
+- Only the first [`PAPERLESS_CONSUMER_BARCODE_MAX_PAGES`](configuration.md#PAPERLESS_CONSUMER_BARCODE_MAX_PAGES)
+  pages are scanned. Reprocessing reads the barcodes of existing documents.
+- Each version keeps its own barcodes, and the newest version's are shown and searched.
 
 ## Automatic collation of double-sided documents {#collate}
 

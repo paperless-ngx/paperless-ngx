@@ -1,6 +1,5 @@
 import os
 from collections.abc import Callable
-from dataclasses import dataclass
 from pathlib import Path
 from unittest import mock
 
@@ -19,35 +18,7 @@ from paperless.checks import check_v3_minimum_upgrade_version
 from paperless.checks import debug_mode_check
 from paperless.checks import paths_check
 from paperless.checks import settings_values_check
-
-
-@dataclass(frozen=True, slots=True)
-class PaperlessTestDirs:
-    data_dir: Path
-    media_dir: Path
-    consumption_dir: Path
-
-
-# TODO: consolidate with documents/tests/conftest.py PaperlessDirs/paperless_dirs
-#       once the paperless and documents test suites are ready to share fixtures.
-@pytest.fixture()
-def directories(tmp_path: Path, settings: Settings) -> PaperlessTestDirs:
-    data_dir = tmp_path / "data"
-    media_dir = tmp_path / "media"
-    consumption_dir = tmp_path / "consumption"
-
-    for d in (data_dir, media_dir, consumption_dir):
-        d.mkdir()
-
-    settings.DATA_DIR = data_dir
-    settings.MEDIA_ROOT = media_dir
-    settings.CONSUMPTION_DIR = consumption_dir
-
-    return PaperlessTestDirs(
-        data_dir=data_dir,
-        media_dir=media_dir,
-        consumption_dir=consumption_dir,
-    )
+from paperless_testing.dirs import PaperlessDirs
 
 
 class TestChecks:
@@ -58,7 +29,7 @@ class TestChecks:
         settings.CONVERT_BINARY = "uuuhh"
         assert len(binaries_check(None)) == 1
 
-    @pytest.mark.usefixtures("directories")
+    @pytest.mark.usefixtures("paperless_dirs")
     def test_paths_check(self) -> None:
         assert paths_check(None) == []
 
@@ -73,17 +44,17 @@ class TestChecks:
         for msg in msgs:
             assert msg.msg.endswith("is set but doesn't exist.")
 
-    def test_paths_check_no_access(self, directories: PaperlessTestDirs) -> None:
-        directories.data_dir.chmod(0o000)
-        directories.media_dir.chmod(0o000)
-        directories.consumption_dir.chmod(0o000)
+    def test_paths_check_no_access(self, paperless_dirs: PaperlessDirs) -> None:
+        paperless_dirs.data_dir.chmod(0o000)
+        paperless_dirs.media_dir.chmod(0o000)
+        paperless_dirs.consumption_dir.chmod(0o000)
 
         try:
             msgs = paths_check(None)
         finally:
-            directories.data_dir.chmod(0o777)
-            directories.media_dir.chmod(0o777)
-            directories.consumption_dir.chmod(0o777)
+            paperless_dirs.data_dir.chmod(0o777)
+            paperless_dirs.media_dir.chmod(0o777)
+            paperless_dirs.consumption_dir.chmod(0o777)
 
         assert len(msgs) == 3
         for msg in msgs:

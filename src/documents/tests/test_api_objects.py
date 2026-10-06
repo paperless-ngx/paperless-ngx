@@ -3,12 +3,10 @@ import json
 from unittest import mock
 
 from django.contrib.auth.models import Group
-from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.db import connection
 from django.test import override_settings
 from django.test.utils import CaptureQueriesContext
-from guardian.shortcuts import assign_perm
 from guardian.shortcuts import get_groups_with_perms
 from guardian.shortcuts import get_users_with_perms
 from rest_framework import status
@@ -21,14 +19,17 @@ from documents.models import Document
 from documents.models import DocumentType
 from documents.models import StoragePath
 from documents.models import Tag
-from documents.tests.utils import DirectoriesMixin
+from paperless_testing.dirs import DirectoriesMixin
+from paperless_testing.factories import UserFactory
+from paperless_testing.permissions import grant_global
+from paperless_testing.permissions import grant_object
 
 
 class TestApiObjects(DirectoriesMixin, APITestCase):
     def setUp(self) -> None:
         super().setUp()
 
-        user = User.objects.create_superuser(username="temp_admin")
+        user = UserFactory(username="temp_admin", superuser=True)
         self.client.force_authenticate(user=user)
 
         self.tag1 = Tag.objects.create(name="t1", is_inbox_tag=True)
@@ -153,7 +154,7 @@ class TestApiObjects(DirectoriesMixin, APITestCase):
 
         # A newer document owned by another user must not leak through the
         # aggregate for a non-superuser who cannot view it
-        other = User.objects.create_user(username="other")
+        other = UserFactory(username="other")
         Document.objects.create(
             mime_type="application/pdf",
             correspondent=self.c1,
@@ -162,10 +163,8 @@ class TestApiObjects(DirectoriesMixin, APITestCase):
             owner=other,
         )
 
-        user = User.objects.create_user(username="regular")
-        user.user_permissions.add(
-            Permission.objects.get(codename="view_correspondent"),
-        )
+        user = UserFactory(username="regular")
+        grant_global(user, "view_correspondent")
         self.client.force_authenticate(user=user)
 
         response = self.client.get("/api/correspondents/?last_correspondence=true")
@@ -200,7 +199,7 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
     def setUp(self) -> None:
         super().setUp()
 
-        user = User.objects.create_superuser(username="temp_admin")
+        user = UserFactory(username="temp_admin", superuser=True)
         self.client.force_authenticate(user=user)
 
         self.sp1 = StoragePath.objects.create(name="sp1", path="Something/{checksum}")
@@ -455,11 +454,9 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
         self.assertEqual(response.data, "folder/Something.pdf")
 
     def test_test_storage_path_requires_document_view_permission(self) -> None:
-        owner = User.objects.create_user(username="owner")
-        unprivileged = User.objects.create_user(username="unprivileged")
-        unprivileged.user_permissions.add(
-            Permission.objects.get(codename="view_document"),
-        )
+        owner = UserFactory(username="owner")
+        unprivileged = UserFactory(username="unprivileged")
+        grant_global(unprivileged, "view_document")
         document = Document.objects.create(
             mime_type="application/pdf",
             owner=owner,
@@ -481,15 +478,15 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
         self.assertIn("document", response.data)
 
     def test_test_storage_path_allows_shared_document_view_permission(self) -> None:
-        owner = User.objects.create_user(username="owner")
-        viewer = User.objects.create_user(username="viewer")
+        owner = UserFactory(username="owner")
+        viewer = UserFactory(username="viewer")
         document = Document.objects.create(
             mime_type="application/pdf",
             owner=owner,
             title="Shared",
             checksum="123",
         )
-        assign_perm("view_document", viewer, document)
+        grant_object(viewer, document, "view_document")
 
         self.client.force_authenticate(user=viewer)
         response = self.client.post(
@@ -504,9 +501,7 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-        viewer.user_permissions.add(
-            Permission.objects.get(codename="view_document"),
-        )
+        grant_global(viewer, "view_document")
         viewer = User.objects.get(pk=viewer.pk)
         self.client.force_authenticate(user=viewer)
         response = self.client.post(
@@ -545,14 +540,12 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
     def test_test_storage_path_exposes_basic_document_context_but_not_sensitive_owner_data(
         self,
     ) -> None:
-        owner = User.objects.create_user(
+        owner = UserFactory(
             username="owner",
             password="password",
             email="owner@example.com",
         )
-        owner.user_permissions.add(
-            Permission.objects.get(codename="view_document"),
-        )
+        grant_global(owner, "view_document")
         document = Document.objects.create(
             mime_type="application/pdf",
             owner=owner,
@@ -614,8 +607,8 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
     def test_test_storage_path_includes_related_objects_for_visible_document(
         self,
     ) -> None:
-        owner = User.objects.create_user(username="owner")
-        viewer = User.objects.create_user(username="viewer")
+        owner = UserFactory(username="owner")
+        viewer = UserFactory(username="viewer")
         private_correspondent = Correspondent.objects.create(
             name="Private Correspondent",
             owner=owner,
@@ -627,10 +620,8 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
             title="Document",
             checksum="123",
         )
-        assign_perm("view_document", viewer, document)
-        viewer.user_permissions.add(
-            Permission.objects.get(codename="view_document"),
-        )
+        grant_object(viewer, document, "view_document")
+        grant_global(viewer, "view_document")
 
         self.client.force_authenticate(user=viewer)
         response = self.client.post(
@@ -662,7 +653,7 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
         self.assertEqual(response.data, "Private Correspondent.pdf")
 
     def test_test_storage_path_superuser_can_view_private_related_objects(self) -> None:
-        owner = User.objects.create_user(username="owner")
+        owner = UserFactory(username="owner")
         private_correspondent = Correspondent.objects.create(
             name="Private Correspondent",
             owner=owner,
@@ -693,8 +684,8 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
     def test_test_storage_path_includes_doc_type_storage_path_and_tags(
         self,
     ) -> None:
-        owner = User.objects.create_user(username="owner")
-        viewer = User.objects.create_user(username="viewer")
+        owner = UserFactory(username="owner")
+        viewer = UserFactory(username="viewer")
         private_document_type = DocumentType.objects.create(
             name="Private Type",
             owner=owner,
@@ -717,10 +708,8 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
             checksum="123",
         )
         document.tags.add(private_tag)
-        assign_perm("view_document", viewer, document)
-        viewer.user_permissions.add(
-            Permission.objects.get(codename="view_document"),
-        )
+        grant_object(viewer, document, "view_document")
+        grant_global(viewer, "view_document")
 
         self.client.force_authenticate(user=viewer)
         response = self.client.post(
@@ -756,8 +745,8 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
     def test_test_storage_path_includes_custom_fields_for_visible_document(
         self,
     ) -> None:
-        owner = User.objects.create_user(username="owner")
-        viewer = User.objects.create_user(username="viewer")
+        owner = UserFactory(username="owner")
+        viewer = UserFactory(username="viewer")
         document = Document.objects.create(
             mime_type="application/pdf",
             owner=owner,
@@ -773,10 +762,8 @@ class TestApiStoragePaths(DirectoriesMixin, APITestCase):
             field=custom_field,
             value_int=42,
         )
-        assign_perm("view_document", viewer, document)
-        viewer.user_permissions.add(
-            Permission.objects.get(codename="view_document"),
-        )
+        grant_object(viewer, document, "view_document")
+        grant_global(viewer, "view_document")
 
         self.client.force_authenticate(user=viewer)
         response = self.client.post(
@@ -798,7 +785,7 @@ class TestBulkEditObjects(APITestCase):
     def setUp(self) -> None:
         super().setUp()
 
-        self.temp_admin = User.objects.create_superuser(username="temp_admin")
+        self.temp_admin = UserFactory(username="temp_admin", superuser=True)
         self.client.force_authenticate(user=self.temp_admin)
 
         self.t1 = Tag.objects.create(name="t1")
@@ -1030,9 +1017,7 @@ class TestBulkEditObjects(APITestCase):
         THEN:
             - User is able to delete objects
         """
-        self.user1.user_permissions.add(
-            *Permission.objects.filter(codename="delete_tag"),
-        )
+        grant_global(self.user1, "delete_tag")
         self.user1.save()
         self.client.force_authenticate(user=self.user1)
 
@@ -1062,9 +1047,7 @@ class TestBulkEditObjects(APITestCase):
         self.t2.owner = User.objects.get(username="temp_admin")
         self.t2.save()
 
-        self.user1.user_permissions.add(
-            *Permission.objects.filter(codename="delete_tag"),
-        )
+        grant_global(self.user1, "delete_tag")
         self.user1.save()
         self.client.force_authenticate(user=self.user1)
 
@@ -1097,9 +1080,7 @@ class TestBulkEditObjects(APITestCase):
         self.t2.owner = User.objects.get(username="temp_admin")
         self.t2.save()
 
-        self.user1.user_permissions.add(
-            *Permission.objects.filter(codename="delete_tag"),
-        )
+        grant_global(self.user1, "delete_tag")
         self.user1.save()
         self.client.force_authenticate(user=self.user1)
 

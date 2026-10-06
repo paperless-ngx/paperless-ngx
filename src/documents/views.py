@@ -49,7 +49,6 @@ from django.db.models import Sum
 from django.db.models import When
 from django.db.models.functions import Coalesce
 from django.db.models.functions import Lower
-from django.db.models.manager import Manager
 from django.http import FileResponse
 from django.http import Http404
 from django.http import HttpRequest
@@ -194,6 +193,7 @@ from documents.serialisers import BulkEditSerializer
 from documents.serialisers import CorrespondentSerializer
 from documents.serialisers import CustomFieldSerializer
 from documents.serialisers import DeleteDocumentsSerializer
+from documents.serialisers import DocumentBarcodeSerializer
 from documents.serialisers import DocumentSelectionSerializer
 from documents.serialisers import DocumentSerializer
 from documents.serialisers import DocumentTypeSerializer
@@ -846,6 +846,7 @@ class EmailDocumentDetailSchema(EmailSerializer):
                         required=False,
                     ),
                     "lang": serializers.CharField(),
+                    "barcodes": DocumentBarcodeSerializer(many=True),
                 },
             ),
             HTTPStatus.BAD_REQUEST: None,
@@ -1193,6 +1194,7 @@ class DocumentViewSet(
                     "version_label",
                     "root_document_id",
                     "version_index",
+                    "page_count",
                 ),
             ),
             "tags",
@@ -1272,13 +1274,16 @@ class DocumentViewSet(
         if (
             "version" not in request.query_params
             or not isinstance(response.data, dict)
-            or "content" not in response.data
+            or not ({"content", "page_count"} & response.data.keys())
         ):
             return response
 
         root_doc = self.get_object()
         content_doc = self._resolve_file_doc(root_doc, request)
-        response.data["content"] = content_doc.content or ""
+        if "content" in response.data:
+            response.data["content"] = content_doc.content or ""
+        if "page_count" in response.data:
+            response.data["page_count"] = content_doc.page_count
         return response
 
     def update(self, request, *args, **kwargs):
@@ -1523,6 +1528,7 @@ class DocumentViewSet(
             "original_filename": doc.original_filename,
             "archive_size": archive_filesize,
             "archive_metadata": archive_metadata,
+            "barcodes": DocumentBarcodeSerializer(doc.barcodes.all(), many=True).data,
         }
 
         lang = "en"
@@ -2968,11 +2974,15 @@ class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
         if user.is_superuser:
             return True
 
-        document_objs = Document.objects.select_related("owner").filter(
-            pk__in=documents,
-        )
+        root_docs = {
+            get_root_document(doc)
+            for doc in Document.objects.select_related(
+                "owner",
+                "root_document__owner",
+            ).filter(pk__in=documents)
+        }
         user_is_owner_of_all_documents = all(
-            (doc.owner == user or doc.owner is None) for doc in document_objs
+            (doc.owner == user or doc.owner is None) for doc in root_docs
         )
 
         # check global and object permissions for all documents
@@ -2980,9 +2990,13 @@ class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
             user.has_perm(
                 "documents.change_document",
             )
-            and not document_objs.exclude(
+            and not Document.global_objects.filter(
+                pk__in=[doc.pk for doc in root_docs],
+            )
+            .exclude(
                 pk__in=permitted_document_ids(user, perm="change_document"),
-            ).exists()
+            )
+            .exists()
         )
 
         # check ownership for methods that change original document
@@ -3141,6 +3155,38 @@ class BulkEditView(DocumentOperationPermissionMixin):
 
     serializer_class = BulkEditSerializer
 
+    @staticmethod
+    def _snapshot_field(doc_ids: list[int], field: str) -> dict[int, Any]:
+        """
+        Returns each document's current value of field, for the audit log.
+
+        Tags and custom fields are one row per value, so they are gathered
+        into a sorted list of pks per document (empty when there are none).
+        Reading them through Document.values() instead would join those rows
+        and return one arbitrary value per document.
+        """
+        if field == "tags":
+            rows = (
+                Document.tags.through.objects.filter(document_id__in=doc_ids)
+                .order_by("tag_id")
+                .values_list("document_id", "tag_id")
+            )
+        elif field == "custom_fields":
+            rows = (
+                CustomFieldInstance.objects.filter(document_id__in=doc_ids)
+                .order_by("pk")
+                .values_list("document_id", "pk")
+            )
+        else:
+            return dict(
+                Document.objects.filter(pk__in=doc_ids).values_list("pk", field),
+            )
+
+        values: dict[int, list[int]] = {doc_id: [] for doc_id in doc_ids}
+        for doc_id, pk in rows:
+            values[doc_id].append(pk)
+        return values
+
     def post(self, request, *args, **kwargs):
         request_method = request.data.get("method")
         api_version = int(request.version or settings.REST_FRAMEWORK["DEFAULT_VERSION"])
@@ -3187,41 +3233,19 @@ class BulkEditView(DocumentOperationPermissionMixin):
         try:
             modified_field = self.MODIFIED_FIELD_BY_METHOD.get(method.__name__, None)
             if settings.AUDIT_LOG_ENABLED and modified_field:
-                old_documents = {
-                    obj["pk"]: obj
-                    for obj in Document.objects.filter(pk__in=documents).values(
-                        "pk",
-                        "correspondent",
-                        "document_type",
-                        "storage_path",
-                        "tags",
-                        "custom_fields",
-                        "deleted_at",
-                        "checksum",
-                    )
-                }
+                old_values = self._snapshot_field(documents, modified_field)
 
             result = method(documents, **parameters)
 
             if settings.AUDIT_LOG_ENABLED and modified_field:
-                new_documents = Document.objects.filter(pk__in=documents)
-                for doc in new_documents:
-                    old_value = old_documents[doc.pk][modified_field]
-                    new_value = getattr(doc, modified_field)
-
-                    if isinstance(new_value, Model):
-                        # correspondent, document type, etc.
-                        new_value = new_value.pk
-                    elif isinstance(new_value, Manager):
-                        # tags, custom fields
-                        new_value = list(new_value.values_list("pk", flat=True))
-
+                new_values = self._snapshot_field(documents, modified_field)
+                for doc in Document.objects.filter(pk__in=documents):
                     LogEntry.objects.log_create(
                         instance=doc,
                         changes={
                             modified_field: [
-                                old_value,
-                                new_value,
+                                old_values[doc.pk],
+                                new_values[doc.pk],
                             ],
                         },
                         action=LogEntry.Action.UPDATE,

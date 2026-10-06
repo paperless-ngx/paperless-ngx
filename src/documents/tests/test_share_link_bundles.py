@@ -6,10 +6,8 @@ from pathlib import Path
 from unittest import mock
 
 from django.conf import settings
-from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.utils import timezone
-from guardian.shortcuts import assign_perm
 from rest_framework import serializers
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -20,8 +18,11 @@ from documents.models import ShareLinkBundle
 from documents.serialisers import ShareLinkBundleSerializer
 from documents.tasks import build_share_link_bundle
 from documents.tasks import cleanup_expired_share_link_bundles
-from documents.tests.factories import DocumentFactory
-from documents.tests.utils import DirectoriesMixin
+from paperless_testing.dirs import DirectoriesMixin
+from paperless_testing.factories import DocumentFactory
+from paperless_testing.factories import UserFactory
+from paperless_testing.permissions import grant_global
+from paperless_testing.permissions import grant_object
 
 
 class ShareLinkBundleAPITests(DirectoriesMixin, APITestCase):
@@ -29,7 +30,7 @@ class ShareLinkBundleAPITests(DirectoriesMixin, APITestCase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.user = User.objects.create_superuser(username="bundle_admin")
+        self.user = UserFactory(username="bundle_admin", superuser=True)
         self.client.force_authenticate(self.user)
         self.document = DocumentFactory.create()
 
@@ -55,13 +56,11 @@ class ShareLinkBundleAPITests(DirectoriesMixin, APITestCase):
         self,
         delay_mock,
     ) -> None:
-        owner = User.objects.create_user(username="document_owner")
-        requester = User.objects.create_user(username="bundle_creator")
-        requester.user_permissions.add(
-            Permission.objects.get(codename="add_sharelinkbundle"),
-        )
+        owner = UserFactory(username="document_owner")
+        requester = UserFactory(username="bundle_creator")
+        grant_global(requester, "add_sharelinkbundle")
         document = DocumentFactory.create(owner=owner)
-        assign_perm("view_document", requester, document)
+        grant_object(requester, document, "view_document")
         self.client.force_authenticate(requester)
         payload = {
             "document_ids": [document.pk],
@@ -72,9 +71,7 @@ class ShareLinkBundleAPITests(DirectoriesMixin, APITestCase):
         response = self.client.post(self.ENDPOINT, payload, format="json")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
-        requester.user_permissions.add(
-            Permission.objects.get(codename="view_document"),
-        )
+        grant_global(requester, "view_document")
         requester = User.objects.get(pk=requester.pk)
         self.client.force_authenticate(requester)
         response = self.client.post(self.ENDPOINT, payload, format="json")
@@ -342,15 +339,6 @@ class ShareLinkBundleBuildTaskTests(DirectoriesMixin, APITestCase):
         )
         self.document.archive_checksum = ""
         self.document.save()
-        self.addCleanup(
-            setattr,
-            settings,
-            "SHARE_LINK_BUNDLE_DIR",
-            settings.SHARE_LINK_BUNDLE_DIR,
-        )
-        settings.SHARE_LINK_BUNDLE_DIR = (
-            Path(settings.MEDIA_ROOT) / "documents" / "share_link_bundles"
-        )
 
     def _write_document_file(self, *, archive: bool, content: bytes) -> Path:
         if archive:

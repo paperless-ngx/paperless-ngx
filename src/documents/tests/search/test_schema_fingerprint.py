@@ -35,6 +35,8 @@ if TYPE_CHECKING:
 
     from pytest_django.fixtures import SettingsWrapper
 
+    from paperless_testing.dirs import PaperlessDirs
+
 pytestmark = pytest.mark.search
 
 # The on-disk field layout of a v2 index, pinned as data. Any edit here is an
@@ -167,6 +169,14 @@ PINNED_DESCRIPTORS: tuple[FieldDescriptor, ...] = (
     ),
     FieldDescriptor(
         "custom_fields",
+        "json",
+        stored=True,
+        indexed=True,
+        fast=False,
+        tokenizer="paperless_text",
+    ),
+    FieldDescriptor(
+        "barcodes",
         "json",
         stored=True,
         indexed=True,
@@ -469,7 +479,7 @@ def _fingerprint_of(descriptors: list[FieldDescriptor]) -> str:
 class TestNeedsRebuildOnFingerprint:
     def test_matching_fingerprint_does_not_rebuild(
         self,
-        index_dir: Path,
+        paperless_dirs: PaperlessDirs,
         settings: SettingsWrapper,
     ) -> None:
         """
@@ -482,13 +492,13 @@ class TestNeedsRebuildOnFingerprint:
             - It returns False
         """
         settings.SEARCH_LANGUAGE = None
-        _sentinels(index_dir)
+        _sentinels(paperless_dirs.index_dir)
 
-        assert needs_rebuild(index_dir) is False
+        assert needs_rebuild(paperless_dirs.index_dir) is False
 
     def test_stale_fingerprint_rebuilds_despite_a_matching_version(
         self,
-        index_dir: Path,
+        paperless_dirs: PaperlessDirs,
         settings: SettingsWrapper,
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
@@ -505,7 +515,7 @@ class TestNeedsRebuildOnFingerprint:
               every subsequent write would raise
         """
         settings.SEARCH_LANGUAGE = None
-        _sentinels(index_dir)
+        _sentinels(paperless_dirs.index_dir)
         extended = [
             *field_descriptors(),
             FieldDescriptor(
@@ -519,11 +529,11 @@ class TestNeedsRebuildOnFingerprint:
         ]
         monkeypatch.setattr(_schema, "field_descriptors", lambda: extended)
 
-        assert needs_rebuild(index_dir) is True
+        assert needs_rebuild(paperless_dirs.index_dir) is True
 
     def test_reordered_schema_rebuilds(
         self,
-        index_dir: Path,
+        paperless_dirs: PaperlessDirs,
         settings: SettingsWrapper,
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
@@ -538,16 +548,16 @@ class TestNeedsRebuildOnFingerprint:
             - It returns True
         """
         settings.SEARCH_LANGUAGE = None
-        _sentinels(index_dir)
+        _sentinels(paperless_dirs.index_dir)
         reordered = field_descriptors()
         reordered[1], reordered[2] = reordered[2], reordered[1]
         monkeypatch.setattr(_schema, "field_descriptors", lambda: reordered)
 
-        assert needs_rebuild(index_dir) is True
+        assert needs_rebuild(paperless_dirs.index_dir) is True
 
     def test_missing_fingerprint_rebuilds(
         self,
-        index_dir: Path,
+        paperless_dirs: PaperlessDirs,
         settings: SettingsWrapper,
     ) -> None:
         """
@@ -561,15 +571,15 @@ class TestNeedsRebuildOnFingerprint:
               is rebuilt rather than trusted
         """
         settings.SEARCH_LANGUAGE = None
-        (index_dir / ".index_settings.json").write_text(
+        (paperless_dirs.index_dir / ".index_settings.json").write_text(
             json.dumps({"schema_version": SCHEMA_VERSION, "language": None}),
         )
 
-        assert needs_rebuild(index_dir) is True
+        assert needs_rebuild(paperless_dirs.index_dir) is True
 
     def test_written_sentinels_satisfy_the_check(
         self,
-        index_dir: Path,
+        paperless_dirs: PaperlessDirs,
         settings: SettingsWrapper,
     ) -> None:
         """
@@ -582,6 +592,6 @@ class TestNeedsRebuildOnFingerprint:
             - It returns False
         """
         settings.SEARCH_LANGUAGE = "en"
-        _write_sentinels(index_dir)
+        _write_sentinels(paperless_dirs.index_dir)
 
-        assert needs_rebuild(index_dir) is False
+        assert needs_rebuild(paperless_dirs.index_dir) is False

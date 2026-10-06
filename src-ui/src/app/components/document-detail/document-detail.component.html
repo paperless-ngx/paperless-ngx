@@ -134,11 +134,17 @@
                 [loading]="suggestionsLoading()"
                 [suggestions]="suggestions()"
                 [aiEnabled]="aiEnabled"
+                [source]="suggestionSource"
+                [defaultSource]="defaultSuggestionSource"
+                [fetchedSources]="fetchedSuggestionSources()"
                 [appliedTags]="documentForm.value.tags"
                 [appliedCorrespondent]="documentForm.value.correspondent"
                 [appliedDocumentType]="documentForm.value.document_type"
                 [appliedStoragePath]="documentForm.value.storage_path"
-                (getSuggestions)="getSuggestions()"
+                [appliedTitle]="documentForm.value.title"
+                [appliedCreated]="documentForm.value.created"
+                (getSuggestions)="getSuggestions($event)"
+                (sourceChange)="suggestionSourceOverride.set($event)"
                 (addTag)="createTag($event)"
                 (addDocumentType)="createDocumentType($event)"
                 (addCorrespondent)="createCorrespondent($event)">
@@ -350,6 +356,10 @@
               </table>
             }
 
+            @if (metadata()?.barcodes?.length > 0) {
+              <h6 i18n>Barcodes</h6>
+              <pngx-document-barcodes [barcodes]="metadata().barcodes"></pngx-document-barcodes>
+            }
             @if (metadata()?.original_metadata?.length > 0) {
               <pngx-metadata-collapse i18n-title title="Original document metadata" [metadata]="metadata()?.original_metadata"></pngx-metadata-collapse>
             }

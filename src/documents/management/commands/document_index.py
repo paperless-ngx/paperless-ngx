@@ -77,6 +77,8 @@ class Command(PaperlessCommand):
                     "notes__user",
                     "custom_fields__field",
                     "versions",
+                    "barcodes",
+                    "versions__barcodes",
                 )
                 total = documents.count()
                 rebuild_kwargs = {}

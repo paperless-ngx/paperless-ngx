@@ -30,7 +30,7 @@ RUN set -eux \
 # Purpose: Installs s6-overlay and rootfs
 # Comments:
 #  - Don't leave anything extra in here either
-FROM ghcr.io/astral-sh/uv:0.12.16-python3.14-trixie-slim AS s6-overlay-base
+FROM ghcr.io/astral-sh/uv:0.12.23-python3.14-trixie-slim AS s6-overlay-base
 
 WORKDIR /usr/src/s6
 
@@ -171,7 +171,9 @@ RUN set -eux \
         && cp /etc/ImageMagick-6/paperless-policy.xml /etc/ImageMagick-6/policy.xml \
       && echo "Cleaning up image layer" \
         && rm --force --verbose *.deb \
-    && rm --recursive --force --verbose /var/lib/apt/lists/*
+    && rm --recursive --force --verbose /var/lib/apt/lists/* \
+    && echo "Configuring interactive shells to source the s6 container environment" \
+      && echo '. /etc/profile.d/contenv.sh' >> /etc/bash.bashrc
 
 WORKDIR /usr/src/paperless/src/
 

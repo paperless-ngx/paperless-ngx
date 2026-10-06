@@ -5,8 +5,6 @@ from datetime import timedelta
 from pathlib import Path
 from unittest import mock
 
-from django.contrib.auth.models import Permission
-from django.contrib.auth.models import User
 from django.test import override_settings
 from django.utils import timezone
 from rest_framework import status
@@ -14,8 +12,10 @@ from rest_framework.test import APITestCase
 
 from documents.models import PaperlessTask
 from documents.permissions import has_system_status_permission
-from documents.tests.factories import PaperlessTaskFactory
 from paperless import version
+from paperless_testing.factories import PaperlessTaskFactory
+from paperless_testing.factories import UserFactory
+from paperless_testing.permissions import grant_global
 
 
 class TestSystemStatus(APITestCase):
@@ -23,9 +23,7 @@ class TestSystemStatus(APITestCase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.user = User.objects.create_superuser(
-            username="temp_admin",
-        )
+        self.user = UserFactory(username="temp_admin", superuser=True)
         self.tmp_dir = Path(tempfile.mkdtemp())
         self.override = override_settings(MEDIA_ROOT=self.tmp_dir)
         self.override.enable()
@@ -96,7 +94,7 @@ class TestSystemStatus(APITestCase):
         response = self.client.get(self.ENDPOINT)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
         self.assertEqual(response["WWW-Authenticate"], "Token")
-        normal_user = User.objects.create_user(username="normal_user")
+        normal_user = UserFactory(username="normal_user")
         self.client.force_login(normal_user)
         response = self.client.get(self.ENDPOINT)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -107,10 +105,8 @@ class TestSystemStatus(APITestCase):
         response = self.client.get(self.ENDPOINT)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-        user = User.objects.create_user(username="status_user")
-        user.user_permissions.add(
-            Permission.objects.get(codename="view_system_monitoring"),
-        )
+        user = UserFactory(username="status_user")
+        grant_global(user, "view_system_monitoring")
 
         self.client.force_login(user)
         response = self.client.get(self.ENDPOINT)

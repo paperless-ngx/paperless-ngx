@@ -1,7 +1,9 @@
 [project]
 name = "paperless-ngx"
 version = "3.2.1"
-description = "A community-supported supercharged document management system: scan, index and archive all your physical documents"
+description = """\
+  A community-supported supercharged document management system: scan, index and archive all your physical documents\
+  """
 readme = "README.md"
 requires-python = ">=3.11"
 classifiers = [
@@ -10,13 +12,13 @@ classifiers = [
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.14",
+  "Programming Language :: Python :: 3.15",
 ]
 # TODO: Move certain things to groups and then utilize that further
 # This will allow testing to not install a webserver, mysql, etc
 dependencies = [
   "azure-ai-documentintelligence>=1.0.2",
   "babel>=2.17",
-  "bleach~=6.4.0",
   "celery[redis]~=5.6.2",
   "channels~=4.2",
   "channels-redis~=4.2",
@@ -31,8 +33,8 @@ dependencies = [
   "django-compression-middleware~=0.5.0",
   "django-cors-headers~=4.9.0",
   "django-extensions~=4.1",
-  "django-filter~=25.1",
-  "django-guardian>=3.3.3,<3.5",
+  "django-filter>=25.1,<27",
+  "django-guardian>=3.3.3,<3.6",
   "django-multiselectfield~=1.0.1",
   "django-rich~=2.2.0",
   "django-soft-delete~=1.0.18",
@@ -42,7 +44,7 @@ dependencies = [
   "drf-spectacular-sidecar>=2026.7.1,<2026.10",
   "drf-writable-nested~=0.7.1",
   "filelock~=3.32.0",
-  "flower>=2.0.1,<2.2",
+  "flower>=2.0.1,<2.3",
   "gotenberg-client[httpx]~=1.0",
   "httpx-oauth~=0.17",
   "ijson>=3.5.1",
@@ -74,6 +76,7 @@ dependencies = [
   "tantivy~=0.26.0",
   "tika-client[httpx]~=1.0",
   "torch>=2.13,<2.15",
+  "turbohtml~=1.10.0",
   "watchfiles>=1.2",
   "whitenoise~=6.11",
   "whoosh-compat[tantivy]==0.3",
@@ -81,13 +84,13 @@ dependencies = [
 ]
 [project.optional-dependencies]
 mariadb = [
-  "mysqlclient~=2.2.7",
+  "mysqlclient>=2.2.7,<2.4",
 ]
 postgres = [
   "psycopg[c,pool]==3.3.4",
   # Direct dependency for proper resolution of the pre-built wheels
   "psycopg-c==3.3.4",
-  "psycopg-pool==3.3.1",
+  "psycopg-pool==3.3.3",
 ]
 webserver = [
   "granian[uvloop]>=2.7,<2.9",
@@ -109,7 +112,7 @@ lint = [
 testing = [
   "daphne",
   "factory-boy~=3.3.1",
-  "faker>=40.36,<40.39",
+  "faker>=40.36,<40.40",
   "imagehash",
   "pytest~=9.1.1",
   "pytest-cov~=7.1.0",
@@ -117,7 +120,7 @@ testing = [
   "pytest-env~=1.7.0",
   "pytest-httpx",
   "pytest-mock~=3.15.1",
-  # "pytest-randomly~=4.0.1",
+  "pytest-randomly~=5.0.0",
   "pytest-rerunfailures~=16.4",
   "pytest-sugar",
   "pytest-xdist~=3.8.0",
@@ -133,7 +136,6 @@ typing = [
   "mypy",
   "mypy-baseline",
   "pyrefly",
-  "types-bleach",
   "types-channels",
   "types-colorama",
   "types-dateparser",
@@ -148,6 +150,7 @@ typing = [
 
 [tool.uv]
 required-version = ">=0.9.0"
+prerelease = "disallow"
 environments = [
   "sys_platform == 'darwin'",
   "sys_platform == 'linux'",
@@ -244,6 +247,10 @@ per-file-ignores."docker/wait-for-redis.py" = [
 per-file-ignores."src/documents/models.py" = [
   "SIM115",
 ]
+per-file-ignores."src/documents/tests/*.py" = [
+  "TID251",
+]
+flake8-tidy-imports.banned-api."documents.tests".msg = "Shared test infrastructure lives in src/paperless_testing/."
 isort.force-single-line = true
 
 [tool.codespell]
@@ -271,9 +278,9 @@ plugins = [
 ]
 
 [tool.pyrefly]
-baseline = ".pyrefly-baseline.json"
 python-platform = "linux"
 search-path = [ "src" ]
+baseline = ".pyrefly-baseline.json"
 
 [tool.django-stubs]
 django_settings_module = "paperless.settings"
@@ -326,6 +333,8 @@ PAPERLESS_CACHE_BACKEND = "django.core.cache.backends.locmem.LocMemCache"
 PAPERLESS_CHANNELS_BACKEND = "channels.layers.InMemoryChannelLayer"
 # I don't think anything hits this, but just in case, basically infinite
 PAPERLESS_TOKEN_THROTTLE_RATE = "1000/min"
+# The 0.1s production default trips on a stalled CI runner, the date parsing tests then find no dates
+PAPERLESS_MATCH_REGEX_TIMEOUT_SECONDS = "5"
 
 [tool.coverage.run]
 source = [
@@ -334,13 +343,15 @@ source = [
 omit = [
   "*/tests/*",
   "manage.py",
-  "paperless/wsgi.py",
   "paperless/auth.py",
+  "paperless/wsgi.py",
+  "src/conftest.py",
+  "src/paperless_testing/*",
 ]
 [tool.coverage.report]
 exclude_also = [
-  "if settings.AUDIT_LOG_ENABLED:",
   "if AUDIT_LOG_ENABLED:",
+  "if settings.AUDIT_LOG_ENABLED:",
   "if TYPE_CHECKING:",
 ]
 

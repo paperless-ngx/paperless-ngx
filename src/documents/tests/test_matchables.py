@@ -7,10 +7,10 @@ from documents import matching
 from documents.models import Document
 from documents.models import MatchingModel
 from documents.signals import document_consumption_finished
-from documents.tests.factories import CorrespondentFactory
-from documents.tests.factories import DocumentFactory
-from documents.tests.factories import DocumentTypeFactory
-from documents.tests.factories import TagFactory
+from paperless_testing.factories import CorrespondentFactory
+from paperless_testing.factories import DocumentFactory
+from paperless_testing.factories import DocumentTypeFactory
+from paperless_testing.factories import TagFactory
 
 
 @pytest.fixture(

@@ -38,7 +38,7 @@ class TestUnterminatedBracketReturnsA400:
     def test_unterminated_bracket_is_a_400(
         self,
         admin_client: APIClient,
-        indexed_document: Document,
+        searchable_document: Document,
         query: str,
     ) -> None:
         """
@@ -59,7 +59,7 @@ class TestUnterminatedBracketReturnsA400:
     def test_properly_closed_bracket_still_searches_cleanly(
         self,
         admin_client: APIClient,
-        indexed_document: Document,
+        searchable_document: Document,
     ) -> None:
         """
         GIVEN:

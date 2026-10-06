@@ -22,11 +22,11 @@ if TYPE_CHECKING:
 
 
 @pytest.fixture(scope="session")
-def samples_dir() -> Path:
+def parser_samples_dir() -> Path:
     """Absolute path to the shared parser sample files directory.
 
     Sub-package conftest files derive format-specific paths from this root,
-    e.g. ``samples_dir / "text" / "test.txt"``.
+    e.g. ``parser_samples_dir / "text" / "test.txt"``.
 
     Returns
     -------
@@ -37,7 +37,7 @@ def samples_dir() -> Path:
 
 
 @pytest.fixture(scope="session")
-def tagged_no_text_pdf_file(samples_dir: Path) -> Path:
+def tagged_no_text_pdf_file(parser_samples_dir: Path) -> Path:
     """Path to a tagged PDF whose only "text" is pdftotext layout padding.
 
     Reproduces GH #13387: ``/MarkInfo /Marked true`` is set, but the only
@@ -50,7 +50,7 @@ def tagged_no_text_pdf_file(samples_dir: Path) -> Path:
     Path
         Absolute path to ``tesseract/tagged-but-no-text.pdf``.
     """
-    return samples_dir / "tesseract" / "tagged-but-no-text.pdf"
+    return parser_samples_dir / "tesseract" / "tagged-but-no-text.pdf"
 
 
 @pytest.fixture(autouse=True)

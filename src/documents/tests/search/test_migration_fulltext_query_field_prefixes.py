@@ -1,6 +1,6 @@
 import pytest
 
-from documents.tests.utils import TestMigrations
+from paperless_testing.migrations import TestMigrations
 
 pytestmark = pytest.mark.search
 

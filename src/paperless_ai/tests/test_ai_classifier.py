@@ -1,20 +1,17 @@
 import datetime
 from collections.abc import Generator
 from types import SimpleNamespace
+from typing import TYPE_CHECKING
 from unittest.mock import MagicMock
 from unittest.mock import patch
 
 import pytest
 import pytest_mock
 from django.test import override_settings
-from guardian.shortcuts import assign_perm
 from guardian.shortcuts import remove_perm
 
 from documents.models import Document
 from documents.search import TantivyBackend
-from documents.tests.factories import DocumentFactory
-from documents.tests.factories import TagFactory
-from documents.tests.factories import UserFactory
 from paperless.config import AIConfig
 from paperless_ai.ai_classifier import TAXONOMY_CANDIDATE_TOP_K
 from paperless_ai.ai_classifier import _fulltext_similar_documents
@@ -27,6 +24,13 @@ from paperless_ai.ai_classifier import get_taxonomy_context
 from paperless_ai.taxonomy import SimilarDocument
 from paperless_ai.taxonomy import TaxonomyCandidate
 from paperless_ai.taxonomy import TaxonomyCandidates
+from paperless_testing.factories import DocumentFactory
+from paperless_testing.factories import TagFactory
+from paperless_testing.factories import UserFactory
+from paperless_testing.permissions import grant_object
+
+if TYPE_CHECKING:
+    from paperless_testing.dirs import PaperlessDirs
 
 
 @pytest.fixture
@@ -630,10 +634,11 @@ class TestFulltextSimilarDocuments:
     def fulltext_backend(
         self,
         mocker: pytest_mock.MockerFixture,
+        paperless_dirs: "PaperlessDirs",
     ) -> Generator[TantivyBackend, None, None]:
-        """An in-memory Tantivy backend, wired up as the module-level
+        """An on-disk Tantivy backend, wired up as the module-level
         singleton _fulltext_similar_documents resolves via get_backend()."""
-        backend = TantivyBackend(path=None)
+        backend = TantivyBackend(path=paperless_dirs.index_dir)
         backend.open()
         mocker.patch("documents.search.get_backend", return_value=backend)
         try:
@@ -815,8 +820,8 @@ class TestFulltextSimilarDocuments:
             content="shared content phrase",
             owner=owner,
         )
-        assign_perm("view_document", viewer, permitted)
-        assign_perm("view_document", viewer, now_private)
+        grant_object(viewer, permitted, "view_document")
+        grant_object(viewer, now_private, "view_document")
         fulltext_backend.add_or_update(source)
         fulltext_backend.add_or_update(permitted)
         fulltext_backend.add_or_update(now_private)

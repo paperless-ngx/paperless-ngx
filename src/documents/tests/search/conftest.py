@@ -9,29 +9,21 @@ from documents.search._backend import TantivyBackend
 from documents.search._backend import reset_backend
 from documents.search._schema import build_schema
 from documents.search._tokenizer import register_tokenizers
-from documents.tests.factories import DocumentFactory
+from paperless_testing.factories import DocumentFactory
 
 if TYPE_CHECKING:
     from collections.abc import Callable
     from collections.abc import Generator
-    from pathlib import Path
 
     from pytest_django.fixtures import Settings
 
     from documents.models import Document
+    from paperless_testing.dirs import PaperlessDirs
 
 
 @pytest.fixture
-def index_dir(tmp_path: Path, settings: Settings) -> Path:
-    path = tmp_path / "index"
-    path.mkdir()
-    settings.INDEX_DIR = path
-    return path
-
-
-@pytest.fixture
-def backend() -> Generator[TantivyBackend, None, None]:
-    b = TantivyBackend()  # path=None → in-memory index
+def backend(paperless_dirs: PaperlessDirs) -> Generator[TantivyBackend, None, None]:
+    b = TantivyBackend(path=paperless_dirs.index_dir)
     b.open()
     try:
         yield b

@@ -3,10 +3,8 @@ from pathlib import Path
 
 import pytest
 from django.contrib.auth.models import Group
-from django.contrib.auth.models import User
 from django.db import connection
 from django.test.utils import CaptureQueriesContext
-from guardian.shortcuts import assign_perm
 from pytest_mock import MockerFixture
 
 from documents.models import CustomField
@@ -19,11 +17,12 @@ from documents.search._backend import WriteBatch
 from documents.search._backend import get_backend
 from documents.search._backend import reset_backend
 from documents.signals.handlers import add_to_index
-from documents.tests.factories import CorrespondentFactory
-from documents.tests.factories import DocumentFactory
-from documents.tests.factories import DocumentTypeFactory
-from documents.tests.factories import TagFactory
-from documents.tests.factories import UserFactory
+from paperless_testing.factories import CorrespondentFactory
+from paperless_testing.factories import DocumentFactory
+from paperless_testing.factories import DocumentTypeFactory
+from paperless_testing.factories import TagFactory
+from paperless_testing.factories import UserFactory
+from paperless_testing.permissions import grant_object
 
 pytestmark = [pytest.mark.search, pytest.mark.django_db]
 
@@ -189,7 +188,7 @@ class TestAddOrUpdateIds:
             pk=1,
             owner=owner,
         )
-        assign_perm("view_document", user, doc)
+        grant_object(user, doc, "view_document")
 
         with backend.batch_update() as batch:
             batch.add_or_update_ids([doc.pk])
@@ -209,7 +208,7 @@ class TestAddOrUpdateIds:
             pk=1,
             owner=owner,
         )
-        assign_perm("view_document", group, doc)
+        grant_object(group, doc, "view_document")
 
         with backend.batch_update() as batch:
             batch.add_or_update_ids([doc.pk])
@@ -763,8 +762,8 @@ class TestSearchIds:
 
     def test_respects_permission_filter(self, backend: TantivyBackend) -> None:
         """search_ids must respect user permission filtering."""
-        owner = User.objects.create_user("ids_owner")
-        other = User.objects.create_user("ids_other")
+        owner = UserFactory(username="ids_owner")
+        other = UserFactory(username="ids_other")
         doc = Document.objects.create(
             title="private doc",
             content="secret keyword",
@@ -843,7 +842,7 @@ class TestRebuild:
             content="group secret keyword",
             owner=owner,
         )
-        assign_perm("view_document", group, doc)
+        grant_object(group, doc, "view_document")
 
         backend.rebuild(Document.objects.all())
 
@@ -948,7 +947,8 @@ class TestSingleton:
         yield
         reset_backend()
 
-    def test_returns_same_instance_on_repeated_calls(self, index_dir) -> None:
+    @pytest.mark.usefixtures("paperless_dirs")
+    def test_returns_same_instance_on_repeated_calls(self) -> None:
         """Singleton pattern: repeated calls to get_backend() must return the same instance."""
         assert get_backend() is get_backend()
 
@@ -965,7 +965,8 @@ class TestSingleton:
         assert b1 is not b2
         assert b2._path == tmp_path / "b"
 
-    def test_reset_forces_new_instance(self, index_dir) -> None:
+    @pytest.mark.usefixtures("paperless_dirs")
+    def test_reset_forces_new_instance(self) -> None:
         """reset_backend() must force creation of a new backend instance on next get_backend() call."""
         b1 = get_backend()
         reset_backend()
@@ -1071,7 +1072,7 @@ class TestFieldHandling:
 
     def test_notes_include_user_information(self, backend: TantivyBackend) -> None:
         """Notes must be indexed with user information when available for structured queries."""
-        user = User.objects.create_user("notewriter")
+        user = UserFactory(username="notewriter")
         doc = Document.objects.create(
             title="Doc with notes",
             content="test",
@@ -1173,7 +1174,7 @@ class TestHighlightHits:
         notes.note: prefix so the query targets notes content directly, but
         the snippet is generated from notes_text which stores the same text.
         """
-        user = User.objects.create_user("hl_noteuser")
+        user = UserFactory(username="hl_noteuser")
         doc = Document.objects.create(
             title="Doc with matching note",
             content="unrelated content",

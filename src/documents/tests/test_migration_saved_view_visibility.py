@@ -1,4 +1,4 @@
-from documents.tests.utils import TestMigrations
+from paperless_testing.migrations import TestMigrations
 
 SAVED_VIEWS_KEY = "saved_views"
 DASHBOARD_VIEWS_VISIBLE_IDS_KEY = "dashboard_views_visible_ids"

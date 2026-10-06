@@ -2,8 +2,8 @@ import datetime as dt
 import os
 import shutil
 from pathlib import Path
-from unittest import mock
 
+import pytest
 from django.test import TestCase
 from django.test import override_settings
 from pdfminer.high_level import extract_text
@@ -15,22 +15,26 @@ from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentSource
 from documents.double_sided import STAGING_FILE_NAME
 from documents.double_sided import TIMEOUT_MINUTES
-from documents.tests.utils import DirectoriesMixin
-from documents.tests.utils import DummyProgressManager
-from documents.tests.utils import FileSystemAssertsMixin
+from documents.tests.utils import SampleDirMixin
+from paperless_testing.assertions import FileSystemAssertsMixin
+from paperless_testing.dirs import DirectoriesMixin
 
 
+@pytest.mark.usefixtures("fake_progress_manager")
 @override_settings(
     CONSUMER_RECURSIVE=True,
     CONSUMER_ENABLE_COLLATE_DOUBLE_SIDED=True,
 )
-class TestDoubleSided(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
-    SAMPLE_DIR = Path(__file__).parent / "samples"
-
+class TestDoubleSided(
+    DirectoriesMixin,
+    FileSystemAssertsMixin,
+    SampleDirMixin,
+    TestCase,
+):
     def setUp(self) -> None:
         super().setUp()
-        self.dirs.double_sided_dir = self.dirs.consumption_dir / "double-sided"
-        self.dirs.double_sided_dir.mkdir()
+        self.double_sided_dir = self.dirs.consumption_dir / "double-sided"
+        self.double_sided_dir.mkdir()
         self.staging_file = self.dirs.scratch_dir / STAGING_FILE_NAME
 
     def consume_file(self, srcname, dstname: str | Path = "foo.pdf"):
@@ -39,20 +43,16 @@ class TestDoubleSided(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         destination file does not exist afterwards
         """
         src = self.SAMPLE_DIR / srcname
-        dst = self.dirs.double_sided_dir / dstname
+        dst = self.double_sided_dir / dstname
         dst.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy(src, dst)
-        with mock.patch(
-            "documents.tasks.ProgressManager",
-            DummyProgressManager,
-        ):
-            msg = tasks.consume_file(
-                ConsumableDocument(
-                    source=DocumentSource.ConsumeFolder,
-                    original_file=dst,
-                ),
-                None,
-            )
+        msg = tasks.consume_file(
+            ConsumableDocument(
+                source=DocumentSource.ConsumeFolder,
+                original_file=dst,
+            ),
+            None,
+        )
         self.assertIsNotFile(dst)
         return msg
 
@@ -214,31 +214,41 @@ class TestDoubleSided(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertIsNotFile(self.staging_file)
         self.assertIsInstance(msg.get("document_id"), int)
 
-    def test_subdirectory_upload(self) -> None:
+    def test_consume_double_sided_in_nested_dir(self) -> None:
         """
         GIVEN:
             - A staging file exists
         WHEN:
-            - A file gets uploaded into foo/bar/double-sided
-              or double-sided/foo/bar
+            - A file is uploaded into foo/bar/double-sided
         THEN:
-            - The collated file gets put into foo/bar
+            - The collated file is placed into foo/bar
         """
-        # TODO: parameterize this instead
-        for path in [
-            Path("foo") / "bar" / "double-sided",
-            Path("double-sided") / "foo" / "bar",
-        ]:
-            with self.subTest(path=str(path)):
-                # Ensure we get fresh directories for each run
-                self.tearDown()
-                self.setUp()
+        self.create_staging_file()
+        self.consume_file(
+            "double-sided-odd.pdf",
+            Path("foo") / "bar" / "double-sided" / "foo.pdf",
+        )
+        self.assertIsFile(
+            self.dirs.consumption_dir / "foo" / "bar" / "foo-collated.pdf",
+        )
 
-                self.create_staging_file()
-                self.consume_file("double-sided-odd.pdf", Path(path) / "foo.pdf")
-                self.assertIsFile(
-                    self.dirs.consumption_dir / "foo" / "bar" / "foo-collated.pdf",
-                )
+    def test_consume_double_sided_with_nested_subdir(self) -> None:
+        """
+        GIVEN:
+            - A staging file exists
+        WHEN:
+            - A file is uploaded into double-sided/foo/bar
+        THEN:
+            - The collated file is placed into foo/bar
+        """
+        self.create_staging_file()
+        self.consume_file(
+            "double-sided-odd.pdf",
+            Path("double-sided") / "foo" / "bar" / "foo.pdf",
+        )
+        self.assertIsFile(
+            self.dirs.consumption_dir / "foo" / "bar" / "foo-collated.pdf",
+        )
 
     @override_settings(CONSUMER_ENABLE_COLLATE_DOUBLE_SIDED=False)
     def test_disabled_double_sided_dir_upload(self) -> None:
