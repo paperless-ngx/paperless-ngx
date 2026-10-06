@@ -13,9 +13,9 @@ physical documents into a searchable online archive so you can keep, well, _less
 [Demo](https://demo.paperless-ngx.com){ .md-button .md-button--secondary target=\_blank }
 
 <div style="display: flex; justify-content: end; margin-top: -1.5rem;">
-  <a href="https://m.do.co/c/8d70b916d462" target="_blank">
-    <img src="https://opensource.nyc3.cdn.digitaloceanspaces.com/attribution/assets/PoweredByDO/DO_Powered_by_Badge_white.svg#only-dark" class="no-lightbox" width="150px">
-    <img src="https://opensource.nyc3.cdn.digitaloceanspaces.com/attribution/assets/PoweredByDO/DO_Powered_by_Badge_black.svg#only-light" class="no-lightbox" width="150px">
+  <a href="https://miget.com" target="_blank" aria-label="Demo hosting provided by Miget">
+    <img src="assets/sponsors/miget-white.png#only-dark" alt="Miget" class="no-lightbox" width="150px">
+    <img src="assets/sponsors/miget-black.png#only-light" alt="Miget" class="no-lightbox" width="150px">
   </a>
 </div>
 
