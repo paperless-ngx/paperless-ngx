@@ -1154,7 +1154,7 @@ export class DocumentDetailComponent
           if (this.suggestions()) {
             this.suggestions.set({
               ...this.suggestions(),
-              suggested_tags: this.suggestions().suggested_tags.filter(
+              suggested_tags: (this.suggestions().suggested_tags ?? []).filter(
                 (tag) => tag !== newTag.name
               ),
             })
@@ -1193,10 +1193,12 @@ export class DocumentDetailComponent
         this.documentForm.get('document_type').setValue(newDocumentType.id)
         this.documentForm.get('document_type').markAsDirty()
         if (this.suggestions()) {
-          this.suggestions().suggested_document_types =
-            this.suggestions().suggested_document_types.filter(
-              (dt) => dt !== newName
-            )
+          this.suggestions.set({
+            ...this.suggestions(),
+            suggested_document_types: (
+              this.suggestions().suggested_document_types ?? []
+            ).filter((dt) => dt !== newName),
+          })
         }
       })
   }
@@ -1223,10 +1225,12 @@ export class DocumentDetailComponent
         this.documentForm.get('correspondent').setValue(newCorrespondent.id)
         this.documentForm.get('correspondent').markAsDirty()
         if (this.suggestions()) {
-          this.suggestions().suggested_correspondents =
-            this.suggestions().suggested_correspondents.filter(
-              (c) => c !== newName
-            )
+          this.suggestions.set({
+            ...this.suggestions(),
+            suggested_correspondents: (
+              this.suggestions().suggested_correspondents ?? []
+            ).filter((c) => c !== newName),
+          })
         }
       })
   }

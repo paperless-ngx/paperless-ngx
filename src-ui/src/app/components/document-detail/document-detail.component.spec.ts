@@ -662,6 +662,45 @@ describe('DocumentDetailComponent', () => {
     )
   })
 
+  it.each([
+    ['tag', 'createTag', 'tags', 'suggested_tags'],
+    [
+      'document type',
+      'createDocumentType',
+      'document_type',
+      'suggested_document_types',
+    ],
+    [
+      'correspondent',
+      'createCorrespondent',
+      'correspondent',
+      'suggested_correspondents',
+    ],
+  ])(
+    'should create a %s after ML-only suggestions',
+    (_, method, field, suggestedField) => {
+      initNormally()
+      component.suggestions.set({ tags: [1] })
+      let openModal: NgbModalRef
+      modalService.activeInstances.subscribe((modal) => (openModal = modal[0]))
+      component[method]('New value')
+      openModal.componentInstance.succeeded.next({
+        id: 12,
+        name: 'New value',
+        is_inbox_tag: false,
+        color: '#ff0000',
+        text_color: '#000000',
+      })
+
+      if (field === 'tags') {
+        expect(component.tagsInput.value).toContain(12)
+      } else {
+        expect(component.documentForm.get(field).value).toBe(12)
+      }
+      expect(component.suggestions()[suggestedField]).toEqual([])
+    }
+  )
+
   it('should support creating storage path', () => {
     initNormally()
     let openModal: NgbModalRef
