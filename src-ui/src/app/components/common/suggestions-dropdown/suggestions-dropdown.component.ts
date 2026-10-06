@@ -34,6 +34,8 @@ export class SuggestionsDropdownComponent {
   readonly appliedCorrespondent = input<number>(null)
   readonly appliedDocumentType = input<number>(null)
   readonly appliedStoragePath = input<number>(null)
+  readonly appliedTitle = input<string>(null)
+  readonly appliedCreated = input<string>(null)
 
   @Output()
   getSuggestions: EventEmitter<SuggestionSource> = new EventEmitter()
@@ -134,9 +136,22 @@ export class SuggestionsDropdownComponent {
   get fieldSuggestions(): number {
     return (
       this.reusableSuggestions +
-      (this.suggestions()?.title ? 1 : 0) +
-      (this.suggestions()?.dates?.length ?? 0)
+      this.unappliedTitleSuggestions +
+      this.unappliedDateSuggestions
     )
+  }
+
+  // hide a title or date suggestion equal to the current value
+  private get unappliedTitleSuggestions(): number {
+    const title = this.suggestions()?.title
+    return title && title !== this.appliedTitle() ? 1 : 0
+  }
+
+  private get unappliedDateSuggestions(): number {
+    const created = this.appliedCreated()
+    return (this.suggestions()?.dates ?? []).filter(
+      (date) => !created || date !== created
+    ).length
   }
 
   private countUnapplied(suggested: number[], applied: number[]): number {

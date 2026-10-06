@@ -141,6 +141,8 @@
                 [appliedCorrespondent]="documentForm.value.correspondent"
                 [appliedDocumentType]="documentForm.value.document_type"
                 [appliedStoragePath]="documentForm.value.storage_path"
+                [appliedTitle]="documentForm.value.title"
+                [appliedCreated]="documentForm.value.created"
                 (getSuggestions)="getSuggestions($event)"
                 (sourceChange)="suggestionSourceOverride.set($event)"
                 (addTag)="createTag($event)"

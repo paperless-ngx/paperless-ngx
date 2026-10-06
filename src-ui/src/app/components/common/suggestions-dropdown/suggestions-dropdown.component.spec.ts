@@ -154,6 +154,19 @@ describe('SuggestionsDropdownComponent', () => {
     expect(fixture.nativeElement.textContent).not.toContain('existing value')
   })
 
+  it('should not count title or date suggestions matching the current values', () => {
+    fixture.componentRef.setInput('suggestions', {
+      title: 'Current title',
+      dates: ['2026-01-04', '2026-02-01'],
+    })
+    expect(component.fieldSuggestions).toBe(3)
+
+    fixture.componentRef.setInput('appliedTitle', 'Current title')
+    fixture.componentRef.setInput('appliedCreated', '2026-01-04')
+    expect(component.fieldSuggestions).toBe(1)
+    expect(component.totalSuggestions).toBe(1)
+  })
+
   it('should show when a completed request returned no suggestions', () => {
     fixture.componentRef.setInput('suggestions', {
       correspondents: [],
