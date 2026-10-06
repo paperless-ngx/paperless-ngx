@@ -272,6 +272,65 @@ This error can occur in installations which have upgraded from a version of Pape
 $ python3 manage.py convert_mariadb_uuid
 ```
 
+## MariaDB/MySQL error "Illegal mix of collations"
+
+Consumption or other operations fail with an error like:
+
+```
+(1267, "Illegal mix of collations (utf8mb4_general_ci,IMPLICIT) and
+(utf8mb4_unicode_ci,IMPLICIT) for operation '='")
+```
+
+This happens when the tables in your database do not all use the same
+collation. It is most often seen on databases that existed before a
+MariaDB/MySQL upgrade: older tables keep their original collation, while
+tables created afterwards use the new server default.
+
+To work around it, set the collation your existing tables use (the one in the error
+that is not `utf8mb4_unicode_ci`) with
+[`PAPERLESS_DB_OPTIONS`](configuration.md#PAPERLESS_DB_OPTIONS):
+
+```bash
+PAPERLESS_DB_OPTIONS="collation=utf8mb4_general_ci"
+```
+
+To fix it permanently, back up your database, then convert the database and
+each table to a single collation and remove the override:
+
+```sql
+ALTER DATABASE paperless CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE <table_name> CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
+## PostgreSQL warns about a "collation version mismatch"
+
+The PostgreSQL log shows a warning like:
+
+```
+WARNING:  database "paperless" has a collation version mismatch
+DETAIL:  The database was created using collation version 2.36, but the operating system provides version 2.41.
+HINT:  Rebuild all objects in this database that use the default collation and run ALTER DATABASE paperless REFRESH COLLATION VERSION, or build PostgreSQL with the right library version.
+```
+
+This comes from PostgreSQL, not Paperless-ngx. The `glibc` version that PostgreSQL
+runs against changed, and the existing database was created with an older one. With
+Docker, `glibc` comes from the PostgreSQL image's Debian base, not the host, so this
+commonly happens when a new image is pulled after its base Debian release changed.
+If PostgreSQL is installed directly on a host, it uses the host's `glibc` instead.
+
+The warning is not an error and Paperless-ngx keeps working, but the database's text
+indexes may be built with outdated sorting rules. To resolve it, back up your
+database, then connect to it (for example with `psql -U paperless -d paperless`
+inside the database container) and run:
+
+```sql
+REINDEX DATABASE paperless;
+ALTER DATABASE paperless REFRESH COLLATION VERSION;
+```
+
+To avoid this in the future, pin your PostgreSQL image to a specific Debian release,
+for example `postgres:18-trixie`, rather than `postgres:18`.
+
 ## Platform-Specific Deployment Troubleshooting
 
 A user-maintained wiki page is available to help troubleshoot issues that may arise when trying to deploy Paperless-ngx on specific platforms, for example SELinux. Please see [the wiki](https://github.com/paperless-ngx/paperless-ngx/wiki/Platform%E2%80%90Specific-Troubleshooting).
