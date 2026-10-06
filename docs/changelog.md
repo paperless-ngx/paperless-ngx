@@ -4,15 +4,13 @@
 
 ### Features / Enhancements
 
-- Feature: store barcode contents, list and search them [@jurassicparkicecream](https://github.com/jurassicparkicecream) ([#14276](https://github.com/paperless-ngx/paperless-ngx/pull/14276))
 - Enhancement: more control over suggestion requests [@shamoon](https://github.com/shamoon) ([#14258](https://github.com/paperless-ngx/paperless-ngx/pull/14258))
 - Chorehancement: set manifest CORS for credentials [@shamoon](https://github.com/shamoon) ([#14307](https://github.com/paperless-ngx/paperless-ngx/pull/14307))
-- docker-compose(deps): bump greenmail/standalone from 2.1.13 to 2.1.14 in /docker/compose @[dependabot[bot]](https://github.com/apps/dependabot) ([#14281](https://github.com/paperless-ngx/paperless-ngx/pull/14281))
-- docker(deps): Bump astral-sh/uv from 0.12.16-python3.14-trixie-slim to 0.12.20-python3.14-trixie-slim @[dependabot[bot]](https://github.com/apps/dependabot) ([#14282](https://github.com/paperless-ngx/paperless-ngx/pull/14282))
 - Enhancement: include Django admin with 2FA [@shamoon](https://github.com/shamoon) ([#14270](https://github.com/paperless-ngx/paperless-ngx/pull/14270))
 - Feature: propagate resolved secrets to interactive container shells [@stumpylog](https://github.com/stumpylog) ([#14254](https://github.com/paperless-ngx/paperless-ngx/pull/14254))
 - Enhancement: support separate embedding API key [@furkanural](https://github.com/furkanural) ([#14067](https://github.com/paperless-ngx/paperless-ngx/pull/14067))
 - Enhancement: support passthrough extra params for LLMs [@shamoon](https://github.com/shamoon) ([#14202](https://github.com/paperless-ngx/paperless-ngx/pull/14202))
+- Feature: store barcode contents, list and search them [@jurassicparkicecream](https://github.com/jurassicparkicecream) ([#14276](https://github.com/paperless-ngx/paperless-ngx/pull/14276))
 
 ### Bug Fixes
 
