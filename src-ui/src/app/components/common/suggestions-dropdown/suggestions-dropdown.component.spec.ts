@@ -84,7 +84,7 @@ describe('SuggestionsDropdownComponent', () => {
     fixture.detectChanges()
 
     expect(fixture.nativeElement.textContent).toContain(
-      '2 existing values suggested below'
+      '2 suggestions available below'
     )
     expect(fixture.nativeElement.textContent).not.toContain(
       'No novel suggestions'
@@ -108,7 +108,7 @@ describe('SuggestionsDropdownComponent', () => {
     expect(component.totalSuggestions).toBe(4)
     expect(fixture.nativeElement.textContent).toContain('Arbitration')
     expect(fixture.nativeElement.textContent).toContain(
-      '2 existing values suggested below'
+      '2 suggestions available below'
     )
   })
 
@@ -125,10 +125,33 @@ describe('SuggestionsDropdownComponent', () => {
     })
 
     expect(component.novelSuggestions).toBe(0)
-    expect(component.totalSuggestions).toBe(5)
+    expect(component.totalSuggestions).toBe(6)
 
     fixture.componentRef.setInput('appliedStoragePath', 7)
-    expect(component.totalSuggestions).toBe(4)
+    expect(component.totalSuggestions).toBe(5)
+  })
+
+  it('should count title and dates as field suggestions without calling them existing values', () => {
+    fixture.componentRef.setInput('aiEnabled', true)
+    fixture.componentRef.setInput('fetchedSources', [SuggestionSource.ML])
+    fixture.componentRef.setInput('suggestions', {
+      title: 'Suggested title',
+      dates: ['2026-01-04', '2026-02-01', '2026-03-01'],
+      correspondents: [1, 2, 3, 4],
+      document_types: [1, 2, 3, 4],
+      tags: [1, 2, 3, 4, 5, 6, 7, 8],
+    })
+    fixture.detectChanges()
+    component.clickSuggest()
+    fixture.detectChanges()
+
+    expect(component.reusableSuggestions).toBe(16)
+    expect(component.fieldSuggestions).toBe(20)
+    expect(component.totalSuggestions).toBe(20)
+    expect(fixture.nativeElement.textContent).toContain(
+      '20 suggestions available below'
+    )
+    expect(fixture.nativeElement.textContent).not.toContain('existing value')
   })
 
   it('should show when a completed request returned no suggestions', () => {
@@ -143,6 +166,28 @@ describe('SuggestionsDropdownComponent', () => {
 
     expect(component.noSuggestions).toBeTruthy()
     expect(fixture.nativeElement.textContent).toContain('No suggestions')
+  })
+
+  it('should wait for all pending responses before showing the empty state', () => {
+    fixture.componentRef.setInput('aiEnabled', true)
+    fixture.componentRef.setInput('source', SuggestionSource.Both)
+    fixture.componentRef.setInput('fetchedSources', [SuggestionSource.ML])
+    fixture.componentRef.setInput('suggestions', { tags: [] })
+    fixture.componentRef.setInput('loading', true)
+    fixture.detectChanges()
+
+    expect(component.noSuggestions).toBeFalsy()
+    expect(fixture.nativeElement.textContent).not.toContain('No suggestions')
+    expect(
+      fixture.nativeElement.querySelector('[role="status"]')
+    ).not.toBeNull()
+
+    fixture.componentRef.setInput('loading', false)
+    fixture.detectChanges()
+
+    expect(component.noSuggestions).toBeTruthy()
+    expect(fixture.nativeElement.textContent).toContain('No suggestions')
+    expect(fixture.nativeElement.querySelector('[role="status"]')).toBeNull()
   })
 
   it('should not show the empty state before a request or with suggestions', () => {

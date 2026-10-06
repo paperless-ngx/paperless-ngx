@@ -128,7 +128,15 @@ export class SuggestionsDropdownComponent {
   }
 
   get totalSuggestions(): number {
-    return this.novelSuggestions + this.reusableSuggestions
+    return this.novelSuggestions + this.fieldSuggestions
+  }
+
+  get fieldSuggestions(): number {
+    return (
+      this.reusableSuggestions +
+      (this.suggestions()?.title ? 1 : 0) +
+      (this.suggestions()?.dates?.length ?? 0)
+    )
   }
 
   private countUnapplied(suggested: number[], applied: number[]): number {
@@ -139,6 +147,7 @@ export class SuggestionsDropdownComponent {
   get noSuggestions(): boolean {
     const suggestions = this.suggestions()
     return (
+      !this.loading() &&
       suggestions != null &&
       !suggestions.title &&
       !suggestions.tags?.length &&
