@@ -337,6 +337,37 @@ def check_deprecated_v2_ocr_env_vars(
     return warnings
 
 
+DEPRECATED_CONVERT_ENV_VARS: dict[str, str] = {
+    "PAPERLESS_CONVERT_MEMORY_LIMIT": "paperless.W004",
+    "PAPERLESS_CONVERT_TMPDIR": "paperless.W005",
+}
+
+
+@register()
+def check_deprecated_convert_env_vars(
+    app_configs: object,
+    **kwargs: object,
+) -> list[Warning]:
+    """Warn when the deprecated ImageMagick convert environment variables are set.
+
+    PDF thumbnails no longer use ImageMagick, so these variables are ignored.
+    """
+    warnings: list[Warning] = []
+
+    for var, check_id in DEPRECATED_CONVERT_ENV_VARS.items():
+        if os.environ.get(var):
+            warnings.append(
+                Warning(
+                    f"{var} is deprecated, has no effect and will be removed "
+                    "in a future release.",
+                    hint="It can be removed from your environment or configuration.",
+                    id=check_id,
+                ),
+            )
+
+    return warnings
+
+
 def get_tesseract_langs():
     proc = subprocess.run(
         [shutil.which("tesseract"), "--list-langs"],

@@ -1315,29 +1315,19 @@ valid crontab(5) expression describing when to run.
 
 #### [`PAPERLESS_CONVERT_MEMORY_LIMIT=<num>`](#PAPERLESS_CONVERT_MEMORY_LIMIT) {#PAPERLESS_CONVERT_MEMORY_LIMIT}
 
-: On smaller systems, or even in the case of Very Large Documents, the
-consumer may explode, complaining about how it's "unable to extend
-pixel cache". In such cases, try setting this to a reasonably low
-value, like 32. The default is to use whatever is necessary to do
-everything without writing to disk, and units are in megabytes.
+!!! warning
 
-    For more information on how to use this value, you should search the
-    web for "MAGICK_MEMORY_LIMIT".
-
-    Defaults to 0, which disables the limit.
+    This option is deprecated and has no effect. It only applied to PDF
+    thumbnail generation via ImageMagick, which no longer happens. It will be
+    removed in a future release and can be removed from your configuration now.
 
 #### [`PAPERLESS_CONVERT_TMPDIR=<path>`](#PAPERLESS_CONVERT_TMPDIR) {#PAPERLESS_CONVERT_TMPDIR}
 
-: Similar to the memory limit, if you've got a small system and your
-OS mounts /tmp as tmpfs, you should set this to a path that's on a
-physical disk, like /home/your_user/tmp or something. ImageMagick
-will use this as scratch space when crunching through very large
-documents.
+!!! warning
 
-    For more information on how to use this value, you should search the
-    web for "MAGICK_TMPDIR".
-
-    Default is none, which disables the temporary directory.
+    This option is deprecated and has no effect. It only applied to PDF
+    thumbnail generation via ImageMagick, which no longer happens. It will be
+    removed in a future release and can be removed from your configuration now.
 
 #### [`PAPERLESS_APPS=<string>`](#PAPERLESS_APPS) {#PAPERLESS_APPS}
 

@@ -177,7 +177,7 @@ to a positive number to enable polling and disable native filesystem notificatio
     - `pkg-config` for mysqlclient (python dependency)
     - `fonts-liberation` for generating thumbnails for plain text
       files
-    - `imagemagick` >= 6 for PDF conversion
+    - `imagemagick` >= 6 for image alpha handling
     - `gnupg` for decrypting GPG-encrypted email
     - `libpq-dev` for PostgreSQL
     - `libmagic-dev` for mime type detection
@@ -416,11 +416,11 @@ to a positive number to enable polling and disable native filesystem notificatio
         You may need to change the path in the files. Example:
         `ExecStart=/opt/paperless/.local/bin/celery --app paperless worker --loglevel INFO`
 
-12. Configure ImageMagick to allow processing of PDF documents and disable
-    formats that Paperless-ngx does not use. Most distributions disable PDF
-    processing by default, since PDF documents can contain malware.
-    Paperless-ngx no longer passes PDF documents to ImageMagick, so enabling
-    PDF processing is not required.
+12. Harden ImageMagick by disabling formats that Paperless-ngx does not use.
+    Most distributions disable PDF processing by default, since PDF documents
+    can contain malware. Paperless-ngx no longer passes PDF documents to
+    ImageMagick, so enabling PDF processing is not required and should be left
+    disabled.
 
     Configure the active ImageMagick policy file (commonly
     `/etc/ImageMagick-6/policy.xml` or `/etc/ImageMagick-7/policy.xml`) and

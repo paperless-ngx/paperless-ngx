@@ -1,4 +1,4 @@
-"""Tests for v3 system checks: deprecated v2 OCR env var warnings."""
+"""Tests for v3 system checks: deprecated environment variable warnings."""
 
 from __future__ import annotations
 
@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 
+from paperless.checks import check_deprecated_convert_env_vars
 from paperless.checks import check_deprecated_v2_ocr_env_vars
 
 if TYPE_CHECKING:
@@ -62,3 +63,94 @@ class TestDeprecatedV2OcrEnvVarWarnings:
         warning = result[0]
         assert warning.id == expected_id
         assert expected_fragment in warning.msg
+
+
+class TestDeprecatedConvertEnvVarWarnings:
+    def test_no_deprecated_vars_returns_empty(self, mocker: MockerFixture) -> None:
+        """
+        GIVEN:
+            - Neither deprecated convert variable is set
+        WHEN:
+            - The deprecated convert check runs
+        THEN:
+            - No warnings are returned
+        """
+        mocker.patch.dict(os.environ, {}, clear=True)
+        assert check_deprecated_convert_env_vars(None) == []
+
+    def test_empty_value_returns_empty(self, mocker: MockerFixture) -> None:
+        """
+        GIVEN:
+            - A deprecated convert variable is set to an empty string
+        WHEN:
+            - The deprecated convert check runs
+        THEN:
+            - No warnings are returned
+        """
+        mocker.patch.dict(
+            os.environ,
+            {"PAPERLESS_CONVERT_TMPDIR": ""},
+            clear=True,
+        )
+        assert check_deprecated_convert_env_vars(None) == []
+
+    @pytest.mark.parametrize(
+        ("env_var", "env_value", "expected_id"),
+        [
+            pytest.param(
+                "PAPERLESS_CONVERT_MEMORY_LIMIT",
+                "32",
+                "paperless.W004",
+                id="memory-limit-warns",
+            ),
+            pytest.param(
+                "PAPERLESS_CONVERT_TMPDIR",
+                "/var/tmp/paperless",
+                "paperless.W005",
+                id="tmpdir-warns",
+            ),
+        ],
+    )
+    def test_deprecated_var_produces_one_warning(
+        self,
+        mocker: MockerFixture,
+        env_var: str,
+        env_value: str,
+        expected_id: str,
+    ) -> None:
+        """
+        GIVEN:
+            - One deprecated convert variable is set
+        WHEN:
+            - The deprecated convert check runs
+        THEN:
+            - Exactly one warning naming that variable is returned
+        """
+        mocker.patch.dict(os.environ, {env_var: env_value}, clear=True)
+        result = check_deprecated_convert_env_vars(None)
+
+        assert len(result) == 1
+        assert result[0].id == expected_id
+        assert env_var in result[0].msg
+        assert "no effect" in result[0].msg
+
+    def test_both_vars_produce_two_warnings(self, mocker: MockerFixture) -> None:
+        """
+        GIVEN:
+            - Both deprecated convert variables are set
+        WHEN:
+            - The deprecated convert check runs
+        THEN:
+            - One warning per variable is returned
+        """
+        mocker.patch.dict(
+            os.environ,
+            {
+                "PAPERLESS_CONVERT_MEMORY_LIMIT": "32",
+                "PAPERLESS_CONVERT_TMPDIR": "/var/tmp/paperless",
+            },
+            clear=True,
+        )
+        result = check_deprecated_convert_env_vars(None)
+
+        assert {w.id for w in result} == {"paperless.W004", "paperless.W005"}
