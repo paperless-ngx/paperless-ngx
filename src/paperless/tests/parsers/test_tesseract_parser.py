@@ -297,12 +297,11 @@ class TestGetThumbnail:
     ) -> None:
         """
         GIVEN:
-            - A PDF whose first page is wider than the thumbnail width
+            - A portrait or landscape PDF
         WHEN:
             - A thumbnail is generated
         THEN:
-            - The thumbnail is a WebP, 500px wide, keeping the page's aspect
-              ratio (within rounding of the DPI computation)
+            - A 500px wide WebP keeping the page's aspect ratio
         """
         thumb = tesseract_parser.get_thumbnail(
             tesseract_samples_dir / filename,
@@ -325,8 +324,7 @@ class TestGetThumbnail:
         WHEN:
             - A thumbnail is generated
         THEN:
-            - The PDF is repaired with qpdf and rasterized again, producing a
-              real thumbnail rather than the default placeholder
+            - The PDF is repaired with qpdf and a real thumbnail is rendered
         """
         original = tesseract_samples_dir / "simple-digital.pdf"
 

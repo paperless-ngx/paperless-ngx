@@ -139,12 +139,11 @@ class TestGetPdfFirstPageSizePoints:
     def test_inherited_rotation_swaps_dimensions(self, tmp_path: Path) -> None:
         """
         GIVEN:
-            - A portrait PDF page whose /Rotate 90 is set on the /Pages node,
-              not on the page itself
+            - A page inheriting /Rotate 90 from the /Pages node
         WHEN:
             - The first page size is requested
         THEN:
-            - The inherited rotation is honored and width/height are swapped
+            - Width and height are swapped
         """
         pdf_path = self._write_pdf(tmp_path / "inherited.pdf", inherited_rotate=90)
         assert get_pdf_first_page_size_points(pdf_path) == (800.0, 600.0)
@@ -156,8 +155,7 @@ class TestGetPdfFirstPageSizePoints:
         WHEN:
             - The first page size is requested
         THEN:
-            - The CropBox dimensions are returned, matching what pdftoppm
-              renders with -cropbox
+            - The CropBox size is returned
         """
         pdf_path = self._write_pdf(
             tmp_path / "cropped.pdf",
@@ -172,7 +170,7 @@ class TestGetPdfFirstPageSizePoints:
         WHEN:
             - The first page size is requested
         THEN:
-            - None is returned instead of a size that would break DPI math
+            - None is returned
         """
         pdf_path = self._write_pdf(
             tmp_path / "degenerate.pdf",

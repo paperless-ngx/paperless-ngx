@@ -164,16 +164,11 @@ class TestComputeThumbnailDpi:
     ) -> None:
         """
         GIVEN:
-            - A PDF whose first page has the given size in points (or whose
-              geometry cannot be read)
+            - A first page of the given size, or unreadable geometry
         WHEN:
             - The thumbnail DPI is computed
         THEN:
-            - The DPI is rounded up so the render reaches 500x5000, is capped
-              at 300 and floored at 1, and is supersampled 2x except at the
-              1 DPI floor
-            - An unknown size gives the plain 150 DPI fallback without
-              supersampling
+            - The expected DPI and supersample factor are returned
         """
         mocker.patch(
             "paperless.parsers.utils.get_pdf_first_page_size_points",
@@ -214,13 +209,11 @@ class TestMakeThumbnailFromPdf:
     ) -> None:
         """
         GIVEN:
-            - A PDF whose page geometry is either readable or not
+            - Readable or unreadable page geometry
         WHEN:
-            - A thumbnail is made from it
+            - A thumbnail is made
         THEN:
-            - The page is rasterized at twice the computed DPI when the
-              geometry is known, and at the plain 150 DPI fallback otherwise
-            - The encode step is told the matching downsample factor
+            - Rasterize and encode get the matching DPI and supersample factor
         """
         mocker.patch(
             "paperless.parsers.utils.get_pdf_first_page_size_points",
@@ -257,8 +250,7 @@ class TestMakeThumbnailFromPdf:
         WHEN:
             - A thumbnail is made from it
         THEN:
-            - The WebP thumbnail is exactly 500px wide, unless the page is
-              too small to reach that even at 300 DPI
+            - The thumbnail has the expected width
         """
         pdf_path = self._write_blank_pdf(tmp_path / "in.pdf", page_size)
 
@@ -272,8 +264,7 @@ class TestMakeThumbnailFromPdf:
     @classmethod
     def _write_pdf_without_xref(cls, path: Path) -> Path:
         """
-        Writes a valid one page PDF, then cuts off its cross reference table
-        and trailer, which poppler cannot recover from but qpdf can.
+        Cuts off the xref and trailer, which pdftoppm cannot recover from but qpdf can.
         """
         cls._write_blank_pdf(path)
         data = path.read_bytes()
@@ -287,15 +278,12 @@ class TestMakeThumbnailFromPdf:
     ) -> None:
         """
         GIVEN:
-            - A PDF without a cross reference table or trailer, which
-              pdftoppm cannot render but qpdf can repair
+            - A PDF with its xref table and trailer cut off
         WHEN:
             - A thumbnail is made from it
         THEN:
-            - The unrepaired file really cannot be rasterized
-            - The thumbnail comes from the repaired copy and is a rendered
-              500px wide page, not the default placeholder
-            - The original file is left untouched
+            - The thumbnail is rendered from a qpdf repaired copy
+            - The original file is unchanged
         """
         pdf_path = self._write_pdf_without_xref(tmp_path / "broken.pdf")
         original_bytes = pdf_path.read_bytes()
@@ -327,13 +315,11 @@ class TestMakeThumbnailFromPdf:
     ) -> None:
         """
         GIVEN:
-            - A PDF which cannot be rasterized, either because qpdf cannot
-              repair it or because the repaired copy still cannot be rendered
+            - A PDF that cannot be rendered, even after qpdf repair
         WHEN:
             - A thumbnail is made from it
         THEN:
-            - The result is a copy of the default thumbnail, so the caller
-              can move it without consuming the shared resource
+            - A copy of the default thumbnail is returned
         """
         mocker.patch(
             "documents.parsers.rasterize_pdf_page_to_png",
@@ -385,13 +371,11 @@ class TestRasterizePdfPageToPng:
     ) -> None:
         """
         GIVEN:
-            - A two page PDF whose first page is 144x72 points, optionally
-              cropped or rotated
+            - A two page PDF, first page optionally cropped or rotated
         WHEN:
             - The first page is rasterized at 72 DPI
         THEN:
-            - Exactly the requested output path is written, and the image
-              matches the first page's cropped, rotated size
+            - Only out_path is written, sized to the first page's crop and rotation
         """
         pdf_path = self._write_pdf(
             tmp_path / "in.pdf",
@@ -481,13 +465,11 @@ class TestEncodeThumbnailWebp:
     ) -> None:
         """
         GIVEN:
-            - A rendered page image of the given size, made at the given
-              supersampling factor
+            - A rendered image and its supersample factor
         WHEN:
             - It is encoded as a thumbnail with that factor
         THEN:
-            - It is downsampled by the factor, then shrunk to fit 500x5000
-              keeping aspect ratio, and never enlarged
+            - It is downsampled, fit within 500x5000 and never enlarged
         """
         png_path = tmp_path / "in.png"
         Image.new("RGB", in_size, (255, 255, 255)).save(png_path)
@@ -513,12 +495,11 @@ class TestEncodeThumbnailWebp:
     ) -> None:
         """
         GIVEN:
-            - Opening the rendered image fails with an OSError or a
-              DecompressionBombError
+            - Opening the rendered image fails
         WHEN:
             - It is encoded as a thumbnail
         THEN:
-            - A ParseError is raised so the default thumbnail is used
+            - A ParseError is raised
         """
         png_path = tmp_path / "in.png"
         Image.new("RGB", (10, 10)).save(png_path)

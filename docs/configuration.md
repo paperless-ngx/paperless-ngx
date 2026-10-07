@@ -1317,17 +1317,15 @@ valid crontab(5) expression describing when to run.
 
 !!! warning
 
-    This option is deprecated and has no effect. It only applied to PDF
-    thumbnail generation via ImageMagick, which no longer happens. It will be
-    removed in a future release and can be removed from your configuration now.
+    Deprecated and has no effect, since PDF thumbnails no longer use
+    ImageMagick. It will be removed in a future release.
 
 #### [`PAPERLESS_CONVERT_TMPDIR=<path>`](#PAPERLESS_CONVERT_TMPDIR) {#PAPERLESS_CONVERT_TMPDIR}
 
 !!! warning
 
-    This option is deprecated and has no effect. It only applied to PDF
-    thumbnail generation via ImageMagick, which no longer happens. It will be
-    removed in a future release and can be removed from your configuration now.
+    Deprecated and has no effect, since PDF thumbnails no longer use
+    ImageMagick. It will be removed in a future release.
 
 #### [`PAPERLESS_APPS=<string>`](#PAPERLESS_APPS) {#PAPERLESS_APPS}
 

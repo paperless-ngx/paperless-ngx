@@ -417,10 +417,7 @@ to a positive number to enable polling and disable native filesystem notificatio
         `ExecStart=/opt/paperless/.local/bin/celery --app paperless worker --loglevel INFO`
 
 12. Harden ImageMagick by disabling formats that Paperless-ngx does not use.
-    Most distributions disable PDF processing by default, since PDF documents
-    can contain malware. Paperless-ngx no longer passes PDF documents to
-    ImageMagick, so enabling PDF processing is not required and should be left
-    disabled.
+    PDF processing is not needed and should stay disabled.
 
     Configure the active ImageMagick policy file (commonly
     `/etc/ImageMagick-6/policy.xml` or `/etc/ImageMagick-7/policy.xml`) and

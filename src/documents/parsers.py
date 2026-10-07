@@ -79,12 +79,9 @@ _THUMBNAIL_MAX_WIDTH = 500
 _THUMBNAIL_MAX_HEIGHT = 5000
 # Used only when the page geometry cannot be read
 _THUMBNAIL_FALLBACK_DPI = 150
-# Cap on the target density, applied before supersampling, so a tiny page is
-# not blown up past the size a plain 300 DPI render would give
+# Applied before supersampling, so tiny pages are not enlarged
 _THUMBNAIL_MAX_DPI = 300
-# Pages with known geometry are rendered at this multiple of the computed DPI
-# and downsampled with Lanczos, which keeps text noticeably crisper than
-# rasterizing straight at the target size
+# Rendering at a multiple and downsampling keeps text crisper
 _THUMBNAIL_SUPERSAMPLE = 2
 
 
@@ -96,12 +93,10 @@ def rasterize_pdf_page_to_png(
     logging_group=None,
 ) -> None:
     """
-    Rasterizes page 1 of a PDF to a PNG at out_path via pdftoppm (Poppler),
-    at the given DPI. pdftoppm honors the page's /Rotate on its own.
+    Rasterizes the first page of a PDF to a PNG with pdftoppm.
     """
-    # -singlefile stops pdftoppm appending a page number to the output name,
-    # and with -png it appends ".png" itself, so it is given the path without
-    # its suffix to write exactly out_path
+    # -singlefile drops the page number and -png appends ".png", so pass the
+    # path without its suffix
     args = [
         "pdftoppm",
         "-f",
@@ -134,12 +129,7 @@ def encode_thumbnail_webp(
     supersample: int = 1,
 ) -> None:
     """
-    Flattens any alpha onto white and saves the image as WebP.
-
-    A render made at supersample times the target density is first
-    downsampled by that factor with Lanczos. The result is then trimmed to the
-    thumbnail size, since the computed DPI is rounded up and lands at or
-    slightly above it. The image is never enlarged.
+    Flattens alpha onto white, undoes supersampling, shrinks to fit and saves as WebP.
     """
     from PIL import Image
 
@@ -168,8 +158,8 @@ def encode_thumbnail_webp(
 
 def _compute_thumbnail_dpi(in_path: Path, logging_group=None) -> tuple[int, int]:
     """
-    Returns (dpi, supersample): render at dpi * supersample, then downsample
-    by supersample. Unknown page geometry gives the fallback DPI, unsupersampled.
+    Returns (dpi, supersample). Unknown geometry is not supersampled, since
+    the render size cannot be bounded.
     """
     from paperless.parsers.utils import get_pdf_first_page_size_points
 
@@ -211,9 +201,7 @@ def _render_pdf_thumbnail(
 
 
 def _repair_pdf_with_qpdf(in_path: Path, out_path: Path) -> None:
-    # qpdf rewrites in place, so work on a copy and leave the original alone.
-    # qpdf exits 3 when it had to repair the file, which is the expected
-    # outcome here, so warnings must not count as failure.
+    # qpdf exits 3 after a repair; --warning-exit-0 keeps that from failing
     try:
         shutil.copy(in_path, out_path)
         run_subprocess(

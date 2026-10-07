@@ -271,16 +271,11 @@ def get_pdf_first_page_size_points(
 ) -> tuple[float, float] | None:
     """Return the first page's (width, height) in PDF points, post-rotation.
 
-    Uses ``page.cropbox``, which falls back to the MediaBox when the page has
-    no ``/CropBox`` of its own.  This must match the box the renderer is told
-    to use (pdftoppm's ``-cropbox`` flag), or a DPI computed from it will
-    target the wrong box's dimensions.
+    Uses the CropBox (MediaBox if absent), which must match pdftoppm's
+    ``-cropbox`` or the computed DPI targets the wrong box.
 
-    Width and height are swapped when the page's effective rotation is 90 or
-    270, since that is the orientation the page is rendered in.
-    ``page.rotation`` resolves a ``/Rotate`` inherited from an ancestor
-    ``/Pages`` node and normalizes it to ``[0, 360)``, which a raw
-    ``/Rotate`` lookup on the page dictionary would not.
+    Swaps width and height for 90/270 rotation. ``page.rotation`` resolves
+    inherited and negative ``/Rotate`` values, a raw lookup does not.
 
     Parameters
     ----------
