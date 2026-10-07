@@ -147,7 +147,11 @@ class TestComputeThumbnailDpi:
             pytest.param((612.0, 100000.0), (4, 2), id="tall-strip-height-bound"),
             pytest.param((200.0, 300.0), (180, 2), id="small-page-width-bound"),
             pytest.param((72.0, 72.0), (300, 2), id="tiny-page-capped-at-300"),
-            pytest.param((1000000.0, 1000000.0), (1, 2), id="huge-page-minimum-one"),
+            pytest.param(
+                (1000000.0, 1000000.0),
+                (1, 1),
+                id="huge-page-minimum-one-unsupersampled",
+            ),
             pytest.param(None, (150, 1), id="unreadable-geometry-fallback"),
         ],
     )
@@ -166,7 +170,8 @@ class TestComputeThumbnailDpi:
             - The thumbnail DPI is computed
         THEN:
             - The DPI is rounded up so the render reaches 500x5000, never
-              exceeds 300, is at least 1, and is supersampled 2x; an unknown
+              exceeds 300, is at least 1, and is supersampled 2x (except at the
+              1 DPI floor); an unknown
               size gives the plain 150 DPI fallback without supersampling
         """
         mocker.patch(
@@ -491,6 +496,7 @@ class TestEncodeThumbnailWebp:
             pytest.param((1001, 1401), 2, (500, 700), id="2x-odd-rounded"),
             pytest.param((1000, 1400), 1, (500, 700), id="no-supersample-clamped"),
             pytest.param((600, 800), 2, (300, 400), id="2x-small-not-enlarged"),
+            pytest.param((900, 1200), 2, (450, 600), id="2x-below-clamp"),
         ],
     )
     def test_supersampled_render_downsampled(

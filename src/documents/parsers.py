@@ -79,7 +79,8 @@ _THUMBNAIL_MAX_WIDTH = 500
 _THUMBNAIL_MAX_HEIGHT = 5000
 # Used only when the page geometry cannot be read
 _THUMBNAIL_FALLBACK_DPI = 150
-# Matches the density the thumbnail was previously rendered at before scaling
+# Cap on the target density, applied before supersampling: a capped tiny page
+# is rasterized at twice this and halved to the size a 300 DPI render gave
 _THUMBNAIL_MAX_DPI = 300
 # Pages with known geometry are rendered at this multiple of the computed DPI
 # and downsampled with Lanczos, which keeps text noticeably crisper than
@@ -196,14 +197,16 @@ def _compute_thumbnail_dpi(in_path: Path, logging_group=None) -> tuple[int, int]
     dpi_for_height = _THUMBNAIL_MAX_HEIGHT * 72 / height_pts
     # The old pipeline rendered at 300 DPI and then shrank to fit, so only
     # pages too small to reach the thumbnail size even at 300 DPI end up
-    # smaller than it. Rounding up keeps the render at or above the target,
-    # so the shrink-only clamp in encode_thumbnail_webp trims it to exactly
-    # the thumbnail size instead of leaving it a few pixels short.
+    # smaller than it. Rounding up keeps the downsampled render at or above
+    # the target, so the shrink-only clamp in encode_thumbnail_webp trims it
+    # to exactly the thumbnail size instead of leaving it a few pixels short.
     dpi = max(
         1,
         math.ceil(min(_THUMBNAIL_MAX_DPI, dpi_for_width, dpi_for_height)),
     )
-    return dpi, _THUMBNAIL_SUPERSAMPLE
+    # A page so large it hits the 1 DPI floor is already oversized, so
+    # doubling it would only quadruple the pixel count for no benefit
+    return dpi, 1 if dpi == 1 else _THUMBNAIL_SUPERSAMPLE
 
 
 def _render_pdf_thumbnail(
