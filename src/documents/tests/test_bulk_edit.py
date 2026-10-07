@@ -2021,3 +2021,69 @@ class TestBulkEditReprocess(DirectoriesMixin, TestCase):
         self.assertEqual(mock_task.apply_async.call_count, 2)
         for call in mock_task.apply_async.call_args_list:
             self.assertTrue(call.kwargs["kwargs"]["remote_ocr"])
+
+    @mock.patch("documents.bulk_edit.update_document_content_maybe_archive_file")
+    def test_reprocess_root_uses_latest_version(self, mock_task: mock.Mock) -> None:
+        """
+        GIVEN:
+            - A root document with two versions
+        WHEN:
+            - reprocess is called with the root document
+        THEN:
+            - The latest version is reprocessed, not the root's original file
+        """
+        Document.objects.create(
+            title="test",
+            checksum="A-v1",
+            mime_type="application/pdf",
+            root_document=self.doc,
+            version_index=1,
+        )
+        latest = Document.objects.create(
+            title="test",
+            checksum="A-v2",
+            mime_type="application/pdf",
+            root_document=self.doc,
+            version_index=2,
+        )
+
+        bulk_edit.reprocess([self.doc.id])
+
+        mock_task.apply_async.assert_called_once()
+        self.assertEqual(
+            mock_task.apply_async.call_args.kwargs["kwargs"]["document_id"],
+            latest.id,
+        )
+
+    @mock.patch("documents.bulk_edit.update_document_content_maybe_archive_file")
+    def test_reprocess_explicit_version(self, mock_task: mock.Mock) -> None:
+        """
+        GIVEN:
+            - A root document with two versions
+        WHEN:
+            - reprocess is called with the older version
+        THEN:
+            - That version is reprocessed
+        """
+        older = Document.objects.create(
+            title="test",
+            checksum="A-v1",
+            mime_type="application/pdf",
+            root_document=self.doc,
+            version_index=1,
+        )
+        Document.objects.create(
+            title="test",
+            checksum="A-v2",
+            mime_type="application/pdf",
+            root_document=self.doc,
+            version_index=2,
+        )
+
+        bulk_edit.reprocess([older.id])
+
+        mock_task.apply_async.assert_called_once()
+        self.assertEqual(
+            mock_task.apply_async.call_args.kwargs["kwargs"]["document_id"],
+            older.id,
+        )

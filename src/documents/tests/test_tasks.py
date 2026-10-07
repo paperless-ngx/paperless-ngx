@@ -287,6 +287,61 @@ class TestUpdateContent(DirectoriesMixin, TestCase):
         tasks.update_document_content_maybe_archive_file(doc.pk)
         self.assertNotEqual(Document.objects.get(pk=doc.pk).content, "test")
 
+    @mock.patch("documents.tasks.clear_document_caches")
+    @mock.patch("documents.search.get_backend")
+    def test_update_content_version_indexes_root(
+        self,
+        mock_get_backend: mock.Mock,
+        mock_clear_caches: mock.Mock,
+    ) -> None:
+        """
+        GIVEN:
+            - A root document with a version
+        WHEN:
+            - Update content task is called for the version
+        THEN:
+            - The version's content is updated
+            - The root document is indexed rather than the version
+            - Caches are cleared for both
+        """
+        sample1 = self.dirs.scratch_dir / "sample.pdf"
+        shutil.copy(
+            Path(__file__).parent
+            / "samples"
+            / "documents"
+            / "originals"
+            / "0000001.pdf",
+            sample1,
+        )
+        root = Document.objects.create(
+            title="test",
+            content="root content",
+            checksum="root",
+            mime_type="application/pdf",
+        )
+        version = Document.objects.create(
+            title="test",
+            content="my document",
+            checksum="wow",
+            filename=sample1,
+            mime_type="application/pdf",
+            root_document=root,
+            version_index=1,
+        )
+
+        tasks.update_document_content_maybe_archive_file(version.pk)
+
+        self.assertNotEqual(
+            Document.objects.get(pk=version.pk).content,
+            "my document",
+        )
+        self.assertEqual(Document.objects.get(pk=root.pk).content, "root content")
+        indexed = mock_get_backend.return_value.add_or_update.call_args.args[0]
+        self.assertEqual(indexed.pk, root.pk)
+        mock_clear_caches.assert_has_calls(
+            [mock.call(version.pk), mock.call(root.pk)],
+        )
+
 
 class TestUpdateContentRemoteOCR(DirectoriesMixin, TestCase):
     """

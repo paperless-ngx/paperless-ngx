@@ -408,10 +408,16 @@ def reprocess(doc_ids: list[int], *, remote_ocr: bool = False) -> Literal["OK"]:
 
     Consumption workflows do not run here, so ``remote_ocr`` is how the user
     asks for the remote engine when it is not configured to handle everything.
+
+    A root document with versions reprocesses its latest version, which is the
+    file whose content, archive and thumbnail are shown for it.
     """
-    for document_id in doc_ids:
+    for doc in Document.objects.select_related("root_document").filter(
+        id__in=doc_ids,
+    ):
+        pair = _resolve_root_and_source_doc(doc)
         update_document_content_maybe_archive_file.apply_async(
-            kwargs={"document_id": document_id, "remote_ocr": remote_ocr},
+            kwargs={"document_id": pair.source_doc.id, "remote_ocr": remote_ocr},
             headers={"trigger_source": PaperlessTask.TriggerSource.MANUAL},
         )
 
