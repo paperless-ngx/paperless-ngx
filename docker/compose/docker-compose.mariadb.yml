@@ -36,7 +36,6 @@ services:
     volumes:
       - dbdata:/var/lib/mysql
     environment:
-      MARIADB_HOST: paperless
       MARIADB_DATABASE: paperless
       MARIADB_USER: paperless
       MARIADB_PASSWORD: paperless
