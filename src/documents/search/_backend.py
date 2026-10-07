@@ -31,6 +31,7 @@ from documents.search._query import parse_user_query
 from documents.search._schema import _write_sentinels
 from documents.search._schema import build_schema
 from documents.search._schema import open_or_rebuild_index
+from documents.search._schema import rebuild_in_progress
 from documents.search._schema import wipe_index
 from documents.search._tokenizer import ascii_fold
 from documents.search._tokenizer import autocomplete_tokens
@@ -1110,39 +1111,44 @@ class TantivyBackend:
                 flushing a segment, deferring merge work; they do not avoid it.
         """
         wipe_index(self._path)
-        new_index = tantivy.Index(build_schema(), path=str(self._path))
-        _write_sentinels(self._path)
-        register_tokenizers(new_index, settings.SEARCH_LANGUAGE)
+        # The marker covers the window where the empty index is already stamped
+        # as current but not yet populated, so an interrupted rebuild is retried.
+        with rebuild_in_progress(self._path):
+            new_index = tantivy.Index(build_schema(), path=str(self._path))
+            _write_sentinels(self._path)
+            register_tokenizers(new_index, settings.SEARCH_LANGUAGE)
 
-        # Point instance at the new index so _build_tantivy_doc uses it
-        old_index, old_schema = self._raw_index, self._raw_schema
-        self._raw_index = new_index
-        self._raw_schema = new_index.schema
-        # Stream documents one-by-one (so the progress bar advances per
-        # document) while fetching viewer permissions one SQL query per chunk.
-        # The stream is Sized, so iter_wrapper can still discover the total.
-        documents_stream = _DocumentViewerStream(documents, chunk_size=1000)
-        try:
-            writer = new_index.writer(heap_size=writer_heap_bytes)
-            for document, (viewer_ids, viewer_group_ids) in iter_wrapper(
-                documents_stream,
-            ):
-                doc = self._build_tantivy_doc(
-                    document,
-                    viewer_ids=viewer_ids,
-                    viewer_group_ids=viewer_group_ids,
-                )
-                writer.add_document(doc)
-            writer.commit()
-            # Wait for background merge threads to finish so all segments are
-            # fully merged and persisted before the index is considered rebuilt.
-            writer.wait_merging_threads()
-            new_index.reload()
-        except BaseException:  # pragma: no cover
-            # Restore old index on failure so the backend remains usable
-            self._raw_index = old_index
-            self._raw_schema = old_schema
-            raise
+            # Point instance at the new index so _build_tantivy_doc uses it
+            old_index, old_schema = self._raw_index, self._raw_schema
+            self._raw_index = new_index
+            self._raw_schema = new_index.schema
+            # Stream documents one-by-one (so the progress bar advances per
+            # document) while fetching viewer permissions one SQL query per
+            # chunk. The stream is Sized, so iter_wrapper can still discover
+            # the total.
+            documents_stream = _DocumentViewerStream(documents, chunk_size=1000)
+            try:
+                writer = new_index.writer(heap_size=writer_heap_bytes)
+                for document, (viewer_ids, viewer_group_ids) in iter_wrapper(
+                    documents_stream,
+                ):
+                    doc = self._build_tantivy_doc(
+                        document,
+                        viewer_ids=viewer_ids,
+                        viewer_group_ids=viewer_group_ids,
+                    )
+                    writer.add_document(doc)
+                writer.commit()
+                # Wait for background merge threads to finish so all segments
+                # are fully merged and persisted before the index is considered
+                # rebuilt.
+                writer.wait_merging_threads()
+                new_index.reload()
+            except BaseException:  # pragma: no cover
+                # Restore old index on failure so the backend remains usable
+                self._raw_index = old_index
+                self._raw_schema = old_schema
+                raise
 
 
 def chunked(iterable, size):

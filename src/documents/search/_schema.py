@@ -4,6 +4,7 @@ import hashlib
 import json
 import logging
 import shutil
+from contextlib import contextmanager
 from typing import TYPE_CHECKING
 from typing import Final
 from typing import NamedTuple
@@ -16,6 +17,7 @@ from whoosh_compat import FieldKind
 from documents.search._fields import PUBLIC_FIELDS
 
 if TYPE_CHECKING:
+    from collections.abc import Iterator
     from pathlib import Path
 
 logger = logging.getLogger("paperless.search")
@@ -27,6 +29,11 @@ logger = logging.getLogger("paperless.search")
 #      index built by v1 rejects every write against the v2 schema.
 # v3 - barcodes JSON field for stored barcode contents
 SCHEMA_VERSION: Final[int] = 3
+
+# Present in the index directory from the moment a full rebuild starts until it
+# finishes. If a rebuild is interrupted it is left behind, so the half-built
+# index is not mistaken for a complete one.
+REBUILD_MARKER: Final[str] = ".rebuilding"
 
 
 class FieldDescriptor(NamedTuple):
@@ -255,15 +262,49 @@ def needs_rebuild(index_dir: Path) -> bool:
     """
     Check if the search index needs rebuilding.
 
-    Reads .index_settings.json to compare the stored schema version, search
-    language and schema fingerprint against the current configuration. Returns
-    True if the file is missing, unparsable, or any value mismatches.
+    True if a previous full rebuild never finished (the rebuild marker is still
+    present), or if the index's stamped settings no longer match the current
+    configuration. See _settings_mismatch().
 
     Args:
         index_dir: Path to the search index directory
 
     Returns:
         True if the index needs rebuilding, False if it's up to date
+    """
+    if (index_dir / REBUILD_MARKER).exists():
+        logger.warning("Previous search index rebuild did not finish - rebuilding.")
+        return True
+    return _settings_mismatch(index_dir)
+
+
+@contextmanager
+def rebuild_in_progress(index_dir: Path) -> Iterator[None]:
+    """
+    Flag the index as incomplete for the duration of a full rebuild.
+
+    The marker is cleared only if the block exits cleanly. There is deliberately
+    no try/finally: an exception must leave the marker behind so the next
+    needs_rebuild() check retries the rebuild.
+    """
+    marker = index_dir / REBUILD_MARKER
+    marker.touch()
+    yield
+    marker.unlink(missing_ok=True)
+
+
+def _settings_mismatch(index_dir: Path) -> bool:
+    """
+    Check the stamped settings against the current configuration.
+
+    Reads .index_settings.json to compare the stored schema version, search
+    language and schema fingerprint. Returns True if the file is missing,
+    unparsable, or any value mismatches.
+
+    This deliberately ignores the rebuild marker: open_or_rebuild_index() uses it
+    so that a process opening the index while another process is mid-rebuild
+    (or after one died) does not wipe the partial index out from under it.
+    Repopulating is the job of ``document_index reindex``.
     """
     settings_file = index_dir / ".index_settings.json"
     if not settings_file.exists():
@@ -333,7 +374,7 @@ def open_or_rebuild_index(index_dir: Path | None = None) -> tantivy.Index:
         index_dir = cast("Path", settings.INDEX_DIR)
     if not index_dir.exists():
         return tantivy.Index(build_schema())
-    if needs_rebuild(index_dir):
+    if _settings_mismatch(index_dir):
         wipe_index(index_dir)
         idx = tantivy.Index(build_schema(), path=str(index_dir))
         _write_sentinels(index_dir)
