@@ -3,7 +3,6 @@ from __future__ import annotations
 import logging
 import math
 import mimetypes
-import os
 import shutil
 import subprocess
 import tempfile
@@ -67,58 +66,6 @@ def get_supported_file_extensions() -> set[str]:
             extensions.add(ext)
 
     return extensions
-
-
-def run_convert(
-    input_file,
-    output_file,
-    *,
-    density=None,
-    scale=None,
-    alpha=None,
-    strip=False,
-    trim=False,
-    type=None,
-    depth=None,
-    auto_orient=False,
-    use_cropbox=False,
-    extra=None,
-    logging_group=None,
-) -> None:
-    environment = os.environ.copy()
-    if settings.CONVERT_MEMORY_LIMIT:
-        # MAGICK_MEMORY_LIMIT sets the maximum amount of RAM the pixel cache can use.
-        # MAGICK_MAP_LIMIT sets the maximum amount of memory-mapped I/O allowed.
-        #
-        # For large-format documents  ImageMagick will hit the RAM limit and
-        # immediately try to "map" the remaining data. If MAGICK_MAP_LIMIT isn't
-        # also set, the process may trigger an OOM kill because the default
-        # system/policy map limit is often too restrictive for these massive bitmaps.
-        environment["MAGICK_MEMORY_LIMIT"] = settings.CONVERT_MEMORY_LIMIT
-        environment["MAGICK_MAP_LIMIT"] = settings.CONVERT_MEMORY_LIMIT
-    if settings.CONVERT_TMPDIR:
-        environment["MAGICK_TMPDIR"] = settings.CONVERT_TMPDIR
-
-    args = [settings.CONVERT_BINARY]
-    args += ["-density", str(density)] if density else []
-    args += ["-scale", str(scale)] if scale else []
-    args += ["-alpha", str(alpha)] if alpha else []
-    args += ["-strip"] if strip else []
-    args += ["-trim"] if trim else []
-    args += ["-type", str(type)] if type else []
-    args += ["-depth", str(depth)] if depth else []
-    args += ["-auto-orient"] if auto_orient else []
-    args += ["-define", "pdf:use-cropbox=true"] if use_cropbox else []
-    args += [str(input_file), str(output_file)]
-
-    logger.debug("Execute: " + " ".join(args), extra={"group": logging_group})
-
-    try:
-        run_subprocess(args, environment, logger)
-    except subprocess.CalledProcessError as e:
-        raise ParseError(f"Convert failed at {args}") from e
-    except Exception as e:  # pragma: no cover
-        raise ParseError("Unknown error running convert") from e
 
 
 def get_default_thumbnail() -> Path:
