@@ -311,8 +311,8 @@ def get_pdf_first_page_size_points(
             if page.rotation in (90, 270):
                 width, height = height, width
             return width, height
-    except Exception:
-        _log.warning("Could not determine PDF page size for %s", path, exc_info=True)
+    except Exception as e:
+        _log.warning("Could not determine PDF page size for %s: %s", path, e)
         return None
 
 

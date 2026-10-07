@@ -13,6 +13,7 @@ from documents.parsers import encode_thumbnail_webp
 from documents.parsers import get_default_file_extension
 from documents.parsers import get_supported_file_extensions
 from documents.parsers import is_file_ext_supported
+from documents.parsers import make_thumbnail_from_pdf
 from documents.parsers import rasterize_pdf_page_to_png
 from paperless.parsers.registry import get_parser_registry
 from paperless.parsers.registry import reset_parser_registry
@@ -140,9 +141,10 @@ class TestComputeThumbnailDpi:
         ("size", "expected_dpi"),
         [
             pytest.param((612.0, 792.0), 59, id="letter-width-bound"),
-            pytest.param((792.0, 612.0), 45, id="landscape-width-bound"),
+            pytest.param((792.0, 612.0), 46, id="landscape-rounded-up"),
             pytest.param((612.0, 100000.0), 4, id="tall-strip-height-bound"),
-            pytest.param((200.0, 300.0), 72, id="small-page-never-enlarged"),
+            pytest.param((200.0, 300.0), 180, id="small-page-width-bound"),
+            pytest.param((72.0, 72.0), 300, id="tiny-page-capped-at-300"),
             pytest.param((1000000.0, 1000000.0), 1, id="huge-page-minimum-one"),
             pytest.param(None, 150, id="unreadable-geometry-fallback"),
         ],
@@ -161,14 +163,56 @@ class TestComputeThumbnailDpi:
         WHEN:
             - The thumbnail DPI is computed
         THEN:
-            - The DPI fits the page into 500x5000 without ever exceeding 72,
-              is at least 1, and falls back to 150 when the size is unknown
+            - The DPI is rounded up so the render reaches 500x5000, never
+              exceeds 300, is at least 1, and falls back to 150 when the
+              size is unknown
         """
         mocker.patch(
             "paperless.parsers.utils.get_pdf_first_page_size_points",
             return_value=size,
         )
         assert _compute_thumbnail_dpi(tmp_path / "doc.pdf") == expected_dpi
+
+
+class TestMakeThumbnailFromPdf:
+    @pytest.mark.parametrize(
+        ("page_size", "expected_width"),
+        [
+            pytest.param((612, 792), 500, id="letter"),
+            pytest.param((792, 612), 500, id="landscape-letter"),
+            pytest.param((595, 842), 500, id="a4"),
+            pytest.param((200, 300), 500, id="small-page"),
+            pytest.param((72, 72), 300, id="tiny-page-capped"),
+        ],
+    )
+    def test_thumbnail_width(
+        self,
+        tmp_path: Path,
+        page_size: tuple[int, int],
+        expected_width: int,
+    ) -> None:
+        """
+        GIVEN:
+            - A PDF whose first page has the given size in points
+        WHEN:
+            - A thumbnail is made from it
+        THEN:
+            - The WebP thumbnail is exactly 500px wide, unless the page is
+              too small to reach that even at 300 DPI
+        """
+        pdf = pikepdf.new()
+        pdf.add_blank_page(page_size=page_size)
+        pdf_path = tmp_path / "in.pdf"
+        pdf.save(pdf_path)
+        work_dir = tmp_path / "work"
+        work_dir.mkdir()
+
+        thumb = make_thumbnail_from_pdf(pdf_path, work_dir)
+
+        assert thumb == work_dir / "convert.webp"
+        with Image.open(thumb) as im:
+            assert im.format == "WEBP"
+            assert im.width == expected_width
 
 
 class TestRasterizePdfPageToPng:

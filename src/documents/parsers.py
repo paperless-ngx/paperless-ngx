@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import math
 import mimetypes
 import os
 import shutil
@@ -131,6 +132,8 @@ _THUMBNAIL_MAX_WIDTH = 500
 _THUMBNAIL_MAX_HEIGHT = 5000
 # Used only when the page geometry cannot be read
 _THUMBNAIL_FALLBACK_DPI = 150
+# Matches the density the thumbnail was previously rendered at before scaling
+_THUMBNAIL_MAX_DPI = 300
 
 
 def rasterize_pdf_page_to_png(
@@ -183,9 +186,9 @@ def encode_thumbnail_webp(
     """
     Flattens any alpha onto white and saves the image as WebP.
 
-    max_width/max_height are only a safety-net clamp for DPI rounding, since
-    the render is already sized by the computed DPI. The image is never
-    enlarged, matching the previous "-scale WxH>" behavior.
+    max_width/max_height trim the render to the exact thumbnail size, since
+    the computed DPI is rounded up and lands at or slightly above it. The
+    image is never enlarged, matching the previous "-scale WxH>" behavior.
     """
     from PIL import Image
 
@@ -205,8 +208,9 @@ def encode_thumbnail_webp(
 
 def _compute_thumbnail_dpi(in_path: Path, logging_group=None) -> int:
     """
-    Computes the DPI which renders the first page of the PDF to fit within the
-    thumbnail size in one pass, never above the page's natural 72 DPI size.
+    Computes the DPI which renders the first page of the PDF at or just above
+    the thumbnail size in one pass, never above the 300 DPI the thumbnail was
+    previously rendered at before being scaled down.
     """
     from paperless.parsers.utils import get_pdf_first_page_size_points
 
@@ -221,9 +225,15 @@ def _compute_thumbnail_dpi(in_path: Path, logging_group=None) -> int:
     width_pts, height_pts = size
     dpi_for_width = _THUMBNAIL_MAX_WIDTH * 72 / width_pts
     dpi_for_height = _THUMBNAIL_MAX_HEIGHT * 72 / height_pts
-    # Capping at 72 (1px per point) keeps the shrink-only behavior: a page
-    # already smaller than the thumbnail size is never enlarged
-    return max(1, round(min(72, dpi_for_width, dpi_for_height)))
+    # The old pipeline rendered at 300 DPI and then shrank to fit, so only
+    # pages too small to reach the thumbnail size even at 300 DPI end up
+    # smaller than it. Rounding up keeps the render at or above the target,
+    # so the shrink-only clamp in encode_thumbnail_webp trims it to exactly
+    # the thumbnail size instead of leaving it a few pixels short.
+    return max(
+        1,
+        math.ceil(min(_THUMBNAIL_MAX_DPI, dpi_for_width, dpi_for_height)),
+    )
 
 
 def _render_pdf_thumbnail(
