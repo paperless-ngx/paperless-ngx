@@ -1065,7 +1065,13 @@ class TestVersionActionPermissions(DirectoriesMixin, APITestCase):
         for owner in (None, self.user):
             self.version.owner = owner
             self.version.save(update_fields=["owner"])
-            for action in ("notes", "suggestions", "history", "share_links"):
+            for action in (
+                "notes",
+                "suggestions",
+                "ai_suggestions",
+                "history",
+                "share_links",
+            ):
                 with self.subTest(owner=owner, action=action):
                     response = self.client.get(
                         f"/api/documents/{self.version.pk}/{action}/",
