@@ -824,7 +824,6 @@ def delete_pages(
     )
     doc = Document.objects.select_related("root_document").get(id=doc_ids[0])
     pair = _resolve_root_and_source_doc(doc, source_mode=source_mode)
-    pages = sorted(set(pages))
 
     try:
         # Produce edited PDF to a temp file and create a new version
