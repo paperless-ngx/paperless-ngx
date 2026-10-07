@@ -16,7 +16,10 @@ from documents.search._backend import TantivyBackend
 from documents.search._backend import WriteBatch
 from documents.search._backend import get_backend
 from documents.search._backend import reset_backend
+from documents.search._schema import REBUILD_MARKER
+from documents.search._schema import needs_rebuild
 from documents.signals.handlers import add_to_index
+from paperless_testing.dirs import PaperlessDirs
 from paperless_testing.factories import CorrespondentFactory
 from paperless_testing.factories import DocumentFactory
 from paperless_testing.factories import DocumentTypeFactory
@@ -822,6 +825,53 @@ class TestRebuild:
         Document.objects.create(title="Tracked", content="x", checksum="TW1", pk=30)
         backend.rebuild(Document.objects.all(), iter_wrapper=wrapper)
         assert 30 in seen
+
+    def test_successful_rebuild_leaves_index_up_to_date(
+        self,
+        backend: TantivyBackend,
+        paperless_dirs: PaperlessDirs,
+    ) -> None:
+        """
+        GIVEN:
+            - A backend and one document
+        WHEN:
+            - rebuild() completes
+        THEN:
+            - needs_rebuild() is False and no rebuild marker remains
+        """
+        DocumentFactory.create()
+
+        backend.rebuild(Document.objects.all())
+
+        assert needs_rebuild(paperless_dirs.index_dir) is False
+        assert not (paperless_dirs.index_dir / REBUILD_MARKER).exists()
+
+    def test_interrupted_rebuild_is_retried(
+        self,
+        backend: TantivyBackend,
+        paperless_dirs: PaperlessDirs,
+    ) -> None:
+        """
+        GIVEN:
+            - A rebuild that dies while indexing documents (e.g. the database
+              connection is lost)
+        WHEN:
+            - needs_rebuild() is checked afterwards
+        THEN:
+            - It is True, even though the empty index was already stamped with
+              current settings, so the next start rebuilds instead of reporting
+              the index as up to date
+        """
+        DocumentFactory.create()
+
+        def die(pairs):
+            raise RuntimeError("terminating connection due to administrator command")
+            yield  # pragma: no cover
+
+        with pytest.raises(RuntimeError):
+            backend.rebuild(Document.objects.all(), iter_wrapper=die)
+
+        assert needs_rebuild(paperless_dirs.index_dir) is True
 
     def test_includes_group_granted_viewers(self, backend: TantivyBackend) -> None:
         """Rebuild must index viewer ids for group-only grants, not just direct ones.
