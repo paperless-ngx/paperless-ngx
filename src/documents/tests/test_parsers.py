@@ -1,3 +1,4 @@
+import subprocess
 from collections.abc import Generator
 from pathlib import Path
 
@@ -11,6 +12,7 @@ from documents.parsers import ParseError
 from documents.parsers import _compute_thumbnail_dpi
 from documents.parsers import encode_thumbnail_webp
 from documents.parsers import get_default_file_extension
+from documents.parsers import get_default_thumbnail
 from documents.parsers import get_supported_file_extensions
 from documents.parsers import is_file_ext_supported
 from documents.parsers import make_thumbnail_from_pdf
@@ -213,6 +215,91 @@ class TestMakeThumbnailFromPdf:
         with Image.open(thumb) as im:
             assert im.format == "WEBP"
             assert im.width == expected_width
+
+    @staticmethod
+    def _write_pdf_without_xref(path: Path) -> Path:
+        """
+        Writes a valid one page PDF, then cuts off its cross reference table
+        and trailer, which poppler cannot recover from but qpdf can.
+        """
+        pdf = pikepdf.new()
+        pdf.add_blank_page(page_size=(612, 792))
+        pdf.save(path, object_stream_mode=pikepdf.ObjectStreamMode.disable)
+        data = path.read_bytes()
+        path.write_bytes(data[: data.rindex(b"\nxref")])
+        return path
+
+    def test_qpdf_repair_produces_real_thumbnail(self, tmp_path: Path) -> None:
+        """
+        GIVEN:
+            - A PDF without a cross reference table or trailer, which
+              pdftoppm cannot render but qpdf can repair
+        WHEN:
+            - A thumbnail is made from it
+        THEN:
+            - The unrepaired file really cannot be rasterized
+            - The thumbnail comes from the repaired copy and is a rendered
+              500px wide page, not the default placeholder
+            - The original file is left untouched
+        """
+        pdf_path = self._write_pdf_without_xref(tmp_path / "broken.pdf")
+        original_bytes = pdf_path.read_bytes()
+        work_dir = tmp_path / "work"
+        work_dir.mkdir()
+
+        with pytest.raises(ParseError):
+            rasterize_pdf_page_to_png(pdf_path, work_dir / "probe.png", dpi=50)
+
+        thumb = make_thumbnail_from_pdf(pdf_path, work_dir)
+
+        assert thumb == work_dir / "convert_qpdf.webp"
+        assert thumb.read_bytes() != get_default_thumbnail().read_bytes()
+        with Image.open(thumb) as im:
+            assert im.format == "WEBP"
+            assert im.width == 500
+        assert pdf_path.read_bytes() == original_bytes
+
+    @pytest.mark.parametrize(
+        "qpdf_error",
+        [
+            pytest.param(subprocess.CalledProcessError(2, "qpdf"), id="qpdf-fails"),
+            pytest.param(None, id="repaired-still-unrenderable"),
+        ],
+    )
+    def test_double_failure_uses_default_thumbnail(
+        self,
+        mocker: MockerFixture,
+        tmp_path: Path,
+        qpdf_error: subprocess.CalledProcessError | None,
+    ) -> None:
+        """
+        GIVEN:
+            - A PDF which cannot be rasterized, either because qpdf cannot
+              repair it or because the repaired copy still cannot be rendered
+        WHEN:
+            - A thumbnail is made from it
+        THEN:
+            - The result is a copy of the default thumbnail, so the caller
+              can move it without consuming the shared resource
+        """
+        mocker.patch(
+            "documents.parsers.rasterize_pdf_page_to_png",
+            side_effect=ParseError("Does not compute."),
+        )
+        if qpdf_error is not None:
+            mocker.patch("documents.parsers.run_subprocess", side_effect=qpdf_error)
+        pdf = pikepdf.new()
+        pdf.add_blank_page(page_size=(612, 792))
+        pdf_path = tmp_path / "in.pdf"
+        pdf.save(pdf_path)
+        work_dir = tmp_path / "work"
+        work_dir.mkdir()
+
+        thumb = make_thumbnail_from_pdf(pdf_path, work_dir)
+
+        assert thumb == work_dir / "document.webp"
+        assert thumb != get_default_thumbnail()
+        assert thumb.read_bytes() == get_default_thumbnail().read_bytes()
 
 
 class TestRasterizePdfPageToPng:
