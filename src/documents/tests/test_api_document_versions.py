@@ -1108,6 +1108,18 @@ class TestVersionActionPermissions(DirectoriesMixin, APITestCase):
                 format="json",
             )
             self.assertEqual(response.status_code, 403)
+            with (
+                mock.patch("documents.views.AIConfig") as ai_config,
+                mock.patch("documents.views.stream_chat_with_documents") as chat,
+            ):
+                ai_config.return_value.ai_enabled = True
+                response = self.client.post(
+                    "/api/documents/chat/",
+                    {"q": "Version?", "document_id": self.version.pk},
+                    format="json",
+                )
+            self.assertEqual(response.status_code, 403)
+            chat.assert_not_called()
         self.assertTrue(Note.objects.filter(pk=note.pk).exists())
         self.assertFalse(ShareLink.objects.exists())
 

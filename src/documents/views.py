@@ -2443,11 +2443,17 @@ class ChatStreamingView(GenericAPIView[Any]):
 
         if doc_id:
             try:
-                document = Document.objects.get(id=doc_id)
+                document = Document.objects.select_related(
+                    "root_document__owner",
+                ).get(id=doc_id)
             except Document.DoesNotExist:
                 return HttpResponseBadRequest("Document not found")
 
-            if not has_perms_owner_aware(request.user, "view_document", document):
+            if not has_perms_owner_aware(
+                request.user,
+                "view_document",
+                get_root_document(document),
+            ):
                 return HttpResponseForbidden("Insufficient permissions")
 
             documents = Document.objects.filter(pk=document.pk)
