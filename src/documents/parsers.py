@@ -81,6 +81,10 @@ _THUMBNAIL_MAX_HEIGHT = 5000
 _THUMBNAIL_FALLBACK_DPI = 150
 # Matches the density the thumbnail was previously rendered at before scaling
 _THUMBNAIL_MAX_DPI = 300
+# Pages with known geometry are rendered at this multiple of the computed DPI
+# and downsampled with Lanczos, which keeps text noticeably crisper than
+# rasterizing straight at the target size
+_THUMBNAIL_SUPERSAMPLE = 2
 
 
 def rasterize_pdf_page_to_png(
@@ -129,13 +133,16 @@ def encode_thumbnail_webp(
     *,
     max_width: int = _THUMBNAIL_MAX_WIDTH,
     max_height: int = _THUMBNAIL_MAX_HEIGHT,
+    supersample: int = 1,
 ) -> None:
     """
     Flattens any alpha onto white and saves the image as WebP.
 
-    max_width/max_height trim the render to the exact thumbnail size, since
-    the computed DPI is rounded up and lands at or slightly above it. The
-    image is never enlarged, matching the previous "-scale WxH>" behavior.
+    A render made at supersample times the target density is first
+    downsampled by that factor with Lanczos. max_width/max_height then trim
+    the result to the exact thumbnail size, since the computed DPI is rounded
+    up and lands at or slightly above it. The image is never enlarged,
+    matching the previous "-scale WxH>" behavior.
     """
     from PIL import Image
 
@@ -147,17 +154,32 @@ def encode_thumbnail_webp(
             else:
                 flattened = im.convert("RGB")
 
+        if supersample > 1:
+            flattened = flattened.resize(
+                (
+                    max(1, round(flattened.width / supersample)),
+                    max(1, round(flattened.height / supersample)),
+                ),
+                Image.Resampling.LANCZOS,
+            )
+
         flattened.thumbnail((max_width, max_height))
         flattened.save(out_path, format="WEBP")
     except (OSError, Image.DecompressionBombError) as e:
         raise ParseError(f"Unable to encode thumbnail from {png_path}") from e
 
 
-def _compute_thumbnail_dpi(in_path: Path, logging_group=None) -> int:
+def _compute_thumbnail_dpi(in_path: Path, logging_group=None) -> tuple[int, int]:
     """
-    Computes the DPI which renders the first page of the PDF at or just above
-    the thumbnail size in one pass, never above the 300 DPI the thumbnail was
-    previously rendered at before being scaled down.
+    Computes the DPI at which the first page of the PDF reaches at or just
+    above the thumbnail size, never above the 300 DPI the thumbnail was
+    previously rendered at before being scaled down, and the supersampling
+    factor to render with.
+
+    Returns (dpi, supersample). The page is rendered at supersample * dpi and
+    downsampled by supersample afterwards. When the page geometry cannot be
+    read the fixed fallback DPI is used without supersampling, as that render
+    is not bounded by the thumbnail size.
     """
     from paperless.parsers.utils import get_pdf_first_page_size_points
 
@@ -167,7 +189,7 @@ def _compute_thumbnail_dpi(in_path: Path, logging_group=None) -> int:
             "Could not read PDF page size, using fallback DPI",
             extra={"group": logging_group},
         )
-        return _THUMBNAIL_FALLBACK_DPI
+        return _THUMBNAIL_FALLBACK_DPI, 1
 
     width_pts, height_pts = size
     dpi_for_width = _THUMBNAIL_MAX_WIDTH * 72 / width_pts
@@ -177,10 +199,11 @@ def _compute_thumbnail_dpi(in_path: Path, logging_group=None) -> int:
     # smaller than it. Rounding up keeps the render at or above the target,
     # so the shrink-only clamp in encode_thumbnail_webp trims it to exactly
     # the thumbnail size instead of leaving it a few pixels short.
-    return max(
+    dpi = max(
         1,
         math.ceil(min(_THUMBNAIL_MAX_DPI, dpi_for_width, dpi_for_height)),
     )
+    return dpi, _THUMBNAIL_SUPERSAMPLE
 
 
 def _render_pdf_thumbnail(
@@ -189,15 +212,15 @@ def _render_pdf_thumbnail(
     out_path: Path,
     logging_group=None,
 ) -> None:
-    dpi = _compute_thumbnail_dpi(in_path, logging_group=logging_group)
+    dpi, supersample = _compute_thumbnail_dpi(in_path, logging_group=logging_group)
     rasterize_pdf_page_to_png(
         in_path,
         png_path,
-        dpi=dpi,
+        dpi=dpi * supersample,
         use_cropbox=True,
         logging_group=logging_group,
     )
-    encode_thumbnail_webp(png_path, out_path)
+    encode_thumbnail_webp(png_path, out_path, supersample=supersample)
 
 
 def make_thumbnail_from_pdf_qpdf_fallback(
