@@ -1613,13 +1613,16 @@ class DocumentViewSet(
     @method_decorator(cache_control(no_cache=True))
     def ai_suggestions(self, request, pk=None):
         doc = get_object_or_404(
-            Document.objects.select_related("owner").prefetch_related("versions"),
+            Document.objects.select_related(
+                "owner",
+                "root_document__owner",
+            ).prefetch_related("versions"),
             pk=pk,
         )
         if request.user is not None and not has_perms_owner_aware(
             request.user,
             "change_document",
-            doc,
+            get_root_document(doc),
         ):
             return HttpResponseForbidden("Insufficient permissions")
 
@@ -1861,7 +1864,12 @@ class DocumentViewSet(
             doc = (
                 Document.objects.select_related("owner", "root_document__owner")
                 .prefetch_related("notes")
-                .only("pk", "owner__id", "root_document__owner__id")
+                .only(
+                    "pk",
+                    "owner__id",
+                    "root_document__id",
+                    "root_document__owner__id",
+                )
                 .get(pk=pk)
             )
             if currentUser is not None and not has_perms_owner_aware(
