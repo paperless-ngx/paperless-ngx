@@ -444,3 +444,32 @@ class TestEncodeThumbnailWebp:
 
         with Image.open(out_path) as im:
             assert im.size == expected_size
+
+    @pytest.mark.parametrize(
+        "error",
+        [
+            pytest.param(OSError("broken image"), id="os-error"),
+            pytest.param(Image.DecompressionBombError("too large"), id="bomb"),
+        ],
+    )
+    def test_decode_failure_raises_parse_error(
+        self,
+        tmp_path: Path,
+        mocker: MockerFixture,
+        error: Exception,
+    ) -> None:
+        """
+        GIVEN:
+            - Opening the rendered image fails with an OSError or a
+              DecompressionBombError
+        WHEN:
+            - It is encoded as a thumbnail
+        THEN:
+            - A ParseError is raised so the default thumbnail is used
+        """
+        png_path = tmp_path / "in.png"
+        Image.new("RGB", (10, 10)).save(png_path)
+        mocker.patch("PIL.Image.open", side_effect=error)
+
+        with pytest.raises(ParseError):
+            encode_thumbnail_webp(png_path, tmp_path / "out.webp")

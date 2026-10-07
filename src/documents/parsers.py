@@ -149,7 +149,7 @@ def encode_thumbnail_webp(
 
         flattened.thumbnail((max_width, max_height))
         flattened.save(out_path, format="WEBP")
-    except OSError as e:
+    except (OSError, Image.DecompressionBombError) as e:
         raise ParseError(f"Unable to encode thumbnail from {png_path}") from e
 
 

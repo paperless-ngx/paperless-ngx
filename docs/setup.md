@@ -182,7 +182,7 @@ to a positive number to enable polling and disable native filesystem notificatio
     - `libpq-dev` for PostgreSQL
     - `libmagic-dev` for mime type detection
     - `mariadb-client` for MariaDB compile time
-    - `poppler-utils` for barcode detection
+    - `poppler-utils` for thumbnail generation and barcode detection
 
     Use this list for your preferred package management:
 
@@ -419,8 +419,8 @@ to a positive number to enable polling and disable native filesystem notificatio
 12. Configure ImageMagick to allow processing of PDF documents and disable
     formats that Paperless-ngx does not use. Most distributions disable PDF
     processing by default, since PDF documents can contain malware. If you
-    don't enable it, Paperless-ngx will fall back to Ghostscript for certain
-    steps such as thumbnail generation.
+    don't enable it, steps that still rely on ImageMagick, such as TIFF to
+    PDF conversion, may fail. PDF thumbnails no longer use ImageMagick.
 
     Configure the active ImageMagick policy file (commonly
     `/etc/ImageMagick-6/policy.xml` or `/etc/ImageMagick-7/policy.xml`) and

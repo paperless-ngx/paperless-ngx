@@ -111,7 +111,7 @@ jobs:
         timeout-minutes: 12
         uses: $/.github/actions/apt-install
         with:
-          packages: unpaper tesseract-ocr imagemagick ghostscript poppler-utils
+          packages: unpaper tesseract-ocr imagemagick ghostscript poppler-utils qpdf
       - name: Configure ImageMagick
         run: |
           sudo cp docker/rootfs/etc/ImageMagick-6/paperless-policy.xml /etc/ImageMagick-7/policy.xml
