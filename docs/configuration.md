@@ -794,6 +794,15 @@ system. See the corresponding
 
     Defaults to None
 
+#### [`PAPERLESS_MFA_SKIP_FOR_SOCIAL_LOGIN=<bool>`](#PAPERLESS_MFA_SKIP_FOR_SOCIAL_LOGIN) {#PAPERLESS_MFA_SKIP_FOR_SOCIAL_LOGIN}
+
+: Skip the Paperless-ngx two-factor authentication prompt for users who log in via a third party authentication system (e.g. OIDC). Users who log in with their Paperless-ngx username and password are still prompted for their code as usual, so this allows delegating the second factor entirely to the identity provider while keeping it enforced for regular logins.
+
+    !!! warning
+        Only enable this if your identity provider enforces multi-factor authentication itself. Otherwise anyone who can authenticate against the identity provider — including via a newly created account matched by email address if signups are enabled — gains access to the Paperless-ngx account with a single factor.
+
+    Defaults to False
+
 #### [`PAPERLESS_SOCIAL_ACCOUNT_DEFAULT_GROUPS=<comma-separated-list>`](#PAPERLESS_SOCIAL_ACCOUNT_DEFAULT_GROUPS) {#PAPERLESS_SOCIAL_ACCOUNT_DEFAULT_GROUPS}
 
 : A list of group names that users who signup via social accounts will be added to upon signup. Groups listed here must already exist.

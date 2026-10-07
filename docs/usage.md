@@ -473,6 +473,8 @@ Users can enable two-factor authentication (2FA) for their accounts from the 'My
 
 Should a user lose access to their 2FA device and all recovery codes, a superuser can disable 2FA for the user from the 'Users & Groups' management screen.
 
+If you use a third party authentication system (see [Authentication & SSO](configuration.md#authentication)) that already enforces multi-factor authentication, you can set [`PAPERLESS_MFA_SKIP_FOR_SOCIAL_LOGIN`](configuration.md#PAPERLESS_MFA_SKIP_FOR_SOCIAL_LOGIN) so that the Paperless-ngx code is only requested for regular username and password logins.
+
 ## Workflows
 
 !!! note

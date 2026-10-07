@@ -2,19 +2,26 @@ import logging
 
 import pytest
 from allauth.account.adapter import get_adapter
+from allauth.account.models import Login
 from allauth.core import context
+from allauth.mfa.totp.internal import auth as totp_auth
 from allauth.socialaccount.adapter import get_adapter as get_social_adapter
+from allauth.socialaccount.models import SocialAccount
+from allauth.socialaccount.models import SocialLogin
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
+from django.contrib.sessions.middleware import SessionMiddleware
 from django.forms import ValidationError
 from django.http import HttpRequest
+from django.test import RequestFactory
 from django.urls import reverse
 from pytest_django.fixtures import Settings
 from pytest_mock import MockerFixture
 from rest_framework.authtoken.models import Token
 
 from paperless.adapter import DrfTokenStrategy
+from paperless.adapter import SocialAwareAuthenticateStage
 from paperless_testing.factories import UserFactory
 
 
@@ -127,6 +134,118 @@ class TestCustomAccountAdapter:
         )
         user2 = adapter.save_user(HttpRequest(), User(), form, commit=True)
         assert not user2.is_superuser
+
+
+class TestSocialAwareAuthenticateStage:
+    @staticmethod
+    def _stage(user: User, *, social: bool) -> SocialAwareAuthenticateStage:
+        signal_kwargs = None
+        if social:
+            signal_kwargs = {
+                "sociallogin": SocialLogin(
+                    user=user,
+                    account=SocialAccount(provider="openid_connect", uid="uid"),
+                ),
+            }
+        login = Login(user=user, signal_kwargs=signal_kwargs)
+        request = RequestFactory().get("/")
+        SessionMiddleware(lambda _request: None).process_request(request)
+        return SocialAwareAuthenticateStage(None, request, login)
+
+    def test_stage_is_installed(self) -> None:
+        """
+        GIVEN:
+            - The Paperless-ngx account adapter
+        WHEN:
+            - The login stages are built
+        THEN:
+            - The social aware MFA stage replaces the stock allauth one
+        """
+        stages = get_adapter().get_login_stages()
+
+        assert "paperless.adapter.SocialAwareAuthenticateStage" in stages
+        assert "allauth.mfa.stages.AuthenticateStage" not in stages
+
+    @pytest.mark.django_db
+    def test_mfa_skipped_for_social_login(
+        self,
+        settings: Settings,
+        caplog: pytest.LogCaptureFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A user with TOTP enabled who logs in via a social account
+            - MFA_SKIP_FOR_SOCIAL_LOGIN enabled
+        WHEN:
+            - The MFA login stage is evaluated
+        THEN:
+            - The stage is skipped and the reason is logged
+        """
+        settings.MFA_SKIP_FOR_SOCIAL_LOGIN = True
+        user = UserFactory(username="testuser")
+        totp_auth.TOTP.activate(user, totp_auth.generate_totp_secret())
+        stage = self._stage(user, social=True)
+
+        with caplog.at_level(logging.DEBUG, logger="paperless.auth"):
+            assert not stage._should_handle(stage.request)
+
+        assert any("Skipping MFA" in msg for msg in caplog.messages)
+
+    @pytest.mark.django_db
+    def test_mfa_enforced_for_social_login_by_default(
+        self,
+        settings: Settings,
+    ) -> None:
+        """
+        GIVEN:
+            - A user with TOTP enabled who logs in via a social account
+            - MFA_SKIP_FOR_SOCIAL_LOGIN disabled (the default)
+        WHEN:
+            - The MFA login stage is evaluated
+        THEN:
+            - The stage is handled, i.e. a code is still required
+        """
+        settings.MFA_SKIP_FOR_SOCIAL_LOGIN = False
+        user = UserFactory(username="testuser")
+        totp_auth.TOTP.activate(user, totp_auth.generate_totp_secret())
+        stage = self._stage(user, social=True)
+
+        assert stage._should_handle(stage.request)
+
+    @pytest.mark.django_db
+    def test_mfa_enforced_for_regular_login(self, settings: Settings) -> None:
+        """
+        GIVEN:
+            - A user with TOTP enabled who logs in with username and password
+            - MFA_SKIP_FOR_SOCIAL_LOGIN enabled
+        WHEN:
+            - The MFA login stage is evaluated
+        THEN:
+            - The stage is handled, the setting only affects social logins
+        """
+        settings.MFA_SKIP_FOR_SOCIAL_LOGIN = True
+        user = UserFactory(username="testuser")
+        totp_auth.TOTP.activate(user, totp_auth.generate_totp_secret())
+        stage = self._stage(user, social=False)
+
+        assert stage._should_handle(stage.request)
+
+    @pytest.mark.django_db
+    def test_no_mfa_without_authenticator(self, settings: Settings) -> None:
+        """
+        GIVEN:
+            - A user who has not enabled TOTP
+            - MFA_SKIP_FOR_SOCIAL_LOGIN disabled
+        WHEN:
+            - The MFA login stage is evaluated
+        THEN:
+            - The stage is not handled, unchanged from upstream behavior
+        """
+        settings.MFA_SKIP_FOR_SOCIAL_LOGIN = False
+        user = UserFactory(username="testuser")
+        stage = self._stage(user, social=False)
+
+        assert not stage._should_handle(stage.request)
 
 
 class TestCustomSocialAccountAdapter:

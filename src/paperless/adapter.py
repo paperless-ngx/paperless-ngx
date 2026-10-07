@@ -4,6 +4,7 @@ from urllib.parse import quote
 from allauth.account.adapter import DefaultAccountAdapter
 from allauth.core import context
 from allauth.headless.tokens.strategies.sessions import SessionTokenStrategy
+from allauth.mfa.stages import AuthenticateStage
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from django.conf import settings
 from django.contrib.auth.models import Group
@@ -19,7 +20,37 @@ from paperless.signals import handle_social_account_updated
 logger = logging.getLogger("paperless.auth")
 
 
+class SocialAwareAuthenticateStage(AuthenticateStage):
+    """
+    MFA login stage that can skip the second factor for logins which were
+    performed via a social account (e.g. OIDC), see MFA_SKIP_FOR_SOCIAL_LOGIN.
+    """
+
+    def _should_handle(self, request: HttpRequest) -> bool:
+        if settings.MFA_SKIP_FOR_SOCIAL_LOGIN and self.login.signal_kwargs:
+            sociallogin = self.login.signal_kwargs.get("sociallogin")
+            if sociallogin is not None:
+                logger.debug(
+                    "Skipping MFA for login via social account provider "
+                    f"`{sociallogin.account.provider}`",
+                )
+                return False
+        return super()._should_handle(request)
+
+
 class CustomAccountAdapter(DefaultAccountAdapter):
+    def get_login_stages(self) -> list[str]:
+        """
+        Replace the stock MFA authentication stage with one that is aware of
+        social logins, so that MFA_SKIP_FOR_SOCIAL_LOGIN can take effect.
+        """
+        return [
+            "paperless.adapter.SocialAwareAuthenticateStage"
+            if stage == "allauth.mfa.stages.AuthenticateStage"
+            else stage
+            for stage in super().get_login_stages()
+        ]
+
     def is_open_for_signup(self, request):
         """
         Check whether the site is open for signups, which can be

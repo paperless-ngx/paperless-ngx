@@ -352,6 +352,9 @@ SOCIAL_ACCOUNT_SYNC_STAFF_GROUP: Final[str | None] = os.getenv(
 HEADLESS_TOKEN_STRATEGY = "paperless.adapter.DrfTokenStrategy"
 
 MFA_TOTP_ISSUER = "Paperless-ngx"
+MFA_SKIP_FOR_SOCIAL_LOGIN = get_bool_from_env(
+    "PAPERLESS_MFA_SKIP_FOR_SOCIAL_LOGIN",
+)
 
 ACCOUNT_EMAIL_SUBJECT_PREFIX = "[Paperless-ngx] "
 
