@@ -6,8 +6,10 @@ import codecs
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+import pikepdf
 import pytest
 
+from paperless.parsers.utils import get_pdf_first_page_size_points
 from paperless.parsers.utils import is_tagged_pdf
 from paperless.parsers.utils import pdf_born_digital_text
 from paperless.parsers.utils import post_process_text
@@ -68,6 +70,151 @@ class TestIsTaggedPdf:
         bad = tmp_path / "bad.pdf"
         bad.write_bytes(b"not a pdf")
         assert is_tagged_pdf(bad) is False
+
+
+class TestGetPdfFirstPageSizePoints:
+    @staticmethod
+    def _write_pdf(
+        path: Path,
+        *,
+        media_box: tuple[float, float, float, float] = (0, 0, 600, 800),
+        crop_box: tuple[float, float, float, float] | None = None,
+        page_rotate: int | None = None,
+        inherited_rotate: int | None = None,
+    ) -> Path:
+        pdf = pikepdf.new()
+        pdf.add_blank_page(page_size=(media_box[2], media_box[3]))
+        page = pdf.pages[0]
+        page.obj.MediaBox = pikepdf.Array(media_box)
+        if crop_box is not None:
+            page.obj.CropBox = pikepdf.Array(crop_box)
+        if page_rotate is not None:
+            page.obj.Rotate = page_rotate
+        if inherited_rotate is not None:
+            pdf.Root.Pages.Rotate = inherited_rotate
+        pdf.save(path)
+        return path
+
+    def test_letter_sample(self) -> None:
+        """
+        GIVEN:
+            - A US Letter sample PDF with no CropBox and no rotation
+        WHEN:
+            - The first page size is requested
+        THEN:
+            - The MediaBox size in points is returned
+        """
+        assert get_pdf_first_page_size_points(SAMPLES / "simple-digital.pdf") == (
+            612.0,
+            792.0,
+        )
+
+    @pytest.mark.parametrize(
+        ("rotate", "expected"),
+        [
+            pytest.param(0, (600.0, 800.0), id="rotate-0"),
+            pytest.param(90, (800.0, 600.0), id="rotate-90"),
+            pytest.param(180, (600.0, 800.0), id="rotate-180"),
+            pytest.param(270, (800.0, 600.0), id="rotate-270"),
+            pytest.param(-90, (800.0, 600.0), id="rotate-negative-90"),
+        ],
+    )
+    def test_page_rotation_swaps_dimensions(
+        self,
+        tmp_path: Path,
+        rotate: int,
+        expected: tuple[float, float],
+    ) -> None:
+        """
+        GIVEN:
+            - A portrait PDF page with /Rotate set directly on the page
+        WHEN:
+            - The first page size is requested
+        THEN:
+            - Width and height are swapped for quarter-turn rotations only
+        """
+        pdf_path = self._write_pdf(tmp_path / "rotated.pdf", page_rotate=rotate)
+        assert get_pdf_first_page_size_points(pdf_path) == expected
+
+    def test_inherited_rotation_swaps_dimensions(self, tmp_path: Path) -> None:
+        """
+        GIVEN:
+            - A portrait PDF page whose /Rotate 90 is set on the /Pages node,
+              not on the page itself
+        WHEN:
+            - The first page size is requested
+        THEN:
+            - The inherited rotation is honored and width/height are swapped
+        """
+        pdf_path = self._write_pdf(tmp_path / "inherited.pdf", inherited_rotate=90)
+        assert get_pdf_first_page_size_points(pdf_path) == (800.0, 600.0)
+
+    def test_crop_box_preferred_over_media_box(self, tmp_path: Path) -> None:
+        """
+        GIVEN:
+            - A PDF page with a CropBox smaller than its MediaBox
+        WHEN:
+            - The first page size is requested
+        THEN:
+            - The CropBox dimensions are returned, matching what pdftoppm
+              renders with -cropbox
+        """
+        pdf_path = self._write_pdf(
+            tmp_path / "cropped.pdf",
+            crop_box=(50, 100, 350, 500),
+        )
+        assert get_pdf_first_page_size_points(pdf_path) == (300.0, 400.0)
+
+    def test_degenerate_box_returns_none(self, tmp_path: Path) -> None:
+        """
+        GIVEN:
+            - A PDF page whose box has zero width
+        WHEN:
+            - The first page size is requested
+        THEN:
+            - None is returned instead of a size that would break DPI math
+        """
+        pdf_path = self._write_pdf(
+            tmp_path / "degenerate.pdf",
+            media_box=(0, 0, 600, 800),
+            crop_box=(100, 0, 100, 800),
+        )
+        assert get_pdf_first_page_size_points(pdf_path) is None
+
+    def test_nonexistent_path_returns_none(self) -> None:
+        """
+        GIVEN:
+            - A path that does not exist
+        WHEN:
+            - The first page size is requested
+        THEN:
+            - None is returned and nothing is raised
+        """
+        assert get_pdf_first_page_size_points(Path("/nonexistent/file.pdf")) is None
+
+    def test_corrupt_pdf_returns_none(self, tmp_path: Path) -> None:
+        """
+        GIVEN:
+            - A file that is not a PDF
+        WHEN:
+            - The first page size is requested
+        THEN:
+            - None is returned and nothing is raised
+        """
+        bad = tmp_path / "bad.pdf"
+        bad.write_bytes(b"not a pdf")
+        assert get_pdf_first_page_size_points(bad) is None
+
+    def test_encrypted_pdf_returns_none(self) -> None:
+        """
+        GIVEN:
+            - A password protected PDF
+        WHEN:
+            - The first page size is requested
+        THEN:
+            - None is returned and nothing is raised
+        """
+        assert get_pdf_first_page_size_points(SAMPLES / "encrypted.pdf") is None
 
 
 class TestPostProcessText:

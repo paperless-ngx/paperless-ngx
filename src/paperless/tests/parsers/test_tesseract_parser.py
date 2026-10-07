@@ -15,9 +15,10 @@ from typing import TYPE_CHECKING
 
 import pytest
 from ocrmypdf import SubprocessOutputError
+from PIL import Image
 
+import documents.parsers
 from documents.parsers import ParseError
-from documents.parsers import run_convert
 from paperless.models import ModeChoices
 from paperless.parsers import ParserProtocol
 from paperless.parsers.tesseract import RasterisedDocumentParser
@@ -280,24 +281,74 @@ class TestGetThumbnail:
         )
         assert thumb.is_file()
 
-    def test_thumbnail_fallback_on_convert_error(
+    @pytest.mark.parametrize(
+        ("filename", "expected_height"),
+        [
+            pytest.param("simple-digital.pdf", 647, id="portrait-letter"),
+            pytest.param("rotated.pdf", 386, id="landscape"),
+        ],
+    )
+    def test_thumbnail_is_correct_format_and_size(
+        self,
+        tesseract_parser: RasterisedDocumentParser,
+        tesseract_samples_dir: Path,
+        filename: str,
+        expected_height: int,
+    ) -> None:
+        """
+        GIVEN:
+            - A PDF whose first page is wider than the thumbnail width
+        WHEN:
+            - A thumbnail is generated
+        THEN:
+            - The thumbnail is a WebP, 500px wide, keeping the page's aspect
+              ratio (within rounding of the DPI computation)
+        """
+        thumb = tesseract_parser.get_thumbnail(
+            tesseract_samples_dir / filename,
+            "application/pdf",
+        )
+        with Image.open(thumb) as im:
+            assert im.format == "WEBP"
+            assert im.width == 500
+            assert im.height == pytest.approx(expected_height, abs=2)
+
+    def test_thumbnail_fallback_on_pdftoppm_error(
         self,
         mocker: MockerFixture,
         tesseract_parser: RasterisedDocumentParser,
         tesseract_samples_dir: Path,
     ) -> None:
-        def _raise_on_pdf(input_file, output_file, **kwargs) -> None:
-            if ".pdf" in str(input_file):
+        """
+        GIVEN:
+            - Rasterizing the original PDF fails
+        WHEN:
+            - A thumbnail is generated
+        THEN:
+            - The PDF is repaired with qpdf and rasterized again, producing a
+              real thumbnail rather than the default placeholder
+        """
+        real_rasterize = documents.parsers.rasterize_pdf_page_to_png
+        original = tesseract_samples_dir / "simple-digital.pdf"
+
+        def _fail_on_original(in_path: Path, out_path: Path, **kwargs) -> None:
+            if in_path == original:
                 raise ParseError("Does not compute.")
-            run_convert(input_file=input_file, output_file=output_file, **kwargs)
+            real_rasterize(in_path, out_path, **kwargs)
 
-        mocker.patch("documents.parsers.run_convert", side_effect=_raise_on_pdf)
-
-        thumb = tesseract_parser.get_thumbnail(
-            tesseract_samples_dir / "simple-digital.pdf",
-            "application/pdf",
+        rasterize = mocker.patch(
+            "documents.parsers.rasterize_pdf_page_to_png",
+            side_effect=_fail_on_original,
         )
+
+        thumb = tesseract_parser.get_thumbnail(original, "application/pdf")
+
+        assert rasterize.call_count == 2
         assert thumb.is_file()
+        assert thumb.name == "convert_qpdf.webp"
+        with Image.open(thumb) as im:
+            assert im.format == "WEBP"
+            assert im.width == 500
 
     def test_thumbnail_encrypted_pdf(
         self,

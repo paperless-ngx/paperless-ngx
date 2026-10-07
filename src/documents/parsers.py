@@ -127,42 +127,160 @@ def get_default_thumbnail() -> Path:
     return (Path(__file__).parent / "resources" / "document.webp").resolve()
 
 
-def make_thumbnail_from_pdf_gs_fallback(in_path, temp_dir, logging_group=None) -> Path:
-    out_path: Path = Path(temp_dir) / "convert_gs.webp"
+_THUMBNAIL_MAX_WIDTH = 500
+_THUMBNAIL_MAX_HEIGHT = 5000
+# Used only when the page geometry cannot be read
+_THUMBNAIL_FALLBACK_DPI = 150
 
-    # if convert fails, fall back to extracting
-    # the first PDF page as a PNG using Ghostscript
-    logger.warning(
-        "Thumbnail generation with ImageMagick failed, falling back "
-        "to ghostscript. Check your /etc/ImageMagick-x/policy.xml!",
-        extra={"group": logging_group},
-    )
-    # Ghostscript doesn't handle WebP outputs
-    gs_out_path: Path = Path(temp_dir) / "gs_out.png"
-    cmd = [settings.GS_BINARY, "-q", "-sDEVICE=pngalpha", "-o", gs_out_path, in_path]
+
+def rasterize_pdf_page_to_png(
+    in_path: Path,
+    out_path: Path,
+    *,
+    dpi: int,
+    use_cropbox: bool = True,
+    logging_group=None,
+) -> None:
+    """
+    Rasterizes page 1 of a PDF to a PNG at out_path via pdftoppm (Poppler),
+    at the given DPI. pdftoppm honors the page's /Rotate on its own.
+    """
+    # -singlefile stops pdftoppm appending a page number to the output name,
+    # and with -png it appends ".png" itself, so it is given the path without
+    # its suffix to write exactly out_path
+    args = [
+        "pdftoppm",
+        "-f",
+        "1",
+        "-l",
+        "1",
+        "-r",
+        str(dpi),
+        "-png",
+        "-singlefile",
+    ]
+    if use_cropbox:
+        args.append("-cropbox")
+    args += [str(in_path), str(out_path.with_suffix(""))]
+
+    logger.debug("Execute: " + " ".join(args), extra={"group": logging_group})
 
     try:
-        try:
-            run_subprocess(cmd, logger=logger)
-        except subprocess.CalledProcessError as e:
-            raise ParseError(f"Thumbnail (gs) failed at {cmd}") from e
-        # then run convert on the output from gs to make WebP
-        run_convert(
-            density=300,
-            scale="500x5000>",
-            alpha="remove",
-            strip=True,
-            trim=False,
-            auto_orient=True,
-            input_file=gs_out_path,
-            output_file=out_path,
-            logging_group=logging_group,
+        run_subprocess(args, logger=logger)
+    except subprocess.CalledProcessError as e:
+        raise ParseError(f"pdftoppm failed at {args}") from e
+    except Exception as e:  # pragma: no cover
+        raise ParseError("Unknown error running pdftoppm") from e
+
+
+def encode_thumbnail_webp(
+    png_path: Path,
+    out_path: Path,
+    *,
+    max_width: int = _THUMBNAIL_MAX_WIDTH,
+    max_height: int = _THUMBNAIL_MAX_HEIGHT,
+) -> None:
+    """
+    Flattens any alpha onto white and saves the image as WebP.
+
+    max_width/max_height are only a safety-net clamp for DPI rounding, since
+    the render is already sized by the computed DPI. The image is never
+    enlarged, matching the previous "-scale WxH>" behavior.
+    """
+    from PIL import Image
+
+    try:
+        with Image.open(png_path) as im:
+            if im.mode in ("RGBA", "LA"):
+                flattened = Image.new("RGB", im.size, (255, 255, 255))
+                flattened.paste(im, mask=im.split()[-1])
+            else:
+                flattened = im.convert("RGB")
+
+        flattened.thumbnail((max_width, max_height))
+        flattened.save(out_path, format="WEBP")
+    except OSError as e:
+        raise ParseError(f"Unable to encode thumbnail from {png_path}") from e
+
+
+def _compute_thumbnail_dpi(in_path: Path, logging_group=None) -> int:
+    """
+    Computes the DPI which renders the first page of the PDF to fit within the
+    thumbnail size in one pass, never above the page's natural 72 DPI size.
+    """
+    from paperless.parsers.utils import get_pdf_first_page_size_points
+
+    size = get_pdf_first_page_size_points(in_path)
+    if size is None:
+        logger.debug(
+            "Could not read PDF page size, using fallback DPI",
+            extra={"group": logging_group},
         )
+        return _THUMBNAIL_FALLBACK_DPI
+
+    width_pts, height_pts = size
+    dpi_for_width = _THUMBNAIL_MAX_WIDTH * 72 / width_pts
+    dpi_for_height = _THUMBNAIL_MAX_HEIGHT * 72 / height_pts
+    # Capping at 72 (1px per point) keeps the shrink-only behavior: a page
+    # already smaller than the thumbnail size is never enlarged
+    return max(1, round(min(72, dpi_for_width, dpi_for_height)))
+
+
+def _render_pdf_thumbnail(
+    in_path: Path,
+    png_path: Path,
+    out_path: Path,
+    logging_group=None,
+) -> None:
+    dpi = _compute_thumbnail_dpi(in_path, logging_group=logging_group)
+    rasterize_pdf_page_to_png(
+        in_path,
+        png_path,
+        dpi=dpi,
+        use_cropbox=True,
+        logging_group=logging_group,
+    )
+    encode_thumbnail_webp(png_path, out_path)
+
+
+def make_thumbnail_from_pdf_qpdf_fallback(
+    in_path: Path,
+    temp_dir: Path,
+    logging_group=None,
+) -> Path:
+    png_path: Path = Path(temp_dir) / "page1_repaired.png"
+    out_path: Path = Path(temp_dir) / "convert_qpdf.webp"
+    repaired_path: Path = Path(temp_dir) / "repaired.pdf"
+
+    logger.warning(
+        "Thumbnail generation with pdftoppm failed, attempting qpdf repair and retry.",
+        extra={"group": logging_group},
+    )
+
+    try:
+        # qpdf rewrites in place, so work on a copy and leave the original alone.
+        # qpdf exits 3 when it had to repair the file, which is the expected
+        # outcome here, so warnings must not count as failure.
+        try:
+            shutil.copy(in_path, repaired_path)
+            run_subprocess(
+                [
+                    "qpdf",
+                    "--warning-exit-0",
+                    "--replace-input",
+                    str(repaired_path),
+                ],
+                logger=logger,
+            )
+        except (subprocess.CalledProcessError, OSError) as e:
+            raise ParseError(f"qpdf repair failed for {in_path}") from e
+
+        _render_pdf_thumbnail(repaired_path, png_path, out_path, logging_group)
 
         return out_path
 
     except ParseError as e:
-        logger.error(f"Unable to make thumbnail with Ghostscript: {e}")
+        logger.error(f"Unable to make thumbnail after qpdf repair: {e}")
         # The caller might expect a generated thumbnail that can be moved,
         # so we need to copy it before it gets moved.
         # https://github.com/paperless-ngx/paperless-ngx/issues/3631
@@ -175,25 +293,18 @@ def make_thumbnail_from_pdf(in_path: Path, temp_dir: Path, logging_group=None) -
     """
     The thumbnail of a PDF is just a 500px wide image of the first page.
     """
+    png_path: Path = temp_dir / "page1.png"
     out_path: Path = temp_dir / "convert.webp"
 
-    # Run convert to get a decent thumbnail
     try:
-        run_convert(
-            density=300,
-            scale="500x5000>",
-            alpha="remove",
-            strip=True,
-            trim=False,
-            auto_orient=True,
-            use_cropbox=True,
-            input_file=f"{in_path}[0]",
-            output_file=str(out_path),
-            logging_group=logging_group,
-        )
+        _render_pdf_thumbnail(in_path, png_path, out_path, logging_group)
     except ParseError as e:
-        logger.error(f"Unable to make thumbnail with convert: {e}")
-        out_path = make_thumbnail_from_pdf_gs_fallback(in_path, temp_dir, logging_group)
+        logger.error(f"Unable to make thumbnail with pdftoppm: {e}")
+        out_path = make_thumbnail_from_pdf_qpdf_fallback(
+            in_path,
+            temp_dir,
+            logging_group,
+        )
 
     return out_path
 
