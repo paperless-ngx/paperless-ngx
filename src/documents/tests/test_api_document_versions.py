@@ -8,6 +8,7 @@ from auditlog.models import LogEntry  # type: ignore[import-untyped]
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase as DjangoTestCase
+from django.test import override_settings
 from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -16,13 +17,17 @@ from documents.data_models import DocumentSource
 from documents.filters import EffectiveContentFilter
 from documents.filters import TitleContentFilter
 from documents.models import Document
+from documents.models import Note
+from documents.models import ShareLink
 from documents.versioning import annotate_effective_content
 from documents.views import DocumentSelectionMixin
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import DocumentFactory
 from paperless_testing.factories import UserFactory
 from paperless_testing.http import read_streaming_response
+from paperless_testing.permissions import grant_all_global
 from paperless_testing.permissions import grant_global
+from paperless_testing.permissions import grant_object
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -1043,3 +1048,110 @@ class TestBulkSelectionExcludesVersions(DjangoTestCase):
         )
 
         self.assertEqual(selected, [root.id])
+
+
+class TestVersionActionPermissions(DirectoriesMixin, APITestCase):
+    def setUp(self):
+        super().setUp()
+        self.user = UserFactory()
+        grant_all_global(self.user)
+        self.client.force_authenticate(self.user)
+        self.root = DocumentFactory(owner=UserFactory())
+        self.version = DocumentFactory(root_document=self.root, owner=None)
+
+    @override_settings(AUDIT_LOG_ENABLED=True)
+    def test_actions_reject_stale_version_ownership(self):
+        note = Note.objects.create(document=self.version, note="Version note")
+        for owner in (None, self.user):
+            self.version.owner = owner
+            self.version.save(update_fields=["owner"])
+            for action in ("notes", "suggestions", "history", "share_links"):
+                with self.subTest(owner=owner, action=action):
+                    response = self.client.get(
+                        f"/api/documents/{self.version.pk}/{action}/",
+                    )
+                    self.assertEqual(response.status_code, 403)
+            response = self.client.post(
+                f"/api/documents/{self.version.pk}/notes/",
+                {"note": "New note"},
+            )
+            self.assertEqual(response.status_code, 403)
+            response = self.client.delete(
+                f"/api/documents/{self.version.pk}/notes/?id={note.pk}",
+            )
+            self.assertEqual(response.status_code, 403)
+            response = self.client.post(
+                "/api/share_links/",
+                {"document": self.version.pk, "file_version": "original"},
+            )
+            self.assertEqual(response.status_code, 403)
+            response = self.client.post(
+                "/api/share_link_bundles/",
+                {"document_ids": [self.version.pk], "file_version": "original"},
+                format="json",
+            )
+            self.assertEqual(response.status_code, 400)
+            response = self.client.post(
+                "/api/documents/email/",
+                {
+                    "documents": [self.version.pk],
+                    "addresses": "recipient@example.com",
+                    "subject": "Version",
+                    "message": "Version",
+                },
+                format="json",
+            )
+            self.assertEqual(response.status_code, 403)
+        self.assertTrue(Note.objects.filter(pk=note.pk).exists())
+        self.assertFalse(ShareLink.objects.exists())
+
+    @mock.patch("documents.views.build_share_link_bundle.apply_async")
+    def test_root_permissions_allow_sharing_a_private_version(self, build_mock):
+        self.version.owner = UserFactory()
+        self.version.save(update_fields=["owner"])
+        grant_object(self.user, self.root, "view_document", "change_document")
+        note = Note.objects.create(document=self.version, note="Version note")
+        response = self.client.get(f"/api/documents/{self.version.pk}/notes/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data[0]["id"], note.pk)
+        response = self.client.post(
+            "/api/share_links/",
+            {"document": self.version.pk, "file_version": "original"},
+        )
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(ShareLink.objects.get().document_id, self.version.pk)
+        response = self.client.get(f"/api/documents/{self.version.pk}/share_links/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        response = self.client.post(
+            "/api/share_link_bundles/",
+            {"document_ids": [self.version.pk], "file_version": "original"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 201)
+        build_mock.assert_called_once()
+
+    def test_root_view_permission_does_not_allow_note_changes(self):
+        grant_object(self.user, self.root, "view_document")
+        note = Note.objects.create(document=self.version, note="Version note")
+        response = self.client.get(f"/api/documents/{self.version.pk}/notes/")
+        self.assertEqual(response.status_code, 200)
+        response = self.client.post(
+            f"/api/documents/{self.version.pk}/notes/",
+            {"note": "New note"},
+        )
+        self.assertEqual(response.status_code, 403)
+        response = self.client.delete(
+            f"/api/documents/{self.version.pk}/notes/?id={note.pk}",
+        )
+        self.assertEqual(response.status_code, 403)
+        self.assertTrue(Note.objects.filter(pk=note.pk).exists())
+
+    @override_settings(AUDIT_LOG_ENABLED=True)
+    def test_history_uses_root_ownership(self):
+        self.root.owner = self.user
+        self.root.save(update_fields=["owner"])
+        self.version.owner = UserFactory()
+        self.version.save(update_fields=["owner"])
+        response = self.client.get(f"/api/documents/{self.version.pk}/history/")
+        self.assertEqual(response.status_code, 200)
