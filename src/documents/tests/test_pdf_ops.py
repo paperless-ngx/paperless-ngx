@@ -62,6 +62,15 @@ class TestRotatePdf:
         self,
         tmp_path: Path,
     ) -> None:
+        """
+        GIVEN:
+            - A three page PDF
+        WHEN:
+            - It is rotated by 90 degrees, then the result is rotated by 90 again
+        THEN:
+            - Every page is rotated relative to its current rotation
+            - The page content itself is unchanged
+        """
         once = tmp_path / "once.pdf"
         twice = tmp_path / "twice.pdf"
 
@@ -73,6 +82,14 @@ class TestRotatePdf:
         assert fingerprints(twice) == fingerprints(THREE_PAGES)
 
     def test_keeps_document_info(self, tmp_path: Path) -> None:
+        """
+        GIVEN:
+            - A PDF with document info
+        WHEN:
+            - It is rotated
+        THEN:
+            - The document info is still present in the output
+        """
         dst = tmp_path / "out.pdf"
 
         pdf_ops.rotate_pdf(THREE_PAGES, dst, 90)
@@ -113,14 +130,37 @@ class TestRemovePages:
         assert fingerprints(dst) == [source_fingerprints[i] for i in kept]
 
     def test_keeps_document_info(self, tmp_path: Path) -> None:
+        """
+        GIVEN:
+            - A PDF with document info
+        WHEN:
+            - A page is removed
+        THEN:
+            - The document info is still present in the output
+        """
         dst = tmp_path / "out.pdf"
 
         pdf_ops.remove_pages(THREE_PAGES, dst, [1])
 
         assert "/Creator" in docinfo_keys(dst)
 
-    @pytest.mark.parametrize("bad_page", [0, -1])
+    @pytest.mark.parametrize(
+        "bad_page",
+        [
+            pytest.param(0, id="zero"),
+            pytest.param(-1, id="negative"),
+        ],
+    )
     def test_rejects_pages_below_one(self, tmp_path: Path, bad_page: int) -> None:
+        """
+        GIVEN:
+            - A three page PDF
+        WHEN:
+            - Pages are removed and one of them is below 1
+        THEN:
+            - ValueError is raised
+            - No output file is written
+        """
         dst = tmp_path / "out.pdf"
 
         with pytest.raises(ValueError, match="start at 1"):
@@ -135,6 +175,15 @@ class TestBuildPdfs:
         tmp_path: Path,
         source_fingerprints: list[str],
     ) -> None:
+        """
+        GIVEN:
+            - A three page PDF
+        WHEN:
+            - One output is built from pages 3 then 1
+        THEN:
+            - The output has those pages in that order
+            - Its path is returned
+        """
         dst = tmp_path / "out.pdf"
 
         written = pdf_ops.build_pdfs(
@@ -146,6 +195,14 @@ class TestBuildPdfs:
         assert fingerprints(dst) == [source_fingerprints[2], source_fingerprints[0]]
 
     def test_rotates_only_the_requested_pages(self, tmp_path: Path) -> None:
+        """
+        GIVEN:
+            - A three page PDF
+        WHEN:
+            - One output is built with a different rotation on each page
+        THEN:
+            - Each output page has exactly the rotation requested for it
+        """
         dst = tmp_path / "out.pdf"
 
         pdf_ops.build_pdfs(
@@ -156,6 +213,15 @@ class TestBuildPdfs:
         assert rotations(dst) == [0, 90, 180]
 
     def test_writes_one_file_per_output_in_order(self, tmp_path: Path) -> None:
+        """
+        GIVEN:
+            - A twelve page PDF
+        WHEN:
+            - Two outputs are built from different page ranges
+        THEN:
+            - Two files are written and returned in output order
+            - Each holds exactly its own pages
+        """
         first = tmp_path / "first.pdf"
         second = tmp_path / "second.pdf"
         source = fingerprints(TWELVE_PAGES)
@@ -173,6 +239,14 @@ class TestBuildPdfs:
         assert fingerprints(second) == source[3:]
 
     def test_empty_page_list_writes_a_zero_page_file(self, tmp_path: Path) -> None:
+        """
+        GIVEN:
+            - A three page PDF
+        WHEN:
+            - An output with no pages is built
+        THEN:
+            - A PDF with zero pages is written
+        """
         dst = tmp_path / "out.pdf"
 
         pdf_ops.build_pdfs(THREE_PAGES, [([], constant(dst))])
@@ -183,6 +257,16 @@ class TestBuildPdfs:
         self,
         tmp_path: Path,
     ) -> None:
+        """
+        GIVEN:
+            - A three page PDF
+        WHEN:
+            - Several outputs are built
+            - A later output refers to a page past the end
+        THEN:
+            - IndexError is raised
+            - No destination was requested for any output, including earlier valid ones
+        """
         requested: list[Path] = []
 
         def make_dst() -> Path:
@@ -190,16 +274,34 @@ class TestBuildPdfs:
             return requested[-1]
 
         with pytest.raises(IndexError):
-            pdf_ops.build_pdfs(THREE_PAGES, [([PageSpec(99)], make_dst)])
+            pdf_ops.build_pdfs(
+                THREE_PAGES,
+                [([PageSpec(1)], make_dst), ([PageSpec(99)], make_dst)],
+            )
 
         assert requested == []
 
-    @pytest.mark.parametrize("bad_page", [0, -1])
+    @pytest.mark.parametrize(
+        "bad_page",
+        [
+            pytest.param(0, id="zero"),
+            pytest.param(-1, id="negative"),
+        ],
+    )
     def test_rejects_pages_below_one_before_opening_anything(
         self,
         tmp_path: Path,
         bad_page: int,
     ) -> None:
+        """
+        GIVEN:
+            - A three page PDF
+        WHEN:
+            - Several outputs are built and a later one has a page below 1
+        THEN:
+            - ValueError is raised
+            - No destination was requested for any output
+        """
         requested: list[Path] = []
 
         def make_dst() -> Path:
@@ -217,11 +319,27 @@ class TestBuildPdfs:
 
 class TestValidatePageOperations:
     def test_returns_the_output_count(self) -> None:
+        """
+        GIVEN:
+            - Operations that all target the default output
+        WHEN:
+            - They are validated
+        THEN:
+            - One output document is reported
+        """
         operations = [{"page": 1}, {"page": 2}, {"page": 3}]
 
         assert pdf_ops.validate_page_operations(operations, single_output=True) == 1
 
     def test_gap_in_output_indices_counts_up_to_the_highest(self) -> None:
+        """
+        GIVEN:
+            - Operations that target outputs 0 and 2 but never 1
+        WHEN:
+            - They are validated
+        THEN:
+            - Three output documents are reported
+        """
         operations = [
             {"page": 1, "doc": 0},
             {"page": 2, "doc": 2},
@@ -233,17 +351,48 @@ class TestValidatePageOperations:
         assert count == 3
 
     def test_empty_operations_are_rejected(self) -> None:
+        """
+        GIVEN:
+            - No operations
+        WHEN:
+            - They are validated
+        THEN:
+            - ValueError is raised
+        """
         with pytest.raises(ValueError, match="index is out of bounds"):
             pdf_ops.validate_page_operations([], single_output=False)
 
     def test_multiple_outputs_rejected_when_single_output_required(self) -> None:
+        """
+        GIVEN:
+            - Operations that target two outputs
+        WHEN:
+            - They are validated with a single output required
+        THEN:
+            - ValueError is raised
+        """
         operations = [{"page": 1, "doc": 0}, {"page": 2, "doc": 1}]
 
         with pytest.raises(ValueError, match="Multiple output documents"):
             pdf_ops.validate_page_operations(operations, single_output=True)
 
-    @pytest.mark.parametrize("doc", [-1, 2, 2**32])
+    @pytest.mark.parametrize(
+        "doc",
+        [
+            pytest.param(-1, id="negative"),
+            pytest.param(2, id="equal-to-operation-count"),
+            pytest.param(2**32, id="huge"),
+        ],
+    )
     def test_output_index_out_of_bounds(self, doc: int) -> None:
+        """
+        GIVEN:
+            - Two operations, one with an output index that is out of bounds
+        WHEN:
+            - They are validated
+        THEN:
+            - ValueError is raised
+        """
         operations = [{"page": 1, "doc": 0}, {"page": 2, "doc": doc}]
 
         with pytest.raises(ValueError, match="index is out of bounds"):
@@ -271,6 +420,15 @@ class TestDecrypt:
         assert pdf_ops.needs_decrypt(path) is expected
 
     def test_decrypt_writes_an_unencrypted_copy(self, tmp_path: Path) -> None:
+        """
+        GIVEN:
+            - A password protected PDF
+        WHEN:
+            - It is decrypted with the correct password
+        THEN:
+            - The path from make_dst is returned
+            - The written copy no longer needs decrypting
+        """
         dst = tmp_path / "out.pdf"
 
         result = pdf_ops.decrypt_pdf(ENCRYPTED, constant(dst), "test")
@@ -282,6 +440,15 @@ class TestDecrypt:
         self,
         tmp_path: Path,
     ) -> None:
+        """
+        GIVEN:
+            - A password protected PDF
+        WHEN:
+            - It is decrypted with the wrong password
+        THEN:
+            - PasswordError is raised
+            - No destination was requested
+        """
         requested: list[Path] = []
 
         def make_dst() -> Path:
@@ -300,6 +467,14 @@ class TestPdfMerger:
         tmp_path: Path,
         source_fingerprints: list[str],
     ) -> None:
+        """
+        GIVEN:
+            - A reordered PDF and the original three page PDF
+        WHEN:
+            - Both are added to a merger in that order and saved
+        THEN:
+            - The output holds all pages in the order they were added
+        """
         reordered = tmp_path / "reordered.pdf"
         merged = tmp_path / "merged.pdf"
         pdf_ops.build_pdfs(
@@ -322,6 +497,14 @@ class TestPdfMerger:
         self,
         tmp_path: Path,
     ) -> None:
+        """
+        GIVEN:
+            - Two PDFs with different PDF versions
+        WHEN:
+            - Both are added to a merger and saved
+        THEN:
+            - The output version is at least the highest source version
+        """
         merged = tmp_path / "merged.pdf"
         with pikepdf.open(TWELVE_PAGES) as pdf:
             source_versions = [pdf.pdf_version]
