@@ -74,16 +74,26 @@ def build_pdfs(
     """
     Build one new PDF per output from pages of ``src``, opening ``src`` once.
 
-    Each output is ``(page_specs, make_dst)``. ``make_dst`` is called after that
+    Each output is ``(page_specs, make_dst)``. Every page number is checked against
+    ``src`` before any output is built, and ``make_dst`` is called after that
     output's pages are copied and immediately before it is saved, so a bad page
-    number never leaves a destination behind. Document-level data (Info, XMP,
-    outlines) is not carried over. Returns the written paths in output order.
+    number in any output never leaves a destination behind. Document-level data
+    (Info, XMP, outlines) is not carried over. Returns the written paths in output
+    order.
     """
     for specs, _ in outputs:
         _require_positive(spec.page for spec in specs)
 
     written: list[Path] = []
     with pikepdf.open(src) as source:
+        page_count = len(source.pages)
+        for specs, _ in outputs:
+            for spec in specs:
+                if spec.page > page_count:
+                    raise IndexError(
+                        f"Page {spec.page} is out of range, the PDF has "
+                        f"{page_count} pages",
+                    )
         for specs, make_dst in outputs:
             dst = pikepdf.new()
             for spec in specs:
