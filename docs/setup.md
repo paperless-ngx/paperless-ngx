@@ -418,9 +418,9 @@ to a positive number to enable polling and disable native filesystem notificatio
 
 12. Configure ImageMagick to allow processing of PDF documents and disable
     formats that Paperless-ngx does not use. Most distributions disable PDF
-    processing by default, since PDF documents can contain malware. If you
-    don't enable it, steps that still rely on ImageMagick, such as TIFF to
-    PDF conversion, may fail. PDF thumbnails no longer use ImageMagick.
+    processing by default, since PDF documents can contain malware.
+    Paperless-ngx no longer passes PDF documents to ImageMagick, so enabling
+    PDF processing is not required.
 
     Configure the active ImageMagick policy file (commonly
     `/etc/ImageMagick-6/policy.xml` or `/etc/ImageMagick-7/policy.xml`) and
