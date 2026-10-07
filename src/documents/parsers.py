@@ -79,8 +79,8 @@ _THUMBNAIL_MAX_WIDTH = 500
 _THUMBNAIL_MAX_HEIGHT = 5000
 # Used only when the page geometry cannot be read
 _THUMBNAIL_FALLBACK_DPI = 150
-# Cap on the target density, applied before supersampling: a capped tiny page
-# is rasterized at twice this and halved to the size a 300 DPI render gave
+# Cap on the target density, applied before supersampling, so a tiny page is
+# not blown up past the size a plain 300 DPI render would give
 _THUMBNAIL_MAX_DPI = 300
 # Pages with known geometry are rendered at this multiple of the computed DPI
 # and downsampled with Lanczos, which keeps text noticeably crisper than
@@ -93,7 +93,6 @@ def rasterize_pdf_page_to_png(
     out_path: Path,
     *,
     dpi: int,
-    use_cropbox: bool = True,
     logging_group=None,
 ) -> None:
     """
@@ -113,10 +112,10 @@ def rasterize_pdf_page_to_png(
         str(dpi),
         "-png",
         "-singlefile",
+        "-cropbox",
+        str(in_path),
+        str(out_path.with_suffix("")),
     ]
-    if use_cropbox:
-        args.append("-cropbox")
-    args += [str(in_path), str(out_path.with_suffix(""))]
 
     logger.debug("Execute: " + " ".join(args), extra={"group": logging_group})
 
@@ -132,18 +131,15 @@ def encode_thumbnail_webp(
     png_path: Path,
     out_path: Path,
     *,
-    max_width: int = _THUMBNAIL_MAX_WIDTH,
-    max_height: int = _THUMBNAIL_MAX_HEIGHT,
     supersample: int = 1,
 ) -> None:
     """
     Flattens any alpha onto white and saves the image as WebP.
 
     A render made at supersample times the target density is first
-    downsampled by that factor with Lanczos. max_width/max_height then trim
-    the result to the exact thumbnail size, since the computed DPI is rounded
-    up and lands at or slightly above it. The image is never enlarged,
-    matching the previous "-scale WxH>" behavior.
+    downsampled by that factor with Lanczos. The result is then trimmed to the
+    thumbnail size, since the computed DPI is rounded up and lands at or
+    slightly above it. The image is never enlarged.
     """
     from PIL import Image
 
@@ -164,7 +160,7 @@ def encode_thumbnail_webp(
                 Image.Resampling.LANCZOS,
             )
 
-        flattened.thumbnail((max_width, max_height))
+        flattened.thumbnail((_THUMBNAIL_MAX_WIDTH, _THUMBNAIL_MAX_HEIGHT))
         flattened.save(out_path, format="WEBP")
     except (OSError, Image.DecompressionBombError) as e:
         raise ParseError(f"Unable to encode thumbnail from {png_path}") from e
@@ -172,15 +168,8 @@ def encode_thumbnail_webp(
 
 def _compute_thumbnail_dpi(in_path: Path, logging_group=None) -> tuple[int, int]:
     """
-    Computes the DPI at which the first page of the PDF reaches at or just
-    above the thumbnail size, never above the 300 DPI the thumbnail was
-    previously rendered at before being scaled down, and the supersampling
-    factor to render with.
-
-    Returns (dpi, supersample). The page is rendered at supersample * dpi and
-    downsampled by supersample afterwards. When the page geometry cannot be
-    read the fixed fallback DPI is used without supersampling, as that render
-    is not bounded by the thumbnail size.
+    Returns (dpi, supersample): render at dpi * supersample, then downsample
+    by supersample. Unknown page geometry gives the fallback DPI, unsupersampled.
     """
     from paperless.parsers.utils import get_pdf_first_page_size_points
 
@@ -195,17 +184,13 @@ def _compute_thumbnail_dpi(in_path: Path, logging_group=None) -> tuple[int, int]
     width_pts, height_pts = size
     dpi_for_width = _THUMBNAIL_MAX_WIDTH * 72 / width_pts
     dpi_for_height = _THUMBNAIL_MAX_HEIGHT * 72 / height_pts
-    # The old pipeline rendered at 300 DPI and then shrank to fit, so only
-    # pages too small to reach the thumbnail size even at 300 DPI end up
-    # smaller than it. Rounding up keeps the downsampled render at or above
-    # the target, so the shrink-only clamp in encode_thumbnail_webp trims it
-    # to exactly the thumbnail size instead of leaving it a few pixels short.
+    # Round up so the downsampled render is never a few pixels short of the
+    # target; the shrink-only clamp in encode_thumbnail_webp trims the excess.
     dpi = max(
         1,
         math.ceil(min(_THUMBNAIL_MAX_DPI, dpi_for_width, dpi_for_height)),
     )
-    # A page so large it hits the 1 DPI floor is already oversized, so
-    # doubling it would only quadruple the pixel count for no benefit
+    # At the 1 DPI floor the page is already oversized, so do not supersample
     return dpi, 1 if dpi == 1 else _THUMBNAIL_SUPERSAMPLE
 
 
@@ -220,10 +205,23 @@ def _render_pdf_thumbnail(
         in_path,
         png_path,
         dpi=dpi * supersample,
-        use_cropbox=True,
         logging_group=logging_group,
     )
     encode_thumbnail_webp(png_path, out_path, supersample=supersample)
+
+
+def _repair_pdf_with_qpdf(in_path: Path, out_path: Path) -> None:
+    # qpdf rewrites in place, so work on a copy and leave the original alone.
+    # qpdf exits 3 when it had to repair the file, which is the expected
+    # outcome here, so warnings must not count as failure.
+    try:
+        shutil.copy(in_path, out_path)
+        run_subprocess(
+            ["qpdf", "--warning-exit-0", "--replace-input", str(out_path)],
+            logger=logger,
+        )
+    except (subprocess.CalledProcessError, OSError) as e:
+        raise ParseError(f"qpdf repair failed for {in_path}") from e
 
 
 def make_thumbnail_from_pdf_qpdf_fallback(
@@ -231,9 +229,9 @@ def make_thumbnail_from_pdf_qpdf_fallback(
     temp_dir: Path,
     logging_group=None,
 ) -> Path:
-    png_path: Path = Path(temp_dir) / "page1_repaired.png"
-    out_path: Path = Path(temp_dir) / "convert_qpdf.webp"
-    repaired_path: Path = Path(temp_dir) / "repaired.pdf"
+    png_path = temp_dir / "page1_repaired.png"
+    out_path = temp_dir / "convert_qpdf.webp"
+    repaired_path = temp_dir / "repaired.pdf"
 
     logger.warning(
         "Thumbnail generation with pdftoppm failed, attempting qpdf repair and retry.",
@@ -241,25 +239,8 @@ def make_thumbnail_from_pdf_qpdf_fallback(
     )
 
     try:
-        # qpdf rewrites in place, so work on a copy and leave the original alone.
-        # qpdf exits 3 when it had to repair the file, which is the expected
-        # outcome here, so warnings must not count as failure.
-        try:
-            shutil.copy(in_path, repaired_path)
-            run_subprocess(
-                [
-                    "qpdf",
-                    "--warning-exit-0",
-                    "--replace-input",
-                    str(repaired_path),
-                ],
-                logger=logger,
-            )
-        except (subprocess.CalledProcessError, OSError) as e:
-            raise ParseError(f"qpdf repair failed for {in_path}") from e
-
+        _repair_pdf_with_qpdf(in_path, repaired_path)
         _render_pdf_thumbnail(repaired_path, png_path, out_path, logging_group)
-
         return out_path
 
     except ParseError as e:
@@ -267,7 +248,7 @@ def make_thumbnail_from_pdf_qpdf_fallback(
         # The caller might expect a generated thumbnail that can be moved,
         # so we need to copy it before it gets moved.
         # https://github.com/paperless-ngx/paperless-ngx/issues/3631
-        default_thumbnail_path: Path = Path(temp_dir) / "document.webp"
+        default_thumbnail_path = temp_dir / "document.webp"
         copy_file_with_basic_stats(get_default_thumbnail(), default_thumbnail_path)
         return default_thumbnail_path
 

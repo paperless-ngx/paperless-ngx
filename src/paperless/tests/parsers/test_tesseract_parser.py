@@ -17,8 +17,8 @@ import pytest
 from ocrmypdf import SubprocessOutputError
 from PIL import Image
 
-import documents.parsers
 from documents.parsers import ParseError
+from documents.parsers import rasterize_pdf_page_to_png
 from paperless.models import ModeChoices
 from paperless.parsers import ParserProtocol
 from paperless.parsers.tesseract import RasterisedDocumentParser
@@ -328,13 +328,12 @@ class TestGetThumbnail:
             - The PDF is repaired with qpdf and rasterized again, producing a
               real thumbnail rather than the default placeholder
         """
-        real_rasterize = documents.parsers.rasterize_pdf_page_to_png
         original = tesseract_samples_dir / "simple-digital.pdf"
 
         def _fail_on_original(in_path: Path, out_path: Path, **kwargs) -> None:
             if in_path == original:
                 raise ParseError("Does not compute.")
-            real_rasterize(in_path, out_path, **kwargs)
+            rasterize_pdf_page_to_png(in_path, out_path, **kwargs)
 
         rasterize = mocker.patch(
             "documents.parsers.rasterize_pdf_page_to_png",

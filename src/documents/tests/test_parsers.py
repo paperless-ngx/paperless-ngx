@@ -169,10 +169,11 @@ class TestComputeThumbnailDpi:
         WHEN:
             - The thumbnail DPI is computed
         THEN:
-            - The DPI is rounded up so the render reaches 500x5000, never
-              exceeds 300, is at least 1, and is supersampled 2x (except at the
-              1 DPI floor); an unknown
-              size gives the plain 150 DPI fallback without supersampling
+            - The DPI is rounded up so the render reaches 500x5000, is capped
+              at 300 and floored at 1, and is supersampled 2x except at the
+              1 DPI floor
+            - An unknown size gives the plain 150 DPI fallback without
+              supersampling
         """
         mocker.patch(
             "paperless.parsers.utils.get_pdf_first_page_size_points",
@@ -182,6 +183,19 @@ class TestComputeThumbnailDpi:
 
 
 class TestMakeThumbnailFromPdf:
+    @pytest.fixture
+    def work_dir(self, tmp_path: Path) -> Path:
+        path = tmp_path / "work"
+        path.mkdir()
+        return path
+
+    @staticmethod
+    def _write_blank_pdf(path: Path, page_size: tuple[int, int] = (612, 792)) -> Path:
+        pdf = pikepdf.new()
+        pdf.add_blank_page(page_size=page_size)
+        pdf.save(path, object_stream_mode=pikepdf.ObjectStreamMode.disable)
+        return path
+
     @pytest.mark.parametrize(
         ("size", "expected_dpi", "expected_supersample"),
         [
@@ -193,6 +207,7 @@ class TestMakeThumbnailFromPdf:
         self,
         mocker: MockerFixture,
         tmp_path: Path,
+        work_dir: Path,
         size: tuple[float, float] | None,
         expected_dpi: int,
         expected_supersample: int,
@@ -213,8 +228,6 @@ class TestMakeThumbnailFromPdf:
         )
         rasterize = mocker.patch("documents.parsers.rasterize_pdf_page_to_png")
         encode = mocker.patch("documents.parsers.encode_thumbnail_webp")
-        work_dir = tmp_path / "work"
-        work_dir.mkdir()
 
         make_thumbnail_from_pdf(tmp_path / "in.pdf", work_dir)
 
@@ -234,6 +247,7 @@ class TestMakeThumbnailFromPdf:
     def test_thumbnail_width(
         self,
         tmp_path: Path,
+        work_dir: Path,
         page_size: tuple[int, int],
         expected_width: int,
     ) -> None:
@@ -246,12 +260,7 @@ class TestMakeThumbnailFromPdf:
             - The WebP thumbnail is exactly 500px wide, unless the page is
               too small to reach that even at 300 DPI
         """
-        pdf = pikepdf.new()
-        pdf.add_blank_page(page_size=page_size)
-        pdf_path = tmp_path / "in.pdf"
-        pdf.save(pdf_path)
-        work_dir = tmp_path / "work"
-        work_dir.mkdir()
+        pdf_path = self._write_blank_pdf(tmp_path / "in.pdf", page_size)
 
         thumb = make_thumbnail_from_pdf(pdf_path, work_dir)
 
@@ -260,20 +269,22 @@ class TestMakeThumbnailFromPdf:
             assert im.format == "WEBP"
             assert im.width == expected_width
 
-    @staticmethod
-    def _write_pdf_without_xref(path: Path) -> Path:
+    @classmethod
+    def _write_pdf_without_xref(cls, path: Path) -> Path:
         """
         Writes a valid one page PDF, then cuts off its cross reference table
         and trailer, which poppler cannot recover from but qpdf can.
         """
-        pdf = pikepdf.new()
-        pdf.add_blank_page(page_size=(612, 792))
-        pdf.save(path, object_stream_mode=pikepdf.ObjectStreamMode.disable)
+        cls._write_blank_pdf(path)
         data = path.read_bytes()
         path.write_bytes(data[: data.rindex(b"\nxref")])
         return path
 
-    def test_qpdf_repair_produces_real_thumbnail(self, tmp_path: Path) -> None:
+    def test_qpdf_repair_produces_real_thumbnail(
+        self,
+        tmp_path: Path,
+        work_dir: Path,
+    ) -> None:
         """
         GIVEN:
             - A PDF without a cross reference table or trailer, which
@@ -288,8 +299,6 @@ class TestMakeThumbnailFromPdf:
         """
         pdf_path = self._write_pdf_without_xref(tmp_path / "broken.pdf")
         original_bytes = pdf_path.read_bytes()
-        work_dir = tmp_path / "work"
-        work_dir.mkdir()
 
         with pytest.raises(ParseError):
             rasterize_pdf_page_to_png(pdf_path, work_dir / "probe.png", dpi=50)
@@ -297,7 +306,6 @@ class TestMakeThumbnailFromPdf:
         thumb = make_thumbnail_from_pdf(pdf_path, work_dir)
 
         assert thumb == work_dir / "convert_qpdf.webp"
-        assert thumb.read_bytes() != get_default_thumbnail().read_bytes()
         with Image.open(thumb) as im:
             assert im.format == "WEBP"
             assert im.width == 500
@@ -314,6 +322,7 @@ class TestMakeThumbnailFromPdf:
         self,
         mocker: MockerFixture,
         tmp_path: Path,
+        work_dir: Path,
         qpdf_error: subprocess.CalledProcessError | None,
     ) -> None:
         """
@@ -332,17 +341,11 @@ class TestMakeThumbnailFromPdf:
         )
         if qpdf_error is not None:
             mocker.patch("documents.parsers.run_subprocess", side_effect=qpdf_error)
-        pdf = pikepdf.new()
-        pdf.add_blank_page(page_size=(612, 792))
-        pdf_path = tmp_path / "in.pdf"
-        pdf.save(pdf_path)
-        work_dir = tmp_path / "work"
-        work_dir.mkdir()
+        pdf_path = self._write_blank_pdf(tmp_path / "in.pdf")
 
         thumb = make_thumbnail_from_pdf(pdf_path, work_dir)
 
         assert thumb == work_dir / "document.webp"
-        assert thumb != get_default_thumbnail()
         assert thumb.read_bytes() == get_default_thumbnail().read_bytes()
 
 
@@ -458,48 +461,18 @@ class TestEncodeThumbnailWebp:
             assert min(red, green, blue) >= 250
 
     @pytest.mark.parametrize(
-        ("in_size", "expected_size"),
-        [
-            pytest.param((1000, 2000), (500, 1000), id="too-wide-shrunk"),
-            pytest.param((100, 10000), (50, 5000), id="too-tall-shrunk"),
-            pytest.param((100, 200), (100, 200), id="small-not-enlarged"),
-        ],
-    )
-    def test_size_clamped_without_enlarging(
-        self,
-        tmp_path: Path,
-        in_size: tuple[int, int],
-        expected_size: tuple[int, int],
-    ) -> None:
-        """
-        GIVEN:
-            - A rendered page image of the given size
-        WHEN:
-            - It is encoded as a thumbnail
-        THEN:
-            - It is shrunk to fit 500x5000 keeping aspect ratio, and never
-              enlarged
-        """
-        png_path = tmp_path / "in.png"
-        Image.new("RGB", in_size, (255, 255, 255)).save(png_path)
-        out_path = tmp_path / "out.webp"
-
-        encode_thumbnail_webp(png_path, out_path)
-
-        with Image.open(out_path) as im:
-            assert im.size == expected_size
-
-    @pytest.mark.parametrize(
         ("in_size", "supersample", "expected_size"),
         [
+            pytest.param((1000, 2000), 1, (500, 1000), id="too-wide-shrunk"),
+            pytest.param((100, 10000), 1, (50, 5000), id="too-tall-shrunk"),
+            pytest.param((100, 200), 1, (100, 200), id="small-not-enlarged"),
             pytest.param((1000, 1400), 2, (500, 700), id="2x-halved"),
             pytest.param((1001, 1401), 2, (500, 700), id="2x-odd-rounded"),
-            pytest.param((1000, 1400), 1, (500, 700), id="no-supersample-clamped"),
             pytest.param((600, 800), 2, (300, 400), id="2x-small-not-enlarged"),
             pytest.param((900, 1200), 2, (450, 600), id="2x-below-clamp"),
         ],
     )
-    def test_supersampled_render_downsampled(
+    def test_size_clamped_and_downsampled(
         self,
         tmp_path: Path,
         in_size: tuple[int, int],
@@ -508,11 +481,13 @@ class TestEncodeThumbnailWebp:
     ) -> None:
         """
         GIVEN:
-            - A rendered page image made at a supersampling factor
+            - A rendered page image of the given size, made at the given
+              supersampling factor
         WHEN:
             - It is encoded as a thumbnail with that factor
         THEN:
-            - It is downsampled by the factor before the 500x5000 clamp
+            - It is downsampled by the factor, then shrunk to fit 500x5000
+              keeping aspect ratio, and never enlarged
         """
         png_path = tmp_path / "in.png"
         Image.new("RGB", in_size, (255, 255, 255)).save(png_path)
