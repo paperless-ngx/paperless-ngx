@@ -22,6 +22,7 @@ from documents.models import Document
 from documents.tasks import update_document_content_maybe_archive_file
 from paperless_testing.assertions import FileSystemAssertsMixin
 from paperless_testing.dirs import DirectoriesMixin
+from paperless_testing.factories import DocumentFactory
 
 sample_file: Path = Path(__file__).parent / "samples" / "simple.pdf"
 
@@ -115,6 +116,27 @@ class TestMakeIndex:
         )
         call_command("document_index", "reindex", skip_checks=True)
         mock_get_backend.return_value.rebuild.assert_called_once()
+
+    def test_reindex_skips_versions(self, mocker: MockerFixture) -> None:
+        """
+        GIVEN:
+            - A root document with a version
+        WHEN:
+            - The reindex command runs
+        THEN:
+            - Only the root document is handed to the rebuild, since a version
+              is indexed as its root
+        """
+        root = DocumentFactory()
+        DocumentFactory(root_document=root, version_index=1)
+        mock_get_backend = mocker.patch(
+            "documents.management.commands.document_index.get_backend",
+        )
+
+        call_command("document_index", "reindex", skip_checks=True)
+
+        documents = mock_get_backend.return_value.rebuild.call_args.args[0]
+        assert list(documents.values_list("pk", flat=True)) == [root.pk]
 
     def test_optimize(self) -> None:
         """Optimize command must execute without error (Tantivy handles optimization automatically)."""

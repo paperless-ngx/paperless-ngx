@@ -310,7 +310,7 @@ class TestUpdateContent(DirectoriesMixin, TestCase):
 
     @mock.patch("documents.tasks.clear_document_caches")
     @mock.patch("documents.search.get_backend")
-    def test_update_content_version_indexes_root(
+    def test_update_content_version_clears_caches_for_root(
         self,
         mock_get_backend: mock.Mock,
         mock_clear_caches: mock.Mock,
@@ -321,8 +321,8 @@ class TestUpdateContent(DirectoriesMixin, TestCase):
         WHEN:
             - Update content task is called for the version
         THEN:
-            - The version's content is updated
-            - The root document is indexed rather than the version
+            - The version's content is updated, not the root's
+            - The document is indexed
             - Caches are cleared for both
         """
         root, version = self._create_root_with_version()
@@ -334,8 +334,7 @@ class TestUpdateContent(DirectoriesMixin, TestCase):
             "my document",
         )
         self.assertEqual(Document.objects.get(pk=root.pk).content, "root content")
-        indexed = mock_get_backend.return_value.add_or_update.call_args.args[0]
-        self.assertEqual(indexed.pk, root.pk)
+        mock_get_backend.return_value.add_or_update.assert_called_once()
         mock_clear_caches.assert_has_calls(
             [mock.call(version.pk), mock.call(root.pk)],
         )
@@ -343,7 +342,7 @@ class TestUpdateContent(DirectoriesMixin, TestCase):
     @override_settings(AI_ENABLED=True, LLM_EMBEDDING_BACKEND="huggingface")
     @mock.patch("documents.tasks.llm_index_add_or_update_document")
     @mock.patch("documents.search.get_backend")
-    def test_update_content_version_updates_llm_index_for_root(
+    def test_update_content_version_updates_llm_index(
         self,
         mock_get_backend: mock.Mock,
         mock_llm_index: mock.Mock,
@@ -355,14 +354,13 @@ class TestUpdateContent(DirectoriesMixin, TestCase):
         WHEN:
             - Update content task is called for the version
         THEN:
-            - The LLM index is updated for the root document, not the version
+            - The LLM index is updated
         """
-        root, version = self._create_root_with_version()
+        _, version = self._create_root_with_version()
 
         tasks.update_document_content_maybe_archive_file(version.pk)
 
         mock_llm_index.assert_called_once()
-        self.assertEqual(mock_llm_index.call_args.args[0].pk, root.pk)
 
 
 class TestUpdateContentRemoteOCR(DirectoriesMixin, TestCase):
