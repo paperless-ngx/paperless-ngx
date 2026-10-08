@@ -7,6 +7,7 @@ from documents.models import Document
 from documents.permissions import permitted_object_ids
 from documents.permissions import restrict_queryset_to_visible
 from documents.permissions import user_is_unrestricted
+from documents.versioning import annotate_effective_content
 from paperless.config import AIConfig
 from paperless_ai.base_model import ClassificationSuggestions
 from paperless_ai.base_model import TaxonomyChoiceDict
@@ -113,7 +114,7 @@ def build_prompt_without_rag(
 ) -> str:
     filename = document.filename or ""
     content = truncate_content(
-        document.content[:4000] or "",
+        (document.get_effective_content() or "")[:4000],
         chunk_size=config.llm_embedding_chunk_size,
         context_size=config.llm_context_size,
     )
@@ -227,7 +228,9 @@ def get_taxonomy_context(
 
         # similar_documents is already ordered by descending weight; don't lose it.
         similar_document_ids = [s["document_id"] for s in similar_documents]
-        similar_documents_by_id = Document.objects.in_bulk(similar_document_ids)
+        similar_documents_by_id = annotate_effective_content(
+            Document.objects.all(),
+        ).in_bulk(similar_document_ids)
         similar_docs = [
             similar_documents_by_id[document_id]
             for document_id in similar_document_ids
@@ -235,7 +238,7 @@ def get_taxonomy_context(
         ][:max_docs]
         context_blocks = []
         for similar in similar_docs:
-            text = similar.content[:1000] or ""
+            text = (similar.get_effective_content() or "")[:1000]
             title = similar.title or similar.filename or "Untitled"
             context_blocks.append(f"TITLE: {title}\n{text}")
     except Exception:
