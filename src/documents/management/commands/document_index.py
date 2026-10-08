@@ -67,18 +67,22 @@ class Command(PaperlessCommand):
                 if options.get("recreate"):
                     wipe_index(settings.INDEX_DIR)
 
-                documents = Document.objects.select_related(
-                    "correspondent",
-                    "document_type",
-                    "storage_path",
-                    "owner",
-                ).prefetch_related(
-                    "tags",
-                    "notes__user",
-                    "custom_fields__field",
-                    "versions",
-                    "barcodes",
-                    "versions__barcodes",
+                documents = (
+                    Document.objects.filter(root_document__isnull=True)
+                    .select_related(
+                        "correspondent",
+                        "document_type",
+                        "storage_path",
+                        "owner",
+                    )
+                    .prefetch_related(
+                        "tags",
+                        "notes__user",
+                        "custom_fields__field",
+                        "versions",
+                        "barcodes",
+                        "versions__barcodes",
+                    )
                 )
                 total = documents.count()
                 rebuild_kwargs = {}
