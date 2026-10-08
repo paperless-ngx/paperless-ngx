@@ -17,6 +17,7 @@ from documents.models import PaperlessTask
 from documents.utils import IterWrapper
 from documents.utils import QuerySetStream
 from documents.utils import identity
+from documents.versioning import annotate_effective_content
 from documents.versioning import root_document_ids
 from paperless.config import AIConfig
 from paperless_ai.db import db_connection_released
@@ -444,10 +445,10 @@ def update_llm_index(
                 "Skipping LLM index update: migration check deferred; "
                 "will retry next run."
             )
-    documents = (
+    documents = annotate_effective_content(
         Document.objects.filter(root_document__isnull=True)
         .select_related("correspondent", "document_type", "storage_path")
-        .prefetch_related("tags", "notes", "custom_fields__field")
+        .prefetch_related("tags", "notes", "custom_fields__field"),
     )
     no_documents = not documents.exists()
 
@@ -694,7 +695,7 @@ def retrieve_similar_nodes(
     )
 
     query_text = truncate_embedding_query(
-        (document.title or "") + "\n" + (document.content or ""),
+        (document.title or "") + "\n" + (document.get_effective_content() or ""),
         chunk_size=config.llm_embedding_chunk_size,
     )
     # Hold the shared read lock for the whole retrieval so the connection is
