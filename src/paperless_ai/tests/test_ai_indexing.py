@@ -438,6 +438,31 @@ class TestLlmIndexVersions:
 
         assert set(indexed) == {str(root.pk)}
 
+    def test_rebuild_indexes_the_newest_versions_content(
+        self,
+        temp_llm_index_dir: Path,
+        mock_embed_model: FakeEmbedding,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A root document with a version
+        WHEN:
+            - The LLM index is rebuilt
+        THEN:
+            - The root's text for the index is the version's content, answered
+              from the query rather than a query per document
+        """
+        root = DocumentFactory(content="stale text")
+        DocumentFactory(root_document=root, version_index=1, content="latest text")
+        spy = mocker.spy(indexing, "build_document_node")
+
+        indexing.update_llm_index(rebuild=True)
+
+        indexed = spy.call_args.args[0]
+        assert indexed.pk == root.pk
+        assert indexed.effective_content == "latest text"
+
     def test_incremental_update_by_version_id_refreshes_the_root(
         self,
         temp_llm_index_dir: Path,
