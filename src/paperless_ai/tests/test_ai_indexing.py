@@ -389,6 +389,83 @@ def test_update_llm_index_partial_update(
 
 
 @pytest.mark.django_db
+class TestLlmIndexVersions:
+    """The LLM index holds root documents only: a version is indexed as its root."""
+
+    def test_add_or_update_document_indexes_a_version_as_its_root(
+        self,
+        temp_llm_index_dir: Path,
+        mock_embed_model: FakeEmbedding,
+    ) -> None:
+        """
+        GIVEN:
+            - A root document with a version
+        WHEN:
+            - The version is passed to llm_index_add_or_update_document
+        THEN:
+            - Only the root document is in the index
+        """
+        root = DocumentFactory(content="root content")
+        version = DocumentFactory(root_document=root, version_index=1)
+
+        indexing.llm_index_add_or_update_document(version)
+
+        with indexing.get_vector_store() as store:
+            indexed = store.get_modified_times()
+
+        assert set(indexed) == {str(root.pk)}
+
+    def test_rebuild_skips_versions(
+        self,
+        temp_llm_index_dir: Path,
+        mock_embed_model: FakeEmbedding,
+    ) -> None:
+        """
+        GIVEN:
+            - A root document with a version
+        WHEN:
+            - The LLM index is rebuilt
+        THEN:
+            - Only the root document is in the index
+        """
+        root = DocumentFactory()
+        DocumentFactory(root_document=root, version_index=1)
+
+        indexing.update_llm_index(rebuild=True)
+
+        with indexing.get_vector_store() as store:
+            indexed = store.get_modified_times()
+
+        assert set(indexed) == {str(root.pk)}
+
+    def test_incremental_update_by_version_id_refreshes_the_root(
+        self,
+        temp_llm_index_dir: Path,
+        mock_embed_model: FakeEmbedding,
+    ) -> None:
+        """
+        GIVEN:
+            - An indexed root document with a version whose root was modified since
+        WHEN:
+            - An incremental update is scoped to the version's id
+        THEN:
+            - The root's entry is refreshed and no entry exists for the version
+        """
+        root = DocumentFactory()
+        version = DocumentFactory(root_document=root, version_index=1)
+        indexing.update_llm_index(rebuild=True)
+        Document.objects.filter(pk=root.pk).update(modified=timezone.now())
+        root.refresh_from_db()
+
+        indexing.update_llm_index(document_ids=[version.pk])
+
+        with indexing.get_vector_store() as store:
+            indexed = store.get_modified_times()
+
+        assert indexed == {str(root.pk): root.modified.isoformat()}
+
+
+@pytest.mark.django_db
 def test_add_or_update_document_updates_existing_entry(
     temp_llm_index_dir: Path,
     real_document: Document,
@@ -637,6 +714,7 @@ class TestLlmIndexAddOrUpdateDocumentEmptyContent:
 
         doc = MagicMock(spec=Document)
         doc.id = 42
+        doc.root_document_id = None
         # Must not raise
         indexing.llm_index_add_or_update_document(doc)
 

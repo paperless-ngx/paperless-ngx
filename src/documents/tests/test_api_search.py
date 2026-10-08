@@ -1196,6 +1196,59 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         self.assertIn(d3.id, result_ids)
         self.assertNotIn(d4.id, result_ids)
 
+    def test_search_more_like_version_uses_its_root(self) -> None:
+        """
+        GIVEN:
+            - A document similar in content to a root document, and one that is not
+            - A version of the root document, which is never indexed
+        WHEN:
+            - API request for more like the version
+        THEN:
+            - The documents similar to the root are returned, not the version
+        """
+        indexed = {}
+        for name, title, content, day in (
+            ("root", "bank statement 1", "things i paid for in august", (2019, 3, 4)),
+            (
+                "similar",
+                "bank statement 3",
+                "things i paid for in september",
+                (2020, 7, 9),
+            ),
+            (
+                "other",
+                "Quarterly Report",
+                "quarterly revenue profit margin",
+                (2021, 11, 30),
+            ),
+        ):
+            with time_machine.travel(
+                timezone.make_aware(datetime.datetime(*day)),
+                tick=False,
+            ):
+                indexed[name] = DocumentFactory(
+                    title=title,
+                    content=content,
+                    created=datetime.date(*day),
+                    added=timezone.make_aware(datetime.datetime(*day)),
+                )
+        version = DocumentFactory(
+            root_document=indexed["root"],
+            version_index=1,
+            content="things i paid for in august",
+        )
+        backend = get_backend()
+        for document in indexed.values():
+            backend.add_or_update(document)
+
+        response = self.client.get(f"/api/documents/?more_like_id={version.id}")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        result_ids = [r["id"] for r in response.data["results"]]
+        self.assertIn(indexed["similar"].id, result_ids)
+        self.assertNotIn(indexed["other"].id, result_ids)
+        self.assertNotIn(version.id, result_ids)
+
     def test_more_like_requires_id_of_existing_document(self) -> None:
         """
         GIVEN:

@@ -17,6 +17,7 @@ from documents.models import PaperlessTask
 from documents.utils import IterWrapper
 from documents.utils import QuerySetStream
 from documents.utils import identity
+from documents.versioning import root_document_ids
 from paperless.config import AIConfig
 from paperless_ai.db import db_connection_released
 from paperless_ai.embedding import build_llm_index_text
@@ -443,11 +444,11 @@ def update_llm_index(
                 "Skipping LLM index update: migration check deferred; "
                 "will retry next run."
             )
-    documents = Document.objects.select_related(
-        "correspondent",
-        "document_type",
-        "storage_path",
-    ).prefetch_related("tags", "notes", "custom_fields__field")
+    documents = (
+        Document.objects.filter(root_document__isnull=True)
+        .select_related("correspondent", "document_type", "storage_path")
+        .prefetch_related("tags", "notes", "custom_fields__field")
+    )
     no_documents = not documents.exists()
 
     # Fast exit before touching config: nothing to index and no existing index.
@@ -483,7 +484,7 @@ def update_llm_index(
             msg = "LLM index rebuilt successfully."
         else:
             scoped_documents = (
-                documents.filter(id__in=document_ids)
+                documents.filter(id__in=root_document_ids(document_ids))
                 if document_ids is not None
                 else documents
             )
@@ -510,7 +511,12 @@ def update_llm_index(
 
 
 def llm_index_add_or_update_document(document: Document):
-    """Add or atomically replace a document's chunks in the index."""
+    """
+    Add or atomically replace a document's chunks in the index. Only root
+    documents are indexed, so a version is indexed as its root document.
+    """
+    if document.root_document_id is not None:
+        document = document.root_document
     config = AIConfig()
     new_nodes = build_document_node(
         document,

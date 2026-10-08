@@ -293,6 +293,80 @@ class TestAddOrUpdateIds:
         assert backend.search_ids("updated", user=None) == [doc.pk]
 
 
+class TestVersionsAreIndexedAsTheirRoot:
+    """Only root documents are indexed, with their effective content, so
+    every write path that is handed a version indexes its root instead."""
+
+    @staticmethod
+    def _root_with_version() -> tuple[Document, Document]:
+        root = DocumentFactory(title="Statement", content="stale text")
+        version = DocumentFactory(
+            title="Statement",
+            content="latest text",
+            root_document=root,
+            version_index=1,
+        )
+        return root, version
+
+    def test_add_or_update_indexes_the_root_of_a_version(
+        self,
+        backend: TantivyBackend,
+    ) -> None:
+        """
+        GIVEN:
+            - A root document with a version
+        WHEN:
+            - The version is passed to add_or_update
+        THEN:
+            - The root is indexed with the version's text, and the version is not
+        """
+        root, version = self._root_with_version()
+
+        backend.add_or_update(version)
+
+        assert backend.search_ids("latest", user=None) == [root.pk]
+        assert backend.search_ids("stale", user=None) == []
+
+    def test_add_or_update_ids_indexes_each_root_once(
+        self,
+        backend: TantivyBackend,
+    ) -> None:
+        """
+        GIVEN:
+            - A root document with a version
+        WHEN:
+            - Both ids are passed to add_or_update_ids
+        THEN:
+            - The root is indexed once and the version is not indexed
+        """
+        root, version = self._root_with_version()
+
+        with backend.batch_update() as batch:
+            batch.add_or_update_ids([version.pk, root.pk])
+
+        assert backend.search_ids("Statement", user=None) == [root.pk]
+        assert backend.search_ids("latest", user=None) == [root.pk]
+
+    def test_add_or_update_ids_resolves_a_lone_version(
+        self,
+        backend: TantivyBackend,
+    ) -> None:
+        """
+        GIVEN:
+            - A root document with a version
+        WHEN:
+            - Only the version's id is passed to add_or_update_ids
+        THEN:
+            - The root is indexed
+        """
+        root, version = self._root_with_version()
+
+        with backend.batch_update() as batch:
+            batch.add_or_update_ids([version.pk])
+
+        assert backend.search_ids("latest", user=None) == [root.pk]
+
+
 class TestSearch:
     """Test search query parsing and matching via search_ids."""
 

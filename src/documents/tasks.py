@@ -490,23 +490,20 @@ def update_document_content_maybe_archive_file(
                     shutil.move(thumbnail, document.thumbnail_path)
 
             document.refresh_from_db()
-            root_document = (
-                document.root_document if document.root_document_id else document
-            )
             logger.info(
-                f"Updating index for document {root_document.pk} ({document.archive_checksum})",
+                f"Updating index for document {document_id} ({document.archive_checksum})",
             )
             from documents.search import get_backend
 
-            get_backend().add_or_update(root_document)
+            get_backend().add_or_update(document)
 
             ai_config = AIConfig()
             if ai_config.llm_index_enabled:
-                llm_index_add_or_update_document(root_document)
+                llm_index_add_or_update_document(document)
 
             clear_document_caches(document.pk)
-            if root_document.pk != document.pk:
-                clear_document_caches(root_document.pk)
+            if document.root_document_id is not None:
+                clear_document_caches(document.root_document_id)
 
         except Exception:
             logger.exception(
