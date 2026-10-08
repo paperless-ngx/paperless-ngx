@@ -13,8 +13,14 @@ from celery import group
 from celery import shared_task
 from django.conf import settings
 from django.db import transaction
+from django.db.models import Case
+from django.db.models import F
 from django.db.models import Max
+from django.db.models import OuterRef
 from django.db.models import Q
+from django.db.models import Subquery
+from django.db.models import When
+from django.db.models.functions import Coalesce
 from django.utils import timezone
 
 from documents.data_models import ConsumableDocument
@@ -36,6 +42,7 @@ from documents.tasks import remove_document_from_index
 from documents.tasks import update_document_content_maybe_archive_file
 from documents.versioning import get_latest_version_for_root
 from documents.versioning import get_root_document
+from documents.versioning import versions_newest_first
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -412,12 +419,24 @@ def reprocess(doc_ids: list[int], *, remote_ocr: bool = False) -> Literal["OK"]:
     A root document with versions reprocesses its latest version, which is the
     file whose content, archive and thumbnail are shown for it.
     """
-    for doc in Document.objects.select_related("root_document").filter(
-        id__in=doc_ids,
-    ):
-        pair = _resolve_root_and_source_doc(doc)
+    latest_version = versions_newest_first(
+        Document.objects.filter(root_document=OuterRef("pk")),
+    ).values("id")[:1]
+    source_ids = (
+        Document.objects.filter(id__in=doc_ids)
+        .annotate(
+            source_id=Case(
+                When(root_document__isnull=False, then=F("id")),
+                default=Coalesce(Subquery(latest_version), F("id")),
+            ),
+        )
+        .order_by()
+        .values_list("source_id", flat=True)
+        .distinct()
+    )
+    for source_id in source_ids:
         update_document_content_maybe_archive_file.apply_async(
-            kwargs={"document_id": pair.source_doc.id, "remote_ocr": remote_ocr},
+            kwargs={"document_id": source_id, "remote_ocr": remote_ocr},
             headers={"trigger_source": PaperlessTask.TriggerSource.MANUAL},
         )
 

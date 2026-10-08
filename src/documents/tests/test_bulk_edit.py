@@ -2060,3 +2060,28 @@ class TestBulkEditReprocess:
         bulk_edit.reprocess([older.id])
 
         assert self._queued_ids(mock_task) == [older.id]
+
+    def test_reprocess_root_and_latest_version_dispatches_once(
+        self,
+        mock_task: mock.MagicMock,
+    ) -> None:
+        """
+        GIVEN:
+            - A root document with two versions, the latest created on a
+              different date than the root
+        WHEN:
+            - reprocess is called with both the root and its latest version
+        THEN:
+            - The latest version is reprocessed only once
+        """
+        root = DocumentFactory(created=date(2024, 1, 1))
+        DocumentFactory(root_document=root, version_index=1)
+        latest = DocumentFactory(
+            root_document=root,
+            version_index=2,
+            created=date(2025, 1, 1),
+        )
+
+        bulk_edit.reprocess([root.id, latest.id])
+
+        assert self._queued_ids(mock_task) == [latest.id]
