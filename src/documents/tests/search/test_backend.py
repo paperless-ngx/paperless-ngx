@@ -1,4 +1,6 @@
 import json
+import logging
+from datetime import date
 from pathlib import Path
 
 import pytest
@@ -902,6 +904,79 @@ class TestRebuild:
             search_mode=SearchMode.QUERY,
         )
         assert ids == [doc.pk]
+
+
+class TestCreatedDateOutOfRange:
+    """The index stores dates as nanosecond i64 values (1677-09-22 to 2262-04-11).
+
+    A document whose created date falls outside that window must not abort
+    indexing: it is indexed without a created value and a warning names it.
+    """
+
+    @pytest.mark.parametrize(
+        ("created", "expected_warnings"),
+        [
+            pytest.param(date(1677, 9, 22), 0, id="first-representable-day"),
+            pytest.param(date(2262, 4, 11), 0, id="last-representable-day"),
+            pytest.param(date(1677, 9, 21), 1, id="day-before-first"),
+            pytest.param(date(2262, 4, 12), 1, id="day-after-last"),
+            pytest.param(date(16, 8, 30), 1, id="two-digit-year-read-as-year-16"),
+            pytest.param(date(9999, 12, 31), 1, id="max-python-date"),
+        ],
+    )
+    def test_add_or_update_indexes_document_and_warns_when_out_of_range(
+        self,
+        backend: TantivyBackend,
+        caplog: pytest.LogCaptureFixture,
+        created: date,
+        expected_warnings: int,
+    ) -> None:
+        """
+        GIVEN:
+            - A document with a created date at or beyond the index date limits
+        WHEN:
+            - The document is added to the index
+        THEN:
+            - The document is indexed and searchable either way
+            - A warning naming the document is logged only for out-of-range dates
+        """
+        doc = DocumentFactory(created=created, content="boundarycontent")
+
+        with caplog.at_level(logging.WARNING, logger="paperless.search"):
+            backend.add_or_update(doc)
+
+        assert backend.search_ids("boundarycontent", user=None) == [doc.pk]
+        warnings = [r for r in caplog.records if r.levelno == logging.WARNING]
+        assert len(warnings) == expected_warnings
+        if expected_warnings:
+            assert f"Document {doc.pk}" in warnings[0].getMessage()
+
+    def test_rebuild_continues_past_out_of_range_document(
+        self,
+        backend: TantivyBackend,
+        caplog: pytest.LogCaptureFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A document with an unrepresentable created date among valid ones
+        WHEN:
+            - The index is rebuilt
+        THEN:
+            - Rebuild completes and every document is searchable
+            - A warning names the offending document
+        """
+        good = DocumentFactory(created=date(2016, 8, 30), content="rebuildcontent")
+        bad = DocumentFactory(created=date(16, 8, 30), content="rebuildcontent")
+
+        with caplog.at_level(logging.WARNING, logger="paperless.search"):
+            backend.rebuild(Document.objects.all())
+
+        assert sorted(backend.search_ids("rebuildcontent", user=None)) == sorted(
+            [good.pk, bad.pk],
+        )
+        warnings = [r for r in caplog.records if r.levelno == logging.WARNING]
+        assert len(warnings) == 1
+        assert f"Document {bad.pk}" in warnings[0].getMessage()
 
 
 class TestAutocomplete:
