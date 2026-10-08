@@ -174,6 +174,7 @@ from documents.permissions import TrashPermissions
 from documents.permissions import ViewDocumentsPermissions
 from documents.permissions import annotate_document_count_by_ids
 from documents.permissions import annotate_document_count_for_related_queryset
+from documents.permissions import documents_without_permitted_root
 from documents.permissions import get_document_count_filter_for_user
 from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import has_global_statistics_permission
@@ -1550,13 +1551,16 @@ class DocumentViewSet(
     )
     def suggestions(self, request, pk=None):
         doc = get_object_or_404(
-            Document.objects.select_related("owner").prefetch_related("versions"),
+            Document.objects.select_related(
+                "owner",
+                "root_document__owner",
+            ).prefetch_related("versions"),
             pk=pk,
         )
         if request.user is not None and not has_perms_owner_aware(
             request.user,
             "change_document",
-            doc,
+            get_root_document(doc),
         ):
             return HttpResponseForbidden("Insufficient permissions")
 
@@ -1610,13 +1614,16 @@ class DocumentViewSet(
     @method_decorator(cache_control(no_cache=True))
     def ai_suggestions(self, request, pk=None):
         doc = get_object_or_404(
-            Document.objects.select_related("owner").prefetch_related("versions"),
+            Document.objects.select_related(
+                "owner",
+                "root_document__owner",
+            ).prefetch_related("versions"),
             pk=pk,
         )
         if request.user is not None and not has_perms_owner_aware(
             request.user,
             "change_document",
-            doc,
+            get_root_document(doc),
         ):
             return HttpResponseForbidden("Insufficient permissions")
 
@@ -1856,15 +1863,20 @@ class DocumentViewSet(
         currentUser = request.user
         try:
             doc = (
-                Document.objects.select_related("owner")
+                Document.objects.select_related("owner", "root_document__owner")
                 .prefetch_related("notes")
-                .only("pk", "owner__id")
+                .only(
+                    "pk",
+                    "owner__id",
+                    "root_document__id",
+                    "root_document__owner__id",
+                )
                 .get(pk=pk)
             )
             if currentUser is not None and not has_perms_owner_aware(
                 currentUser,
                 "view_document",
-                doc,
+                get_root_document(doc),
             ):
                 return HttpResponseForbidden("Insufficient permissions to view notes")
         except Document.DoesNotExist:
@@ -1886,7 +1898,7 @@ class DocumentViewSet(
                 if currentUser is not None and not has_perms_owner_aware(
                     currentUser,
                     "change_document",
-                    doc,
+                    get_root_document(doc),
                 ):
                     return HttpResponseForbidden(
                         "Insufficient permissions to create notes",
@@ -1929,7 +1941,7 @@ class DocumentViewSet(
             if currentUser is not None and not has_perms_owner_aware(
                 currentUser,
                 "change_document",
-                doc,
+                get_root_document(doc),
             ):
                 return HttpResponseForbidden("Insufficient permissions to delete notes")
 
@@ -1973,11 +1985,13 @@ class DocumentViewSet(
     def share_links(self, request, pk=None):
         currentUser = request.user
         try:
-            doc = Document.objects.select_related("owner").get(pk=pk)
+            doc = Document.objects.select_related("owner", "root_document__owner").get(
+                pk=pk,
+            )
             if currentUser is not None and not has_perms_owner_aware(
                 currentUser,
                 "change_document",
-                doc,
+                get_root_document(doc),
             ):
                 return HttpResponseForbidden(
                     "Insufficient permissions to add share link",
@@ -2008,10 +2022,11 @@ class DocumentViewSet(
         if not settings.AUDIT_LOG_ENABLED:
             return HttpResponseBadRequest("Audit log is disabled")
         try:
-            doc = Document.objects.get(pk=pk)
+            doc = Document.objects.select_related("root_document__owner").get(pk=pk)
+            root_doc = get_root_document(doc)
             if not request.user.has_perm("auditlog.view_logentry") or (
-                doc.owner is not None
-                and doc.owner != request.user
+                root_doc.owner is not None
+                and root_doc.owner != request.user
                 and not request.user.is_superuser
             ):
                 return HttpResponseForbidden(
@@ -2102,9 +2117,7 @@ class DocumentViewSet(
         documents = Document.objects.filter(pk__in=document_ids)
         if (
             request.user is not None
-            and documents.exclude(
-                pk__in=permitted_document_ids(request.user),
-            ).exists()
+            and documents_without_permitted_root(documents, request.user).exists()
         ):
             return HttpResponseForbidden("Insufficient permissions")
 
@@ -2430,11 +2443,17 @@ class ChatStreamingView(GenericAPIView[Any]):
 
         if doc_id:
             try:
-                document = Document.objects.get(id=doc_id)
+                document = Document.objects.select_related(
+                    "root_document__owner",
+                ).get(id=doc_id)
             except Document.DoesNotExist:
                 return HttpResponseBadRequest("Document not found")
 
-            if not has_perms_owner_aware(request.user, "view_document", document):
+            if not has_perms_owner_aware(
+                request.user,
+                "view_document",
+                get_root_document(document),
+            ):
                 return HttpResponseForbidden("Insufficient permissions")
 
             documents = Document.objects.filter(pk=document.pk)
@@ -3605,10 +3624,11 @@ class SelectionDataView(DocumentSelectionMixin, GenericAPIView[Any]):
             user=request.user,
             validated_data=serializer.validated_data,
         )
-        permitted_documents = Document.objects.filter(
-            id__in=permitted_document_ids(request.user),
-        )
-        if permitted_documents.filter(pk__in=ids).count() != len(ids):
+        documents = Document.objects.filter(pk__in=ids)
+        if (
+            documents.count() != len(ids)
+            or documents_without_permitted_root(documents, request.user).exists()
+        ):
             return HttpResponseForbidden("Insufficient permissions")
 
         correspondents = Correspondent.objects.annotate(
@@ -4790,19 +4810,23 @@ class ShareLinkBundleViewSet(PassUserMixin, ModelViewSet[ShareLinkBundle]):
                 },
             )
 
-        documents = list(documents_qs)
-        permitted_ids = set(permitted_document_ids(request.user))
-        for document in documents:
-            if document.pk not in permitted_ids:
-                raise ValidationError(
-                    {
-                        "document_ids": _(
-                            "Insufficient permissions to share document %(id)s.",
-                        )
-                        % {"id": document.pk},
-                    },
-                )
+        denied_id = (
+            documents_without_permitted_root(documents_qs, request.user)
+            .order_by("pk")
+            .values_list("pk", flat=True)
+            .first()
+        )
+        if denied_id is not None:
+            raise ValidationError(
+                {
+                    "document_ids": _(
+                        "Insufficient permissions to share document %(id)s.",
+                    )
+                    % {"id": denied_id},
+                },
+            )
 
+        documents = list(documents_qs)
         document_map = {document.pk: document for document in documents}
         ordered_documents = [document_map[doc_id] for doc_id in document_ids]
 
@@ -5587,6 +5611,23 @@ class TrashView(ListModelMixin, PassUserMixin):
     class _TrashPermittedObjectsFilter(PermittedObjectsFilter):
         include_granted = False
 
+        def filter_queryset(self, request, queryset, view):
+            if request.user.is_superuser or not request.user.is_active:
+                return super().filter_queryset(request, queryset, view)
+
+            # A version belongs to whoever owns its root
+            def owned_or_unowned(prefix: str) -> Q:
+                return Q(**{f"{prefix}owner": request.user}) | Q(
+                    **{f"{prefix}owner__isnull": True},
+                )
+
+            return queryset.filter(
+                (Q(root_document__isnull=True) & owned_or_unowned(""))
+                | (
+                    Q(root_document__isnull=False) & owned_or_unowned("root_document__")
+                ),
+            )
+
     filter_backends = (_TrashPermittedObjectsFilter,)
     pagination_class = StandardPagination
 
@@ -5616,12 +5657,11 @@ class TrashView(ListModelMixin, PassUserMixin):
             if doc_ids is not None
             else self.filter_queryset(self.get_queryset()).all()
         )
-        if docs.exclude(
-            pk__in=permitted_document_ids(
-                request.user,
-                perm="delete_document",
-                include_deleted=True,
-            ),
+        if documents_without_permitted_root(
+            docs,
+            request.user,
+            perm="delete_document",
+            include_deleted=True,
         ).exists():
             return HttpResponseForbidden("Insufficient permissions")
         action = serializer.validated_data.get("action")
