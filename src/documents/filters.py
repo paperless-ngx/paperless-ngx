@@ -50,6 +50,7 @@ from documents.models import ShareLink
 from documents.models import ShareLinkBundle
 from documents.models import StoragePath
 from documents.models import Tag
+from documents.permissions import annotate_authorizing_fields
 from documents.permissions import permitted_document_ids
 from documents.permissions import permitted_object_ids
 from documents.versioning import annotate_effective_content
@@ -1075,6 +1076,9 @@ class PermittedObjectsFilter(BaseFilterBackend):
 
     include_granted: bool = True
     perm_codename: str | None = None
+    # A self-referencing foreign key whose target authorizes a row, so a row is
+    # judged by its parent's owner and grants (``Document.root_document``).
+    parent_field: str | None = None
 
     def filter_queryset(self, request, queryset, view):
         # Before the superuser and owner-only paths, neither of which consults
@@ -1086,11 +1090,23 @@ class PermittedObjectsFilter(BaseFilterBackend):
         if request.user.is_superuser:
             return queryset
         if not self.include_granted:
-            return queryset.filter(Q(owner=request.user) | Q(owner__isnull=True))
+            owner_field = "owner"
+            if self.parent_field is not None:
+                queryset = annotate_authorizing_fields(queryset, self.parent_field)
+                owner_field = "authorizing_owner"
+            return queryset.filter(
+                Q(**{owner_field: request.user.pk})
+                | Q(**{f"{owner_field}__isnull": True}),
+            )
         model = queryset.model
         perm = self.perm_codename or f"view_{model._meta.model_name}"
         return queryset.filter(
-            id__in=permitted_object_ids(request.user, model, perm),
+            id__in=permitted_object_ids(
+                request.user,
+                model,
+                perm,
+                parent_field=self.parent_field,
+            ),
         )
 
 

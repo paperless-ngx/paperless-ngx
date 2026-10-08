@@ -389,14 +389,7 @@ def permitted_object_ids(
     owner_field, key_field = "owner", "pk"
     if parent_field is not None:
         owner_field, key_field = "authorizing_owner", "authorizing_id"
-        base_qs = base_qs.annotate(
-            authorizing_id=Coalesce(f"{parent_field}_id", "id"),
-            authorizing_owner=Case(
-                When(**{f"{parent_field}_id__isnull": True}, then=F("owner_id")),
-                default=F(f"{parent_field}__owner_id"),
-                output_field=IntegerField(),
-            ),
-        )
+        base_qs = annotate_authorizing_fields(base_qs, parent_field)
     unowned = Q(**{f"{owner_field}__isnull": True})
 
     if user is None or not getattr(user, "is_authenticated", False):
@@ -447,6 +440,26 @@ def permitted_object_ids(
 
 
 ModelT = TypeVar("ModelT", bound=Model)
+
+
+def annotate_authorizing_fields(
+    queryset: QuerySet[ModelT],
+    parent_field: str,
+) -> QuerySet[ModelT]:
+    """
+    Annotate each row with ``authorizing_id`` and ``authorizing_owner``: the id
+    and owner of the row that authorizes it. A row with a parent (the
+    self-referencing foreign key ``parent_field``) is authorized by its parent,
+    any other row by itself.
+    """
+    return queryset.annotate(
+        authorizing_id=Coalesce(f"{parent_field}_id", "id"),
+        authorizing_owner=Case(
+            When(**{f"{parent_field}_id__isnull": True}, then=F("owner_id")),
+            default=F(f"{parent_field}__owner_id"),
+            output_field=IntegerField(),
+        ),
+    )
 
 
 def user_is_unrestricted(user: User | None) -> bool:
