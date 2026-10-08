@@ -1173,3 +1173,27 @@ class TestVersionActionPermissions(DirectoriesMixin, APITestCase):
         self.version.save(update_fields=["owner"])
         response = self.client.get(f"/api/documents/{self.version.pk}/history/")
         self.assertEqual(response.status_code, 200)
+
+    def test_selection_data_rejects_stale_version_ownership(self):
+        for owner in (None, self.user):
+            self.version.owner = owner
+            self.version.save(update_fields=["owner"])
+            with self.subTest(owner=owner):
+                response = self.client.post(
+                    "/api/documents/selection_data/",
+                    {"documents": [self.version.pk]},
+                    format="json",
+                )
+                self.assertEqual(response.status_code, 403)
+
+    def test_selection_data_allows_private_version_of_permitted_root(self):
+        self.version.owner = UserFactory()
+        self.version.save(update_fields=["owner"])
+        grant_object(self.user, self.root, "view_document")
+        other = DocumentFactory(owner=self.user)
+        response = self.client.post(
+            "/api/documents/selection_data/",
+            {"documents": [self.version.pk, other.pk]},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 200)

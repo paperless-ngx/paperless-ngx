@@ -3624,8 +3624,11 @@ class SelectionDataView(DocumentSelectionMixin, GenericAPIView[Any]):
             user=request.user,
             validated_data=serializer.validated_data,
         )
-        permitted_documents = Document.objects.filter(
-            id__in=permitted_document_ids(request.user),
+        # Versions are authorized by their root document
+        permitted_documents = Document.objects.annotate(
+            root_id=Coalesce("root_document_id", "id"),
+        ).filter(
+            root_id__in=permitted_document_ids(request.user),
         )
         if permitted_documents.filter(pk__in=ids).count() != len(ids):
             return HttpResponseForbidden("Insufficient permissions")
