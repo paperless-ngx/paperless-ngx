@@ -14,6 +14,7 @@ from django.db.models import QuerySet
 from django.db.models import Value
 from django.db.models import When
 from django.db.models.functions import Cast
+from django.db.models.functions import Coalesce
 from guardian.core import ObjectPermissionChecker
 from guardian.models import GroupObjectPermission
 from guardian.models import UserObjectPermission
@@ -472,6 +473,29 @@ def permitted_document_ids(
     ``get_objects_for_user`` to keep the subquery small and index-friendly.
     """
     return permitted_object_ids(user, Document, perm, include_deleted=include_deleted)
+
+
+def documents_without_permitted_root(
+    documents: QuerySet[Document],
+    user: User | None,
+    *,
+    perm: str = "view_document",
+    include_deleted: bool = False,
+) -> QuerySet[Document]:
+    """
+    The documents the user lacks ``perm`` on. Versions are authorized by their
+    root document, so a version's own owner is ignored. A single query, without
+    loading the documents or joining the root.
+    """
+    return documents.annotate(
+        root_id=Coalesce("root_document_id", "id"),
+    ).exclude(
+        root_id__in=permitted_document_ids(
+            user,
+            perm=perm,
+            include_deleted=include_deleted,
+        ),
+    )
 
 
 def get_document_count_filter_for_user(user, related_name: str = "documents"):

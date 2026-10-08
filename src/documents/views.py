@@ -174,6 +174,7 @@ from documents.permissions import TrashPermissions
 from documents.permissions import ViewDocumentsPermissions
 from documents.permissions import annotate_document_count_by_ids
 from documents.permissions import annotate_document_count_for_related_queryset
+from documents.permissions import documents_without_permitted_root
 from documents.permissions import get_document_count_filter_for_user
 from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import has_global_statistics_permission
@@ -2113,13 +2114,12 @@ class DocumentViewSet(
         message = validated_data.get("message")
         use_archive_version = validated_data.get("use_archive_version", True)
 
-        documents = Document.objects.filter(pk__in=document_ids).select_related(
-            "root_document__owner",
-        )
-        if request.user is not None:
-            permitted_ids = set(permitted_document_ids(request.user))
-            if any(get_root_document(doc).pk not in permitted_ids for doc in documents):
-                return HttpResponseForbidden("Insufficient permissions")
+        documents = Document.objects.filter(pk__in=document_ids)
+        if (
+            request.user is not None
+            and documents_without_permitted_root(documents, request.user).exists()
+        ):
+            return HttpResponseForbidden("Insufficient permissions")
 
         try:
             attachments: list[EmailAttachment] = []
@@ -3624,13 +3624,11 @@ class SelectionDataView(DocumentSelectionMixin, GenericAPIView[Any]):
             user=request.user,
             validated_data=serializer.validated_data,
         )
-        # Versions are authorized by their root document
-        permitted_documents = Document.objects.annotate(
-            root_id=Coalesce("root_document_id", "id"),
-        ).filter(
-            root_id__in=permitted_document_ids(request.user),
-        )
-        if permitted_documents.filter(pk__in=ids).count() != len(ids):
+        documents = Document.objects.filter(pk__in=ids)
+        if (
+            documents.count() != len(ids)
+            or documents_without_permitted_root(documents, request.user).exists()
+        ):
             return HttpResponseForbidden("Insufficient permissions")
 
         correspondents = Correspondent.objects.annotate(
@@ -4799,7 +4797,6 @@ class ShareLinkBundleViewSet(PassUserMixin, ModelViewSet[ShareLinkBundle]):
         document_ids = serializer.validated_data["document_ids"]
         documents_qs = Document.objects.filter(pk__in=document_ids).select_related(
             "owner",
-            "root_document__owner",
         )
         found_ids = set(documents_qs.values_list("pk", flat=True))
         missing = sorted(set(document_ids) - found_ids)
@@ -4813,19 +4810,23 @@ class ShareLinkBundleViewSet(PassUserMixin, ModelViewSet[ShareLinkBundle]):
                 },
             )
 
-        documents = list(documents_qs)
-        permitted_ids = set(permitted_document_ids(request.user))
-        for document in documents:
-            if get_root_document(document).pk not in permitted_ids:
-                raise ValidationError(
-                    {
-                        "document_ids": _(
-                            "Insufficient permissions to share document %(id)s.",
-                        )
-                        % {"id": document.pk},
-                    },
-                )
+        denied_id = (
+            documents_without_permitted_root(documents_qs, request.user)
+            .order_by("pk")
+            .values_list("pk", flat=True)
+            .first()
+        )
+        if denied_id is not None:
+            raise ValidationError(
+                {
+                    "document_ids": _(
+                        "Insufficient permissions to share document %(id)s.",
+                    )
+                    % {"id": denied_id},
+                },
+            )
 
+        documents = list(documents_qs)
         document_map = {document.pk: document for document in documents}
         ordered_documents = [document_map[doc_id] for doc_id in document_ids]
 
@@ -5656,18 +5657,12 @@ class TrashView(ListModelMixin, PassUserMixin):
             if doc_ids is not None
             else self.filter_queryset(self.get_queryset()).all()
         )
-        # Versions are authorized by their root document
-        if (
-            docs.annotate(root_id=Coalesce("root_document_id", "id"))
-            .exclude(
-                root_id__in=permitted_document_ids(
-                    request.user,
-                    perm="delete_document",
-                    include_deleted=True,
-                ),
-            )
-            .exists()
-        ):
+        if documents_without_permitted_root(
+            docs,
+            request.user,
+            perm="delete_document",
+            include_deleted=True,
+        ).exists():
             return HttpResponseForbidden("Insufficient permissions")
         action = serializer.validated_data.get("action")
         if action == "restore":
