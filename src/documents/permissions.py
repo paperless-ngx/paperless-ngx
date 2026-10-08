@@ -6,9 +6,13 @@ from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Case
+from django.db.models import CharField
 from django.db.models import Count
+from django.db.models import Exists
+from django.db.models import F
 from django.db.models import IntegerField
 from django.db.models import Model
+from django.db.models import OuterRef
 from django.db.models import Q
 from django.db.models import QuerySet
 from django.db.models import Value
@@ -349,6 +353,7 @@ def permitted_object_ids(
     perm: str,
     *,
     include_deleted: bool = False,
+    parent_field: str | None = None,
 ) -> QuerySet[int]:
     """
     Generic version of ``permitted_document_ids`` for any model with an
@@ -357,6 +362,20 @@ def permitted_object_ids(
     soft-delete pattern (currently only ``Document``); for every other model
     it is accepted but has no effect, since those models have no soft-delete
     concept.
+
+    ``parent_field`` names a self-referencing foreign key whose target
+    authorizes the row (``Document.root_document``). A row with a parent is
+    visible exactly when its parent is, judged by the parent's owner and
+    grants, so the row's own owner and grants are ignored.
+
+    Guardian stores ``object_pk`` as a string, so each grant is an ``EXISTS``
+    keyed on the row's id cast to a string, which can use guardian's
+    (user, permission, object_pk) unique index. Casting every ``object_pk`` to
+    an integer for an ``id IN (...)`` is not indexable, and MariaDB cannot
+    materialize it inside the owner ``OR``, so it re-scans the user's grants
+    for every row. The user's groups are matched with an ``IN`` subquery
+    rather than a join through the membership table, which SQLite plans badly
+    once the grant tables grow.
     """
     has_soft_delete = hasattr(model, "global_objects")
     manager = (
@@ -364,8 +383,21 @@ def permitted_object_ids(
     )
     base_qs = manager.all().only("id", "owner")
 
+    owner_field, key_field = "owner", "pk"
+    if parent_field is not None:
+        owner_field, key_field = "authorizing_owner", "authorizing_id"
+        base_qs = base_qs.annotate(
+            authorizing_id=Coalesce(f"{parent_field}_id", "id"),
+            authorizing_owner=Case(
+                When(**{f"{parent_field}_id__isnull": True}, then=F("owner_id")),
+                default=F(f"{parent_field}__owner_id"),
+                output_field=IntegerField(),
+            ),
+        )
+    unowned = Q(**{f"{owner_field}__isnull": True})
+
     if user is None or not getattr(user, "is_authenticated", False):
-        return base_qs.filter(owner__isnull=True).values_list("id", flat=True)
+        return base_qs.filter(unowned).values_list("id", flat=True)
 
     # Deactivated users get nothing, deactivated superusers included, so this
     # has to come before the superuser shortcut. guardian's
@@ -389,20 +421,24 @@ def permitted_object_ids(
         "permission__content_type": content_type,
     }
 
-    user_perm_ids = (
-        UserObjectPermission.objects.filter(user=user, **perm_filter)
-        .annotate(object_pk_int=Cast("object_pk", IntegerField()))
-        .values_list("object_pk_int", flat=True)
+    key_as_text = Cast(OuterRef(key_field), CharField(max_length=64))
+    granted_to_user = Exists(
+        UserObjectPermission.objects.filter(
+            user=user,
+            object_pk=key_as_text,
+            **perm_filter,
+        ),
     )
-    group_perm_ids = (
-        GroupObjectPermission.objects.filter(group__user=user, **perm_filter)
-        .annotate(object_pk_int=Cast("object_pk", IntegerField()))
-        .values_list("object_pk_int", flat=True)
+    granted_to_group = Exists(
+        GroupObjectPermission.objects.filter(
+            group_id__in=user.groups.values("id"),
+            object_pk=key_as_text,
+            **perm_filter,
+        ),
     )
-    permitted_ids = user_perm_ids.union(group_perm_ids)
 
     return base_qs.filter(
-        Q(owner=user) | Q(owner__isnull=True) | Q(id__in=permitted_ids),
+        Q(**{owner_field: user.pk}) | unowned | granted_to_user | granted_to_group,
     ).values_list("id", flat=True)
 
 
@@ -471,30 +507,16 @@ def permitted_document_ids(
     ``include_deleted=True`` for callers that need to check permission on
     soft-deleted documents (e.g. trash restore). This intentionally avoids
     ``get_objects_for_user`` to keep the subquery small and index-friendly.
-    """
-    return permitted_object_ids(user, Document, perm, include_deleted=include_deleted)
 
-
-def documents_without_permitted_root(
-    documents: QuerySet[Document],
-    user: User | None,
-    *,
-    perm: str = "view_document",
-    include_deleted: bool = False,
-) -> QuerySet[Document]:
+    A version is authorized by its root document, so a version's own owner and
+    grants never matter.
     """
-    The documents the user lacks ``perm`` on. Versions are authorized by their
-    root document, so a version's own owner is ignored. A single query, without
-    loading the documents or joining the root.
-    """
-    return documents.annotate(
-        root_id=Coalesce("root_document_id", "id"),
-    ).exclude(
-        root_id__in=permitted_document_ids(
-            user,
-            perm=perm,
-            include_deleted=include_deleted,
-        ),
+    return permitted_object_ids(
+        user,
+        Document,
+        perm,
+        include_deleted=include_deleted,
+        parent_field="root_document",
     )
 
 
