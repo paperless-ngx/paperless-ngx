@@ -30,6 +30,7 @@ from rest_framework.permissions import BasePermission
 from rest_framework.permissions import DjangoObjectPermissions
 
 from documents.models import Document
+from documents.versioning import get_root_document
 
 
 class PaperlessObjectPermissions(DjangoObjectPermissions):
@@ -676,7 +677,14 @@ def has_perms_owner_aware(user, perms, obj):
     single-object check still has many production callers. Several callers
     remain across ``documents/``, ``paperless_mail/``, and ``paperless_ai/``
     -- grep for this function name before removing it.
+
+    A document version is authorized by its root document, like in
+    ``permitted_document_ids``, so a version's own owner and grants never
+    matter. Fetch the root with ``select_related("root_document__owner")`` to
+    avoid extra queries.
     """
+    if isinstance(obj, Document):
+        obj = get_root_document(obj)
     checker = ObjectPermissionChecker(user)
     return obj.owner is None or obj.owner == user or checker.has_perm(perms, obj)
 
