@@ -7,6 +7,7 @@ import threading
 import time
 from datetime import UTC
 from datetime import datetime
+from datetime import timedelta
 from enum import StrEnum
 from itertools import islice
 from typing import TYPE_CHECKING
@@ -54,6 +55,19 @@ if TYPE_CHECKING:
     from documents.models import Document
 
 logger = logging.getLogger("paperless.search")
+
+# tantivy stores dates as signed 64-bit nanoseconds since the Unix epoch, which
+# covers 1677-09-21T00:12:43 to 2262-04-11T23:47:16 UTC
+_INDEX_DATE_NANOS_MIN: Final[int] = -(2**63)
+_INDEX_DATE_NANOS_MAX: Final[int] = 2**63 - 1
+_UNIX_EPOCH: Final[datetime] = datetime(1970, 1, 1, tzinfo=UTC)
+
+
+def _is_indexable_date(value: datetime) -> bool:
+    """Whether value, at whole-second precision, fits tantivy's date range."""
+    nanos = ((value - _UNIX_EPOCH) // timedelta(seconds=1)) * 1_000_000_000
+    return _INDEX_DATE_NANOS_MIN <= nanos <= _INDEX_DATE_NANOS_MAX
+
 
 _LOCK_TIMEOUT_SECONDS: Final[float] = 10.0  # per-attempt acquire timeout
 _LOCK_RETRY_ATTEMPTS: Final[int] = 4  # total attempts (1 initial + 3 retries)
@@ -628,7 +642,15 @@ class TantivyBackend:
             document.created.day,
             tzinfo=UTC,
         )
-        doc.add_date("created", created_date)
+        if _is_indexable_date(created_date):
+            doc.add_date("created", created_date)
+        else:
+            logger.warning(
+                "Document %s has a created date (%s) outside the range the search "
+                "index can store; it will be indexed without a created date",
+                document.pk,
+                document.created,
+            )
         doc.add_date("modified", document.modified)
         doc.add_date("added", document.added)
 
