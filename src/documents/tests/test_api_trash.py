@@ -6,6 +6,7 @@ from rest_framework.test import APITestCase
 
 from documents.models import Document
 from paperless_testing.dirs import DirectoriesMixin
+from paperless_testing.factories import DocumentFactory
 from paperless_testing.factories import UserFactory
 from paperless_testing.permissions import grant_all_global
 
@@ -293,32 +294,14 @@ class TestTrashAPI(DirectoriesMixin, APITestCase):
             - The version of the user's own document can be restored
         """
         user2 = UserFactory(username="user2")
-        other_root = Document.objects.create(
-            title="other root",
-            checksum="other-root",
-            mime_type="application/pdf",
-            owner=user2,
-        )
-        other_version = Document.objects.create(
-            title="other version",
-            checksum="other-version",
-            mime_type="application/pdf",
-            root_document=other_root,
+        other_version = DocumentFactory(
+            root_document=DocumentFactory(owner=user2),
             version_index=1,
         )
         other_version.delete()
-        own_root = Document.objects.create(
-            title="own root",
-            checksum="own-root",
-            mime_type="application/pdf",
-            owner=self.user,
-        )
-        own_version = Document.objects.create(
-            title="own version",
-            checksum="own-version",
-            mime_type="application/pdf",
+        own_version = DocumentFactory(
             owner=user2,
-            root_document=own_root,
+            root_document=DocumentFactory(owner=self.user),
             version_index=1,
         )
         own_version.delete()
