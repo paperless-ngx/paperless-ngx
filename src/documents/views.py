@@ -5602,23 +5602,7 @@ class TrashView(ListModelMixin, PassUserMixin):
 
     class _TrashPermittedObjectsFilter(PermittedObjectsFilter):
         include_granted = False
-
-        def filter_queryset(self, request, queryset, view):
-            if request.user.is_superuser or not request.user.is_active:
-                return super().filter_queryset(request, queryset, view)
-
-            # A version belongs to whoever owns its root
-            def owned_or_unowned(prefix: str) -> Q:
-                return Q(**{f"{prefix}owner": request.user}) | Q(
-                    **{f"{prefix}owner__isnull": True},
-                )
-
-            return queryset.filter(
-                (Q(root_document__isnull=True) & owned_or_unowned(""))
-                | (
-                    Q(root_document__isnull=False) & owned_or_unowned("root_document__")
-                ),
-            )
+        parent_field = "root_document"
 
     filter_backends = (_TrashPermittedObjectsFilter,)
     pagination_class = StandardPagination
