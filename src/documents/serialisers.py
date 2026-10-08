@@ -90,7 +90,6 @@ from documents.templating.utils import convert_format_str_to_template_format
 from documents.templating.workflows import validate_workflow_template
 from documents.validators import uri_validator
 from documents.validators import url_validator
-from documents.versioning import get_root_document
 from documents.versioning import has_prefetched_effective_content
 from documents.versioning import sort_versions_newest_first
 
@@ -2895,7 +2894,7 @@ class ShareLinkSerializer(OwnedObjectSerializer):
             and has_perms_owner_aware(
                 self.user,
                 "view_document",
-                get_root_document(document),
+                document,
             )
         ):
             return document

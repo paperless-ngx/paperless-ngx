@@ -1559,7 +1559,7 @@ class DocumentViewSet(
         if request.user is not None and not has_perms_owner_aware(
             request.user,
             "change_document",
-            get_root_document(doc),
+            doc,
         ):
             return HttpResponseForbidden("Insufficient permissions")
 
@@ -1622,7 +1622,7 @@ class DocumentViewSet(
         if request.user is not None and not has_perms_owner_aware(
             request.user,
             "change_document",
-            get_root_document(doc),
+            doc,
         ):
             return HttpResponseForbidden("Insufficient permissions")
 
@@ -1875,7 +1875,7 @@ class DocumentViewSet(
             if currentUser is not None and not has_perms_owner_aware(
                 currentUser,
                 "view_document",
-                get_root_document(doc),
+                doc,
             ):
                 return HttpResponseForbidden("Insufficient permissions to view notes")
         except Document.DoesNotExist:
@@ -1897,7 +1897,7 @@ class DocumentViewSet(
                 if currentUser is not None and not has_perms_owner_aware(
                     currentUser,
                     "change_document",
-                    get_root_document(doc),
+                    doc,
                 ):
                     return HttpResponseForbidden(
                         "Insufficient permissions to create notes",
@@ -1940,7 +1940,7 @@ class DocumentViewSet(
             if currentUser is not None and not has_perms_owner_aware(
                 currentUser,
                 "change_document",
-                get_root_document(doc),
+                doc,
             ):
                 return HttpResponseForbidden("Insufficient permissions to delete notes")
 
@@ -1990,7 +1990,7 @@ class DocumentViewSet(
             if currentUser is not None and not has_perms_owner_aware(
                 currentUser,
                 "change_document",
-                get_root_document(doc),
+                doc,
             ):
                 return HttpResponseForbidden(
                     "Insufficient permissions to add share link",
@@ -2451,7 +2451,7 @@ class ChatStreamingView(GenericAPIView[Any]):
             if not has_perms_owner_aware(
                 request.user,
                 "view_document",
-                get_root_document(document),
+                document,
             ):
                 return HttpResponseForbidden("Insufficient permissions")
 

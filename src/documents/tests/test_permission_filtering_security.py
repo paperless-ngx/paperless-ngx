@@ -18,6 +18,7 @@ from documents.models import Correspondent
 from documents.models import DocumentType
 from documents.models import StoragePath
 from documents.models import Tag
+from documents.permissions import has_perms_owner_aware
 from documents.permissions import permitted_document_ids
 from documents.permissions import permitted_object_ids
 from documents.permissions import restrict_queryset_to_visible
@@ -468,6 +469,92 @@ class TestPermittedDocumentIdsVersions:
             expected_visible=[root.pk, version.pk],
             expected_hidden=[],
         )
+
+
+@pytest.mark.django_db
+class TestHasPermsOwnerAwareVersions:
+    """
+    The single-object check agrees with permitted_document_ids: a version is
+    authorized by its root document.
+    """
+
+    @pytest.mark.parametrize(
+        ("root_owner", "version_owner", "expected"),
+        [
+            pytest.param(
+                "other",
+                "nobody",
+                False,
+                id="unowned-version-of-private-root",
+            ),
+            pytest.param("other", "user", False, id="own-version-of-private-root"),
+            pytest.param("user", "other", True, id="foreign-version-of-own-root"),
+            pytest.param("nobody", "other", True, id="private-version-of-unowned-root"),
+        ],
+    )
+    def test_version_follows_root_owner(
+        self,
+        root_owner: str,
+        version_owner: str,
+        *,
+        expected: bool,
+    ) -> None:
+        """
+        GIVEN:
+            - A root document and a version with differing owners
+        WHEN:
+            - The single-object check runs for the version
+        THEN:
+            - The version is allowed exactly when its root is
+        """
+        user = UserFactory()
+        owners = {"user": user, "other": UserFactory(), "nobody": None}
+        root = DocumentFactory(owner=owners[root_owner])
+        version = DocumentFactory(root_document=root, owner=owners[version_owner])
+
+        assert has_perms_owner_aware(user, "view_document", version) is expected
+        assert has_perms_owner_aware(user, "view_document", root) is expected
+
+    def test_grant_on_root_applies_and_grant_on_version_does_not(self) -> None:
+        """
+        GIVEN:
+            - A private root with a version, and a second private root with a version
+            - The user may change only the first root, and was granted the second
+              root's version directly
+        WHEN:
+            - The single-object check runs for each version
+        THEN:
+            - Only the first root's version is allowed
+        """
+        user = UserFactory()
+        shared_root = DocumentFactory(owner=UserFactory())
+        shared_version = DocumentFactory(root_document=shared_root, owner=UserFactory())
+        private_root = DocumentFactory(owner=UserFactory())
+        private_version = DocumentFactory(
+            root_document=private_root,
+            owner=UserFactory(),
+        )
+        grant_object(user, shared_root, "change_document")
+        grant_object(user, private_version, "change_document")
+
+        assert has_perms_owner_aware(user, "change_document", shared_version)
+        assert not has_perms_owner_aware(user, "change_document", private_version)
+
+    def test_other_models_use_their_own_owner(self) -> None:
+        """
+        GIVEN:
+            - A tag owned by someone else, and one owned by the user
+        WHEN:
+            - The single-object check runs for each
+        THEN:
+            - Only the user's own tag is allowed without a grant
+        """
+        user = UserFactory()
+        mine = TagFactory(owner=user)
+        theirs = TagFactory(owner=UserFactory())
+
+        assert has_perms_owner_aware(user, "view_tag", mine)
+        assert not has_perms_owner_aware(user, "view_tag", theirs)
 
 
 @pytest.mark.django_db
