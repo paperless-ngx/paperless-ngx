@@ -174,7 +174,6 @@ from documents.permissions import TrashPermissions
 from documents.permissions import ViewDocumentsPermissions
 from documents.permissions import annotate_document_count_by_ids
 from documents.permissions import annotate_document_count_for_related_queryset
-from documents.permissions import documents_without_permitted_root
 from documents.permissions import get_document_count_filter_for_user
 from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import has_global_statistics_permission
@@ -2117,7 +2116,7 @@ class DocumentViewSet(
         documents = Document.objects.filter(pk__in=document_ids)
         if (
             request.user is not None
-            and documents_without_permitted_root(documents, request.user).exists()
+            and documents.exclude(id__in=permitted_document_ids(request.user)).exists()
         ):
             return HttpResponseForbidden("Insufficient permissions")
 
@@ -3009,12 +3008,8 @@ class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
             user.has_perm(
                 "documents.change_document",
             )
-            and not Document.global_objects.filter(
-                pk__in=[doc.pk for doc in root_docs],
-            )
-            .exclude(
-                pk__in=permitted_document_ids(user, perm="change_document"),
-            )
+            and not Document.global_objects.filter(pk__in=documents)
+            .exclude(pk__in=permitted_document_ids(user, perm="change_document"))
             .exists()
         )
 
@@ -3627,7 +3622,7 @@ class SelectionDataView(DocumentSelectionMixin, GenericAPIView[Any]):
         documents = Document.objects.filter(pk__in=ids)
         if (
             documents.count() != len(ids)
-            or documents_without_permitted_root(documents, request.user).exists()
+            or documents.exclude(id__in=permitted_document_ids(request.user)).exists()
         ):
             return HttpResponseForbidden("Insufficient permissions")
 
@@ -4124,21 +4119,16 @@ class BulkDownloadView(DocumentSelectionMixin, GenericAPIView[Any]):
             validated_data=serializer.validated_data,
         )
         documents = Document.objects.filter(pk__in=ids)
-        versioned_documents = []
         compression = serializer.validated_data.get("compression")
         content = serializer.validated_data.get("content")
         follow_filename_format = serializer.validated_data.get("follow_formatting")
 
-        permitted_ids = set(permitted_document_ids(request.user))
-        for document in documents:
-            root_doc = get_root_document(document)
-            if root_doc.pk not in permitted_ids:
-                return HttpResponseForbidden("Insufficient permissions")
-            versioned_documents.append(
-                get_latest_version_for_root(
-                    root_doc,
-                ),
-            )
+        if documents.exclude(id__in=permitted_document_ids(request.user)).exists():
+            return HttpResponseForbidden("Insufficient permissions")
+        versioned_documents = [
+            get_latest_version_for_root(get_root_document(document))
+            for document in documents
+        ]
 
         if content == "both":
             strategy_class = OriginalAndArchiveStrategy
@@ -4811,7 +4801,7 @@ class ShareLinkBundleViewSet(PassUserMixin, ModelViewSet[ShareLinkBundle]):
             )
 
         denied_id = (
-            documents_without_permitted_root(documents_qs, request.user)
+            documents_qs.exclude(id__in=permitted_document_ids(request.user))
             .order_by("pk")
             .values_list("pk", flat=True)
             .first()
@@ -5657,11 +5647,12 @@ class TrashView(ListModelMixin, PassUserMixin):
             if doc_ids is not None
             else self.filter_queryset(self.get_queryset()).all()
         )
-        if documents_without_permitted_root(
-            docs,
-            request.user,
-            perm="delete_document",
-            include_deleted=True,
+        if docs.exclude(
+            id__in=permitted_document_ids(
+                request.user,
+                perm="delete_document",
+                include_deleted=True,
+            ),
         ).exists():
             return HttpResponseForbidden("Insufficient permissions")
         action = serializer.validated_data.get("action")
