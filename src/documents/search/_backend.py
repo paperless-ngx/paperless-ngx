@@ -1043,16 +1043,21 @@ class TantivyBackend:
         excluded from results.
 
         Args:
-            doc_id: Primary key of the reference document
+            doc_id: Primary key of the reference document, or of one of its
+                versions
             user: User for permission filtering (None for no filtering)
             limit: Maximum number of IDs to return (None = all matching docs)
 
         Returns:
             List of similar document IDs (excluding the original)
         """
+        from documents.versioning import root_document_ids
+
         self._ensure_open()
         searcher = self._index.searcher()
 
+        # Only root documents are indexed, so a version stands for its root
+        doc_id = next(iter(root_document_ids([doc_id])), doc_id)
         id_query = tantivy.Query.term_query(self._schema, "id", doc_id)
         results = searcher.search(id_query, limit=1)
 

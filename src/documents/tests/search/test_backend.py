@@ -1136,6 +1136,34 @@ class TestMoreLikeThis:
         assert 150 not in ids
         assert 151 in ids
 
+    def test_more_like_this_ids_seeded_by_version_uses_root(
+        self,
+        backend: TantivyBackend,
+    ) -> None:
+        """A version is not indexed, so it must be looked up as its root."""
+        root = DocumentFactory.create(
+            title="Important document",
+            content="financial information report",
+        )
+        version = DocumentFactory.create(
+            title="Important document",
+            content="financial information report",
+            root_document=root,
+            version_index=1,
+        )
+        other = DocumentFactory.create(
+            title="Another document",
+            content="financial information report",
+        )
+        backend.add_or_update(root)
+        backend.add_or_update(other)
+
+        ids = backend.more_like_this_ids(doc_id=version.pk, user=None)
+
+        assert other.pk in ids
+        assert root.pk not in ids
+        assert version.pk not in ids
+
 
 class TestSingleton:
     """Test get_backend() and reset_backend() singleton lifecycle."""
