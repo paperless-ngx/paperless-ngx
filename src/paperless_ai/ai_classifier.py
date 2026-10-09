@@ -4,8 +4,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 
 from documents.models import Document
-from documents.permissions import permitted_object_ids
-from documents.permissions import restrict_queryset_to_visible
+from documents.permissions import permitted_document_ids
 from documents.permissions import user_is_unrestricted
 from paperless.config import AIConfig
 from paperless_ai.base_model import ClassificationSuggestions
@@ -54,8 +53,8 @@ def _fulltext_similar_documents(
     active superuser - see user_is_unrestricted) is normalized to ``None``
     before calling, since the backend's permission filter has no superuser
     short-circuit of its own. Results are re-checked with
-    restrict_queryset_to_visible() since Tantivy's indexed permission fields
-    lag the DB via async reindexing.
+    permitted_document_ids() since Tantivy's indexed permission fields lag the
+    DB via async reindexing and judge a version by its own owner.
     """
     from documents.search import get_backend
 
@@ -69,10 +68,9 @@ def _fulltext_similar_documents(
     )
     if not unrestricted:
         allowed_ids = set(
-            restrict_queryset_to_visible(
-                Document.objects.filter(pk__in=similar_ids),
-                user,
-                "view_document",
+            Document.objects.filter(
+                pk__in=similar_ids,
+                id__in=permitted_document_ids(user),
             ).values_list("pk", flat=True),
         )
         similar_ids = [doc_id for doc_id in similar_ids if doc_id in allowed_ids]
@@ -200,13 +198,13 @@ def get_taxonomy_context(
             # quadratic scan in the vector store at best, and past ~32,763
             # documents a hard sqlite3.OperationalError (SQLite's
             # bound-parameter limit) at worst.
-            # permitted_object_ids() has its own superuser shortcut that would
+            # permitted_document_ids() has its own superuser shortcut that would
             # return every Document's id anyway, so this changes nothing about
             # which documents are considered -- only how we get there.
             visible_document_ids = (
                 None
                 if user_is_unrestricted(user)
-                else list(permitted_object_ids(user, Document, "view_document"))
+                else list(permitted_document_ids(user))
             )
             nodes = retrieve_similar_nodes(
                 document,
