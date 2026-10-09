@@ -28,7 +28,9 @@ logger = logging.getLogger("paperless.search")
 #      columns dropped. tantivy compares schemas by ordered field list, so an
 #      index built by v1 rejects every write against the v2 schema.
 # v3 - barcodes JSON field for stored barcode contents
-SCHEMA_VERSION: Final[int] = 3
+# v4 - root documents only. Earlier indexes may hold document versions under
+#      their own id and metadata, so they are rebuilt without them.
+SCHEMA_VERSION: Final[int] = 4
 
 # Present in the index directory from the moment a full rebuild starts until it
 # finishes. If a rebuild is interrupted it is left behind, so the half-built
