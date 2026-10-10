@@ -142,13 +142,17 @@ class TestComputeThumbnailDpi:
     @pytest.mark.parametrize(
         ("size", "expected"),
         [
-            pytest.param((612.0, 792.0), 59, id="letter-width-bound"),
-            pytest.param((792.0, 612.0), 46, id="landscape-rounded-up"),
-            pytest.param((612.0, 100000.0), 4, id="tall-strip-height-bound"),
-            pytest.param((200.0, 300.0), 180, id="small-page-width-bound"),
-            pytest.param((72.0, 72.0), 300, id="tiny-page-capped-at-300"),
-            pytest.param((1000000.0, 1000000.0), 1, id="huge-page-minimum-one"),
-            pytest.param(None, 150, id="unreadable-geometry-fallback"),
+            pytest.param((612.0, 792.0), (59, 2), id="letter-width-bound"),
+            pytest.param((792.0, 612.0), (46, 2), id="landscape-rounded-up"),
+            pytest.param((612.0, 100000.0), (4, 2), id="tall-strip-height-bound"),
+            pytest.param((200.0, 300.0), (180, 2), id="small-page-width-bound"),
+            pytest.param((72.0, 72.0), (300, 2), id="tiny-page-capped-at-300"),
+            pytest.param(
+                (1000000.0, 1000000.0),
+                (1, 1),
+                id="huge-page-minimum-one-unsupersampled",
+            ),
+            pytest.param(None, (150, 1), id="unreadable-geometry-fallback"),
         ],
     )
     def test_dpi_from_page_size(
@@ -156,7 +160,7 @@ class TestComputeThumbnailDpi:
         mocker: MockerFixture,
         tmp_path: Path,
         size: tuple[float, float] | None,
-        expected: int,
+        expected: tuple[int, int],
     ) -> None:
         """
         GIVEN:
@@ -164,7 +168,7 @@ class TestComputeThumbnailDpi:
         WHEN:
             - The thumbnail DPI is computed
         THEN:
-            - The expected DPI is returned
+            - The expected DPI and supersample factor are returned
         """
         mocker.patch(
             "paperless.parsers.utils.get_pdf_first_page_size_points",
@@ -186,6 +190,42 @@ class TestMakeThumbnailFromPdf:
         pdf.add_blank_page(page_size=page_size)
         pdf.save(path, object_stream_mode=pikepdf.ObjectStreamMode.disable)
         return path
+
+    @pytest.mark.parametrize(
+        ("size", "expected_dpi", "expected_supersample"),
+        [
+            pytest.param((612.0, 792.0), 118, 2, id="known-geometry-2x"),
+            pytest.param(None, 150, 1, id="unreadable-geometry-plain-fallback"),
+        ],
+    )
+    def test_render_dpi_requested(
+        self,
+        mocker: MockerFixture,
+        tmp_path: Path,
+        work_dir: Path,
+        size: tuple[float, float] | None,
+        expected_dpi: int,
+        expected_supersample: int,
+    ) -> None:
+        """
+        GIVEN:
+            - Readable or unreadable page geometry
+        WHEN:
+            - A thumbnail is made
+        THEN:
+            - Rasterize and encode get the matching DPI and supersample factor
+        """
+        mocker.patch(
+            "paperless.parsers.utils.get_pdf_first_page_size_points",
+            return_value=size,
+        )
+        rasterize = mocker.patch("documents.parsers.rasterize_pdf_page_to_png")
+        encode = mocker.patch("documents.parsers.encode_thumbnail_webp")
+
+        make_thumbnail_from_pdf(tmp_path / "in.pdf", work_dir)
+
+        assert rasterize.call_args.kwargs["dpi"] == expected_dpi
+        assert encode.call_args.kwargs["supersample"] == expected_supersample
 
     @pytest.mark.parametrize(
         ("page_size", "expected_width"),
@@ -405,32 +445,37 @@ class TestEncodeThumbnailWebp:
             assert min(red, green, blue) >= 250
 
     @pytest.mark.parametrize(
-        ("in_size", "expected_size"),
+        ("in_size", "supersample", "expected_size"),
         [
-            pytest.param((1000, 2000), (500, 1000), id="too-wide-shrunk"),
-            pytest.param((100, 10000), (50, 5000), id="too-tall-shrunk"),
-            pytest.param((100, 200), (100, 200), id="small-not-enlarged"),
+            pytest.param((1000, 2000), 1, (500, 1000), id="too-wide-shrunk"),
+            pytest.param((100, 10000), 1, (50, 5000), id="too-tall-shrunk"),
+            pytest.param((100, 200), 1, (100, 200), id="small-not-enlarged"),
+            pytest.param((1000, 1400), 2, (500, 700), id="2x-halved"),
+            pytest.param((1001, 1401), 2, (500, 700), id="2x-odd-rounded"),
+            pytest.param((600, 800), 2, (300, 400), id="2x-small-not-enlarged"),
+            pytest.param((900, 1200), 2, (450, 600), id="2x-below-clamp"),
         ],
     )
     def test_size_clamped_and_downsampled(
         self,
         tmp_path: Path,
         in_size: tuple[int, int],
+        supersample: int,
         expected_size: tuple[int, int],
     ) -> None:
         """
         GIVEN:
-            - A rendered image
+            - A rendered image and its supersample factor
         WHEN:
-            - It is encoded as a thumbnail
+            - It is encoded as a thumbnail with that factor
         THEN:
-            - It is fit within 500x5000 and never enlarged
+            - It is downsampled, fit within 500x5000 and never enlarged
         """
         png_path = tmp_path / "in.png"
         Image.new("RGB", in_size, (255, 255, 255)).save(png_path)
         out_path = tmp_path / "out.webp"
 
-        encode_thumbnail_webp(png_path, out_path)
+        encode_thumbnail_webp(png_path, out_path, supersample=supersample)
 
         with Image.open(out_path) as im:
             assert im.size == expected_size
