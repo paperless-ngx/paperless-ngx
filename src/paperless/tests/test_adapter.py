@@ -2,19 +2,26 @@ import logging
 
 import pytest
 from allauth.account.adapter import get_adapter
+from allauth.account.models import Login
 from allauth.core import context
+from allauth.mfa.totp.internal.auth import TOTP
+from allauth.mfa.totp.internal.auth import generate_totp_secret
 from allauth.socialaccount.adapter import get_adapter as get_social_adapter
+from allauth.socialaccount.models import SocialAccount
+from allauth.socialaccount.models import SocialLogin
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
 from django.forms import ValidationError
 from django.http import HttpRequest
+from django.test import RequestFactory
 from django.urls import reverse
 from pytest_django.fixtures import Settings
 from pytest_mock import MockerFixture
 from rest_framework.authtoken.models import Token
 
 from paperless.adapter import DrfTokenStrategy
+from paperless.adapter import SocialAccountAuthenticateStage
 from paperless_testing.factories import UserFactory
 
 
@@ -127,6 +134,89 @@ class TestCustomAccountAdapter:
         )
         user2 = adapter.save_user(HttpRequest(), User(), form, commit=True)
         assert not user2.is_superuser
+
+
+@pytest.mark.django_db
+class TestSocialAccountAuthenticateStage:
+    @staticmethod
+    def _should_handle(user: User, extra_data: dict | None) -> bool:
+        signal_kwargs = None
+        if extra_data is not None:
+            account = SocialAccount(
+                provider="openid_connect",
+                uid="uid",
+                extra_data=extra_data,
+            )
+            signal_kwargs = {"sociallogin": SocialLogin(user=user, account=account)}
+        request = RequestFactory().get("/")
+        request.session = {}
+        stage = SocialAccountAuthenticateStage(
+            None,
+            request,
+            Login(user=user, signal_kwargs=signal_kwargs),
+        )
+        return stage._should_handle(request)
+
+    def test_stage_replaces_allauth_stage(self) -> None:
+        stages = get_adapter().get_login_stages()
+
+        assert "paperless.adapter.SocialAccountAuthenticateStage" in stages
+        assert "allauth.mfa.stages.AuthenticateStage" not in stages
+
+    @pytest.mark.parametrize(
+        ("trusted_amr", "extra_data", "expected"),
+        [
+            pytest.param(
+                ["mfa"],
+                {"id_token": {"amr": ["pwd", "mfa"]}},
+                False,
+                id="trusted-amr",
+            ),
+            pytest.param(
+                ["phr"],
+                {"id_token": {"amr": ["otp"]}},
+                True,
+                id="untrusted-amr",
+            ),
+            pytest.param([], {"id_token": {"amr": ["mfa"]}}, True, id="setting-unset"),
+            pytest.param(["mfa"], {"id_token": {}}, True, id="no-amr-claim"),
+            pytest.param(
+                ["mfa"],
+                {"userinfo": {"amr": ["mfa"]}},
+                True,
+                id="userinfo-only",
+            ),
+            pytest.param(["mfa"], None, True, id="regular-login"),
+        ],
+    )
+    def test_mfa_skipped_only_for_trusted_amr(
+        self,
+        settings: Settings,
+        trusted_amr: list[str],
+        extra_data: dict | None,
+        *,
+        expected: bool,
+    ) -> None:
+        """
+        GIVEN:
+            - A user with TOTP enabled
+        WHEN:
+            - The user logs in, via a social account or not
+        THEN:
+            - The 2FA prompt is only skipped if the ID token's amr claim contains
+              one of SOCIAL_ACCOUNT_MFA_TRUSTED_AMR
+        """
+        settings.SOCIAL_ACCOUNT_MFA_TRUSTED_AMR = trusted_amr
+        user = UserFactory(username="testuser")
+        TOTP.activate(user, generate_totp_secret())
+
+        assert self._should_handle(user, extra_data) is expected
+
+    def test_no_mfa_for_user_without_authenticator(self, settings: Settings) -> None:
+        settings.SOCIAL_ACCOUNT_MFA_TRUSTED_AMR = ["mfa"]
+        user = UserFactory(username="testuser")
+
+        assert not self._should_handle(user, {"id_token": {"amr": ["pwd"]}})
 
 
 class TestCustomSocialAccountAdapter:

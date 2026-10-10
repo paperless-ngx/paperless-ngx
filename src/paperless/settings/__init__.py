@@ -348,6 +348,11 @@ SOCIAL_ACCOUNT_SYNC_SUPERUSER_GROUP: Final[str | None] = os.getenv(
 SOCIAL_ACCOUNT_SYNC_STAFF_GROUP: Final[str | None] = os.getenv(
     "PAPERLESS_SOCIAL_ACCOUNT_SYNC_STAFF_GROUP",
 )
+SOCIAL_ACCOUNT_MFA_TRUSTED_AMR = [
+    value.strip()
+    for value in os.getenv("PAPERLESS_SOCIAL_ACCOUNT_MFA_TRUSTED_AMR", "mfa").split(",")
+    if value.strip()
+]
 
 HEADLESS_TOKEN_STRATEGY = "paperless.adapter.DrfTokenStrategy"
 

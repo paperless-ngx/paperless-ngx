@@ -473,6 +473,8 @@ Users can enable two-factor authentication (2FA) for their accounts from the 'My
 
 Should a user lose access to their 2FA device and all recovery codes, a superuser can disable 2FA for the user from the 'Users & Groups' management screen.
 
+If users log in via an OpenID Connect provider which already enforces multi-factor authentication, see [`PAPERLESS_SOCIAL_ACCOUNT_MFA_TRUSTED_AMR`](configuration.md#PAPERLESS_SOCIAL_ACCOUNT_MFA_TRUSTED_AMR) to skip the Paperless-ngx prompt for those logins.
+
 ## Workflows
 
 !!! note
