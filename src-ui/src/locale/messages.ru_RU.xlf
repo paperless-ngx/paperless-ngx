@@ -17,7 +17,7 @@
           <context context-type="linenumber">386,393</context>
         </context-group>
         <note priority="1" from="description">Currently selected slide number read by screen reader</note>
-        <target state="needs-translation"> Slide <x id="INTERPOLATION" equiv-text="xt(source?: Ngb"/> of <x id="INTERPOLATION_1" equiv-text="this._cycleToSe"/> </target>
+        <target state="translated"> Слайд <x id="INTERPOLATION" equiv-text="xt(source?: Ngb"/> из <x id="INTERPOLATION_1" equiv-text="this._cycleToSe"/> </target>
       </trans-unit>
       <trans-unit id="ngb.carousel.previous" datatype="html">
         <source>Previous</source>
@@ -1403,7 +1403,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">259,260</context>
         </context-group>
-        <target state="needs-translation">Suggestions default to</target>
+        <target state="translated">Предложения по умолчанию для</target>
       </trans-unit>
       <trans-unit id="6251586038459969294" datatype="html">
         <source>Both</source>
@@ -1411,7 +1411,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">264</context>
         </context-group>
-        <target state="needs-translation">Both</target>
+        <target state="translated">Оба</target>
       </trans-unit>
       <trans-unit id="8967224283122923634" datatype="html">
         <source>ML only</source>
@@ -1419,7 +1419,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">266</context>
         </context-group>
-        <target state="needs-translation">ML only</target>
+        <target state="translated">Только ML</target>
       </trans-unit>
       <trans-unit id="6418969597665857901" datatype="html">
         <source>AI only</source>
@@ -1427,7 +1427,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">268</context>
         </context-group>
-        <target state="needs-translation">AI only</target>
+        <target state="translated">Только ИИ</target>
       </trans-unit>
       <trans-unit id="1043449647727456069" datatype="html">
         <source>Automatically request suggestions for inbox documents</source>
@@ -8525,7 +8525,7 @@
           <context context-type="sourcefile">src/app/components/common/suggestions-dropdown/suggestions-dropdown.component.html</context>
           <context context-type="linenumber">54</context>
         </context-group>
-        <target state="needs-translation">{VAR_PLURAL, plural, =1 {1 suggestion available below} other {<x id="INTERPOLATION"/> suggestions available below}}</target>
+        <target state="translated">{VAR_PLURAL, plural, =1 {1 совет} other {<x id="INTERPOLATION"/> советов}}</target>
       </trans-unit>
       <trans-unit id="4169875112244042673" datatype="html">
         <source>Suggestion options</source>
@@ -8533,7 +8533,7 @@
           <context context-type="sourcefile">src/app/components/common/suggestions-dropdown/suggestions-dropdown.component.html</context>
           <context context-type="linenumber">65,66</context>
         </context-group>
-        <target state="needs-translation">Suggestion options</target>
+        <target state="translated">Настройки советов</target>
       </trans-unit>
       <trans-unit id="3145824396228856507" datatype="html">
         <source>Not using default</source>
@@ -8541,7 +8541,7 @@
           <context context-type="sourcefile">src/app/components/common/suggestions-dropdown/suggestions-dropdown.component.html</context>
           <context context-type="linenumber">69,70</context>
         </context-group>
-        <target state="needs-translation">Not using default</target>
+        <target state="translated">Не использует по умолчанию</target>
       </trans-unit>
       <trans-unit id="8102623853570619759" datatype="html">
         <source>Suggest using:</source>
@@ -8549,7 +8549,7 @@
           <context context-type="sourcefile">src/app/components/common/suggestions-dropdown/suggestions-dropdown.component.html</context>
           <context context-type="linenumber">74,75</context>
         </context-group>
-        <target state="needs-translation">Suggest using:</target>
+        <target state="translated">Предложить используя:</target>
       </trans-unit>
       <trans-unit id="5799391967036896978" datatype="html">
         <source>ML</source>
@@ -8557,7 +8557,7 @@
           <context context-type="sourcefile">src/app/components/common/suggestions-dropdown/suggestions-dropdown.component.html</context>
           <context context-type="linenumber">77</context>
         </context-group>
-        <target state="needs-translation">ML</target>
+        <target state="translated">ML</target>
       </trans-unit>
       <trans-unit id="3484984238852181071" datatype="html">
         <source>AI</source>
@@ -8565,7 +8565,7 @@
           <context context-type="sourcefile">src/app/components/common/suggestions-dropdown/suggestions-dropdown.component.html</context>
           <context context-type="linenumber">81</context>
         </context-group>
-        <target state="needs-translation">AI</target>
+        <target state="translated">ИИ</target>
       </trans-unit>
       <trans-unit id="9180110319941008393" datatype="html">
         <source>Environment</source>
@@ -9219,7 +9219,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-barcodes/document-barcodes.component.html</context>
           <context context-type="linenumber">40,41</context>
         </context-group>
-        <target state="needs-translation">Copy content</target>
+        <target state="translated">Скопировать содержимое</target>
       </trans-unit>
       <trans-unit id="2266163016683537825" datatype="html">
         <source>of <x id="INTERPOLATION" equiv-text="{{previewNumPages()}}"/></source>
@@ -9479,7 +9479,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">360,361</context>
         </context-group>
-        <target state="needs-translation">Barcodes</target>
+        <target state="translated">Штрихкоды</target>
       </trans-unit>
       <trans-unit id="6992781481378431874" datatype="html" approved="yes">
         <source>Original document metadata</source>
@@ -13375,7 +13375,7 @@
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
           <context context-type="linenumber">335</context>
         </context-group>
-        <target state="needs-translation">Store Barcode Contents</target>
+        <target state="translated">Сохранить содержимое штрихкодов</target>
       </trans-unit>
       <trans-unit id="7011909364081812031" datatype="html">
         <source>AI Enabled</source>

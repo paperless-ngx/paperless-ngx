@@ -8525,7 +8525,7 @@
           <context context-type="sourcefile">src/app/components/common/suggestions-dropdown/suggestions-dropdown.component.html</context>
           <context context-type="linenumber">54</context>
         </context-group>
-        <target state="needs-translation">{VAR_PLURAL, plural, =1 {1 suggestion available below} other {<x id="INTERPOLATION"/> suggestions available below}}</target>
+        <target state="translated">{VAR_PLURAL, plural, one {<x id="INTERPOLATION"/> suggerimenti disponibili sotto} =1 {1 suggerimento disponibile sotto} other {<x id="INTERPOLATION"/> suggerimenti disponibili sotto}}</target>
       </trans-unit>
       <trans-unit id="4169875112244042673" datatype="html">
         <source>Suggestion options</source>
@@ -9219,7 +9219,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-barcodes/document-barcodes.component.html</context>
           <context context-type="linenumber">40,41</context>
         </context-group>
-        <target state="needs-translation">Copy content</target>
+        <target state="translated">Copia contenuto</target>
       </trans-unit>
       <trans-unit id="2266163016683537825" datatype="html">
         <source>of <x id="INTERPOLATION" equiv-text="{{previewNumPages()}}"/></source>
@@ -9479,7 +9479,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">360,361</context>
         </context-group>
-        <target state="needs-translation">Barcodes</target>
+        <target state="translated">Codici a barre</target>
       </trans-unit>
       <trans-unit id="6992781481378431874" datatype="html" approved="yes">
         <source>Original document metadata</source>
@@ -13376,7 +13376,7 @@
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
           <context context-type="linenumber">335</context>
         </context-group>
-        <target state="needs-translation">Store Barcode Contents</target>
+        <target state="translated">Contenuti Codice a Barre</target>
       </trans-unit>
       <trans-unit id="7011909364081812031" datatype="html">
         <source>AI Enabled</source>
