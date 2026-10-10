@@ -32,6 +32,8 @@ from paperless_testing.permissions import grant_global
 from paperless_testing.permissions import grant_object
 
 if TYPE_CHECKING:
+    from django.contrib.auth.models import User
+
     from paperless_testing.dirs import PaperlessDirs
 
 
@@ -175,6 +177,296 @@ class TestPermittedDocumentIdsIncludeDeleted:
             permitted_document_ids(stranger, include_deleted=True),
             expected_visible=[],
             expected_hidden=[doc.pk],
+        )
+
+
+@pytest.mark.django_db
+class TestPermittedDocumentIdsVersions:
+    """
+    A version is authorized by its root document: the version's own owner and
+    grants never matter.
+    """
+
+    @pytest.mark.parametrize(
+        ("root_owner", "version_owner", "expected_visible"),
+        [
+            pytest.param(
+                "other",
+                "nobody",
+                False,
+                id="unowned-version-of-private-root",
+            ),
+            pytest.param("other", "user", False, id="own-version-of-private-root"),
+            pytest.param("user", "other", True, id="foreign-version-of-own-root"),
+            pytest.param("user", "nobody", True, id="unowned-version-of-own-root"),
+            pytest.param("nobody", "other", True, id="private-version-of-unowned-root"),
+        ],
+    )
+    def test_version_follows_root_owner(
+        self,
+        root_owner: str,
+        version_owner: str,
+        *,
+        expected_visible: bool,
+    ) -> None:
+        """
+        GIVEN:
+            - A root document and a version with differing owners
+        WHEN:
+            - The permitted document ids are resolved for the user
+        THEN:
+            - The version is visible exactly when its root is
+        """
+        user = UserFactory()
+        owners = {"user": user, "other": UserFactory(), "nobody": None}
+        root = DocumentFactory(owner=owners[root_owner])
+        version = DocumentFactory(root_document=root, owner=owners[version_owner])
+
+        visible = set(permitted_document_ids(user))
+
+        assert (version.pk in visible) is expected_visible
+        assert (root.pk in visible) is expected_visible
+
+    @staticmethod
+    def grantee(user: User, kind: str) -> User | Group:
+        """The user itself, or a new group the user belongs to."""
+        if kind == "user":
+            return user
+        group = Group.objects.create(name="shared")
+        user.groups.add(group)
+        return group
+
+    @pytest.mark.parametrize(
+        "grantee_kind",
+        [pytest.param("user", id="user"), pytest.param("group", id="group")],
+    )
+    def test_grant_on_root_applies_to_version(self, grantee_kind: str) -> None:
+        """
+        GIVEN:
+            - A private root document shared with a user or one of their groups
+            - A version of it owned by someone else
+        WHEN:
+            - The permitted document ids are resolved for the user
+        THEN:
+            - Both the root and the version are visible
+            - A user without the grant sees neither
+        """
+        user = UserFactory()
+        stranger = UserFactory()
+        root = DocumentFactory(owner=UserFactory())
+        version = DocumentFactory(root_document=root, owner=UserFactory())
+        grant_object(self.grantee(user, grantee_kind), root, "view_document")
+
+        assert_visible_document_ids(
+            permitted_document_ids(user),
+            expected_visible=[root.pk, version.pk],
+            expected_hidden=[],
+        )
+        assert_visible_document_ids(
+            permitted_document_ids(stranger),
+            expected_visible=[],
+            expected_hidden=[root.pk, version.pk],
+        )
+
+    @pytest.mark.parametrize(
+        "grantee_kind",
+        [pytest.param("user", id="user"), pytest.param("group", id="group")],
+    )
+    def test_grant_on_version_is_ignored(self, grantee_kind: str) -> None:
+        """
+        GIVEN:
+            - A private root document
+            - A version with an explicit grant for the user or one of their groups
+        WHEN:
+            - The permitted document ids are resolved for the user
+        THEN:
+            - Neither the root nor the version is visible
+        """
+        user = UserFactory()
+        root = DocumentFactory(owner=UserFactory())
+        version = DocumentFactory(root_document=root, owner=UserFactory())
+        grant_object(self.grantee(user, grantee_kind), version, "view_document")
+
+        assert_visible_document_ids(
+            permitted_document_ids(user),
+            expected_visible=[],
+            expected_hidden=[root.pk, version.pk],
+        )
+
+    def test_grant_on_one_root_does_not_reach_another_roots_version(self) -> None:
+        """
+        GIVEN:
+            - Two private roots, each with a version
+            - The user may view only the first root
+        WHEN:
+            - The permitted document ids are resolved for the user
+        THEN:
+            - Only the first root and its version are visible
+        """
+        user = UserFactory()
+        first = DocumentFactory(owner=UserFactory())
+        first_version = DocumentFactory(root_document=first, owner=UserFactory())
+        second = DocumentFactory(owner=UserFactory())
+        second_version = DocumentFactory(root_document=second, owner=user)
+        grant_object(user, first, "view_document")
+
+        assert_visible_document_ids(
+            permitted_document_ids(user),
+            expected_visible=[first.pk, first_version.pk],
+            expected_hidden=[second.pk, second_version.pk],
+        )
+
+    def test_user_in_several_groups(self) -> None:
+        """
+        GIVEN:
+            - A user in two groups
+            - Two private roots shared with one group each, and a third shared with nobody
+            - A version of each root
+        WHEN:
+            - The permitted document ids are resolved for the user
+        THEN:
+            - The two shared roots and their versions are visible
+            - The third root and its version are not
+        """
+        user = UserFactory()
+        groups = [Group.objects.create(name=f"group{i}") for i in range(2)]
+        user.groups.add(*groups)
+        shared = [DocumentFactory(owner=UserFactory()) for _ in groups]
+        for root, group in zip(shared, groups, strict=True):
+            grant_object(group, root, "view_document")
+        unshared = DocumentFactory(owner=UserFactory())
+        shared_versions = [
+            DocumentFactory(root_document=root, owner=UserFactory()) for root in shared
+        ]
+        unshared_version = DocumentFactory(root_document=unshared, owner=None)
+
+        assert_visible_document_ids(
+            permitted_document_ids(user),
+            expected_visible=[
+                *(root.pk for root in shared),
+                *(version.pk for version in shared_versions),
+            ],
+            expected_hidden=[unshared.pk, unshared_version.pk],
+        )
+
+    def test_permission_is_resolved_through_the_root(self) -> None:
+        """
+        GIVEN:
+            - A private root document where the user may view and change
+        WHEN:
+            - The permitted ids are resolved for view, change and delete
+        THEN:
+            - The version is visible for view and change only
+        """
+        user = UserFactory()
+        root = DocumentFactory(owner=UserFactory())
+        version = DocumentFactory(root_document=root, owner=UserFactory())
+        grant_object(user, root, "view_document", "change_document")
+
+        assert version.pk in set(permitted_document_ids(user))
+        assert version.pk in set(permitted_document_ids(user, perm="change_document"))
+        assert version.pk in set(
+            permitted_document_ids(user, perm="documents.change_document"),
+        )
+        assert version.pk not in set(
+            permitted_document_ids(user, perm="delete_document"),
+        )
+
+    def test_anonymous_sees_versions_of_unowned_roots_only(self) -> None:
+        """
+        GIVEN:
+            - A version owned by nobody under a private root
+            - A version owned by someone under an unowned root
+        WHEN:
+            - The permitted document ids are resolved for an anonymous user
+        THEN:
+            - Only the version of the unowned root is visible
+        """
+        private_root = DocumentFactory(owner=UserFactory())
+        private_version = DocumentFactory(root_document=private_root, owner=None)
+        open_root = DocumentFactory(owner=None)
+        open_version = DocumentFactory(root_document=open_root, owner=UserFactory())
+
+        assert_visible_document_ids(
+            permitted_document_ids(AnonymousUser()),
+            expected_visible=[open_root.pk, open_version.pk],
+            expected_hidden=[private_root.pk, private_version.pk],
+        )
+
+    def test_deleted_versions_follow_their_deleted_root(self) -> None:
+        """
+        GIVEN:
+            - A soft-deleted root document and its version, which deleting the
+              root soft-deletes too; the version is owned by someone else
+        WHEN:
+            - The permitted document ids are resolved with and without deleted
+              documents
+        THEN:
+            - Nothing is visible by default
+            - With deleted documents included, the version is visible to the
+              root's owner and not to the version's own owner
+        """
+        owner = UserFactory()
+        version_owner = UserFactory()
+        root = DocumentFactory(owner=owner)
+        version = DocumentFactory(root_document=root, owner=version_owner)
+        root.delete()
+
+        assert not {root.pk, version.pk} & set(permitted_document_ids(owner))
+        assert_visible_document_ids(
+            permitted_document_ids(owner, include_deleted=True),
+            expected_visible=[root.pk, version.pk],
+            expected_hidden=[],
+        )
+        assert_visible_document_ids(
+            permitted_document_ids(version_owner, include_deleted=True),
+            expected_visible=[],
+            expected_hidden=[root.pk, version.pk],
+        )
+
+    @pytest.mark.parametrize(
+        "is_superuser",
+        [
+            pytest.param(False, id="regular-user"),
+            pytest.param(True, id="superuser"),
+        ],
+    )
+    def test_inactive_user_sees_no_versions(self, *, is_superuser: bool) -> None:
+        """
+        GIVEN:
+            - An inactive user, possibly a superuser, who owns a root and its version
+        WHEN:
+            - The permitted document ids are resolved for them
+        THEN:
+            - Nothing is visible
+        """
+        user = UserFactory(is_active=False, is_superuser=is_superuser)
+        root = DocumentFactory(owner=user)
+        version = DocumentFactory(root_document=root, owner=user)
+
+        assert_visible_document_ids(
+            permitted_document_ids(user),
+            expected_visible=[],
+            expected_hidden=[root.pk, version.pk],
+        )
+
+    def test_superuser_sees_all_versions(self) -> None:
+        """
+        GIVEN:
+            - A private root owned by someone else, with a version
+        WHEN:
+            - The permitted document ids are resolved for a superuser
+        THEN:
+            - Both the root and the version are visible
+        """
+        superuser = UserFactory(superuser=True)
+        root = DocumentFactory(owner=UserFactory())
+        version = DocumentFactory(root_document=root, owner=UserFactory())
+
+        assert_visible_document_ids(
+            permitted_document_ids(superuser),
+            expected_visible=[root.pk, version.pk],
+            expected_hidden=[],
         )
 
 
