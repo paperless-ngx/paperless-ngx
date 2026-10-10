@@ -1,4 +1,5 @@
 import json
+import logging
 from collections import defaultdict
 from typing import TYPE_CHECKING
 from typing import Final
@@ -8,6 +9,11 @@ from django.contrib.auth.models import User
 from django.db.models import Model
 from django.db.models import Prefetch
 
+from documents.classifier import load_classifier
+from documents.matching import match_correspondents
+from documents.matching import match_document_types
+from documents.matching import match_storage_paths
+from documents.matching import match_tags
 from documents.models import Correspondent
 from documents.models import Document
 from documents.models import DocumentType
@@ -19,6 +25,8 @@ from paperless_ai.prompts.render import render_prompt
 
 if TYPE_CHECKING:
     from llama_index.core.schema import NodeWithScore
+
+logger = logging.getLogger("paperless_ai.taxonomy")
 
 
 MAX_TAG_CANDIDATES: Final = 10
@@ -191,6 +199,92 @@ def build_taxonomy_candidates(
             MAX_SINGLE_VALUE_CANDIDATES,
         ),
     )
+
+
+def merge_matched_candidates(
+    candidates: TaxonomyCandidates,
+    document: Document,
+    user: User | None,
+) -> TaxonomyCandidates:
+    """Add what the built-in matching would assign to ``document`` - matching
+    rules that fire plus the trained classifier's predictions - on top of the
+    neighbour-derived ``candidates``.
+
+    Neighbour voting only knows the taxonomy of the few most similar
+    documents, so an existing tag none of them happen to carry is invisible
+    to the model and gets reinvented under a near-duplicate name. The
+    classifier has seen every document that carries it, and a matching rule
+    is the user spelling out the assignment. Both run through the same
+    ``match_*`` functions the non-LLM suggestions endpoint uses, so they are
+    already permission-filtered for ``user`` (falling back to the document
+    owner when there is none) and tolerate a missing classifier model.
+
+    Matched objects are boosted above every neighbour weight in their
+    category so they always survive the cap and rank first; neighbour order
+    is kept below them. Weight is an internal ranking detail - the model
+    never sees it, only the resulting id/name list.
+    """
+    try:
+        classifier = load_classifier()
+        matched_tags = [
+            tag
+            for tag in match_tags(document, classifier, user)
+            if not tag.is_inbox_tag
+        ]
+        matched = {
+            "tags": (matched_tags, Tag, "view_tag", MAX_TAG_CANDIDATES),
+            "document_types": (
+                match_document_types(document, classifier, user),
+                DocumentType,
+                "view_documenttype",
+                MAX_SINGLE_VALUE_CANDIDATES,
+            ),
+            "correspondents": (
+                match_correspondents(document, classifier, user),
+                Correspondent,
+                "view_correspondent",
+                MAX_SINGLE_VALUE_CANDIDATES,
+            ),
+            "storage_paths": (
+                match_storage_paths(document, classifier, user),
+                StoragePath,
+                "view_storagepath",
+                MAX_SINGLE_VALUE_CANDIDATES,
+            ),
+        }
+    except Exception:
+        logger.exception(
+            "Failed to match document %s against matching rules and classifier; "
+            "continuing with neighbour-derived taxonomy candidates only.",
+            document.pk,
+        )
+        return candidates
+
+    merged = dict(candidates)
+    for category, (objects, model, perm, limit) in matched.items():
+        if not objects:
+            continue
+        weights: dict[int, float] = {c["id"]: c["weight"] for c in candidates[category]}
+        # A matched object starts from its neighbour weight, or from 0 when
+        # no neighbour carries it. Neighbour weights can be negative
+        # (similarity is 1 - cosine distance) or well above 1 (aggregated
+        # over many neighbours, or rank-based in the full-text fallback), so
+        # lift by the spread of {neighbour weights, 0} plus a margin: the
+        # lowest possible starting point then lands above the highest
+        # unmatched weight.
+        lowest = min([*weights.values(), 0.0])
+        highest = max([*weights.values(), 0.0])
+        boost = highest - lowest + 1.0
+        for obj in objects:
+            weights[obj.pk] = weights.get(obj.pk, 0.0) + boost
+        merged[category] = _visible_ranked_candidates(
+            weights,
+            model,
+            perm,
+            user,
+            limit,
+        )
+    return TaxonomyCandidates(**merged)
 
 
 def format_taxonomy_for_prompt(

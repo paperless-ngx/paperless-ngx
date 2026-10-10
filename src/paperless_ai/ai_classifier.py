@@ -25,6 +25,7 @@ from paperless_ai.taxonomy import _node_document_weights
 from paperless_ai.taxonomy import build_taxonomy_candidates
 from paperless_ai.taxonomy import empty_taxonomy_candidates
 from paperless_ai.taxonomy import format_taxonomy_for_prompt
+from paperless_ai.taxonomy import merge_matched_candidates
 
 logger = logging.getLogger("paperless_ai.rag_classifier")
 
@@ -184,10 +185,12 @@ def get_taxonomy_context(
     """One retrieval feeds both taxonomy candidates and RAG text context. Uses
     vector similarity when an embedding backend is configured, otherwise
     falls back to Tantivy full-text "More Like This" similarity - see
-    _fulltext_similar_documents. On any retrieval failure, degrades to empty
-    candidates/context rather than propagating the exception - neither a
-    vector-store outage nor a search-index issue should block classification,
-    only its context-assisted enrichment.
+    _fulltext_similar_documents. The neighbour-derived candidates are then
+    merged with matching-rule and classifier hits (merge_matched_candidates),
+    which does not depend on retrieval. On any retrieval failure, degrades to
+    an empty context and matched-only candidates rather than propagating the
+    exception - neither a vector-store outage nor a search-index issue should
+    block classification, only its context-assisted enrichment.
     """
     ai_config = AIConfig()
     try:
@@ -238,15 +241,19 @@ def get_taxonomy_context(
             text = similar.content[:1000] or ""
             title = similar.title or similar.filename or "Untitled"
             context_blocks.append(f"TITLE: {title}\n{text}")
+        context = "\n\n".join(context_blocks)
     except Exception:
         logger.exception(
             "Failed to retrieve similar-document context for document %s; "
-            "continuing without taxonomy candidates or similar-document context.",
+            "continuing without neighbour-derived taxonomy candidates or "
+            "similar-document context.",
             document.pk,
         )
-        return empty_taxonomy_candidates(), ""
+        candidates, context = empty_taxonomy_candidates(), ""
 
-    return candidates, "\n\n".join(context_blocks)
+    # Independent of retrieval: matching rules and the trained classifier
+    # still supply candidates when there are no (or no useful) neighbours.
+    return merge_matched_candidates(candidates, document, user), context
 
 
 def parse_ai_response(raw: dict) -> ClassificationSuggestions:

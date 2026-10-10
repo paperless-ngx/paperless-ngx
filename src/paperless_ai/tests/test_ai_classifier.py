@@ -898,6 +898,84 @@ def test_get_taxonomy_context_candidate_building_failure_degrades_to_no_hints(
 
 
 @pytest.mark.django_db
+@override_settings(LLM_EMBEDDING_BACKEND="huggingface")
+@patch("paperless_ai.ai_classifier.merge_matched_candidates")
+@patch("paperless_ai.ai_classifier.retrieve_similar_nodes")
+def test_get_taxonomy_context_merges_matched_candidates(
+    mock_retrieve,
+    mock_merge,
+):
+    """
+    GIVEN:
+        - A neighbour document with a tag is retrieved
+    WHEN:
+        - get_taxonomy_context() is called with a user
+    THEN:
+        - The neighbour-derived candidates, the document and the user are
+          handed to merge_matched_candidates(), whose result is returned
+    """
+    tag = TagFactory.create(name="Bloodwork")
+    neighbour = DocumentFactory.create(content="Neighbour content")
+    neighbour.tags.add(tag)
+    document = DocumentFactory.create(content="Some content")
+    user = UserFactory.create(is_superuser=True)
+    mock_retrieve.return_value = [
+        SimpleNamespace(metadata={"document_id": str(neighbour.pk)}, score=0.8),
+    ]
+    merged = {
+        "tags": [{"id": tag.pk, "name": "Bloodwork", "weight": 9.0}],
+        "document_types": [],
+        "correspondents": [],
+        "storage_paths": [],
+    }
+    mock_merge.return_value = merged
+
+    candidates, _rag_context = get_taxonomy_context(document, user=user)
+
+    assert candidates is merged
+    mock_merge.assert_called_once()
+    neighbour_candidates, merge_document, merge_user = mock_merge.call_args.args
+    assert neighbour_candidates["tags"][0]["id"] == tag.pk
+    assert merge_document == document
+    assert merge_user == user
+
+
+@pytest.mark.django_db
+@override_settings(LLM_EMBEDDING_BACKEND="huggingface")
+@patch("paperless_ai.ai_classifier.merge_matched_candidates")
+@patch("paperless_ai.ai_classifier.retrieve_similar_nodes")
+def test_get_taxonomy_context_retrieval_failure_still_merges_matched_candidates(
+    mock_retrieve,
+    mock_merge,
+):
+    """
+    GIVEN:
+        - retrieve_similar_nodes() raises (e.g. vector store outage)
+    WHEN:
+        - get_taxonomy_context() is called
+    THEN:
+        - merge_matched_candidates() still runs, on empty neighbour
+          candidates, so matching rules and the classifier keep supplying
+          candidates without any retrieval
+    """
+    document = DocumentFactory.create(content="Some content")
+    mock_retrieve.side_effect = RuntimeError("vector store unavailable")
+    mock_merge.side_effect = lambda candidates, *_: candidates
+
+    candidates, rag_context = get_taxonomy_context(document, user=None)
+
+    mock_merge.assert_called_once()
+    assert mock_merge.call_args.args[0] == {
+        "tags": [],
+        "document_types": [],
+        "correspondents": [],
+        "storage_paths": [],
+    }
+    assert candidates == mock_merge.call_args.args[0]
+    assert rag_context == ""
+
+
+@pytest.mark.django_db
 def test_build_prompt_without_rag_includes_taxonomy_block():
     """
     GIVEN:

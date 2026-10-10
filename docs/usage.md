@@ -331,6 +331,8 @@ Paperless-ngx includes several features that use AI to enhance the document mana
 
 The AI features work by creating an embedding of the text content and metadata of documents, which is then used for various tasks such as similarity search and question answering.
 
+When suggesting tags, correspondents, document types and storage paths, the LLM is shown a short list of existing ones to prefer over inventing new names. That list combines the metadata of the most similar documents with whatever the built-in (non-LLM) matching would assign — matching rules that fire and the trained classifier's predictions — so an existing tag is offered even when none of the similar documents carry it.
+
 See [AI features](advanced_usage.md#ai-features) for how to enable and configure these features, including choosing an LLM backend and setting up the LLM index for RAG.
 
 ### AI-Enhanced Suggestions

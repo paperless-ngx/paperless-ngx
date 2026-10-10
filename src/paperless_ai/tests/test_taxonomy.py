@@ -1,12 +1,16 @@
 import json
+from unittest.mock import MagicMock
 
 import pytest
 import pytest_mock
 
+from documents.models import MatchingModel
 from paperless_ai.taxonomy import SimilarDocument
 from paperless_ai.taxonomy import TaxonomyCandidates
 from paperless_ai.taxonomy import build_taxonomy_candidates
+from paperless_ai.taxonomy import empty_taxonomy_candidates
 from paperless_ai.taxonomy import format_taxonomy_for_prompt
+from paperless_ai.taxonomy import merge_matched_candidates
 from paperless_testing.factories import CorrespondentFactory
 from paperless_testing.factories import DocumentFactory
 from paperless_testing.factories import DocumentTypeFactory
@@ -304,6 +308,400 @@ class TestBuildTaxonomyCandidates:
 
         assert result["tags"][0]["name"] == "Owned"
         spy.assert_not_called()
+
+
+def fake_classifier(
+    *,
+    tags: list[int] | None = None,
+    correspondent: int | None = None,
+    document_type: int | None = None,
+    storage_path: int | None = None,
+) -> MagicMock:
+    classifier = MagicMock()
+    classifier.predict_tags.return_value = tags or []
+    classifier.predict_correspondent.return_value = correspondent
+    classifier.predict_document_type.return_value = document_type
+    classifier.predict_storage_path.return_value = storage_path
+    return classifier
+
+
+@pytest.mark.django_db
+class TestMergeMatchedCandidates:
+    def test_classifier_prediction_missing_from_neighbours_ranks_first(
+        self,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - Neighbour candidates contain one tag
+            - The classifier predicts a different "Auto" tag
+        WHEN:
+            - merge_matched_candidates() is called
+        THEN:
+            - The predicted tag is added and ranked above the neighbour tag
+        """
+        neighbour_tag = TagFactory.create(name="Neighbour")
+        predicted_tag = TagFactory.create(
+            name="Bloodwork",
+            matching_algorithm=MatchingModel.MATCH_AUTO,
+        )
+        document = DocumentFactory.create()
+        candidates = empty_taxonomy_candidates()
+        candidates["tags"] = [
+            {"id": neighbour_tag.pk, "name": "Neighbour", "weight": 0.9},
+        ]
+        mocker.patch(
+            "paperless_ai.taxonomy.load_classifier",
+            return_value=fake_classifier(tags=[predicted_tag.pk]),
+        )
+
+        result = merge_matched_candidates(candidates, document, user=None)
+
+        assert [c["name"] for c in result["tags"]] == ["Bloodwork", "Neighbour"]
+        assert result["tags"][0]["weight"] > result["tags"][1]["weight"]
+        assert result["tags"][1]["weight"] == pytest.approx(0.9)
+
+    def test_matching_rule_hit_added_without_classifier(
+        self,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - No trained classifier model
+            - A tag whose literal matching rule fires on the document content
+        WHEN:
+            - merge_matched_candidates() is called with empty neighbour candidates
+        THEN:
+            - The rule-matched tag is the only candidate
+        """
+        tag = TagFactory.create(
+            name="Invoice",
+            match="invoice",
+            matching_algorithm=MatchingModel.MATCH_LITERAL,
+        )
+        TagFactory.create(name="Unrelated")
+        document = DocumentFactory.create(content="This is an invoice for you.")
+        mocker.patch("paperless_ai.taxonomy.load_classifier", return_value=None)
+
+        result = merge_matched_candidates(
+            empty_taxonomy_candidates(),
+            document,
+            user=None,
+        )
+
+        assert [c["id"] for c in result["tags"]] == [tag.pk]
+
+    def test_object_in_both_sources_is_one_boosted_entry(
+        self,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - Two neighbour tag candidates (weights 0.9 and 0.4)
+            - The classifier predicts the lower-weighted one
+        WHEN:
+            - merge_matched_candidates() is called
+        THEN:
+            - That tag appears once, boosted above every neighbour weight
+        """
+        strong = TagFactory.create(name="Strong")
+        weak = TagFactory.create(
+            name="Weak",
+            matching_algorithm=MatchingModel.MATCH_AUTO,
+        )
+        document = DocumentFactory.create()
+        candidates = empty_taxonomy_candidates()
+        candidates["tags"] = [
+            {"id": strong.pk, "name": "Strong", "weight": 0.9},
+            {"id": weak.pk, "name": "Weak", "weight": 0.4},
+        ]
+        mocker.patch(
+            "paperless_ai.taxonomy.load_classifier",
+            return_value=fake_classifier(tags=[weak.pk]),
+        )
+
+        result = merge_matched_candidates(candidates, document, user=None)
+
+        assert [c["name"] for c in result["tags"]] == ["Weak", "Strong"]
+        # prior 0.4 + boost (spread of {0.9, 0.4, 0} = 0.9, plus 1.0)
+        assert result["tags"][0]["weight"] == pytest.approx(2.3)
+
+    def test_new_match_survives_full_list_of_heavy_neighbours(
+        self,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - Ten neighbour tag candidates (the cap) each with weight 15
+            - The classifier predicts a tag none of the neighbours carry
+        WHEN:
+            - merge_matched_candidates() is called
+        THEN:
+            - The predicted tag ranks first and one neighbour tag is dropped
+        """
+        neighbour_tags = [TagFactory.create(name=f"Neighbour{i}") for i in range(10)]
+        predicted = TagFactory.create(
+            name="Predicted",
+            matching_algorithm=MatchingModel.MATCH_AUTO,
+        )
+        document = DocumentFactory.create()
+        candidates = empty_taxonomy_candidates()
+        candidates["tags"] = [
+            {"id": tag.pk, "name": tag.name, "weight": 15.0} for tag in neighbour_tags
+        ]
+        mocker.patch(
+            "paperless_ai.taxonomy.load_classifier",
+            return_value=fake_classifier(tags=[predicted.pk]),
+        )
+
+        result = merge_matched_candidates(candidates, document, user=None)
+
+        assert len(result["tags"]) == 10
+        assert result["tags"][0]["name"] == "Predicted"
+        assert result["tags"][0]["weight"] > 15.0
+
+    def test_negative_neighbour_weights_still_rank_matched_first(
+        self,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - Neighbour tag candidates with negative weights (similarity is
+              1 - cosine distance, so this is possible)
+            - The classifier predicts the lowest-weighted one plus a new tag
+        WHEN:
+            - merge_matched_candidates() is called
+        THEN:
+            - Both matched tags rank above the unmatched neighbour tag
+        """
+        unmatched = TagFactory.create(name="Unmatched")
+        matched_neighbour = TagFactory.create(
+            name="MatchedNeighbour",
+            matching_algorithm=MatchingModel.MATCH_AUTO,
+        )
+        matched_new = TagFactory.create(
+            name="MatchedNew",
+            matching_algorithm=MatchingModel.MATCH_AUTO,
+        )
+        document = DocumentFactory.create()
+        candidates = empty_taxonomy_candidates()
+        candidates["tags"] = [
+            {"id": unmatched.pk, "name": "Unmatched", "weight": -0.2},
+            {"id": matched_neighbour.pk, "name": "MatchedNeighbour", "weight": -0.9},
+        ]
+        mocker.patch(
+            "paperless_ai.taxonomy.load_classifier",
+            return_value=fake_classifier(tags=[matched_neighbour.pk, matched_new.pk]),
+        )
+
+        result = merge_matched_candidates(candidates, document, user=None)
+
+        assert [c["name"] for c in result["tags"]][-1] == "Unmatched"
+        assert {c["name"] for c in result["tags"][:2]} == {
+            "MatchedNeighbour",
+            "MatchedNew",
+        }
+        assert all(
+            c["weight"] > result["tags"][-1]["weight"] for c in result["tags"][:2]
+        )
+
+    def test_cap_still_applies_and_prefers_matched(
+        self,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - One neighbour tag candidate
+            - The classifier predicts 12 "Auto" tags
+        WHEN:
+            - merge_matched_candidates() is called
+        THEN:
+            - Only 10 tags are returned, none of them the neighbour tag
+        """
+        neighbour_tag = TagFactory.create(name="Neighbour")
+        predicted = [
+            TagFactory.create(
+                name=f"Predicted{i}",
+                matching_algorithm=MatchingModel.MATCH_AUTO,
+            )
+            for i in range(12)
+        ]
+        document = DocumentFactory.create()
+        candidates = empty_taxonomy_candidates()
+        candidates["tags"] = [
+            {"id": neighbour_tag.pk, "name": "Neighbour", "weight": 0.9},
+        ]
+        mocker.patch(
+            "paperless_ai.taxonomy.load_classifier",
+            return_value=fake_classifier(tags=[t.pk for t in predicted]),
+        )
+
+        result = merge_matched_candidates(candidates, document, user=None)
+
+        assert len(result["tags"]) == 10
+        assert neighbour_tag.pk not in {c["id"] for c in result["tags"]}
+
+    def test_single_valued_categories_are_merged(
+        self,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - The classifier predicts an "Auto" correspondent, document type
+              and storage path
+        WHEN:
+            - merge_matched_candidates() is called with empty neighbour candidates
+        THEN:
+            - Each prediction is surfaced in its category
+        """
+        correspondent = CorrespondentFactory.create(
+            matching_algorithm=MatchingModel.MATCH_AUTO,
+        )
+        document_type = DocumentTypeFactory.create(
+            matching_algorithm=MatchingModel.MATCH_AUTO,
+        )
+        storage_path = StoragePathFactory.create(
+            matching_algorithm=MatchingModel.MATCH_AUTO,
+        )
+        document = DocumentFactory.create()
+        mocker.patch(
+            "paperless_ai.taxonomy.load_classifier",
+            return_value=fake_classifier(
+                correspondent=correspondent.pk,
+                document_type=document_type.pk,
+                storage_path=storage_path.pk,
+            ),
+        )
+
+        result = merge_matched_candidates(
+            empty_taxonomy_candidates(),
+            document,
+            user=None,
+        )
+
+        assert [c["id"] for c in result["correspondents"]] == [correspondent.pk]
+        assert [c["id"] for c in result["document_types"]] == [document_type.pk]
+        assert [c["id"] for c in result["storage_paths"]] == [storage_path.pk]
+        assert result["tags"] == []
+
+    def test_inbox_tags_are_excluded(
+        self,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - The classifier predicts an "Auto" inbox tag
+        WHEN:
+            - merge_matched_candidates() is called
+        THEN:
+            - The inbox tag is not a candidate
+        """
+        inbox = TagFactory.create(
+            name="Inbox",
+            is_inbox_tag=True,
+            matching_algorithm=MatchingModel.MATCH_AUTO,
+        )
+        document = DocumentFactory.create()
+        mocker.patch(
+            "paperless_ai.taxonomy.load_classifier",
+            return_value=fake_classifier(tags=[inbox.pk]),
+        )
+
+        result = merge_matched_candidates(
+            empty_taxonomy_candidates(),
+            document,
+            user=None,
+        )
+
+        assert result["tags"] == []
+
+    def test_user_without_permission_never_sees_prediction(
+        self,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - An "Auto" tag owned by another user, with no view grants
+            - An unowned "Auto" tag, visible to everyone
+            - The classifier predicts both
+        WHEN:
+            - merge_matched_candidates() is called with a plain user
+        THEN:
+            - Only the unowned tag is a candidate; real permission filtering,
+              no mocks
+        """
+        owner = UserFactory.create()
+        restricted = TagFactory.create(
+            name="Restricted",
+            matching_algorithm=MatchingModel.MATCH_AUTO,
+            owner=owner,
+        )
+        public = TagFactory.create(
+            name="Public",
+            matching_algorithm=MatchingModel.MATCH_AUTO,
+        )
+        document = DocumentFactory.create()
+        user = UserFactory.create()
+        mocker.patch(
+            "paperless_ai.taxonomy.load_classifier",
+            return_value=fake_classifier(tags=[restricted.pk, public.pk]),
+        )
+
+        result = merge_matched_candidates(
+            empty_taxonomy_candidates(),
+            document,
+            user=user,
+        )
+
+        assert [c["id"] for c in result["tags"]] == [public.pk]
+
+    def test_nothing_matched_leaves_candidates_unchanged(
+        self,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - No classifier model and no matching rules
+        WHEN:
+            - merge_matched_candidates() is called
+        THEN:
+            - The neighbour candidates are returned as they were
+        """
+        tag = TagFactory.create(name="Neighbour")
+        document = DocumentFactory.create()
+        candidates = empty_taxonomy_candidates()
+        candidates["tags"] = [{"id": tag.pk, "name": "Neighbour", "weight": 0.9}]
+        mocker.patch("paperless_ai.taxonomy.load_classifier", return_value=None)
+
+        result = merge_matched_candidates(candidates, document, user=None)
+
+        assert result == candidates
+
+    def test_matching_failure_degrades_to_neighbour_candidates(
+        self,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - Matching raises
+        WHEN:
+            - merge_matched_candidates() is called
+        THEN:
+            - The neighbour candidates are returned unchanged, no exception
+        """
+        tag = TagFactory.create(name="Neighbour")
+        document = DocumentFactory.create()
+        candidates = empty_taxonomy_candidates()
+        candidates["tags"] = [{"id": tag.pk, "name": "Neighbour", "weight": 0.9}]
+        mocker.patch("paperless_ai.taxonomy.load_classifier", return_value=None)
+        mocker.patch(
+            "paperless_ai.taxonomy.match_tags",
+            side_effect=RuntimeError("boom"),
+        )
+
+        result = merge_matched_candidates(candidates, document, user=None)
+
+        assert result == candidates
 
 
 class TestFormatTaxonomyForPrompt:
