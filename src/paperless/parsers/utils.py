@@ -265,6 +265,52 @@ def get_page_count_for_pdf(
         return None
 
 
+def get_pdf_first_page_size_points(
+    path: Path,
+    log: logging.Logger | None = None,
+) -> tuple[float, float] | None:
+    """Return the first page's (width, height) in PDF points, post-rotation.
+
+    Uses the CropBox (MediaBox if absent), which must match pdftoppm's
+    ``-cropbox`` or the computed DPI targets the wrong box.
+
+    Swaps width and height for 90/270 rotation. ``page.rotation`` resolves
+    inherited and negative ``/Rotate`` values, a raw lookup does not.
+
+    Parameters
+    ----------
+    path:
+        Absolute path to the PDF file.
+    log:
+        Logger for warnings.  Falls back to the module-level logger when omitted.
+
+    Returns
+    -------
+    tuple[float, float] | None
+        ``(width_points, height_points)``, or ``None`` if the file cannot be
+        opened, has no pages, or the page box is degenerate.
+    """
+    import pikepdf
+
+    _log = log or logger
+    try:
+        with pikepdf.Pdf.open(path) as pdf:
+            if len(pdf.pages) == 0:
+                return None
+            page = pdf.pages[0]
+            llx, lly, urx, ury = (float(v) for v in page.cropbox)
+            width = abs(urx - llx)
+            height = abs(ury - lly)
+            if width <= 0 or height <= 0:
+                return None
+            if page.rotation in (90, 270):
+                width, height = height, width
+            return width, height
+    except Exception as e:
+        _log.warning("Could not determine PDF page size for %s: %s", path, e)
+        return None
+
+
 def extract_pdf_metadata(
     document_path: Path,
     log: logging.Logger | None = None,
