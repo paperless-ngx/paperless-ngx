@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-05 16:26+0000\n"
-"PO-Revision-Date: 2026-10-05 16:27\n"
+"POT-Creation-Date: 2026-10-08 18:39+0000\n"
+"PO-Revision-Date: 2026-10-08 18:40\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
@@ -1006,23 +1006,23 @@ msgstr "заметки"
 
 #: documents/models.py:996
 msgid "page"
-msgstr ""
+msgstr "страница"
 
 #: documents/models.py:997
 msgid "Page of the original file, starting at 1"
-msgstr ""
+msgstr "Страница исходного файла, начиная с 1"
 
 #: documents/models.py:1052
 msgid "format"
-msgstr ""
+msgstr "формат"
 
 #: documents/models.py:1056
 msgid "document barcode"
-msgstr ""
+msgstr "штрих-код документа"
 
 #: documents/models.py:1057
 msgid "document barcodes"
-msgstr ""
+msgstr "штрих-коды документа"
 
 #: documents/models.py:1066
 msgid "Original"
@@ -1635,48 +1635,48 @@ msgstr "запуск рабочего процесса"
 msgid "workflow runs"
 msgstr "запуски рабочего процесса"
 
-#: documents/serialisers.py:515 documents/serialisers.py:872
-#: documents/serialisers.py:2902 documents/views.py:343 documents/views.py:2732
+#: documents/serialisers.py:516 documents/serialisers.py:873
+#: documents/serialisers.py:2903 documents/views.py:344 documents/views.py:2751
 #: paperless_mail/serialisers.py:156
 msgid "Insufficient permissions."
 msgstr "Недостаточно прав."
 
-#: documents/serialisers.py:708
+#: documents/serialisers.py:709
 msgid "Invalid color."
 msgstr "Неверный цвет."
 
-#: documents/serialisers.py:2369
+#: documents/serialisers.py:2370
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Тип файла %(type)s не поддерживается"
 
-#: documents/serialisers.py:2413
+#: documents/serialisers.py:2414
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
 msgstr "Идентификатор настраиваемого поля должен быть целым числом: %(id)s"
 
-#: documents/serialisers.py:2420
+#: documents/serialisers.py:2421
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
 msgstr "Пользовательское поле с идентификатором %(id)s не существует"
 
-#: documents/serialisers.py:2437 documents/serialisers.py:2447
+#: documents/serialisers.py:2438 documents/serialisers.py:2448
 msgid "Custom fields must be a list of integers or an object mapping ids to values."
 msgstr "Пользовательские поля должны быть списком целых чисел или идентификаторами отображения объектов значений."
 
-#: documents/serialisers.py:2442
+#: documents/serialisers.py:2443
 msgid "Some custom fields don't exist or were specified twice."
 msgstr "Некоторые пользовательские поля не существуют или были указаны дважды."
 
-#: documents/serialisers.py:2589
+#: documents/serialisers.py:2590
 msgid "Invalid variable detected."
 msgstr "Обнаружена неверная переменная."
 
-#: documents/serialisers.py:2958
+#: documents/serialisers.py:2959
 msgid "Duplicate document identifiers are not allowed."
 msgstr "Повторяющиеся идентификаторы документа не допускаются."
 
-#: documents/serialisers.py:2988 documents/views.py:4787
+#: documents/serialisers.py:2989 documents/views.py:4807
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr "Документы не найдены: %(ids)s"
@@ -1913,59 +1913,44 @@ msgstr "Вы собираетесь войти через сторонний с�
 msgid "As a final step, please complete the following form:"
 msgstr "На завершение, пожалуйста заполните следующую форму:"
 
-#: documents/validators.py:24
-#, python-brace-format
-msgid "Unable to parse URI {value}, missing scheme"
-msgstr "Не удается распознать URI {value}, отсутствует схема"
-
-#: documents/validators.py:29
-#, python-brace-format
-msgid "Unable to parse URI {value}, missing net location or path"
-msgstr "Не удалось распознать URI {value}, отсутствует сетевое расположение или путь"
-
 #: documents/validators.py:36
-msgid "URI scheme '{parts.scheme}' is not allowed. Allowed schemes: {', '.join(allowed_schemes)}"
-msgstr "Недопустимая схема URI '{parts.scheme}'. Разрешенные схемы: {', '.join(allowed_schemes)}"
+msgid ", "
+msgstr ", "
 
-#: documents/validators.py:45
-#, python-brace-format
-msgid "Unable to parse URI {value}"
-msgstr "Невозможно распознать URI {value}"
-
-#: documents/views.py:336 documents/views.py:2729
+#: documents/views.py:337 documents/views.py:2748
 msgid "Invalid more_like_id"
 msgstr "Недопустимый more_like_id"
 
-#: documents/views.py:1676
+#: documents/views.py:1683
 msgid "Invalid AI configuration."
 msgstr "Неверная конфигурация ИИ."
 
-#: documents/views.py:1687
+#: documents/views.py:1694
 msgid "AI backend request timed out."
 msgstr "Таймаут запроса ИИ."
 
-#: documents/views.py:1699
+#: documents/views.py:1706
 msgid "AI backend rejected the request. Check logs for details."
 msgstr "Движок ИИ отклонил запрос. Проверьте логи."
 
-#: documents/views.py:2554 documents/views.py:2870
+#: documents/views.py:2573 documents/views.py:2889
 msgid "Specify only one of text, title_search, query, or more_like_id."
 msgstr "Укажите только одно: текст, title_search, query или more _like_id."
 
-#: documents/views.py:4800
+#: documents/views.py:4823
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr "Недостаточно прав для совместного доступа к документу %(id)s."
 
-#: documents/views.py:4846
+#: documents/views.py:4870
 msgid "Bundle is already being processed."
 msgstr "Пакет уже обрабатывается."
 
-#: documents/views.py:4910
+#: documents/views.py:4934
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr "Набор ссылок все еще готовится. Пожалуйста, повторите попытку позже."
 
-#: documents/views.py:4924
+#: documents/views.py:4948
 msgid "The share link bundle is unavailable."
 msgstr "Пакет общих ссылок недоступен."
 
@@ -2183,7 +2168,7 @@ msgstr "Включает разделение на штрих-коды тего�
 
 #: paperless/models.py:308
 msgid "Stores the values of detected barcodes"
-msgstr ""
+msgstr "Сохраняет значения обнаруженных штрих-кодов"
 
 #: paperless/models.py:318
 msgid "Sets the remote OCR engine"

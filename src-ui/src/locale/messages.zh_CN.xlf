@@ -595,7 +595,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
           <context context-type="linenumber">43</context>
         </context-group>
-        <target state="needs-translation">Reset to external</target>
+        <target state="translated">重置为外部</target>
       </trans-unit>
       <trans-unit id="7808756054397155068" datatype="html">
         <source>Reset</source>
@@ -1135,7 +1135,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">115,116</context>
         </context-group>
-        <target state="needs-translation">Sidebar items to show:</target>
+        <target state="translated">侧边栏显示项：</target>
       </trans-unit>
       <trans-unit id="1356890996281769972" datatype="html">
         <source>Dark mode</source>
@@ -1419,7 +1419,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">266</context>
         </context-group>
-        <target state="needs-translation">ML only</target>
+        <target state="translated">仅限 ML</target>
       </trans-unit>
       <trans-unit id="6418969597665857901" datatype="html">
         <source>AI only</source>
@@ -1427,7 +1427,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">268</context>
         </context-group>
-        <target state="needs-translation">AI only</target>
+        <target state="translated">仅限 AI</target>
       </trans-unit>
       <trans-unit id="1043449647727456069" datatype="html">
         <source>Automatically request suggestions for inbox documents</source>
@@ -2887,7 +2887,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">104</context>
         </context-group>
-        <target state="needs-translation">Apply AI Suggestions</target>
+        <target state="translated">应用 AI 建议</target>
       </trans-unit>
       <trans-unit id="9172233176401579786" datatype="html">
         <source>Scheduled</source>
@@ -3939,7 +3939,7 @@
           <context context-type="sourcefile">src/app/components/manage/share-links/share-links.component.html</context>
           <context context-type="linenumber">2,3</context>
         </context-group>
-        <target state="needs-translation">Share links</target>
+        <target state="translated">分享链接</target>
       </trans-unit>
       <trans-unit id="7844706011418789951" datatype="html">
         <source>Administration</source>
@@ -4259,7 +4259,7 @@
           <context context-type="sourcefile">src/app/data/saved-view-icons.ts</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="needs-translation">Chat</target>
+        <target state="translated">聊天</target>
       </trans-unit>
       <trans-unit id="8066608938393600549" datatype="html">
         <source>Message</source>
@@ -4539,7 +4539,7 @@
           <context context-type="sourcefile">src/app/components/common/confirm-dialog/reprocess-confirm-dialog/reprocess-confirm-dialog.component.html</context>
           <context context-type="linenumber">16,17</context>
         </context-group>
-        <target state="needs-translation">Use remote OCR</target>
+        <target state="translated">使用远程 OCR</target>
       </trans-unit>
       <trans-unit id="6733578401091585663" datatype="html">
         <source>Sends the document to the configured remote OCR service, which may incur costs.</source>
@@ -4547,7 +4547,7 @@
           <context context-type="sourcefile">src/app/components/common/confirm-dialog/reprocess-confirm-dialog/reprocess-confirm-dialog.component.html</context>
           <context context-type="linenumber">17,18</context>
         </context-group>
-        <target state="needs-translation">Sends the document to the configured remote OCR service, which may incur costs.</target>
+        <target state="translated">将文档发送到已配置的远程 OCR 服务，可能会产生费用。</target>
       </trans-unit>
       <trans-unit id="3883144805282469432" datatype="html">
         <source>Rotate counterclockwise</source>
@@ -4655,7 +4655,7 @@
           <context context-type="sourcefile">src/app/components/common/input/date/date.component.html</context>
           <context context-type="linenumber">16</context>
         </context-group>
-        <target state="needs-translation">Open date picker</target>
+        <target state="translated">打开日期选择器</target>
       </trans-unit>
       <trans-unit id="6048892649018070225" datatype="html">
         <source>Today</source>
@@ -4779,7 +4779,7 @@
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
           <context context-type="linenumber">154</context>
         </context-group>
-        <target state="needs-translation">Remove query</target>
+        <target state="translated">移除查询</target>
       </trans-unit>
       <trans-unit id="3184700926171002527" datatype="html">
         <source>Any</source>
@@ -4823,7 +4823,7 @@
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
           <context context-type="linenumber">196</context>
         </context-group>
-        <target state="needs-translation">Remove expression</target>
+        <target state="translated">移除表达式</target>
       </trans-unit>
       <trans-unit id="6630533861307510614" datatype="html">
         <source>Clear created relative date</source>
@@ -6931,7 +6931,7 @@
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
           <context context-type="linenumber">58</context>
         </context-group>
-        <target state="needs-translation">Remote OCR</target>
+        <target state="translated">远程 OCR</target>
       </trans-unit>
       <trans-unit id="4101630920511881483" datatype="html">
         <source>Apply AI suggestions</source>
@@ -6939,7 +6939,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
           <context context-type="linenumber">159</context>
         </context-group>
-        <target state="needs-translation">Apply AI suggestions</target>
+        <target state="translated">应用 AI 建议</target>
       </trans-unit>
       <trans-unit id="5701618810648052610" datatype="html">
         <source>Title</source>
@@ -6975,7 +6975,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
           <context context-type="linenumber">186</context>
         </context-group>
-        <target state="needs-translation">Created date</target>
+        <target state="translated">创建日期</target>
       </trans-unit>
       <trans-unit id="4522609911791833187" datatype="html">
         <source>Has any of these tags</source>
@@ -7396,7 +7396,7 @@
           <context context-type="sourcefile">src/app/components/common/input/document-link/document-link.component.html</context>
           <context context-type="linenumber">52,53</context>
         </context-group>
-        <target state="needs-translation">Unavailable</target>
+        <target state="translated">不可用</target>
       </trans-unit>
       <trans-unit id="5676637575587497817" datatype="html">
         <source>Search for documents</source>
@@ -7440,7 +7440,7 @@
           <context context-type="sourcefile">src/app/components/common/input/entries/entries.component.html</context>
           <context context-type="linenumber">16</context>
         </context-group>
-        <target state="needs-translation">Remove entry</target>
+        <target state="translated">移除条目</target>
       </trans-unit>
       <trans-unit id="6932865105766151309" datatype="html">
         <source>Upload</source>
@@ -7493,7 +7493,7 @@
           <context context-type="sourcefile">src/app/components/common/input/select/select.component.html</context>
           <context context-type="linenumber">41</context>
         </context-group>
-        <target state="needs-translation">Remove item</target>
+        <target state="translated">移除项目</target>
       </trans-unit>
       <trans-unit id="3686284950598311784" datatype="html">
         <source>Private</source>
@@ -7769,7 +7769,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-filter-dropdown/permissions-filter-dropdown.component.html</context>
           <context context-type="linenumber">61</context>
         </context-group>
-        <target state="needs-translation">Clear selected users</target>
+        <target state="translated">清除选中的用户</target>
       </trans-unit>
       <trans-unit id="8999708063434507268" datatype="html">
         <source>Hide unowned</source>
@@ -8481,7 +8481,7 @@
           <context context-type="sourcefile">src/app/components/common/suggestions-dropdown/suggestions-dropdown.component.html</context>
           <context context-type="linenumber">12,13</context>
         </context-group>
-        <target state="needs-translation">No suggestions</target>
+        <target state="translated">无建议</target>
       </trans-unit>
       <trans-unit id="5320136382998259826" datatype="html">
         <source>Suggest</source>
@@ -8533,7 +8533,7 @@
           <context context-type="sourcefile">src/app/components/common/suggestions-dropdown/suggestions-dropdown.component.html</context>
           <context context-type="linenumber">65,66</context>
         </context-group>
-        <target state="needs-translation">Suggestion options</target>
+        <target state="translated">建议选项</target>
       </trans-unit>
       <trans-unit id="3145824396228856507" datatype="html">
         <source>Not using default</source>
@@ -8541,7 +8541,7 @@
           <context context-type="sourcefile">src/app/components/common/suggestions-dropdown/suggestions-dropdown.component.html</context>
           <context context-type="linenumber">69,70</context>
         </context-group>
-        <target state="needs-translation">Not using default</target>
+        <target state="translated">不使用默认值</target>
       </trans-unit>
       <trans-unit id="8102623853570619759" datatype="html">
         <source>Suggest using:</source>
@@ -8549,7 +8549,7 @@
           <context context-type="sourcefile">src/app/components/common/suggestions-dropdown/suggestions-dropdown.component.html</context>
           <context context-type="linenumber">74,75</context>
         </context-group>
-        <target state="needs-translation">Suggest using:</target>
+        <target state="translated">建议使用：</target>
       </trans-unit>
       <trans-unit id="5799391967036896978" datatype="html">
         <source>ML</source>
@@ -8557,7 +8557,7 @@
           <context context-type="sourcefile">src/app/components/common/suggestions-dropdown/suggestions-dropdown.component.html</context>
           <context context-type="linenumber">77</context>
         </context-group>
-        <target state="needs-translation">ML</target>
+        <target state="translated">ML</target>
       </trans-unit>
       <trans-unit id="3484984238852181071" datatype="html">
         <source>AI</source>
@@ -8565,7 +8565,7 @@
           <context context-type="sourcefile">src/app/components/common/suggestions-dropdown/suggestions-dropdown.component.html</context>
           <context context-type="linenumber">81</context>
         </context-group>
-        <target state="needs-translation">AI</target>
+        <target state="translated">AI</target>
       </trans-unit>
       <trans-unit id="9180110319941008393" datatype="html">
         <source>Environment</source>
@@ -9219,7 +9219,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-barcodes/document-barcodes.component.html</context>
           <context context-type="linenumber">40,41</context>
         </context-group>
-        <target state="needs-translation">Copy content</target>
+        <target state="translated">复制内容</target>
       </trans-unit>
       <trans-unit id="2266163016683537825" datatype="html">
         <source>of <x id="INTERPOLATION" equiv-text="{{previewNumPages()}}"/></source>
@@ -9255,7 +9255,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
           <context context-type="linenumber">154</context>
         </context-group>
-        <target state="needs-translation">Download options</target>
+        <target state="translated">下载选项</target>
       </trans-unit>
       <trans-unit id="8659635229098859487" datatype="html">
         <source>Download original</source>
@@ -9479,7 +9479,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">360,361</context>
         </context-group>
-        <target state="needs-translation">Barcodes</target>
+        <target state="translated">条形码</target>
       </trans-unit>
       <trans-unit id="6992781481378431874" datatype="html">
         <source>Original document metadata</source>
@@ -9727,7 +9727,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">1074</context>
         </context-group>
-        <target state="needs-translation">You have unsaved changes to the content of this version.</target>
+        <target state="translated">此版本的内容有未保存的更改。</target>
       </trans-unit>
       <trans-unit id="85184271222513014" datatype="html">
         <source>Switching versions will discard them.</source>
@@ -9735,7 +9735,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">1075</context>
         </context-group>
-        <target state="needs-translation">Switching versions will discard them.</target>
+        <target state="translated">切换版本将丢弃这些更改。</target>
       </trans-unit>
       <trans-unit id="2565707334844767610" datatype="html">
         <source>Discard and switch</source>
@@ -9743,7 +9743,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">1077</context>
         </context-group>
-        <target state="needs-translation">Discard and switch</target>
+        <target state="translated">丢弃并切换</target>
       </trans-unit>
       <trans-unit id="2109314380040637387" datatype="html">
         <source>Save and switch</source>
@@ -9751,7 +9751,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">1079</context>
         </context-group>
-        <target state="needs-translation">Save and switch</target>
+        <target state="translated">保存并切换</target>
       </trans-unit>
       <trans-unit id="3456881259945295697" datatype="html">
         <source>Error retrieving suggestions.</source>
@@ -9967,7 +9967,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-version-dropdown/add-existing-document-version-dialog/add-existing-document-version-dialog.component.html</context>
           <context context-type="linenumber">13,14</context>
         </context-group>
-        <target state="needs-translation">Select one document to add as a version.</target>
+        <target state="translated">请选择一份文档，将其添加为新版本。</target>
       </trans-unit>
       <trans-unit id="337558081609002420" datatype="html">
         <source>Add version</source>
@@ -10011,7 +10011,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-version-dropdown/document-version-dropdown.component.html</context>
           <context context-type="linenumber">35,36</context>
         </context-group>
-        <target state="needs-translation">Upload a new version</target>
+        <target state="translated">上传新版本</target>
       </trans-unit>
       <trans-unit id="278763911843514709" datatype="html">
         <source>Use an existing document</source>
@@ -10019,7 +10019,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-version-dropdown/document-version-dropdown.component.html</context>
           <context context-type="linenumber">44,45</context>
         </context-group>
-        <target state="needs-translation">Use an existing document</target>
+        <target state="translated">使用现有文档</target>
       </trans-unit>
       <trans-unit id="1906507263389090131" datatype="html">
         <source>Existing</source>
@@ -10027,7 +10027,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-version-dropdown/document-version-dropdown.component.html</context>
           <context context-type="linenumber">47,48</context>
         </context-group>
-        <target state="needs-translation">Existing</target>
+        <target state="translated">已有的</target>
       </trans-unit>
       <trans-unit id="3119565892291077820" datatype="html">
         <source>Uploading version...</source>
@@ -11234,7 +11234,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">208</context>
         </context-group>
-        <target state="needs-translation">Duplicates</target>
+        <target state="translated">创建副本</target>
       </trans-unit>
       <trans-unit id="8492379284173601938" datatype="html">
         <source>Custom fields (Deprecated)</source>
@@ -11298,7 +11298,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">252</context>
         </context-group>
-        <target state="needs-translation">exist</target>
+        <target state="translated">存在</target>
       </trans-unit>
       <trans-unit id="4528435301189613620" datatype="html">
         <source>do not exist</source>
@@ -11306,7 +11306,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">256</context>
         </context-group>
-        <target state="needs-translation">do not exist</target>
+        <target state="translated">不存在</target>
       </trans-unit>
       <trans-unit id="5195932016807797291" datatype="html">
         <source>Correspondent: <x id="PH" equiv-text="this.correspondentSelectionModel.items.find(                 (c) =&gt; c.id == +rule.value               )?.name"/></source>
@@ -11378,7 +11378,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">343</context>
         </context-group>
-        <target state="needs-translation">Without duplicates</target>
+        <target state="translated">无重复项</target>
       </trans-unit>
       <trans-unit id="8448347828886552444" datatype="html">
         <source>With duplicates</source>
@@ -11386,7 +11386,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">344</context>
         </context-group>
-        <target state="needs-translation">With duplicates</target>
+        <target state="translated">带重复项</target>
       </trans-unit>
       <trans-unit id="8644099678903817943" datatype="html">
         <source>Custom fields query</source>
@@ -11462,7 +11462,7 @@
           <context context-type="sourcefile">src/app/components/manage/saved-views/saved-views.component.html</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="needs-translation">Icon</target>
+        <target state="translated">图标</target>
       </trans-unit>
       <trans-unit id="8689274715612276035" datatype="html">
         <source>Show in sidebar</source>
@@ -12515,7 +12515,7 @@
           <context context-type="sourcefile">src/app/components/manage/share-links/share-link-list/share-link-list.component.html</context>
           <context context-type="linenumber">40,41</context>
         </context-group>
-        <target state="needs-translation">Expired</target>
+        <target state="translated">已过期</target>
       </trans-unit>
       <trans-unit id="2057574872309338088" datatype="html">
         <source>Copy share link</source>
@@ -12559,7 +12559,7 @@
           <context context-type="sourcefile">src/app/components/manage/share-links/share-link-bundle-list/share-link-bundle-list.component.html</context>
           <context context-type="linenumber">164,165</context>
         </context-group>
-        <target state="needs-translation">Share link bundles pagination</target>
+        <target state="translated">分享链接合集分页</target>
       </trans-unit>
       <trans-unit id="1541995860059283227" datatype="html">
         <source>Failed to load share link bundles.</source>
@@ -12623,7 +12623,7 @@
           <context context-type="sourcefile">src/app/components/manage/share-links/share-link-list/share-link-list.component.html</context>
           <context context-type="linenumber">15,16</context>
         </context-group>
-        <target state="needs-translation">Document</target>
+        <target state="translated">文档</target>
       </trans-unit>
       <trans-unit id="7420713064779772535" datatype="html">
         <source>Delete share link</source>
@@ -12631,7 +12631,7 @@
           <context context-type="sourcefile">src/app/components/manage/share-links/share-link-list/share-link-list.component.html</context>
           <context context-type="linenumber">75,76</context>
         </context-group>
-        <target state="needs-translation">Delete share link</target>
+        <target state="translated">删除分享链接</target>
       </trans-unit>
       <trans-unit id="5198271726831144068" datatype="html">
         <source>Share links pagination</source>
@@ -12647,7 +12647,7 @@
           <context context-type="sourcefile">src/app/components/manage/share-links/share-link-list/share-link-list.component.ts</context>
           <context context-type="linenumber">105</context>
         </context-group>
-        <target state="needs-translation">Failed to load share links.</target>
+        <target state="translated">加载分享链接失败。</target>
       </trans-unit>
       <trans-unit id="4100863040928608880" datatype="html">
         <source>Error retrieving share links.</source>
@@ -12655,7 +12655,7 @@
           <context context-type="sourcefile">src/app/components/manage/share-links/share-link-list/share-link-list.component.ts</context>
           <context context-type="linenumber">107</context>
         </context-group>
-        <target state="needs-translation">Error retrieving share links.</target>
+        <target state="translated">获取分享链接失败。</target>
       </trans-unit>
       <trans-unit id="326120283142363299" datatype="html">
         <source>Share link deleted.</source>
@@ -12663,7 +12663,7 @@
           <context context-type="sourcefile">src/app/components/manage/share-links/share-link-list/share-link-list.component.ts</context>
           <context context-type="linenumber">154</context>
         </context-group>
-        <target state="needs-translation">Share link deleted.</target>
+        <target state="translated">分享链接已删除。</target>
       </trans-unit>
       <trans-unit id="4964931417181298145" datatype="html">
         <source>Error deleting share link.</source>
@@ -12671,7 +12671,7 @@
           <context context-type="sourcefile">src/app/components/manage/share-links/share-link-list/share-link-list.component.ts</context>
           <context context-type="linenumber">159</context>
         </context-group>
-        <target state="needs-translation">Error deleting share link.</target>
+        <target state="translated">删除分享链接失败。</target>
       </trans-unit>
       <trans-unit id="3439104787814858626" datatype="html">
         <source>Manage public links to individual documents and document bundles.</source>
@@ -12679,7 +12679,7 @@
           <context context-type="sourcefile">src/app/components/manage/share-links/share-links.component.html</context>
           <context context-type="linenumber">4,5</context>
         </context-group>
-        <target state="needs-translation">Manage public links to individual documents and document bundles.</target>
+        <target state="translated">管理单个文档和文档合集的公开分享链接。</target>
       </trans-unit>
       <trans-unit id="3740311348735113099" datatype="html">
         <source>Document links</source>
@@ -12687,7 +12687,7 @@
           <context context-type="sourcefile">src/app/components/manage/share-links/share-links.component.html</context>
           <context context-type="linenumber">18,19</context>
         </context-group>
-        <target state="needs-translation">Document links</target>
+        <target state="translated">文档链接</target>
       </trans-unit>
       <trans-unit id="8216780576869093031" datatype="html">
         <source>Bundles</source>
@@ -12695,7 +12695,7 @@
           <context context-type="sourcefile">src/app/components/manage/share-links/share-links.component.html</context>
           <context context-type="linenumber">26,27</context>
         </context-group>
-        <target state="needs-translation">Bundles</target>
+        <target state="translated">捆绑包</target>
       </trans-unit>
       <trans-unit id="1229748338333965418" datatype="html">
         <source>Use workflows to customize the behavior of Paperless-ngx when events &apos;trigger&apos; a workflow.</source>
@@ -13208,7 +13208,7 @@
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
           <context context-type="linenumber">200</context>
         </context-group>
-        <target state="needs-translation">Remote OCR Engine</target>
+        <target state="translated">远程 OCR 引擎</target>
       </trans-unit>
       <trans-unit id="2892372808177591734" datatype="html">
         <source>Enabling remote OCR sends documents to a third-party service for processing. Consider the privacy implications as well as potential costs before enabling.</source>
@@ -13224,7 +13224,7 @@
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
           <context context-type="linenumber">210</context>
         </context-group>
-        <target state="needs-translation">Remote OCR API Key</target>
+        <target state="translated">远程 OCR API 密钥</target>
       </trans-unit>
       <trans-unit id="8592973963881683840" datatype="html">
         <source>Remote OCR Endpoint</source>
@@ -13232,7 +13232,7 @@
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
           <context context-type="linenumber">218</context>
         </context-group>
-        <target state="needs-translation">Remote OCR Endpoint</target>
+        <target state="translated">远程 OCR 端点</target>
       </trans-unit>
       <trans-unit id="2477780225973884032" datatype="html">
         <source>Required when using the Azure AI engine.</source>
@@ -13240,7 +13240,7 @@
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
           <context context-type="linenumber">223</context>
         </context-group>
-        <target state="needs-translation">Required when using the Azure AI engine.</target>
+        <target state="translated">使用 Azure AI 引擎时必填。</target>
       </trans-unit>
       <trans-unit id="2908398258708722139" datatype="html">
         <source>Remote OCR Mode</source>
@@ -13248,7 +13248,7 @@
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
           <context context-type="linenumber">227</context>
         </context-group>
-        <target state="needs-translation">Remote OCR Mode</target>
+        <target state="translated">远程 OCR 模式</target>
       </trans-unit>
       <trans-unit id="4022045371405916558" datatype="html">
         <source>Which documents are sent to the remote engine. Use &apos;workflow_only&apos; to keep remote OCR off unless a workflow enables it for a document.</source>

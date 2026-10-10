@@ -17,7 +17,7 @@
           <context context-type="linenumber">386,393</context>
         </context-group>
         <note priority="1" from="description">Currently selected slide number read by screen reader</note>
-        <target state="needs-translation"> Slide <x id="INTERPOLATION" equiv-text="xt(source?: Ngb"/> of <x id="INTERPOLATION_1" equiv-text="this._cycleToSe"/> </target>
+        <target state="translated"> Slajd <x id="INTERPOLATION" equiv-text="xt(source?: Ngb"/> z <x id="INTERPOLATION_1" equiv-text="this._cycleToSe"/> </target>
       </trans-unit>
       <trans-unit id="ngb.carousel.previous" datatype="html">
         <source>Previous</source>
@@ -507,7 +507,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">225</context>
         </context-group>
-        <target state="needs-translation">Tasks helps you track background work, what needs attention, and what recently completed.</target>
+        <target state="translated">Zadania pomagają śledzić pracę w tle, to, co wymaga uwagi i co zostało ostatnio ukończone.</target>
       </trans-unit>
       <trans-unit id="2755033621682206902" datatype="html">
         <source>Check out the settings for various tweaks to the web app.</source>
@@ -571,7 +571,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
           <context context-type="linenumber">35</context>
         </context-group>
-        <target state="needs-translation">This value overrides <x id="INTERPOLATION" equiv-text="{{option.config_key}}"/>, which is set outside Paperless.</target>
+        <target state="translated">Ta wartość zastępuje <x id="INTERPOLATION" equiv-text="{{option.config_key}}"/>, która jest ustawiona poza Paperless.</target>
       </trans-unit>
       <trans-unit id="7221396516204435584" datatype="html">
         <source><x id="INTERPOLATION" equiv-text="{{option.config_key}}"/> is set outside Paperless. Enter a value here to override it.</source>
@@ -579,7 +579,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
           <context context-type="linenumber">37</context>
         </context-group>
-        <target state="needs-translation"><x id="INTERPOLATION" equiv-text="{{option.config_key}}"/> is set outside Paperless. Enter a value here to override it.</target>
+        <target state="translated"><x id="INTERPOLATION" equiv-text="{{option.config_key}}"/> jest ustawiony poza Paperless. Wpisz tutaj wartość, aby go zastąpić.</target>
       </trans-unit>
       <trans-unit id="8318849619178340389" datatype="html">
         <source>Use the externally configured value</source>
@@ -587,7 +587,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
           <context context-type="linenumber">42</context>
         </context-group>
-        <target state="needs-translation">Use the externally configured value</target>
+        <target state="translated">Użyj wartości skonfigurowanej zewnętrznie</target>
       </trans-unit>
       <trans-unit id="6032629623003430385" datatype="html">
         <source>Reset to external</source>
@@ -595,7 +595,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
           <context context-type="linenumber">43</context>
         </context-group>
-        <target state="needs-translation">Reset to external</target>
+        <target state="translated">Zresetuj na zewnętrzny</target>
       </trans-unit>
       <trans-unit id="7808756054397155068" datatype="html">
         <source>Reset</source>
@@ -1411,7 +1411,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">264</context>
         </context-group>
-        <target state="needs-translation">Both</target>
+        <target state="translated">Obydwa</target>
       </trans-unit>
       <trans-unit id="8967224283122923634" datatype="html">
         <source>ML only</source>
@@ -1419,7 +1419,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">266</context>
         </context-group>
-        <target state="needs-translation">ML only</target>
+        <target state="translated">Tylko ML</target>
       </trans-unit>
       <trans-unit id="6418969597665857901" datatype="html">
         <source>AI only</source>
@@ -1427,7 +1427,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">268</context>
         </context-group>
-        <target state="needs-translation">AI only</target>
+        <target state="translated">Tylko SI</target>
       </trans-unit>
       <trans-unit id="1043449647727456069" datatype="html">
         <source>Automatically request suggestions for inbox documents</source>
@@ -2211,7 +2211,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.html</context>
           <context context-type="linenumber">4,5</context>
         </context-group>
-        <target state="needs-translation">Tasks shows detailed information about document consumption and system tasks.</target>
+        <target state="translated">Zadania zawierają szczegóły dotyczące przetwarzania dokumentów i zadań systemowych.</target>
       </trans-unit>
       <trans-unit id="103921551219467537" datatype="html">
         <source>Clear selection</source>
@@ -2327,7 +2327,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.html</context>
           <context context-type="linenumber">92,93</context>
         </context-group>
-        <target state="needs-translation">Search tasks</target>
+        <target state="translated">Szukaj w zadaniach</target>
       </trans-unit>
       <trans-unit id="6849725902312323996" datatype="html" approved="yes">
         <source>Reset filters</source>
@@ -2651,7 +2651,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.html</context>
           <context context-type="linenumber">207</context>
         </context-group>
-        <target state="needs-translation">View task details</target>
+        <target state="translated">Wyświetl szczegóły zadania</target>
       </trans-unit>
       <trans-unit id="1536087519743707362" datatype="html">
         <source>Dismiss</source>
@@ -4555,7 +4555,7 @@
           <context context-type="sourcefile">src/app/components/common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component.html</context>
           <context context-type="linenumber">9</context>
         </context-group>
-        <target state="needs-translation">Rotate counterclockwise</target>
+        <target state="translated">Obróć w lewo</target>
       </trans-unit>
       <trans-unit id="631338357809243389" datatype="html">
         <source>Rotate clockwise</source>
@@ -4563,7 +4563,7 @@
           <context context-type="sourcefile">src/app/components/common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component.html</context>
           <context context-type="linenumber">19</context>
         </context-group>
-        <target state="needs-translation">Rotate clockwise</target>
+        <target state="translated">Obróć w prawo</target>
       </trans-unit>
       <trans-unit id="8157388568390631653" datatype="html">
         <source>Note that only PDFs will be rotated.</source>
@@ -7641,7 +7641,7 @@
           <context context-type="sourcefile">src/app/components/common/pdf-editor/pdf-editor.component.html</context>
           <context context-type="linenumber">17</context>
         </context-group>
-        <target state="translated">Obróć wybrane strony przeciwnie do ruchu wskazówek zegara</target>
+        <target state="translated">Obróć zaznaczone strony w lewo</target>
       </trans-unit>
       <trans-unit id="4787219034890830544" datatype="html">
         <source>Rotate selected pages clockwise</source>
@@ -7649,7 +7649,7 @@
           <context context-type="sourcefile">src/app/components/common/pdf-editor/pdf-editor.component.html</context>
           <context context-type="linenumber">20</context>
         </context-group>
-        <target state="translated">Obróć wybrane strony zgodnie z ruchem wskazówek zegara</target>
+        <target state="translated">Obróć zaznaczone strony w prawo</target>
       </trans-unit>
       <trans-unit id="3441043765105475130" datatype="html">
         <source>Delete selected pages</source>
@@ -7665,7 +7665,7 @@
           <context context-type="sourcefile">src/app/components/common/pdf-editor/pdf-editor.component.html</context>
           <context context-type="linenumber">33</context>
         </context-group>
-        <target state="translated">Obróć stronę przeciwnie do ruchu wskazówek zegara</target>
+        <target state="translated">Obróć stronę w lewo</target>
       </trans-unit>
       <trans-unit id="3450236521040548507" datatype="html">
         <source>Rotate page clockwise</source>
@@ -7673,7 +7673,7 @@
           <context context-type="sourcefile">src/app/components/common/pdf-editor/pdf-editor.component.html</context>
           <context context-type="linenumber">36</context>
         </context-group>
-        <target state="translated">Obróć stronę zgodnie z ruchem wskazówek zegara</target>
+        <target state="translated">Obróć stronę w prawo</target>
       </trans-unit>
       <trans-unit id="7647925464077975347" datatype="html">
         <source>Delete page</source>

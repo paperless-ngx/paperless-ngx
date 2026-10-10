@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-05 16:26+0000\n"
-"PO-Revision-Date: 2026-10-05 16:27\n"
+"POT-Creation-Date: 2026-10-08 18:39+0000\n"
+"PO-Revision-Date: 2026-10-10 12:28\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -286,11 +286,11 @@ msgstr "银行"
 
 #: documents/models.py:564
 msgid "Basket"
-msgstr ""
+msgstr "篮子"
 
 #: documents/models.py:565
 msgid "Bell"
-msgstr ""
+msgstr "铃铛"
 
 #: documents/models.py:566
 msgid "Bookmark"
@@ -402,7 +402,7 @@ msgstr "过滤器"
 
 #: documents/models.py:596
 msgid "Gear"
-msgstr ""
+msgstr "齿轮"
 
 #: documents/models.py:597
 msgid "Globe"
@@ -450,7 +450,7 @@ msgstr ""
 
 #: documents/models.py:608
 msgid "Printer"
-msgstr ""
+msgstr "打印机"
 
 #: documents/models.py:609
 msgid "Receipt"
@@ -458,19 +458,19 @@ msgstr "收据"
 
 #: documents/models.py:610
 msgid "Safe"
-msgstr ""
+msgstr "安全"
 
 #: documents/models.py:611
 msgid "Search"
-msgstr ""
+msgstr "搜索"
 
 #: documents/models.py:612
 msgid "Send"
-msgstr ""
+msgstr "发送"
 
 #: documents/models.py:613
 msgid "Shop"
-msgstr ""
+msgstr "商店"
 
 #: documents/models.py:614
 msgid "Stack"
@@ -490,15 +490,15 @@ msgstr "标签"
 
 #: documents/models.py:618
 msgid "Telephone"
-msgstr ""
+msgstr "电话"
 
 #: documents/models.py:619
 msgid "Truck"
-msgstr ""
+msgstr "货车"
 
 #: documents/models.py:620
 msgid "Barcode"
-msgstr ""
+msgstr "条形码"
 
 #: documents/models.py:621
 msgid "Wallet"
@@ -562,7 +562,7 @@ msgstr "页"
 
 #: documents/models.py:646
 msgid "icon"
-msgstr ""
+msgstr "图标"
 
 #: documents/models.py:653
 msgid "sort field"
@@ -1006,7 +1006,7 @@ msgstr "备注"
 
 #: documents/models.py:996
 msgid "page"
-msgstr ""
+msgstr "页面"
 
 #: documents/models.py:997
 msgid "Page of the original file, starting at 1"
@@ -1014,15 +1014,15 @@ msgstr ""
 
 #: documents/models.py:1052
 msgid "format"
-msgstr ""
+msgstr "格式"
 
 #: documents/models.py:1056
 msgid "document barcode"
-msgstr ""
+msgstr "文档条形码"
 
 #: documents/models.py:1057
 msgid "document barcodes"
-msgstr ""
+msgstr "文档条形码"
 
 #: documents/models.py:1066
 msgid "Original"
@@ -1404,23 +1404,23 @@ msgstr "移动到回收站"
 
 #: documents/models.py:1795
 msgid "Remote OCR"
-msgstr ""
+msgstr "远程 OCR"
 
 #: documents/models.py:1799
 msgid "Apply AI suggestions"
-msgstr ""
+msgstr "应用 AI 建议"
 
 #: documents/models.py:1806
 msgid "Document type"
-msgstr ""
+msgstr "文档类型"
 
 #: documents/models.py:1807
 msgid "Storage path"
-msgstr ""
+msgstr "保存路径"
 
 #: documents/models.py:1808
 msgid "Created date"
-msgstr ""
+msgstr "创建日期"
 
 #: documents/models.py:1811
 msgid "Workflow Action Type"
@@ -1573,27 +1573,27 @@ msgstr "移除PDF保护时的密码。用逗号或新行分隔。"
 
 #: documents/models.py:2048
 msgid "AI suggestion fields"
-msgstr ""
+msgstr "AI 建议字段"
 
 #: documents/models.py:2052
 msgid "Which of the AI-suggested fields to apply to the document."
-msgstr ""
+msgstr "适用于文档的 AI-建议字段中的哪一个。"
 
 #: documents/models.py:2057
 msgid "create missing objects"
-msgstr ""
+msgstr "创建缺失对象"
 
 #: documents/models.py:2060
 msgid "Create suggested tags, correspondents, document types and storage paths that do not already exist instead of skipping them."
-msgstr ""
+msgstr "创建建议的标签、往来方、文档类型和存储路径（如果这些项目尚不存在），而不是跳过它们。"
 
 #: documents/models.py:2066
 msgid "overwrite existing values"
-msgstr ""
+msgstr "覆盖现有值"
 
 #: documents/models.py:2069
 msgid "Apply suggestions even if the document already has a value for that field. Tags are always added to, never replaced."
-msgstr ""
+msgstr "即使文档的该字段已有值，也应用建议的内容。标签始终采用追加方式，不会替换现有标签。"
 
 #: documents/models.py:2075
 msgid "workflow action"
@@ -1635,48 +1635,48 @@ msgstr "工作流运行"
 msgid "workflow runs"
 msgstr "工作流运行"
 
-#: documents/serialisers.py:515 documents/serialisers.py:872
-#: documents/serialisers.py:2902 documents/views.py:343 documents/views.py:2732
+#: documents/serialisers.py:516 documents/serialisers.py:873
+#: documents/serialisers.py:2903 documents/views.py:344 documents/views.py:2751
 #: paperless_mail/serialisers.py:156
 msgid "Insufficient permissions."
 msgstr "权限不足。"
 
-#: documents/serialisers.py:708
+#: documents/serialisers.py:709
 msgid "Invalid color."
 msgstr "无效的颜色"
 
-#: documents/serialisers.py:2369
+#: documents/serialisers.py:2370
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "不支持文件类型 %(type)s"
 
-#: documents/serialisers.py:2413
+#: documents/serialisers.py:2414
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
 msgstr "自定义字段 id 必须是数字：%(id)s"
 
-#: documents/serialisers.py:2420
+#: documents/serialisers.py:2421
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
 msgstr "自定义字段 id %(id)s 不存在"
 
-#: documents/serialisers.py:2437 documents/serialisers.py:2447
+#: documents/serialisers.py:2438 documents/serialisers.py:2448
 msgid "Custom fields must be a list of integers or an object mapping ids to values."
 msgstr "自定义字段必须为整数列表，或是一个将ID映射到值的对象。"
 
-#: documents/serialisers.py:2442
+#: documents/serialisers.py:2443
 msgid "Some custom fields don't exist or were specified twice."
 msgstr "部分自定义字段不存在或重复指定。"
 
-#: documents/serialisers.py:2589
+#: documents/serialisers.py:2590
 msgid "Invalid variable detected."
 msgstr "检测到无效变量。"
 
-#: documents/serialisers.py:2958
+#: documents/serialisers.py:2959
 msgid "Duplicate document identifiers are not allowed."
 msgstr "不允许重复文档标识符。"
 
-#: documents/serialisers.py:2988 documents/views.py:4787
+#: documents/serialisers.py:2989 documents/views.py:4807
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr "未找到文档：%(ids)s"
@@ -1913,59 +1913,44 @@ msgstr "您将使用您的 %(provider_name)s 账户登录."
 msgid "As a final step, please complete the following form:"
 msgstr "作为最后一步，请填写以下表格："
 
-#: documents/validators.py:24
-#, python-brace-format
-msgid "Unable to parse URI {value}, missing scheme"
-msgstr "无法解析 URI {value}，缺少scheme"
-
-#: documents/validators.py:29
-#, python-brace-format
-msgid "Unable to parse URI {value}, missing net location or path"
-msgstr "无法解析 URI {value}，缺少网络位置或路径"
-
 #: documents/validators.py:36
-msgid "URI scheme '{parts.scheme}' is not allowed. Allowed schemes: {', '.join(allowed_schemes)}"
-msgstr "URI 格式 '{parts.scheme}' 不支持。支持的格式有：{', '.join(allowed_schemes)}"
+msgid ", "
+msgstr "，"
 
-#: documents/validators.py:45
-#, python-brace-format
-msgid "Unable to parse URI {value}"
-msgstr "无法解析 URI {value}"
-
-#: documents/views.py:336 documents/views.py:2729
+#: documents/views.py:337 documents/views.py:2748
 msgid "Invalid more_like_id"
 msgstr "无效的more_like_id"
 
-#: documents/views.py:1676
+#: documents/views.py:1683
 msgid "Invalid AI configuration."
 msgstr "无效的 AI 配置。"
 
-#: documents/views.py:1687
+#: documents/views.py:1694
 msgid "AI backend request timed out."
 msgstr "AI 后端请求超时。"
 
-#: documents/views.py:1699
+#: documents/views.py:1706
 msgid "AI backend rejected the request. Check logs for details."
-msgstr ""
+msgstr "AI 后端拒绝了请求。请检查日志的详细信息。"
 
-#: documents/views.py:2554 documents/views.py:2870
+#: documents/views.py:2573 documents/views.py:2889
 msgid "Specify only one of text, title_search, query, or more_like_id."
 msgstr "只能指定 text、title_search、query 或 more_like_id 中的一项。"
 
-#: documents/views.py:4800
+#: documents/views.py:4823
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr "权限不足以分享文件：%(id)s。"
 
-#: documents/views.py:4846
+#: documents/views.py:4870
 msgid "Bundle is already being processed."
 msgstr "捆绑包已在处理中。"
 
-#: documents/views.py:4910
+#: documents/views.py:4934
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr "分享链接包仍在准备中，请稍后再试。"
 
-#: documents/views.py:4924
+#: documents/views.py:4948
 msgid "The share link bundle is unavailable."
 msgstr "分享链接包不可用。"
 
@@ -2051,15 +2036,15 @@ msgstr "CMYK"
 
 #: paperless/models.py:82
 msgid "Azure AI Document Intelligence"
-msgstr ""
+msgstr "Azure AI 文档智能"
 
 #: paperless/models.py:90
 msgid "All supported documents"
-msgstr ""
+msgstr "所有支持的文档"
 
 #: paperless/models.py:91
 msgid "Only when a workflow enables it"
-msgstr ""
+msgstr "仅当工作流启用时"
 
 #: paperless/models.py:95 paperless/models.py:105
 msgid "OpenAI-compatible"
@@ -2183,23 +2168,23 @@ msgstr "启用标签条码拆分"
 
 #: paperless/models.py:308
 msgid "Stores the values of detected barcodes"
-msgstr ""
+msgstr "存储检测到条形码的值"
 
 #: paperless/models.py:318
 msgid "Sets the remote OCR engine"
-msgstr ""
+msgstr "设置远程 OCR 引擎"
 
 #: paperless/models.py:327
 msgid "Sets the remote OCR API key"
-msgstr ""
+msgstr "设置远程 OCR API 密钥"
 
 #: paperless/models.py:335
 msgid "Sets the remote OCR endpoint"
-msgstr ""
+msgstr "设置远程 OCR 端点"
 
 #: paperless/models.py:343
 msgid "Sets which documents are sent to the remote OCR engine"
-msgstr ""
+msgstr "设置发送到远程 OCR 引擎的文档"
 
 #: paperless/models.py:355
 msgid "Enables AI features"
@@ -2215,7 +2200,7 @@ msgstr "设置 LLM 嵌入模型"
 
 #: paperless/models.py:375
 msgid "Sets the LLM embedding API key"
-msgstr ""
+msgstr "设置 LLM 嵌入模型的 API 密钥"
 
 #: paperless/models.py:382
 msgid "Sets the LLM embedding endpoint, optional"
