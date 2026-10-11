@@ -5,7 +5,7 @@
   </button>
   <div ngbDropdownMenu class="dropdown-menu-end shadow p-3" aria-labelledby="chatDropdown">
     <div class="chat-container bg-light p-2">
-      <div class="chat-messages font-monospace small">
+      <div class="chat-messages small">
         @for (message of messages(); track message) {
           <div class="message d-flex flex-row small" [class.justify-content-end]="message.role === 'user'">
             <div class="p-2 m-2" [class.bg-body]="message.role === 'user'">
