@@ -1,5 +1,5 @@
 
-<li ngbDropdown class="nav-item" (openChange)="onOpenChange($event)">
+<li ngbDropdown class="nav-item" display="dynamic" placement="bottom-end" [popperOptions]="popperOptions" (openChange)="onOpenChange($event)">
   <button class="btn navbar-action border-0" id="chatDropdown" ngbDropdownToggle aria-label="Chat" i18n-aria-label>
     <i-bs width="1.3em" height="1.3em" name="chatSquareDots"></i-bs>
   </button>

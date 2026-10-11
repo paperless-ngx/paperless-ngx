@@ -17,6 +17,7 @@ import {
   ChatService,
   parseChatResponse,
 } from 'src/app/services/chat.service'
+import { pngxPopperOptions } from 'src/app/utils/popper-options'
 
 const SLOW_RESPONSE_DELAY_MS = 8000
 
@@ -39,6 +40,7 @@ export class ChatComponent implements OnInit {
   readonly input = signal('')
   readonly documentId = signal<number>(undefined)
   readonly slowResponse = signal(false)
+  public popperOptions = pngxPopperOptions
 
   private chatService: ChatService = inject(ChatService)
   private router: Router = inject(Router)
