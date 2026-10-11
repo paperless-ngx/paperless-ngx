@@ -51,6 +51,7 @@ export class ChatComponent implements OnInit {
   private typewriterTimeout: ReturnType<typeof setTimeout>
   private streamSubscription: Subscription
   private streamingMessage: ChatMessage
+  private streamFinished = false
   private slowResponseTimeout: ReturnType<typeof setTimeout>
 
   public get placeholder(): string {
@@ -91,6 +92,7 @@ export class ChatComponent implements OnInit {
     this.messages.update((messages) => [...messages, assistantMessage])
     this.loading.set(true)
     this.streamingMessage = assistantMessage
+    this.streamFinished = false
     this.slowResponseTimeout = setTimeout(
       () => this.slowResponse.set(true),
       SLOW_RESPONSE_DELAY_MS
@@ -120,19 +122,14 @@ export class ChatComponent implements OnInit {
           this.notifyMessagesChanged()
         },
         error: () => {
-          this.clearSlowResponse()
           this.flushTypewriter(assistantMessage)
           assistantMessage.content += '\n\n⚠️ Error receiving response.'
-          assistantMessage.isStreaming = false
-          this.notifyMessagesChanged()
-          this.loading.set(false)
+          this.finishStreaming(assistantMessage)
         },
         complete: () => {
-          this.clearSlowResponse()
-          assistantMessage.isStreaming = false
-          this.notifyMessagesChanged()
-          this.loading.set(false)
-          this.scrollToBottom()
+          // let the typewriter catch up before hiding the cursor
+          this.streamFinished = true
+          if (!this.typewriterActive) this.finishStreaming(assistantMessage)
         },
       })
 
@@ -148,17 +145,16 @@ export class ChatComponent implements OnInit {
     if (!message.content) {
       this.messages.update((messages) => messages.filter((m) => m !== message))
     }
+    this.finishStreaming(message)
+  }
+
+  private finishStreaming(message: ChatMessage): void {
     this.clearSlowResponse()
+    this.streamFinished = false
     message.isStreaming = false
     this.notifyMessagesChanged()
     this.loading.set(false)
-  }
-
-  private flushTypewriter(message: ChatMessage): void {
-    message.content += this.typewriterBuffer.join('')
-    clearTimeout(this.typewriterTimeout)
-    this.typewriterBuffer = []
-    this.typewriterActive = false
+    this.scrollToBottom()
   }
 
   private clearSlowResponse(): void {
@@ -166,9 +162,19 @@ export class ChatComponent implements OnInit {
     this.slowResponse.set(false)
   }
 
-  private resetTypewriter(message: ChatMessage, content: string): void {
+  private flushTypewriter(message: ChatMessage): void {
+    message.content += this.typewriterBuffer.join('')
+    this.cancelTypewriter()
+  }
+
+  private cancelTypewriter(): void {
+    clearTimeout(this.typewriterTimeout)
     this.typewriterBuffer = []
     this.typewriterActive = false
+  }
+
+  private resetTypewriter(message: ChatMessage, content: string): void {
+    this.cancelTypewriter()
     message.content = content
     this.notifyMessagesChanged()
     this.scrollToBottom()
@@ -188,6 +194,7 @@ export class ChatComponent implements OnInit {
   playTypewriter(message: ChatMessage): void {
     if (this.typewriterBuffer.length === 0) {
       this.typewriterActive = false
+      if (this.streamFinished) this.finishStreaming(message)
       return
     }
 
