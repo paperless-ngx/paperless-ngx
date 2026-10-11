@@ -12,7 +12,11 @@
               @if (message.isStreaming && !message.content) {
                 <div class="d-flex align-items-center text-muted">
                   <div class="spinner-border spinner-border-sm me-2" role="status"></div>
-                  <ng-container i18n>Thinking...</ng-container>
+                  @if (slowResponse()) {
+                    <ng-container i18n>Still thinking...</ng-container>
+                  } @else {
+                    <ng-container i18n>Thinking...</ng-container>
+                  }
                 </div>
               } @else if (message.role === 'assistant') {
                 <div class="chat-markdown text-break text-wrap" [innerHTML]="message.content | markdown"></div>

@@ -170,6 +170,21 @@ describe('ChatComponent', () => {
     expect(component.loading()).toBe(false)
   })
 
+  it('should show a slow response message while waiting', () => {
+    component.input.set('Hello')
+    component.sendMessage()
+    fixture.detectChanges()
+    const messagesEl = fixture.nativeElement.querySelector('.chat-messages')
+    expect(messagesEl.textContent).not.toContain('Still thinking...')
+
+    jest.advanceTimersByTime(8000)
+    fixture.detectChanges()
+    expect(messagesEl.textContent).toContain('Still thinking...')
+
+    mockStream$.next('Hi')
+    expect(component.slowResponse()).toBe(false)
+  })
+
   it('should enqueue typewriter chunks correctly', () => {
     const message = { content: '', role: 'assistant', isStreaming: true }
     component.enqueueTypewriter(null, message as any) // coverage for null
