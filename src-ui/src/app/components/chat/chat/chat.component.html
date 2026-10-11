@@ -52,7 +52,11 @@
             (ngModelChange)="input.set($event)"
             (keydown)="searchInputKeyDown($event)"
             />
-          <button class="btn btn-sm btn-secondary" type="button" (click)="sendMessage()" [disabled]="loading()">Send</button>
+          @if (loading()) {
+            <button class="btn btn-sm btn-outline-secondary" type="button" (click)="stopStreaming()" i18n>Stop</button>
+          } @else {
+            <button class="btn btn-sm btn-secondary" type="button" (click)="sendMessage()">Send</button>
+          }
         </div>
       </form>
     </div>
