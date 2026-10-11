@@ -171,6 +171,21 @@ describe('ChatComponent', () => {
     expect(component.loading()).toBe(false)
   })
 
+  it('should keep streaming until the typewriter catches up', () => {
+    component.input.set('Hello')
+    component.sendMessage()
+
+    mockStream$.next('Hi there')
+    mockStream$.complete()
+    expect(component.messages()[1].isStreaming).toBe(true)
+    expect(component.loading()).toBe(true)
+
+    jest.advanceTimersByTime(1000)
+    expect(component.messages()[1].content).toBe('Hi there')
+    expect(component.messages()[1].isStreaming).toBe(false)
+    expect(component.loading()).toBe(false)
+  })
+
   it('should show a slow response message while waiting', () => {
     component.input.set('Hello')
     component.sendMessage()
