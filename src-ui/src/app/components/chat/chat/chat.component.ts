@@ -121,6 +121,7 @@ export class ChatComponent implements OnInit {
         },
         error: () => {
           this.clearSlowResponse()
+          this.flushTypewriter(assistantMessage)
           assistantMessage.content += '\n\n⚠️ Error receiving response.'
           assistantMessage.isStreaming = false
           this.notifyMessagesChanged()
