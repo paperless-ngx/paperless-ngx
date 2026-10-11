@@ -1,9 +1,9 @@
 .dropdown-menu {
-  width: var(--pngx-toast-max-width);
+  width: min(36rem, calc(100vw - 20px));
 }
 
 .chat-messages {
-  max-height: 350px;
+  max-height: min(60dvh, 36rem);
   overflow-y: auto;
   white-space: pre-wrap;
 }
@@ -16,9 +16,9 @@
   white-space: initial;
 }
 
-@media screen and (max-width: 400px) {
-  :host ::ng-deep .dropdown-menu-end {
-    right: -3rem;
+@media screen and (max-width: 575.98px) {
+  .chat-messages {
+    max-height: calc(100dvh - 12rem);
   }
 }
 
