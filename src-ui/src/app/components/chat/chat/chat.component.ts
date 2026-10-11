@@ -18,6 +18,8 @@ import {
   parseChatResponse,
 } from 'src/app/services/chat.service'
 
+const SLOW_RESPONSE_DELAY_MS = 8000
+
 @Component({
   selector: 'pngx-chat',
   imports: [
@@ -36,6 +38,7 @@ export class ChatComponent implements OnInit {
   readonly loading = signal(false)
   readonly input = signal('')
   readonly documentId = signal<number>(undefined)
+  readonly slowResponse = signal(false)
 
   private chatService: ChatService = inject(ChatService)
   private router: Router = inject(Router)
@@ -45,6 +48,7 @@ export class ChatComponent implements OnInit {
 
   private typewriterBuffer: string[] = []
   private typewriterActive = false
+  private slowResponseTimeout: ReturnType<typeof setTimeout>
 
   public get placeholder(): string {
     return this.documentId()
@@ -83,11 +87,16 @@ export class ChatComponent implements OnInit {
     }
     this.messages.update((messages) => [...messages, assistantMessage])
     this.loading.set(true)
+    this.slowResponseTimeout = setTimeout(
+      () => this.slowResponse.set(true),
+      SLOW_RESPONSE_DELAY_MS
+    )
 
     let lastVisibleContent = ''
 
     this.chatService.streamChat(this.documentId(), this.input()).subscribe({
       next: (chunk) => {
+        this.clearSlowResponse()
         const nextResponse = parseChatResponse(chunk)
 
         if (nextResponse.content.length < lastVisibleContent.length) {
@@ -105,12 +114,14 @@ export class ChatComponent implements OnInit {
         this.notifyMessagesChanged()
       },
       error: () => {
+        this.clearSlowResponse()
         assistantMessage.content += '\n\n⚠️ Error receiving response.'
         assistantMessage.isStreaming = false
         this.notifyMessagesChanged()
         this.loading.set(false)
       },
       complete: () => {
+        this.clearSlowResponse()
         assistantMessage.isStreaming = false
         this.notifyMessagesChanged()
         this.loading.set(false)
@@ -119,6 +130,11 @@ export class ChatComponent implements OnInit {
     })
 
     this.input.set('')
+  }
+
+  private clearSlowResponse(): void {
+    clearTimeout(this.slowResponseTimeout)
+    this.slowResponse.set(false)
   }
 
   private resetTypewriter(message: ChatMessage, content: string): void {
