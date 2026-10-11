@@ -221,4 +221,19 @@ describe('ChatComponent', () => {
     expect(el.querySelector('.chat-markdown script')).toBeNull()
     expect(el.textContent).toContain('**user**')
   })
+
+  it('should keep the destination hostname visible after sanitizing chat links', () => {
+    component.messages.set([
+      {
+        role: 'assistant',
+        content:
+          '[View original document](https://otherdomain.example/?data=secret)',
+      },
+    ])
+    fixture.detectChanges()
+    const el: HTMLElement = fixture.nativeElement
+    const link = el.querySelector('.chat-markdown a')
+    expect(link?.textContent).toBe('View original document')
+    expect(link?.nextElementSibling?.textContent).toBe('(otherdomain.example)')
+  })
 })

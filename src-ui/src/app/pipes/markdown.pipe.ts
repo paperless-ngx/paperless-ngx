@@ -35,7 +35,11 @@ const renderer: Partial<Renderer> = {
     const url = safeHref(href)
     if (!url) return text
     const titleAttr = title ? ` title="${escapeHtml(title)}"` : ''
-    return `<a href="${escapeHtml(url)}"${titleAttr} target="_blank" rel="noopener noreferrer nofollow">${text}</a>`
+    const hostname = new URL(url).hostname
+    const hostnameLabel = hostname
+      ? ` <span class="text-muted small">(${escapeHtml(hostname)})</span>`
+      : ''
+    return `<a href="${escapeHtml(url)}"${titleAttr} target="_blank" rel="noopener noreferrer nofollow">${text}</a>${hostnameLabel}`
   },
 }
 

@@ -31,9 +31,11 @@ describe('MarkdownPipe', () => {
   })
 
   it('should not render images', () => {
-    const html = pipe.transform('![secret](https://evil.example/x.png?d=1)')
+    const html = pipe.transform(
+      '![secret](https://otherdomain.example/x.png?d=1)'
+    )
     expect(html).not.toContain('<img')
-    expect(html).not.toContain('evil.example')
+    expect(html).not.toContain('otherdomain.example')
     expect(html).toContain('secret')
   })
 
@@ -59,6 +61,24 @@ describe('MarkdownPipe', () => {
       expect(html).not.toContain('<a')
       expect(html).toContain('click')
     }
+  })
+
+  it('should show the actual hostname beside web links with misleading labels', () => {
+    for (const protocol of ['http', 'https']) {
+      const html = pipe.transform(
+        `[docs.paperless-ngx.com](${protocol}://docs.paperless-ngx.com@otherdomain.example/path?secret=1)`
+      )
+      expect(html).toContain(
+        '</a> <span class="text-muted small">(otherdomain.example)</span>'
+      )
+      expect(html).not.toContain('(docs.paperless-ngx.com)')
+    }
+  })
+
+  it('should omit the hostname label for mailto links', () => {
+    expect(pipe.transform('[mail](mailto:a@b.c)')).toBe(
+      '<p><a href="mailto:a@b.c" target="_blank" rel="noopener noreferrer nofollow">mail</a></p>\n'
+    )
   })
 
   it('should escape link titles', () => {
