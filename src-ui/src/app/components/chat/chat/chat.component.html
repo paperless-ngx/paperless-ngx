@@ -7,7 +7,7 @@
     <div class="chat-container bg-light p-2">
       <div class="chat-messages small">
         @for (message of messages(); track message) {
-          <div class="message d-flex flex-row small" [class.justify-content-end]="message.role === 'user'">
+          <div class="message d-flex flex-row small" [class.justify-content-end]="message.role === 'user'" [class.mt-3]="message.role === 'user' && !$first">
             <div class="p-2 m-2" [class.bg-body]="message.role === 'user'" [class.flex-grow-1]="message.role === 'assistant'">
               @if (message.isStreaming && !message.content) {
                 <div class="d-flex align-items-center text-muted">
