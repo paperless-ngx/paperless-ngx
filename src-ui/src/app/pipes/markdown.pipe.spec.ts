@@ -42,7 +42,7 @@ describe('MarkdownPipe', () => {
   it('should render safe links with target and rel', () => {
     const html = pipe.transform('[docs](https://docs.paperless-ngx.com "Docs")')
     expect(html).toContain(
-      '<a href="https://docs.paperless-ngx.com/" title="Docs" target="_blank" rel="noopener noreferrer nofollow">docs</a>'
+      '<a target="_blank" rel="noopener noreferrer nofollow" href="https://docs.paperless-ngx.com" title="Docs">docs</a>'
     )
     expect(pipe.transform('[mail](mailto:a@b.c)')).toContain(
       'href="mailto:a@b.c"'
@@ -77,7 +77,7 @@ describe('MarkdownPipe', () => {
 
   it('should omit the hostname label for mailto links', () => {
     expect(pipe.transform('[mail](mailto:a@b.c)')).toBe(
-      '<p><a href="mailto:a@b.c" target="_blank" rel="noopener noreferrer nofollow">mail</a></p>\n'
+      '<p><a target="_blank" rel="noopener noreferrer nofollow" href="mailto:a@b.c">mail</a></p>\n'
     )
   })
 

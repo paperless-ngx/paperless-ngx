@@ -3,43 +3,34 @@ import { Marked, Renderer, Tokens } from 'marked'
 
 const ALLOWED_LINK_PROTOCOLS = new Set(['http:', 'https:', 'mailto:'])
 
-function escapeHtml(text: string): string {
-  return text
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#39;')
-}
-
-function safeHref(href: string): string | null {
+function allowedUrl(href: string): URL | null {
   try {
     const url = new URL(href)
-    return ALLOWED_LINK_PROTOCOLS.has(url.protocol) ? url.href : null
+    return ALLOWED_LINK_PROTOCOLS.has(url.protocol) ? url : null
   } catch {
     return null
   }
 }
 
 // Treat chat content as untrusted: no raw HTML, no images, and only
-// absolute links. Angular sanitizer runs on top of this as well.
+// absolute links. All escaping is done by marked's default renderer, and
+// Angular's sanitizer runs on top of this as well.
 const renderer: Partial<Renderer> = {
-  html({ text }: Tokens.HTML | Tokens.Tag): string {
-    return escapeHtml(text)
+  html(this: Renderer, { raw, text }: Tokens.HTML | Tokens.Tag): string {
+    return this.text({ type: 'text', raw, text })
   },
-  image({ text }: Tokens.Image): string {
-    return escapeHtml(text)
+  image(this: Renderer, { raw, text }: Tokens.Image): string {
+    return this.text({ type: 'text', raw, text })
   },
-  link(this: Renderer, { href, title, tokens }: Tokens.Link): string {
-    const text = this.parser.parseInline(tokens)
-    const url = safeHref(href)
-    if (!url) return text
-    const titleAttr = title ? ` title="${escapeHtml(title)}"` : ''
-    const hostname = new URL(url).hostname
-    const hostnameLabel = hostname
-      ? ` <span class="text-muted small">(${escapeHtml(hostname)})</span>`
-      : ''
-    return `<a href="${escapeHtml(url)}"${titleAttr} target="_blank" rel="noopener noreferrer nofollow">${text}</a>${hostnameLabel}`
+  link(this: Renderer, token: Tokens.Link): string {
+    const url = allowedUrl(token.href)
+    if (!url) return this.parser.parseInline(token.tokens)
+    const anchor = Renderer.prototype.link
+      .call(this, token)
+      .replace('<a ', '<a target="_blank" rel="noopener noreferrer nofollow" ')
+    if (!url.hostname) return anchor
+    const hostname = this.text({ type: 'text', raw: '', text: url.hostname })
+    return `${anchor} <span class="text-muted small">(${hostname})</span>`
   },
 }
 
