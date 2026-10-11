@@ -8,7 +8,7 @@
       <div class="chat-messages small">
         @for (message of messages(); track message) {
           <div class="message d-flex flex-row small" [class.justify-content-end]="message.role === 'user'">
-            <div class="p-2 m-2" [class.bg-body]="message.role === 'user'">
+            <div class="p-2 m-2" [class.bg-body]="message.role === 'user'" [class.flex-grow-1]="message.role === 'assistant'">
               @if (message.isStreaming && !message.content) {
                 <div class="d-flex align-items-center text-muted">
                   <div class="spinner-border spinner-border-sm me-2" role="status"></div>
@@ -26,9 +26,10 @@
               }
               @if (message.role === 'assistant' && message.references?.length) {
                 <div class="chat-references list-group mt-3">
+                  <div class="list-group-item text-muted small py-1" i18n>Sources</div>
                   @for (reference of message.references; track reference.id) {
-                    <a class="list-group-item list-group-item-action d-flex text-primary text-break" [routerLink]="['/documents', reference.id]">
-                      <i-bs width="0.9em" height="0.9em" name="file-text" class="me-1"></i-bs><span>{{ reference.title }}</span> &rarr;
+                    <a class="list-group-item list-group-item-action d-flex align-items-center text-primary" [routerLink]="['/documents', reference.id]" [title]="reference.title">
+                      <i-bs width="0.9em" height="0.9em" name="file-text" class="me-2 flex-shrink-0"></i-bs><span class="text-truncate">{{ reference.title }}</span>
                     </a>
                   }
                 </div>
