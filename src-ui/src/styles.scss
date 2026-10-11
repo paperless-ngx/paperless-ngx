@@ -1,4 +1,10 @@
 @use "sass:meta";
+
+@import "node_modules/bootstrap/dist/css/bootstrap.css";
+@import "node_modules/highlight.js/styles/github.css";
+@import "node_modules/katex/dist/katex.min.css";
+@import "@ng-select/ng-select/themes/default.theme.css";
+
 // bs variables
 $grid-gutter-width: 1.5rem;
 $border-radius: .425rem;
@@ -7,11 +13,7 @@ $btn-border-width: var(--bs-border-width);
 $form-file-button-bg: var(--bs-body-bg);
 $form-file-button-hover-bg: var(--pngx-bg-alt);
 
-@import "node_modules/bootstrap/dist/css/bootstrap.css";
-@import "node_modules/highlight.js/styles/github.css";
-@import "node_modules/katex/dist/katex.min.css";
 @include meta.load-css("theme");
-@import "@ng-select/ng-select/themes/default.theme.css";
 @include meta.load-css("print");
 
 // re-created bootstrap styles
