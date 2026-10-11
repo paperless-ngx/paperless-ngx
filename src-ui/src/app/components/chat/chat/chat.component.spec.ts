@@ -163,9 +163,10 @@ describe('ChatComponent', () => {
     component.input.set('Hello')
     component.sendMessage()
 
+    mockStream$.next('Partial')
     mockStream$.error('Error')
-    expect(component.messages()[1].content).toContain(
-      '⚠️ Error receiving response.'
+    expect(component.messages()[1].content).toBe(
+      'Partial\n\n⚠️ Error receiving response.'
     )
     expect(component.loading()).toBe(false)
   })
