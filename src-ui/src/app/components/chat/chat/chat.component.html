@@ -1,49 +1,82 @@
 
-<li ngbDropdown class="nav-item" (openChange)="onOpenChange($event)">
-  <button class="btn navbar-action border-0" id="chatDropdown" ngbDropdownToggle aria-label="Chat" i18n-aria-label>
+<li class="nav-item">
+  <button
+    class="btn navbar-action border-0"
+    id="chatPanelToggle"
+    type="button"
+    aria-controls="chatPanel"
+    [attr.aria-expanded]="isOpen()"
+    aria-label="Chat"
+    i18n-aria-label
+    (click)="togglePanel()"
+  >
     <i-bs width="1.3em" height="1.3em" name="chatSquareDots"></i-bs>
   </button>
-  <div ngbDropdownMenu class="dropdown-menu-end shadow p-3" aria-labelledby="chatDropdown">
-    <div class="chat-container bg-light p-2">
-      <div class="chat-messages font-monospace small">
-        @for (message of messages(); track message) {
-          <div class="message d-flex flex-row small" [class.justify-content-end]="message.role === 'user'">
-            <div class="p-2 m-2" [class.bg-body]="message.role === 'user'">
-              <span class="text-break">
-                {{ message.content }}
-                @if (message.isStreaming) { <span class="blinking-cursor">|</span> }
-              </span>
-              @if (message.role === 'assistant' && message.references?.length) {
-                <div class="chat-references list-group mt-3">
-                  @for (reference of message.references; track reference.id) {
-                    <a class="list-group-item list-group-item-action d-flex text-primary text-break" [routerLink]="['/documents', reference.id]">
-                      <i-bs width="0.9em" height="0.9em" name="file-text" class="me-1"></i-bs><span>{{ reference.title }}</span>
-                    </a>
-                  }
-                </div>
+</li>
+
+<aside
+  id="chatPanel"
+  class="chat-panel"
+  [class.is-open]="isOpen()"
+  [attr.aria-hidden]="!isOpen()"
+  [attr.inert]="isOpen() ? null : ''"
+  role="complementary"
+  aria-labelledby="chatPanelTitle"
+>
+  <header class="chat-panel-header">
+    <div>
+      <h2 id="chatPanelTitle" i18n>AI Chat</h2>
+      <p class="mb-0 text-muted small">{{ contextDescription }}</p>
+    </div>
+    <button class="btn btn-sm btn-outline-secondary" type="button" (click)="closePanel()" aria-label="Close chat" i18n-aria-label>
+      <i-bs width="1.1em" height="1.1em" name="x-lg"></i-bs>
+    </button>
+  </header>
+
+  <div class="chat-messages" role="log" aria-live="polite" aria-relevant="additions text">
+    @if (messages().length === 0) {
+      <p class="chat-empty-state text-muted" i18n>Ask a question to search your documents.</p>
+    }
+    @for (message of messages(); track message) {
+      <div class="message" [class.message-user]="message.role === 'user'" [class.message-assistant]="message.role === 'assistant'">
+        <div class="message-bubble">
+          <div class="message-content text-break" [innerHTML]="message.content | chatMarkdown"></div>
+          @if (message.isStreaming && !message.content) {
+            <div class="typing-indicator" role="status" aria-label="AI is typing" i18n-aria-label>
+              <span></span><span></span><span></span>
+            </div>
+          } @else if (message.isStreaming) {
+            <span class="blinking-cursor" aria-label="Generating response">|</span>
+          }
+          @if (message.role === 'assistant' && message.references?.length) {
+            <div class="chat-references list-group">
+              @for (reference of message.references; track reference.id) {
+                <a class="list-group-item list-group-item-action d-flex text-primary text-break" [routerLink]="['/documents', reference.id]" (click)="closePanel()">
+                  <i-bs width="0.9em" height="0.9em" name="file-text" class="me-1"></i-bs><span>{{ reference.title }}</span>
+                </a>
               }
             </div>
-          </div>
-        }
-        <div #scrollAnchor></div>
-      </div>
-
-      <form class="chat-input">
-        <label class="visually-hidden" for="chatInput" i18n>Message</label>
-        <div class="input-group">
-          <input
-            #chatInput
-            id="chatInput"
-            class="form-control form-control-sm" name="chatInput" type="text"
-            [placeholder]="placeholder"
-            [disabled]="loading()"
-            [ngModel]="input()"
-            (ngModelChange)="input.set($event)"
-            (keydown)="searchInputKeyDown($event)"
-            />
-          <button class="btn btn-sm btn-secondary" type="button" (click)="sendMessage()" [disabled]="loading()">Send</button>
+          }
         </div>
-      </form>
-    </div>
+      </div>
+    }
+    <div #scrollAnchor></div>
   </div>
-</li>
+
+  <form class="chat-input" (submit)="$event.preventDefault(); sendMessage()">
+    <label class="visually-hidden" for="chatInput" i18n>Message</label>
+    <textarea
+      #chatInput
+      id="chatInput"
+      class="form-control"
+      name="chatInput"
+      rows="2"
+      [placeholder]="placeholder"
+      [disabled]="loading()"
+      [ngModel]="input()"
+      (ngModelChange)="input.set($event)"
+      (keydown)="searchInputKeyDown($event)"
+    ></textarea>
+    <button class="btn btn-primary" type="submit" [disabled]="loading() || !input().trim()" i18n>Send</button>
+  </form>
+</aside>

@@ -79,6 +79,10 @@ describe('ChatComponent', () => {
     expect(component.messages()).toHaveLength(2)
     expect(component.messages()[0].content).toBe('Hello')
     expect(component.loading()).toBe(true)
+    fixture.detectChanges()
+    expect(
+      fixture.nativeElement.querySelector('.typing-indicator')
+    ).not.toBeNull()
 
     mockStream$.next('Hi')
     expect(component.messages()[1].content).toBe('H')
@@ -180,15 +184,28 @@ describe('ChatComponent', () => {
     expect(scrollSpy).toHaveBeenCalled()
   })
 
-  it('should focus chat input when dropdown is opened', () => {
+  it('should open the panel and focus the chat input', () => {
     const focus = jest.fn()
     component.chatInput = {
       nativeElement: { focus: focus },
     } as unknown as ElementRef<HTMLInputElement>
 
-    component.onOpenChange(true)
+    component.togglePanel()
     jest.advanceTimersByTime(15)
+    expect(component.isOpen()).toBe(true)
     expect(focus).toHaveBeenCalled()
+  })
+
+  it('should close the panel', () => {
+    component.isOpen.set(true)
+    component.closePanel()
+    expect(component.isOpen()).toBe(false)
+  })
+
+  it('should close the panel when Escape is pressed', () => {
+    component.isOpen.set(true)
+    component.onEscape()
+    expect(component.isOpen()).toBe(false)
   })
 
   it('should send message on Enter key press', () => {
@@ -203,6 +220,16 @@ describe('ChatComponent', () => {
     const event = new KeyboardEvent('keydown', {
       key: 'Enter',
       isComposing: true,
+    })
+    component.searchInputKeyDown(event)
+    expect(component.sendMessage).not.toHaveBeenCalled()
+  })
+
+  it('should retain a line break when Shift+Enter is pressed', () => {
+    jest.spyOn(component, 'sendMessage')
+    const event = new KeyboardEvent('keydown', {
+      key: 'Enter',
+      shiftKey: true,
     })
     component.searchInputKeyDown(event)
     expect(component.sendMessage).not.toHaveBeenCalled()

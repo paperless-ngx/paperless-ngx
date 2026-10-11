@@ -1,6 +1,7 @@
 import {
   Component,
   ElementRef,
+  HostListener,
   inject,
   OnInit,
   signal,
@@ -8,9 +9,9 @@ import {
 } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NavigationEnd, Router, RouterModule } from '@angular/router'
-import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { filter, map } from 'rxjs'
+import { ChatMarkdownPipe } from 'src/app/pipes/chat-markdown.pipe'
 import {
   ChatMessage,
   ChatService,
@@ -24,7 +25,7 @@ import {
     ReactiveFormsModule,
     RouterModule,
     NgxBootstrapIconsModule,
-    NgbDropdownModule,
+    ChatMarkdownPipe,
   ],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.scss',
@@ -34,6 +35,7 @@ export class ChatComponent implements OnInit {
   readonly loading = signal(false)
   readonly input = signal('')
   readonly documentId = signal<number>(undefined)
+  readonly isOpen = signal(false)
 
   private chatService: ChatService = inject(ChatService)
   private router: Router = inject(Router)
@@ -48,6 +50,12 @@ export class ChatComponent implements OnInit {
     return this.documentId()
       ? $localize`Ask a question about this document...`
       : $localize`Ask a question about a document...`
+  }
+
+  public get contextDescription(): string {
+    return this.documentId()
+      ? $localize`Asking about this document`
+      : $localize`Searching your accessible documents`
   }
 
   ngOnInit(): void {
@@ -162,17 +170,32 @@ export class ChatComponent implements OnInit {
     }, 50)
   }
 
-  public onOpenChange(open: boolean): void {
-    if (open) {
+  public togglePanel(): void {
+    if (this.isOpen()) {
+      this.closePanel()
+    } else {
+      this.isOpen.set(true)
       setTimeout(() => {
         this.chatInput.nativeElement.focus()
       }, 10)
     }
   }
 
-  public searchInputKeyDown(event: KeyboardEvent) {
+  public closePanel(): void {
+    this.isOpen.set(false)
+  }
+
+  @HostListener('document:keydown.escape')
+  public onEscape(): void {
+    if (this.isOpen()) {
+      this.closePanel()
+    }
+  }
+
+  public searchInputKeyDown(event: KeyboardEvent): void {
     if (
       event.key === 'Enter' &&
+      !event.shiftKey &&
       !(event.isComposing || event.keyCode === 229)
     ) {
       event.preventDefault()

@@ -179,6 +179,14 @@ about your documents. It operates over a single document or across multiple docu
 depending on the current view, and its answers include links to the source documents it
 drew from.
 
+Select the chat control to open the chat panel. From a document detail page, questions are
+limited to that document. Elsewhere, the chat searches the documents you can access.
+
+Chat responses support common Markdown formatting, including headings, emphasis, lists and
+task lists, block quotes, tables, links, and fenced code blocks with syntax highlighting.
+Inline and display TeX math are also supported. Response HTML is sanitized before it is
+displayed.
+
 ### AI Security notes
 
 - Document content is passed to the LLM as **untrusted data**.
