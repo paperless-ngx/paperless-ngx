@@ -1,21 +1,21 @@
 import { Pipe, PipeTransform } from '@angular/core'
 import { Marked, Renderer, Tokens } from 'marked'
 
-const ALLOWED_LINK_PROTOCOLS = ['http:', 'https:', 'mailto:']
+const ALLOWED_LINK_PROTOCOLS = new Set(['http:', 'https:', 'mailto:'])
 
 function escapeHtml(text: string): string {
   return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;')
 }
 
 function safeHref(href: string): string | null {
   try {
     const url = new URL(href)
-    return ALLOWED_LINK_PROTOCOLS.includes(url.protocol) ? url.href : null
+    return ALLOWED_LINK_PROTOCOLS.has(url.protocol) ? url.href : null
   } catch {
     return null
   }
