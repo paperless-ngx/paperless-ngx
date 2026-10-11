@@ -10,8 +10,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NavigationEnd, Router, RouterModule } from '@angular/router'
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { filter, map, Subscription } from 'rxjs'
 import { MarkdownPipe } from 'src/app/pipes/markdown.pipe'
-import { filter, map } from 'rxjs'
 import {
   ChatMessage,
   ChatService,
@@ -48,6 +48,9 @@ export class ChatComponent implements OnInit {
 
   private typewriterBuffer: string[] = []
   private typewriterActive = false
+  private typewriterTimeout: ReturnType<typeof setTimeout>
+  private streamSubscription: Subscription
+  private streamingMessage: ChatMessage
   private slowResponseTimeout: ReturnType<typeof setTimeout>
 
   public get placeholder(): string {
@@ -87,6 +90,7 @@ export class ChatComponent implements OnInit {
     }
     this.messages.update((messages) => [...messages, assistantMessage])
     this.loading.set(true)
+    this.streamingMessage = assistantMessage
     this.slowResponseTimeout = setTimeout(
       () => this.slowResponse.set(true),
       SLOW_RESPONSE_DELAY_MS
@@ -94,42 +98,66 @@ export class ChatComponent implements OnInit {
 
     let lastVisibleContent = ''
 
-    this.chatService.streamChat(this.documentId(), this.input()).subscribe({
-      next: (chunk) => {
-        this.clearSlowResponse()
-        const nextResponse = parseChatResponse(chunk)
+    this.streamSubscription = this.chatService
+      .streamChat(this.documentId(), this.input())
+      .subscribe({
+        next: (chunk) => {
+          this.clearSlowResponse()
+          const nextResponse = parseChatResponse(chunk)
 
-        if (nextResponse.content.length < lastVisibleContent.length) {
-          this.resetTypewriter(assistantMessage, nextResponse.content)
-          lastVisibleContent = nextResponse.content
-        } else {
-          const visibleDelta = nextResponse.content.substring(
-            lastVisibleContent.length
-          )
-          lastVisibleContent = nextResponse.content
-          this.enqueueTypewriter(visibleDelta, assistantMessage)
-        }
+          if (nextResponse.content.length < lastVisibleContent.length) {
+            this.resetTypewriter(assistantMessage, nextResponse.content)
+            lastVisibleContent = nextResponse.content
+          } else {
+            const visibleDelta = nextResponse.content.substring(
+              lastVisibleContent.length
+            )
+            lastVisibleContent = nextResponse.content
+            this.enqueueTypewriter(visibleDelta, assistantMessage)
+          }
 
-        assistantMessage.references = nextResponse.references
-        this.notifyMessagesChanged()
-      },
-      error: () => {
-        this.clearSlowResponse()
-        assistantMessage.content += '\n\n⚠️ Error receiving response.'
-        assistantMessage.isStreaming = false
-        this.notifyMessagesChanged()
-        this.loading.set(false)
-      },
-      complete: () => {
-        this.clearSlowResponse()
-        assistantMessage.isStreaming = false
-        this.notifyMessagesChanged()
-        this.loading.set(false)
-        this.scrollToBottom()
-      },
-    })
+          assistantMessage.references = nextResponse.references
+          this.notifyMessagesChanged()
+        },
+        error: () => {
+          this.clearSlowResponse()
+          assistantMessage.content += '\n\n⚠️ Error receiving response.'
+          assistantMessage.isStreaming = false
+          this.notifyMessagesChanged()
+          this.loading.set(false)
+        },
+        complete: () => {
+          this.clearSlowResponse()
+          assistantMessage.isStreaming = false
+          this.notifyMessagesChanged()
+          this.loading.set(false)
+          this.scrollToBottom()
+        },
+      })
 
     this.input.set('')
+  }
+
+  stopStreaming(): void {
+    const message = this.streamingMessage
+    if (!message?.isStreaming) return
+
+    this.streamSubscription?.unsubscribe()
+    this.flushTypewriter(message)
+    if (!message.content) {
+      this.messages.update((messages) => messages.filter((m) => m !== message))
+    }
+    this.clearSlowResponse()
+    message.isStreaming = false
+    this.notifyMessagesChanged()
+    this.loading.set(false)
+  }
+
+  private flushTypewriter(message: ChatMessage): void {
+    message.content += this.typewriterBuffer.join('')
+    clearTimeout(this.typewriterTimeout)
+    this.typewriterBuffer = []
+    this.typewriterActive = false
   }
 
   private clearSlowResponse(): void {
@@ -167,7 +195,8 @@ export class ChatComponent implements OnInit {
     this.notifyMessagesChanged()
     this.scrollToBottom()
 
-    setTimeout(() => this.playTypewriter(message), 10) // 10ms per character
+    // 10ms per character
+    this.typewriterTimeout = setTimeout(() => this.playTypewriter(message), 10)
   }
 
   private notifyMessagesChanged(): void {

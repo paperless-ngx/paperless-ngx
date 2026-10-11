@@ -185,6 +185,37 @@ describe('ChatComponent', () => {
     expect(component.slowResponse()).toBe(false)
   })
 
+  it('should stop streaming and keep the partial response', () => {
+    component.input.set('Hello')
+    component.sendMessage()
+    fixture.detectChanges()
+    const stopButton = fixture.nativeElement.querySelector('.chat-input button')
+    expect(stopButton.textContent).toContain('Stop')
+
+    mockStream$.next('Hi there')
+    jest.advanceTimersByTime(20)
+    stopButton.click()
+
+    expect(mockStream$.observed).toBe(false)
+    expect(component.messages()[1].content).toBe('Hi there')
+    expect(component.messages()[1].isStreaming).toBe(false)
+    expect(component.loading()).toBe(false)
+
+    jest.advanceTimersByTime(1000)
+    expect(component.messages()[1].content).toBe('Hi there')
+  })
+
+  it('should drop the empty response when stopped before any content', () => {
+    component.input.set('Hello')
+    component.sendMessage()
+    component.stopStreaming()
+
+    expect(component.messages()).toHaveLength(1)
+    expect(component.loading()).toBe(false)
+    component.stopStreaming() // no-op once stopped
+    expect(component.messages()).toHaveLength(1)
+  })
+
   it('should enqueue typewriter chunks correctly', () => {
     const message = { content: '', role: 'assistant', isStreaming: true }
     component.enqueueTypewriter(null, message as any) // coverage for null
