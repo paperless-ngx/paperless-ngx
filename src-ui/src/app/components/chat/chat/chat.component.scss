@@ -199,6 +199,13 @@
       overflow-y: hidden;
     }
 
+    .chat-math-display {
+      display: block;
+      margin: .75rem 0;
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+
     .hljs {
       color: #24292e;
       background: #fff;

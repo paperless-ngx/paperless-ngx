@@ -135,6 +135,17 @@ describe('ChatComponent', () => {
     expect(link.getAttribute('href')).toContain('/documents/42')
   })
 
+  it('should render sanitized math placeholders with KaTeX', () => {
+    component.messages.set([
+      { role: 'assistant', content: 'The result is \\(E=mc^2\\).' },
+    ])
+    fixture.detectChanges()
+
+    const math = fixture.nativeElement.querySelector('.chat-math')
+    expect(math.getAttribute('title')).toBeNull()
+    expect(math.querySelector('.katex')).not.toBeNull()
+  })
+
   it('should remove delimiter fragments that were already streamed', () => {
     component.input.set('Hello')
     component.sendMessage()

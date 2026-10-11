@@ -1,4 +1,5 @@
 import {
+  AfterViewChecked,
   Component,
   ElementRef,
   HostListener,
@@ -10,6 +11,7 @@ import {
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NavigationEnd, Router, RouterModule } from '@angular/router'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import katex from 'katex'
 import { filter, map } from 'rxjs'
 import { ChatMarkdownPipe } from 'src/app/pipes/chat-markdown.pipe'
 import {
@@ -30,15 +32,16 @@ import {
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.scss',
 })
-export class ChatComponent implements OnInit {
+export class ChatComponent implements OnInit, AfterViewChecked {
   readonly messages = signal<ChatMessage[]>([])
   readonly loading = signal(false)
   readonly input = signal('')
   readonly documentId = signal<number>(undefined)
   readonly isOpen = signal(false)
 
-  private chatService: ChatService = inject(ChatService)
-  private router: Router = inject(Router)
+  private readonly chatService: ChatService = inject(ChatService)
+  private readonly router: Router = inject(Router)
+  private readonly host = inject(ElementRef<HTMLElement>)
 
   @ViewChild('scrollAnchor') scrollAnchor!: ElementRef<HTMLDivElement>
   @ViewChild('chatInput') chatInput!: ElementRef<HTMLInputElement>
@@ -67,6 +70,26 @@ export class ChatComponent implements OnInit {
       )
       .subscribe((url) => {
         this.updateDocumentId(url)
+      })
+  }
+
+  ngAfterViewChecked(): void {
+    this.host.nativeElement
+      .querySelectorAll<HTMLElement>('.chat-math[title]')
+      .forEach((element) => {
+        const encodedFormula = element.getAttribute('title')
+        if (!encodedFormula) return
+
+        try {
+          katex.render(decodeURIComponent(encodedFormula), element, {
+            displayMode: element.classList.contains('chat-math-display'),
+            throwOnError: false,
+            trust: false,
+          })
+        } catch {
+          element.textContent = ''
+        }
+        element.removeAttribute('title')
       })
   }
 

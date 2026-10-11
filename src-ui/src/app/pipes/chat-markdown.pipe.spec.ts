@@ -21,7 +21,7 @@ describe('ChatMarkdownPipe', () => {
     expect(html).toContain('<h1>Heading</h1>')
     expect(html).toContain('<strong>Bold</strong>')
     expect(html).toContain('<em>italic</em>')
-    expect(html).toContain('<strong><em>both</em></strong>')
+    expect(html).toContain('<em><strong>both</strong></em>')
     expect(html).toContain('<del>deleted</del>')
     expect(html).toContain('<u>underlined</u>')
     expect(html).toContain('class="chat-task-checkbox checked"')
@@ -29,7 +29,7 @@ describe('ChatMarkdownPipe', () => {
     expect(html).toContain('<ol>')
   })
 
-  it('renders tables, highlighted code, and TeX math', () => {
+  it('renders tables, highlighted code, and safe TeX placeholders', () => {
     const html = render(
       '| Name | Amount |\n| :--- | ---: |\n| Revenue | 125 |\n\n```python\ndef hello():\n    return "Hello"\n```\n\n\\(E=mc^2\\)\n\n\\[\\frac{a}{b}\\]'
     )
@@ -39,8 +39,10 @@ describe('ChatMarkdownPipe', () => {
     expect(html).toContain('align="right"')
     expect(html).toContain('class="hljs language-python"')
     expect(html).toContain('hljs-keyword')
-    expect(html).toContain('class="katex"')
-    expect(html).toContain('katex-display')
+    expect(html).toContain('class="chat-math"')
+    expect(html).toContain('class="chat-math chat-math-display"')
+    expect(html).toContain('title="E%3Dmc%5E2"')
+    expect(html).toContain('title="%5Cfrac%7Ba%7D%7Bb%7D"')
   })
 
   it('sanitizes unsafe HTML while retaining safe formatting', () => {

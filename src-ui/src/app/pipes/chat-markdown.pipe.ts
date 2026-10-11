@@ -1,10 +1,8 @@
-import { Pipe, PipeTransform, inject } from '@angular/core'
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser'
-import DOMPurify from 'dompurify'
+import { Pipe, PipeTransform, SecurityContext, inject } from '@angular/core'
+import { DomSanitizer } from '@angular/platform-browser'
 import hljs from 'highlight.js'
 import { Marked } from 'marked'
 import { markedHighlight } from 'marked-highlight'
-import markedKatex from 'marked-katex-extension'
 
 const markdown = new Marked(
   {
@@ -21,10 +19,6 @@ const markdown = new Marked(
         : 'plaintext'
       return hljs.highlight(code, { language: supportedLanguage }).value
     },
-  }),
-  markedKatex({
-    nonStandard: true,
-    throwOnError: false,
   })
 )
 
@@ -32,31 +26,65 @@ const markdown = new Marked(
   name: 'chatMarkdown',
 })
 export class ChatMarkdownPipe implements PipeTransform {
-  private sanitizer = inject(DomSanitizer)
+  private readonly sanitizer = inject(DomSanitizer)
 
-  transform(value: string | null | undefined): SafeHtml | string {
+  transform(value: string | null | undefined): string {
     if (!value) return ''
 
-    const rendered = replaceTaskCheckboxes(
-      markdown.parse(normalizeMathDelimiters(value), {
-        async: false,
-      })
+    const { markdown: source, math } = extractMath(value)
+    const rendered = renderMathPlaceholders(
+      replaceTaskCheckboxes(
+        markdown.parse(source, {
+          async: false,
+        })
+      ),
+      math
     )
-    const sanitized = DOMPurify.sanitize(rendered, {
-      ADD_ATTR: ['align', 'rel', 'target'],
-      USE_PROFILES: { html: true, mathMl: true },
-    })
-    return this.sanitizer.bypassSecurityTrustHtml(sanitized)
+    return this.sanitizer.sanitize(SecurityContext.HTML, rendered) ?? ''
   }
 }
 
-function normalizeMathDelimiters(value: string): string {
-  return value
-    .replace(
-      /\\\[([\s\S]*?)\\\]/g,
-      (_, formula: string) => `\n$$\n${formula}\n$$\n`
-    )
-    .replace(/\\\(([\s\S]*?)\\\)/g, (_, formula: string) => `$${formula}$`)
+interface ChatMath {
+  formula: string
+  display: boolean
+  placeholder: string
+}
+
+function extractMath(value: string): { markdown: string; math: ChatMath[] } {
+  const math: ChatMath[] = []
+  const replace = (formula: string, display: boolean): string => {
+    const placeholder = `\uE000chat-math-${math.length}\uE001`
+    math.push({ formula, display, placeholder })
+    return placeholder
+  }
+
+  return {
+    markdown: value
+      .replace(/\\\[([\s\S]*?)\\\]/g, (_, formula: string) =>
+        replace(formula, true)
+      )
+      .replace(/\\\(([\s\S]*?)\\\)/g, (_, formula: string) =>
+        replace(formula, false)
+      )
+      .replace(/\$\$([\s\S]*?)\$\$/g, (_, formula: string) =>
+        replace(formula, true)
+      )
+      .replace(/\$([^$\n]+?)\$/g, (_, formula: string) =>
+        replace(formula, false)
+      ),
+    math,
+  }
+}
+
+function renderMathPlaceholders(value: string, math: ChatMath[]): string {
+  return math.reduce(
+    (rendered, item) =>
+      rendered.replace(
+        item.placeholder,
+        `<span class="chat-math${item.display ? ' chat-math-display' : ''}" title="${encodeURIComponent(item.formula)}"></span>`
+      ),
+    value
+  )
 }
 
 function replaceTaskCheckboxes(value: string): string {
