@@ -41,7 +41,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
 
   private readonly chatService: ChatService = inject(ChatService)
   private readonly router: Router = inject(Router)
-  private readonly host = inject(ElementRef<HTMLElement>)
+  private readonly host: ElementRef<HTMLElement> = inject(ElementRef)
 
   @ViewChild('scrollAnchor') scrollAnchor!: ElementRef<HTMLDivElement>
   @ViewChild('chatInput') chatInput!: ElementRef<HTMLInputElement>
