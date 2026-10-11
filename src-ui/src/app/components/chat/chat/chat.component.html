@@ -20,7 +20,6 @@
   [class.is-open]="isOpen()"
   [attr.aria-hidden]="!isOpen()"
   [attr.inert]="isOpen() ? null : ''"
-  role="complementary"
   aria-labelledby="chatPanelTitle"
 >
   <header class="chat-panel-header">
@@ -42,9 +41,9 @@
         <div class="message-bubble">
           <div class="message-content text-break" [innerHTML]="message.content | chatMarkdown"></div>
           @if (message.isStreaming && !message.content) {
-            <div class="typing-indicator" role="status" aria-label="AI is typing" i18n-aria-label>
+            <output class="typing-indicator" aria-label="AI is typing" i18n-aria-label>
               <span></span><span></span><span></span>
-            </div>
+            </output>
           } @else if (message.isStreaming) {
             <span class="blinking-cursor" aria-label="Generating response">|</span>
           }
