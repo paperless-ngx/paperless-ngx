@@ -80,8 +80,15 @@ describe('ChatComponent', () => {
     expect(component.messages()[0].content).toBe('Hello')
     expect(component.loading()).toBe(true)
 
+    fixture.detectChanges()
+    const messagesEl = fixture.nativeElement.querySelector('.chat-messages')
+    expect(messagesEl.querySelector('.spinner-border')).not.toBeNull()
+    expect(messagesEl.textContent).toContain('Thinking...')
+
     mockStream$.next('Hi')
     expect(component.messages()[1].content).toBe('H')
+    fixture.detectChanges()
+    expect(messagesEl.querySelector('.spinner-border')).toBeNull()
     mockStream$.next('Hi there')
     // advance time to process the typewriter effect
     await jest.runAllTimersAsync()

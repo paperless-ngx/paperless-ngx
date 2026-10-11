@@ -9,7 +9,12 @@
         @for (message of messages(); track message) {
           <div class="message d-flex flex-row small" [class.justify-content-end]="message.role === 'user'">
             <div class="p-2 m-2" [class.bg-body]="message.role === 'user'">
-              @if (message.role === 'assistant') {
+              @if (message.isStreaming && !message.content) {
+                <div class="d-flex align-items-center text-muted">
+                  <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                  <ng-container i18n>Thinking...</ng-container>
+                </div>
+              } @else if (message.role === 'assistant') {
                 <div class="chat-markdown text-break text-wrap" [innerHTML]="message.content | markdown"></div>
                 @if (message.isStreaming) { <span class="blinking-cursor">|</span> }
               } @else {
