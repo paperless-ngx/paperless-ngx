@@ -2,6 +2,7 @@ import hashlib
 import json
 import shutil
 import tempfile
+from datetime import date
 from datetime import timedelta
 from io import StringIO
 from pathlib import Path
@@ -44,14 +45,18 @@ from documents.models import Workflow
 from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
 from documents.sanity_checker import check_sanity
+from documents.settings import EXPORTER_ARCHIVE_NAME
 from documents.settings import EXPORTER_FILE_NAME
 from documents.settings import EXPORTER_SHARE_LINK_BUNDLE_NAME
+from documents.settings import EXPORTER_THUMBNAIL_NAME
 from documents.tests.utils import SampleDirMixin
 from paperless_mail.models import MailAccount
 from paperless_testing.assertions import FileSystemAssertsMixin
 from paperless_testing.dirs import DirectoriesMixin
+from paperless_testing.dirs import PaperlessDirs
 from paperless_testing.dirs import paperless_environment
 from paperless_testing.factories import DocumentBarcodeFactory
+from paperless_testing.factories import DocumentFactory
 from paperless_testing.permissions import grant_object
 
 
@@ -1462,3 +1467,73 @@ class TestCryptExportImport(
             ("No passphrase was given, sensitive fields will be in plaintext"),
             stdout.read(),
         )
+
+
+@pytest.mark.management
+@pytest.mark.django_db
+class TestExportDerivedFileNameCollisions:
+    def test_same_stem_different_extension_get_distinct_derived_files(
+        self,
+        paperless_dirs: PaperlessDirs,
+        tmp_path: Path,
+    ) -> None:
+        """
+        GIVEN:
+            - Two documents with the same title and created date
+            - One original is a PDF, the other a PNG, both with archive and thumbnail
+        WHEN:
+            - The exporter runs
+        THEN:
+            - Each document is exported under a distinct original, thumbnail and archive name
+            - Each exported file holds its own document's content
+        """
+        for pk, (filename, mime_type) in enumerate(
+            [("collide.pdf", "application/pdf"), ("collide.png", "image/png")],
+            start=1,
+        ):
+            (paperless_dirs.originals_dir / filename).write_bytes(
+                f"original {pk}".encode(),
+            )
+            (paperless_dirs.archive_dir / f"{pk:07}.pdf").write_bytes(
+                f"archive {pk}".encode(),
+            )
+            (paperless_dirs.thumbnail_dir / f"{pk:07}.webp").write_bytes(
+                f"thumbnail {pk}".encode(),
+            )
+            DocumentFactory(
+                pk=pk,
+                title="collide",
+                created=date(2026, 10, 7),
+                filename=filename,
+                archive_filename=f"{pk:07}.pdf",
+                mime_type=mime_type,
+            )
+
+        target = tmp_path / "export"
+        target.mkdir()
+        call_command(
+            "document_exporter",
+            str(target),
+            "--no-progress-bar",
+            skip_checks=True,
+        )
+
+        manifest = json.loads((target / "manifest.json").read_text())
+        records = {r["pk"]: r for r in manifest if r["model"] == "documents.document"}
+
+        for key in (
+            EXPORTER_FILE_NAME,
+            EXPORTER_THUMBNAIL_NAME,
+            EXPORTER_ARCHIVE_NAME,
+        ):
+            assert records[1][key] != records[2][key]
+
+        for pk in (1, 2):
+            record = records[pk]
+            assert (target / record[EXPORTER_FILE_NAME]).read_text() == f"original {pk}"
+            assert (
+                target / record[EXPORTER_THUMBNAIL_NAME]
+            ).read_text() == f"thumbnail {pk}"
+            assert (
+                target / record[EXPORTER_ARCHIVE_NAME]
+            ).read_text() == f"archive {pk}"
