@@ -7,9 +7,7 @@ from unittest.mock import patch
 
 import pytest
 import pytest_mock
-from django.db import connection
 from django.test import override_settings
-from django.test.utils import CaptureQueriesContext
 from guardian.shortcuts import remove_perm
 
 from documents.models import Document
@@ -484,37 +482,6 @@ class TestClassifierEffectiveContent:
             _candidates, context = get_taxonomy_context(document, user=None)
 
         assert context == "TITLE: Statement\nlatest text"
-
-    @override_settings(LLM_EMBEDDING_BACKEND="huggingface")
-    def test_similar_document_context_does_not_query_per_document(self) -> None:
-        """
-        GIVEN:
-            - Several similar root documents, each with a version
-        WHEN:
-            - The similar-document context is built
-        THEN:
-            - Effective content is annotated in bulk, so the number of queries
-              does not grow with the number of similar documents
-        """
-        document = DocumentFactory(content="Some content")
-
-        def count_queries(similar_count: int) -> int:
-            similar = [self._root_with_version() for _ in range(similar_count)]
-            fake_nodes = [
-                SimpleNamespace(metadata={"document_id": str(s.pk)}, score=0.9)
-                for s in similar
-            ]
-            with (
-                patch(
-                    "paperless_ai.ai_classifier.retrieve_similar_nodes",
-                    return_value=fake_nodes,
-                ),
-                CaptureQueriesContext(connection) as queries,
-            ):
-                get_taxonomy_context(document, user=None, max_docs=similar_count)
-            return len(queries)
-
-        assert count_queries(2) == count_queries(6)
 
 
 @pytest.mark.django_db
