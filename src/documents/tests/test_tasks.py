@@ -279,14 +279,7 @@ class TestUpdateContent(DirectoriesMixin, TestCase):
 
     def _create_root_with_version(self) -> tuple[Document, Document]:
         sample1 = self.dirs.scratch_dir / "sample.pdf"
-        shutil.copy(
-            Path(__file__).parent
-            / "samples"
-            / "documents"
-            / "originals"
-            / "0000001.pdf",
-            sample1,
-        )
+        shutil.copy(SIMPLE_DIGITAL_PDF, sample1)
         root = DocumentFactory(content="root content", mime_type="application/pdf")
         version = DocumentFactory(
             content="my document",
