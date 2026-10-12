@@ -206,7 +206,7 @@ describe('ChatComponent', () => {
     component.sendMessage()
     fixture.detectChanges()
     const stopButton = fixture.nativeElement.querySelector('.chat-input button')
-    expect(stopButton.textContent).toContain('Stop')
+    expect(stopButton.getAttribute('aria-label')).toBe('Stop')
 
     mockStream$.next('Hi there')
     jest.advanceTimersByTime(20)
@@ -230,6 +230,27 @@ describe('ChatComponent', () => {
     expect(component.loading()).toBe(false)
     component.stopStreaming() // no-op once stopped
     expect(component.messages()).toHaveLength(1)
+  })
+
+  it('should clear the conversation', () => {
+    component.input.set('Hello')
+    component.sendMessage()
+    mockStream$.next('Hi there')
+    fixture.detectChanges()
+
+    fixture.nativeElement.querySelector('button[title="Clear chat"]').click()
+    expect(component.messages()).toHaveLength(0)
+    expect(component.loading()).toBe(false)
+    expect(mockStream$.observed).toBe(false)
+
+    fixture.detectChanges()
+    jest.advanceTimersByTime(10)
+    expect(document.activeElement).toBe(
+      fixture.nativeElement.querySelector('#chatInput')
+    )
+    expect(fixture.nativeElement.textContent).toContain(
+      'Answers come from your documents'
+    )
   })
 
   it('should enqueue typewriter chunks correctly', () => {

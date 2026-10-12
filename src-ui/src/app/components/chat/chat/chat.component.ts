@@ -150,6 +150,12 @@ export class ChatComponent implements OnInit {
     this.finishStreaming(message)
   }
 
+  clearChat(): void {
+    this.stopStreaming()
+    this.messages.set([])
+    setTimeout(() => this.chatInput?.nativeElement.focus())
+  }
+
   private finishStreaming(message: ChatMessage): void {
     this.clearSlowResponse()
     this.streamFinished = false
