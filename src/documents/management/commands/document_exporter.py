@@ -514,8 +514,11 @@ class Command(CryptMixin, PaperlessCommand):
             else:
                 base_name = document.get_public_filename(counter=filename_counter)
 
-            if base_name not in self.exported_files:
-                self.exported_files.add(base_name)
+            # The thumbnail and archive names are derived from the stem, so
+            # uniqueness must hold without the original's extension
+            unique_key = str(Path(base_name).with_suffix(""))
+            if unique_key not in self.exported_files:
+                self.exported_files.add(unique_key)
                 break
             else:
                 filename_counter += 1
