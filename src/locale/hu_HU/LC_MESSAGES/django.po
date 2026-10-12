@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-05 16:26+0000\n"
-"PO-Revision-Date: 2026-10-05 16:27\n"
+"POT-Creation-Date: 2026-10-12 19:12+0000\n"
+"PO-Revision-Date: 2026-10-12 19:13\n"
 "Last-Translator: \n"
 "Language-Team: Hungarian\n"
 "Language: hu_HU\n"
@@ -21,39 +21,39 @@ msgstr ""
 msgid "Documents"
 msgstr "Dokumentumok"
 
-#: documents/filters.py:463
+#: documents/filters.py:464
 msgid "Value must be valid JSON."
 msgstr "Érvényes JSON érték szükséges."
 
-#: documents/filters.py:482
+#: documents/filters.py:483
 msgid "Invalid custom field query expression"
 msgstr "Érvénytelen egyéni mező lekérdezési kifejezés"
 
-#: documents/filters.py:492
+#: documents/filters.py:493
 msgid "Invalid expression list. Must be nonempty."
 msgstr "Érvénytelen kifejezéslista. Nem lehet üres."
 
-#: documents/filters.py:513
+#: documents/filters.py:514
 msgid "Invalid logical operator {op!r}"
 msgstr "Érvénytelen logikai operátor {op!r}"
 
-#: documents/filters.py:527
+#: documents/filters.py:528
 msgid "Maximum number of query conditions exceeded."
 msgstr "Maximum lekérdezési feltételszám átlépve."
 
-#: documents/filters.py:591
+#: documents/filters.py:592
 msgid "{name!r} is not a valid custom field."
 msgstr "{name!r} nem érvényes egyéni mező."
 
-#: documents/filters.py:628
+#: documents/filters.py:629
 msgid "{data_type} does not support query expr {expr!r}."
 msgstr "A(z) {data_type} nem támogatja a {expr!r} kifejezés lekérdezést."
 
-#: documents/filters.py:747 documents/models.py:137
+#: documents/filters.py:748 documents/models.py:137
 msgid "Maximum nesting depth exceeded."
 msgstr "Maximum beágyazási mélység túllépve."
 
-#: documents/filters.py:1109
+#: documents/filters.py:1125
 msgid "Custom field not found"
 msgstr "Az egyéni mező nem található"
 
@@ -1636,7 +1636,7 @@ msgid "workflow runs"
 msgstr "munkafolyamat futtatások"
 
 #: documents/serialisers.py:515 documents/serialisers.py:872
-#: documents/serialisers.py:2902 documents/views.py:343 documents/views.py:2732
+#: documents/serialisers.py:2902 documents/views.py:344 documents/views.py:2752
 #: paperless_mail/serialisers.py:156
 msgid "Insufficient permissions."
 msgstr "Nincs jogosúltsága."
@@ -1676,7 +1676,7 @@ msgstr "Érvénytelen változó észlelve."
 msgid "Duplicate document identifiers are not allowed."
 msgstr "A dokumentumazonosítók duplikálása nem megengedett."
 
-#: documents/serialisers.py:2988 documents/views.py:4787
+#: documents/serialisers.py:2988 documents/views.py:4799
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr "Dokumentumok nem találhatók: %(ids)s"
@@ -1913,59 +1913,44 @@ msgstr "A %(provider_name)s felhasználói fiókkal fogsz belépni."
 msgid "As a final step, please complete the following form:"
 msgstr "Utolsó lépésként kérjük válaszoljon az alábbi kérdésekre:"
 
-#: documents/validators.py:24
-#, python-brace-format
-msgid "Unable to parse URI {value}, missing scheme"
-msgstr "A {value} URI értelmezése sikertelen, hiányzó séma"
-
-#: documents/validators.py:29
-#, python-brace-format
-msgid "Unable to parse URI {value}, missing net location or path"
-msgstr "A {value} URI értelmezése sikertelen, hiányzó hálózati vagy elérési útvonal"
-
 #: documents/validators.py:36
-msgid "URI scheme '{parts.scheme}' is not allowed. Allowed schemes: {', '.join(allowed_schemes)}"
-msgstr "A '{parts.scheme}' séma nem engedélyezett. Engedélyezett sémák: {', '.join(allowed_schemes)}"
+msgid ", "
+msgstr ""
 
-#: documents/validators.py:45
-#, python-brace-format
-msgid "Unable to parse URI {value}"
-msgstr "A {value} URI értelmezése sikertelen"
-
-#: documents/views.py:336 documents/views.py:2729
+#: documents/views.py:337 documents/views.py:2749
 msgid "Invalid more_like_id"
 msgstr "Érvénytelen more_like_id"
 
-#: documents/views.py:1676
+#: documents/views.py:1684
 msgid "Invalid AI configuration."
 msgstr "Érvénytelen MI konfiguráció."
 
-#: documents/views.py:1687
+#: documents/views.py:1695
 msgid "AI backend request timed out."
 msgstr ""
 
-#: documents/views.py:1699
+#: documents/views.py:1707
 msgid "AI backend rejected the request. Check logs for details."
 msgstr ""
 
-#: documents/views.py:2554 documents/views.py:2870
+#: documents/views.py:2574 documents/views.py:2890
 msgid "Specify only one of text, title_search, query, or more_like_id."
 msgstr "A text, title_search, query, vagy more_like_id közül csak egyet adjon meg."
 
-#: documents/views.py:4800
+#: documents/views.py:4815
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr "Nincs megfelelő jogosultság a %(id)s dokumentum megosztásához."
 
-#: documents/views.py:4846
+#: documents/views.py:4862
 msgid "Bundle is already being processed."
 msgstr "A csomag feldolgozása már folyamatban van."
 
-#: documents/views.py:4910
+#: documents/views.py:4926
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr "A megosztási linkcsomag készítése folyamatban. Kérjük, próbálja meg később."
 
-#: documents/views.py:4924
+#: documents/views.py:4940
 msgid "The share link bundle is unavailable."
 msgstr "A megosztási linkcsomag nem elérhető."
 
@@ -2257,151 +2242,151 @@ msgstr ""
 msgid "paperless application settings"
 msgstr "paperless alkalmazás beállítások"
 
-#: paperless/settings/__init__.py:561
+#: paperless/settings/__init__.py:562
 msgid "English (US)"
 msgstr "Angol (US)"
 
-#: paperless/settings/__init__.py:562
+#: paperless/settings/__init__.py:563
 msgid "Arabic"
 msgstr "Arab"
 
-#: paperless/settings/__init__.py:563
+#: paperless/settings/__init__.py:564
 msgid "Afrikaans"
 msgstr "Afrikai"
 
-#: paperless/settings/__init__.py:564
+#: paperless/settings/__init__.py:565
 msgid "Belarusian"
 msgstr "Fehérorosz"
 
-#: paperless/settings/__init__.py:565
+#: paperless/settings/__init__.py:566
 msgid "Bulgarian"
 msgstr "Bolgár"
 
-#: paperless/settings/__init__.py:566
+#: paperless/settings/__init__.py:567
 msgid "Catalan"
 msgstr "Katalán"
 
-#: paperless/settings/__init__.py:567
+#: paperless/settings/__init__.py:568
 msgid "Czech"
 msgstr "Cseh"
 
-#: paperless/settings/__init__.py:568
+#: paperless/settings/__init__.py:569
 msgid "Danish"
 msgstr "Dán"
 
-#: paperless/settings/__init__.py:569
+#: paperless/settings/__init__.py:570
 msgid "German"
 msgstr "Német"
 
-#: paperless/settings/__init__.py:570
+#: paperless/settings/__init__.py:571
 msgid "Greek"
 msgstr "Görög"
 
-#: paperless/settings/__init__.py:571
+#: paperless/settings/__init__.py:572
 msgid "English (GB)"
 msgstr "Angol (GB)"
 
-#: paperless/settings/__init__.py:572
+#: paperless/settings/__init__.py:573
 msgid "Spanish"
 msgstr "Spanyol"
 
-#: paperless/settings/__init__.py:573
+#: paperless/settings/__init__.py:574
 msgid "Persian"
 msgstr "Perzsa"
 
-#: paperless/settings/__init__.py:574
+#: paperless/settings/__init__.py:575
 msgid "Finnish"
 msgstr "Finn"
 
-#: paperless/settings/__init__.py:575
+#: paperless/settings/__init__.py:576
 msgid "French"
 msgstr "Francia"
 
-#: paperless/settings/__init__.py:576
+#: paperless/settings/__init__.py:577
 msgid "Hungarian"
 msgstr "Magyar"
 
-#: paperless/settings/__init__.py:577
+#: paperless/settings/__init__.py:578
 msgid "Indonesian"
 msgstr "Indonéz"
 
-#: paperless/settings/__init__.py:578
+#: paperless/settings/__init__.py:579
 msgid "Italian"
 msgstr "Olasz"
 
-#: paperless/settings/__init__.py:579
+#: paperless/settings/__init__.py:580
 msgid "Japanese"
 msgstr "Japán"
 
-#: paperless/settings/__init__.py:580
+#: paperless/settings/__init__.py:581
 msgid "Korean"
 msgstr "Koreai"
 
-#: paperless/settings/__init__.py:581
+#: paperless/settings/__init__.py:582
 msgid "Luxembourgish"
 msgstr "Luxemburgi"
 
-#: paperless/settings/__init__.py:582
+#: paperless/settings/__init__.py:583
 msgid "Norwegian"
 msgstr "Norvég"
 
-#: paperless/settings/__init__.py:583
+#: paperless/settings/__init__.py:584
 msgid "Dutch"
 msgstr "Holland"
 
-#: paperless/settings/__init__.py:584
+#: paperless/settings/__init__.py:585
 msgid "Polish"
 msgstr "Lengyel"
 
-#: paperless/settings/__init__.py:585
+#: paperless/settings/__init__.py:586
 msgid "Portuguese (Brazil)"
 msgstr "Portugál (Brazília)"
 
-#: paperless/settings/__init__.py:586
+#: paperless/settings/__init__.py:587
 msgid "Portuguese"
 msgstr "Portugál"
 
-#: paperless/settings/__init__.py:587
+#: paperless/settings/__init__.py:588
 msgid "Romanian"
 msgstr "Román"
 
-#: paperless/settings/__init__.py:588
+#: paperless/settings/__init__.py:589
 msgid "Russian"
 msgstr "Orosz"
 
-#: paperless/settings/__init__.py:589
+#: paperless/settings/__init__.py:590
 msgid "Slovak"
 msgstr "Szlovák"
 
-#: paperless/settings/__init__.py:590
+#: paperless/settings/__init__.py:591
 msgid "Slovenian"
 msgstr "Szlovén"
 
-#: paperless/settings/__init__.py:591
+#: paperless/settings/__init__.py:592
 msgid "Serbian"
 msgstr "Szerb"
 
-#: paperless/settings/__init__.py:592
+#: paperless/settings/__init__.py:593
 msgid "Swedish"
 msgstr "Svéd"
 
-#: paperless/settings/__init__.py:593
+#: paperless/settings/__init__.py:594
 msgid "Turkish"
 msgstr "Török"
 
-#: paperless/settings/__init__.py:594
+#: paperless/settings/__init__.py:595
 msgid "Ukrainian"
 msgstr "Ukrán"
 
-#: paperless/settings/__init__.py:595
+#: paperless/settings/__init__.py:596
 msgid "Vietnamese"
 msgstr "Vietnámi"
 
-#: paperless/settings/__init__.py:596
+#: paperless/settings/__init__.py:597
 msgid "Chinese Simplified"
 msgstr "Kínai egyszerűsített"
 
-#: paperless/settings/__init__.py:597
+#: paperless/settings/__init__.py:598
 msgid "Chinese Traditional"
 msgstr "Tradicionális kínai"
 
