@@ -456,6 +456,18 @@ def simple_png_file(tesseract_samples_dir: Path) -> Path:
     return tesseract_samples_dir / "simple.png"
 
 
+@pytest.fixture(scope="session")
+def rotated_pdf_file(tesseract_samples_dir: Path) -> Path:
+    """Path to a landscape (rotated) PDF sample file.
+
+    Returns
+    -------
+    Path
+        Absolute path to ``tesseract/rotated.pdf``.
+    """
+    return tesseract_samples_dir / "rotated.pdf"
+
+
 # ------------------------------------------------------------------
 # Tesseract parser instance and settings helpers
 # ------------------------------------------------------------------

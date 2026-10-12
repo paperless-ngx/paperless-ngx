@@ -282,17 +282,17 @@ class TestGetThumbnail:
         assert thumb.is_file()
 
     @pytest.mark.parametrize(
-        ("filename", "expected_height"),
+        ("sample_fixture", "expected_height"),
         [
-            pytest.param("simple-digital.pdf", 647, id="portrait-letter"),
-            pytest.param("rotated.pdf", 386, id="landscape"),
+            pytest.param("simple_digital_pdf_file", 647, id="portrait-letter"),
+            pytest.param("rotated_pdf_file", 386, id="landscape"),
         ],
     )
     def test_thumbnail_is_correct_format_and_size(
         self,
         tesseract_parser: RasterisedDocumentParser,
-        tesseract_samples_dir: Path,
-        filename: str,
+        request: pytest.FixtureRequest,
+        sample_fixture: str,
         expected_height: int,
     ) -> None:
         """
@@ -304,7 +304,7 @@ class TestGetThumbnail:
             - A 500px wide WebP keeping the page's aspect ratio
         """
         thumb = tesseract_parser.get_thumbnail(
-            tesseract_samples_dir / filename,
+            request.getfixturevalue(sample_fixture),
             "application/pdf",
         )
         with Image.open(thumb) as im:
