@@ -6,6 +6,7 @@ from unittest.mock import patch
 from urllib.parse import quote
 
 import time_machine
+from django.db import connection
 from django.test import override_settings
 from django.utils import timezone
 from rest_framework.test import APITestCase
@@ -18,6 +19,13 @@ from documents.models import SavedViewFilterRule
 from documents.serialisers import DocumentSerializer
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import UserFactory
+
+
+def _exact_equal(value: str | None, expected: str) -> bool:
+    """`exact` follows the column collation, which is case insensitive on MariaDB."""
+    if connection.vendor == "mysql" and value is not None:
+        return value.casefold() == expected.casefold()
+    return value == expected
 
 
 class DocumentWrapper:
@@ -287,7 +295,8 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
         self._assert_query_match_predicate(
             ["string_field", "exact", "paperless"],
             lambda document: (
-                "string_field" in document and document["string_field"] == "paperless"
+                "string_field" in document
+                and _exact_equal(document["string_field"], "paperless")
             ),
         )
 
@@ -296,7 +305,10 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
             ["string_field", "in", ["paperless", "Paperless"]],
             lambda document: (
                 "string_field" in document
-                and document["string_field"] in ("paperless", "Paperless")
+                and any(
+                    _exact_equal(document["string_field"], expected)
+                    for expected in ("paperless", "Paperless")
+                )
             ),
         )
 
@@ -761,7 +773,7 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
             lambda document: (
                 not (
                     "string_field" in document
-                    and document["string_field"] == "paperless"
+                    and _exact_equal(document["string_field"], "paperless")
                 )
             ),
         )

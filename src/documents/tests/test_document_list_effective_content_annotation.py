@@ -242,9 +242,7 @@ class TestDocumentListEffectiveContentAnnotation:
         # Only the list query itself reads a content column: no extra query
         # for the skipped prefetch, none for a per-instance fallback
         content_queries = [
-            query
-            for query in ctx.captured_queries
-            if '"documents_document"."content"' in query["sql"]
+            query for query in ctx.captured_queries if _content_column() in query["sql"]
         ]
         assert len(content_queries) == 1
 
@@ -365,6 +363,11 @@ def _get_document_queries(
     return [q for q in ctx.captured_queries if '"django_content_type"' not in q["sql"]]
 
 
+def _content_column() -> str:
+    quote = connection.ops.quote_name
+    return f"{quote('documents_document')}.{quote('content')}"
+
+
 def _get_effective_content_fallback_queries(
     ctx: CaptureQueriesContext,
 ) -> list[dict[str, str]]:
@@ -379,7 +382,7 @@ def _get_effective_content_fallback_queries(
     return [
         q
         for q in ctx.captured_queries
-        if q["sql"].startswith('SELECT "documents_document"."content" FROM')
+        if q["sql"].startswith(f"SELECT {_content_column()} FROM")
     ]
 
 
