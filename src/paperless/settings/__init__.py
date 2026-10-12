@@ -1,5 +1,4 @@
 import datetime
-import json
 import logging
 import logging.config
 import math
@@ -7,7 +6,6 @@ import multiprocessing
 import os
 import tempfile
 from pathlib import Path
-from typing import Any
 from typing import Final
 from urllib.parse import urlparse
 
@@ -25,6 +23,7 @@ from paperless.settings.parsers import get_bool_from_env
 from paperless.settings.parsers import get_choice_from_env
 from paperless.settings.parsers import get_float_from_env
 from paperless.settings.parsers import get_int_from_env
+from paperless.settings.parsers import get_json_from_env
 from paperless.settings.parsers import get_list_from_env
 from paperless.settings.parsers import get_path_from_env
 
@@ -331,8 +330,10 @@ SOCIALACCOUNT_ALLOW_SIGNUPS = get_bool_from_env(
     "yes",
 )
 SOCIALACCOUNT_AUTO_SIGNUP = get_bool_from_env("PAPERLESS_SOCIAL_AUTO_SIGNUP")
-SOCIALACCOUNT_PROVIDERS = json.loads(
-    os.getenv("PAPERLESS_SOCIALACCOUNT_PROVIDERS", "{}"),
+SOCIALACCOUNT_PROVIDERS = get_json_from_env(
+    "PAPERLESS_SOCIALACCOUNT_PROVIDERS",
+    {},
+    dict,
 )
 SOCIAL_ACCOUNT_DEFAULT_GROUPS = get_list_from_env(
     "PAPERLESS_SOCIAL_ACCOUNT_DEFAULT_GROUPS",
@@ -488,7 +489,7 @@ ALLAUTH_TRUSTED_CLIENT_IP_HEADER = os.getenv(
 USE_X_FORWARDED_HOST = get_bool_from_env("PAPERLESS_USE_X_FORWARD_HOST", "false")
 USE_X_FORWARDED_PORT = get_bool_from_env("PAPERLESS_USE_X_FORWARD_PORT", "false")
 SECURE_PROXY_SSL_HEADER = (
-    tuple(json.loads(os.environ["PAPERLESS_PROXY_SSL_HEADER"]))
+    tuple(get_json_from_env("PAPERLESS_PROXY_SSL_HEADER", [], list))
     if "PAPERLESS_PROXY_SSL_HEADER" in os.environ
     else None
 )
@@ -828,23 +829,17 @@ CONSUMER_DELETE_DUPLICATES = get_bool_from_env("PAPERLESS_CONSUMER_DELETE_DUPLIC
 CONSUMER_RECURSIVE = get_bool_from_env("PAPERLESS_CONSUMER_RECURSIVE")
 
 # Ignore regex patterns, matched against filename only
-CONSUMER_IGNORE_PATTERNS = list(
-    json.loads(
-        os.getenv(
-            "PAPERLESS_CONSUMER_IGNORE_PATTERNS",
-            json.dumps([]),
-        ),
-    ),
+CONSUMER_IGNORE_PATTERNS = get_json_from_env(
+    "PAPERLESS_CONSUMER_IGNORE_PATTERNS",
+    [],
+    list,
 )
 
 # Directories to always ignore.  These are matched by directory name, not full path
-CONSUMER_IGNORE_DIRS = list(
-    json.loads(
-        os.getenv(
-            "PAPERLESS_CONSUMER_IGNORE_DIRS",
-            json.dumps([]),
-        ),
-    ),
+CONSUMER_IGNORE_DIRS = get_json_from_env(
+    "PAPERLESS_CONSUMER_IGNORE_DIRS",
+    [],
+    list,
 )
 
 CONSUMER_SUBDIRS_AS_TAGS = get_bool_from_env("PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS")
@@ -894,13 +889,10 @@ CONSUMER_ENABLE_TAG_BARCODE: Final[bool] = get_bool_from_env(
     "PAPERLESS_CONSUMER_ENABLE_TAG_BARCODE",
 )
 
-CONSUMER_TAG_BARCODE_MAPPING = dict(
-    json.loads(
-        os.getenv(
-            "PAPERLESS_CONSUMER_TAG_BARCODE_MAPPING",
-            '{"TAG:(.*)": "\\\\g<1>"}',
-        ),
-    ),
+CONSUMER_TAG_BARCODE_MAPPING = get_json_from_env(
+    "PAPERLESS_CONSUMER_TAG_BARCODE_MAPPING",
+    {"TAG:(.*)": "\\g<1>"},
+    dict,
 )
 
 CONSUMER_TAG_BARCODE_SPLIT: Final[bool] = get_bool_from_env(
@@ -1088,25 +1080,6 @@ CLASSIFIER_LANGUAGES: Final[dict[str, str]] = {
 }
 
 
-def _get_llm_extra_params() -> dict[str, Any]:
-    """
-    Parse PAPERLESS_AI_LLM_EXTRA_PARAMS, a JSON object passed straight through
-    to the LLM backend's request body.
-    """
-    raw = os.getenv("PAPERLESS_AI_LLM_EXTRA_PARAMS", "{}")
-    try:
-        parsed = json.loads(raw)
-    except json.JSONDecodeError as e:
-        raise ImproperlyConfigured(
-            "PAPERLESS_AI_LLM_EXTRA_PARAMS must be valid JSON",
-        ) from e
-    if not isinstance(parsed, dict):
-        raise ImproperlyConfigured(
-            "PAPERLESS_AI_LLM_EXTRA_PARAMS must be a JSON object",
-        )
-    return parsed
-
-
 def _get_classifier_language_setting(ocr_lang: str) -> str | None:
     """
     Maps the primary Tesseract language to the classifier's stemming
@@ -1268,4 +1241,5 @@ LLM_ALLOW_INTERNAL_ENDPOINTS = get_bool_from_env(
     "PAPERLESS_AI_LLM_ALLOW_INTERNAL_ENDPOINTS",
     "true",
 )
-LLM_EXTRA_PARAMS = _get_llm_extra_params()
+# JSON object passed straight through to the LLM backend's request body
+LLM_EXTRA_PARAMS = get_json_from_env("PAPERLESS_AI_LLM_EXTRA_PARAMS", {}, dict)
