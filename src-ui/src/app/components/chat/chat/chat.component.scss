@@ -22,18 +22,23 @@
   }
 }
 
-.blinking-cursor {
-  font-weight: bold;
-  font-size: 1.2em;
-  animation: blink 1s step-end infinite;
+.chat-markdown.streaming ::ng-deep {
+  > :last-child:not(ul, ol, table)::after,
+  > :is(ul, ol):last-child > li:last-child::after {
+    content: '';
+    display: inline-block;
+    width: 2px;
+    height: 1.05em;
+    margin-left: 2px;
+    background-color: currentColor;
+    vertical-align: -0.15em;
+    animation: blink 1s step-end infinite;
+  }
 }
 
 @keyframes blink {
-  from, to {
-    opacity: 0;
-  }
   50% {
-    opacity: 1;
+    opacity: 0;
   }
 }
 

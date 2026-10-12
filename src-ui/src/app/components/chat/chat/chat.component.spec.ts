@@ -89,6 +89,7 @@ describe('ChatComponent', () => {
     expect(component.messages()[1].content).toBe('H')
     fixture.detectChanges()
     expect(messagesEl.querySelector('.spinner-border')).toBeNull()
+    expect(messagesEl.querySelector('.chat-markdown.streaming')).not.toBeNull()
     mockStream$.next('Hi there')
     // advance time to process the typewriter effect
     await jest.runAllTimersAsync()
@@ -103,6 +104,8 @@ describe('ChatComponent', () => {
     await fixture.whenStable()
     expect(component.loading()).toBe(false)
     expect(component.messages()[1].isStreaming).toBe(false)
+    fixture.detectChanges()
+    expect(messagesEl.querySelector('.chat-markdown.streaming')).toBeNull()
     expect(fixture.nativeElement.querySelector('#chatInput').disabled).toBe(
       false
     )
@@ -130,6 +133,10 @@ describe('ChatComponent', () => {
     mockStream$.next(
       `Hi there${CHAT_METADATA_DELIMITER}{"references":[{"id":42,"title":"Bread Recipe"}]}`
     )
+    fixture.detectChanges()
+    expect(fixture.nativeElement.querySelector('.chat-references')).toBeNull()
+
+    mockStream$.complete()
     jest.advanceTimersByTime(1000)
     fixture.detectChanges()
 
