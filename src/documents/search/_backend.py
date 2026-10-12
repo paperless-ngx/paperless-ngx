@@ -284,9 +284,14 @@ class WriteBatch:
         and adding the new version. This ensures stale document data (e.g., after
         permission changes) doesn't persist in the index.
 
+        Only root documents are indexed, with their effective content, so a
+        version is indexed as its root document.
+
         Args:
             document: Django Document instance to index
         """
+        if document.root_document_id is not None:
+            document = document.root_document
         self.remove(document.pk)
         doc = self._backend._build_tantivy_doc(document)
         self._writer.add_document(doc)
@@ -311,20 +316,22 @@ class WriteBatch:
         An id with no matching document (e.g. deleted between the caller
         collecting ids and the batch running) is silently skipped, matching
         ``add_or_update()``'s existing single-document deferred-task behavior
-        rather than erroring or leaving a stale index entry.
+        rather than erroring or leaving a stale index entry. The id of a
+        version stands for its root document.
 
         Args:
             ids: Primary keys of Document instances to index
         """
         from documents.models import Document
         from documents.versioning import annotate_effective_content
+        from documents.versioning import root_document_ids
 
         ids = list(ids)
         if not ids:
             return
 
         queryset = annotate_effective_content(
-            Document.objects.filter(pk__in=ids)
+            Document.objects.filter(pk__in=root_document_ids(ids))
             .select_related("correspondent", "document_type", "storage_path", "owner")
             .prefetch_related(
                 "tags",
@@ -1036,16 +1043,21 @@ class TantivyBackend:
         excluded from results.
 
         Args:
-            doc_id: Primary key of the reference document
+            doc_id: Primary key of the reference document, or of one of its
+                versions
             user: User for permission filtering (None for no filtering)
             limit: Maximum number of IDs to return (None = all matching docs)
 
         Returns:
             List of similar document IDs (excluding the original)
         """
+        from documents.versioning import root_document_ids
+
         self._ensure_open()
         searcher = self._index.searcher()
 
+        # Only root documents are indexed, so a version stands for its root
+        doc_id = next(iter(root_document_ids([doc_id])), doc_id)
         id_query = tantivy.Query.term_query(self._schema, "id", doc_id)
         results = searcher.search(id_query, limit=1)
 

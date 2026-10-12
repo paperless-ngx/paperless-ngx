@@ -329,9 +329,10 @@ def _get_tantivy_query_and_mode(params):
 def _get_more_like_id(query_params: dict[str, Any], user: User | None) -> int:
     try:
         more_like_doc_id = int(query_params["more_like_id"])
-        more_like_doc = Document.objects.select_related("owner").get(
-            pk=more_like_doc_id,
-        )
+        more_like_doc = Document.objects.select_related(
+            "owner",
+            "root_document__owner",
+        ).get(pk=more_like_doc_id)
     except (TypeError, ValueError, Document.DoesNotExist):
         raise PermissionDenied(_("Invalid more_like_id"))
 
@@ -342,7 +343,8 @@ def _get_more_like_id(query_params: dict[str, Any], user: User | None) -> int:
     ):
         raise PermissionDenied(_("Insufficient permissions."))
 
-    return more_like_doc_id
+    # Only root documents are indexed, a version stands for its root
+    return more_like_doc.root_document_id or more_like_doc.pk
 
 
 class SearchParams(NamedTuple):
