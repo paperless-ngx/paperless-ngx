@@ -14,7 +14,7 @@ services:
     command:
       - "gotenberg"
       - "--chromium-disable-javascript=true"
-      - "--chromium-allow-list=file:///tmp/.*"
+      - "--chromium-allow-list=^file:///tmp/.*"
       - "--log-level=warn"
       - "--log-format=text"
   tika:
