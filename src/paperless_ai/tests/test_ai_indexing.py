@@ -438,6 +438,31 @@ class TestLlmIndexVersions:
 
         assert set(indexed) == {str(root.pk)}
 
+    def test_rebuild_indexes_the_newest_versions_content(
+        self,
+        temp_llm_index_dir: Path,
+        mock_embed_model: FakeEmbedding,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A root document with a version
+        WHEN:
+            - The LLM index is rebuilt
+        THEN:
+            - The root's text for the index is the version's content, answered
+              from the query rather than a query per document
+        """
+        root = DocumentFactory(content="stale text")
+        DocumentFactory(root_document=root, version_index=1, content="latest text")
+        spy = mocker.spy(indexing, "build_document_node")
+
+        indexing.update_llm_index(rebuild=True)
+
+        indexed = spy.call_args.args[0]
+        assert indexed.pk == root.pk
+        assert indexed.effective_content == "latest text"
+
     def test_incremental_update_by_version_id_refreshes_the_root(
         self,
         temp_llm_index_dir: Path,
@@ -599,6 +624,39 @@ def test_retrieve_similar_nodes_truncates_query_to_embedding_chunk_size(
         query_text = mock_retriever.retrieve.call_args.args[0]
         assert query_text
         assert "word199" not in query_text
+
+
+@pytest.mark.django_db
+@override_settings(
+    LLM_EMBEDDING_BACKEND="huggingface",
+    LLM_BACKEND="ollama",
+)
+def test_retrieve_similar_nodes_queries_with_newest_versions_content(
+    temp_llm_index_dir: Path,
+) -> None:
+    """
+    GIVEN:
+        - A root document whose newest version carries different content
+    WHEN:
+        - Documents similar to the root are retrieved
+    THEN:
+        - The query text holds the newest version's content, not the root's own
+    """
+    root = DocumentFactory(title="Statement", content="stale root text")
+    DocumentFactory(root_document=root, version_index=1, content="latest version text")
+
+    with (
+        patch("paperless_ai.indexing.load_or_build_index"),
+        patch("paperless_ai.indexing.llm_index_exists", return_value=True),
+        patch("llama_index.core.retrievers.VectorIndexRetriever") as mock_retriever_cls,
+    ):
+        mock_retriever_cls.return_value.retrieve.return_value = []
+
+        indexing.retrieve_similar_nodes(root, top_k=3)
+
+    query_text = mock_retriever_cls.return_value.retrieve.call_args.args[0]
+    assert "latest version text" in query_text
+    assert "stale root text" not in query_text
 
 
 class TestUpdateLlmIndexEmptyDocumentSet:

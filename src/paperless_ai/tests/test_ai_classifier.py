@@ -55,6 +55,7 @@ def mock_document():
     doc.storage_path = None
     doc.archive_serial_number = "12345"
     doc.content = "This is the document content."
+    doc.get_effective_content.return_value = "This is the document content."
 
     cf1 = MagicMock(__str__=lambda x: "Value1")
     cf1.field = MagicMock()
@@ -432,6 +433,55 @@ def test_get_taxonomy_context_preserves_similarity_order_and_distinct_documents(
         "TITLE: Most Similar\nMost similar content\n\n"
         "TITLE: Second Most Similar\nSecond most similar content"
     )
+
+
+@pytest.mark.django_db
+class TestClassifierEffectiveContent:
+    """A root document's text for the LLM is its newest version's content."""
+
+    @staticmethod
+    def _root_with_version() -> Document:
+        root = DocumentFactory(title="Statement", content="stale text")
+        DocumentFactory(root_document=root, version_index=1, content="latest text")
+        return root
+
+    def test_prompt_uses_the_newest_versions_content(self) -> None:
+        """
+        GIVEN:
+            - A root document with a version
+        WHEN:
+            - The classification prompt is built for the root
+        THEN:
+            - It contains the newest version's content
+        """
+        prompt = build_prompt_without_rag(self._root_with_version(), AIConfig())
+
+        assert "latest text" in prompt
+        assert "stale text" not in prompt
+
+    @override_settings(LLM_EMBEDDING_BACKEND="huggingface")
+    def test_similar_document_context_uses_the_newest_versions_content(self) -> None:
+        """
+        GIVEN:
+            - A similar root document with a version
+        WHEN:
+            - The similar-document context is built
+        THEN:
+            - It contains the newest version's content
+        """
+        similar = self._root_with_version()
+        document = DocumentFactory(content="Some content")
+        fake_nodes = [
+            SimpleNamespace(metadata={"document_id": str(similar.pk)}, score=0.9),
+        ]
+
+        with patch(
+            "paperless_ai.ai_classifier.retrieve_similar_nodes",
+            return_value=fake_nodes,
+        ):
+            _candidates, context = get_taxonomy_context(document, user=None)
+
+        assert context == "TITLE: Statement\nlatest text"
 
 
 @pytest.mark.django_db
