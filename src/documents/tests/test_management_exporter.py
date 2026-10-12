@@ -828,10 +828,7 @@ class TestExportImport(
 
     def _export_import_barcodes(self, *, split_manifest: bool) -> None:
         shutil.rmtree(Path(self.dirs.media_dir) / "documents")
-        shutil.copytree(
-            Path(__file__).parent / "samples" / "documents",
-            Path(self.dirs.media_dir) / "documents",
-        )
+        install_document_samples(Path(self.dirs.media_dir) / "documents")
         DocumentBarcodeFactory(document=self.d1, value="https://example.com")
         DocumentBarcodeFactory(document=self.d2, page=2, value="DE8937")
 

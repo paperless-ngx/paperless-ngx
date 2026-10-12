@@ -93,7 +93,7 @@ class TestGetPdfFirstPageSizePoints:
         pdf.save(path)
         return path
 
-    def test_letter_sample(self) -> None:
+    def test_letter_sample(self, simple_digital_pdf_file: Path) -> None:
         """
         GIVEN:
             - A US Letter sample PDF with no CropBox and no rotation
@@ -102,7 +102,7 @@ class TestGetPdfFirstPageSizePoints:
         THEN:
             - The MediaBox size in points is returned
         """
-        assert get_pdf_first_page_size_points(SAMPLES / "simple-digital.pdf") == (
+        assert get_pdf_first_page_size_points(simple_digital_pdf_file) == (
             612.0,
             792.0,
         )
@@ -197,6 +197,7 @@ class TestGetPdfFirstPageSizePoints:
     def test_pdfinfo_not_installed_returns_none(
         self,
         mocker: MockerFixture,
+        simple_digital_pdf_file: Path,
     ) -> None:
         """
         GIVEN:
@@ -207,7 +208,7 @@ class TestGetPdfFirstPageSizePoints:
             - None is returned and nothing is raised
         """
         mocker.patch("subprocess.run", side_effect=FileNotFoundError("pdfinfo"))
-        assert get_pdf_first_page_size_points(SAMPLES / "simple-digital.pdf") is None
+        assert get_pdf_first_page_size_points(simple_digital_pdf_file) is None
 
     def test_degenerate_box_returns_none(self, tmp_path: Path) -> None:
         """
@@ -249,7 +250,7 @@ class TestGetPdfFirstPageSizePoints:
         bad.write_bytes(b"not a pdf")
         assert get_pdf_first_page_size_points(bad) is None
 
-    def test_encrypted_pdf_returns_none(self) -> None:
+    def test_encrypted_pdf_returns_none(self, parser_samples_dir: Path) -> None:
         """
         GIVEN:
             - A password protected PDF
@@ -258,7 +259,8 @@ class TestGetPdfFirstPageSizePoints:
         THEN:
             - None is returned and nothing is raised
         """
-        assert get_pdf_first_page_size_points(SAMPLES / "encrypted.pdf") is None
+        encrypted = parser_samples_dir / "tesseract" / "encrypted.pdf"
+        assert get_pdf_first_page_size_points(encrypted) is None
 
 
 class TestPostProcessText:
