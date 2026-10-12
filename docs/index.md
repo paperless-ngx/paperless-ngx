@@ -12,9 +12,10 @@ physical documents into a searchable online archive so you can keep, well, _less
 [Get started](setup.md){ .md-button .md-button--primary .index-callout }
 [Demo](https://demo.paperless-ngx.com){ .md-button .md-button--secondary target=\_blank }
 
-<div style="display: flex; justify-content: end; margin-top: -1.5rem;">
-  <a href="https://fyrastack.com" target="_blank" aria-label="Demo hosting provided by Fyra Stack">
-    <img src="assets/sponsors/fyra-stack.svg" alt="" class="no-lightbox" width="28px" style="vertical-align: middle;"> Fyra Stack
+<div class="demo-sponsor">
+  <span>Demo hosting by</span>
+  <a href="https://fyrastack.com" target="_blank" rel="noopener">
+    <img src="assets/sponsors/fyra-stack.svg" alt="" class="no-lightbox" width="20" height="20"> Fyra Stack
   </a>
 </div>
 

@@ -101,3 +101,32 @@ h4 code {
         border-top: .05rem solid var(--md-default-fg-color--lightest);
     }
 }
+
+.md-typeset .demo-sponsor {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: .35rem;
+    margin-top: -1rem;
+    margin-bottom: 2rem;
+    color: var(--md-default-fg-color--light);
+    font-size: .65rem;
+}
+
+.md-typeset .demo-sponsor a {
+    display: inline-flex;
+    align-items: center;
+    gap: .25rem;
+    color: inherit;
+    font-weight: 600;
+}
+
+.md-typeset .demo-sponsor a:hover {
+    color: var(--md-accent-fg-color);
+}
+
+.md-typeset .demo-sponsor img {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+}
