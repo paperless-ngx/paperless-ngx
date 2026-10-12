@@ -1261,6 +1261,39 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(response.content, b"Insufficient permissions.")
 
+    def test_search_more_like_version_requires_view_permission_on_its_root(
+        self,
+    ) -> None:
+        """
+        GIVEN:
+            - Another user's private root document with an unowned version
+        WHEN:
+            - A user without access requests more-like-this for the version
+        THEN:
+            - The request is rejected, the version's missing owner grants nothing
+        """
+        owner = UserFactory(username="owner")
+        attacker = UserFactory(username="attacker")
+        grant_global(attacker, "view_document")
+        private_root = DocumentFactory(
+            title="private bank statement",
+            content="quarterly treasury bank statement wire transfer",
+            owner=owner,
+        )
+        version = DocumentFactory(
+            root_document=private_root,
+            version_index=1,
+            owner=None,
+        )
+        get_backend().add_or_update(private_root)
+
+        self.client.force_authenticate(user=attacker)
+
+        response = self.client.get(f"/api/documents/?more_like_id={version.id}")
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.content, b"Insufficient permissions.")
+
     def test_search_filtering(self) -> None:
         t = Tag.objects.create(name="tag")
         t2 = Tag.objects.create(name="tag2")
