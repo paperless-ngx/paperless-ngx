@@ -760,6 +760,9 @@ class TestFileHandlingWithArchive(DirectoriesMixin, FileSystemAssertsMixin, Test
             archive_checksum="B",
         )
 
+        # Without a format the files are renamed to match the primary key
+        original = doc.source_path
+        archive = doc.archive_path
         self.assertIsFile(original)
         self.assertIsFile(archive)
         self.assertIsFile(doc.source_path)
@@ -978,6 +981,9 @@ class TestFileHandlingWithArchive(DirectoriesMixin, FileSystemAssertsMixin, Test
             archive_filename="0000001.pdf",
         )
 
+        # Without a format the files are renamed to match the primary key
+        original = doc.source_path
+        archive = doc.archive_path
         self.assertIsFile(original)
         self.assertIsFile(archive)
         self.assertIsFile(doc.source_path)

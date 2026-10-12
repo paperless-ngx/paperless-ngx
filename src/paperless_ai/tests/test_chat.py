@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from contextlib import nullcontext
 from typing import TYPE_CHECKING
 from typing import Any
 from unittest.mock import MagicMock
@@ -35,6 +36,13 @@ def patch_embed_model():
     llama_settings.Settings.embed_model = MockEmbedding(embed_dim=1536)
     yield
     llama_settings.Settings.embed_model = None
+
+
+@pytest.fixture(autouse=True)
+def keep_db_connection():
+    # Closing the connection would roll back the test's transaction on PostgreSQL
+    with patch("paperless_ai.chat.db_connection_released", nullcontext):
+        yield
 
 
 @pytest.fixture(autouse=True)

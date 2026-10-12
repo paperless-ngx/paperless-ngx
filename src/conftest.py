@@ -77,6 +77,30 @@ def _clear_django_caches() -> None:
         cache.clear()
 
 
+@pytest.fixture(autouse=True)
+def _keep_connection_open_in_atomic(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Make ``close_old_connections()`` a no-op inside the test's transaction.
+
+    The Celery signal handlers call it, as a worker would between tasks. Tests
+    run inside an open atomic block, where Postgres really closes the
+    connection, taking the test transaction and every later test on the
+    worker with it. SQLite in-memory ignores the close, which hid this.
+    """
+    from django.db.backends.base.base import BaseDatabaseWrapper
+
+    original = BaseDatabaseWrapper.close_if_unusable_or_obsolete
+
+    def close_unless_atomic(self: BaseDatabaseWrapper) -> None:
+        if not self.in_atomic_block:
+            original(self)
+
+    monkeypatch.setattr(
+        BaseDatabaseWrapper,
+        "close_if_unusable_or_obsolete",
+        close_unless_atomic,
+    )
+
+
 @pytest.fixture
 def paperless_dirs(
     tmp_path: Path,

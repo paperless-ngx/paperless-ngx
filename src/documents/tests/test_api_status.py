@@ -5,6 +5,7 @@ from datetime import timedelta
 from pathlib import Path
 from unittest import mock
 
+from django.db import connection
 from django.test import override_settings
 from django.utils import timezone
 from rest_framework import status
@@ -68,7 +69,7 @@ class TestSystemStatus(APITestCase):
         self.assertEqual(response.data["install_type"], "bare-metal")
         self.assertIsNotNone(response.data["storage"]["total"])
         self.assertIsNotNone(response.data["storage"]["available"])
-        self.assertEqual(response.data["database"]["type"], "sqlite")
+        self.assertEqual(response.data["database"]["type"], connection.vendor)
         self.assertIsNotNone(response.data["database"]["url"])
         self.assertEqual(response.data["database"]["status"], "OK")
         self.assertIsNone(response.data["database"]["error"])

@@ -944,7 +944,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         results = response.data["results"]
-        self.assertEqual({r["id"] for r in results}, {1, 2})
+        self.assertEqual({r["id"] for r in results}, {d1.id, d2.id})
 
     @mock.patch("documents.search._backend.parse_user_query")
     def test_search_parser_bug_surfaces_as_500_not_400(self, m) -> None:
@@ -1801,6 +1801,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
     def test_search_sorting(self) -> None:
         u1 = UserFactory(username="user1")
         u2 = UserFactory(username="user2")
+        u3 = UserFactory(username="user3")
         c1 = Correspondent.objects.create(name="corres Ax")
         c2 = Correspondent.objects.create(name="corres Cx")
         c3 = Correspondent.objects.create(name="corres Bx")
@@ -1826,6 +1827,7 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
             content="test",
             archive_serial_number=1,
             title="1",
+            owner=u3,
         )
         Note.objects.create(
             note="This is a note.",
@@ -1878,14 +1880,14 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
             search_query("&ordering=-num_notes"),
             [d1.id, d3.id, d2.id],
         )
-        # owner sort: ORM orders by owner_id (integer); NULLs first in SQLite ASC
+        # owner sort: ORM orders by owner_id (integer)
         self.assertListEqual(
             search_query("&ordering=owner"),
-            [d3.id, d1.id, d2.id],
+            [d1.id, d2.id, d3.id],
         )
         self.assertListEqual(
             search_query("&ordering=-owner"),
-            [d2.id, d1.id, d3.id],
+            [d3.id, d2.id, d1.id],
         )
 
     def test_search_ordering_by_score(self) -> None:
