@@ -21,7 +21,7 @@ Paperless-ngx is a document management system that transforms your physical docu
 
 Paperless-ngx is the official successor to the original [Paperless](https://github.com/the-paperless-project/paperless) & [Paperless-ng](https://github.com/jonaswinkler/paperless-ng) projects and is designed to distribute the responsibility of advancing and supporting the project among a team of people. [Consider joining us!](#community-support)
 
-Thanks to the generous folks at [DigitalOcean](https://m.do.co/c/8d70b916d462), a demo is available at [demo.paperless-ngx.com](https://demo.paperless-ngx.com) using login `demo` / `demo`. _Note: demo content is reset frequently and confidential information should not be uploaded._
+Thanks to the generous folks at [Fyra Stack](https://fyrastack.com), a demo is available at [demo.paperless-ngx.com](https://demo.paperless-ngx.com) using login `demo` / `demo`. _Note: demo content is reset frequently and confidential information should not be uploaded._
 
 - [Features](#features)
 - [Getting started](#getting-started)
@@ -33,13 +33,9 @@ Thanks to the generous folks at [DigitalOcean](https://m.do.co/c/8d70b916d462), 
 - [Related Projects](#related-projects)
 - [Important Note](#important-note)
 
-<p align="right">This project is supported by:<br/>
-  <a href="https://m.do.co/c/8d70b916d462" style="padding-top: 4px; display: block;">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://opensource.nyc3.cdn.digitaloceanspaces.com/attribution/assets/SVG/DO_Logo_horizontal_white.svg" width="140px">
-      <source media="(prefers-color-scheme: light)" srcset="https://opensource.nyc3.cdn.digitaloceanspaces.com/attribution/assets/SVG/DO_Logo_horizontal_blue.svg" width="140px">
-      <img src="https://opensource.nyc3.cdn.digitaloceanspaces.com/attribution/assets/SVG/DO_Logo_horizontal_black_.svg" width="140px">
-    </picture>
+<p align="right">Demo hosting provided by:<br/>
+  <a href="https://fyrastack.com">
+    <img src="docs/assets/sponsors/fyra-stack.svg" alt="" width="28px" align="absmiddle"> Fyra Stack
   </a>
 </p>
 

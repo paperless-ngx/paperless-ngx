@@ -299,19 +299,18 @@ for details.
 ### Duplicate documents
 
 By default, Paperless-ngx **does not reject duplicates**. If you consume a file whose
-contents exactly match an existing document (same checksum), the new copy is still
-consumed and a warning is logged. The task entry for the upload also flags that a
-duplicate was detected and links to the existing document(s).
+contents match an existing document (same original or archive checksum), the new copy is
+still consumed and a warning is logged.
 
-To review duplicates, open a document and switch to the **Duplicates** tab on the
-document detail page. It lists other documents that share the same content, including any
-that are in the trash (shown with a badge), and links to each so you can decide which to
-keep.
+When a document has duplicates, a **Duplicates** tab appears on its detail page, listing
+the other documents you can view that share the same content (including any in the trash).
+To find all documents with duplicates, choose **Duplicates** in the document list's text
+filter dropdown, or use `has_duplicates=true` in the REST API.
 
 If you would rather reject duplicates at consumption time (the pre-v3 behavior), set
 [`PAPERLESS_CONSUMER_DELETE_DUPLICATES`](configuration.md#PAPERLESS_CONSUMER_DELETE_DUPLICATES)
 to `true`. The duplicate file is then deleted instead of consumed, and the task fails with
-a "document already exists" message.
+a "Document already exists" message linking to the existing document.
 
 ## Document Suggestions
 
