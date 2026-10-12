@@ -3,7 +3,6 @@ from __future__ import annotations
 import logging
 import re
 from fnmatch import fnmatch
-from fnmatch import translate as fnmatch_translate
 from typing import TYPE_CHECKING
 
 from rest_framework import serializers
@@ -548,6 +547,48 @@ def existing_document_matches_workflow(
     return (True, None)
 
 
+def glob_to_database_regex(pattern: str) -> str:
+    """
+    Translates an fnmatch style glob into a regular expression which the
+    database can evaluate, matching the whole value.
+
+    fnmatch.translate is not usable here: it emits syntax such as (?s:...),
+    atomic groups and named group backreferences, which PostgreSQL rejects.
+    Only constructs common to Python, PostgreSQL and MariaDB are produced.
+    """
+    parts: list[str] = []
+    i = 0
+    n = len(pattern)
+    while i < n:
+        char = pattern[i]
+        i += 1
+        if char == "*":
+            parts.append(".*")
+        elif char == "?":
+            parts.append(".")
+        elif char == "[":
+            j = i
+            if j < n and pattern[j] == "!":
+                j += 1
+            if j < n and pattern[j] == "]":
+                j += 1
+            while j < n and pattern[j] != "]":
+                j += 1
+            if j >= n:
+                parts.append(r"\[")
+            else:
+                stuff = pattern[i:j].replace("\\", r"\\").replace("[", r"\[")
+                i = j + 1
+                if stuff.startswith("!"):
+                    stuff = "^" + stuff[1:]
+                elif stuff.startswith("^"):
+                    stuff = "\\" + stuff
+                parts.append(f"[{stuff}]")
+        else:
+            parts.append(re.escape(char))
+    return "^" + "".join(parts) + "$"
+
+
 def prefilter_documents_by_workflowtrigger(
     documents: QuerySet[Document],
     trigger: WorkflowTrigger,
@@ -628,8 +669,9 @@ def prefilter_documents_by_workflowtrigger(
         documents = documents.annotate(**annotations).filter(custom_field_q)
 
     if trigger.filter_filename:
-        regex = fnmatch_translate(trigger.filter_filename).lstrip("^").rstrip("$")
-        documents = documents.filter(original_filename__iregex=regex)
+        documents = documents.filter(
+            original_filename__iregex=glob_to_database_regex(trigger.filter_filename),
+        )
 
     return documents
 
