@@ -4,9 +4,9 @@ from django.conf import settings
 from django.contrib.auth.models import User
 
 from documents.models import Document
-from documents.permissions import permitted_object_ids
-from documents.permissions import restrict_queryset_to_visible
+from documents.permissions import permitted_document_ids
 from documents.permissions import user_is_unrestricted
+from documents.versioning import annotate_effective_content
 from paperless.config import AIConfig
 from paperless_ai.base_model import ClassificationSuggestions
 from paperless_ai.base_model import TaxonomyChoiceDict
@@ -54,8 +54,8 @@ def _fulltext_similar_documents(
     active superuser - see user_is_unrestricted) is normalized to ``None``
     before calling, since the backend's permission filter has no superuser
     short-circuit of its own. Results are re-checked with
-    restrict_queryset_to_visible() since Tantivy's indexed permission fields
-    lag the DB via async reindexing.
+    permitted_document_ids() since Tantivy's indexed permission fields lag the
+    DB via async reindexing and judge a version by its own owner.
     """
     from documents.search import get_backend
 
@@ -69,10 +69,9 @@ def _fulltext_similar_documents(
     )
     if not unrestricted:
         allowed_ids = set(
-            restrict_queryset_to_visible(
-                Document.objects.filter(pk__in=similar_ids),
-                user,
-                "view_document",
+            Document.objects.filter(
+                pk__in=similar_ids,
+                id__in=permitted_document_ids(user),
             ).values_list("pk", flat=True),
         )
         similar_ids = [doc_id for doc_id in similar_ids if doc_id in allowed_ids]
@@ -113,7 +112,7 @@ def build_prompt_without_rag(
 ) -> str:
     filename = document.filename or ""
     content = truncate_content(
-        document.content[:4000] or "",
+        (document.get_effective_content() or "")[:4000],
         chunk_size=config.llm_embedding_chunk_size,
         context_size=config.llm_context_size,
     )
@@ -200,13 +199,13 @@ def get_taxonomy_context(
             # quadratic scan in the vector store at best, and past ~32,763
             # documents a hard sqlite3.OperationalError (SQLite's
             # bound-parameter limit) at worst.
-            # permitted_object_ids() has its own superuser shortcut that would
+            # permitted_document_ids() has its own superuser shortcut that would
             # return every Document's id anyway, so this changes nothing about
             # which documents are considered -- only how we get there.
             visible_document_ids = (
                 None
                 if user_is_unrestricted(user)
-                else list(permitted_object_ids(user, Document, "view_document"))
+                else list(permitted_document_ids(user))
             )
             nodes = retrieve_similar_nodes(
                 document,
@@ -227,7 +226,9 @@ def get_taxonomy_context(
 
         # similar_documents is already ordered by descending weight; don't lose it.
         similar_document_ids = [s["document_id"] for s in similar_documents]
-        similar_documents_by_id = Document.objects.in_bulk(similar_document_ids)
+        similar_documents_by_id = annotate_effective_content(
+            Document.objects.all(),
+        ).in_bulk(similar_document_ids)
         similar_docs = [
             similar_documents_by_id[document_id]
             for document_id in similar_document_ids
@@ -235,7 +236,7 @@ def get_taxonomy_context(
         ][:max_docs]
         context_blocks = []
         for similar in similar_docs:
-            text = similar.content[:1000] or ""
+            text = (similar.get_effective_content() or "")[:1000]
             title = similar.title or similar.filename or "Untitled"
             context_blocks.append(f"TITLE: {title}\n{text}")
     except Exception:

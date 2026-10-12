@@ -55,6 +55,7 @@ def mock_document():
     doc.storage_path = None
     doc.archive_serial_number = "12345"
     doc.content = "This is the document content."
+    doc.get_effective_content.return_value = "This is the document content."
 
     cf1 = MagicMock(__str__=lambda x: "Value1")
     cf1.field = MagicMock()
@@ -435,6 +436,55 @@ def test_get_taxonomy_context_preserves_similarity_order_and_distinct_documents(
 
 
 @pytest.mark.django_db
+class TestClassifierEffectiveContent:
+    """A root document's text for the LLM is its newest version's content."""
+
+    @staticmethod
+    def _root_with_version() -> Document:
+        root = DocumentFactory(title="Statement", content="stale text")
+        DocumentFactory(root_document=root, version_index=1, content="latest text")
+        return root
+
+    def test_prompt_uses_the_newest_versions_content(self) -> None:
+        """
+        GIVEN:
+            - A root document with a version
+        WHEN:
+            - The classification prompt is built for the root
+        THEN:
+            - It contains the newest version's content
+        """
+        prompt = build_prompt_without_rag(self._root_with_version(), AIConfig())
+
+        assert "latest text" in prompt
+        assert "stale text" not in prompt
+
+    @override_settings(LLM_EMBEDDING_BACKEND="huggingface")
+    def test_similar_document_context_uses_the_newest_versions_content(self) -> None:
+        """
+        GIVEN:
+            - A similar root document with a version
+        WHEN:
+            - The similar-document context is built
+        THEN:
+            - It contains the newest version's content
+        """
+        similar = self._root_with_version()
+        document = DocumentFactory(content="Some content")
+        fake_nodes = [
+            SimpleNamespace(metadata={"document_id": str(similar.pk)}, score=0.9),
+        ]
+
+        with patch(
+            "paperless_ai.ai_classifier.retrieve_similar_nodes",
+            return_value=fake_nodes,
+        ):
+            _candidates, context = get_taxonomy_context(document, user=None)
+
+        assert context == "TITLE: Statement\nlatest text"
+
+
+@pytest.mark.django_db
 @override_settings(LLM_EMBEDDING_BACKEND="huggingface")
 def test_get_taxonomy_context_no_similar_docs():
     """
@@ -552,7 +602,7 @@ class TestGetTaxonomyContextVisibility:
             return_value=[],
         )
         mock_permitted = mocker.patch(
-            "paperless_ai.ai_classifier.permitted_object_ids",
+            "paperless_ai.ai_classifier.permitted_document_ids",
         )
         user = UserFactory.create(is_superuser=True)
 
@@ -582,7 +632,7 @@ class TestGetTaxonomyContextVisibility:
             return_value=[],
         )
         mock_permitted = mocker.patch(
-            "paperless_ai.ai_classifier.permitted_object_ids",
+            "paperless_ai.ai_classifier.permitted_document_ids",
         )
 
         get_taxonomy_context(document, None)
@@ -611,15 +661,54 @@ class TestGetTaxonomyContextVisibility:
             return_value=[],
         )
         mock_permitted = mocker.patch(
-            "paperless_ai.ai_classifier.permitted_object_ids",
+            "paperless_ai.ai_classifier.permitted_document_ids",
             return_value=[1, 2, 3],
         )
         user = UserFactory.create(is_superuser=False)
 
         get_taxonomy_context(document, user)
 
-        mock_permitted.assert_called_once_with(user, Document, "view_document")
+        mock_permitted.assert_called_once_with(user)
         assert mock_retrieve.call_args.kwargs["document_ids"] == [1, 2, 3]
+
+    @pytest.mark.django_db
+    @override_settings(LLM_EMBEDDING_BACKEND="huggingface")
+    def test_version_of_private_root_is_not_visible(
+        self,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A private root document owned by someone else
+            - A version of it whose own owner is unset, as when the root
+              changed hands after the version was created
+        WHEN:
+            - get_taxonomy_context() is called for a non-superuser
+        THEN:
+            - Neither the root nor the version is in the visible ids passed to
+              retrieve_similar_nodes(), since a version follows its root
+        """
+        owner = UserFactory.create()
+        viewer = UserFactory.create(is_superuser=False)
+        root = DocumentFactory.create(content="private", owner=owner)
+        version = DocumentFactory.create(
+            content="private",
+            owner=None,
+            root_document=root,
+            version_index=1,
+        )
+        source = DocumentFactory.create(content="Some content", owner=viewer)
+        mock_retrieve = mocker.patch(
+            "paperless_ai.ai_classifier.retrieve_similar_nodes",
+            return_value=[],
+        )
+
+        get_taxonomy_context(source, viewer)
+
+        visible = mock_retrieve.call_args.kwargs["document_ids"]
+        assert source.pk in visible
+        assert root.pk not in visible
+        assert version.pk not in visible
 
 
 @pytest.mark.django_db
@@ -803,7 +892,7 @@ class TestFulltextSimilarDocuments:
             - _fulltext_similar_documents() is called with that user
         THEN:
             - Only the still-permitted document is returned - the DB
-              re-check via restrict_queryset_to_visible() must catch the
+              re-check via permitted_document_ids() must catch the
               document Tantivy's stale index still thinks is visible
         """
         owner = UserFactory.create()
@@ -833,6 +922,45 @@ class TestFulltextSimilarDocuments:
         result = _fulltext_similar_documents(source, user=viewer, top_k=5)
 
         assert [s["document_id"] for s in result] == [permitted.pk]
+
+    def test_excludes_version_of_private_root_for_regular_user(
+        self,
+        fulltext_backend: TantivyBackend,
+    ) -> None:
+        """
+        GIVEN:
+            - A regular user and a private root owned by someone else
+            - A version of that root with no owner of its own, which the
+              Tantivy index therefore treats as visible to everyone
+        WHEN:
+            - _fulltext_similar_documents() is called with that user
+        THEN:
+            - The version is not returned, since the DB re-check judges it by
+              its root
+        """
+        owner = UserFactory.create()
+        viewer = UserFactory.create(is_superuser=False)
+        source = DocumentFactory.create(
+            content="shared content phrase",
+            owner=viewer,
+        )
+        root = DocumentFactory.create(
+            content="shared content phrase",
+            owner=owner,
+        )
+        version = DocumentFactory.create(
+            content="shared content phrase",
+            owner=None,
+            root_document=root,
+            version_index=1,
+        )
+        fulltext_backend.add_or_update(source)
+        fulltext_backend.add_or_update(root)
+        fulltext_backend.add_or_update(version)
+
+        result = _fulltext_similar_documents(source, user=viewer, top_k=5)
+
+        assert version.pk not in [s["document_id"] for s in result]
 
 
 @pytest.mark.django_db

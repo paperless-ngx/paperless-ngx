@@ -90,10 +90,13 @@ class ShareLinkBundleAPITests(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("document_ids", response.data)
 
-    @mock.patch("documents.views.permitted_document_ids", return_value=set())
-    def test_create_bundle_rejects_insufficient_permissions(self, perms_mock) -> None:
+    def test_create_bundle_rejects_insufficient_permissions(self) -> None:
+        requester = UserFactory(username="bundle_creator")
+        grant_global(requester, "add_sharelinkbundle", "view_document")
+        self.client.force_authenticate(requester)
+        document = DocumentFactory(owner=UserFactory(username="document_owner"))
         payload = {
-            "document_ids": [self.document.pk],
+            "document_ids": [self.document.pk, document.pk],
             "file_version": ShareLink.FileVersion.ARCHIVE,
             "expiration_days": 7,
         }
@@ -101,8 +104,8 @@ class ShareLinkBundleAPITests(DirectoriesMixin, APITestCase):
         response = self.client.post(self.ENDPOINT, payload, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("document_ids", response.data)
-        perms_mock.assert_called()
+        self.assertIn(str(document.pk), str(response.data["document_ids"]))
+        self.assertFalse(ShareLinkBundle.objects.exists())
 
     @mock.patch("documents.views.build_share_link_bundle.apply_async")
     def test_rebuild_bundle_resets_state(self, delay_mock) -> None:

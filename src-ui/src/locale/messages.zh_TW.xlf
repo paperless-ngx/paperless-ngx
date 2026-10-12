@@ -479,7 +479,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">201</context>
         </context-group>
-        <target state="translated">標籤、關聯方、文件類型、儲存路徑與自訂欄位等屬性皆可在此處管理，亦可在「文件編輯」檢視中建立。</target>
+        <target state="translated">標籤、關聯方、文件類型、儲存路徑與自訂欄位等文件屬性皆可在此處管理，亦可在「文件編輯」檢視中建立。</target>
       </trans-unit>
       <trans-unit id="7851939076947092983" datatype="html">
         <source>Manage e-mail accounts and rules for automatically importing documents.</source>
@@ -3859,7 +3859,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">195</context>
         </context-group>
-        <target state="translated">屬性</target>
+        <target state="translated">文件屬性</target>
       </trans-unit>
       <trans-unit id="7437910965833684826" datatype="html">
         <source>Correspondents</source>
@@ -8525,7 +8525,7 @@
           <context context-type="sourcefile">src/app/components/common/suggestions-dropdown/suggestions-dropdown.component.html</context>
           <context context-type="linenumber">54</context>
         </context-group>
-        <target state="needs-translation">{VAR_PLURAL, plural, =1 {1 suggestion available below} other {<x id="INTERPOLATION"/> suggestions available below}}</target>
+        <target state="translated">{VAR_PLURAL, plural, =1 {以下有 1 個可用建議} other {以下有 <x id="INTERPOLATION"/> 個可用建議}}</target>
       </trans-unit>
       <trans-unit id="4169875112244042673" datatype="html">
         <source>Suggestion options</source>
@@ -9219,7 +9219,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-barcodes/document-barcodes.component.html</context>
           <context context-type="linenumber">40,41</context>
         </context-group>
-        <target state="needs-translation">Copy content</target>
+        <target state="translated">拷貝內容</target>
       </trans-unit>
       <trans-unit id="2266163016683537825" datatype="html">
         <source>of <x id="INTERPOLATION" equiv-text="{{previewNumPages()}}"/></source>
@@ -9479,7 +9479,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">360,361</context>
         </context-group>
-        <target state="needs-translation">Barcodes</target>
+        <target state="translated">條碼</target>
       </trans-unit>
       <trans-unit id="6992781481378431874" datatype="html">
         <source>Original document metadata</source>
@@ -13376,7 +13376,7 @@
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
           <context context-type="linenumber">335</context>
         </context-group>
-        <target state="needs-translation">Store Barcode Contents</target>
+        <target state="translated">儲存條碼內容</target>
       </trans-unit>
       <trans-unit id="7011909364081812031" datatype="html">
         <source>AI Enabled</source>

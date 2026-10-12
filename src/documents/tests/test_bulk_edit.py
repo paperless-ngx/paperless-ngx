@@ -4,6 +4,7 @@ from pathlib import Path
 from unittest import mock
 
 import pikepdf
+import pytest
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
@@ -12,6 +13,7 @@ from django.test import TestCase
 from django.test.utils import CaptureQueriesContext
 from guardian.shortcuts import get_groups_with_perms
 from guardian.shortcuts import get_users_with_perms
+from pytest_mock import MockerFixture
 
 from documents import bulk_edit
 from documents.models import Correspondent
@@ -23,6 +25,7 @@ from documents.models import StoragePath
 from documents.models import Tag
 from documents.permissions import set_permissions_for_objects
 from paperless_testing.dirs import DirectoriesMixin
+from paperless_testing.factories import DocumentFactory
 from paperless_testing.permissions import grant_object
 
 
@@ -1970,18 +1973,22 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         self.assertIn("Error removing password from document", cm.output[0])
 
 
-class TestBulkEditReprocess(DirectoriesMixin, TestCase):
-    def setUp(self) -> None:
-        super().setUp()
-
-        self.doc = Document.objects.create(
-            title="test",
-            checksum="A",
-            mime_type="application/pdf",
+@pytest.mark.django_db
+class TestBulkEditReprocess:
+    @pytest.fixture
+    def mock_task(self, mocker: MockerFixture) -> mock.MagicMock:
+        return mocker.patch(
+            "documents.bulk_edit.update_document_content_maybe_archive_file",
         )
 
-    @mock.patch("documents.bulk_edit.update_document_content_maybe_archive_file")
-    def test_reprocess_defaults_to_local(self, mock_task: mock.Mock) -> None:
+    @staticmethod
+    def _queued_ids(mock_task: mock.MagicMock) -> list[int]:
+        return [
+            call.kwargs["kwargs"]["document_id"]
+            for call in mock_task.apply_async.call_args_list
+        ]
+
+    def test_reprocess_defaults_to_local(self, mock_task: mock.MagicMock) -> None:
         """
         GIVEN:
             - A reprocess request that says nothing about remote OCR
@@ -1990,18 +1997,17 @@ class TestBulkEditReprocess(DirectoriesMixin, TestCase):
         THEN:
             - The task is queued without asking for the remote engine
         """
-        result = bulk_edit.reprocess([self.doc.id])
+        doc = DocumentFactory()
 
-        self.assertEqual(result, "OK")
+        assert bulk_edit.reprocess([doc.id]) == "OK"
+
         mock_task.apply_async.assert_called_once()
-        _, kwargs = mock_task.apply_async.call_args
-        self.assertEqual(
-            kwargs["kwargs"],
-            {"document_id": self.doc.id, "remote_ocr": False},
-        )
+        assert mock_task.apply_async.call_args.kwargs["kwargs"] == {
+            "document_id": doc.id,
+            "remote_ocr": False,
+        }
 
-    @mock.patch("documents.bulk_edit.update_document_content_maybe_archive_file")
-    def test_reprocess_passes_remote_ocr(self, mock_task: mock.Mock) -> None:
+    def test_reprocess_passes_remote_ocr(self, mock_task: mock.MagicMock) -> None:
         """
         GIVEN:
             - A reprocess request that explicitly asks for remote OCR
@@ -2010,14 +2016,72 @@ class TestBulkEditReprocess(DirectoriesMixin, TestCase):
         THEN:
             - The request is forwarded to the task for every document
         """
-        other = Document.objects.create(
-            title="test2",
-            checksum="B",
-            mime_type="application/pdf",
+        docs = DocumentFactory.create_batch(2)
+
+        bulk_edit.reprocess([doc.id for doc in docs], remote_ocr=True)
+
+        assert mock_task.apply_async.call_count == 2
+        for call in mock_task.apply_async.call_args_list:
+            assert call.kwargs["kwargs"]["remote_ocr"]
+
+    def test_reprocess_root_uses_latest_version(
+        self,
+        mock_task: mock.MagicMock,
+    ) -> None:
+        """
+        GIVEN:
+            - A root document with two versions
+        WHEN:
+            - reprocess is called with the root document
+        THEN:
+            - The latest version is reprocessed, not the root's original file
+        """
+        root = DocumentFactory()
+        DocumentFactory(root_document=root, version_index=1)
+        latest = DocumentFactory(root_document=root, version_index=2)
+
+        bulk_edit.reprocess([root.id])
+
+        assert self._queued_ids(mock_task) == [latest.id]
+
+    def test_reprocess_explicit_version(self, mock_task: mock.MagicMock) -> None:
+        """
+        GIVEN:
+            - A root document with two versions
+        WHEN:
+            - reprocess is called with the older version
+        THEN:
+            - That version is reprocessed
+        """
+        root = DocumentFactory()
+        older = DocumentFactory(root_document=root, version_index=1)
+        DocumentFactory(root_document=root, version_index=2)
+
+        bulk_edit.reprocess([older.id])
+
+        assert self._queued_ids(mock_task) == [older.id]
+
+    def test_reprocess_root_and_latest_version_dispatches_once(
+        self,
+        mock_task: mock.MagicMock,
+    ) -> None:
+        """
+        GIVEN:
+            - A root document with two versions, the latest created on a
+              different date than the root
+        WHEN:
+            - reprocess is called with both the root and its latest version
+        THEN:
+            - The latest version is reprocessed only once
+        """
+        root = DocumentFactory(created=date(2024, 1, 1))
+        DocumentFactory(root_document=root, version_index=1)
+        latest = DocumentFactory(
+            root_document=root,
+            version_index=2,
+            created=date(2025, 1, 1),
         )
 
-        bulk_edit.reprocess([self.doc.id, other.id], remote_ocr=True)
+        bulk_edit.reprocess([root.id, latest.id])
 
-        self.assertEqual(mock_task.apply_async.call_count, 2)
-        for call in mock_task.apply_async.call_args_list:
-            self.assertTrue(call.kwargs["kwargs"]["remote_ocr"])
+        assert self._queued_ids(mock_task) == [latest.id]

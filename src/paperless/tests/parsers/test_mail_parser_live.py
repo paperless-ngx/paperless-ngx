@@ -137,9 +137,20 @@ class TestNginxService:
     reason="No Gotenberg/Tika servers to test with",
 )
 class TestParserLive:
-    @staticmethod
-    def imagehash(file: Path, hash_size: int = 18) -> str:
-        return f"{average_hash(Image.open(file), hash_size)}"
+    # Rasterizer versions shift a few pixels, so compare perceptual hashes by
+    # Hamming distance (out of 18 * 18 = 324 bits) rather than for equality
+    MAX_HASH_DISTANCE = 8
+
+    @classmethod
+    def assert_thumbnails_similar(cls, generated: Path, expected: Path) -> None:
+        distance = average_hash(Image.open(generated), 18) - average_hash(
+            Image.open(expected),
+            18,
+        )
+        assert distance <= cls.MAX_HASH_DISTANCE, (
+            f"Thumbnail {generated} differs from {expected} by {distance} bits "
+            f"(max {cls.MAX_HASH_DISTANCE})"
+        )
 
     def test_get_thumbnail(
         self,
@@ -168,12 +179,7 @@ class TestParserLive:
         assert thumb.exists()
         assert thumb.is_file()
 
-        assert self.imagehash(thumb) == self.imagehash(
-            simple_txt_email_thumbnail_file,
-        ), (
-            f"Created thumbnail {thumb} differs from expected file "
-            f"{simple_txt_email_thumbnail_file}"
-        )
+        self.assert_thumbnails_similar(thumb, simple_txt_email_thumbnail_file)
 
     def test_tika_parse_successful(self, mail_parser: MailDocumentParser) -> None:
         """
@@ -255,7 +261,7 @@ class TestParserLive:
         THEN:
             - Gotenberg shall be called to generate the PDF
             - The archive PDF shall contain the expected content
-            - The generated thumbnail shall match the expected image hash
+            - The generated thumbnail shall be perceptually close to the expected image
         """
         util_call_with_backoff(mail_parser.parse, [html_email_file, "message/rfc822"])
 
@@ -272,14 +278,4 @@ class TestParserLive:
             html_email_file,
             "message/rfc822",
         )
-        generated_thumbnail_hash = self.imagehash(generated_thumbnail)
-
-        # The created PDF is not reproducible, but the converted image
-        # should always look the same
-        expected_hash = self.imagehash(html_email_thumbnail_file)
-
-        assert generated_thumbnail_hash == expected_hash, (
-            f"PDF thumbnail differs from expected. "
-            f"Generated: {generated_thumbnail}, "
-            f"Hash: {generated_thumbnail_hash} vs {expected_hash}"
-        )
+        self.assert_thumbnails_similar(generated_thumbnail, html_email_thumbnail_file)

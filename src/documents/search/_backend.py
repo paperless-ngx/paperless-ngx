@@ -7,6 +7,7 @@ import threading
 import time
 from datetime import UTC
 from datetime import datetime
+from datetime import timedelta
 from enum import StrEnum
 from itertools import islice
 from typing import TYPE_CHECKING
@@ -31,6 +32,7 @@ from documents.search._query import parse_user_query
 from documents.search._schema import _write_sentinels
 from documents.search._schema import build_schema
 from documents.search._schema import open_or_rebuild_index
+from documents.search._schema import rebuild_in_progress
 from documents.search._schema import wipe_index
 from documents.search._tokenizer import ascii_fold
 from documents.search._tokenizer import autocomplete_tokens
@@ -53,6 +55,19 @@ if TYPE_CHECKING:
     from documents.models import Document
 
 logger = logging.getLogger("paperless.search")
+
+# tantivy stores dates as signed 64-bit nanoseconds since the Unix epoch, which
+# covers 1677-09-21T00:12:43 to 2262-04-11T23:47:16 UTC
+_INDEX_DATE_NANOS_MIN: Final[int] = -(2**63)
+_INDEX_DATE_NANOS_MAX: Final[int] = 2**63 - 1
+_UNIX_EPOCH: Final[datetime] = datetime(1970, 1, 1, tzinfo=UTC)
+
+
+def _is_indexable_date(value: datetime) -> bool:
+    """Whether value, at whole-second precision, fits tantivy's date range."""
+    nanos = ((value - _UNIX_EPOCH) // timedelta(seconds=1)) * 1_000_000_000
+    return _INDEX_DATE_NANOS_MIN <= nanos <= _INDEX_DATE_NANOS_MAX
+
 
 _LOCK_TIMEOUT_SECONDS: Final[float] = 10.0  # per-attempt acquire timeout
 _LOCK_RETRY_ATTEMPTS: Final[int] = 4  # total attempts (1 initial + 3 retries)
@@ -269,9 +284,14 @@ class WriteBatch:
         and adding the new version. This ensures stale document data (e.g., after
         permission changes) doesn't persist in the index.
 
+        Only root documents are indexed, with their effective content, so a
+        version is indexed as its root document.
+
         Args:
             document: Django Document instance to index
         """
+        if document.root_document_id is not None:
+            document = document.root_document
         self.remove(document.pk)
         doc = self._backend._build_tantivy_doc(document)
         self._writer.add_document(doc)
@@ -296,20 +316,22 @@ class WriteBatch:
         An id with no matching document (e.g. deleted between the caller
         collecting ids and the batch running) is silently skipped, matching
         ``add_or_update()``'s existing single-document deferred-task behavior
-        rather than erroring or leaving a stale index entry.
+        rather than erroring or leaving a stale index entry. The id of a
+        version stands for its root document.
 
         Args:
             ids: Primary keys of Document instances to index
         """
         from documents.models import Document
         from documents.versioning import annotate_effective_content
+        from documents.versioning import root_document_ids
 
         ids = list(ids)
         if not ids:
             return
 
         queryset = annotate_effective_content(
-            Document.objects.filter(pk__in=ids)
+            Document.objects.filter(pk__in=root_document_ids(ids))
             .select_related("correspondent", "document_type", "storage_path", "owner")
             .prefetch_related(
                 "tags",
@@ -627,7 +649,15 @@ class TantivyBackend:
             document.created.day,
             tzinfo=UTC,
         )
-        doc.add_date("created", created_date)
+        if _is_indexable_date(created_date):
+            doc.add_date("created", created_date)
+        else:
+            logger.warning(
+                "Document %s has a created date (%s) outside the range the search "
+                "index can store; it will be indexed without a created date",
+                document.pk,
+                document.created,
+            )
         doc.add_date("modified", document.modified)
         doc.add_date("added", document.added)
 
@@ -1013,16 +1043,21 @@ class TantivyBackend:
         excluded from results.
 
         Args:
-            doc_id: Primary key of the reference document
+            doc_id: Primary key of the reference document, or of one of its
+                versions
             user: User for permission filtering (None for no filtering)
             limit: Maximum number of IDs to return (None = all matching docs)
 
         Returns:
             List of similar document IDs (excluding the original)
         """
+        from documents.versioning import root_document_ids
+
         self._ensure_open()
         searcher = self._index.searcher()
 
+        # Only root documents are indexed, so a version stands for its root
+        doc_id = next(iter(root_document_ids([doc_id])), doc_id)
         id_query = tantivy.Query.term_query(self._schema, "id", doc_id)
         results = searcher.search(id_query, limit=1)
 
@@ -1110,39 +1145,44 @@ class TantivyBackend:
                 flushing a segment, deferring merge work; they do not avoid it.
         """
         wipe_index(self._path)
-        new_index = tantivy.Index(build_schema(), path=str(self._path))
-        _write_sentinels(self._path)
-        register_tokenizers(new_index, settings.SEARCH_LANGUAGE)
+        # The marker covers the window where the empty index is already stamped
+        # as current but not yet populated, so an interrupted rebuild is retried.
+        with rebuild_in_progress(self._path):
+            new_index = tantivy.Index(build_schema(), path=str(self._path))
+            _write_sentinels(self._path)
+            register_tokenizers(new_index, settings.SEARCH_LANGUAGE)
 
-        # Point instance at the new index so _build_tantivy_doc uses it
-        old_index, old_schema = self._raw_index, self._raw_schema
-        self._raw_index = new_index
-        self._raw_schema = new_index.schema
-        # Stream documents one-by-one (so the progress bar advances per
-        # document) while fetching viewer permissions one SQL query per chunk.
-        # The stream is Sized, so iter_wrapper can still discover the total.
-        documents_stream = _DocumentViewerStream(documents, chunk_size=1000)
-        try:
-            writer = new_index.writer(heap_size=writer_heap_bytes)
-            for document, (viewer_ids, viewer_group_ids) in iter_wrapper(
-                documents_stream,
-            ):
-                doc = self._build_tantivy_doc(
-                    document,
-                    viewer_ids=viewer_ids,
-                    viewer_group_ids=viewer_group_ids,
-                )
-                writer.add_document(doc)
-            writer.commit()
-            # Wait for background merge threads to finish so all segments are
-            # fully merged and persisted before the index is considered rebuilt.
-            writer.wait_merging_threads()
-            new_index.reload()
-        except BaseException:  # pragma: no cover
-            # Restore old index on failure so the backend remains usable
-            self._raw_index = old_index
-            self._raw_schema = old_schema
-            raise
+            # Point instance at the new index so _build_tantivy_doc uses it
+            old_index, old_schema = self._raw_index, self._raw_schema
+            self._raw_index = new_index
+            self._raw_schema = new_index.schema
+            # Stream documents one-by-one (so the progress bar advances per
+            # document) while fetching viewer permissions one SQL query per
+            # chunk. The stream is Sized, so iter_wrapper can still discover
+            # the total.
+            documents_stream = _DocumentViewerStream(documents, chunk_size=1000)
+            try:
+                writer = new_index.writer(heap_size=writer_heap_bytes)
+                for document, (viewer_ids, viewer_group_ids) in iter_wrapper(
+                    documents_stream,
+                ):
+                    doc = self._build_tantivy_doc(
+                        document,
+                        viewer_ids=viewer_ids,
+                        viewer_group_ids=viewer_group_ids,
+                    )
+                    writer.add_document(doc)
+                writer.commit()
+                # Wait for background merge threads to finish so all segments
+                # are fully merged and persisted before the index is considered
+                # rebuilt.
+                writer.wait_merging_threads()
+                new_index.reload()
+            except BaseException:  # pragma: no cover
+                # Restore old index on failure so the backend remains usable
+                self._raw_index = old_index
+                self._raw_schema = old_schema
+                raise
 
 
 def chunked(iterable, size):

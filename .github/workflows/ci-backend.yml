@@ -80,7 +80,7 @@ jobs:
     needs: changes
     if: needs.changes.outputs.backend_changed == 'true'
     name: "Python ${{ matrix.python-version }}"
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
     strategy:
@@ -114,7 +114,7 @@ jobs:
           packages: unpaper tesseract-ocr imagemagick ghostscript poppler-utils
       - name: Configure ImageMagick
         run: |
-          sudo cp docker/rootfs/etc/ImageMagick-6/paperless-policy.xml /etc/ImageMagick-6/policy.xml
+          sudo cp docker/rootfs/etc/ImageMagick-6/paperless-policy.xml /etc/ImageMagick-7/policy.xml
       - name: Install Python dependencies
         env:
           PYTHON_VERSION: ${{ steps.setup-python.outputs.python-version }}
@@ -158,7 +158,7 @@ jobs:
     needs: changes
     if: needs.changes.outputs.backend_changed == 'true'
     name: Check project typing
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
     env:

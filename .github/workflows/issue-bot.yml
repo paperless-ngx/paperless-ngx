@@ -7,7 +7,7 @@ jobs:
     # Note: peakoss/anti-slop does not support the `issues` event yet (all of its
     # issue inputs are still commented out upstream), so the checks that the PR Bot
     # workflow gets from the action are implemented manually here.
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     permissions:
       issues: write
     steps:

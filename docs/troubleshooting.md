@@ -129,7 +129,7 @@ change in the `docker-compose.yml` file:
 command:
   - 'gotenberg'
   - '--chromium-disable-javascript=true'
-  - '--chromium-allow-list=file:///tmp/.*'
+  - '--chromium-allow-list=^file:///tmp/.*'
   - '--api-timeout=60s'
 ```
 

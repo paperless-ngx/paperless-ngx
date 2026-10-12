@@ -1196,6 +1196,59 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         self.assertIn(d3.id, result_ids)
         self.assertNotIn(d4.id, result_ids)
 
+    def test_search_more_like_version_uses_its_root(self) -> None:
+        """
+        GIVEN:
+            - A document similar in content to a root document, and one that is not
+            - A version of the root document, which is never indexed
+        WHEN:
+            - API request for more like the version
+        THEN:
+            - The documents similar to the root are returned, not the version
+        """
+        indexed = {}
+        for name, title, content, day in (
+            ("root", "bank statement 1", "things i paid for in august", (2019, 3, 4)),
+            (
+                "similar",
+                "bank statement 3",
+                "things i paid for in september",
+                (2020, 7, 9),
+            ),
+            (
+                "other",
+                "Quarterly Report",
+                "quarterly revenue profit margin",
+                (2021, 11, 30),
+            ),
+        ):
+            with time_machine.travel(
+                timezone.make_aware(datetime.datetime(*day)),
+                tick=False,
+            ):
+                indexed[name] = DocumentFactory(
+                    title=title,
+                    content=content,
+                    created=datetime.date(*day),
+                    added=timezone.make_aware(datetime.datetime(*day)),
+                )
+        version = DocumentFactory(
+            root_document=indexed["root"],
+            version_index=1,
+            content="things i paid for in august",
+        )
+        backend = get_backend()
+        for document in indexed.values():
+            backend.add_or_update(document)
+
+        response = self.client.get(f"/api/documents/?more_like_id={version.id}")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        result_ids = [r["id"] for r in response.data["results"]]
+        self.assertIn(indexed["similar"].id, result_ids)
+        self.assertNotIn(indexed["other"].id, result_ids)
+        self.assertNotIn(version.id, result_ids)
+
     def test_more_like_requires_id_of_existing_document(self) -> None:
         """
         GIVEN:
@@ -1257,6 +1310,39 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         response = self.client.get(
             f"/api/documents/?more_like_id={private_seed.id}",
         )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.content, b"Insufficient permissions.")
+
+    def test_search_more_like_version_requires_view_permission_on_its_root(
+        self,
+    ) -> None:
+        """
+        GIVEN:
+            - Another user's private root document with an unowned version
+        WHEN:
+            - A user without access requests more-like-this for the version
+        THEN:
+            - The request is rejected, the version's missing owner grants nothing
+        """
+        owner = UserFactory(username="owner")
+        attacker = UserFactory(username="attacker")
+        grant_global(attacker, "view_document")
+        private_root = DocumentFactory(
+            title="private bank statement",
+            content="quarterly treasury bank statement wire transfer",
+            owner=owner,
+        )
+        version = DocumentFactory(
+            root_document=private_root,
+            version_index=1,
+            owner=None,
+        )
+        get_backend().add_or_update(private_root)
+
+        self.client.force_authenticate(user=attacker)
+
+        response = self.client.get(f"/api/documents/?more_like_id={version.id}")
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(response.content, b"Insufficient permissions.")

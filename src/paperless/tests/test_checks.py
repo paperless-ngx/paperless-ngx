@@ -211,14 +211,14 @@ class TestAuditLogChecks:
         assert "auditlog table was found but audit log is disabled." in msgs[0].msg
 
 
-DEPRECATED_VARS: dict[str, str] = {
-    "PAPERLESS_DB_TIMEOUT": "timeout",
-    "PAPERLESS_DB_POOLSIZE": "pool.min_size / pool.max_size",
-    "PAPERLESS_DBSSLMODE": "sslmode",
-    "PAPERLESS_DBSSLROOTCERT": "sslrootcert",
-    "PAPERLESS_DBSSLCERT": "sslcert",
-    "PAPERLESS_DBSSLKEY": "sslkey",
-}
+DEPRECATED_VARS = (
+    "PAPERLESS_DB_TIMEOUT",
+    "PAPERLESS_DB_POOLSIZE",
+    "PAPERLESS_DBSSLMODE",
+    "PAPERLESS_DBSSLROOTCERT",
+    "PAPERLESS_DBSSLCERT",
+    "PAPERLESS_DBSSLKEY",
+)
 
 
 class TestDeprecatedDbSettings:
@@ -234,26 +234,11 @@ class TestDeprecatedDbSettings:
         result = check_deprecated_db_settings(None)
         assert result == []
 
-    @pytest.mark.parametrize(
-        ("env_var", "db_option_key"),
-        [
-            pytest.param("PAPERLESS_DB_TIMEOUT", "timeout", id="db-timeout"),
-            pytest.param(
-                "PAPERLESS_DB_POOLSIZE",
-                "pool.min_size / pool.max_size",
-                id="db-poolsize",
-            ),
-            pytest.param("PAPERLESS_DBSSLMODE", "sslmode", id="ssl-mode"),
-            pytest.param("PAPERLESS_DBSSLROOTCERT", "sslrootcert", id="ssl-rootcert"),
-            pytest.param("PAPERLESS_DBSSLCERT", "sslcert", id="ssl-cert"),
-            pytest.param("PAPERLESS_DBSSLKEY", "sslkey", id="ssl-key"),
-        ],
-    )
+    @pytest.mark.parametrize("env_var", DEPRECATED_VARS)
     def test_single_deprecated_var_produces_one_warning(
         self,
         mocker: MockerFixture,
         env_var: str,
-        db_option_key: str,
     ) -> None:
         """Each deprecated var in isolation produces exactly one warning."""
         mocker.patch.dict(os.environ, {env_var: "some_value"}, clear=True)
@@ -264,7 +249,8 @@ class TestDeprecatedDbSettings:
         assert isinstance(warning, Warning)
         assert warning.id == "paperless.W001"
         assert env_var in warning.hint
-        assert db_option_key in warning.hint
+        assert "PAPERLESS_DB_OPTIONS" in warning.hint
+        assert "https://docs.paperless-ngx.com/migration-v3/" in warning.hint
 
     def test_multiple_deprecated_vars_produce_one_warning_each(
         self,

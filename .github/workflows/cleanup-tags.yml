@@ -17,7 +17,7 @@ jobs:
   cleanup-images:
     name: Cleanup Image Tags for ${{ matrix.primary-name }}
     if: github.repository_owner == 'paperless-ngx'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     environment: registry-maintenance
     strategy:
       fail-fast: false
@@ -42,7 +42,7 @@ jobs:
   cleanup-untagged-images:
     name: Cleanup Untagged Images Tags for ${{ matrix.primary-name }}
     if: github.repository_owner == 'paperless-ngx'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs:
       - cleanup-images
     environment: registry-maintenance

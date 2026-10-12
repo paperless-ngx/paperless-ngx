@@ -17,7 +17,24 @@ from django.db.models.functions import RowNumber
 from documents.models import Document
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
+
     from rest_framework.request import Request
+
+
+def root_document_ids(ids: Iterable[int]) -> QuerySet[int]:
+    """
+    The ids of the root documents of the given documents: a root stands for
+    itself and a version for its root. Only the indexes' bookkeeping needs
+    this, since they hold root documents only.
+    """
+    return (
+        Document.objects.filter(pk__in=ids)
+        .annotate(root_id=Coalesce("root_document_id", "id"))
+        .order_by()
+        .values_list("root_id", flat=True)
+        .distinct()
+    )
 
 
 def versions_newest_first(documents: QuerySet[Document]) -> QuerySet[Document]:

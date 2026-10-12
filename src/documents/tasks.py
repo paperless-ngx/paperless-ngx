@@ -502,6 +502,8 @@ def update_document_content_maybe_archive_file(
                 llm_index_add_or_update_document(document)
 
             clear_document_caches(document.pk)
+            if document.root_document_id is not None:
+                clear_document_caches(document.root_document_id)
 
         except Exception:
             logger.exception(
