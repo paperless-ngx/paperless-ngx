@@ -38,16 +38,6 @@ jobs:
         uses: actions/labeler@bf12e9b00b37c5c0ca2b87b79b2daf7891dbda13 # v7.0.0
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Label by size
-        uses: Gascon1/pr-size-labeler@deff8ed00a76639a7c0f197525bafa3350ba4c36 # v1.3.0
-        with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          xs_label: 'small-change'
-          xs_diff: '9'
-          s_label: 'non-trivial'
-          s_diff: '99999'
-          fail_if_xl: 'false'
-          excluded_files: /\.lock$/ /\.txt$/ ^src-ui/pnpm-lock\.yaml$ ^src-ui/messages\.xlf$ ^src/locale/en_US/LC_MESSAGES/django\.po$
       - name: Label by PR title
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
