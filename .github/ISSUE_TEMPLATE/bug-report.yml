@@ -31,9 +31,19 @@ body:
       value: |
         #### 🤖 Use of AI tools
 
-        If this report was generated, in whole or in part, by an AI tool or agent you **must** clearly say so in the description below. Failing to clearly disclose this is a violation of our [Code of Conduct](https://github.com/paperless-ngx/paperless-ngx/blob/main/CODE_OF_CONDUCT.md).
+        If this report was generated, in whole or in part, by an AI tool or agent you **must** say so using the field below. Failing to clearly disclose this is a violation of our [Code of Conduct](https://github.com/paperless-ngx/paperless-ngx/blob/main/CODE_OF_CONDUCT.md).
 
         Reports written by an AI agent must describe the _observed behavior only_: what happened, how to reproduce it, logs etc. Do **not** include code analysis, speculation about the root cause, or suggest code fixes.
+  - type: dropdown
+    id: ai-usage
+    attributes:
+      label: AI usage
+      description: Was any part of this report written by an AI tool or agent?
+      options:
+        - No AI tools were used
+        - Yes, AI tools helped write this report
+    validations:
+      required: true
   - type: textarea
     id: description
     attributes:
