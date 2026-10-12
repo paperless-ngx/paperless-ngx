@@ -2,10 +2,6 @@
 
 ## paperless-ngx 3.3.1
 
-### Features / Enhancements
-
-- Documentation: remove MARIADB\_HOST from MariaDB compose files [@shamoon](https://github.com/shamoon) ([#14378](https://github.com/paperless-ngx/paperless-ngx/pull/14378))
-
 ### Bug Fixes
 
 - Fix: use a root document's effective content for the LLM index and pr… [@stumpylog](https://github.com/stumpylog) ([#14423](https://github.com/paperless-ngx/paperless-ngx/pull/14423))
@@ -22,6 +18,7 @@
 ### Documentation
 
 - Chore: silence gotenberg startup warning [@slankes](https://github.com/slankes) ([#14405](https://github.com/paperless-ngx/paperless-ngx/pull/14405))
+- Documentation: remove MARIADB\_HOST from MariaDB compose files [@shamoon](https://github.com/shamoon) ([#14378](https://github.com/paperless-ngx/paperless-ngx/pull/14378))
 - Documentation: Updates the troubleshooting with 2 common database collation issues [@stumpylog](https://github.com/stumpylog) ([#14370](https://github.com/paperless-ngx/paperless-ngx/pull/14370))
 
 ### Maintenance
