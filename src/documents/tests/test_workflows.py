@@ -174,8 +174,8 @@ class TestWorkflows(
         w.save()
 
         self.assertEqual(w.__str__(), "Workflow: Workflow 1")
-        self.assertEqual(trigger.__str__(), "WorkflowTrigger 1")
-        self.assertEqual(action.__str__(), "WorkflowAction 1")
+        self.assertEqual(trigger.__str__(), f"WorkflowTrigger {trigger.pk}")
+        self.assertEqual(action.__str__(), f"WorkflowAction {action.pk}")
 
         test_file = shutil.copy(
             self.SIMPLE_PDF,
@@ -433,7 +433,7 @@ class TestWorkflows(
                 list(document.tags.all()),
                 [self.t1, self.t2, self.t3],
             )
-            self.assertEqual(
+            self.assertCountEqual(
                 list(
                     get_users_with_perms(
                         document,

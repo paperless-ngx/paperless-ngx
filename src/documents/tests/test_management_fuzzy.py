@@ -19,6 +19,10 @@ class TestFuzzyMatchCommand(TestCase):
         call_command(
             "document_fuzzy_match",
             "--no-progress-bar",
+            # The default scales with the CPU count and forks, which closes
+            # the test's database connection on PostgreSQL
+            "--processes",
+            "1",
             *args,
             stdout=stdout,
             stderr=stderr,

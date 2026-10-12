@@ -248,8 +248,8 @@ class TestConsumer(
         )
         self.assertIsNone(document.correspondent)
         self.assertIsNone(document.document_type)
-        self.assertEqual(document.filename, "0000001.pdf")
-        self.assertEqual(document.archive_filename, "0000001.pdf")
+        self.assertEqual(document.filename, f"{document.pk:07}.pdf")
+        self.assertEqual(document.archive_filename, f"{document.pk:07}.pdf")
 
         self.assertIsFile(document.source_path)
 
@@ -1127,17 +1127,17 @@ class TestConsumer(
         with self.get_consumer(settings.CONSUMPTION_DIR / "simple.png") as consumer:
             consumer.run()
 
-            doc1 = Document.objects.filter(pk=1).first()
+            doc1 = Document.objects.latest("pk")
 
         with self.get_consumer(settings.CONSUMPTION_DIR / "simple.pdf") as consumer:
             consumer.run()
 
-            doc2 = Document.objects.filter(pk=2).first()
+            doc2 = Document.objects.latest("pk")
 
         with self.get_consumer(settings.CONSUMPTION_DIR / "simple.png.pdf") as consumer:
             consumer.run()
 
-            doc3 = Document.objects.filter(pk=3).first()
+            doc3 = Document.objects.latest("pk")
 
         self.assertEqual(doc1.filename, "simple.png")
         self.assertEqual(doc1.archive_filename, "simple.pdf")

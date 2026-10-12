@@ -628,22 +628,23 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
     # Subset check (document link field only)                   #
     # ==========================================================#
     def test_document_link_contains(self) -> None:
+        linked = {self.documents[1].id, self.documents[2].id}
         # Document link field "contains" performs a subset check.
         self._assert_query_match_predicate(
-            ["documentlink_field", "contains", [1, 2]],
+            ["documentlink_field", "contains", sorted(linked)],
             lambda document: (
                 "documentlink_field" in document
                 and document["documentlink_field"] is not None
-                and set(document["documentlink_field"]) >= {1, 2}
+                and set(document["documentlink_field"]) >= linked
             ),
         )
         # The order of IDs don't matter - this is the same as above.
         self._assert_query_match_predicate(
-            ["documentlink_field", "contains", [2, 1]],
+            ["documentlink_field", "contains", sorted(linked, reverse=True)],
             lambda document: (
                 "documentlink_field" in document
                 and document["documentlink_field"] is not None
-                and set(document["documentlink_field"]) >= {1, 2}
+                and set(document["documentlink_field"]) >= linked
             ),
         )
 
