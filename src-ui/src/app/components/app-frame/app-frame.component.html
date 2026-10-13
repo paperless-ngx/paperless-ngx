@@ -75,7 +75,8 @@
   </ul>
 </nav>
 
-<input type="file" class="visually-hidden" (change)="onFileSelected($event)" multiple #fileUpload tabindex="-1" aria-hidden="true">
+<input type="file" class="visually-hidden" id="navbar-file-upload" (change)="onFileSelected($event)" multiple #fileUpload tabindex="-1" aria-hidden="true">
+<label for="navbar-file-upload" class="visually-hidden" i18n>Upload Files</label>
 
 <div class="container-fluid">
   <div class="row">
