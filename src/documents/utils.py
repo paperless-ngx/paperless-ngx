@@ -9,11 +9,13 @@ from pathlib import Path
 from subprocess import CompletedProcess
 from subprocess import run
 from typing import TYPE_CHECKING
+from typing import Any
 from typing import Generic
 from typing import TypeVar
 
 from django.conf import settings
 from PIL import Image
+from PIL import ImageSequence
 
 if TYPE_CHECKING:
     from django.db.models import Model
@@ -126,6 +128,30 @@ def maybe_override_pixel_limit() -> None:
         if pixel_count == 0:
             pixel_count = None
         Image.MAX_IMAGE_PIXELS = pixel_count
+
+
+def remove_alpha_channel(source: Path, dest: Path) -> Path:
+    """
+    Writes a copy of the image with its alpha channel dropped, keeping the
+    format, every frame, the DPI and any ICC profile.
+
+    The channel is dropped, not composited, so transparent pixels keep their
+    underlying color. Returns dest.
+    """
+    with Image.open(source) as im:
+        image_format = im.format
+        opaque_mode = "L" if im.mode == "LA" else "RGB"
+        frames = [frame.convert(opaque_mode) for frame in ImageSequence.Iterator(im)]
+        save_kwargs: dict[str, Any] = {}
+        if "dpi" in im.info:
+            save_kwargs["dpi"] = im.info["dpi"]
+        if "icc_profile" in im.info:
+            save_kwargs["icc_profile"] = im.info["icc_profile"]
+        if len(frames) > 1:
+            save_kwargs["save_all"] = True
+            save_kwargs["append_images"] = frames[1:]
+    frames[0].save(dest, format=image_format, **save_kwargs)
+    return dest
 
 
 def run_subprocess(

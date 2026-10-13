@@ -177,7 +177,6 @@ to a positive number to enable polling and disable native filesystem notificatio
     - `pkg-config` for mysqlclient (python dependency)
     - `fonts-liberation` for generating thumbnails for plain text
       files
-    - `imagemagick` >= 6 for image alpha handling
     - `gnupg` for decrypting GPG-encrypted email
     - `libpq-dev` for PostgreSQL
     - `libmagic-dev` for mime type detection
@@ -187,7 +186,7 @@ to a positive number to enable polling and disable native filesystem notificatio
     Use this list for your preferred package management:
 
     ```
-    python3 python3-pip python3-dev imagemagick fonts-liberation gnupg libpq-dev default-libmysqlclient-dev pkg-config libmagic-dev poppler-utils
+    python3 python3-pip python3-dev fonts-liberation gnupg libpq-dev default-libmysqlclient-dev pkg-config libmagic-dev poppler-utils
     ```
 
     These dependencies are required for OCRmyPDF, which is used for text
@@ -415,13 +414,6 @@ to a positive number to enable polling and disable native filesystem notificatio
         `paperless-task-queue.service` and `paperless-scheduler.service`.
         You may need to change the path in the files. Example:
         `ExecStart=/opt/paperless/.local/bin/celery --app paperless worker --loglevel INFO`
-
-12. Harden ImageMagick by disabling formats that Paperless-ngx does not use.
-    PDF processing is not needed and should stay disabled.
-
-    Configure the active ImageMagick policy file (commonly
-    `/etc/ImageMagick-6/policy.xml` or `/etc/ImageMagick-7/policy.xml`) and
-    adjust similar to [the docker policy file](https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/refs/heads/main/docker/rootfs/etc/ImageMagick-6/paperless-policy.xml). You should also include restrictions as noted there.
 
 **Optional: Install the [jbig2enc](https://ocrmypdf.readthedocs.io/en/latest/jbig2.html) encoder.**
 This will reduce the size of generated PDF documents. You'll most likely need to compile this yourself, because this
