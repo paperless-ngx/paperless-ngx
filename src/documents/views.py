@@ -289,6 +289,7 @@ logger = logging.getLogger("paperless.api")
 # clauses efficiently, so this threshold mainly protects SQLite users.
 _TANTIVY_INTERSECT_THRESHOLD = 5_000
 _TANTIVY_SEARCH_PARAM_NAMES = ("text", "title_search", "query", "more_like_id")
+_TANTIVY_COMBINABLE_SEARCH_PARAMS = ({"text", "query"}, {"title_search", "query"})
 
 # whoosh-compat's fieldname tagger (used only for SearchMode.QUERY, via the
 # whoosh grammar in parse_user_query) is O(n^2) in plain word characters:
@@ -308,6 +309,18 @@ _TANTIVY_SEARCH_PARAM_NAMES = ("text", "title_search", "query", "more_like_id")
 _MAX_QUERY_LENGTH: Final[int] = 4096
 
 
+def _validate_tantivy_search_params(active: list[str]) -> None:
+    # may also have a filter query alongside a simple search e.g. relative dates
+    if len(active) > 1 and set(active) not in _TANTIVY_COMBINABLE_SEARCH_PARAMS:
+        raise ValidationError(
+            {
+                "detail": _(
+                    "Specify only one of text, title_search, query, or more_like_id.",
+                ),
+            },
+        )
+
+
 def _get_tantivy_query_and_mode(params):
     from documents.search import QueryTooLongError
     from documents.search import SearchMode
@@ -321,9 +334,15 @@ def _get_tantivy_query_and_mode(params):
     else:
         return None  # pragma: no cover
 
-    if len(raw) > _MAX_QUERY_LENGTH:
-        raise QueryTooLongError(len(raw), _MAX_QUERY_LENGTH)
-    return raw, mode
+    filter_query = (
+        str(params["query"])
+        if mode is not SearchMode.QUERY and "query" in params
+        else None
+    )
+    for value in (raw, filter_query):
+        if value is not None and len(value) > _MAX_QUERY_LENGTH:
+            raise QueryTooLongError(len(value), _MAX_QUERY_LENGTH)
+    return raw, mode, filter_query
 
 
 def _get_more_like_id(query_params: dict[str, Any], user: User | None) -> int:
@@ -2566,15 +2585,9 @@ class UnifiedSearchViewSet(DocumentViewSet):
 
         def parse_search_params() -> SearchParams:
             """Extract query string, search mode, and ordering from request."""
-            active = self._get_active_search_params(request)
-            if len(active) > 1:
-                raise ValidationError(
-                    {
-                        "detail": _(
-                            "Specify only one of text, title_search, query, or more_like_id.",
-                        ),
-                    },
-                )
+            _validate_tantivy_search_params(
+                self._get_active_search_params(request),
+            )
 
             ordering_param = request.query_params.get("ordering", "")
             sort_reverse = ordering_param.startswith("-")
@@ -2636,7 +2649,9 @@ class UnifiedSearchViewSet(DocumentViewSet):
             filtered_qs: QuerySet[Document],
         ) -> SearchResultPage:
             """Handle text/title/query search: IDs, ORM intersection, page highlights."""
-            query_str, search_mode = _get_tantivy_query_and_mode(request.query_params)
+            query_str, search_mode, filter_query = _get_tantivy_query_and_mode(
+                request.query_params,
+            )
 
             # "score" is not a real Tantivy sort field — it means relevance order,
             # which is Tantivy's default when no sort field is specified.
@@ -2649,6 +2664,7 @@ class UnifiedSearchViewSet(DocumentViewSet):
                 ),
                 sort_reverse=sort_reverse,
                 search_mode=search_mode,
+                filter_query=filter_query,
             )
             ordered_ids = intersect_and_order(
                 all_ids,
@@ -2883,14 +2899,7 @@ class DocumentSelectionMixin:
         ]
         if not search_filters:
             return None
-        if len(search_filters) > 1:
-            raise ValidationError(
-                {
-                    "detail": _(
-                        "Specify only one of text, title_search, query, or more_like_id.",
-                    ),
-                },
-            )
+        _validate_tantivy_search_params(search_filters)
 
         from documents.search import SearchQueryError
         from documents.search import get_backend
@@ -2909,11 +2918,14 @@ class DocumentSelectionMixin:
                     user=search_user,
                 )
             else:
-                query_str, search_mode = _get_tantivy_query_and_mode(filters)
+                query_str, search_mode, filter_query = _get_tantivy_query_and_mode(
+                    filters,
+                )
                 search_ids = backend.search_ids(
                     query_str,
                     user=search_user,
                     search_mode=search_mode,
+                    filter_query=filter_query,
                 )
         except SearchQueryError as e:
             # Same user-fixable-query mapping as the search list endpoint:
