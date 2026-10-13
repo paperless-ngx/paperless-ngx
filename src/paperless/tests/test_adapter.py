@@ -4,11 +4,14 @@ import pytest
 from allauth.account.adapter import get_adapter
 from allauth.core import context
 from allauth.socialaccount.adapter import get_adapter as get_social_adapter
+from allauth.socialaccount.providers.base.utils import respond_to_login_on_get
+from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
 from django.forms import ValidationError
 from django.http import HttpRequest
+from django.test import RequestFactory
 from django.urls import reverse
 from pytest_django.fixtures import Settings
 from pytest_mock import MockerFixture
@@ -175,6 +178,55 @@ class TestCustomSocialAccountAdapter:
                 exception="Test authentication error",
             )
         assert any("Test authentication error" in msg for msg in caplog.messages)
+
+
+@pytest.mark.django_db
+class TestSocialLoginOnGet:
+    def test_get_shows_confirmation_page_by_default(
+        self,
+        rf: RequestFactory,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - PAPERLESS_SOCIAL_LOGIN_ON_GET is not set
+        WHEN:
+            - A provider login URL is opened with a GET request
+        THEN:
+            - The confirmation page is shown instead of starting the handshake
+        """
+        assert settings.SOCIALACCOUNT_LOGIN_ON_GET is False
+        response = respond_to_login_on_get(
+            rf.get("/accounts/oidc/authentik/login/"),
+            mocker.MagicMock(),
+        )
+
+        assert response is not None
+        assert response.status_code == 200
+        assert b"Continue" in response.content
+
+    def test_get_starts_handshake_when_enabled(
+        self,
+        rf: RequestFactory,
+        mocker: MockerFixture,
+        settings: Settings,
+    ) -> None:
+        """
+        GIVEN:
+            - PAPERLESS_SOCIAL_LOGIN_ON_GET is enabled
+        WHEN:
+            - A provider login URL is opened with a GET request
+        THEN:
+            - No confirmation page is returned, so the handshake starts directly
+        """
+        settings.SOCIALACCOUNT_LOGIN_ON_GET = True
+
+        response = respond_to_login_on_get(
+            rf.get("/accounts/oidc/authentik/login/"),
+            mocker.MagicMock(),
+        )
+
+        assert response is None
 
 
 @pytest.mark.django_db

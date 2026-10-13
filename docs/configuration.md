@@ -752,6 +752,23 @@ system. See the corresponding
 
     Defaults to False
 
+#### [`PAPERLESS_SOCIAL_LOGIN_ON_GET=<bool>`](#PAPERLESS_SOCIAL_LOGIN_ON_GET) {#PAPERLESS_SOCIAL_LOGIN_ON_GET}
+
+: Start the third party login handshake directly when the provider login URL is opened with a GET request,
+instead of first showing a confirmation page. This lets an identity provider dashboard link straight into
+Paperless-ngx while the regular login page stays unchanged. For an OpenID Connect provider the URL is
+`<PAPERLESS_URL>/accounts/oidc/<provider_id>/login/`, where `<provider_id>` is the `provider_id` from
+[PAPERLESS_SOCIALACCOUNT_PROVIDERS](#PAPERLESS_SOCIALACCOUNT_PROVIDERS). Append `?next=/` to choose the page
+shown after login. See the corresponding
+[django-allauth documentation](https://docs.allauth.org/en/latest/socialaccount/configuration.html)
+
+    !!! warning
+
+        django-allauth recommends requiring a POST request to start a social login. With this setting enabled,
+        any website can send a visitor's browser to the login URL and start the handshake.
+
+    Defaults to False
+
 #### [`PAPERLESS_SOCIALACCOUNT_ALLOW_SIGNUPS=<bool>`](#PAPERLESS_SOCIALACCOUNT_ALLOW_SIGNUPS) {#PAPERLESS_SOCIALACCOUNT_ALLOW_SIGNUPS}
 
 : Allow users to signup for a new Paperless-ngx account using any setup third party authentication systems.
