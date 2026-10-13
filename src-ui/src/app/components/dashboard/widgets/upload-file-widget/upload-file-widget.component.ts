@@ -130,11 +130,9 @@ export class UploadFileWidgetComponent extends ComponentWithPermissions {
   }
 
   public onFileSelected(event: Event) {
-    const files = (event.target as HTMLInputElement).files
-    for (let i = 0; i < files?.length; i++) {
-      const file = files.item(i)
-      file && this.uploadDocumentsService.uploadFile(file)
-    }
+    const input = event.target as HTMLInputElement
+    this.uploadDocumentsService.uploadFiles(Array.from(input.files ?? []))
+    input.value = ''
   }
 
   get slimSidebarEnabled(): boolean {

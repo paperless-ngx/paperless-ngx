@@ -48,12 +48,13 @@ import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { TasksService } from 'src/app/services/tasks.service'
 import { ToastService } from 'src/app/services/toast.service'
+import { UploadDocumentsService } from 'src/app/services/upload-documents.service'
 import { environment } from 'src/environments/environment'
 import { ChatComponent } from '../chat/chat/chat.component'
+import { SwitchComponent } from '../common/input/switch/switch.component'
 import { BrandMarkComponent } from '../common/logo/brand-mark/brand-mark.component'
 import { LogoComponent } from '../common/logo/logo.component'
 import { ProfileEditDialogComponent } from '../common/profile-edit-dialog/profile-edit-dialog.component'
-import { SwitchComponent } from '../common/input/switch/switch.component'
 import { DocumentDetailComponent } from '../document-detail/document-detail.component'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
 import { GlobalSearchComponent } from './global-search/global-search.component'
@@ -101,6 +102,7 @@ export class AppFrameComponent
   private modalService = inject(NgbModal)
   permissionsService = inject(PermissionsService)
   private djangoMessagesService = inject(DjangoMessagesService)
+  private uploadDocumentsService = inject(UploadDocumentsService)
 
   readonly appRemoteVersion = signal<AppRemoteVersion>(null)
   readonly isMenuCollapsed = signal(true)
@@ -509,6 +511,15 @@ export class AppFrameComponent
     if (enable) {
       this.checkForUpdates()
     }
+  }
+
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement
+    const files = Array.from(input.files ?? [])
+    input.value = ''
+    if (!files.length) return
+    this.toastService.showInfo($localize`Initiating upload...`, 3000)
+    this.uploadDocumentsService.uploadFiles(files)
   }
 
   onLogout() {
