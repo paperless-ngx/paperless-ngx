@@ -33,6 +33,7 @@ import { SearchService } from 'src/app/services/rest/search.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { TasksService } from 'src/app/services/tasks.service'
 import { ToastService } from 'src/app/services/toast.service'
+import { UploadDocumentsService } from 'src/app/services/upload-documents.service'
 import { environment } from 'src/environments/environment'
 import { ProfileEditDialogComponent } from '../common/profile-edit-dialog/profile-edit-dialog.component'
 import { DocumentDetailComponent } from '../document-detail/document-detail.component'
@@ -460,6 +461,29 @@ describe('AppFrameComponent', () => {
     component.closeAll()
     expect(closeAllSpy).toHaveBeenCalled()
     expect(routerSpy).toHaveBeenCalled()
+  })
+
+  it('should upload files selected from the navbar upload button', () => {
+    const uploadDocumentsService = TestBed.inject(UploadDocumentsService)
+    const uploadSpy = jest
+      .spyOn(uploadDocumentsService, 'uploadFiles')
+      .mockImplementation(() => {})
+    const toastSpy = jest.spyOn(toastService, 'showInfo')
+    const file = new File(['testing'], 'file.pdf')
+    const input = window.document.createElement('input')
+    jest.spyOn(input, 'files', 'get').mockReturnValue([file] as any)
+
+    component.onFileSelected({ target: input } as unknown as Event)
+    expect(toastSpy).toHaveBeenCalled()
+    expect(uploadSpy).toHaveBeenCalledWith([file])
+  })
+
+  it('should not upload when no files are selected from the navbar', () => {
+    const uploadDocumentsService = TestBed.inject(UploadDocumentsService)
+    const uploadSpy = jest.spyOn(uploadDocumentsService, 'uploadFiles')
+    const input = window.document.createElement('input')
+    component.onFileSelected({ target: input } as unknown as Event)
+    expect(uploadSpy).not.toHaveBeenCalled()
   })
 
   it('should close all documents on logout', () => {

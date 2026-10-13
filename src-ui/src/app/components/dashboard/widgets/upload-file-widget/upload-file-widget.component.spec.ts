@@ -85,15 +85,11 @@ describe('UploadFileWidgetComponent', () => {
       'file.pdf'
     )
     const fileInput = fixture.debugElement.query(By.css('input'))
-    jest.spyOn(fileInput.nativeElement, 'files', 'get').mockReturnValue({
-      item: () => file,
-      length: 1,
-      [Symbol.iterator]: () => ({
-        next: () => ({ done: false, value: file }),
-      }),
-    } as any)
+    jest
+      .spyOn(fileInput.nativeElement, 'files', 'get')
+      .mockReturnValue([file] as any)
     fileInput.nativeElement.dispatchEvent(new Event('change'))
-    expect(uploadSpy).toHaveBeenCalled()
+    expect(uploadSpy).toHaveBeenCalledWith(file)
   })
 
   it('should generate stats summary', () => {
