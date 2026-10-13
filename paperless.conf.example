@@ -88,5 +88,4 @@ PAPERLESS_SECRET_KEY=change-me
 
 # Binaries
 
-#PAPERLESS_CONVERT_BINARY=/usr/bin/convert
 #PAPERLESS_GS_BINARY=/usr/bin/gs

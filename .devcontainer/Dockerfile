@@ -39,7 +39,6 @@ ARG RUNTIME_PACKAGES="\
   ghostscript \
   gnupg \
   icc-profiles-free \
-  imagemagick \
   # PostgreSQL
   postgresql-client \
   # MySQL / MariaDB
@@ -92,21 +91,6 @@ RUN set -eux \
         --output jbig2enc_${JBIG2ENC_VERSION}-1_${TARGETARCH}.deb \
         https://github.com/paperless-ngx/builder/releases/download/jbig2enc-trixie-v${JBIG2ENC_VERSION}/jbig2enc_${JBIG2ENC_VERSION}-1_${TARGETARCH}.deb \
       && dpkg --install ./jbig2enc_${JBIG2ENC_VERSION}-1_${TARGETARCH}.deb
-
-# setup docker-specific things
-# These change sometimes, but rarely
-WORKDIR /usr/src/paperless/src/docker/
-
-COPY [ \
-  "docker/rootfs/etc/ImageMagick-6/paperless-policy.xml", \
-  "./" \
-]
-
-RUN set -eux \
-  && echo "Configuring ImageMagick" \
-    && mkdir -p /etc/ImageMagick-6 \
-    && mv paperless-policy.xml /etc/ImageMagick-6/policy.xml
-
 
 # Packages needed only for building a few quick Python
 # dependencies
