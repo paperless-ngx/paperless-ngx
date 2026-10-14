@@ -1,7 +1,11 @@
+from collections.abc import Mapping
+from collections.abc import Sequence
 from typing import Any
 from typing import ClassVar
+from typing import Literal
 from typing import TypeGuard
 from typing import TypeVar
+from typing import cast
 
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
@@ -724,6 +728,10 @@ def has_perms_owner_aware(user, perms, obj):
     return obj.owner is None or obj.owner == user or checker.has_perm(perms, obj)
 
 
+# HEAD is deliberately absent: GlobalPermissionsByMethod checks it against GET.
+MappedMethod = Literal["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
+
+
 class GlobalPermissionsByMethod(BasePermission):
     """
     Requires the global (model-level) permissions listed in ``perms_map`` for
@@ -732,14 +740,16 @@ class GlobalPermissionsByMethod(BasePermission):
     ``perms_map`` is denied.
     """
 
-    perms_map: ClassVar[dict[str, list[str]]]
+    perms_map: ClassVar[Mapping[MappedMethod, Sequence[str]]]
 
     def has_permission(self, request: Any, view: Any) -> bool:
         if not request.user or not request.user.is_authenticated:
             return False
 
         method = "GET" if request.method == "HEAD" else request.method
-        perms = self.perms_map.get(method)
+        # An unknown method is not a MappedMethod, but .get() returns None for
+        # it, so it is still denied.
+        perms = self.perms_map.get(cast("MappedMethod", method))
         return perms is not None and request.user.has_perms(perms)
 
 
