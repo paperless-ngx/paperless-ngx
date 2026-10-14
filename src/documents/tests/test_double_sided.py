@@ -37,12 +37,15 @@ class TestDoubleSided(
         self.double_sided_dir.mkdir()
         self.staging_file = self.dirs.scratch_dir / STAGING_FILE_NAME
 
+    def _sample(self, name: str) -> Path:
+        return self.SIMPLE_PDF if name == "simple.pdf" else self.SAMPLE_DIR / name
+
     def consume_file(self, srcname, dstname: str | Path = "foo.pdf"):
         """
         Starts the consume process and also ensures the
         destination file does not exist afterwards
         """
-        src = self.SAMPLE_DIR / srcname
+        src = self._sample(srcname)
         dst = self.double_sided_dir / dstname
         dst.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy(src, dst)
@@ -57,7 +60,7 @@ class TestDoubleSided(
         return msg
 
     def create_staging_file(self, src="double-sided-odd.pdf", datetime=None) -> None:
-        shutil.copy(self.SAMPLE_DIR / src, self.staging_file)
+        shutil.copy(self._sample(src), self.staging_file)
         if datetime is None:
             datetime = dt.datetime.now()
         os.utime(str(self.staging_file), (datetime.timestamp(),) * 2)

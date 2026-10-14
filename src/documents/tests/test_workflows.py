@@ -178,7 +178,7 @@ class TestWorkflows(
         self.assertEqual(action.__str__(), "WorkflowAction 1")
 
         test_file = shutil.copy(
-            self.SAMPLE_DIR / "simple.pdf",
+            self.SIMPLE_PDF,
             self.dirs.scratch_dir / "simple.pdf",
         )
 
@@ -290,7 +290,7 @@ class TestWorkflows(
         w.save()
 
         test_file = shutil.copy(
-            self.SAMPLE_DIR / "simple.pdf",
+            self.SIMPLE_PDF,
             self.dirs.scratch_dir / "simple.pdf",
         )
 
@@ -409,7 +409,7 @@ class TestWorkflows(
         w2.save()
 
         test_file = shutil.copy(
-            self.SAMPLE_DIR / "simple.pdf",
+            self.SIMPLE_PDF,
             self.dirs.scratch_dir / "simple.pdf",
         )
 
@@ -478,7 +478,7 @@ class TestWorkflows(
         w.save()
 
         test_file = shutil.copy(
-            self.SAMPLE_DIR / "simple.pdf",
+            self.SIMPLE_PDF,
             self.dirs.scratch_dir / "simple.pdf",
         )
 
@@ -531,7 +531,7 @@ class TestWorkflows(
         w.save()
 
         test_file = shutil.copy(
-            self.SAMPLE_DIR / "simple.pdf",
+            self.SIMPLE_PDF,
             self.dirs.scratch_dir / "simple.pdf",
         )
 
@@ -608,7 +608,7 @@ class TestWorkflows(
         w.save()
 
         test_file = shutil.copy(
-            self.SAMPLE_DIR / "simple.pdf",
+            self.SIMPLE_PDF,
             self.dirs.scratch_dir / "simple.pdf",
         )
 
@@ -687,7 +687,7 @@ class TestWorkflows(
         w.save()
 
         test_file = shutil.copy(
-            self.SAMPLE_DIR / "simple.pdf",
+            self.SIMPLE_PDF,
             self.dirs.scratch_dir / "simple.pdf",
         )
 
@@ -765,7 +765,7 @@ class TestWorkflows(
         w.save()
 
         test_file = shutil.copy(
-            self.SAMPLE_DIR / "simple.pdf",
+            self.SIMPLE_PDF,
             self.dirs.scratch_dir / "simple.pdf",
         )
 
@@ -876,7 +876,7 @@ class TestWorkflows(
         w.save()
 
         test_file = shutil.copy(
-            self.SAMPLE_DIR / "simple.pdf",
+            self.SIMPLE_PDF,
             self.dirs.scratch_dir / "simple.pdf",
         )
 
@@ -928,7 +928,7 @@ class TestWorkflows(
         generated = generate_unique_filename(doc)
         destination = (settings.ORIGINALS_DIR / generated).resolve()
         create_source_path_directory(destination)
-        shutil.copy(self.SAMPLE_DIR / "simple.pdf", destination)
+        shutil.copy(self.SIMPLE_PDF, destination)
         Document.objects.filter(pk=doc.pk).update(filename=generated.as_posix())
         doc.refresh_from_db()
 
@@ -2023,7 +2023,7 @@ class TestWorkflows(
         superuser = UserFactory(username="superuser", superuser=True)
         self.client.force_authenticate(user=superuser)
         test_file = shutil.copy(
-            self.SAMPLE_DIR / "simple.pdf",
+            self.SIMPLE_PDF,
             self.dirs.scratch_dir / "simple.pdf",
         )
         tasks.consume_file(
@@ -3009,7 +3009,7 @@ class TestWorkflows(
         generated = generate_unique_filename(doc)
         destination = (settings.ORIGINALS_DIR / generated).resolve()
         create_source_path_directory(destination)
-        shutil.copy(self.SAMPLE_DIR / "simple.pdf", destination)
+        shutil.copy(self.SIMPLE_PDF, destination)
         Document.objects.filter(pk=doc.pk).update(filename=generated.as_posix())
         doc.refresh_from_db()
         doc.tags.set([self.t1, self.t2])
@@ -3073,7 +3073,7 @@ class TestWorkflows(
         generated = generate_unique_filename(doc)
         destination = (settings.ORIGINALS_DIR / generated).resolve()
         create_source_path_directory(destination)
-        shutil.copy(self.SAMPLE_DIR / "simple.pdf", destination)
+        shutil.copy(self.SIMPLE_PDF, destination)
         Document.objects.filter(pk=doc.pk).update(filename=generated.as_posix())
         doc.refresh_from_db()
         doc.tags.set([self.t1])
@@ -3222,7 +3222,7 @@ class TestWorkflows(
         w.save()
 
         test_file = shutil.copy(
-            self.SAMPLE_DIR / "simple.pdf",
+            self.SIMPLE_PDF,
             self.dirs.scratch_dir / "simple.pdf",
         )
 
@@ -3346,7 +3346,7 @@ class TestWorkflows(
         w.save()
 
         test_file = shutil.copy(
-            self.SAMPLE_DIR / "simple.pdf",
+            self.SIMPLE_PDF,
             self.dirs.scratch_dir / "simple.pdf",
         )
 
@@ -3496,7 +3496,7 @@ class TestWorkflows(
         workflow.actions.set([assignment_action, email_action])
 
         temp_working_copy = shutil.copy(
-            self.SAMPLE_DIR / "simple.pdf",
+            self.SIMPLE_PDF,
             self.dirs.scratch_dir / "working-copy.pdf",
         )
 
@@ -3596,7 +3596,7 @@ class TestWorkflows(
 
         # move the file
         test_file = shutil.copy(
-            self.SAMPLE_DIR / "simple.pdf",
+            self.SIMPLE_PDF,
             self.dirs.scratch_dir / "simple.pdf",
         )
 
@@ -3704,7 +3704,7 @@ class TestWorkflows(
         generated = generate_unique_filename(doc)
         destination = (settings.ORIGINALS_DIR / generated).resolve()
         create_source_path_directory(destination)
-        shutil.copy(self.SAMPLE_DIR / "simple.pdf", destination)
+        shutil.copy(self.SIMPLE_PDF, destination)
         Document.objects.filter(pk=doc.pk).update(filename=generated.as_posix())
 
         run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc)
@@ -3915,7 +3915,7 @@ class TestWorkflows(
         w.save()
 
         test_file = shutil.copy(
-            self.SAMPLE_DIR / "simple.pdf",
+            self.SIMPLE_PDF,
             self.dirs.scratch_dir / "simple.pdf",
         )
 
@@ -4036,7 +4036,7 @@ class TestWorkflows(
         w.save()
 
         test_file = shutil.copy(
-            self.SAMPLE_DIR / "simple.pdf",
+            self.SIMPLE_PDF,
             self.dirs.scratch_dir / "simple.pdf",
         )
 
@@ -4387,7 +4387,7 @@ class TestWorkflows(
         w.save()
 
         test_file = shutil.copy(
-            self.SAMPLE_DIR / "simple.pdf",
+            self.SIMPLE_PDF,
             self.dirs.scratch_dir / "simple.pdf",
         )
 
@@ -4835,7 +4835,7 @@ class TestWorkflows(
         w.save()
 
         test_file = shutil.copy(
-            self.SAMPLE_DIR / "simple.pdf",
+            self.SIMPLE_PDF,
             self.dirs.scratch_dir / "simple.pdf",
         )
 
@@ -5027,7 +5027,7 @@ class TestWorkflows(
 
         # Create a test file to be consumed
         test_file = shutil.copy(
-            self.SAMPLE_DIR / "simple.pdf",
+            self.SIMPLE_PDF,
             self.dirs.scratch_dir / "simple.pdf",
         )
         test_file_path = Path(test_file)
@@ -5091,7 +5091,7 @@ class TestWorkflows(
 
         # Create a test file to be consumed
         test_file = shutil.copy(
-            self.SAMPLE_DIR / "simple.pdf",
+            self.SIMPLE_PDF,
             self.dirs.scratch_dir / "simple2.pdf",
         )
         test_file_path = Path(test_file)
@@ -5529,7 +5529,7 @@ class TestDateWorkflowLocalization(
         )
 
         test_file = shutil.copy(
-            self.SAMPLE_DIR / "simple.pdf",
+            self.SIMPLE_PDF,
             tmp_path / "simple.pdf",
         )
 
@@ -5596,7 +5596,7 @@ class TestRemoteOCRWorkflowAction(DirectoriesMixin, SampleDirMixin, APITestCase)
         self._make_workflow(WorkflowTrigger.WorkflowTriggerType.CONSUMPTION)
 
         test_file = shutil.copy(
-            self.SAMPLE_DIR / "simple.pdf",
+            self.SIMPLE_PDF,
             self.dirs.scratch_dir / "simple.pdf",
         )
         overrides = DocumentMetadataOverrides()
@@ -5814,7 +5814,7 @@ class TestApplyAISuggestionsWorkflowAction(
         )
 
         test_file = shutil.copy(
-            self.SAMPLE_DIR / "simple.pdf",
+            self.SIMPLE_PDF,
             self.dirs.scratch_dir / "simple.pdf",
         )
 

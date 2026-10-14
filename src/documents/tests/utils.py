@@ -11,6 +11,7 @@ from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
 from paperless_testing.fakes.progress import FakeProgressManager
+from paperless_testing.samples import SIMPLE_DIGITAL_PDF
 
 
 class ConsumeTaskMixin:
@@ -52,6 +53,8 @@ class SampleDirMixin:
     SAMPLE_DIR = Path(__file__).parent / "samples"
 
     BARCODE_SAMPLE_DIR = SAMPLE_DIR / "barcodes"
+
+    SIMPLE_PDF = SIMPLE_DIGITAL_PDF
 
 
 class GetConsumerMixin:

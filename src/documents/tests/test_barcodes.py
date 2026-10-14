@@ -167,7 +167,7 @@ class TestBarcode(
             - No barcodes detected
             - No pages to split on
         """
-        test_file = self.SAMPLE_DIR / "simple.pdf"
+        test_file = self.SIMPLE_PDF
         with self.get_reader(test_file) as reader:
             reader.detect()
             separator_page_numbers = reader.get_separation_pages()
@@ -459,7 +459,7 @@ class TestBarcode(
         THEN:
             - Nothing happens
         """
-        test_file = self.SAMPLE_DIR / "simple.pdf"
+        test_file = self.SIMPLE_PDF
 
         with self.get_reader(test_file) as reader:
             try:

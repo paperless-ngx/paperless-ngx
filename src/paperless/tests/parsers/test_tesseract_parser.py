@@ -160,11 +160,11 @@ class TestGetPageCount:
     def test_single_page_pdf(
         self,
         tesseract_parser: RasterisedDocumentParser,
-        tesseract_samples_dir: Path,
+        simple_digital_pdf_file: Path,
     ) -> None:
         assert (
             tesseract_parser.get_page_count(
-                tesseract_samples_dir / "simple-digital.pdf",
+                simple_digital_pdf_file,
                 "application/pdf",
             )
             == 1
@@ -187,7 +187,7 @@ class TestGetPageCount:
         self,
         mocker: MockerFixture,
         tesseract_parser: RasterisedDocumentParser,
-        tesseract_samples_dir: Path,
+        simple_digital_pdf_file: Path,
         caplog,
     ) -> None:
         """
@@ -203,7 +203,7 @@ class TestGetPageCount:
 
         with caplog.at_level(logging.WARNING):
             page_count = tesseract_parser.get_page_count(
-                tesseract_samples_dir / "simple-digital.pdf",
+                simple_digital_pdf_file,
                 "application/pdf",
             )
         assert page_count is None
@@ -272,10 +272,10 @@ class TestGetThumbnail:
     def test_thumbnail_is_file(
         self,
         tesseract_parser: RasterisedDocumentParser,
-        tesseract_samples_dir: Path,
+        simple_digital_pdf_file: Path,
     ) -> None:
         thumb = tesseract_parser.get_thumbnail(
-            tesseract_samples_dir / "simple-digital.pdf",
+            simple_digital_pdf_file,
             "application/pdf",
         )
         assert thumb.is_file()
@@ -284,7 +284,7 @@ class TestGetThumbnail:
         self,
         mocker: MockerFixture,
         tesseract_parser: RasterisedDocumentParser,
-        tesseract_samples_dir: Path,
+        simple_digital_pdf_file: Path,
     ) -> None:
         def _raise_on_pdf(input_file, output_file, **kwargs) -> None:
             if ".pdf" in str(input_file):
@@ -294,7 +294,7 @@ class TestGetThumbnail:
         mocker.patch("documents.parsers.run_convert", side_effect=_raise_on_pdf)
 
         thumb = tesseract_parser.get_thumbnail(
-            tesseract_samples_dir / "simple-digital.pdf",
+            simple_digital_pdf_file,
             "application/pdf",
         )
         assert thumb.is_file()
@@ -320,11 +320,11 @@ class TestExtractText:
     def test_extract_text_from_digital_pdf(
         self,
         tesseract_parser: RasterisedDocumentParser,
-        tesseract_samples_dir: Path,
+        simple_digital_pdf_file: Path,
     ) -> None:
         text = tesseract_parser.extract_text(
             None,
-            tesseract_samples_dir / "simple-digital.pdf",
+            simple_digital_pdf_file,
         )
         assert text is not None
         assert "This is a test document." in text.strip()
@@ -339,7 +339,7 @@ class TestParsePdf:
     def test_simple_digital_creates_archive(
         self,
         tesseract_parser: RasterisedDocumentParser,
-        tesseract_samples_dir: Path,
+        multi_page_digital_pdf_file: Path,
     ) -> None:
         """
         GIVEN:
@@ -353,7 +353,7 @@ class TestParsePdf:
             - Text is extracted
         """
         tesseract_parser.parse(
-            tesseract_samples_dir / "multi-page-digital.pdf",
+            multi_page_digital_pdf_file,
             "application/pdf",
         )
         assert tesseract_parser.archive_path is not None
@@ -368,10 +368,10 @@ class TestParsePdf:
     def test_with_form_default(
         self,
         tesseract_parser: RasterisedDocumentParser,
-        tesseract_samples_dir: Path,
+        with_form_pdf_file: Path,
     ) -> None:
         tesseract_parser.parse(
-            tesseract_samples_dir / "with-form.pdf",
+            with_form_pdf_file,
             "application/pdf",
         )
         assert tesseract_parser.archive_path is not None
@@ -384,11 +384,11 @@ class TestParsePdf:
     def test_with_form_redo_no_archive_when_not_requested(
         self,
         tesseract_parser: RasterisedDocumentParser,
-        tesseract_samples_dir: Path,
+        with_form_pdf_file: Path,
     ) -> None:
         tesseract_parser.settings.mode = ModeChoices.REDO
         tesseract_parser.parse(
-            tesseract_samples_dir / "with-form.pdf",
+            with_form_pdf_file,
             "application/pdf",
             produce_archive=False,
         )
@@ -401,11 +401,11 @@ class TestParsePdf:
     def test_with_form_force(
         self,
         tesseract_parser: RasterisedDocumentParser,
-        tesseract_samples_dir: Path,
+        with_form_pdf_file: Path,
     ) -> None:
         tesseract_parser.settings.mode = ModeChoices.FORCE
         tesseract_parser.parse(
-            tesseract_samples_dir / "with-form.pdf",
+            with_form_pdf_file,
             "application/pdf",
         )
         assert_ordered_substrings(
@@ -446,7 +446,7 @@ class TestParsePdf:
         self,
         mocker: MockerFixture,
         tesseract_parser: RasterisedDocumentParser,
-        tesseract_samples_dir: Path,
+        simple_digital_pdf_file: Path,
     ) -> None:
         mocker.patch(
             "ocrmypdf.ocr",
@@ -454,7 +454,7 @@ class TestParsePdf:
         )
         with pytest.raises(ParseError):
             tesseract_parser.parse(
-                tesseract_samples_dir / "simple-digital.pdf",
+                simple_digital_pdf_file,
                 "application/pdf",
             )
 
@@ -530,10 +530,10 @@ class TestParseMultiPage:
     def test_multi_page_digital(
         self,
         tesseract_parser: RasterisedDocumentParser,
-        tesseract_samples_dir: Path,
+        multi_page_digital_pdf_file: Path,
     ) -> None:
         tesseract_parser.parse(
-            tesseract_samples_dir / "multi-page-digital.pdf",
+            multi_page_digital_pdf_file,
             "application/pdf",
         )
         assert tesseract_parser.archive_path is not None
@@ -557,12 +557,12 @@ class TestParseMultiPage:
         self,
         mode: str,
         tesseract_parser: RasterisedDocumentParser,
-        tesseract_samples_dir: Path,
+        multi_page_digital_pdf_file: Path,
     ) -> None:
         tesseract_parser.settings.pages = 2
         tesseract_parser.settings.mode = mode
         tesseract_parser.parse(
-            tesseract_samples_dir / "multi-page-digital.pdf",
+            multi_page_digital_pdf_file,
             "application/pdf",
         )
         assert tesseract_parser.archive_path is not None
@@ -576,11 +576,11 @@ class TestParseMultiPage:
     def test_multi_page_images_skip(
         self,
         tesseract_parser: RasterisedDocumentParser,
-        tesseract_samples_dir: Path,
+        multi_page_images_pdf_file: Path,
     ) -> None:
         tesseract_parser.settings.mode = ModeChoices.AUTO
         tesseract_parser.parse(
-            tesseract_samples_dir / "multi-page-images.pdf",
+            multi_page_images_pdf_file,
             "application/pdf",
         )
         assert tesseract_parser.archive_path is not None
@@ -594,7 +594,7 @@ class TestParseMultiPage:
     def test_multi_page_images_redo_pages_2(
         self,
         tesseract_parser: RasterisedDocumentParser,
-        tesseract_samples_dir: Path,
+        multi_page_images_pdf_file: Path,
     ) -> None:
         """
         GIVEN:
@@ -609,7 +609,7 @@ class TestParseMultiPage:
         tesseract_parser.settings.pages = 2
         tesseract_parser.settings.mode = ModeChoices.REDO
         tesseract_parser.parse(
-            tesseract_samples_dir / "multi-page-images.pdf",
+            multi_page_images_pdf_file,
             "application/pdf",
         )
         assert tesseract_parser.archive_path is not None
@@ -622,7 +622,7 @@ class TestParseMultiPage:
     def test_multi_page_images_force_page_1(
         self,
         tesseract_parser: RasterisedDocumentParser,
-        tesseract_samples_dir: Path,
+        multi_page_images_pdf_file: Path,
     ) -> None:
         """
         GIVEN:
@@ -637,7 +637,7 @@ class TestParseMultiPage:
         tesseract_parser.settings.pages = 1
         tesseract_parser.settings.mode = ModeChoices.FORCE
         tesseract_parser.parse(
-            tesseract_samples_dir / "multi-page-images.pdf",
+            multi_page_images_pdf_file,
             "application/pdf",
         )
         assert tesseract_parser.archive_path is not None
@@ -733,7 +733,7 @@ class TestSkipArchive:
     def test_skip_noarchive_with_text_layer(
         self,
         tesseract_parser: RasterisedDocumentParser,
-        tesseract_samples_dir: Path,
+        multi_page_digital_pdf_file: Path,
     ) -> None:
         """
         GIVEN:
@@ -747,7 +747,7 @@ class TestSkipArchive:
         """
         tesseract_parser.settings.mode = ModeChoices.AUTO
         tesseract_parser.parse(
-            tesseract_samples_dir / "multi-page-digital.pdf",
+            multi_page_digital_pdf_file,
             "application/pdf",
             produce_archive=False,
         )
@@ -762,7 +762,7 @@ class TestSkipArchive:
     def test_skip_noarchive_image_only_creates_archive(
         self,
         tesseract_parser: RasterisedDocumentParser,
-        tesseract_samples_dir: Path,
+        multi_page_images_pdf_file: Path,
     ) -> None:
         """
         GIVEN:
@@ -775,7 +775,7 @@ class TestSkipArchive:
         """
         tesseract_parser.settings.mode = ModeChoices.AUTO
         tesseract_parser.parse(
-            tesseract_samples_dir / "multi-page-images.pdf",
+            multi_page_images_pdf_file,
             "application/pdf",
         )
         assert tesseract_parser.archive_path is not None
@@ -787,29 +787,29 @@ class TestSkipArchive:
         )
 
     @pytest.mark.parametrize(
-        ("produce_archive", "filename", "expect_archive"),
+        ("produce_archive", "sample_fixture", "expect_archive"),
         [
             pytest.param(
                 True,
-                "multi-page-digital.pdf",
+                "multi_page_digital_pdf_file",
                 True,
                 id="produce-archive-with-text",
             ),
             pytest.param(
                 True,
-                "multi-page-images.pdf",
+                "multi_page_images_pdf_file",
                 True,
                 id="produce-archive-no-text",
             ),
             pytest.param(
                 False,
-                "multi-page-digital.pdf",
+                "multi_page_digital_pdf_file",
                 False,
                 id="no-archive-with-text-layer",
             ),
             pytest.param(
                 False,
-                "multi-page-images.pdf",
+                "multi_page_images_pdf_file",
                 False,
                 id="no-archive-no-text-layer",
             ),
@@ -818,10 +818,10 @@ class TestSkipArchive:
     def test_produce_archive_flag(
         self,
         produce_archive: bool,  # noqa: FBT001
-        filename: str,
+        sample_fixture: str,
         expect_archive: bool,  # noqa: FBT001
         tesseract_parser: RasterisedDocumentParser,
-        tesseract_samples_dir: Path,
+        request: pytest.FixtureRequest,
     ) -> None:
         """
         GIVEN:
@@ -834,8 +834,9 @@ class TestSkipArchive:
             - Text is always extracted
         """
         tesseract_parser.settings.mode = ModeChoices.AUTO
+        sample = request.getfixturevalue(sample_fixture)
         tesseract_parser.parse(
-            tesseract_samples_dir / filename,
+            sample,
             "application/pdf",
             produce_archive=produce_archive,
         )
@@ -852,7 +853,7 @@ class TestSkipArchive:
         self,
         mocker: MockerFixture,
         tesseract_parser: RasterisedDocumentParser,
-        tesseract_samples_dir: Path,
+        simple_digital_pdf_file: Path,
     ) -> None:
         """
         GIVEN:
@@ -868,7 +869,7 @@ class TestSkipArchive:
         tesseract_parser.settings.mode = ModeChoices.AUTO
         mock_ocr = mocker.patch("ocrmypdf.ocr")
         tesseract_parser.parse(
-            tesseract_samples_dir / "simple-digital.pdf",
+            simple_digital_pdf_file,
             "application/pdf",
             produce_archive=False,
         )
@@ -907,7 +908,7 @@ class TestSkipArchive:
     def test_tagged_pdf_produces_pdfa_archive_without_ocr(
         self,
         tesseract_parser: RasterisedDocumentParser,
-        tesseract_samples_dir: Path,
+        simple_digital_pdf_file: Path,
     ) -> None:
         """
         GIVEN:
@@ -922,7 +923,7 @@ class TestSkipArchive:
         """
         tesseract_parser.settings.mode = ModeChoices.AUTO
         tesseract_parser.parse(
-            tesseract_samples_dir / "simple-digital.pdf",
+            simple_digital_pdf_file,
             "application/pdf",
             produce_archive=True,
         )

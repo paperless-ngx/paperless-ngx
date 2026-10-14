@@ -16,8 +16,6 @@ from paperless.parsers.utils import read_file_handle_unicode_errors
 if TYPE_CHECKING:
     from pytest_mock import MockerFixture
 
-SAMPLES = Path(__file__).parent / "samples" / "tesseract"
-
 
 class TestReadFileHandleUnicodeErrors:
     def test_plain_utf8(self, tmp_path: Path) -> None:
@@ -55,11 +53,11 @@ class TestReadFileHandleUnicodeErrors:
 
 
 class TestIsTaggedPdf:
-    def test_tagged_pdf_returns_true(self) -> None:
-        assert is_tagged_pdf(SAMPLES / "simple-digital.pdf") is True
+    def test_tagged_pdf_returns_true(self, simple_digital_pdf_file: Path) -> None:
+        assert is_tagged_pdf(simple_digital_pdf_file) is True
 
-    def test_untagged_pdf_returns_false(self) -> None:
-        assert is_tagged_pdf(SAMPLES / "multi-page-images.pdf") is False
+    def test_untagged_pdf_returns_false(self, multi_page_images_pdf_file: Path) -> None:
+        assert is_tagged_pdf(multi_page_images_pdf_file) is False
 
     def test_nonexistent_path_returns_false(self) -> None:
         assert is_tagged_pdf(Path("/nonexistent/file.pdf")) is False
