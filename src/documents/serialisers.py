@@ -83,7 +83,7 @@ from documents.permissions import get_groups_with_only_permission
 from documents.permissions import has_perms_owner_aware
 from documents.permissions import permitted_document_ids
 from documents.permissions import restrict_queryset_to_visible
-from documents.permissions import set_permissions_for_object
+from documents.permissions import set_permissions_for_objects
 from documents.regex import validate_regex_pattern
 from documents.templating.filepath import validate_filepath_template_and_render
 from documents.templating.utils import convert_format_str_to_template_format
@@ -255,7 +255,7 @@ class SetPermissionsMixin:
         return permissions_dict
 
     def _set_permissions(self, permissions, object) -> None:
-        set_permissions_for_object(permissions, object)
+        set_permissions_for_objects(permissions, type(object), [object.pk])
 
 
 class SerializerWithPerms(serializers.Serializer[dict[str, Any]]):

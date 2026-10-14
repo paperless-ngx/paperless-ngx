@@ -20,10 +20,7 @@ from django.db.models.functions import Coalesce
 from guardian.core import ObjectPermissionChecker
 from guardian.models import GroupObjectPermission
 from guardian.models import UserObjectPermission
-from guardian.shortcuts import assign_perm
 from guardian.shortcuts import get_objects_for_user
-from guardian.shortcuts import get_users_with_perms
-from guardian.shortcuts import remove_perm
 from rest_framework.permissions import BasePermission
 from rest_framework.permissions import DjangoObjectPermissions
 
@@ -104,87 +101,10 @@ def get_groups_with_only_permission(obj, codename):
     return Group.objects.filter(id__in=group_object_perm_group_ids).distinct()
 
 
-def set_permissions_for_object(
-    permissions: dict,
-    object,
-    *,
-    merge: bool = False,
-) -> None:
-    """
-    Set permissions for an object. The permissions are given as a mapping of actions
-    to a dict of user / group id lists, e.g.
-    {"view": {"users": [1], "groups": [2]}, "change": {"users": [], "groups": []}}.
-
-    If merge is True, the permissions are merged with the existing permissions and
-    no users or groups are removed. If False, the permissions are set to exactly
-    the given list of users and groups.
-    """
-
-    for action, entry in permissions.items():
-        permission = f"{action}_{object.__class__.__name__.lower()}"
-        if "users" in entry:
-            # users
-            users_to_add = User.objects.filter(id__in=entry["users"])
-            users_to_remove = (
-                get_users_with_perms(
-                    object,
-                    only_with_perms_in=[permission],
-                    with_group_users=False,
-                )
-                if not merge
-                else User.objects.none()
-            )
-            if users_to_add.exists() and users_to_remove.exists():
-                users_to_remove = users_to_remove.exclude(id__in=users_to_add)
-            if users_to_remove.exists():
-                for user in users_to_remove:
-                    remove_perm(permission, user, object)
-            if users_to_add.exists():
-                for user in users_to_add:
-                    assign_perm(permission, user, object)
-                    if action == "change":
-                        # change gives view too
-                        assign_perm(
-                            f"view_{object.__class__.__name__.lower()}",
-                            user,
-                            object,
-                        )
-        if "groups" in entry:
-            # groups
-            groups_to_add = Group.objects.filter(id__in=entry["groups"])
-            groups_to_remove = (
-                get_groups_with_only_permission(
-                    object,
-                    permission,
-                )
-                if not merge
-                else Group.objects.none()
-            )
-            if groups_to_add.exists() and groups_to_remove.exists():
-                groups_to_remove = groups_to_remove.exclude(id__in=groups_to_add)
-            if groups_to_remove.exists():
-                for group in groups_to_remove:
-                    remove_perm(permission, group, object)
-            if groups_to_add.exists():
-                for group in groups_to_add:
-                    assign_perm(permission, group, object)
-                    if action == "change":
-                        # change gives view too
-                        assign_perm(
-                            f"view_{object.__class__.__name__.lower()}",
-                            group,
-                            object,
-                        )
-
-
 def _resolve_permissions(codenames: set[str], ctype: ContentType) -> list[Permission]:
     """
-    Resolves `codenames` to Permission rows, raising like the single-object
-    assign_perm() this bulk path replaces does (via a `.get()` internally)
-    if any codename doesn't exist. SetPermissionsSerializer rejects unknown
-    action names at the API, but a caller passing one directly would
-    otherwise get a plain `.filter()` that silently builds zero rows and
-    no-ops instead of reporting the bad input.
+    Resolve ``codenames`` to Permission rows, raising for any that don't exist
+    so a bad action name fails loudly instead of granting nothing.
     """
     permission_objs = list(
         Permission.objects.filter(content_type=ctype, codename__in=codenames),
@@ -210,9 +130,6 @@ def _apply_bulk_permission_entry(
     object_pks: list[str],
     merge: bool,
 ) -> None:
-    # Only the ids are needed to build permission rows (via `<field>_id=`),
-    # so avoid fetching full User/Group rows for identities that may not
-    # even end up being granted anything new.
     add_ids = set(
         identity_model.objects.filter(id__in=ids).values_list("id", flat=True),
     )
@@ -250,12 +167,7 @@ def _apply_bulk_permission_entry(
         for pk in object_pks
         for identity_id in add_ids
     ]
-    # ignore_conflicts skips only rows that already exist as an exact
-    # (identity, permission, object) match -- the same de-dup the
-    # underlying (user|group, permission, object_pk) unique constraint
-    # already enforces for the single-object assign_perm() this replaces,
-    # so it doesn't change what counts as "already granted". batch_size
-    # caps how many rows go into a single INSERT statement.
+    # ignore_conflicts skips grants that already exist (unique constraint).
     perm_model.objects.bulk_create(rows, ignore_conflicts=True, batch_size=1000)
 
 
@@ -267,28 +179,14 @@ def set_permissions_for_objects(
     merge: bool = False,
 ) -> None:
     """
-    Bulk equivalent of set_permissions_for_object: applies the same
-    permission changes to every object identified by `pks` at once.
+    Set the view/change grants for every object in ``pks``. With ``merge``,
+    the given users and groups are added; without it, each given action's
+    direct grants are replaced. Granting change also grants view, and an
+    action entry with neither key is left untouched.
 
-    Takes a model + pks (rather than model instances) deliberately -- the
-    permission rows built below only ever need `pk`, `content_type`, and
-    identity ids, so callers shouldn't have to fetch full rows (with every
-    other field) just to hand them to this function.
-
-    Deliberately does not use guardian's queryset/list-aware assign_perm:
-    passing a list as the object routes to bulk_assign_perm, which skips
-    creating a direct permission row for anyone who already has the
-    permission via ANY group membership (it checks
-    ObjectPermissionChecker.has_perm, which is group-inheritance-aware) --
-    unlike the single-object assign_perm this replaces, which always
-    ensures a direct row via get_or_create regardless of group-derived
-    access. Losing that guarantee would mean a later revocation of the
-    group's grant silently strips access an admin explicitly asked to be
-    direct. Bulk-creating rows straight against the permission models
-    instead (see _apply_bulk_permission_entry) preserves the original
-    always-create-a-direct-row semantics while still batching every object
-    and every identity into one query per action, rather than one query per
-    (object, user) pair.
+    guardian's bulk assign_perm is avoided because it skips the direct row
+    for anyone who already has access through a group, so revoking the group
+    later would silently remove access that was granted explicitly.
     """
     object_pks = [str(pk) for pk in pks]
     if not object_pks:  # pragma: no cover
@@ -297,11 +195,8 @@ def set_permissions_for_objects(
     model_name = model.__name__.lower()
     ctype = ContentType.objects.get_for_model(model)
 
-    # Every action is resolved up front, before anything is written, so an
-    # unrecognized action name (see _resolve_permissions) aborts the whole
-    # call instead of leaving the actions ahead of it already applied.
-    # SetPermissionsSerializer rejects unknown actions at the API, so this
-    # guards any other caller.
+    # Resolve every action before writing, so a bad one can't leave the
+    # actions ahead of it applied.
     permissions_by_action: dict[str, list[Permission]] = {}
     for action, entry in permissions.items():
         if "users" not in entry and "groups" not in entry:

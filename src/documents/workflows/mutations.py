@@ -7,7 +7,7 @@ from documents.data_models import DocumentMetadataOverrides
 from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import WorkflowAction
-from documents.permissions import set_permissions_for_object
+from documents.permissions import set_permissions_for_objects
 from documents.templating.workflows import parse_w_workflow_placeholders
 
 logger = logging.getLogger("paperless.workflows.mutations")
@@ -83,9 +83,10 @@ def apply_assignment_to_document(
                 "groups": action.assign_change_groups.values_list("id", flat=True),
             },
         }
-        set_permissions_for_object(
-            permissions=permissions,
-            object=document,
+        set_permissions_for_objects(
+            permissions,
+            Document,
+            [document.pk],
             merge=True,
         )
 
@@ -247,9 +248,10 @@ def apply_removal_to_document(
             "view": {"users": [], "groups": []},
             "change": {"users": [], "groups": []},
         }
-        set_permissions_for_object(
-            permissions=permissions,
-            object=document,
+        set_permissions_for_objects(
+            permissions,
+            Document,
+            [document.pk],
             merge=False,
         )
 
