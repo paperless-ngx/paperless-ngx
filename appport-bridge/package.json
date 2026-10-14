@@ -1,0 +1,15 @@
+{
+  "name": "paperless-ngx-appport-bridge",
+  "private": true,
+  "description": "Opt-in AppPort bridge for Paperless-ngx: read-only document metadata over Paperless-ngx's own REST API, using the caller's own token.",
+  "type": "module",
+  "license": "GPL-3.0-only",
+  "engines": { "node": ">=22.13" },
+  "scripts": {
+    "start": "node bridge.mjs",
+    "test": "node --no-warnings --test --test-concurrency=1 test/*.test.mjs"
+  },
+  "dependencies": {
+    "@appport/sdk": "1.2.2"
+  }
+}
