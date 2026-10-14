@@ -245,8 +245,68 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         self.assertEqual(response.data["count"], 1)
         self.assertEqual(response.data["results"][0]["id"], title_match.id)
 
+    def test_simple_search_combined_with_query_filter(self) -> None:
+        """
+        GIVEN:
+            - A document with the term in its title, created this year
+            - A document with the term only in its content, created this year
+            - A document with the term in its title, created years ago
+        WHEN:
+            - A title or text search is combined with a relative created
+              date query, as the filter editor sends it
+        THEN:
+            - The simple search keeps its own field scope and the query only
+              narrows the results (issue #14436)
+        """
+        this_year = timezone.localdate().replace(month=1, day=1)
+        title_match = Document.objects.create(
+            title="foo report",
+            content="nothing relevant",
+            checksum="F1",
+            created=this_year,
+            pk=21,
+        )
+        content_match = Document.objects.create(
+            title="something else",
+            content="foo appears here",
+            checksum="F2",
+            created=this_year,
+            pk=22,
+        )
+        old_title_match = Document.objects.create(
+            title="foo archive",
+            content="nothing relevant",
+            checksum="F3",
+            created=datetime.date(2001, 1, 1),
+            pk=23,
+        )
+        backend = get_backend()
+        for doc in (title_match, content_match, old_title_match):
+            backend.add_or_update(doc)
+
+        query = "created:[-1 year to now]"
+        response = self.client.get(
+            "/api/documents/",
+            {"title_search": "foo", "query": query},
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            [r["id"] for r in response.data["results"]],
+            [title_match.id],
+        )
+
+        response = self.client.get(
+            "/api/documents/",
+            {"text": "foo", "query": query},
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertCountEqual(
+            [r["id"] for r in response.data["results"]],
+            [title_match.id, content_match.id],
+        )
+
     def test_search_rejects_multiple_search_modes(self) -> None:
-        response = self.client.get("/api/documents/?text=bank&query=bank")
+        response = self.client.get("/api/documents/?text=bank&title_search=bank")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(
             response.data["detail"],

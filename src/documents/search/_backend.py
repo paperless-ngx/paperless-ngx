@@ -926,6 +926,7 @@ class TantivyBackend:
         sort_field: str | None = None,
         sort_reverse: bool = False,
         search_mode: SearchMode = SearchMode.QUERY,
+        filter_query: str | None = None,
         limit: int | None = None,
     ) -> list[int]:
         """
@@ -941,6 +942,7 @@ class TantivyBackend:
             sort_field: Field to sort by (None for relevance ranking)
             sort_reverse: Whether to reverse the sort order
             search_mode: Query parsing mode (QUERY, TEXT, or TITLE)
+            filter_query: Optional advanced query results must also match
             limit: Maximum number of IDs to return (None = all matching docs)
 
         Returns:
@@ -948,6 +950,13 @@ class TantivyBackend:
         """
         self._ensure_open()
         user_query = self._parse_query(query, search_mode)
+        if filter_query is not None:
+            user_query = user_query.and_must_match(
+                tantivy.Query.const_score_query(
+                    self._parse_query(filter_query, SearchMode.QUERY),
+                    0.0,  # zero so doesn't affect relevance
+                ),
+            )
         final_query = self._apply_permission_filter(user_query, user)
 
         searcher = self._index.searcher()

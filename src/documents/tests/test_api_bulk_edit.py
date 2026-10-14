@@ -835,6 +835,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         for filters in (
             {"text": "new doc 2017-03-16"},
             {"title_search": "apple"},
+            {"title_search": "apple", "query": "created:[-1 year to now]"},
         ):
             with self.subTest(filters=filters):
                 get_backend.return_value.search_ids.return_value = [self.doc2.id]
@@ -886,7 +887,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
                     "all": True,
                     "filters": {
                         "text": "B",
-                        "query": "c1",
+                        "title_search": "c1",
                     },
                     "method": "set_storage_path",
                     "parameters": {"storage_path": self.sp1.id},
