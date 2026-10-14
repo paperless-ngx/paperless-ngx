@@ -1188,12 +1188,6 @@ def chunked(iterable, size):
         yield chunk
 
 
-_EMPTY_VIEWER_GRANT: Final[ViewerGrant] = ViewerGrant(
-    viewer_ids=[],
-    viewer_group_ids=[],
-)
-
-
 class _DocumentViewerStream(QuerySetStream["Document"]):
     """Yield document permission data while batch-loading grants.
 
@@ -1219,7 +1213,7 @@ class _DocumentViewerStream(QuerySetStream["Document"]):
         for chunk in chunked(documents, self._chunk_size):
             grants_by_pk = _bulk_get_viewer_permissions([doc.pk for doc in chunk])
             for doc in chunk:
-                yield doc, grants_by_pk.get(doc.pk, _EMPTY_VIEWER_GRANT)
+                yield doc, grants_by_pk[doc.pk]
 
 
 def _bulk_get_viewer_permissions(
