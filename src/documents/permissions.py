@@ -107,20 +107,6 @@ def has_system_status_permission(user: User | None) -> bool:
     )
 
 
-def get_groups_with_only_permission(obj, codename):
-    ctype = ContentType.objects.get_for_model(obj)
-    permission = Permission.objects.get(content_type=ctype, codename=codename)
-    group_object_perm_group_ids = (
-        GroupObjectPermission.objects.filter(
-            object_pk=obj.pk,
-            content_type=ctype,
-        )
-        .filter(permission=permission)
-        .values_list("group_id")
-    )
-    return Group.objects.filter(id__in=group_object_perm_group_ids).distinct()
-
-
 def _resolve_permissions(codenames: set[str], ctype: ContentType) -> list[Permission]:
     """
     Resolve ``codenames`` to Permission rows, raising for any that don't exist
