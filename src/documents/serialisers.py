@@ -78,12 +78,16 @@ from documents.models import WorkflowActionEmail
 from documents.models import WorkflowActionWebhook
 from documents.models import WorkflowTrigger
 from documents.parsers import is_mime_type_supported
+from documents.permissions import PERMISSION_ACTIONS
+from documents.permissions import PermissionAction
+from documents.permissions import PermissionGrantees
+from documents.permissions import PermissionsSpec
 from documents.permissions import get_document_count_filter_for_user
 from documents.permissions import get_groups_with_only_permission
 from documents.permissions import has_perms_owner_aware
 from documents.permissions import permitted_document_ids
 from documents.permissions import restrict_queryset_to_visible
-from documents.permissions import set_permissions_for_object
+from documents.permissions import set_permissions_for_objects
 from documents.regex import validate_regex_pattern
 from documents.templating.filepath import validate_filepath_template_and_render
 from documents.templating.utils import convert_format_str_to_template_format
@@ -211,9 +215,6 @@ class MatchingModelSerializer(serializers.ModelSerializer[Any]):
         return match
 
 
-PERMISSION_ACTIONS = ("view", "change")
-
-
 class SetPermissionsMixin:
     def _validate_user_ids(self, user_ids):
         users = User.objects.none()
@@ -235,8 +236,10 @@ class SetPermissionsMixin:
                 )
         return groups
 
-    def validate_set_permissions(self, set_permissions=None):
-        permissions_dict = {action: {} for action in PERMISSION_ACTIONS}
+    def validate_set_permissions(self, set_permissions=None) -> PermissionsSpec:
+        permissions_dict: dict[PermissionAction, PermissionGrantees] = {
+            action: {} for action in PERMISSION_ACTIONS
+        }
         if set_permissions is not None:
             for action in PERMISSION_ACTIONS:
                 if action in set_permissions:
@@ -244,18 +247,18 @@ class SetPermissionsMixin:
                         users = set_permissions[action]["users"]
                         permissions_dict[action]["users"] = self._validate_user_ids(
                             users,
-                        )
+                        ).values_list("id", flat=True)
                     if "groups" in set_permissions[action]:
                         groups = set_permissions[action]["groups"]
                         permissions_dict[action]["groups"] = self._validate_group_ids(
                             groups,
-                        )
+                        ).values_list("id", flat=True)
                 else:
                     del permissions_dict[action]
         return permissions_dict
 
-    def _set_permissions(self, permissions, object) -> None:
-        set_permissions_for_object(permissions, object)
+    def _set_permissions(self, permissions: PermissionsSpec, object) -> None:
+        set_permissions_for_objects(permissions, type(object), [object.pk])
 
 
 class SerializerWithPerms(serializers.Serializer[dict[str, Any]]):
@@ -3086,7 +3089,7 @@ class BulkEditObjectsSerializer(SerializerWithPerms, SetPermissionsMixin):
             )
         return objects
 
-    def _validate_permissions(self, permissions) -> dict:
+    def _validate_permissions(self, permissions) -> PermissionsSpec:
         return self.validate_set_permissions(
             permissions,
         )

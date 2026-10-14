@@ -34,6 +34,7 @@ from documents.models import DocumentType
 from documents.models import PaperlessTask
 from documents.models import StoragePath
 from documents.models import Tag
+from documents.permissions import PermissionsSpec
 from documents.permissions import set_permissions_for_objects
 from documents.plugins.helpers import DocumentsStatusManager
 from documents.tasks import bulk_update_documents
@@ -445,7 +446,7 @@ def reprocess(doc_ids: list[int], *, remote_ocr: bool = False) -> Literal["OK"]:
 
 def set_permissions(
     doc_ids: list[int],
-    set_permissions: dict,
+    set_permissions: PermissionsSpec,
     *,
     owner: User | None = None,
     merge: bool = False,
