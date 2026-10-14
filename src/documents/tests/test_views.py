@@ -292,6 +292,33 @@ class TestViews(DirectoriesMixin, TestCase):
             else:
                 assert False, f"Unexpected tag found: {tag['name']}"
 
+    def test_retrieve_with_full_permissions(self) -> None:
+        """
+        GIVEN:
+            - A tag with view granted to two groups and change granted to only
+              one of them
+        WHEN:
+            - The single tag is requested with full permissions
+        THEN:
+            - Each action lists only the groups granted that action
+        """
+        view_only = Group.objects.create(name="view_only")
+        view_and_change = Group.objects.create(name="view_and_change")
+        tag = Tag.objects.create(name="invoice")
+        grant_object(view_only, tag, "view_tag")
+        grant_object(view_and_change, tag, "view_tag", "change_tag")
+        grant_global(self.user, "view_tag")
+
+        self.client.force_login(self.user)
+        response = self.client.get(f"/api/tags/{tag.pk}/?full_perms=true")
+
+        assert response.status_code == 200
+        permissions = response.json()["permissions"]
+        assert sorted(permissions["view"]["groups"]) == sorted(
+            [view_only.pk, view_and_change.pk],
+        )
+        assert permissions["change"]["groups"] == [view_and_change.pk]
+
     def test_list_no_n_plus_1_queries(self) -> None:
         """
         GIVEN:
