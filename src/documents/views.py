@@ -5,7 +5,6 @@ import platform
 import re
 import tempfile
 import zipfile
-from collections import defaultdict
 from collections import deque
 from collections.abc import Callable
 from datetime import datetime
@@ -17,7 +16,6 @@ from time import sleep
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import Final
-from typing import Literal
 from typing import NamedTuple
 from unicodedata import normalize
 from urllib.parse import quote
@@ -29,7 +27,6 @@ import pathvalidate
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
-from django.contrib.contenttypes.models import ContentType
 from django.core.cache import cache
 from django.db import connections
 from django.db.migrations.loader import MigrationLoader
@@ -77,8 +74,6 @@ from drf_spectacular.utils import extend_schema
 from drf_spectacular.utils import extend_schema_serializer
 from drf_spectacular.utils import extend_schema_view
 from drf_spectacular.utils import inline_serializer
-from guardian.utils import get_group_obj_perms_model
-from guardian.utils import get_user_obj_perms_model
 from langdetect import detect
 from packaging import version as packaging_version
 from redis import Redis
@@ -176,6 +171,7 @@ from documents.permissions import annotate_document_count_by_ids
 from documents.permissions import annotate_document_count_for_related_queryset
 from documents.permissions import get_document_count_filter_for_user
 from documents.permissions import get_objects_for_user_owner_aware
+from documents.permissions import get_permission_grantees
 from documents.permissions import has_global_statistics_permission
 from documents.permissions import has_perms_owner_aware
 from documents.permissions import has_system_status_permission
@@ -455,42 +451,6 @@ class BulkPermissionMixin:
     Prefetch Django-Guardian permissions for a list before serialization, to avoid N+1 queries.
     """
 
-    def _get_object_perms(
-        self,
-        objects: list,
-        perm_codenames: list[str],
-        actor: Literal["users", "groups"],
-    ) -> dict[int, dict[str, list[int]]]:
-        """
-        Collect object-level permissions for either users or groups.
-        """
-        model = self.queryset.model
-        obj_perm_model = (
-            get_user_obj_perms_model(model)
-            if actor == "users"
-            else get_group_obj_perms_model(model)
-        )
-        id_field = "user_id" if actor == "users" else "group_id"
-        ctype = ContentType.objects.get_for_model(model)
-        object_pks = [obj.pk for obj in objects]
-
-        perms_qs = obj_perm_model.objects.filter(
-            content_type=ctype,
-            object_pk__in=object_pks,
-            permission__codename__in=perm_codenames,
-        ).values_list("object_pk", id_field, "permission__codename")
-
-        perms: dict[int, dict[str, list[int]]] = defaultdict(lambda: defaultdict(list))
-        for object_pk, actor_id, codename in perms_qs:
-            perms[int(object_pk)][codename].append(actor_id)
-
-        # Ensure that all objects have all codenames, even if empty
-        for pk in object_pks:
-            for codename in perm_codenames:
-                perms[pk][codename]
-
-        return perms
-
     def get_serializer_context(self):
         """
         Get all permissions of the current list of objects at once and pass them to the serializer.
@@ -501,7 +461,7 @@ class BulkPermissionMixin:
         if getattr(self, "action", None) != "list":
             # Batching only pays off across a page of objects; for single-object
             # actions (retrieve, update, ...) the per-object fallback in
-            # get_user_can_change()/_get_perms() is cheap and avoids scanning
+            # get_user_can_change()/get_permissions() is cheap and avoids scanning
             # the whole queryset here.
             return context
 
@@ -514,33 +474,10 @@ class BulkPermissionMixin:
         else:
             queryset = self.filter_queryset(self.get_queryset())
 
-        model_name = self.queryset.model.__name__.lower()
-        permission_name_view = f"view_{model_name}"
-        permission_name_change = f"change_{model_name}"
-
-        user_perms = self._get_object_perms(
-            objects=queryset,
-            perm_codenames=[permission_name_view, permission_name_change],
-            actor="users",
+        context["permission_grantees"] = get_permission_grantees(
+            self.queryset.model,
+            [obj.pk for obj in queryset],
         )
-        group_perms = self._get_object_perms(
-            objects=queryset,
-            perm_codenames=[permission_name_view, permission_name_change],
-            actor="groups",
-        )
-
-        context["users_view_perms"] = {
-            pk: user_perms[pk][permission_name_view] for pk in user_perms
-        }
-        context["users_change_perms"] = {
-            pk: user_perms[pk][permission_name_change] for pk in user_perms
-        }
-        context["groups_view_perms"] = {
-            pk: group_perms[pk][permission_name_view] for pk in group_perms
-        }
-        context["groups_change_perms"] = {
-            pk: group_perms[pk][permission_name_change] for pk in group_perms
-        }
 
         return context
 
