@@ -1,8 +1,12 @@
+from collections.abc import Iterable
 from collections.abc import Mapping
 from collections.abc import Sequence
 from typing import Any
 from typing import ClassVar
+from typing import Final
 from typing import Literal
+from typing import TypeAlias
+from typing import TypedDict
 from typing import TypeGuard
 from typing import TypeVar
 from typing import cast
@@ -31,6 +35,22 @@ from rest_framework.permissions import DjangoObjectPermissions
 
 from documents.models import Document
 from documents.versioning import get_root_document
+
+PermissionAction = Literal["view", "change"]
+PERMISSION_ACTIONS: Final[tuple[PermissionAction, ...]] = ("view", "change")
+
+
+class PermissionGrantees(TypedDict, total=False):
+    """
+    The user and group ids to grant one permission action to. A missing key
+    leaves that kind of grant untouched.
+    """
+
+    users: Iterable[int]
+    groups: Iterable[int]
+
+
+PermissionsSpec: TypeAlias = Mapping[PermissionAction, PermissionGrantees]
 
 
 class PaperlessObjectPermissions(DjangoObjectPermissions):
@@ -123,7 +143,7 @@ def _apply_bulk_permission_entry(
     perm_model: type[UserObjectPermission] | type[GroupObjectPermission],
     identity_model: type[User] | type[Group],
     identity_field: str,
-    ids: list[int],
+    ids: Iterable[int],
     codename: str,
     permission_objs: list[Permission],
     ctype: ContentType,
@@ -172,7 +192,7 @@ def _apply_bulk_permission_entry(
 
 
 def set_permissions_for_objects(
-    permissions: dict,
+    permissions: PermissionsSpec,
     model: type[Model],
     pks: QuerySet | list,
     *,
@@ -197,7 +217,7 @@ def set_permissions_for_objects(
 
     # Resolve every action before writing, so a bad one can't leave the
     # actions ahead of it applied.
-    permissions_by_action: dict[str, list[Permission]] = {}
+    permissions_by_action: dict[PermissionAction, list[Permission]] = {}
     for action, entry in permissions.items():
         if "users" not in entry and "groups" not in entry:
             continue

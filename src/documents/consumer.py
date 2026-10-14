@@ -38,6 +38,7 @@ from documents.models import StoragePath
 from documents.models import Tag
 from documents.models import WorkflowTrigger
 from documents.parsers import ParseError
+from documents.permissions import PermissionsSpec
 from documents.permissions import set_permissions_for_objects
 from documents.plugins.base import AlwaysRunPluginMixin
 from documents.plugins.base import ConsumeTaskPlugin
@@ -948,7 +949,7 @@ class ConsumerPlugin(
             or self.metadata.change_users is not None
             or self.metadata.change_groups is not None
         ):
-            permissions = {
+            permissions: PermissionsSpec = {
                 "view": {
                     "users": self.metadata.view_users or [],
                     "groups": self.metadata.view_groups or [],
