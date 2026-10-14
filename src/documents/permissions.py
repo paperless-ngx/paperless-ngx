@@ -21,7 +21,6 @@ from guardian.core import ObjectPermissionChecker
 from guardian.models import GroupObjectPermission
 from guardian.models import UserObjectPermission
 from guardian.shortcuts import assign_perm
-from guardian.shortcuts import get_objects_for_user
 from guardian.shortcuts import get_users_with_perms
 from guardian.shortcuts import remove_perm
 from rest_framework.permissions import BasePermission
@@ -647,41 +646,6 @@ def annotate_document_count_for_related_queryset(
         document_ids=permitted_document_ids(user),
         target_field=target_field,
     )
-
-
-def get_objects_for_user_owner_aware(
-    user: User | None,
-    perms: str | list[str],
-    Model: Any,
-    *,
-    include_deleted: bool = False,
-) -> QuerySet[Any]:
-    """
-    Returns objects the user owns, are unowned, or has explicit perms.
-    When include_deleted is True, soft-deleted items are also included.
-
-    Legacy slow path (guardian-backed, O(n) style permission resolution).
-    Most queryset-filtering call sites have migrated onto
-    ``PermittedObjectsFilter``/``permitted_object_ids()``, but this function
-    is kept because production callers still remain. Several callers remain
-    across ``documents/``, ``paperless_mail/``, and ``paperless_ai/`` --
-    grep for this function name before removing it.
-    """
-    manager = (
-        Model.global_objects
-        if include_deleted and hasattr(Model, "global_objects")
-        else Model.objects
-    )
-
-    objects_owned = manager.filter(owner=user)
-    objects_unowned = manager.filter(owner__isnull=True)
-    objects_with_perms = get_objects_for_user(
-        user=user,
-        perms=perms,
-        klass=manager.all(),
-        accept_global_perms=False,
-    )
-    return objects_owned | objects_unowned | objects_with_perms
 
 
 def has_perms_owner_aware(user, perms, obj):
