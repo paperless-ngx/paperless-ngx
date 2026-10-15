@@ -194,7 +194,13 @@ def test_run_llm_query_openai_uses_tools(mock_ai_config, mock_openai_llm):
     offered_tool_name = kwargs["tools"][0].metadata.name
     assert offered_tool_name == "DocumentClassifierSchema"
     tool_schema = kwargs["tools"][0].metadata.fn_schema.model_json_schema()
-    assert {"title", "tags", "correspondents", "document_types", "storage_paths"} <= set(
+    assert {
+        "title",
+        "tags",
+        "correspondents",
+        "document_types",
+        "storage_paths",
+    } <= set(
         tool_schema["required"],
     )
     assert kwargs["user_msg"].content == (
