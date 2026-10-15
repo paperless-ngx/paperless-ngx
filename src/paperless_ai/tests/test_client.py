@@ -192,6 +192,10 @@ def test_run_llm_query_openai_uses_tools(mock_ai_config, mock_openai_llm):
     mock_llm_instance.chat_with_tools.assert_called_once()
     kwargs = mock_llm_instance.chat_with_tools.call_args.kwargs
     offered_tool_name = kwargs["tools"][0].metadata.name
+    tool_schema = kwargs["tools"][0].metadata.fn_schema.model_json_schema()
+    assert {"title", "tags", "correspondents", "document_types", "storage_paths"} <= set(
+        tool_schema["required"],
+    )
     assert kwargs["user_msg"].content == (
         "test_prompt\n\n"
         f"Answer by calling the {offered_tool_name} tool. "
