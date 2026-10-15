@@ -190,7 +190,6 @@ class DocumentClassifierSchema(BaseModel):
         return _truncate_to_field_limit(value, cls.model_fields[info.field_name])
 
 
-
 class DocumentClassifierToolSchema(DocumentClassifierSchema):
     """Tool-call schema requiring explicit classification fields from the LLM.
 
