@@ -21,6 +21,7 @@ from paperless.network import create_pinned_httpx_client
 from paperless.network import validate_outbound_http_url
 from paperless_ai.base_model import ClassificationSuggestions
 from paperless_ai.base_model import DocumentClassifierSchema
+from paperless_ai.base_model import DocumentClassifierToolSchema
 from paperless_ai.base_model import model_to_classification_suggestions
 from paperless_ai.exceptions import LLMProviderError
 from paperless_ai.exceptions import LLMTimeoutError
@@ -149,7 +150,7 @@ class AIClient:
 
         from llama_index.core.program.function_program import get_function_tool
 
-        tool = get_function_tool(DocumentClassifierSchema)
+        tool = get_function_tool(DocumentClassifierToolSchema)
         user_msg = ChatMessage(
             role="user",
             content=f"{prompt}\n\n"
