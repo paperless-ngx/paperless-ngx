@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging
-import math
 import mimetypes
 import shutil
 import subprocess
@@ -89,7 +88,7 @@ def rasterize_pdf_page_to_png(
     in_path: Path,
     out_path: Path,
     *,
-    dpi: int,
+    dpi: float,
     logging_group=None,
 ) -> None:
     """
@@ -156,10 +155,15 @@ def encode_thumbnail_webp(
         raise ParseError(f"Unable to encode thumbnail from {png_path}") from e
 
 
-def _compute_thumbnail_dpi(in_path: Path, logging_group=None) -> tuple[int, int]:
+def _compute_thumbnail_dpi(in_path: Path, logging_group=None) -> tuple[float, int]:
     """
     Returns (dpi, supersample). Unknown geometry is not supersampled, since
     the render size cannot be bounded.
+
+    The DPI is left fractional rather than floored at 1, so an oversized page
+    still renders at about the thumbnail size instead of an unbounded raster.
+    pdftoppm rounds pixel dimensions up, so the render is never short of the
+    target; the shrink-only clamp in encode_thumbnail_webp trims any excess.
     """
     from paperless.parsers.utils import get_pdf_first_page_size_points
 
@@ -174,14 +178,10 @@ def _compute_thumbnail_dpi(in_path: Path, logging_group=None) -> tuple[int, int]
     width_pts, height_pts = size
     dpi_for_width = _THUMBNAIL_MAX_WIDTH * 72 / width_pts
     dpi_for_height = _THUMBNAIL_MAX_HEIGHT * 72 / height_pts
-    # Round up so the downsampled render is never a few pixels short of the
-    # target; the shrink-only clamp in encode_thumbnail_webp trims the excess.
-    dpi = max(
-        1,
-        math.ceil(min(_THUMBNAIL_MAX_DPI, dpi_for_width, dpi_for_height)),
+    return (
+        min(_THUMBNAIL_MAX_DPI, dpi_for_width, dpi_for_height),
+        _THUMBNAIL_SUPERSAMPLE,
     )
-    # At the 1 DPI floor the page is already oversized, so do not supersample
-    return dpi, 1 if dpi == 1 else _THUMBNAIL_SUPERSAMPLE
 
 
 def _render_pdf_thumbnail(
