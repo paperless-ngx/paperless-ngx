@@ -130,12 +130,14 @@ class DocumentMetadataOverrides:
             get_users_with_perms(
                 doc,
                 only_with_perms_in=["view_document"],
+                with_group_users=False,
             ).values_list("id", flat=True),
         )
         overrides.change_users = list(
             get_users_with_perms(
                 doc,
                 only_with_perms_in=["change_document"],
+                with_group_users=False,
             ).values_list("id", flat=True),
         )
         overrides.custom_fields = {
