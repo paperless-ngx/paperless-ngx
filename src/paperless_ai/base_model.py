@@ -3,6 +3,7 @@ from typing import Final
 from typing import TypedDict
 
 from pydantic import BaseModel
+from pydantic import ConfigDict
 from pydantic import Field
 from pydantic import ValidationInfo
 from pydantic import field_validator
@@ -196,6 +197,9 @@ class DocumentClassifierToolSchema(DocumentClassifierSchema):
     The response parser still uses DocumentClassifierSchema so providers that
     omit optional fields remain backwards compatible.
     """
+
+    # get_function_tool uses the JSON schema title as the exposed tool name.
+    model_config = ConfigDict(title="DocumentClassifierSchema")
 
     tags: list[str] = Field(
         max_length=MAX_NEW_NAMES,
