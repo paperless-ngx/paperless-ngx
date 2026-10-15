@@ -1,11 +1,9 @@
 name: AI classifier schema verification
-
 on:
   push:
     branches:
       - fix/ai-required-classification-fields
   workflow_dispatch:
-
 jobs:
   schema-check:
     runs-on: ubuntu-latest
