@@ -394,7 +394,13 @@ def test_internal_suggestions_convert_to_names_only_model():
 def test_tool_schema_requires_classification_categories():
     """The tool declaration must ask for metadata even when lists are empty."""
     schema = DocumentClassifierToolSchema.model_json_schema()
-    assert {"title", "tags", "correspondents", "document_types", "storage_paths"} <= set(
+    assert {
+        "title",
+        "tags",
+        "correspondents",
+        "document_types",
+        "storage_paths",
+    } <= set(
         schema["required"],
     )
     assert "tags" not in DocumentClassifierSchema.model_json_schema()["required"]
