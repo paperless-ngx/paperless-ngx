@@ -142,15 +142,23 @@ class TestComputeThumbnailDpi:
     @pytest.mark.parametrize(
         ("size", "expected"),
         [
-            pytest.param((612.0, 792.0), (59, 2), id="letter-width-bound"),
-            pytest.param((792.0, 612.0), (46, 2), id="landscape-rounded-up"),
-            pytest.param((612.0, 100000.0), (4, 2), id="tall-strip-height-bound"),
+            pytest.param((612.0, 792.0), (500 * 72 / 612, 2), id="letter-width-bound"),
+            pytest.param(
+                (792.0, 612.0),
+                (500 * 72 / 792, 2),
+                id="landscape-width-bound",
+            ),
+            pytest.param(
+                (612.0, 100000.0),
+                (5000 * 72 / 100000, 2),
+                id="tall-strip-height-bound",
+            ),
             pytest.param((200.0, 300.0), (180, 2), id="small-page-width-bound"),
             pytest.param((72.0, 72.0), (300, 2), id="tiny-page-capped-at-300"),
             pytest.param(
                 (1000000.0, 1000000.0),
-                (1, 1),
-                id="huge-page-minimum-one-unsupersampled",
+                (500 * 72 / 1000000, 2),
+                id="huge-page-fractional",
             ),
             pytest.param(None, (150, 1), id="unreadable-geometry-fallback"),
         ],
@@ -160,7 +168,7 @@ class TestComputeThumbnailDpi:
         mocker: MockerFixture,
         tmp_path: Path,
         size: tuple[float, float] | None,
-        expected: tuple[int, int],
+        expected: tuple[float, int],
     ) -> None:
         """
         GIVEN:
@@ -174,7 +182,7 @@ class TestComputeThumbnailDpi:
             "paperless.parsers.utils.get_pdf_first_page_size_points",
             return_value=size,
         )
-        assert _compute_thumbnail_dpi(tmp_path / "doc.pdf") == expected
+        assert _compute_thumbnail_dpi(tmp_path / "doc.pdf") == pytest.approx(expected)
 
 
 class TestMakeThumbnailFromPdf:
@@ -194,7 +202,12 @@ class TestMakeThumbnailFromPdf:
     @pytest.mark.parametrize(
         ("size", "expected_dpi", "expected_supersample"),
         [
-            pytest.param((612.0, 792.0), 118, 2, id="known-geometry-2x"),
+            pytest.param(
+                (612.0, 792.0),
+                2 * 500 * 72 / 612,
+                2,
+                id="known-geometry-2x",
+            ),
             pytest.param(None, 150, 1, id="unreadable-geometry-plain-fallback"),
         ],
     )
@@ -204,7 +217,7 @@ class TestMakeThumbnailFromPdf:
         tmp_path: Path,
         work_dir: Path,
         size: tuple[float, float] | None,
-        expected_dpi: int,
+        expected_dpi: float,
         expected_supersample: int,
     ) -> None:
         """
@@ -224,7 +237,7 @@ class TestMakeThumbnailFromPdf:
 
         make_thumbnail_from_pdf(tmp_path / "in.pdf", work_dir)
 
-        assert rasterize.call_args.kwargs["dpi"] == expected_dpi
+        assert rasterize.call_args.kwargs["dpi"] == pytest.approx(expected_dpi)
         assert encode.call_args.kwargs["supersample"] == expected_supersample
 
     @pytest.mark.parametrize(
