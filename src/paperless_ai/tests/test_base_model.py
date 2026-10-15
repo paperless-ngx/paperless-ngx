@@ -6,6 +6,7 @@ from paperless_ai.base_model import MAX_SINGLE_VALUE_NAMES
 from paperless_ai.base_model import MAX_TITLE_LENGTH
 from paperless_ai.base_model import ClassificationSuggestions
 from paperless_ai.base_model import DocumentClassifierSchema
+from paperless_ai.base_model import DocumentClassifierToolSchema
 from paperless_ai.base_model import TaxonomyChoiceDict
 from paperless_ai.base_model import classification_suggestions_to_model
 from paperless_ai.base_model import model_to_classification_suggestions
@@ -388,3 +389,24 @@ def test_internal_suggestions_convert_to_names_only_model():
         ),
         dates=["2026-08-30"],
     )
+
+
+def test_tool_schema_requires_classification_categories():
+    """The tool declaration must ask for metadata even when lists are empty."""
+    schema = DocumentClassifierToolSchema.model_json_schema()
+    assert {"title", "tags", "correspondents", "document_types", "storage_paths"} <= set(
+        schema["required"],
+    )
+    assert "tags" not in DocumentClassifierSchema.model_json_schema()["required"]
+    for name in ("tags", "correspondents", "document_types", "storage_paths"):
+        assert "default" not in schema["properties"][name]
+        assert schema["properties"][name]["type"] == "array"
+
+
+def test_response_schema_remains_tolerant_of_missing_metadata():
+    """Older backends can still omit metadata without breaking parsing."""
+    parsed = DocumentClassifierSchema(title="Electricity Contract")
+    assert parsed.tags == []
+    assert parsed.correspondents == []
+    assert parsed.document_types == []
+    assert parsed.storage_paths == []
