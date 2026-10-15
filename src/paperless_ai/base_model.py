@@ -189,6 +189,32 @@ class DocumentClassifierSchema(BaseModel):
         return _truncate_to_field_limit(value, cls.model_fields[info.field_name])
 
 
+
+class DocumentClassifierToolSchema(DocumentClassifierSchema):
+    """Tool-call schema requiring explicit classification fields from the LLM.
+
+    The response parser still uses DocumentClassifierSchema so providers that
+    omit optional fields remain backwards compatible.
+    """
+
+    tags: list[str] = Field(
+        max_length=MAX_NEW_NAMES,
+        description=DocumentClassifierSchema.model_fields["tags"].description,
+    )
+    correspondents: list[str] = Field(
+        max_length=MAX_SINGLE_VALUE_NAMES,
+        description=DocumentClassifierSchema.model_fields["correspondents"].description,
+    )
+    document_types: list[str] = Field(
+        max_length=MAX_SINGLE_VALUE_NAMES,
+        description=DocumentClassifierSchema.model_fields["document_types"].description,
+    )
+    storage_paths: list[str] = Field(
+        max_length=MAX_SINGLE_VALUE_NAMES,
+        description=DocumentClassifierSchema.model_fields["storage_paths"].description,
+    )
+
+
 class TaxonomyChoiceDict(TypedDict):
     """Internal representation of names and existing IDs for one taxonomy."""
 
