@@ -98,6 +98,11 @@
           <button ngbDropdownItem (click)="mergeSelectedAsVersions()" [disabled]="!userOwnsAll || !userCanEditAll || !userCanDelete || list.allSelected || list.selectedCount < 2">
             <pngx-bs-icon name="journal-bookmark-fill" class="me-2"></pngx-bs-icon><ng-container i18n>Merge as versions</ng-container>
           </button>
+          @if (manualWorkflows.length > 0) {
+            <button ngbDropdownItem (click)="runWorkflowSelected()" [disabled]="!canRunWorkflow">
+              <pngx-bs-icon name="play-circle" class="me-2"></pngx-bs-icon><ng-container i18n>Run workflow</ng-container>
+            </button>
+          }
         </div>
       </div>
     </div>

@@ -306,6 +306,28 @@ export class BulkEditorComponent
     this.unsubscribeNotifier.complete()
   }
 
+  get canRunWorkflow(): boolean {
+    return this.userCanEditAll && this.manualWorkflows.length > 0
+  }
+
+  runWorkflowSelected() {
+    const modal = this.modalService.open(RunWorkflowConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.title = $localize`Run workflow`
+    modal.componentInstance.message = $localize`Run a workflow on ${this.getSelectionSize()} selected document(s).`
+    modal.componentInstance.btnCaption = $localize`Run`
+    modal.componentInstance.workflows = this.manualWorkflows
+    modal.componentInstance.confirmClicked
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        this.executeBulkEditMethod(modal, 'run_workflow', {
+          workflow: modal.componentInstance.workflowId,
+          filter_documents: !modal.componentInstance.force,
+        })
+      })
+  }
+
   private executeBulkEditMethod(
     modal: NgbModalRef,
     method: DocumentBulkEditMethod,
