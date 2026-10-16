@@ -1873,7 +1873,10 @@ the literal path for that program.
 
 #### [`PAPERLESS_CONVERT_BINARY=<path>`](#PAPERLESS_CONVERT_BINARY) {#PAPERLESS_CONVERT_BINARY}
 
-: Defaults to "convert".
+!!! warning
+
+    Deprecated and has no effect, since Paperless-ngx no longer uses
+    ImageMagick. It will be removed in a future release.
 
 #### [`PAPERLESS_GS_BINARY=<path>`](#PAPERLESS_GS_BINARY) {#PAPERLESS_GS_BINARY}
 

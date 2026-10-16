@@ -25,9 +25,17 @@ class TestChecks:
     def test_binaries(self) -> None:
         assert binaries_check(None) == []
 
-    def test_binaries_fail(self, settings: Settings) -> None:
-        settings.CONVERT_BINARY = "uuuhh"
-        assert len(binaries_check(None)) == 1
+    def test_binaries_fail(self, mocker: MockerFixture) -> None:
+        """
+        GIVEN:
+            - Neither tesseract nor ghostscript can be found
+        WHEN:
+            - The binaries check runs
+        THEN:
+            - One warning is raised per missing binary
+        """
+        mocker.patch("paperless.checks.shutil.which", return_value=None)
+        assert len(binaries_check(None)) == 2
 
     @pytest.mark.usefixtures("paperless_dirs")
     def test_paths_check(self) -> None:
