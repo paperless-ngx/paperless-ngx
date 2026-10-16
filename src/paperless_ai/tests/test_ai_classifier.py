@@ -613,32 +613,83 @@ class TestGetTaxonomyContextVisibility:
 
     @pytest.mark.django_db
     @override_settings(LLM_EMBEDDING_BACKEND="huggingface")
-    def test_skips_permission_lookup_when_no_user(
+    def test_restricts_to_unowned_documents_when_no_user(
         self,
         mocker: pytest_mock.MockerFixture,
     ) -> None:
         """
         GIVEN:
-            - No user is supplied
+            - No user is supplied (a workflow acting for an unowned document)
+            - Another user's private document
         WHEN:
             - get_taxonomy_context() is called
         THEN:
-            - Permission lookup is skipped and no document_ids restriction is
-              passed to retrieve_similar_nodes()
+            - Only unowned documents are passed to retrieve_similar_nodes(),
+              never the whole library
         """
-        document = DocumentFactory.create(content="Some content")
+        other_owner = UserFactory.create()
+        document = DocumentFactory.create(content="Some content", owner=None)
+        unowned = DocumentFactory.create(content="Public", owner=None)
+        private = DocumentFactory.create(content="Private", owner=other_owner)
         mock_retrieve = mocker.patch(
             "paperless_ai.ai_classifier.retrieve_similar_nodes",
             return_value=[],
         )
-        mock_permitted = mocker.patch(
-            "paperless_ai.ai_classifier.permitted_document_ids",
-        )
 
         get_taxonomy_context(document, None)
 
-        mock_permitted.assert_not_called()
-        assert mock_retrieve.call_args.kwargs["document_ids"] is None
+        visible = mock_retrieve.call_args.kwargs["document_ids"]
+        assert visible is not None
+        assert document.pk in visible
+        assert unowned.pk in visible
+        assert private.pk not in visible
+
+    @pytest.mark.django_db
+    @override_settings(LLM_EMBEDDING_BACKEND="huggingface")
+    def test_private_document_content_never_reaches_context_when_no_user(
+        self,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - No user is supplied (a workflow acting for an unowned document)
+            - Retrieval returns another user's private document anyway (e.g.
+              a stale vector store)
+        WHEN:
+            - get_taxonomy_context() is called
+        THEN:
+            - The private document's title and content are not in the RAG
+              context, while an unowned neighbour's are
+        """
+        other_owner = UserFactory.create()
+        document = DocumentFactory.create(content="Some content", owner=None)
+        unowned = DocumentFactory.create(
+            title="Public neighbour",
+            content="public text",
+            owner=None,
+        )
+        private = DocumentFactory.create(
+            title="Secret neighbour",
+            content="secret text",
+            owner=other_owner,
+        )
+        mocker.patch(
+            "paperless_ai.ai_classifier.retrieve_similar_nodes",
+            return_value=[],
+        )
+        mocker.patch(
+            "paperless_ai.ai_classifier._node_document_weights",
+            return_value=[
+                SimilarDocument(document_id=private.pk, weight=0.9),
+                SimilarDocument(document_id=unowned.pk, weight=0.5),
+            ],
+        )
+
+        _candidates, context = get_taxonomy_context(document, None)
+
+        assert "Public neighbour" in context
+        assert "Secret neighbour" not in context
+        assert "secret text" not in context
 
     @pytest.mark.django_db
     @override_settings(LLM_EMBEDDING_BACKEND="huggingface")
@@ -668,7 +719,9 @@ class TestGetTaxonomyContextVisibility:
 
         get_taxonomy_context(document, user)
 
-        mock_permitted.assert_called_once_with(user)
+        # Once for retrieval, once to re-check the documents whose text goes
+        # into the prompt
+        assert {c.args for c in mock_permitted.call_args_list} == {(user,)}
         assert mock_retrieve.call_args.kwargs["document_ids"] == [1, 2, 3]
 
     @pytest.mark.django_db
@@ -876,6 +929,34 @@ class TestFulltextSimilarDocuments:
         result = _fulltext_similar_documents(source, user=superuser, top_k=5)
 
         assert [s["document_id"] for s in result] == [other.pk]
+
+    def test_no_user_only_returns_unowned_documents(
+        self,
+        fulltext_backend: TantivyBackend,
+    ) -> None:
+        """
+        GIVEN:
+            - An unowned source document, an unowned similar document and a
+              similar document privately owned by another user
+        WHEN:
+            - _fulltext_similar_documents() is called with no user (a workflow
+              acting for an unowned document)
+        THEN:
+            - Only the unowned similar document is returned
+        """
+        other_owner = UserFactory.create()
+        source = DocumentFactory.create(content="shared content phrase", owner=None)
+        unowned = DocumentFactory.create(content="shared content phrase", owner=None)
+        private = DocumentFactory.create(
+            content="shared content phrase",
+            owner=other_owner,
+        )
+        for doc in (source, unowned, private):
+            fulltext_backend.add_or_update(doc)
+
+        result = _fulltext_similar_documents(source, user=None, top_k=5)
+
+        assert [s["document_id"] for s in result] == [unowned.pk]
 
     def test_excludes_stale_permitted_document_for_regular_user(
         self,

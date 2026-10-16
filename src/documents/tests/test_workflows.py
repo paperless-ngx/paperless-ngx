@@ -6176,6 +6176,50 @@ class TestApplyAISuggestionsWorkflowAction(
 
         self.assertEqual(self.doc.tags.count(), 0)
 
+    def test_unowned_document_does_not_get_private_objects_by_id(self) -> None:
+        """
+        GIVEN:
+            - An unowned document
+            - AI suggestions selecting another user's private tag and
+              correspondent by ID, plus an unowned tag
+        WHEN:
+            - The suggestions are applied
+        THEN:
+            - Only the unowned tag is assigned; an unowned document must not
+              be treated as unrestricted
+        """
+        self.doc.owner = None
+        self.doc.save(update_fields=["owner"])
+        other = User.objects.create(username="someone-else")
+        private_tag = Tag.objects.create(name="Private Tag", owner=other)
+        public_tag = Tag.objects.create(name="Public Tag", owner=None)
+        private_correspondent = Correspondent.objects.create(
+            name="Private Correspondent",
+            owner=other,
+        )
+        action = self.make_action(
+            ai_suggestion_fields=[
+                WorkflowAction.AISuggestionField.TAGS,
+                WorkflowAction.AISuggestionField.CORRESPONDENT,
+            ],
+        )
+        suggestions: ClassificationSuggestions = {
+            **SUGGESTIONS,
+            "tags": {
+                "existing_ids": [private_tag.pk, public_tag.pk],
+                "new_names": [],
+            },
+            "correspondents": {
+                "existing_ids": [private_correspondent.pk],
+                "new_names": [],
+            },
+        }
+
+        self.apply(action, suggestions)
+
+        self.assertEqual(list(self.doc.tags.all()), [public_tag])
+        self.assertIsNone(self.doc.correspondent)
+
     def test_unparsable_dates_are_skipped(self) -> None:
         """
         GIVEN:

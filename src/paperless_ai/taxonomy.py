@@ -13,7 +13,7 @@ from documents.models import Document
 from documents.models import DocumentType
 from documents.models import StoragePath
 from documents.models import Tag
-from documents.permissions import restrict_queryset_to_visible
+from documents.permissions import restrict_queryset_to_owner_visible
 from paperless_ai.prompts.context import TaxonomyBlockPromptContext
 from paperless_ai.prompts.render import render_prompt
 
@@ -97,7 +97,7 @@ def _visible_ranked_candidates(
     """
     if not weighted_ids:
         return []
-    visible_queryset = restrict_queryset_to_visible(
+    visible_queryset = restrict_queryset_to_owner_visible(
         model.objects.filter(pk__in=weighted_ids),
         user,
         perm,

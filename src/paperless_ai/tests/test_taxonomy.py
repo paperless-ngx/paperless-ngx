@@ -271,39 +271,27 @@ class TestBuildTaxonomyCandidates:
 
         assert result["tags"] == []
 
-    def test_user_none_means_unrestricted_not_owner_isnull(
-        self,
-        mocker: pytest_mock.MockerFixture,
-    ) -> None:
+    def test_user_none_only_includes_unowned_taxonomy(self) -> None:
         """
         GIVEN:
-            - An owned tag (owner is not None)
-            - user=None (system/superuser/no-auth classification)
+            - A similar document with a tag owned by another user and an
+              unowned tag
+            - user=None (a workflow acting for an unowned document)
         WHEN:
             - build_taxonomy_candidates() is called
         THEN:
-            - The tag is included (no permission filtering occurs)
-            - permitted_object_ids() is never called
+            - Only the unowned tag is a candidate - user=None must not expose
+              another user's private taxonomy
         """
-        # user=None means "no restriction" throughout ai_classifier.py (the
-        # same superuser/no-user fast path get_taxonomy_context uses).
-        # permitted_object_ids(None, ...) itself means something
-        # different ("only unowned rows") - it must not be called at all
-        # when user is None, or an owned tag like this one would be wrongly
-        # dropped for every unauthenticated/system-triggered classification.
-        tag = TagFactory.create(name="Owned")
-        owner = UserFactory.create()
-        tag.owner = owner
-        tag.save()
+        owned = TagFactory.create(name="Owned", owner=UserFactory.create())
+        unowned = TagFactory.create(name="Unowned", owner=None)
         document = DocumentFactory.create()
-        document.tags.add(tag)
+        document.tags.add(owned, unowned)
         similar_documents = [make_similar(document.pk, 0.5)]
-        spy = mocker.patch("documents.permissions.permitted_object_ids")
 
         result = build_taxonomy_candidates(similar_documents, user=None)
 
-        assert result["tags"][0]["name"] == "Owned"
-        spy.assert_not_called()
+        assert [c["name"] for c in result["tags"]] == ["Unowned"]
 
 
 class TestFormatTaxonomyForPrompt:

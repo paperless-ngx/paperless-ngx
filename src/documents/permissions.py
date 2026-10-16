@@ -511,6 +511,28 @@ def restrict_queryset_to_visible(
     return queryset.filter(pk__in=permitted_object_ids(user, queryset.model, perm))
 
 
+def user_is_active_superuser(user: User | None) -> bool:
+    """
+    True only for an active, authenticated superuser.
+    """
+    return user is not None and user_is_unrestricted(user)
+
+
+def restrict_queryset_to_owner_visible(
+    queryset: QuerySet[ModelT],
+    user: User | None,
+    perm: str,
+) -> QuerySet[ModelT]:
+    """
+    Like ``restrict_queryset_to_visible``, but ``user=None`` sees only unowned
+    rows (``permitted_object_ids(None, ...)`` semantics) instead of every row.
+    See ``user_is_active_superuser``.
+    """
+    if user_is_active_superuser(user):
+        return queryset
+    return queryset.filter(pk__in=permitted_object_ids(user, queryset.model, perm))
+
+
 def permitted_document_ids(
     user: User | None,
     *,
