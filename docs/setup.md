@@ -274,6 +274,10 @@ to a positive number to enable polling and disable native filesystem notificatio
     compile the frontend yourself. See [here](development.md#front-end-development)
     and use the `build` step, not `serve`.
 
+    This checkout also requires the [Go integrity scanner](integrity_scanner.md#linux-installation)
+    for management commands and scheduled sanity tasks. Build/install it and
+    make its binary available to the Paperless service user before starting workers.
+
 6.  Configure Paperless-ngx. See [configuration](configuration.md) for details.
     Edit the included `paperless.conf` and adjust the settings to your
     needs. Required settings for getting Paperless-ngx running are:

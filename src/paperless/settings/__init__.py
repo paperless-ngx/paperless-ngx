@@ -83,6 +83,16 @@ EMPTY_TRASH_DIR = (
 # Lock file for synchronizing changes to the MEDIA directory across multiple
 # threads.
 MEDIA_LOCK = MEDIA_ROOT / "media.lock"
+
+INTEGRITY_SCANNER_BINARY = os.getenv(
+    "PAPERLESS_INTEGRITY_SCANNER_BINARY",
+    "paperless-integrity-scanner",
+)
+INTEGRITY_SCANNER_TIMEOUT = int(
+    os.getenv("PAPERLESS_INTEGRITY_SCANNER_TIMEOUT", "3600"),
+)
+if INTEGRITY_SCANNER_TIMEOUT <= 0:
+    raise ValueError("PAPERLESS_INTEGRITY_SCANNER_TIMEOUT must be positive")
 INDEX_DIR = DATA_DIR / "index"
 
 ADVANCED_FUZZY_SEARCH_THRESHOLD: float | None = get_float_from_env(

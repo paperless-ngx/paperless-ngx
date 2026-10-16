@@ -13,15 +13,15 @@ import logging
 from collections import defaultdict
 from collections.abc import Iterator
 from pathlib import Path
-from typing import TYPE_CHECKING
-from typing import Final
 from typing import TypedDict
 
 from django.conf import settings
 
+from documents.integrity import ExpectedFile
+from documents.integrity import Manifest
+from documents.integrity import scan_files
 from documents.models import Document
 from documents.utils import IterWrapper
-from documents.utils import compute_checksum
 from documents.utils import identity
 from paperless.config import GeneralConfig
 
@@ -59,6 +59,7 @@ class SanityCheckMessages:
         self.document_warning_count: int = 0
         self.document_info_count: int = 0
         self.global_warning_count: int = 0
+        self.global_error_count: int = 0
 
     # -- Recording ----------------------------------------------------------
 
@@ -80,6 +81,8 @@ class SanityCheckMessages:
             self._document_error_issue_count += 1
             if self._add_document_issue(doc_pk, self._document_error_pks):
                 self.document_error_count += 1
+        else:
+            self.global_error_count += 1
 
     def warning(self, doc_pk: int | None, message: str) -> None:
         self._messages[doc_pk].append({"level": logging.WARNING, "message": message})
@@ -129,6 +132,7 @@ class SanityCheckMessages:
             self._document_error_issue_count
             + self._document_warning_issue_count
             + self.global_warning_count
+            + self.global_error_count
         )
 
     # -- Logging output (used by Celery task path) --------------------------
@@ -173,76 +177,8 @@ class SanityCheckFailedException(Exception):
 # ---------------------------------------------------------------------------
 
 
-def _build_present_files() -> set[Path]:
-    """Collect all files in MEDIA_ROOT, excluding directories and ignorable files."""
-    present_files = {
-        x.resolve()
-        for x in Path(settings.MEDIA_ROOT).glob("**/*")
-        if not x.is_dir() and x.name not in settings.IGNORABLE_FILES
-    }
-
-    lockfile = Path(settings.MEDIA_LOCK).resolve()
-    present_files.discard(lockfile)
-
-    general_config = GeneralConfig()
-    app_logo = general_config.app_logo or settings.APP_LOGO
-    if app_logo:
-        logo_file = Path(settings.MEDIA_ROOT / Path(app_logo.lstrip("/"))).resolve()
-        present_files.discard(logo_file)
-
-    return present_files
-
-
-def _check_thumbnail(
-    doc: Document,
-    messages: SanityCheckMessages,
-    present_files: set[Path],
-) -> None:
-    """Verify the thumbnail exists and is readable."""
-    # doc.thumbnail_path already returns a resolved Path; no need to re-resolve.
-    thumbnail_path: Final[Path] = doc.thumbnail_path
-    if not thumbnail_path.is_file():
-        messages.error(doc.pk, "Thumbnail of document does not exist.")
-        return
-
-    present_files.discard(thumbnail_path)
-    try:
-        _ = thumbnail_path.read_bytes()
-    except OSError as e:
-        messages.error(doc.pk, f"Cannot read thumbnail file of document: {e}")
-
-
-def _check_original(
-    doc: Document,
-    messages: SanityCheckMessages,
-    present_files: set[Path],
-) -> None:
-    """Verify the original file exists, is readable, and has matching checksum."""
-    # doc.source_path already returns a resolved Path; no need to re-resolve.
-    source_path: Final[Path] = doc.source_path
-    if not source_path.is_file():
-        messages.error(doc.pk, "Original of document does not exist.")
-        return
-
-    present_files.discard(source_path)
-    try:
-        checksum = compute_checksum(source_path)
-    except OSError as e:
-        messages.error(doc.pk, f"Cannot read original file of document: {e}")
-    else:
-        if checksum != doc.checksum:
-            messages.error(
-                doc.pk,
-                f"Checksum mismatch. Stored: {doc.checksum}, actual: {checksum}.",
-            )
-
-
-def _check_archive(
-    doc: Document,
-    messages: SanityCheckMessages,
-    present_files: set[Path],
-) -> None:
-    """Verify archive file consistency: checksum/filename pairing and file integrity."""
+def _check_archive_metadata(doc: Document, messages: SanityCheckMessages) -> bool:
+    """Check archive metadata; return whether the archive file should be scanned."""
     if doc.archive_checksum is not None and doc.archive_filename is None:
         messages.error(
             doc.pk,
@@ -253,30 +189,9 @@ def _check_archive(
             doc.pk,
             "Document has an archive file, but its checksum is missing.",
         )
-    elif doc.has_archive_version:
-        if TYPE_CHECKING:
-            assert isinstance(doc.archive_path, Path)
-        # doc.archive_path already returns a resolved Path; no need to re-resolve.
-        archive_path: Final[Path] = doc.archive_path  # type: ignore[assignment]
-        if not archive_path.is_file():
-            messages.error(doc.pk, "Archived version of document does not exist.")
-            return
-
-        present_files.discard(archive_path)
-        try:
-            checksum = compute_checksum(archive_path)
-        except OSError as e:
-            messages.error(
-                doc.pk,
-                f"Cannot read archive file of document: {e}",
-            )
-        else:
-            if checksum != doc.archive_checksum:
-                messages.error(
-                    doc.pk,
-                    "Checksum mismatch of archived document. "
-                    f"Stored: {doc.archive_checksum}, actual: {checksum}.",
-                )
+    else:
+        return doc.has_archive_version
+    return False
 
 
 def _check_content(doc: Document, messages: SanityCheckMessages) -> None:
@@ -285,16 +200,49 @@ def _check_content(doc: Document, messages: SanityCheckMessages) -> None:
         messages.info(doc.pk, "Document contains no OCR data")
 
 
-def _check_document(
-    doc: Document,
-    messages: SanityCheckMessages,
-    present_files: set[Path],
-) -> None:
-    """Run all checks for a single document."""
-    _check_thumbnail(doc, messages, present_files)
-    _check_original(doc, messages, present_files)
-    _check_archive(doc, messages, present_files)
-    _check_content(doc, messages)
+def _record_findings(manifest: Manifest, messages: SanityCheckMessages) -> None:
+    for finding in scan_files(manifest):
+        index = finding["file_index"]
+        code = finding["code"]
+        if index is None:
+            if code == "orphan":
+                messages.warning(None, f"Orphaned file in media dir: {finding['path']}")
+            else:
+                messages.error(
+                    None,
+                    f"Unsafe path in media dir: {finding['path']}: {finding['detail']}",
+                )
+            continue
+        file = manifest["files"][index]
+        kind = file["kind"]
+        doc_pk = file["document_id"]
+        if code == "missing":
+            label = {
+                "original": "Original",
+                "archive": "Archived version",
+                "thumbnail": "Thumbnail",
+            }[kind]
+            messages.error(doc_pk, f"{label} of document does not exist.")
+        elif code == "unreadable":
+            messages.error(
+                doc_pk,
+                f"Cannot read {kind} file of document: {finding['detail']}",
+            )
+        elif code == "unsafe_path":
+            messages.error(
+                doc_pk,
+                f"Unsafe path for {kind} file of document: {finding['path']}: {finding['detail']}",
+            )
+        else:
+            prefix = (
+                "Checksum mismatch of archived document"
+                if kind == "archive"
+                else "Checksum mismatch"
+            )
+            messages.error(
+                doc_pk,
+                f"{prefix}. Stored: {file['checksum']}, actual: {finding['actual_checksum']}.",
+            )
 
 
 # ---------------------------------------------------------------------------
@@ -316,7 +264,7 @@ def check_sanity(
         A SanityCheckMessages instance containing all detected issues.
     """
     messages = SanityCheckMessages()
-    present_files = _build_present_files()
+    files: list[ExpectedFile] = []
 
     documents = Document.global_objects.only(
         "pk",
@@ -328,9 +276,55 @@ def check_sanity(
         "content",
     ).iterator(chunk_size=500)
     for doc in iter_wrapper(documents):
-        _check_document(doc, messages, present_files)
+        # Do not resolve model paths in Python: the scanner owns symlink safety.
+        files.extend(
+            [
+                ExpectedFile(
+                    document_id=doc.pk,
+                    kind="thumbnail",
+                    path=str((settings.THUMBNAIL_DIR / f"{doc.pk:07}.webp").absolute()),
+                    checksum="",
+                ),
+                ExpectedFile(
+                    document_id=doc.pk,
+                    kind="original",
+                    path=str(
+                        (
+                            settings.ORIGINALS_DIR
+                            / (doc.filename or f"{doc.pk:07}{doc.file_type}")
+                        ).absolute(),
+                    ),
+                    checksum=doc.checksum,
+                ),
+            ],
+        )
+        if _check_archive_metadata(doc, messages):
+            files.append(
+                ExpectedFile(
+                    document_id=doc.pk,
+                    kind="archive",
+                    path=str(
+                        (settings.ARCHIVE_DIR / str(doc.archive_filename)).absolute(),
+                    ),
+                    checksum=doc.archive_checksum or "",
+                ),
+            )
+        _check_content(doc, messages)
 
-    for extra_file in present_files:
-        messages.warning(None, f"Orphaned file in media dir: {extra_file}")
+    exclusions = [str(Path(settings.MEDIA_LOCK).absolute())]
+    app_logo = GeneralConfig().app_logo or settings.APP_LOGO
+    if app_logo:
+        exclusions.append(
+            str((Path(settings.MEDIA_ROOT) / app_logo.lstrip("/")).absolute()),
+        )
+    manifest = Manifest(
+        version=1,
+        media_root=str(Path(settings.MEDIA_ROOT).absolute()),
+        checksum_algorithm="sha256",
+        files=files,
+        ignored_filenames=list(settings.IGNORABLE_FILES),
+        excluded_paths=exclusions,
+    )
+    _record_findings(manifest, messages)
 
     return messages

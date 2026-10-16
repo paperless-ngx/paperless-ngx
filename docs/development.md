@@ -78,6 +78,13 @@ first-time setup.
     uv sync --group dev
     ```
 
+    Install the [pinned Go toolchain and integrity scanner](integrity_scanner.md#linux-installation),
+    which is required by the sanity checker and its regression tests:
+
+    ```bash
+    make -C native/integrity install
+    ```
+
 5.  Install pre-commit hooks:
 
     ```bash

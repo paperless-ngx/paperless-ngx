@@ -5,10 +5,12 @@ from __future__ import annotations
 import logging
 from typing import Any
 
+from django.core.management import CommandError
 from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
 
+from documents.integrity import IntegrityScanError
 from documents.management.commands.base import PaperlessCommand
 from documents.models import Document
 from documents.sanity_checker import SanityCheckMessages
@@ -100,6 +102,11 @@ class Command(PaperlessCommand):
                 f"{messages.global_warning_count} global [yellow]warning(s)[/yellow]",
             )
 
+        if messages.global_error_count:
+            parts.append(
+                f"{messages.global_error_count} global [bold red]error(s)[/bold red]",
+            )
+
         if parts:
             if len(parts) > 1:
                 summary = ", ".join(parts[:-1]) + " and " + parts[-1]
@@ -110,10 +117,13 @@ class Command(PaperlessCommand):
             self.console.print("\nNo issues found.")
 
     def handle(self, *args: Any, **options: Any) -> None:
-        messages = check_sanity(
-            iter_wrapper=lambda docs: self.track(
-                docs,
-                description="Checking documents...",
-            ),
-        )
+        try:
+            messages = check_sanity(
+                iter_wrapper=lambda docs: self.track(
+                    docs,
+                    description="Checking documents...",
+                ),
+            )
+        except IntegrityScanError as e:
+            raise CommandError(str(e)) from e
         self._render_results(messages)

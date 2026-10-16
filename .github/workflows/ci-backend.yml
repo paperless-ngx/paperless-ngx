@@ -75,6 +75,7 @@ jobs:
               - 'pyproject.toml'
               - 'uv.lock'
               - 'native/fuzzy/**'
+              - 'native/integrity/**'
               - 'rust-toolchain.toml'
               - 'docker/compose/docker-compose.ci-test.yml'
               - '.github/workflows/ci-backend.yml'
@@ -105,6 +106,11 @@ jobs:
           python-version: "${{ matrix.python-version }}"
       - name: Install Rust toolchain
         run: rustup show active-toolchain
+      - name: Install Go toolchain
+        uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6
+        with:
+          go-version: '1.26.9'
+          cache: false
       - name: Install uv
         uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
@@ -142,6 +148,8 @@ jobs:
           PAPERLESS_CI_TEST: 1
           PYTHON_VERSION: ${{ steps.setup-python.outputs.python-version }}
         run: |
+          make -C native/integrity test install
+          export PATH="$HOME/.local/bin:$PATH"
           uv run \
             --python "${PYTHON_VERSION}" \
             --dev \

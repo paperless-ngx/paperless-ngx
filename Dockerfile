@@ -26,6 +26,15 @@ esac
 RUN set -eux \
   && ./node_modules/.bin/ng build --configuration production
 
+# Stage: compile-integrity (no Go runtime needed in the final image)
+FROM --platform=$BUILDPLATFORM docker.io/golang:1.26.9-trixie AS compile-integrity
+ARG TARGETOS
+ARG TARGETARCH
+WORKDIR /build
+COPY ./native/integrity ./
+RUN CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} \
+    go build -trimpath -ldflags="-s -w -buildid=" -o /paperless-integrity-scanner .
+
 # Stage: compile-fuzzy
 FROM docker.io/rust:1.89.0-slim-trixie AS compile-fuzzy
 COPY --from=ghcr.io/astral-sh/uv:0.12.23 /uv /usr/local/bin/uv
@@ -99,6 +108,8 @@ COPY ./docker/rootfs /
 # Comments:
 #  - Don't leave anything extra in here
 FROM s6-overlay-base AS main-app
+
+COPY --from=compile-integrity /paperless-integrity-scanner /usr/local/bin/paperless-integrity-scanner
 
 LABEL org.opencontainers.image.authors="paperless-ngx team <hello@paperless-ngx.com>"
 LABEL org.opencontainers.image.documentation="https://docs.paperless-ngx.com/"

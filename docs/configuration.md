@@ -1292,6 +1292,21 @@ valid crontab(5) expression describing when to run.
 
     Defaults to `30 0 * * sun` or Sunday at 30 minutes past midnight.
 
+#### [`PAPERLESS_INTEGRITY_SCANNER_BINARY=<path>`](#PAPERLESS_INTEGRITY_SCANNER_BINARY) {#PAPERLESS_INTEGRITY_SCANNER_BINARY}
+
+: Executable path for the mandatory [Go integrity scanner](integrity_scanner.md).
+No shell arguments are accepted. Ensure both management commands and workers
+can execute it. Missing/incompatible binaries fail the sanity check.
+
+    Defaults to `paperless-integrity-scanner` (looked up on PATH).
+
+#### [`PAPERLESS_INTEGRITY_SCANNER_TIMEOUT=<seconds>`](#PAPERLESS_INTEGRITY_SCANNER_TIMEOUT) {#PAPERLESS_INTEGRITY_SCANNER_TIMEOUT}
+
+: Positive integer maximum runtime of the Go scanner. On timeout the subprocess
+is terminated/reaped and the scan fails. Increase for large archives/slow storage.
+
+    Defaults to `3600`.
+
 #### [`PAPERLESS_WORKFLOW_SCHEDULED_TASK_CRON=<cron expression>`](#PAPERLESS_WORKFLOW_SCHEDULED_TASK_CRON) {#PAPERLESS_WORKFLOW_SCHEDULED_TASK_CRON}
 
 : Configures the scheduled workflow check frequency. The value should be a

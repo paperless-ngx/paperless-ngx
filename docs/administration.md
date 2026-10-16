@@ -640,6 +640,12 @@ document_sanity_checker
 The command takes no arguments. Depending on the size of your document
 archive, this may take some time.
 
+Filesystem scanning uses the mandatory read-only Go binary. Docker includes it;
+source/bare-metal installations must [build/install the integrity scanner](integrity_scanner.md).
+No database or stored-checksum migration is required. Unsafe paths are errors;
+scanner failures or incomplete scans fail the command rather than reporting a
+clean archive.
+
 ### Fetching e-mail
 
 Paperless automatically fetches your e-mail every 10 minutes by default.

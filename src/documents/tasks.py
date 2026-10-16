@@ -299,6 +299,8 @@ def sanity_check(*, raise_on_error: bool = True) -> str:
         parts.append(f"{messages.document_info_count} document(s) with infos")
     if messages.global_warning_count:
         parts.append(f"{messages.global_warning_count} global warning(s)")
+    if messages.global_error_count:
+        parts.append(f"{messages.global_error_count} global error(s)")
 
     summary = ", ".join(parts) + " found."
 
