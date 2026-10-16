@@ -8,10 +8,6 @@
   white-space: pre-wrap;
 }
 
-.chat-references {
-  font-family: var(--bs-font-sans-serif);
-}
-
 .dropdown-toggle::after {
   display: none;
 }
@@ -38,5 +34,21 @@
   }
   50% {
     opacity: 1;
+  }
+}
+
+.chat-markdown ::ng-deep {
+  h1, h2, h3, h4, h5, h6 {
+    font-size: 1em;
+    font-weight: bold;
+  }
+
+  th, td {
+    padding: 0.15rem 0.4rem;
+    border: 1px solid var(--bs-border-color);
+  }
+
+  > :last-child {
+    margin-bottom: 0;
   }
 }

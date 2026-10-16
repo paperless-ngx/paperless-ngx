@@ -207,4 +207,33 @@ describe('ChatComponent', () => {
     component.searchInputKeyDown(event)
     expect(component.sendMessage).not.toHaveBeenCalled()
   })
+
+  it('should render markdown for assistant messages only', () => {
+    component.messages.set([
+      { role: 'user', content: '**user**' },
+      { role: 'assistant', content: '**assistant** <script>x</script>' },
+    ])
+    fixture.detectChanges()
+    const el: HTMLElement = fixture.nativeElement
+    expect(el.querySelector('.chat-markdown strong')?.textContent).toBe(
+      'assistant'
+    )
+    expect(el.querySelector('.chat-markdown script')).toBeNull()
+    expect(el.textContent).toContain('**user**')
+  })
+
+  it('should keep the destination hostname visible after sanitizing chat links', () => {
+    component.messages.set([
+      {
+        role: 'assistant',
+        content:
+          '[View original document](https://otherdomain.example/?data=secret)',
+      },
+    ])
+    fixture.detectChanges()
+    const el: HTMLElement = fixture.nativeElement
+    const link = el.querySelector('.chat-markdown a')
+    expect(link?.textContent).toBe('View original document')
+    expect(link?.nextElementSibling?.textContent).toBe('(otherdomain.example)')
+  })
 })

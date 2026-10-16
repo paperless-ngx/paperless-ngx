@@ -10,6 +10,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NavigationEnd, Router, RouterModule } from '@angular/router'
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { MarkdownPipe } from 'src/app/pipes/markdown.pipe'
 import { filter, map } from 'rxjs'
 import {
   ChatMessage,
@@ -25,6 +26,7 @@ import {
     RouterModule,
     NgxBootstrapIconsModule,
     NgbDropdownModule,
+    MarkdownPipe,
   ],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.scss',
