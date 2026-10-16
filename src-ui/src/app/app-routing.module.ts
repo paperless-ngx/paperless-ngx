@@ -17,6 +17,7 @@ import { SavedViewsComponent } from './components/manage/saved-views/saved-views
 import { ShareLinksComponent } from './components/manage/share-links/share-links.component'
 import { WorkflowsComponent } from './components/manage/workflows/workflows.component'
 import { NotFoundComponent } from './components/not-found/not-found.component'
+import { ReviewQueueComponent } from './components/review-queue/review-queue.component'
 import { DirtyDocGuard } from './guards/dirty-doc.guard'
 import { DirtyFormGuard } from './guards/dirty-form.guard'
 import { DirtySavedViewGuard } from './guards/dirty-saved-view.guard'
@@ -38,6 +39,18 @@ export const routes: Routes = [
         component: DashboardComponent,
         data: {
           componentName: 'AppFrameComponent',
+        },
+      },
+      {
+        path: 'review-queue',
+        component: ReviewQueueComponent,
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.Document,
+          },
+          componentName: 'ReviewQueueComponent',
         },
       },
       {

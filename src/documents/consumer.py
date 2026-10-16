@@ -619,6 +619,7 @@ class ConsumerPlugin(
                                 page_count=page_count,
                                 mime_type=mime_type,
                             )
+                            original_document._review_actor_id = self.metadata.actor_id
                             actor = None
 
                             # Save the new version, potentially creating an audit log entry for the version addition if enabled.

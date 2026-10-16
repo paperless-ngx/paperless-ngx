@@ -392,6 +392,13 @@
           </li>
         }
 
+        <li [ngbNavItem]="DocumentDetailNavIDs.Review">
+          <a ngbNavLink i18n>Review</a>
+          <ng-template ngbNavContent>
+            <pngx-document-review [documentId]="documentId()" [documentModified]="document()?.modified"></pngx-document-review>
+          </ng-template>
+        </li>
+
         @if (historyEnabled) {
           <li [ngbNavItem]="DocumentDetailNavIDs.History">
             <a ngbNavLink i18n>History</a>

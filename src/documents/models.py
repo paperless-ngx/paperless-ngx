@@ -1,7 +1,9 @@
 import datetime
 import uuid
 from pathlib import Path
+from typing import Any
 from typing import Final
+from typing import cast
 
 import pathvalidate
 from django.conf import settings
@@ -28,6 +30,9 @@ from django_softdelete.models import SoftDeleteModel
 
 from documents.data_models import DocumentSource
 from documents.parsers import get_default_file_extension
+from documents.review_managers import DeletedDocumentManager
+from documents.review_managers import DocumentManager
+from documents.review_managers import GlobalDocumentManager
 
 
 class ModelWithOwner(models.Model):
@@ -337,6 +342,10 @@ class Document(SoftDeleteModel, ModelWithOwner):  # type: ignore[django-manager-
         help_text=_("Optional short label for a document version."),
     )
 
+    objects = DocumentManager()
+    global_objects = GlobalDocumentManager()
+    deleted_objects = DeletedDocumentManager()
+
     class Meta:
         ordering = ("-created",)
         verbose_name = _("document")
@@ -365,6 +374,11 @@ class Document(SoftDeleteModel, ModelWithOwner):  # type: ignore[django-manager-
         if self.title:
             res += f" {self.title}"
         return res
+
+    def save(self, *args: Any, **kwargs: Any) -> None:
+        from documents.review import save_document
+
+        return save_document(self, super().save, args, kwargs)
 
     def get_effective_barcodes(self) -> list["DocumentBarcode"]:
         """
@@ -538,23 +552,96 @@ class Document(SoftDeleteModel, ModelWithOwner):  # type: ignore[django-manager-
 
     def delete(
         self,
-        *args,
-        transaction_id=None,
-        **kwargs,
-    ):
-        # Versions must share the root's transaction ID so they are restored
-        # together by django-softdelete.
-        if transaction_id is None:
-            transaction_id = uuid.uuid4()
-        if self.root_document_id is None:
-            Document.objects.filter(root_document=self).delete(
+        *args: Any,
+        transaction_id: uuid.UUID | None = None,
+        **kwargs: Any,
+    ) -> Any:
+        from documents.review import review_lifecycle_context
+
+        with review_lifecycle_context(self):
+            # Versions must share the root's transaction ID so they are restored
+            # together by django-softdelete.
+            if transaction_id is None:
+                transaction_id = uuid.uuid4()
+            if self.root_document_id is None:
+                Document.objects.filter(root_document=self).delete(
+                    transaction_id=transaction_id,
+                )
+            return cast("Any", super()).delete(
+                *args,
                 transaction_id=transaction_id,
+                **kwargs,
             )
-        return super().delete(
-            *args,
-            transaction_id=transaction_id,
-            **kwargs,
-        )
+
+    def restore(self, *args: Any, **kwargs: Any) -> Any:
+        from documents.review import review_lifecycle_context
+
+        with review_lifecycle_context(self):
+            return super().restore(*args, **kwargs)
+
+
+class DocumentReview(SoftDeleteModel):
+    class State(models.TextChoices):
+        UNREVIEWED = "unreviewed", _("Unreviewed")
+        PENDING = "pending", _("Pending")
+        APPROVED = "approved", _("Approved")
+        REJECTED = "rejected", _("Rejected")
+
+    document = models.OneToOneField(
+        Document,
+        on_delete=models.CASCADE,
+        related_name="review_record",
+    )
+    state = models.CharField(
+        max_length=10,
+        choices=State.choices,
+        default=State.UNREVIEWED,
+        db_index=True,
+    )
+    revision = models.PositiveIntegerField(default=0)
+    reviewer = models.ForeignKey(
+        User,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="assigned_document_reviews",
+    )
+    submitted_by = models.ForeignKey(
+        User,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="submitted_document_reviews",
+    )
+
+
+class DocumentReviewEvent(SoftDeleteModel):
+    review = models.ForeignKey(
+        DocumentReview,
+        on_delete=models.CASCADE,
+        related_name="events",
+    )
+    action = models.CharField(max_length=10)
+    actor = models.PositiveIntegerField(null=True, blank=True)
+    revision = models.PositiveIntegerField()
+    at = models.DateTimeField(default=timezone.now)
+    request_id = models.UUIDField(null=True, blank=True)
+    comment = models.TextField(blank=True, default="")
+    payload = models.JSONField(null=True, blank=True)
+    response = models.JSONField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["revision"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["review", "revision"],
+                name="review_event_revision_unique",
+            ),
+            models.UniqueConstraint(
+                fields=["review", "actor", "request_id"],
+                name="review_event_request_unique",
+            ),
+        ]
 
 
 class SavedView(ModelWithOwner):

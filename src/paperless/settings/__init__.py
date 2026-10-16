@@ -229,6 +229,9 @@ SPECTACULAR_SETTINGS = {
     "ENUM_NAME_OVERRIDES": {
         "MatchingAlgorithm": "documents.models.MatchingModel.MATCHING_ALGORITHMS",
         "BarcodeFormatEnum": "documents.models.DocumentBarcode.Format",
+        "DocumentReviewActionEnum": "documents.review_serializers.REVIEW_ACTIONS",
+        "DocumentReviewEventActionEnum": "documents.review_serializers.REVIEW_EVENT_ACTIONS",
+        "DocumentReviewStateEnum": "documents.models.DocumentReview.State",
     },
     "SCHEMA_PATH_PREFIX_INSERT": FORCE_SCRIPT_NAME or "",
 }

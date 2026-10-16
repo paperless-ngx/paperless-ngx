@@ -16,6 +16,9 @@ from drf_spectacular.views import SpectacularAPIView
 from drf_spectacular.views import SpectacularSwaggerView
 from rest_framework.routers import DefaultRouter
 
+from documents.review_views import DocumentReviewersView
+from documents.review_views import DocumentReviewView
+from documents.review_views import ReviewQueueView
 from documents.views import BulkDownloadView
 from documents.views import BulkEditObjectsView
 from documents.views import BulkEditView
@@ -95,6 +98,17 @@ api_router.register(r"processed_mail", ProcessedMailViewSet)
 
 
 urlpatterns = [
+    path(
+        "api/documents/<int:pk>/review/",
+        DocumentReviewView.as_view(),
+        name="document_review",
+    ),
+    path(
+        "api/documents/<int:pk>/reviewers/",
+        DocumentReviewersView.as_view(),
+        name="document_reviewers",
+    ),
+    path("api/review_queue/", ReviewQueueView.as_view(), name="review_queue"),
     re_path(
         r"^api/",
         include(

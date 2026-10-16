@@ -36,6 +36,7 @@ from documents.models import StoragePath
 from documents.models import Tag
 from documents.permissions import set_permissions_for_objects
 from documents.plugins.helpers import DocumentsStatusManager
+from documents.review import version_merge_context
 from documents.tasks import bulk_update_documents
 from documents.tasks import consume_file
 from documents.tasks import remove_document_from_index
@@ -654,6 +655,7 @@ def merge(
     return "OK"
 
 
+@version_merge_context
 def merge_as_versions(
     doc_ids: list[int],
     *,

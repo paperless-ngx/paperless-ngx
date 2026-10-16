@@ -1,0 +1,101 @@
+<h1 i18n>Review queue</h1>
+<form class="row g-3 mb-4" (ngSubmit)="load(true)">
+  <div class="col-sm-4">
+    <label for="queue-state" class="form-label" i18n>Review state</label>
+    <select
+      id="queue-state"
+      name="state"
+      class="form-select"
+      [(ngModel)]="state"
+    >
+      <option value="" i18n>All reviewed records</option>
+      <option value="pending" i18n>Pending</option>
+      <option value="approved" i18n>Approved</option>
+      <option value="rejected" i18n>Rejected</option>
+      <option value="unreviewed" i18n>Reopened / invalidated</option>
+    </select>
+  </div>
+  <div class="col-sm-4">
+    <label for="queue-reviewer" class="form-label" i18n
+      >Reviewer ID (optional)</label
+    >
+    <input
+      id="queue-reviewer"
+      name="reviewer"
+      type="number"
+      min="1"
+      step="1"
+      class="form-control"
+      [(ngModel)]="reviewer"
+    />
+  </div>
+  <div class="col-sm-4 align-self-end">
+    <button type="submit" class="btn btn-primary" [disabled]="loading()" i18n>
+      Apply filters
+    </button>
+  </div>
+</form>
+@if (error()) {
+  <div class="alert alert-warning" role="alert">{{ error() }}</div>
+}
+@if (loading()) {
+  <p role="status" i18n>Loading review queue…</p>
+}
+<p aria-live="polite">
+  <ng-container i18n>Matching documents:</ng-container> {{ queue().count }}
+</p>
+<div class="table-responsive">
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col" i18n>Document</th>
+        <th scope="col" i18n>State</th>
+        <th scope="col" i18n>Reviewer ID</th>
+        <th scope="col" i18n>Revision</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (review of queue().results; track review.document) {
+        <tr>
+          <td>
+            <a [routerLink]="['/documents', review.document, 'review']">{{
+              review.title || review.document
+            }}</a>
+          </td>
+          <td>{{ review.state | titlecase }}</td>
+          <td>{{ review.reviewer ?? '—' }}</td>
+          <td>{{ review.revision }}</td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="4" i18n>No documents match these review filters.</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
+<nav
+  aria-label="Review queue pagination"
+  i18n-aria-label
+  class="d-flex align-items-center gap-3"
+>
+  <button
+    type="button"
+    class="btn btn-outline-secondary"
+    [disabled]="loading() || page <= 1"
+    (click)="nextPage(-1)"
+    i18n
+  >
+    Previous
+  </button>
+  <span><ng-container i18n>Page</ng-container> {{ page }}</span>
+  <button
+    type="button"
+    class="btn btn-outline-secondary"
+    [disabled]="loading() || page * 20 >= queue().count"
+    (click)="nextPage(1)"
+    i18n
+  >
+    Next
+  </button>
+</nav>

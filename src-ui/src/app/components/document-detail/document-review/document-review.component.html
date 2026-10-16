@@ -1,0 +1,156 @@
+<section
+  aria-labelledby="review-heading"
+  [attr.aria-busy]="loading() || busy()"
+>
+  <h3 id="review-heading" i18n>Document review</h3>
+  <p class="text-muted" i18n>
+    Review does not change who can view or download this document.
+  </p>
+  @if (error()) {
+    <div class="alert alert-warning" role="alert">{{ error() }}</div>
+  }
+  <button
+    type="button"
+    class="btn btn-outline-secondary btn-sm mb-3"
+    (click)="reload()"
+    [disabled]="busy() || loading()"
+    i18n
+  >
+    Refresh review
+  </button>
+  @if (loading()) {
+    <p role="status" i18n>Loading review…</p>
+  } @else if (review(); as state) {
+    <dl class="row">
+      <dt class="col-sm-4" i18n>State</dt>
+      <dd class="col-sm-8">{{ state.state | titlecase }}</dd>
+      <dt class="col-sm-4" i18n>Revision</dt>
+      <dd class="col-sm-8">{{ state.revision }}</dd>
+      <dt class="col-sm-4" i18n>Reviewer ID</dt>
+      <dd class="col-sm-8">{{ state.reviewer ?? '—' }}</dd>
+      <dt class="col-sm-4" i18n>Submitter ID</dt>
+      <dd class="col-sm-8">{{ state.submitted_by ?? '—' }}</dd>
+    </dl>
+    @if (can('submit')) {
+      <div class="mb-3">
+        <label for="reviewer-search" class="form-label" i18n
+          >Find an eligible reviewer</label
+        >
+        <div class="input-group mb-2">
+          <input
+            id="reviewer-search"
+            class="form-control"
+            [(ngModel)]="search"
+            [ngModelOptions]="{ standalone: true }"
+            [disabled]="busy()"
+          />
+          <button
+            type="button"
+            class="btn btn-outline-secondary"
+            (click)="searchReviewers()"
+            [disabled]="busy()"
+            i18n
+          >
+            Search
+          </button>
+        </div>
+        <label for="reviewer-selection" class="form-label" i18n>Reviewer</label>
+        <select
+          id="reviewer-selection"
+          class="form-select"
+          [(ngModel)]="reviewer"
+          [ngModelOptions]="{ standalone: true }"
+          [disabled]="busy()"
+        >
+          <option [ngValue]="null" i18n>Select a reviewer</option>
+          @for (user of options().results; track user.id) {
+            <option [ngValue]="user.id">{{ user.username }}</option>
+          }
+        </select>
+        @if (!options().results.length) {
+          <p class="text-muted mt-2" i18n>No eligible reviewers found.</p>
+        }
+      </div>
+      <button
+        type="button"
+        class="btn btn-primary"
+        [disabled]="busy() || reviewer === null"
+        (click)="act('submit')"
+        i18n
+      >
+        Submit for review
+      </button>
+    }
+    @if (can('approve')) {
+      <button
+        type="button"
+        class="btn btn-success mb-3"
+        [disabled]="busy()"
+        (click)="act('approve')"
+        i18n
+      >
+        Approve
+      </button>
+    }
+    @if (can('reject')) {
+      <div class="mb-3">
+        <label for="review-rejection" class="form-label" i18n
+          >Rejection reason (1–2000 characters)</label
+        >
+        <textarea
+          id="review-rejection"
+          class="form-control"
+          rows="3"
+          [(ngModel)]="comment"
+          [ngModelOptions]="{ standalone: true }"
+          [disabled]="busy()"
+          aria-describedby="review-comment-help"
+        ></textarea>
+        <div id="review-comment-help" class="form-text" i18n>
+          Explain what needs to be corrected. A reason is required to reject.
+        </div>
+      </div>
+      <button
+        type="button"
+        class="btn btn-danger"
+        [disabled]="busy() || !validComment"
+        (click)="act('reject')"
+        i18n
+      >
+        Reject
+      </button>
+    }
+    @if (can('reopen')) {
+      <button
+        type="button"
+        class="btn btn-outline-primary"
+        [disabled]="busy()"
+        (click)="act('reopen')"
+        i18n
+      >
+        Reopen review
+      </button>
+    }
+    <h4 class="mt-4" i18n>Review history</h4>
+    <ol class="list-group list-group-numbered">
+      @for (event of state.history; track event.revision) {
+        <li class="list-group-item">
+          <strong>{{ event.action | titlecase }}</strong>
+          <span class="ms-2"
+            >{{ event.at | date: 'medium' }} —
+            <ng-container i18n>Actor</ng-container> {{ event.actor ?? '—' }} —
+            <ng-container i18n>Revision</ng-container>
+            {{ event.revision }}</span
+          >
+          @if (event.comment) {
+            <p class="mb-0 mt-2 text-break" style="white-space: pre-wrap">
+              {{ event.comment }}
+            </p>
+          }
+        </li>
+      } @empty {
+        <li class="list-group-item" i18n>No review activity yet.</li>
+      }
+    </ol>
+  }
+</section>
