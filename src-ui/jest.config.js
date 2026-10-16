@@ -15,6 +15,8 @@ module.exports = {
         tsconfig: '<rootDir>/tsconfig.spec.json',
         stringifyContentPathRegex: '\\.(html|svg)$',
         useESM: true,
+        // Disable the builder's deprecated override; tsconfig.spec.json enables isolation.
+        isolatedModules: false,
       },
     ],
   },
