@@ -17,7 +17,7 @@
           <context context-type="linenumber">386,393</context>
         </context-group>
         <note priority="1" from="description">Currently selected slide number read by screen reader</note>
-        <target state="needs-translation"> Slide <x id="INTERPOLATION" equiv-text="xt(source?: Ngb"/> of <x id="INTERPOLATION_1" equiv-text="this._cycleToSe"/> </target>
+        <target state="translated"> Shlid <x id="INTERPOLATION" equiv-text="xt(source?: Ngb"/> i <x id="INTERPOLATION_1" equiv-text="this._cycleToSe"/></target>
       </trans-unit>
       <trans-unit id="ngb.carousel.previous" datatype="html">
         <source>Previous</source>
@@ -571,7 +571,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
           <context context-type="linenumber">35</context>
         </context-group>
-        <target state="needs-translation">This value overrides <x id="INTERPOLATION" equiv-text="{{option.config_key}}"/>, which is set outside Paperless.</target>
+        <target state="translated">Ky vlerë mbizotëron <x id="INTERPOLATION" equiv-text="{{option.config_key}}"/>, i cili është vendosur jashtë Paperless.</target>
       </trans-unit>
       <trans-unit id="7221396516204435584" datatype="html">
         <source><x id="INTERPOLATION" equiv-text="{{option.config_key}}"/> is set outside Paperless. Enter a value here to override it.</source>
@@ -579,7 +579,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
           <context context-type="linenumber">37</context>
         </context-group>
-        <target state="needs-translation"><x id="INTERPOLATION" equiv-text="{{option.config_key}}"/> is set outside Paperless. Enter a value here to override it.</target>
+        <target state="translated"><x id="INTERPOLATION" equiv-text="{{option.config_key}}"/> është vendosur jashtë Paperless. Shkruani një vlerë këtu për ta mbingarkuar atë.</target>
       </trans-unit>
       <trans-unit id="8318849619178340389" datatype="html">
         <source>Use the externally configured value</source>
@@ -587,7 +587,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
           <context context-type="linenumber">42</context>
         </context-group>
-        <target state="needs-translation">Use the externally configured value</target>
+        <target state="translated">Përdorni vlerën e konfiguruar nga jashtë</target>
       </trans-unit>
       <trans-unit id="6032629623003430385" datatype="html">
         <source>Reset to external</source>
@@ -595,7 +595,7 @@
           <context context-type="sourcefile">src/app/components/admin/config/config.component.html</context>
           <context context-type="linenumber">43</context>
         </context-group>
-        <target state="needs-translation">Reset to external</target>
+        <target state="translated">Rinisni në të jashtëm</target>
       </trans-unit>
       <trans-unit id="7808756054397155068" datatype="html">
         <source>Reset</source>
@@ -1135,7 +1135,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">115,116</context>
         </context-group>
-        <target state="needs-translation">Sidebar items to show:</target>
+        <target state="translated">Elementët e shiritit anësor për t'u shfaqur:</target>
       </trans-unit>
       <trans-unit id="1356890996281769972" datatype="html">
         <source>Dark mode</source>
@@ -1403,7 +1403,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">259,260</context>
         </context-group>
-        <target state="needs-translation">Suggestions default to</target>
+        <target state="translated">Sugjerimet parazgjedhore janë</target>
       </trans-unit>
       <trans-unit id="6251586038459969294" datatype="html">
         <source>Both</source>
@@ -1411,7 +1411,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">264</context>
         </context-group>
-        <target state="needs-translation">Both</target>
+        <target state="translated">Të dyja</target>
       </trans-unit>
       <trans-unit id="8967224283122923634" datatype="html">
         <source>ML only</source>
@@ -1419,7 +1419,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">266</context>
         </context-group>
-        <target state="needs-translation">ML only</target>
+        <target state="translated">Vetëm ML</target>
       </trans-unit>
       <trans-unit id="6418969597665857901" datatype="html">
         <source>AI only</source>
@@ -1427,7 +1427,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">268</context>
         </context-group>
-        <target state="needs-translation">AI only</target>
+        <target state="translated">Vetëm AI</target>
       </trans-unit>
       <trans-unit id="1043449647727456069" datatype="html">
         <source>Automatically request suggestions for inbox documents</source>
@@ -1435,7 +1435,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">276</context>
         </context-group>
-        <target state="needs-translation">Automatically request suggestions for inbox documents</target>
+        <target state="translated">Kërkoni automatikisht sugjerime për dokumentet në kutinë e postës elektronike</target>
       </trans-unit>
       <trans-unit id="460700039378563125" datatype="html">
         <source>If un-checked, suggestions must be requested via the Suggest button.</source>
@@ -1443,7 +1443,7 @@
           <context context-type="sourcefile">src/app/components/admin/settings/settings.component.html</context>
           <context context-type="linenumber">276</context>
         </context-group>
-        <target state="needs-translation">If un-checked, suggestions must be requested via the Suggest button.</target>
+        <target state="translated">Nëse nuk është shënuar, sugjerimet duhet të kërkohen përmes butonit Sugjero.</target>
       </trans-unit>
       <trans-unit id="8793267604636304297" datatype="html">
         <source>Show document thumbnail during loading</source>
@@ -2319,7 +2319,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="needs-translation">Clear search</target>
+        <target state="translated">Pastro kërkimin</target>
       </trans-unit>
       <trans-unit id="3570013039254960445" datatype="html">
         <source>Search tasks</source>
@@ -2651,7 +2651,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.html</context>
           <context context-type="linenumber">207</context>
         </context-group>
-        <target state="needs-translation">View task details</target>
+        <target state="translated">Shiko detajet e detyrës</target>
       </trans-unit>
       <trans-unit id="1536087519743707362" datatype="html">
         <source>Dismiss</source>
@@ -2887,7 +2887,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">104</context>
         </context-group>
-        <target state="needs-translation">Apply AI Suggestions</target>
+        <target state="translated">Apliko sugjerimet e AI</target>
       </trans-unit>
       <trans-unit id="9172233176401579786" datatype="html">
         <source>Scheduled</source>
@@ -3783,7 +3783,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">42</context>
         </context-group>
-        <target state="needs-translation">User menu</target>
+        <target state="translated">Menuja e përdoruesit</target>
       </trans-unit>
       <trans-unit id="2448391510242468907" datatype="html">
         <source>Logged in as <x id="INTERPOLATION" equiv-text="{{this.settingsService.displayName}}"/></source>
@@ -3939,7 +3939,7 @@
           <context context-type="sourcefile">src/app/components/manage/share-links/share-links.component.html</context>
           <context context-type="linenumber">2,3</context>
         </context-group>
-        <target state="needs-translation">Share links</target>
+        <target state="translated">Ndani lidhjet</target>
       </trans-unit>
       <trans-unit id="7844706011418789951" datatype="html">
         <source>Administration</source>
@@ -4015,7 +4015,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.html</context>
           <context context-type="linenumber">403</context>
         </context-group>
-        <target state="needs-translation">Configure update checking</target>
+        <target state="translated">Konfiguro kontrollin e përditësimeve</target>
       </trans-unit>
       <trans-unit id="1542489069631984294" datatype="html">
         <source>Sidebar views updated</source>
@@ -4259,7 +4259,7 @@
           <context context-type="sourcefile">src/app/data/saved-view-icons.ts</context>
           <context context-type="linenumber">21</context>
         </context-group>
-        <target state="needs-translation">Chat</target>
+        <target state="translated">Bisedë</target>
       </trans-unit>
       <trans-unit id="8066608938393600549" datatype="html">
         <source>Message</source>
@@ -4379,7 +4379,7 @@
           <context context-type="sourcefile">src/app/components/common/confirm-dialog/merge-as-versions-confirm-dialog/merge-as-versions-confirm-dialog.component.html</context>
           <context context-type="linenumber">8,9</context>
         </context-group>
-        <target state="needs-translation">Root document:</target>
+        <target state="translated">Dokumenti rrënjësor:</target>
       </trans-unit>
       <trans-unit id="2121026240713807342" datatype="html">
         <source>Versions (oldest first):</source>

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-12 19:12+0000\n"
-"PO-Revision-Date: 2026-10-12 19:13\n"
+"POT-Creation-Date: 2026-10-14 15:18+0000\n"
+"PO-Revision-Date: 2026-10-14 15:19\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
@@ -1636,7 +1636,7 @@ msgid "workflow runs"
 msgstr "запуски рабочего процесса"
 
 #: documents/serialisers.py:515 documents/serialisers.py:872
-#: documents/serialisers.py:2902 documents/views.py:344 documents/views.py:2752
+#: documents/serialisers.py:2902 documents/views.py:363 documents/views.py:2768
 #: paperless_mail/serialisers.py:156
 msgid "Insufficient permissions."
 msgstr "Недостаточно прав."
@@ -1676,7 +1676,7 @@ msgstr "Обнаружена неверная переменная."
 msgid "Duplicate document identifiers are not allowed."
 msgstr "Повторяющиеся идентификаторы документа не допускаются."
 
-#: documents/serialisers.py:2988 documents/views.py:4799
+#: documents/serialisers.py:2988 documents/views.py:4811
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr "Документы не найдены: %(ids)s"
@@ -1917,40 +1917,40 @@ msgstr "На завершение, пожалуйста заполните сл�
 msgid ", "
 msgstr ", "
 
-#: documents/views.py:337 documents/views.py:2749
-msgid "Invalid more_like_id"
-msgstr "Недопустимый more_like_id"
-
-#: documents/views.py:1684
-msgid "Invalid AI configuration."
-msgstr "Неверная конфигурация ИИ."
-
-#: documents/views.py:1695
-msgid "AI backend request timed out."
-msgstr "Таймаут запроса ИИ."
-
-#: documents/views.py:1707
-msgid "AI backend rejected the request. Check logs for details."
-msgstr "Движок ИИ отклонил запрос. Проверьте логи."
-
-#: documents/views.py:2574 documents/views.py:2890
+#: documents/views.py:318
 msgid "Specify only one of text, title_search, query, or more_like_id."
 msgstr "Укажите только одно: текст, title_search, query или more _like_id."
 
-#: documents/views.py:4815
+#: documents/views.py:356 documents/views.py:2765
+msgid "Invalid more_like_id"
+msgstr "Недопустимый more_like_id"
+
+#: documents/views.py:1703
+msgid "Invalid AI configuration."
+msgstr "Неверная конфигурация ИИ."
+
+#: documents/views.py:1714
+msgid "AI backend request timed out."
+msgstr "Таймаут запроса ИИ."
+
+#: documents/views.py:1726
+msgid "AI backend rejected the request. Check logs for details."
+msgstr "Движок ИИ отклонил запрос. Проверьте логи."
+
+#: documents/views.py:4827
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr "Недостаточно прав для совместного доступа к документу %(id)s."
 
-#: documents/views.py:4862
+#: documents/views.py:4874
 msgid "Bundle is already being processed."
 msgstr "Пакет уже обрабатывается."
 
-#: documents/views.py:4926
+#: documents/views.py:4938
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr "Набор ссылок все еще готовится. Пожалуйста, повторите попытку позже."
 
-#: documents/views.py:4940
+#: documents/views.py:4952
 msgid "The share link bundle is unavailable."
 msgstr "Пакет общих ссылок недоступен."
 

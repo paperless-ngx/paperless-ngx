@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-12 19:12+0000\n"
-"PO-Revision-Date: 2026-10-12 19:13\n"
+"POT-Creation-Date: 2026-10-14 15:18+0000\n"
+"PO-Revision-Date: 2026-10-14 15:19\n"
 "Last-Translator: \n"
 "Language-Team: Albanian\n"
 "Language: sq_AL\n"
@@ -482,7 +482,7 @@ msgstr ""
 
 #: documents/models.py:616
 msgid "Tag"
-msgstr ""
+msgstr "Etiketa"
 
 #: documents/models.py:617 documents/models.py:632 documents/models.py:1804
 msgid "Tags"
@@ -494,15 +494,15 @@ msgstr ""
 
 #: documents/models.py:619
 msgid "Truck"
-msgstr ""
+msgstr "Kamion"
 
 #: documents/models.py:620
 msgid "Barcode"
-msgstr ""
+msgstr "Barkodi"
 
 #: documents/models.py:621
 msgid "Wallet"
-msgstr ""
+msgstr "Portofol"
 
 #: documents/models.py:624
 msgid "Table"
@@ -562,7 +562,7 @@ msgstr "Faqet"
 
 #: documents/models.py:646
 msgid "icon"
-msgstr ""
+msgstr "ikonë"
 
 #: documents/models.py:653
 msgid "sort field"
@@ -794,7 +794,7 @@ msgstr "kërkim i thjeshtë teksti"
 
 #: documents/models.py:742
 msgid "has duplicates"
-msgstr ""
+msgstr "ka dublikatë"
 
 #: documents/models.py:752
 msgid "rule type"
@@ -882,7 +882,7 @@ msgstr "Fshirje në masë"
 
 #: documents/models.py:807
 msgid "Apply AI Suggestions"
-msgstr ""
+msgstr "Apliko sugjerimet e AI"
 
 #: documents/models.py:816 documents/models.py:1468
 msgid "Scheduled"
@@ -1006,23 +1006,23 @@ msgstr "shënime"
 
 #: documents/models.py:996
 msgid "page"
-msgstr ""
+msgstr "Faqe"
 
 #: documents/models.py:997
 msgid "Page of the original file, starting at 1"
-msgstr ""
+msgstr "Faqe e skedarit origjinal, duke filluar nga 1"
 
 #: documents/models.py:1052
 msgid "format"
-msgstr ""
+msgstr "Format"
 
 #: documents/models.py:1056
 msgid "document barcode"
-msgstr ""
+msgstr "Dokumenti me barkod"
 
 #: documents/models.py:1057
 msgid "document barcodes"
-msgstr ""
+msgstr "Kodi i barkodit në dokument"
 
 #: documents/models.py:1066
 msgid "Original"
@@ -1404,23 +1404,23 @@ msgstr "Zhvendos në kosh"
 
 #: documents/models.py:1795
 msgid "Remote OCR"
-msgstr ""
+msgstr "OCR në distancë"
 
 #: documents/models.py:1799
 msgid "Apply AI suggestions"
-msgstr ""
+msgstr "Apliko sugjerimet e IA-së"
 
 #: documents/models.py:1806
 msgid "Document type"
-msgstr ""
+msgstr "Lloji i dokumentit"
 
 #: documents/models.py:1807
 msgid "Storage path"
-msgstr ""
+msgstr "Rruga e ruajtjes"
 
 #: documents/models.py:1808
 msgid "Created date"
-msgstr ""
+msgstr "Data e krijimit"
 
 #: documents/models.py:1811
 msgid "Workflow Action Type"
@@ -1573,27 +1573,27 @@ msgstr "Fjalëkalimet që provohen gjatë heqjes së mbrojtjes PDF. Ndaji me pre
 
 #: documents/models.py:2048
 msgid "AI suggestion fields"
-msgstr ""
+msgstr "Fushat e sugjerimeve të AI"
 
 #: documents/models.py:2052
 msgid "Which of the AI-suggested fields to apply to the document."
-msgstr ""
+msgstr "Cilat nga fushat e sugjeruara nga AI t'i aplikoni në dokument."
 
 #: documents/models.py:2057
 msgid "create missing objects"
-msgstr ""
+msgstr "krijo objektet e munguara"
 
 #: documents/models.py:2060
 msgid "Create suggested tags, correspondents, document types and storage paths that do not already exist instead of skipping them."
-msgstr ""
+msgstr "Krijoni etiketa të sugjeruara, korrespondentë, lloje dokumentesh dhe shtigje ruajtjeje që nuk ekzistojnë ende, në vend që t'i anashkaloni."
 
 #: documents/models.py:2066
 msgid "overwrite existing values"
-msgstr ""
+msgstr "mbishkruaj vlera ekzistuese"
 
 #: documents/models.py:2069
 msgid "Apply suggestions even if the document already has a value for that field. Tags are always added to, never replaced."
-msgstr ""
+msgstr "Zbato sugjerimet edhe nëse dokumenti tashmë ka një vlerë për atë fushë. Etiketat gjithmonë shtohen, kurrë nuk zëvendësohen."
 
 #: documents/models.py:2075
 msgid "workflow action"
@@ -1605,7 +1605,7 @@ msgstr "veprime rrjedhe pune"
 
 #: documents/models.py:2091
 msgid "triggers"
-msgstr ""
+msgstr "shkaktarë"
 
 #: documents/models.py:2098
 msgid "actions"
@@ -1636,7 +1636,7 @@ msgid "workflow runs"
 msgstr "ekzekutime rrjedhash pune"
 
 #: documents/serialisers.py:515 documents/serialisers.py:872
-#: documents/serialisers.py:2902 documents/views.py:344 documents/views.py:2752
+#: documents/serialisers.py:2902 documents/views.py:363 documents/views.py:2768
 #: paperless_mail/serialisers.py:156
 msgid "Insufficient permissions."
 msgstr "Leje të pamjaftueshme."
@@ -1662,7 +1662,7 @@ msgstr "Fusha e personalizuar me ID %(id)s nuk ekziston"
 
 #: documents/serialisers.py:2437 documents/serialisers.py:2447
 msgid "Custom fields must be a list of integers or an object mapping ids to values."
-msgstr ""
+msgstr "Fushat e personalizuara duhet të jenë listë numrash të plotë ose objekt që lidh ID-të me vlerat"
 
 #: documents/serialisers.py:2442
 msgid "Some custom fields don't exist or were specified twice."
@@ -1676,14 +1676,14 @@ msgstr "U zbulua variabël e pavlefshme."
 msgid "Duplicate document identifiers are not allowed."
 msgstr "Identifikuesit dublikatë të dokumenteve nuk lejohen."
 
-#: documents/serialisers.py:2988 documents/views.py:4799
+#: documents/serialisers.py:2988 documents/views.py:4811
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr "Dokumentet nuk u gjetën: %(ids)s"
 
 #: documents/templates/account/account_inactive.html:5
 msgid "Paperless-ngx account inactive"
-msgstr ""
+msgstr "Llogaria Paperless-ngx është joaktive."
 
 #: documents/templates/account/account_inactive.html:9
 msgid "Account inactive."
@@ -1807,7 +1807,7 @@ msgstr "Ndrysho fjalëkalimin tim"
 
 #: documents/templates/account/password_reset_from_key_done.html:5
 msgid "Paperless-ngx reset password complete"
-msgstr ""
+msgstr "Rivendosja e fjalëkalimit për Paperless-ngx përfundoi me sukses."
 
 #: documents/templates/account/password_reset_from_key_done.html:9
 msgid "Password reset complete."
@@ -1881,20 +1881,20 @@ msgstr "Lidhja e ndarjes ka skaduar."
 #: documents/templates/socialaccount/authentication_error.html:5
 #: documents/templates/socialaccount/login.html:5
 msgid "Paperless-ngx social account sign in"
-msgstr ""
+msgstr "Hyrje në llogarinë sociale të Paperless-ngx"
 
 #: documents/templates/socialaccount/authentication_error.html:10
 msgid "An error occurred while attempting to login via your social network account. Back to the"
-msgstr ""
+msgstr "Ndodhi një gabim gjatë përpjekjes për t'u identifikuar përmes llogarisë tuaj të rrjetit social. Kthehu tek"
 
 #: documents/templates/socialaccount/authentication_error.html:10
 msgid "login page"
-msgstr ""
+msgstr "faqja e hyrjes"
 
 #: documents/templates/socialaccount/login.html:11
 #, python-format
 msgid "You are about to connect a new third-party account from %(provider)s."
-msgstr ""
+msgstr "Jeni duke u lidhur me një llogari të re të palës së tretë nga %(provider)s."
 
 #: documents/templates/socialaccount/login.html:15
 msgid "Continue"
@@ -1915,64 +1915,64 @@ msgstr "Si hap i fundit, ju lutemi plotësoni formularin e mëposhtëm:"
 
 #: documents/validators.py:36
 msgid ", "
-msgstr ""
+msgstr " ,"
 
-#: documents/views.py:337 documents/views.py:2749
+#: documents/views.py:318
+msgid "Specify only one of text, title_search, query, or more_like_id."
+msgstr "Specifikoni vetëm njërën prej: text, title_search, query, ose more_like_id."
+
+#: documents/views.py:356 documents/views.py:2765
 msgid "Invalid more_like_id"
-msgstr ""
+msgstr "ID e pavlefshme e \"më shumë ngjashmëri\""
 
-#: documents/views.py:1684
+#: documents/views.py:1703
 msgid "Invalid AI configuration."
 msgstr "Konfigurim AI i pavlefshëm."
 
-#: documents/views.py:1695
+#: documents/views.py:1714
 msgid "AI backend request timed out."
-msgstr ""
+msgstr "Kërkesa në backend-in e AI-së ka skaduar kohën."
 
-#: documents/views.py:1707
+#: documents/views.py:1726
 msgid "AI backend rejected the request. Check logs for details."
-msgstr ""
+msgstr "Backend-i i AI-së refuzoi kërkesën. Kontrolloni regjistrimet për detaje."
 
-#: documents/views.py:2574 documents/views.py:2890
-msgid "Specify only one of text, title_search, query, or more_like_id."
-msgstr ""
-
-#: documents/views.py:4815
+#: documents/views.py:4827
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr "Leje të pamjaftueshme për të ndarë dokumentin %(id)s."
 
-#: documents/views.py:4862
+#: documents/views.py:4874
 msgid "Bundle is already being processed."
 msgstr "Paketa po përpunohet tashmë."
 
-#: documents/views.py:4926
+#: documents/views.py:4938
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr "Paketa e lidhjes së ndarjes ende po përgatitet. Ju lutemi provoni përsëri më vonë."
 
-#: documents/views.py:4940
+#: documents/views.py:4952
 msgid "The share link bundle is unavailable."
 msgstr "Paketa e lidhjes së ndarjes nuk është e disponueshme."
 
 #: paperless/apps.py:11
 msgid "Paperless"
-msgstr ""
+msgstr "Paperless"
 
 #: paperless/models.py:26
 msgid "pdf"
-msgstr ""
+msgstr "pdf"
 
 #: paperless/models.py:27
 msgid "pdfa"
-msgstr ""
+msgstr "pdfa"
 
 #: paperless/models.py:28
 msgid "pdfa-1"
-msgstr ""
+msgstr "pdfa-1"
 
 #: paperless/models.py:29
 msgid "pdfa-2"
-msgstr ""
+msgstr "pdfa-2"
 
 #: paperless/models.py:30
 msgid "pdfa-3"
@@ -2004,11 +2004,11 @@ msgstr "kurrë"
 
 #: paperless/models.py:60
 msgid "clean"
-msgstr ""
+msgstr "pastro"
 
 #: paperless/models.py:61
 msgid "clean-final"
-msgstr ""
+msgstr "versioni përfundimtar i pastruar"
 
 #: paperless/models.py:62
 msgid "none"
@@ -2016,7 +2016,7 @@ msgstr "asnjë"
 
 #: paperless/models.py:70
 msgid "LeaveColorUnchanged"
-msgstr ""
+msgstr "LëreNgjyrënTëPandryshuar"
 
 #: paperless/models.py:71
 msgid "RGB"
@@ -2024,7 +2024,7 @@ msgstr "RGB"
 
 #: paperless/models.py:72
 msgid "UseDeviceIndependentColor"
-msgstr ""
+msgstr "PërdorNgjyrën e Pavarur nga Pajisjet"
 
 #: paperless/models.py:73
 msgid "Gray"
@@ -2036,31 +2036,31 @@ msgstr "CMYK"
 
 #: paperless/models.py:82
 msgid "Azure AI Document Intelligence"
-msgstr ""
+msgstr "Inteligjenca e Dokumenteve Azure AI"
 
 #: paperless/models.py:90
 msgid "All supported documents"
-msgstr ""
+msgstr "Të gjitha dokumentet e mbështetura"
 
 #: paperless/models.py:91
 msgid "Only when a workflow enables it"
-msgstr ""
+msgstr "Vetëm kur një rrjedhë pune e lejon"
 
 #: paperless/models.py:95 paperless/models.py:105
 msgid "OpenAI-compatible"
-msgstr ""
+msgstr "E pajtueshme me OpenAI"
 
 #: paperless/models.py:96
 msgid "Huggingface"
-msgstr ""
+msgstr "Huggingface"
 
 #: paperless/models.py:97 paperless/models.py:106
 msgid "Ollama"
-msgstr ""
+msgstr "Ollama"
 
 #: paperless/models.py:115
 msgid "Sets the output PDF type"
-msgstr ""
+msgstr "Cakton llojin e PDF-së së daljes"
 
 #: paperless/models.py:127
 msgid "Do OCR from page 1 to this value"
@@ -2096,7 +2096,7 @@ msgstr "Aktivizon rrotullimin e faqeve"
 
 #: paperless/models.py:178
 msgid "Sets the threshold for rotation of pages"
-msgstr ""
+msgstr "Vendos pragun për rrotullimin e faqeve"
 
 #: paperless/models.py:184
 msgid "Sets the maximum image size for decompression"
@@ -2104,11 +2104,11 @@ msgstr "Cakton madhësinë maksimale të figurës për dekompresim"
 
 #: paperless/models.py:190
 msgid "Sets the Ghostscript color conversion strategy"
-msgstr ""
+msgstr "Përcakton strategjinë e konvertimit të ngjyrave për Ghostscript"
 
 #: paperless/models.py:198
 msgid "Adds additional user arguments for OCRMyPDF"
-msgstr ""
+msgstr "Shton argumente shtesë të përdoruesit për OCRMyPDF"
 
 #: paperless/models.py:207
 msgid "Application title"
@@ -2120,7 +2120,7 @@ msgstr "Logoja e aplikacionit"
 
 #: paperless/models.py:229
 msgid "Enables barcode scanning"
-msgstr ""
+msgstr "Mundëson skanimin e kodeve të vijëzuara"
 
 #: paperless/models.py:235
 msgid "Enables barcode TIFF support"
@@ -2132,19 +2132,19 @@ msgstr "Cakton vargun e barkodit"
 
 #: paperless/models.py:249
 msgid "Retains split pages"
-msgstr ""
+msgstr "Ruan faqet e ndara"
 
 #: paperless/models.py:255
 msgid "Enables ASN barcode"
-msgstr ""
+msgstr "Aktivizon barkodin ASN"
 
 #: paperless/models.py:261
 msgid "Sets the ASN barcode prefix"
-msgstr ""
+msgstr "Vendos prefiksin e barkodit ASN"
 
 #: paperless/models.py:269
 msgid "Sets the barcode upscale factor"
-msgstr ""
+msgstr "Vendos faktorin e zmadhimit të barkodit"
 
 #: paperless/models.py:276
 msgid "Sets the barcode DPI"
@@ -2152,11 +2152,11 @@ msgstr "Cakton DPI-në e barkodit"
 
 #: paperless/models.py:283
 msgid "Sets the maximum pages for barcode"
-msgstr ""
+msgstr "Vendos numrin maksimal të faqeve për barkodin"
 
 #: paperless/models.py:290
 msgid "Enables tag barcode"
-msgstr ""
+msgstr "Aktivizon barkodin e etiketës"
 
 #: paperless/models.py:296
 msgid "Sets the tag barcode mapping"
@@ -2168,23 +2168,23 @@ msgstr "Mundëson ndarjen bazuar në barkodet e etiketave"
 
 #: paperless/models.py:308
 msgid "Stores the values of detected barcodes"
-msgstr ""
+msgstr "Ruan vlerat e barkodeve të zbuluar"
 
 #: paperless/models.py:318
 msgid "Sets the remote OCR engine"
-msgstr ""
+msgstr "Cakton motorin OCR të largët"
 
 #: paperless/models.py:327
 msgid "Sets the remote OCR API key"
-msgstr ""
+msgstr "Cakton çelësin e API-së së OCR-it në distancë"
 
 #: paperless/models.py:335
 msgid "Sets the remote OCR endpoint"
-msgstr ""
+msgstr "Cakton pikën e destinacionit të largët të OCR-së"
 
 #: paperless/models.py:343
 msgid "Sets which documents are sent to the remote OCR engine"
-msgstr ""
+msgstr "Cakton se cilat dokumente dërgohen te motori OCR i largët"
 
 #: paperless/models.py:355
 msgid "Enables AI features"
@@ -2192,23 +2192,23 @@ msgstr "Aktivizon veçoritë AI"
 
 #: paperless/models.py:360
 msgid "Sets the LLM embedding backend"
-msgstr ""
+msgstr "Vendos mekanizmin e pasme (backend) për embedding-un e LLM-së"
 
 #: paperless/models.py:368
 msgid "Sets the LLM embedding model"
-msgstr ""
+msgstr "Vendos modelin e ngulitjes (embedding) të LLM-së"
 
 #: paperless/models.py:375
 msgid "Sets the LLM embedding API key"
-msgstr ""
+msgstr "Cakton çelësin e API-së së integrimit të LLM-së"
 
 #: paperless/models.py:382
 msgid "Sets the LLM embedding endpoint, optional"
-msgstr ""
+msgstr "Vendos pikën përfundimtare të \"embedding\"-ut për LLM-në (opsionale)"
 
 #: paperless/models.py:389
 msgid "Sets the LLM embedding chunk size"
-msgstr ""
+msgstr "Vendos madhësinë e segmentit të enkodimit (embedding) për LLM-në."
 
 #: paperless/models.py:395
 msgid "Sets the LLM context size"
@@ -2216,7 +2216,7 @@ msgstr "Cakton madhësinë e kontekstit LLM"
 
 #: paperless/models.py:401
 msgid "Sets the LLM backend"
-msgstr ""
+msgstr "Vendos backend-in e LLM-së"
 
 #: paperless/models.py:409
 msgid "Sets the LLM model"
@@ -2228,7 +2228,7 @@ msgstr "Cakton çelësin API të LLM"
 
 #: paperless/models.py:423
 msgid "Sets the LLM endpoint, optional"
-msgstr ""
+msgstr "Cakton endpoint-in e embedding LLM, opsionale"
 
 #: paperless/models.py:430
 msgid "Sets the LLM output language"
@@ -2240,7 +2240,7 @@ msgstr "Cakton kohën limit të LLM në sekonda"
 
 #: paperless/models.py:443
 msgid "paperless application settings"
-msgstr ""
+msgstr "cilësimet e aplikimit pa përdorim letre"
 
 #: paperless/settings/__init__.py:562
 msgid "English (US)"
@@ -2252,7 +2252,7 @@ msgstr "Arabisht"
 
 #: paperless/settings/__init__.py:564
 msgid "Afrikaans"
-msgstr ""
+msgstr "Afrikanisht"
 
 #: paperless/settings/__init__.py:565
 msgid "Belarusian"
@@ -2264,7 +2264,7 @@ msgstr "Bullgarisht"
 
 #: paperless/settings/__init__.py:567
 msgid "Catalan"
-msgstr ""
+msgstr "Katalanisht"
 
 #: paperless/settings/__init__.py:568
 msgid "Czech"
@@ -2308,7 +2308,7 @@ msgstr "Hungarisht"
 
 #: paperless/settings/__init__.py:578
 msgid "Indonesian"
-msgstr ""
+msgstr "Indonezisht"
 
 #: paperless/settings/__init__.py:579
 msgid "Italian"
@@ -2376,7 +2376,7 @@ msgstr "Turqisht"
 
 #: paperless/settings/__init__.py:595
 msgid "Ukrainian"
-msgstr ""
+msgstr "Ukrainisht"
 
 #: paperless/settings/__init__.py:596
 msgid "Vietnamese"
@@ -2528,7 +2528,7 @@ msgstr "Process full Email (with embedded attachments in skedar) as .eml"
 
 #: paperless_mail/models.py:109
 msgid "Process full Mail (with embedded attachments in file) as .eml + process attachments as separate documents"
-msgstr ""
+msgstr "Përpuno email-in e plotë (me bashkëngjitje të përfshira në skedar) si .eml + përpuno bashkëngjitjet si dokumente të veçanta."
 
 #: paperless_mail/models.py:116
 msgid "Process all files, including 'inline' attachments."
@@ -2564,7 +2564,7 @@ msgstr "Zhvendos në dosjen e specifikuar"
 
 #: paperless_mail/models.py:128
 msgid "Mark as read, don't process read mails"
-msgstr ""
+msgstr "Shënoji si të lexuara, mos i përpuno emailet e lexuara"
 
 #: paperless_mail/models.py:129
 msgid "Flag the mail, don't process flagged mails"
