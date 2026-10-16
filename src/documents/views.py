@@ -3020,6 +3020,7 @@ class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
                     bulk_edit.edit_pdf,
                     bulk_edit.merge_as_versions,
                     bulk_edit.remove_password,
+                    bulk_edit.run_workflow,
                 ]
             )
             or (
@@ -3159,6 +3160,7 @@ class BulkEditView(DocumentOperationPermissionMixin):
         "edit_pdf": None,
         "reprocess": "checksum",
         "remove_password": None,
+        "run_workflow": None,
     }
 
     serializer_class = BulkEditSerializer

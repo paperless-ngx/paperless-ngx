@@ -42,6 +42,7 @@ from documents.plugins.helpers import DocumentsStatusManager
 from documents.tasks import bulk_update_documents
 from documents.tasks import consume_file
 from documents.tasks import remove_document_from_index
+from documents.tasks import run_workflows_for_documents
 from documents.tasks import update_document_content_maybe_archive_file
 from documents.versioning import get_latest_version_for_root
 from documents.versioning import get_root_document
@@ -442,6 +443,25 @@ def reprocess(doc_ids: list[int], *, remote_ocr: bool = False) -> Literal["OK"]:
             headers={"trigger_source": PaperlessTask.TriggerSource.MANUAL},
         )
 
+    return "OK"
+
+
+def run_workflow(
+    doc_ids: list[int],
+    workflow: int,
+    *,
+    filter_documents: bool = True,
+) -> Literal["OK"]:
+    """
+    Manually run a single workflow against the given documents.
+
+    Done asynchronously via a Celery task.
+    """
+    run_workflows_for_documents.delay(
+        document_ids=doc_ids,
+        workflow_id=workflow,
+        filter_documents=filter_documents,
+    )
     return "OK"
 
 
