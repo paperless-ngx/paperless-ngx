@@ -3005,6 +3005,11 @@ wheels = [
 ]
 
 [[package]]
+name = "paperless-fuzzy-native"
+version = "0.1.0"
+source = { directory = "native/fuzzy" }
+
+[[package]]
 name = "paperless-ngx"
 version = "3.3.1"
 source = { virtual = "." }
@@ -3049,6 +3054,7 @@ dependencies = [
     { name = "llama-index-llms-openai-like" },
     { name = "ocrmypdf", extra = ["heic"] },
     { name = "openai" },
+    { name = "paperless-fuzzy-native" },
     { name = "pathvalidate" },
     { name = "pdf2image" },
     { name = "python-dateutil" },
@@ -3202,6 +3208,7 @@ requires-dist = [
     { name = "mysqlclient", marker = "extra == 'mariadb'", specifier = ">=2.2.7,<2.4" },
     { name = "ocrmypdf", extras = ["heic"], specifier = ">=17.12,<17.13" },
     { name = "openai", specifier = ">=2.48" },
+    { name = "paperless-fuzzy-native", directory = "native/fuzzy" },
     { name = "pathvalidate", specifier = "~=3.3.1" },
     { name = "pdf2image", specifier = "~=1.17.0" },
     { name = "psycopg", extras = ["c", "pool"], marker = "extra == 'postgres'", specifier = "==3.3.4" },

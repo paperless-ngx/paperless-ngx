@@ -1,3 +1,5 @@
+# Rust build outputs
+/native/fuzzy/target/
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

@@ -1,0 +1,14 @@
+[package]
+name = "paperless-fuzzy-native"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.89"
+license = "GPL-3.0-or-later"
+
+[lib]
+name = "_native"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+pyo3 = { version = "=0.27.2", features = ["abi3-py311"] }
+rapidfuzz = "=0.5.0"

@@ -1,0 +1,32 @@
+[build-system]
+build-backend = "maturin"
+requires = [ "maturin==1.10.2" ]
+
+[project]
+name = "paperless-fuzzy-native"
+version = "0.1.0"
+description = "Reference-compatible Rust fuzzy matching for Paperless"
+requires-python = ">=3.11"
+classifiers = [
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Programming Language :: Python :: 3.15",
+]
+
+[tool.maturin]
+module-name = "paperless_fuzzy_native._native"
+python-source = "python"
+features = [ "pyo3/extension-module" ]
+locked = true
+
+[tool.uv]
+cache-keys = [
+  { file = "pyproject.toml" },
+  { file = "Cargo.toml" },
+  { file = "Cargo.lock" },
+  { file = "src/**/*.rs" },
+  { file = "python/**/*" },
+]

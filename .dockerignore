@@ -4,6 +4,7 @@
 **/.mypy_cache/
 # Virtual environment & similar
 .venv/
+native/fuzzy/target/
 ./src-ui/node_modules
 ./src-ui/dist
 # IDE folders

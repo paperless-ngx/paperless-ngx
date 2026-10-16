@@ -710,6 +710,10 @@ taken into account by the detection.
 document_fuzzy_match [--ratio] [--processes N]
 ```
 
+Normalization and scoring use the required Rust extension. See
+[Rust fuzzy matching](fuzzy_matching.md) for source-install requirements,
+compatibility details, diagnostics, and benchmarks. Container images include it.
+
 | Option      | Required | Default             | Description                                                                                                                    |
 | ----------- | -------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
 | --ratio     | No       | 85.0                | a number between 0 and 100, setting how similar a document must be for it to be reported. Higher numbers mean more similarity. |

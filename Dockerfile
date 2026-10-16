@@ -26,6 +26,19 @@ esac
 RUN set -eux \
   && ./node_modules/.bin/ng build --configuration production
 
+# Stage: compile-fuzzy
+FROM docker.io/rust:1.89.0-slim-trixie AS compile-fuzzy
+COPY --from=ghcr.io/astral-sh/uv:0.12.23 /uv /usr/local/bin/uv
+WORKDIR /build
+COPY ./native/fuzzy ./native/fuzzy
+RUN apt-get update \
+  && apt-get install --yes --no-install-recommends python3 python3-dev python3-venv \
+  && rm -rf /var/lib/apt/lists/* \
+  && uv venv /build/venv --python /usr/bin/python3 \
+  && uv pip install --python /build/venv/bin/python maturin==1.10.2 \
+  && /build/venv/bin/maturin build --release --locked \
+    --manifest-path native/fuzzy/Cargo.toml --interpreter /build/venv/bin/python --out /wheels
+
 # Stage: s6-overlay-base
 # Purpose: Installs s6-overlay and rootfs
 # Comments:
@@ -180,6 +193,8 @@ WORKDIR /usr/src/paperless/src/
 # Python dependencies
 # Change pretty frequently
 COPY --chown=1000:1000 ["pyproject.toml", "uv.lock", "/usr/src/paperless/src/"]
+COPY --chown=1000:1000 ./native/fuzzy ./native/fuzzy
+COPY --from=compile-fuzzy /wheels /fuzzy-wheels
 
 # Packages needed only for building a few quick Python
 # dependencies
@@ -195,12 +210,14 @@ RUN set -eux \
     && apt-get update \
     && apt-get install --yes --quiet --no-install-recommends ${BUILD_PACKAGES} \
   && echo "Installing Python requirements" \
-    && uv export --quiet --no-dev --all-extras --format requirements-txt --output-file requirements.txt \
+    && uv export --quiet --no-dev --all-extras --no-emit-package paperless-fuzzy-native --format requirements-txt --output-file requirements.txt \
     && uv pip install --no-cache --system --no-python-downloads --python-preference system \
       --index https://pypi.org/simple \
       --index https://download.pytorch.org/whl/cpu \
       --index-strategy unsafe-best-match \
       --requirements requirements.txt \
+    && uv pip install --system --no-deps /fuzzy-wheels/*.whl \
+    && rm --recursive --force /fuzzy-wheels native \
   && echo "Cleaning up image" \
     && apt-get --yes purge ${BUILD_PACKAGES} \
     && apt-get --yes autoremove --purge \

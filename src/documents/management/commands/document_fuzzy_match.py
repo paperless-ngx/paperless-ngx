@@ -2,12 +2,14 @@ import dataclasses
 from itertools import combinations
 from typing import Final
 
-import rapidfuzz
 from django.core.management import CommandError
 from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
 
+from documents.fuzzy import NativeFuzzyError
+from documents.fuzzy import native_backend
+from documents.fuzzy import process_and_ratio
 from documents.management.commands.base import PaperlessCommand
 from documents.models import Document
 
@@ -29,17 +31,11 @@ class _WorkResult:
 
 
 def _process_and_match(work: _WorkPackage) -> _WorkResult:
-    """
-    Process document content and compute the fuzzy ratio.
-    score_cutoff lets rapidfuzz short-circuit when the score cannot reach the threshold.
-    """
-    first_string = rapidfuzz.utils.default_process(work.content_a)
-    second_string = rapidfuzz.utils.default_process(work.content_b)
-    ratio = rapidfuzz.fuzz.ratio(
-        first_string,
-        second_string,
-        score_cutoff=work.score_cutoff,
-    )
+    """Normalize and score document content in Rust, preserving the pair IDs."""
+    try:
+        ratio = process_and_ratio(work.content_a, work.content_b, work.score_cutoff)
+    except NativeFuzzyError as error:
+        raise CommandError(str(error)) from error
     return _WorkResult(work.pk_a, work.pk_b, ratio)
 
 
@@ -169,6 +165,11 @@ class Command(PaperlessCommand):
         if opt_ratio < RATIO_MIN or opt_ratio > RATIO_MAX:
             raise CommandError("The ratio must be between 0 and 100")
 
+        try:
+            native_backend()
+        except NativeFuzzyError as error:
+            raise CommandError(str(error)) from error
+
         if options["delete"]:
             self.console.print(
                 Panel(
@@ -215,6 +216,8 @@ class Command(PaperlessCommand):
                     description="Matching...",
                 ):
                     if proc_result.error:
+                        if isinstance(proc_result.error, CommandError):
+                            raise proc_result.error
                         self.console.print(
                             f"[red]Failed: {proc_result.error}[/red]",
                         )

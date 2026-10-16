@@ -59,6 +59,7 @@ dependencies = [
   "llama-index-llms-openai-like>=0.7.1",
   "ocrmypdf[heic]>=17.12,<17.13",
   "openai>=2.48",
+  "paperless-fuzzy-native==0.1",
   "pathvalidate~=3.3.1",
   "pdf2image~=1.17.0",
   "python-dateutil~=2.9.0",
@@ -157,6 +158,7 @@ environments = [
 ]
 package = false
 [tool.uv.sources]
+paperless-fuzzy-native = { path = "native/fuzzy" }
 # Markers are chosen to select these almost exclusively when building the Docker image
 psycopg-c = [
   { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.4/psycopg_c-3.3.4-cp312-cp312-linux_x86_64.whl", marker = "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version == '3.12'" },

@@ -74,6 +74,8 @@ jobs:
               - 'src/**'
               - 'pyproject.toml'
               - 'uv.lock'
+              - 'native/fuzzy/**'
+              - 'rust-toolchain.toml'
               - 'docker/compose/docker-compose.ci-test.yml'
               - '.github/workflows/ci-backend.yml'
   test:
@@ -101,6 +103,8 @@ jobs:
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "${{ matrix.python-version }}"
+      - name: Install Rust toolchain
+        run: rustup show active-toolchain
       - name: Install uv
         uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
@@ -126,6 +130,13 @@ jobs:
       - name: List installed Python dependencies
         run: |
           uv pip list
+      - name: Check Rust fuzzy implementation
+        run: |
+          cargo fmt --manifest-path native/fuzzy/Cargo.toml --check
+          export PYO3_PYTHON="$PWD/.venv/bin/python"
+          export LD_LIBRARY_PATH="$(.venv/bin/python -c 'import sysconfig; print(sysconfig.get_config_var("LIBDIR"))')"
+          cargo test --locked --manifest-path native/fuzzy/Cargo.toml
+          PYO3_PYTHON="$PWD/.venv/bin/python" cargo clippy --locked --manifest-path native/fuzzy/Cargo.toml -- -D warnings
       - name: Run tests
         env:
           PAPERLESS_CI_TEST: 1
@@ -174,6 +185,8 @@ jobs:
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "${{ env.DEFAULT_PYTHON }}"
+      - name: Install Rust toolchain
+        run: rustup show active-toolchain
       - name: Install uv
         uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
