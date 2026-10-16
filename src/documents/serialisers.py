@@ -39,6 +39,7 @@ from drf_spectacular.utils import extend_schema_field
 from drf_spectacular.utils import extend_schema_serializer
 from drf_writable_nested.serializers import NestedUpdateMixin
 from guardian.core import ObjectPermissionChecker
+from guardian.shortcuts import get_groups_with_perms
 from guardian.shortcuts import get_users_with_perms
 from guardian.utils import get_group_obj_perms_model
 from guardian.utils import get_user_obj_perms_model
@@ -83,7 +84,6 @@ from documents.permissions import PermissionAction
 from documents.permissions import PermissionGrantees
 from documents.permissions import PermissionsSpec
 from documents.permissions import get_document_count_filter_for_user
-from documents.permissions import get_groups_with_only_permission
 from documents.permissions import has_perms_owner_aware
 from documents.permissions import permitted_document_ids
 from documents.permissions import restrict_queryset_to_visible
@@ -337,9 +337,9 @@ class OwnedObjectSerializer(
             )
         else:  # groups
             return list(
-                get_groups_with_only_permission(
+                get_groups_with_perms(
                     obj,
-                    codename=f"{codename}_{obj.__class__.__name__.lower()}",
+                    only_with_perms_in=[f"{codename}_{obj.__class__.__name__.lower()}"],
                 ).values_list("id", flat=True),
             )
 
