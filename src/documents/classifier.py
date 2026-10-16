@@ -54,6 +54,10 @@ def _predict_with_threshold(classifier, X, threshold: float) -> int | None:
     cutoff so that uncertain predictions are discarded rather than assigned.
     """
     probas = classifier.predict_proba(X)[0]
+    if len(classifier.classes_) == 1:
+        # scikit-learn treats a single-class fit as binary, so predict_proba
+        # returns [1 - p, p] for one class. Column 0 is the real class.
+        probas = probas[:1]
     best_idx = int(probas.argmax())
     best_class = int(classifier.classes_[best_idx])
 
