@@ -12,6 +12,7 @@ export enum WorkflowTriggerType {
   DocumentAdded = 2,
   DocumentUpdated = 3,
   Scheduled = 4,
+  Manual = 5,
 }
 
 export enum ScheduleDateField {
