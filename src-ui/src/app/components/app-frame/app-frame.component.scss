@@ -532,7 +532,23 @@ main {
 
 .header-search {
   width: 100%;
-  max-width: 55rem;
+  max-width: 50rem;
+}
+
+.header-search pngx-global-search {
+  min-width: 0;
+}
+
+// light w shadow to stand out against search
+.header-upload {
+  --bs-btn-bg: rgba(255, 255, 255, .15);
+  --bs-btn-hover-bg: rgba(255, 255, 255, .22);
+  --bs-btn-active-bg: rgba(255, 255, 255, .3);
+  color: var(--pngx-primary-text-contrast) !important; // .navbar .dropdown > .btn in styles.scss
+
+  &:not(:focus) {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .35), 0 1px 1px rgba(0, 0, 0, .2); // leave room for the .btn:focus ring
+  }
 }
 
 @media screen and (max-width: 575.98px) {
@@ -661,4 +677,8 @@ main {
 
 ::ng-deep .navItemDrag .position-absolute i-bs {
   display: none;
+}
+
+.smaller {
+  font-size: 0.75rem;
 }

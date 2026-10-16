@@ -54,6 +54,18 @@ describe('UploadDocumentsService', () => {
     req[0].flush('123-456')
   })
 
+  it('uploads each file when given multiple files', () => {
+    const uploadSpy = jest.spyOn(uploadDocumentsService, 'uploadFile')
+    const file1 = new File(['one'], 'one.pdf')
+    const file2 = new File(['two'], 'two.pdf')
+    uploadDocumentsService.uploadFiles([file1, file2])
+    expect(uploadSpy).toHaveBeenCalledWith(file1)
+    expect(uploadSpy).toHaveBeenCalledWith(file2)
+    httpTestingController
+      .match(`${environment.apiBaseUrl}documents/post_document/`)
+      .forEach((req) => req.flush('123-456'))
+  })
+
   it('updates progress during upload and failure', () => {
     const file = new File(
       [new Blob(['testing'], { type: 'application/pdf' })],
