@@ -100,6 +100,30 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
             self.action.assign_correspondent.pk,
         )
 
+    def test_api_get_workflows_filter_trigger_type(self) -> None:
+        """
+        GIVEN:
+            - A consumption workflow and a manual workflow
+        WHEN:
+            - Workflows are requested filtered by trigger_type
+        THEN:
+            - Only workflows with a matching trigger are returned
+        """
+        manual_trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.MANUAL,
+        )
+        manual_workflow = Workflow.objects.create(name="Manual", order=1)
+        manual_workflow.triggers.add(manual_trigger)
+
+        response = self.client.get(
+            f"{self.ENDPOINT}?trigger_type={WorkflowTrigger.WorkflowTriggerType.MANUAL}",
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["count"], 1)
+        self.assertEqual(response.data["results"][0]["id"], manual_workflow.id)
+
     def test_api_get_workflow_actions_ordered(self) -> None:
         """
         GIVEN:

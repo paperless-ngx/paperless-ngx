@@ -140,6 +140,7 @@ from documents.filters import ShareLinkFilterSet
 from documents.filters import StoragePathFilterSet
 from documents.filters import TagFilterSet
 from documents.filters import TitleContentFilter
+from documents.filters import WorkflowFilterSet
 from documents.mail import EmailAttachment
 from documents.mail import send_email
 from documents.matching import match_correspondents
@@ -5191,6 +5192,8 @@ class WorkflowViewSet(ModelViewSet[Workflow]):
 
     serializer_class = WorkflowSerializer
     pagination_class = StandardPagination
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = WorkflowFilterSet
 
     model = Workflow
 
