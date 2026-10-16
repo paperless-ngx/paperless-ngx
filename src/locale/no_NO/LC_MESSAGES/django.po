@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-12 19:12+0000\n"
-"PO-Revision-Date: 2026-10-12 19:13\n"
+"POT-Creation-Date: 2026-10-14 15:18+0000\n"
+"PO-Revision-Date: 2026-10-14 15:19\n"
 "Last-Translator: \n"
 "Language-Team: Norwegian\n"
 "Language: no_NO\n"
@@ -1636,7 +1636,7 @@ msgid "workflow runs"
 msgstr "workflow runs (NO)"
 
 #: documents/serialisers.py:515 documents/serialisers.py:872
-#: documents/serialisers.py:2902 documents/views.py:344 documents/views.py:2752
+#: documents/serialisers.py:2902 documents/views.py:363 documents/views.py:2768
 #: paperless_mail/serialisers.py:156
 msgid "Insufficient permissions."
 msgstr "Utilstrekkelige tillatelser."
@@ -1676,7 +1676,7 @@ msgstr "Ugyldig variabel oppdaget."
 msgid "Duplicate document identifiers are not allowed."
 msgstr "Duplicate document identifiers are not allowed. (NO)"
 
-#: documents/serialisers.py:2988 documents/views.py:4799
+#: documents/serialisers.py:2988 documents/views.py:4811
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr "Documents not found: %(ids)s (NO)"
@@ -1917,40 +1917,40 @@ msgstr "As a final step, please complete the following form: (NO)"
 msgid ", "
 msgstr ""
 
-#: documents/views.py:337 documents/views.py:2749
-msgid "Invalid more_like_id"
-msgstr "Invalid more_like_id (NO)"
-
-#: documents/views.py:1684
-msgid "Invalid AI configuration."
-msgstr "Invalid AI configuration. (NO)"
-
-#: documents/views.py:1695
-msgid "AI backend request timed out."
-msgstr "Forespørselen til KI-tjenesten fikk tidsavbrudd."
-
-#: documents/views.py:1707
-msgid "AI backend rejected the request. Check logs for details."
-msgstr ""
-
-#: documents/views.py:2574 documents/views.py:2890
+#: documents/views.py:318
 msgid "Specify only one of text, title_search, query, or more_like_id."
 msgstr "Specify only one of text, title_search, query, or more_like_id. (NO)"
 
-#: documents/views.py:4815
+#: documents/views.py:356 documents/views.py:2765
+msgid "Invalid more_like_id"
+msgstr "Invalid more_like_id (NO)"
+
+#: documents/views.py:1703
+msgid "Invalid AI configuration."
+msgstr "Invalid AI configuration. (NO)"
+
+#: documents/views.py:1714
+msgid "AI backend request timed out."
+msgstr "Forespørselen til KI-tjenesten fikk tidsavbrudd."
+
+#: documents/views.py:1726
+msgid "AI backend rejected the request. Check logs for details."
+msgstr ""
+
+#: documents/views.py:4827
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr "Insufficient permissions to share document %(id)s. (NO)"
 
-#: documents/views.py:4862
+#: documents/views.py:4874
 msgid "Bundle is already being processed."
 msgstr "Bundle is already being processed. (NO)"
 
-#: documents/views.py:4926
+#: documents/views.py:4938
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr "The share link bundle is still being prepared. Please try again later. (NO)"
 
-#: documents/views.py:4940
+#: documents/views.py:4952
 msgid "The share link bundle is unavailable."
 msgstr "The share link bundle is unavailable. (NO)"
 

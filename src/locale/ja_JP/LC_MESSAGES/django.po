@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-12 19:12+0000\n"
-"PO-Revision-Date: 2026-10-12 19:13\n"
+"POT-Creation-Date: 2026-10-14 15:18+0000\n"
+"PO-Revision-Date: 2026-10-15 12:29\n"
 "Last-Translator: \n"
 "Language-Team: Japanese\n"
 "Language: ja_JP\n"
@@ -136,7 +136,7 @@ msgstr "タグ"
 
 #: documents/models.py:125
 msgid "Cannot set itself as parent."
-msgstr ""
+msgstr "親として設定することはできません。"
 
 #: documents/models.py:127
 msgid "Cannot set parent to a descendant."
@@ -249,23 +249,23 @@ msgstr "物理的なドキュメントアーカイブ内での、このドキュ
 
 #: documents/models.py:321
 msgid "root document for this version"
-msgstr ""
+msgstr "このバージョンのルートドキュメント"
 
 #: documents/models.py:325
 msgid "version index"
-msgstr ""
+msgstr "バージョンのインデックス"
 
 #: documents/models.py:329
 msgid "Index of this version within the root document."
-msgstr ""
+msgstr "ルートドキュメント内における、このバージョンのインデックス"
 
 #: documents/models.py:333
 msgid "version label"
-msgstr ""
+msgstr "バージョンラベル"
 
 #: documents/models.py:337
 msgid "Optional short label for a document version."
-msgstr ""
+msgstr "ドキュメントバージョンの任意の短いラベル。"
 
 #: documents/models.py:342 documents/models.py:961 documents/models.py:992
 #: documents/models.py:1096 documents/models.py:2126
@@ -282,119 +282,119 @@ msgstr "アーカイブ"
 
 #: documents/models.py:563
 msgid "Bank"
-msgstr ""
+msgstr "銀行"
 
 #: documents/models.py:564
 msgid "Basket"
-msgstr ""
+msgstr "買い物かご"
 
 #: documents/models.py:565
 msgid "Bell"
-msgstr ""
+msgstr "ベル"
 
 #: documents/models.py:566
 msgid "Bookmark"
-msgstr ""
+msgstr "ブックマーク"
 
 #: documents/models.py:567
 msgid "Boxes"
-msgstr ""
+msgstr "箱"
 
 #: documents/models.py:568
 msgid "Briefcase"
-msgstr ""
+msgstr "ブリーフケース"
 
 #: documents/models.py:569
 msgid "Building"
-msgstr ""
+msgstr "建物"
 
 #: documents/models.py:570
 msgid "Calculator"
-msgstr ""
+msgstr "電卓"
 
 #: documents/models.py:571
 msgid "Calendar"
-msgstr ""
+msgstr "カレンダー"
 
 #: documents/models.py:572
 msgid "Camera"
-msgstr ""
+msgstr "カメラ"
 
 #: documents/models.py:573
 msgid "Checklist"
-msgstr ""
+msgstr "チェックリスト"
 
 #: documents/models.py:574
 msgid "Cash"
-msgstr ""
+msgstr "現金"
 
 #: documents/models.py:575
 msgid "Chat"
-msgstr ""
+msgstr "チャット"
 
 #: documents/models.py:576
 msgid "Check"
-msgstr ""
+msgstr "確認"
 
 #: documents/models.py:577
 msgid "Clipboard"
-msgstr ""
+msgstr "クリップボード"
 
 #: documents/models.py:578
 msgid "Clock"
-msgstr ""
+msgstr "時計"
 
 #: documents/models.py:579
 msgid "Credit card"
-msgstr ""
+msgstr "クレジットカード"
 
 #: documents/models.py:580
 msgid "Download"
-msgstr ""
+msgstr "ダウンロード"
 
 #: documents/models.py:581
 msgid "Envelope"
-msgstr ""
+msgstr "封筒"
 
 #: documents/models.py:582
 msgid "Warning"
-msgstr ""
+msgstr "警告"
 
 #: documents/models.py:583
 msgid "File"
-msgstr ""
+msgstr "ファイル"
 
 #: documents/models.py:584
 msgid "Checked file"
-msgstr ""
+msgstr "チェック済みファイル"
 
 #: documents/models.py:585
 msgid "Locked file"
-msgstr ""
+msgstr "ロックされたファイル"
 
 #: documents/models.py:586
 msgid "Medical file"
-msgstr ""
+msgstr "医療ファイル"
 
 #: documents/models.py:587
 msgid "Person file"
-msgstr ""
+msgstr "個人ファイル"
 
 #: documents/models.py:590
 msgid "Spreadsheet"
-msgstr ""
+msgstr "スプレッドシート"
 
 #: documents/models.py:592
 msgid "Text file"
-msgstr ""
+msgstr "テキストファイル"
 
 #: documents/models.py:593
 msgid "Files"
-msgstr ""
+msgstr "ファイル"
 
 #: documents/models.py:594
 msgid "Folder"
-msgstr ""
+msgstr "フォルダー"
 
 #: documents/models.py:595 paperless_mail/admin.py:58
 msgid "Filter"
@@ -406,11 +406,11 @@ msgstr ""
 
 #: documents/models.py:597
 msgid "Globe"
-msgstr ""
+msgstr "地球儀"
 
 #: documents/models.py:598
 msgid "Hash"
-msgstr ""
+msgstr "ハッシュ"
 
 #: documents/models.py:599
 msgid "Heart"
@@ -418,27 +418,27 @@ msgstr ""
 
 #: documents/models.py:600
 msgid "House"
-msgstr ""
+msgstr "家"
 
 #: documents/models.py:601
 msgid "Inbox"
-msgstr ""
+msgstr "受信トレイ"
 
 #: documents/models.py:602
 msgid "Journals"
-msgstr ""
+msgstr "日記"
 
 #: documents/models.py:603
 msgid "Task list"
-msgstr ""
+msgstr "タスクリスト"
 
 #: documents/models.py:604
 msgid "Newspaper"
-msgstr ""
+msgstr "新聞"
 
 #: documents/models.py:605
 msgid "Attachment"
-msgstr ""
+msgstr "添付ファイル"
 
 #: documents/models.py:606
 msgid "People"
@@ -446,15 +446,15 @@ msgstr ""
 
 #: documents/models.py:607
 msgid "Person"
-msgstr ""
+msgstr "人物"
 
 #: documents/models.py:608
 msgid "Printer"
-msgstr ""
+msgstr "プリンター"
 
 #: documents/models.py:609
 msgid "Receipt"
-msgstr ""
+msgstr "領収書"
 
 #: documents/models.py:610
 msgid "Safe"
@@ -1636,7 +1636,7 @@ msgid "workflow runs"
 msgstr "ワークフローの実行"
 
 #: documents/serialisers.py:515 documents/serialisers.py:872
-#: documents/serialisers.py:2902 documents/views.py:344 documents/views.py:2752
+#: documents/serialisers.py:2902 documents/views.py:363 documents/views.py:2768
 #: paperless_mail/serialisers.py:156
 msgid "Insufficient permissions."
 msgstr ""
@@ -1676,7 +1676,7 @@ msgstr "無効な変数を検出しました"
 msgid "Duplicate document identifiers are not allowed."
 msgstr ""
 
-#: documents/serialisers.py:2988 documents/views.py:4799
+#: documents/serialisers.py:2988 documents/views.py:4811
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr ""
@@ -1917,40 +1917,40 @@ msgstr "最後のステップとして、以下のフォームに記入してく
 msgid ", "
 msgstr ""
 
-#: documents/views.py:337 documents/views.py:2749
-msgid "Invalid more_like_id"
-msgstr ""
-
-#: documents/views.py:1684
-msgid "Invalid AI configuration."
-msgstr ""
-
-#: documents/views.py:1695
-msgid "AI backend request timed out."
-msgstr ""
-
-#: documents/views.py:1707
-msgid "AI backend rejected the request. Check logs for details."
-msgstr ""
-
-#: documents/views.py:2574 documents/views.py:2890
+#: documents/views.py:318
 msgid "Specify only one of text, title_search, query, or more_like_id."
 msgstr ""
 
-#: documents/views.py:4815
+#: documents/views.py:356 documents/views.py:2765
+msgid "Invalid more_like_id"
+msgstr ""
+
+#: documents/views.py:1703
+msgid "Invalid AI configuration."
+msgstr ""
+
+#: documents/views.py:1714
+msgid "AI backend request timed out."
+msgstr ""
+
+#: documents/views.py:1726
+msgid "AI backend rejected the request. Check logs for details."
+msgstr ""
+
+#: documents/views.py:4827
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr ""
 
-#: documents/views.py:4862
+#: documents/views.py:4874
 msgid "Bundle is already being processed."
 msgstr ""
 
-#: documents/views.py:4926
+#: documents/views.py:4938
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr ""
 
-#: documents/views.py:4940
+#: documents/views.py:4952
 msgid "The share link bundle is unavailable."
 msgstr ""
 

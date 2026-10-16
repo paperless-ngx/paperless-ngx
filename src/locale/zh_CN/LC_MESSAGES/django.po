@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-12 19:12+0000\n"
-"PO-Revision-Date: 2026-10-12 19:13\n"
+"POT-Creation-Date: 2026-10-14 15:18+0000\n"
+"PO-Revision-Date: 2026-10-14 15:19\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -1636,7 +1636,7 @@ msgid "workflow runs"
 msgstr "工作流运行"
 
 #: documents/serialisers.py:515 documents/serialisers.py:872
-#: documents/serialisers.py:2902 documents/views.py:344 documents/views.py:2752
+#: documents/serialisers.py:2902 documents/views.py:363 documents/views.py:2768
 #: paperless_mail/serialisers.py:156
 msgid "Insufficient permissions."
 msgstr "权限不足。"
@@ -1676,7 +1676,7 @@ msgstr "检测到无效变量。"
 msgid "Duplicate document identifiers are not allowed."
 msgstr "不允许重复文档标识符。"
 
-#: documents/serialisers.py:2988 documents/views.py:4799
+#: documents/serialisers.py:2988 documents/views.py:4811
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr "未找到文档：%(ids)s"
@@ -1917,40 +1917,40 @@ msgstr "作为最后一步，请填写以下表格："
 msgid ", "
 msgstr "，"
 
-#: documents/views.py:337 documents/views.py:2749
-msgid "Invalid more_like_id"
-msgstr "无效的more_like_id"
-
-#: documents/views.py:1684
-msgid "Invalid AI configuration."
-msgstr "无效的 AI 配置。"
-
-#: documents/views.py:1695
-msgid "AI backend request timed out."
-msgstr "AI 后端请求超时。"
-
-#: documents/views.py:1707
-msgid "AI backend rejected the request. Check logs for details."
-msgstr "AI 后端拒绝了请求。请检查日志的详细信息。"
-
-#: documents/views.py:2574 documents/views.py:2890
+#: documents/views.py:318
 msgid "Specify only one of text, title_search, query, or more_like_id."
 msgstr "只能指定 text、title_search、query 或 more_like_id 中的一项。"
 
-#: documents/views.py:4815
+#: documents/views.py:356 documents/views.py:2765
+msgid "Invalid more_like_id"
+msgstr "无效的more_like_id"
+
+#: documents/views.py:1703
+msgid "Invalid AI configuration."
+msgstr "无效的 AI 配置。"
+
+#: documents/views.py:1714
+msgid "AI backend request timed out."
+msgstr "AI 后端请求超时。"
+
+#: documents/views.py:1726
+msgid "AI backend rejected the request. Check logs for details."
+msgstr "AI 后端拒绝了请求。请检查日志的详细信息。"
+
+#: documents/views.py:4827
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr "权限不足以分享文件：%(id)s。"
 
-#: documents/views.py:4862
+#: documents/views.py:4874
 msgid "Bundle is already being processed."
 msgstr "捆绑包已在处理中。"
 
-#: documents/views.py:4926
+#: documents/views.py:4938
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr "分享链接包仍在准备中，请稍后再试。"
 
-#: documents/views.py:4940
+#: documents/views.py:4952
 msgid "The share link bundle is unavailable."
 msgstr "分享链接包不可用。"
 
