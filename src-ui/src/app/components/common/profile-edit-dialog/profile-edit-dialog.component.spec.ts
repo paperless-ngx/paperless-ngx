@@ -218,6 +218,38 @@ describe('ProfileEditDialogComponent', () => {
     jest.useRealTimers()
   })
 
+  it('should logout under base href on save if password changed', () => {
+    jest.useFakeTimers()
+    const base = document.createElement('base')
+    base.href = '/paperless/'
+    document.head.appendChild(base)
+    const getSpy = jest.spyOn(profileService, 'get')
+    getSpy.mockReturnValue(of(profile))
+    const getProvidersSpy = jest.spyOn(
+      profileService,
+      'getSocialAccountProviders'
+    )
+    getProvidersSpy.mockReturnValue(of(socialAccountProviders))
+    component.ngOnInit()
+    component['newPassword'] = 'new*pass'
+    component.form.get('password').patchValue('new*pass')
+    component.form.get('password_confirm').patchValue('new*pass')
+
+    const updateSpy = jest.spyOn(profileService, 'update')
+    updateSpy.mockReturnValue(of(null))
+    const navSpy = jest
+      .spyOn(navUtils, 'setLocationHref')
+      .mockImplementation(() => {})
+    component.save()
+    expect(updateSpy).toHaveBeenCalled()
+    jest.advanceTimersByTime(2600)
+    expect(navSpy).toHaveBeenCalledWith(
+      `${window.location.origin}/paperless/accounts/logout/?next=/paperless/accounts/login/?next=/paperless/`
+    )
+    base.remove()
+    jest.useRealTimers()
+  })
+
   it('should support auth token copy', () => {
     jest.useFakeTimers()
     const getSpy = jest.spyOn(profileService, 'get')
