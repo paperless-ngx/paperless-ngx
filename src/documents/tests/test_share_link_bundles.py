@@ -219,6 +219,21 @@ class ShareLinkBundleAPITests(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_302_FOUND)
         self.assertIn("sharelink_expired=1", response["Location"])
 
+    def test_expired_share_link_bundle_redirects(self) -> None:
+        bundle = ShareLinkBundle.objects.create(
+            slug="expiredbundle",
+            file_version=ShareLink.FileVersion.ARCHIVE,
+            status=ShareLinkBundle.Status.READY,
+            expiration=timezone.now() - timedelta(hours=1),
+        )
+        bundle.documents.set([self.document])
+
+        self.client.logout()
+        response = self.client.get(f"/share/{bundle.slug}/")
+
+        self.assertEqual(response.status_code, status.HTTP_302_FOUND)
+        self.assertIn("sharelink_expired=1", response["Location"])
+
     def test_unknown_share_link_redirects(self) -> None:
         self.client.logout()
         response = self.client.get("/share/unknownsharelink/")
