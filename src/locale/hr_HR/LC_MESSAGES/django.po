@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-14 15:18+0000\n"
-"PO-Revision-Date: 2026-10-14 15:19\n"
+"POT-Creation-Date: 2026-10-16 17:12+0000\n"
+"PO-Revision-Date: 2026-10-16 17:13\n"
 "Last-Translator: \n"
 "Language-Team: Croatian\n"
 "Language: hr_HR\n"
@@ -57,31 +57,31 @@ msgstr "Premašena je najveća razina ugniježđivanja."
 msgid "Custom field not found"
 msgstr "Prilagođeno polje nije pronađeno"
 
-#: documents/models.py:40 documents/models.py:1111 documents/models.py:1159
+#: documents/models.py:40 documents/models.py:1122 documents/models.py:1170
 msgid "owner"
 msgstr "vlasnik"
 
-#: documents/models.py:57 documents/models.py:1457
+#: documents/models.py:57 documents/models.py:1468
 msgid "None"
 msgstr "Ništa"
 
-#: documents/models.py:58 documents/models.py:1458
+#: documents/models.py:58 documents/models.py:1469
 msgid "Any word"
 msgstr "Bilo koja riječ"
 
-#: documents/models.py:59 documents/models.py:1459
+#: documents/models.py:59 documents/models.py:1470
 msgid "All words"
 msgstr "Sve riječi"
 
-#: documents/models.py:60 documents/models.py:1460
+#: documents/models.py:60 documents/models.py:1471
 msgid "Exact match"
 msgstr "Točno podudaranje"
 
-#: documents/models.py:61 documents/models.py:1461
+#: documents/models.py:61 documents/models.py:1472
 msgid "Regular expression"
 msgstr "Uobičajeni izraz"
 
-#: documents/models.py:62 documents/models.py:1462
+#: documents/models.py:62 documents/models.py:1473
 msgid "Fuzzy word"
 msgstr "Nejasna riječ"
 
@@ -89,24 +89,24 @@ msgstr "Nejasna riječ"
 msgid "Automatic"
 msgstr "Automatski"
 
-#: documents/models.py:66 documents/models.py:643 documents/models.py:2083
+#: documents/models.py:66 documents/models.py:654 documents/models.py:2094
 #: paperless_mail/models.py:23 paperless_mail/models.py:143
 msgid "name"
 msgstr "ime"
 
-#: documents/models.py:68 documents/models.py:1526
+#: documents/models.py:68 documents/models.py:1537
 msgid "match"
 msgstr "podudarati"
 
-#: documents/models.py:71 documents/models.py:1529
+#: documents/models.py:71 documents/models.py:1540
 msgid "matching algorithm"
 msgstr "algoritam podudaranja"
 
-#: documents/models.py:76 documents/models.py:1534
+#: documents/models.py:76 documents/models.py:1545
 msgid "is insensitive"
 msgstr "ne razlikuje velika i mala slova"
 
-#: documents/models.py:99 documents/models.py:167
+#: documents/models.py:99 documents/models.py:169
 msgid "correspondent"
 msgstr "dobavljač"
 
@@ -130,7 +130,7 @@ msgstr "Označava ovu oznaku kao oznaku ulazne pošte: Svi novopotrošeni dokume
 msgid "tag"
 msgstr "oznaka"
 
-#: documents/models.py:119 documents/models.py:214
+#: documents/models.py:119 documents/models.py:216
 msgid "tags"
 msgstr "oznake"
 
@@ -142,7 +142,7 @@ msgstr "Ne može se postaviti kao roditelj."
 msgid "Cannot set parent to a descendant."
 msgstr "Nije moguće postaviti roditelja na potomka."
 
-#: documents/models.py:144 documents/models.py:187
+#: documents/models.py:144 documents/models.py:189
 msgid "document type"
 msgstr "vrsta dokumenta"
 
@@ -154,7 +154,7 @@ msgstr "vrste dokumenta"
 msgid "path"
 msgstr "putanja"
 
-#: documents/models.py:154 documents/models.py:176
+#: documents/models.py:154 documents/models.py:178
 msgid "storage path"
 msgstr "putanja pohrane"
 
@@ -162,1476 +162,1476 @@ msgstr "putanja pohrane"
 msgid "storage paths"
 msgstr "putanje pohrane"
 
-#: documents/models.py:179
+#: documents/models.py:181
 msgid "title"
 msgstr "naslov"
 
-#: documents/models.py:191 documents/models.py:944
+#: documents/models.py:193 documents/models.py:955
 msgid "content"
 msgstr "sadržaj"
 
-#: documents/models.py:194
+#: documents/models.py:196
 msgid "The raw, text-only data of the document. This field is primarily used for searching."
 msgstr "Neobrađeni tekstualni podaci dokumenta. Ovo se polje koristi prvenstveno za pretraživanje."
 
-#: documents/models.py:208
+#: documents/models.py:210
 msgid "mime type"
 msgstr "tip datoteke"
 
-#: documents/models.py:218
+#: documents/models.py:220
 msgid "checksum"
 msgstr "kontrolni zbroj"
 
-#: documents/models.py:222
+#: documents/models.py:224
 msgid "The checksum of the original document."
 msgstr "Kontrolni zbroj originalnog dokumenta."
 
-#: documents/models.py:226
+#: documents/models.py:228
 msgid "archive checksum"
 msgstr "arhivski kontrolni zbroj"
 
-#: documents/models.py:232
+#: documents/models.py:234
 msgid "The checksum of the archived document."
 msgstr "Kontrolni zbroj arhiviranog dokumenta."
 
-#: documents/models.py:236
+#: documents/models.py:238
 msgid "page count"
 msgstr "broj stranica"
 
-#: documents/models.py:243
+#: documents/models.py:245
 msgid "The number of pages of the document."
 msgstr "Broj stranica dokumenta."
 
-#: documents/models.py:248 documents/models.py:950 documents/models.py:1069
-#: documents/models.py:1131 documents/models.py:1259 documents/models.py:1318
+#: documents/models.py:250 documents/models.py:961 documents/models.py:1080
+#: documents/models.py:1142 documents/models.py:1270 documents/models.py:1329
 msgid "created"
 msgstr "stvoreno"
 
-#: documents/models.py:254
+#: documents/models.py:256
 msgid "modified"
 msgstr "modificiran"
 
-#: documents/models.py:261
+#: documents/models.py:263
 msgid "added"
 msgstr "dodano"
 
-#: documents/models.py:268
+#: documents/models.py:270
 msgid "filename"
 msgstr "naziv datoteke"
 
-#: documents/models.py:274
+#: documents/models.py:276
 msgid "Current filename in storage"
 msgstr "Trenutni naziv pohranjene datoteke"
 
-#: documents/models.py:278
+#: documents/models.py:280
 msgid "archive filename"
 msgstr "naziv arhivirane datoteke"
 
-#: documents/models.py:284
+#: documents/models.py:286
 msgid "Current archive filename in storage"
 msgstr "Trenutni naziv arhivirane pohranjene datoteke"
 
-#: documents/models.py:288
+#: documents/models.py:290
 msgid "original filename"
 msgstr "izvorno ime datoteke"
 
-#: documents/models.py:294
+#: documents/models.py:296
 msgid "The original name of the file when it was uploaded"
 msgstr "Izvorno ime datoteke prilikom prijenosa"
 
-#: documents/models.py:301
+#: documents/models.py:303
 msgid "archive serial number"
 msgstr "arhivirani serijski broj"
 
-#: documents/models.py:311
+#: documents/models.py:313
 msgid "The position of this document in your physical document archive."
 msgstr "Položaj ovog dokumenta u vašoj fizičkoj arhivi dokumenata."
 
-#: documents/models.py:321
+#: documents/models.py:323
 msgid "root document for this version"
 msgstr "korijenski dokument za ovu verziju"
 
-#: documents/models.py:325
+#: documents/models.py:327
 msgid "version index"
 msgstr "indeks verzije"
 
-#: documents/models.py:329
+#: documents/models.py:331
 msgid "Index of this version within the root document."
 msgstr "Indeks ove verzije unutar korijenskog dokumenta."
 
-#: documents/models.py:333
+#: documents/models.py:335
 msgid "version label"
 msgstr "oznaka verzije"
 
-#: documents/models.py:337
+#: documents/models.py:339
 msgid "Optional short label for a document version."
 msgstr "Opcionalna kratka oznaka za verziju dokumenta."
 
-#: documents/models.py:342 documents/models.py:961 documents/models.py:992
-#: documents/models.py:1096 documents/models.py:2126
+#: documents/models.py:344 documents/models.py:972 documents/models.py:1003
+#: documents/models.py:1107 documents/models.py:2137
 msgid "document"
 msgstr "dokument"
 
-#: documents/models.py:343 documents/models.py:1202
+#: documents/models.py:345 documents/models.py:1213
 msgid "documents"
 msgstr "dokumenti"
 
-#: documents/models.py:562 documents/models.py:1065
+#: documents/models.py:573 documents/models.py:1076
 msgid "Archive"
 msgstr "Arhiva"
 
-#: documents/models.py:563
+#: documents/models.py:574
 msgid "Bank"
 msgstr "Banka"
 
-#: documents/models.py:564
+#: documents/models.py:575
 msgid "Basket"
 msgstr "Košarica"
 
-#: documents/models.py:565
+#: documents/models.py:576
 msgid "Bell"
 msgstr "Zvonce"
 
-#: documents/models.py:566
+#: documents/models.py:577
 msgid "Bookmark"
 msgstr "Oznaka"
 
-#: documents/models.py:567
+#: documents/models.py:578
 msgid "Boxes"
 msgstr "Kutije"
 
-#: documents/models.py:568
+#: documents/models.py:579
 msgid "Briefcase"
 msgstr "Mapa s dokumentima"
 
-#: documents/models.py:569
+#: documents/models.py:580
 msgid "Building"
 msgstr "Zgrada"
 
-#: documents/models.py:570
+#: documents/models.py:581
 msgid "Calculator"
 msgstr "Kalkulator"
 
-#: documents/models.py:571
+#: documents/models.py:582
 msgid "Calendar"
 msgstr "Kalendar"
 
-#: documents/models.py:572
+#: documents/models.py:583
 msgid "Camera"
 msgstr "Kamera"
 
-#: documents/models.py:573
+#: documents/models.py:584
 msgid "Checklist"
 msgstr "Spisak"
 
-#: documents/models.py:574
+#: documents/models.py:585
 msgid "Cash"
 msgstr "Gotovina"
 
-#: documents/models.py:575
+#: documents/models.py:586
 msgid "Chat"
 msgstr "Razgovor"
 
-#: documents/models.py:576
+#: documents/models.py:587
 msgid "Check"
 msgstr "Provjeri"
 
-#: documents/models.py:577
+#: documents/models.py:588
 msgid "Clipboard"
 msgstr "Međuspremnik"
 
-#: documents/models.py:578
+#: documents/models.py:589
 msgid "Clock"
 msgstr "Sat"
 
-#: documents/models.py:579
+#: documents/models.py:590
 msgid "Credit card"
 msgstr "Kreditna kartica"
 
-#: documents/models.py:580
+#: documents/models.py:591
 msgid "Download"
 msgstr "Preuzmi"
 
-#: documents/models.py:581
+#: documents/models.py:592
 msgid "Envelope"
 msgstr "Omotnica"
 
-#: documents/models.py:582
+#: documents/models.py:593
 msgid "Warning"
 msgstr "Upozorenje"
 
-#: documents/models.py:583
+#: documents/models.py:594
 msgid "File"
 msgstr "Datoteka"
 
-#: documents/models.py:584
+#: documents/models.py:595
 msgid "Checked file"
 msgstr "Provjerena datoteka"
 
-#: documents/models.py:585
+#: documents/models.py:596
 msgid "Locked file"
 msgstr "Zaključana datoteka"
 
-#: documents/models.py:586
+#: documents/models.py:597
 msgid "Medical file"
 msgstr "Medicinski karton"
 
-#: documents/models.py:587
+#: documents/models.py:598
 msgid "Person file"
 msgstr "Osobni karton"
 
-#: documents/models.py:590
+#: documents/models.py:601
 msgid "Spreadsheet"
 msgstr "Proračunska tablica"
 
-#: documents/models.py:592
+#: documents/models.py:603
 msgid "Text file"
 msgstr "Tekstualna datoteka"
 
-#: documents/models.py:593
+#: documents/models.py:604
 msgid "Files"
 msgstr "Datoteke"
 
-#: documents/models.py:594
+#: documents/models.py:605
 msgid "Folder"
 msgstr "Mapa"
 
-#: documents/models.py:595 paperless_mail/admin.py:58
+#: documents/models.py:606 paperless_mail/admin.py:58
 msgid "Filter"
 msgstr "Filter"
 
-#: documents/models.py:596
+#: documents/models.py:607
 msgid "Gear"
 msgstr "Oprema"
 
-#: documents/models.py:597
+#: documents/models.py:608
 msgid "Globe"
 msgstr "Globus"
 
-#: documents/models.py:598
+#: documents/models.py:609
 msgid "Hash"
 msgstr "Hash"
 
-#: documents/models.py:599
+#: documents/models.py:610
 msgid "Heart"
 msgstr "Srce"
 
-#: documents/models.py:600
+#: documents/models.py:611
 msgid "House"
 msgstr "Kuća"
 
-#: documents/models.py:601
+#: documents/models.py:612
 msgid "Inbox"
 msgstr "Ulazna pošta"
 
-#: documents/models.py:602
+#: documents/models.py:613
 msgid "Journals"
 msgstr "Dnevnici"
 
-#: documents/models.py:603
+#: documents/models.py:614
 msgid "Task list"
 msgstr "Popis zadataka"
 
-#: documents/models.py:604
+#: documents/models.py:615
 msgid "Newspaper"
 msgstr "Časopis"
 
-#: documents/models.py:605
+#: documents/models.py:616
 msgid "Attachment"
 msgstr "Privitak"
 
-#: documents/models.py:606
+#: documents/models.py:617
 msgid "People"
 msgstr "Osobe"
 
-#: documents/models.py:607
+#: documents/models.py:618
 msgid "Person"
 msgstr "Osoba"
 
-#: documents/models.py:608
+#: documents/models.py:619
 msgid "Printer"
 msgstr "Pisač"
 
-#: documents/models.py:609
+#: documents/models.py:620
 msgid "Receipt"
 msgstr "Račun"
 
-#: documents/models.py:610
+#: documents/models.py:621
 msgid "Safe"
 msgstr "Sef"
 
-#: documents/models.py:611
+#: documents/models.py:622
 msgid "Search"
 msgstr "Pretraži"
 
-#: documents/models.py:612
+#: documents/models.py:623
 msgid "Send"
 msgstr "Pošalji"
 
-#: documents/models.py:613
+#: documents/models.py:624
 msgid "Shop"
 msgstr "Trgovina"
 
-#: documents/models.py:614
+#: documents/models.py:625
 msgid "Stack"
 msgstr "Složiti"
 
-#: documents/models.py:615
+#: documents/models.py:626
 msgid "Stars"
 msgstr "Zvijezde"
 
-#: documents/models.py:616
+#: documents/models.py:627
 msgid "Tag"
 msgstr "Oznake"
 
-#: documents/models.py:617 documents/models.py:632 documents/models.py:1804
+#: documents/models.py:628 documents/models.py:643 documents/models.py:1815
 msgid "Tags"
 msgstr "Oznake"
 
-#: documents/models.py:618
+#: documents/models.py:629
 msgid "Telephone"
 msgstr "Telefon"
 
-#: documents/models.py:619
+#: documents/models.py:630
 msgid "Truck"
 msgstr "Kamion"
 
-#: documents/models.py:620
+#: documents/models.py:631
 msgid "Barcode"
 msgstr "Bar kod"
 
-#: documents/models.py:621
+#: documents/models.py:632
 msgid "Wallet"
 msgstr "Novčanik"
 
-#: documents/models.py:624
+#: documents/models.py:635
 msgid "Table"
 msgstr "Tabela"
 
-#: documents/models.py:625
+#: documents/models.py:636
 msgid "Small Cards"
 msgstr "Male kartice"
 
-#: documents/models.py:626
+#: documents/models.py:637
 msgid "Large Cards"
 msgstr "Velike kartice"
 
-#: documents/models.py:629 documents/models.py:1803
+#: documents/models.py:640 documents/models.py:1814
 msgid "Title"
 msgstr "Naslov"
 
-#: documents/models.py:630 documents/models.py:860 documents/models.py:1478
+#: documents/models.py:641 documents/models.py:871 documents/models.py:1489
 msgid "Created"
 msgstr "Kreirano"
 
-#: documents/models.py:631 documents/models.py:1477
+#: documents/models.py:642 documents/models.py:1488
 msgid "Added"
 msgstr "Dodano"
 
-#: documents/models.py:633 documents/models.py:1805
+#: documents/models.py:644 documents/models.py:1816
 msgid "Correspondent"
 msgstr "Dobavljači"
 
-#: documents/models.py:634
+#: documents/models.py:645
 msgid "Document Type"
 msgstr "Vrste dokumenata"
 
-#: documents/models.py:635
+#: documents/models.py:646
 msgid "Storage Path"
 msgstr "Putanja pohrane"
 
-#: documents/models.py:636
+#: documents/models.py:647
 msgid "Note"
 msgstr "Bilješka"
 
-#: documents/models.py:637
+#: documents/models.py:648
 msgid "Owner"
 msgstr "Vlasnik"
 
-#: documents/models.py:638
+#: documents/models.py:649
 msgid "Shared"
 msgstr "Dijeljeno"
 
-#: documents/models.py:639
+#: documents/models.py:650
 msgid "ASN"
 msgstr "ASN"
 
-#: documents/models.py:640
+#: documents/models.py:651
 msgid "Pages"
 msgstr "Stranice"
 
-#: documents/models.py:646
+#: documents/models.py:657
 msgid "icon"
 msgstr "ikona"
 
-#: documents/models.py:653
+#: documents/models.py:664
 msgid "sort field"
 msgstr "sortiraj polje"
 
-#: documents/models.py:658
+#: documents/models.py:669
 msgid "sort reverse"
 msgstr "obrnuto sortiranje"
 
-#: documents/models.py:661
+#: documents/models.py:672
 msgid "View page size"
 msgstr "Vidi veličinu stranice"
 
-#: documents/models.py:669
+#: documents/models.py:680
 msgid "View display mode"
 msgstr "Način prikaza"
 
-#: documents/models.py:676
+#: documents/models.py:687
 msgid "Document display fields"
 msgstr "Polja za prikaz dokumenta"
 
-#: documents/models.py:683 documents/models.py:749
+#: documents/models.py:694 documents/models.py:760
 msgid "saved view"
 msgstr "spremljen prikaz"
 
-#: documents/models.py:684
+#: documents/models.py:695
 msgid "saved views"
 msgstr "spremljeni prikazi"
 
-#: documents/models.py:692
+#: documents/models.py:703
 msgid "title contains"
 msgstr "naslov sadrži"
 
-#: documents/models.py:693
+#: documents/models.py:704
 msgid "content contains"
 msgstr "sadržaj sadrži"
 
-#: documents/models.py:694
+#: documents/models.py:705
 msgid "ASN is"
 msgstr "ASN je"
 
-#: documents/models.py:695
+#: documents/models.py:706
 msgid "correspondent is"
 msgstr "dopisnik je"
 
-#: documents/models.py:696
+#: documents/models.py:707
 msgid "document type is"
 msgstr "vrsta dokumenta je"
 
-#: documents/models.py:697
+#: documents/models.py:708
 msgid "is in inbox"
 msgstr "nalazi se u ulaznoj pošti"
 
-#: documents/models.py:698
+#: documents/models.py:709
 msgid "has tag"
 msgstr "ima oznaku"
 
-#: documents/models.py:699
+#: documents/models.py:710
 msgid "has any tag"
 msgstr "ima bilo kakvu oznaku"
 
-#: documents/models.py:700
+#: documents/models.py:711
 msgid "created before"
 msgstr "stvoreni prije"
 
-#: documents/models.py:701
+#: documents/models.py:712
 msgid "created after"
 msgstr "stvoreno poslije"
 
-#: documents/models.py:702
+#: documents/models.py:713
 msgid "created year is"
 msgstr "godina stvaranja je"
 
-#: documents/models.py:703
+#: documents/models.py:714
 msgid "created month is"
 msgstr "mjesec stvaranja je"
 
-#: documents/models.py:704
+#: documents/models.py:715
 msgid "created day is"
 msgstr "dan stvaranja je"
 
-#: documents/models.py:705
+#: documents/models.py:716
 msgid "added before"
 msgstr "dodano prije"
 
-#: documents/models.py:706
+#: documents/models.py:717
 msgid "added after"
 msgstr "dodano poslije"
 
-#: documents/models.py:707
+#: documents/models.py:718
 msgid "modified before"
 msgstr "modificirano prije"
 
-#: documents/models.py:708
+#: documents/models.py:719
 msgid "modified after"
 msgstr "modificirano poslije"
 
-#: documents/models.py:709
+#: documents/models.py:720
 msgid "does not have tag"
 msgstr "ne posjeduje oznaku"
 
-#: documents/models.py:710
+#: documents/models.py:721
 msgid "does not have ASN"
 msgstr "ne posjeduje ASN"
 
-#: documents/models.py:711
+#: documents/models.py:722
 msgid "title or content contains"
 msgstr "naziv ili sadržaj sadrži"
 
-#: documents/models.py:712
+#: documents/models.py:723
 msgid "fulltext query"
 msgstr "upit za cijeli tekst"
 
-#: documents/models.py:713
+#: documents/models.py:724
 msgid "more like this"
 msgstr "više ovakvih"
 
-#: documents/models.py:714
+#: documents/models.py:725
 msgid "has tags in"
 msgstr "sadrži oznake"
 
-#: documents/models.py:715
+#: documents/models.py:726
 msgid "ASN greater than"
 msgstr "ASN veći od"
 
-#: documents/models.py:716
+#: documents/models.py:727
 msgid "ASN less than"
 msgstr "ASN manji od"
 
-#: documents/models.py:717
+#: documents/models.py:728
 msgid "storage path is"
 msgstr "putanja za pohranu je"
 
-#: documents/models.py:718
+#: documents/models.py:729
 msgid "has correspondent in"
 msgstr "ima dopisnika u"
 
-#: documents/models.py:719
+#: documents/models.py:730
 msgid "does not have correspondent in"
 msgstr "nema dopisnika u"
 
-#: documents/models.py:720
+#: documents/models.py:731
 msgid "has document type in"
 msgstr "ima vrsta dokumenta u"
 
-#: documents/models.py:721
+#: documents/models.py:732
 msgid "does not have document type in"
 msgstr "nema vrsta dokumenta u"
 
-#: documents/models.py:722
+#: documents/models.py:733
 msgid "has storage path in"
 msgstr "ima putanja pohrane u"
 
-#: documents/models.py:723
+#: documents/models.py:734
 msgid "does not have storage path in"
 msgstr "nema putanja pohrane u"
 
-#: documents/models.py:724
+#: documents/models.py:735
 msgid "owner is"
 msgstr "vlasnik je"
 
-#: documents/models.py:725
+#: documents/models.py:736
 msgid "has owner in"
 msgstr "ima vlasnika u"
 
-#: documents/models.py:726
+#: documents/models.py:737
 msgid "does not have owner"
 msgstr "nema vlasnika"
 
-#: documents/models.py:727
+#: documents/models.py:738
 msgid "does not have owner in"
 msgstr "nema vlasnika u"
 
-#: documents/models.py:728
+#: documents/models.py:739
 msgid "has custom field value"
 msgstr "ima prilagođenu vrijednost polja"
 
-#: documents/models.py:729
+#: documents/models.py:740
 msgid "is shared by me"
 msgstr "dijelim ja"
 
-#: documents/models.py:730
+#: documents/models.py:741
 msgid "has custom fields"
 msgstr "ima prilagođena polja"
 
-#: documents/models.py:731
+#: documents/models.py:742
 msgid "has custom field in"
 msgstr "ima prilagođeno polje u"
 
-#: documents/models.py:732
+#: documents/models.py:743
 msgid "does not have custom field in"
 msgstr "nema prilagođeno polje u"
 
-#: documents/models.py:733
+#: documents/models.py:744
 msgid "does not have custom field"
 msgstr "nema prilagođeno polje"
 
-#: documents/models.py:734
+#: documents/models.py:745
 msgid "custom fields query"
 msgstr "upit prilagođenih polja"
 
-#: documents/models.py:735
+#: documents/models.py:746
 msgid "created to"
 msgstr "stvoren"
 
-#: documents/models.py:736
+#: documents/models.py:747
 msgid "created from"
 msgstr "stvoren iz"
 
-#: documents/models.py:737
+#: documents/models.py:748
 msgid "added to"
 msgstr "dodan"
 
-#: documents/models.py:738
+#: documents/models.py:749
 msgid "added from"
 msgstr "dodan iz"
 
-#: documents/models.py:739
+#: documents/models.py:750
 msgid "mime type is"
 msgstr "tip mime je"
 
-#: documents/models.py:740
+#: documents/models.py:751
 msgid "simple title search"
 msgstr "jednostavna pretraga naslova"
 
-#: documents/models.py:741
+#: documents/models.py:752
 msgid "simple text search"
 msgstr "jednostavna pretraga teksta"
 
-#: documents/models.py:742
+#: documents/models.py:753
 msgid "has duplicates"
 msgstr "postoje duplikati"
 
-#: documents/models.py:752
+#: documents/models.py:763
 msgid "rule type"
 msgstr "vrsta pravila"
 
-#: documents/models.py:754 documents/models.py:1000
+#: documents/models.py:765 documents/models.py:1011
 msgid "value"
 msgstr "vrijednost"
 
-#: documents/models.py:757
+#: documents/models.py:768
 msgid "filter rule"
 msgstr "pravilo filtriranja"
 
-#: documents/models.py:758
+#: documents/models.py:769
 msgid "filter rules"
 msgstr "pravila filtriranja"
 
-#: documents/models.py:788 documents/models.py:1125
+#: documents/models.py:799 documents/models.py:1136
 msgid "Pending"
 msgstr "Na čekanju"
 
-#: documents/models.py:789 documents/models.py:867
+#: documents/models.py:800 documents/models.py:878
 msgid "Started"
 msgstr "Pokrenuto"
 
-#: documents/models.py:790
+#: documents/models.py:801
 msgid "Success"
 msgstr "Uspjeh"
 
-#: documents/models.py:791
+#: documents/models.py:802
 msgid "Failure"
 msgstr "Neuspjeh"
 
-#: documents/models.py:792
+#: documents/models.py:803
 msgid "Revoked"
 msgstr "Opozvano"
 
-#: documents/models.py:795
+#: documents/models.py:806
 msgid "Consume File"
 msgstr "Obradi dokument"
 
-#: documents/models.py:796
+#: documents/models.py:807
 msgid "Train Classifier"
 msgstr "Treniraj klasifikator"
 
-#: documents/models.py:797
+#: documents/models.py:808
 msgid "Sanity Check"
 msgstr "Provjera integriteta"
 
-#: documents/models.py:798
+#: documents/models.py:809
 msgid "Index Optimize"
 msgstr "Optimiziraj index"
 
-#: documents/models.py:799 documents/models.py:1473
+#: documents/models.py:810 documents/models.py:1484
 msgid "Mail Fetch"
 msgstr "Dohvati e-mailove"
 
-#: documents/models.py:800
+#: documents/models.py:811
 msgid "LLM Index"
 msgstr "LLM indeks"
 
-#: documents/models.py:801
+#: documents/models.py:812
 msgid "Empty Trash"
 msgstr "Isprazni smeće"
 
-#: documents/models.py:802
+#: documents/models.py:813
 msgid "Check Workflows"
 msgstr "Provjeri tijekove rada"
 
-#: documents/models.py:803
+#: documents/models.py:814
 msgid "Bulk Update"
 msgstr "Skupno ažuriranje"
 
-#: documents/models.py:804
+#: documents/models.py:815
 msgid "Reprocess Document"
 msgstr "Ponovna obrada dokumenta"
 
-#: documents/models.py:805
+#: documents/models.py:816
 msgid "Build Share Link"
 msgstr "Izradi link za dijeljenje"
 
-#: documents/models.py:806
+#: documents/models.py:817
 msgid "Bulk Delete"
 msgstr "Skupno brisanje"
 
-#: documents/models.py:807
+#: documents/models.py:818
 msgid "Apply AI Suggestions"
 msgstr "Upotrijebi prijedloge umjetne inteligencije"
 
-#: documents/models.py:816 documents/models.py:1468
+#: documents/models.py:827 documents/models.py:1479
 msgid "Scheduled"
 msgstr "Zakazan"
 
-#: documents/models.py:817 documents/models.py:1474
+#: documents/models.py:828 documents/models.py:1485
 msgid "Web UI"
 msgstr "WEB UI"
 
-#: documents/models.py:818
+#: documents/models.py:829
 msgid "API Upload"
 msgstr "API prijenos"
 
-#: documents/models.py:819
+#: documents/models.py:830
 msgid "Folder Consume"
 msgstr "Uvoz iz mape"
 
-#: documents/models.py:820
+#: documents/models.py:831
 msgid "Email Consume"
 msgstr "Uvoz iz e-pošte"
 
-#: documents/models.py:821
+#: documents/models.py:832
 msgid "System"
 msgstr "Sustav"
 
-#: documents/models.py:822
+#: documents/models.py:833
 msgid "Manual"
 msgstr "Ručno"
 
-#: documents/models.py:828
+#: documents/models.py:839
 msgid "Task ID"
 msgstr "Zadatak ID"
 
-#: documents/models.py:829
+#: documents/models.py:840
 msgid "Celery task ID"
 msgstr "Celery zadatak ID"
 
-#: documents/models.py:835
+#: documents/models.py:846
 msgid "Task Type"
 msgstr "Vrsta zadatka"
 
-#: documents/models.py:836
+#: documents/models.py:847
 msgid "The kind of work being performed"
 msgstr "Vrsta posla koji se obavlja"
 
-#: documents/models.py:843
+#: documents/models.py:854
 msgid "Trigger Source"
 msgstr "Izvor okidača"
 
-#: documents/models.py:844
+#: documents/models.py:855
 msgid "What initiated this task"
 msgstr "Što je pokrenulo ovaj zadatak"
 
-#: documents/models.py:853
+#: documents/models.py:864
 msgid "Status"
 msgstr "Status"
 
-#: documents/models.py:873
+#: documents/models.py:884
 msgid "Completed"
 msgstr "Završeno"
 
-#: documents/models.py:881
+#: documents/models.py:892
 msgid "Duration (seconds)"
 msgstr "Trajanje (sekunde)"
 
-#: documents/models.py:882
+#: documents/models.py:893
 msgid "Elapsed time from start to completion"
 msgstr "Proteklo vrijeme od početka do završetka"
 
-#: documents/models.py:888
+#: documents/models.py:899
 msgid "Wait Time (seconds)"
 msgstr "Vrijeme čekanja (sekunde)"
 
-#: documents/models.py:889
+#: documents/models.py:900
 msgid "Time from task creation to worker pickup"
 msgstr "Vrijeme od kreiranja zadatka do preuzimanja"
 
-#: documents/models.py:896
+#: documents/models.py:907
 msgid "Input Data"
 msgstr "Ulazni podaci"
 
-#: documents/models.py:897
+#: documents/models.py:908
 msgid "Structured input parameters for the task"
 msgstr "Strukturirani ulazni parametri za zadatak"
 
-#: documents/models.py:903
+#: documents/models.py:914
 msgid "Result Data"
 msgstr "Podaci o rezultatima"
 
-#: documents/models.py:904
+#: documents/models.py:915
 msgid "Structured result data from task execution"
 msgstr "Strukturirani podaci rezultata izvršavanja zadatka"
 
-#: documents/models.py:910
+#: documents/models.py:921
 msgid "Acknowledged"
 msgstr "Potvrđeno"
 
-#: documents/models.py:915
+#: documents/models.py:926
 msgid "Task"
 msgstr "Zadatak"
 
-#: documents/models.py:916
+#: documents/models.py:927
 msgid "Tasks"
 msgstr "Zadaci"
 
-#: documents/models.py:946
+#: documents/models.py:957
 msgid "Note for the document"
 msgstr "Napomena za dokument"
 
-#: documents/models.py:970
+#: documents/models.py:981
 msgid "user"
 msgstr "korisnik"
 
-#: documents/models.py:975
+#: documents/models.py:986
 msgid "note"
 msgstr "bilješka"
 
-#: documents/models.py:976
+#: documents/models.py:987
 msgid "notes"
 msgstr "bilješka"
 
-#: documents/models.py:996
+#: documents/models.py:1007
 msgid "page"
 msgstr ""
 
-#: documents/models.py:997
+#: documents/models.py:1008
 msgid "Page of the original file, starting at 1"
 msgstr ""
 
-#: documents/models.py:1052
+#: documents/models.py:1063
 msgid "format"
 msgstr ""
 
-#: documents/models.py:1056
+#: documents/models.py:1067
 msgid "document barcode"
 msgstr ""
 
-#: documents/models.py:1057
+#: documents/models.py:1068
 msgid "document barcodes"
 msgstr ""
 
-#: documents/models.py:1066
+#: documents/models.py:1077
 msgid "Original"
 msgstr "Izvornik"
 
-#: documents/models.py:1077 documents/models.py:1139
+#: documents/models.py:1088 documents/models.py:1150
 #: paperless_mail/models.py:75
 msgid "expiration"
 msgstr "istječe"
 
-#: documents/models.py:1084 documents/models.py:1146
+#: documents/models.py:1095 documents/models.py:1157
 msgid "slug"
 msgstr "jedinstveni tekstualni identifikator"
 
-#: documents/models.py:1116
+#: documents/models.py:1127
 msgid "share link"
 msgstr "dijeli vezu"
 
-#: documents/models.py:1117
+#: documents/models.py:1128
 msgid "share links"
 msgstr "dijeljene veze"
 
-#: documents/models.py:1126
+#: documents/models.py:1137
 msgid "Processing"
 msgstr "Obrada"
 
-#: documents/models.py:1127
+#: documents/models.py:1138
 msgid "Ready"
 msgstr "Spreman"
 
-#: documents/models.py:1128
+#: documents/models.py:1139
 msgid "Failed"
 msgstr "Neuspješno"
 
-#: documents/models.py:1175
+#: documents/models.py:1186
 msgid "size (bytes)"
 msgstr "veličina (bajti)"
 
-#: documents/models.py:1181
+#: documents/models.py:1192
 msgid "last error"
 msgstr "posljednja greška"
 
-#: documents/models.py:1188
+#: documents/models.py:1199
 msgid "file path"
 msgstr "putanja datoteke"
 
-#: documents/models.py:1194
+#: documents/models.py:1205
 msgid "built at"
 msgstr "izrađeno u"
 
-#: documents/models.py:1207
+#: documents/models.py:1218
 msgid "share link bundle"
 msgstr "paket linka za dijeljenje"
 
-#: documents/models.py:1208
+#: documents/models.py:1219
 msgid "share link bundles"
 msgstr "paketi linkova za dijeljenje"
 
-#: documents/models.py:1211
+#: documents/models.py:1222
 #, python-format
 msgid "Share link bundle %(slug)s"
 msgstr "Paket linka za dijeljenje %(slug)s"
 
-#: documents/models.py:1247
+#: documents/models.py:1258
 msgid "String"
 msgstr "Karakterni niz"
 
-#: documents/models.py:1248
+#: documents/models.py:1259
 msgid "URL"
 msgstr "URL"
 
-#: documents/models.py:1249
+#: documents/models.py:1260
 msgid "Date"
 msgstr "Datum"
 
-#: documents/models.py:1250
+#: documents/models.py:1261
 msgid "Boolean"
 msgstr "Boolean"
 
-#: documents/models.py:1251
+#: documents/models.py:1262
 msgid "Integer"
 msgstr "Cijeli broj"
 
-#: documents/models.py:1252
+#: documents/models.py:1263
 msgid "Float"
 msgstr "Plutajući"
 
-#: documents/models.py:1253
+#: documents/models.py:1264
 msgid "Monetary"
 msgstr "Monetarni"
 
-#: documents/models.py:1254
+#: documents/models.py:1265
 msgid "Document Link"
 msgstr "Poveznica dokumenta"
 
-#: documents/models.py:1255
+#: documents/models.py:1266
 msgid "Select"
 msgstr "Odabir"
 
-#: documents/models.py:1256
+#: documents/models.py:1267
 msgid "Long Text"
 msgstr "Dugi tekst"
 
-#: documents/models.py:1268
+#: documents/models.py:1279
 msgid "data type"
 msgstr "vrsta dokumenta"
 
-#: documents/models.py:1275
+#: documents/models.py:1286
 msgid "extra data"
 msgstr "dodatni podatci"
 
-#: documents/models.py:1279
+#: documents/models.py:1290
 msgid "Extra data for the custom field, such as select options"
 msgstr "Dodatni podaci za prilagođeno polje, kao što su opcije odabira"
 
-#: documents/models.py:1285
+#: documents/models.py:1296
 msgid "custom field"
 msgstr "prilagođeno polje"
 
-#: documents/models.py:1286
+#: documents/models.py:1297
 msgid "custom fields"
 msgstr "prilagođena polja"
 
-#: documents/models.py:1386
+#: documents/models.py:1397
 msgid "custom field instance"
 msgstr "instanca prilagođenog polja"
 
-#: documents/models.py:1387
+#: documents/models.py:1398
 msgid "custom field instances"
 msgstr "instance prilagođenog polja"
 
-#: documents/models.py:1465
+#: documents/models.py:1476
 msgid "Consumption Started"
 msgstr "Obrada dokumenta započeta"
 
-#: documents/models.py:1466
+#: documents/models.py:1477
 msgid "Document Added"
 msgstr "Dokument dodan"
 
-#: documents/models.py:1467
+#: documents/models.py:1478
 msgid "Document Updated"
 msgstr "Dokument ažuriran"
 
-#: documents/models.py:1471
+#: documents/models.py:1482
 msgid "Consume Folder"
 msgstr "Folder za obradu dokumenata"
 
-#: documents/models.py:1472
+#: documents/models.py:1483
 msgid "Api Upload"
 msgstr "API upload"
 
-#: documents/models.py:1479
+#: documents/models.py:1490
 msgid "Modified"
 msgstr "Modifikovano"
 
-#: documents/models.py:1480
+#: documents/models.py:1491
 msgid "Custom Field"
 msgstr "Prilagođeno polje"
 
-#: documents/models.py:1483
+#: documents/models.py:1494
 msgid "Workflow Trigger Type"
 msgstr "Vrsta okidača za tijek rada"
 
-#: documents/models.py:1495
+#: documents/models.py:1506
 msgid "filter path"
 msgstr "filter putanje"
 
-#: documents/models.py:1500
+#: documents/models.py:1511
 msgid "Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
 msgstr "Obradi samo dokumente sa putanjom pohrane koja odgovara ovoj ako je navedena. Dopušteni su zamjenski znakovi navedeni kao *. Neosjetljivo na velika i mala slova."
 
-#: documents/models.py:1507
+#: documents/models.py:1518
 msgid "filter filename"
 msgstr "filtriraj naziv datoteke"
 
-#: documents/models.py:1512 paperless_mail/models.py:200
+#: documents/models.py:1523 paperless_mail/models.py:200
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
 msgstr "Obradite samo dokumente koji u potpunosti odgovaraju ovom nazivu datoteke ako je navedeno. Dopušteni su zamjenski znakovi kao što su *.pdf ili *faktura*. Neosjetljivo je na mala i mala slova."
 
-#: documents/models.py:1523
+#: documents/models.py:1534
 msgid "filter documents from this mail rule"
 msgstr "filtrirajte dokumente iz ovog pravila pošte"
 
-#: documents/models.py:1539
+#: documents/models.py:1550
 msgid "has these tag(s)"
 msgstr "ima ovu oznaku(e)"
 
-#: documents/models.py:1546
+#: documents/models.py:1557
 msgid "has all of these tag(s)"
 msgstr "ima sve ove oznake"
 
-#: documents/models.py:1553
+#: documents/models.py:1564
 msgid "does not have these tag(s)"
 msgstr "nema ove oznake"
 
-#: documents/models.py:1561
+#: documents/models.py:1572
 msgid "has this document type"
 msgstr "ima ovu vrstu dokumenta"
 
-#: documents/models.py:1568
+#: documents/models.py:1579
 msgid "has one of these document types"
 msgstr "ima jedan od ovih vrsta dokumenata"
 
-#: documents/models.py:1575
+#: documents/models.py:1586
 msgid "does not have these document type(s)"
 msgstr "nema ovu vrstu dokumenta"
 
-#: documents/models.py:1583
+#: documents/models.py:1594
 msgid "has this correspondent"
 msgstr "ima ovog dopisnika"
 
-#: documents/models.py:1590
+#: documents/models.py:1601
 msgid "does not have these correspondent(s)"
 msgstr "nema ovog dopisnika"
 
-#: documents/models.py:1597
+#: documents/models.py:1608
 msgid "has one of these correspondents"
 msgstr "ima jednog od ovih dopisnika"
 
-#: documents/models.py:1605
+#: documents/models.py:1616
 msgid "has this storage path"
 msgstr "ima ovu putanju pohrane"
 
-#: documents/models.py:1612
+#: documents/models.py:1623
 msgid "has one of these storage paths"
 msgstr "ima jednu od ovih putanja"
 
-#: documents/models.py:1619
+#: documents/models.py:1630
 msgid "does not have these storage path(s)"
 msgstr "nema ovu putanju pohrane"
 
-#: documents/models.py:1623
+#: documents/models.py:1634
 msgid "filter custom field query"
 msgstr "Filtrirajte upit prilagođenog polja"
 
-#: documents/models.py:1626
+#: documents/models.py:1637
 msgid "JSON-encoded custom field query expression."
 msgstr "JSON-kodirani izraz za filtriranje prilagođenog polja."
 
-#: documents/models.py:1630
+#: documents/models.py:1641
 msgid "schedule offset days"
 msgstr "pomak rasporeda u danima"
 
-#: documents/models.py:1633
+#: documents/models.py:1644
 msgid "The number of days to offset the schedule trigger by."
 msgstr "Broj dana za koji treba pomaknuti okidač rasporeda."
 
-#: documents/models.py:1638
+#: documents/models.py:1649
 msgid "schedule is recurring"
 msgstr "raspored se ponavlja"
 
-#: documents/models.py:1641
+#: documents/models.py:1652
 msgid "If the schedule should be recurring."
 msgstr "Da li se raspored treba ponavljati."
 
-#: documents/models.py:1646
+#: documents/models.py:1657
 msgid "schedule recurring delay in days"
 msgstr "odgoda ponavljanja rasporeda u danima"
 
-#: documents/models.py:1650
+#: documents/models.py:1661
 msgid "The number of days between recurring schedule triggers."
 msgstr "Broj dana izmežu ponavljajućih okidača rasporeda."
 
-#: documents/models.py:1655
+#: documents/models.py:1666
 msgid "schedule date field"
 msgstr "polje datuma rasporeda"
 
-#: documents/models.py:1660
+#: documents/models.py:1671
 msgid "The field to check for a schedule trigger."
 msgstr "Polje za provjeru okidača rasporeda."
 
-#: documents/models.py:1669
+#: documents/models.py:1680
 msgid "schedule date custom field"
 msgstr "datum zakazivanja prilagođeno polje"
 
-#: documents/models.py:1673
+#: documents/models.py:1684
 msgid "workflow trigger"
 msgstr "okidač tijeka rada"
 
-#: documents/models.py:1674
+#: documents/models.py:1685
 msgid "workflow triggers"
 msgstr "okidači tijeka rada"
 
-#: documents/models.py:1682
+#: documents/models.py:1693
 msgid "email subject"
 msgstr "predmet e-pošte"
 
-#: documents/models.py:1686
+#: documents/models.py:1697
 msgid "The subject of the email, can include some placeholders, see documentation."
 msgstr "Predmet e-pošte može sadržavati placeholder izraze, pogledajte dokumentaciju."
 
-#: documents/models.py:1692
+#: documents/models.py:1703
 msgid "email body"
 msgstr "sadržaj e-pošte"
 
-#: documents/models.py:1695
+#: documents/models.py:1706
 msgid "The body (message) of the email, can include some placeholders, see documentation."
 msgstr "Sadržaj  (poruka) e-pošte može uključivati placeholder izraze, pogledajte dokumentaciju."
 
-#: documents/models.py:1701
+#: documents/models.py:1712
 msgid "emails to"
 msgstr "primatelj"
 
-#: documents/models.py:1704
+#: documents/models.py:1715
 msgid "The destination email addresses, comma separated."
 msgstr "Adrese e-pošte odredišta, odvojene zarezom."
 
-#: documents/models.py:1710
+#: documents/models.py:1721
 msgid "include document in email"
 msgstr "uključi dokument u e-poštu"
 
-#: documents/models.py:1721
+#: documents/models.py:1732
 msgid "webhook url"
 msgstr "webhook url"
 
-#: documents/models.py:1724
+#: documents/models.py:1735
 msgid "The destination URL for the notification."
 msgstr "Odredišni URL za obavijest."
 
-#: documents/models.py:1729
+#: documents/models.py:1740
 msgid "use parameters"
 msgstr "koristi parametre"
 
-#: documents/models.py:1734
+#: documents/models.py:1745
 msgid "send as JSON"
 msgstr "pošalji kao JSON"
 
-#: documents/models.py:1738
+#: documents/models.py:1749
 msgid "webhook parameters"
 msgstr "webhook parametri"
 
-#: documents/models.py:1741
+#: documents/models.py:1752
 msgid "The parameters to send with the webhook URL if body not used."
 msgstr "Parametri za slanje s URL-om web-dojavnika ako se tijelo ne koristi."
 
-#: documents/models.py:1745
+#: documents/models.py:1756
 msgid "webhook body"
 msgstr "webhook body"
 
-#: documents/models.py:1748
+#: documents/models.py:1759
 msgid "The body to send with the webhook URL if parameters not used."
 msgstr "Tijelo za slanje s URL-om web-hooka ako se parametri ne koriste."
 
-#: documents/models.py:1752
+#: documents/models.py:1763
 msgid "webhook headers"
 msgstr "zaglavlja webhooka"
 
-#: documents/models.py:1755
+#: documents/models.py:1766
 msgid "The headers to send with the webhook URL."
 msgstr "Zaglavlja za slanje s URL-om web-hooka"
 
-#: documents/models.py:1760
+#: documents/models.py:1771
 msgid "include document in webhook"
 msgstr "uključi dokument u web-hook"
 
-#: documents/models.py:1771
+#: documents/models.py:1782
 msgid "Assignment"
 msgstr "Zadatak"
 
-#: documents/models.py:1775
+#: documents/models.py:1786
 msgid "Removal"
 msgstr "Uklanjanje"
 
-#: documents/models.py:1779 documents/templates/account/password_reset.html:15
+#: documents/models.py:1790 documents/templates/account/password_reset.html:15
 msgid "Email"
 msgstr "Email"
 
-#: documents/models.py:1783
+#: documents/models.py:1794
 msgid "Webhook"
 msgstr "Webhook"
 
-#: documents/models.py:1787
+#: documents/models.py:1798
 msgid "Password removal"
 msgstr "Uklanjanje lozinke"
 
-#: documents/models.py:1791
+#: documents/models.py:1802
 msgid "Move to trash"
 msgstr "Premjesti u smeće"
 
-#: documents/models.py:1795
+#: documents/models.py:1806
 msgid "Remote OCR"
 msgstr "Udaljeni OCR"
 
-#: documents/models.py:1799
+#: documents/models.py:1810
 msgid "Apply AI suggestions"
 msgstr "Upotrijebi prijedloge umjetne inteligencije"
 
-#: documents/models.py:1806
+#: documents/models.py:1817
 msgid "Document type"
 msgstr "Vrsta dokumenta"
 
-#: documents/models.py:1807
+#: documents/models.py:1818
 msgid "Storage path"
 msgstr "Putanja pohrane"
 
-#: documents/models.py:1808
+#: documents/models.py:1819
 msgid "Created date"
 msgstr "Datum kreiranja"
 
-#: documents/models.py:1811
+#: documents/models.py:1822
 msgid "Workflow Action Type"
 msgstr "Vrsta radnje Tijeka rada"
 
-#: documents/models.py:1816 documents/models.py:2085
+#: documents/models.py:1827 documents/models.py:2096
 #: paperless_mail/models.py:145
 msgid "order"
 msgstr "redoslijed"
 
-#: documents/models.py:1819
+#: documents/models.py:1830
 msgid "assign title"
 msgstr "dodijeli naslov"
 
-#: documents/models.py:1823
+#: documents/models.py:1834
 msgid "Assign a document title, must  be a Jinja2 template, see documentation."
 msgstr "Dodijelite naslov dokumentu, mora biti predložak Jinja2, pogledajte dokumentaciju."
 
-#: documents/models.py:1831 paperless_mail/models.py:274
+#: documents/models.py:1842 paperless_mail/models.py:274
 msgid "assign this tag"
 msgstr "dodijeli oznaku"
 
-#: documents/models.py:1840 paperless_mail/models.py:282
+#: documents/models.py:1851 paperless_mail/models.py:282
 msgid "assign this document type"
 msgstr "dodijeliti ovu vrstu dokumenta"
 
-#: documents/models.py:1849 paperless_mail/models.py:296
+#: documents/models.py:1860 paperless_mail/models.py:296
 msgid "assign this correspondent"
 msgstr "dodijelite ovom dopisniku"
 
-#: documents/models.py:1858
+#: documents/models.py:1869
 msgid "assign this storage path"
 msgstr "dodijelite ovaj putanja pohrane"
 
-#: documents/models.py:1867
+#: documents/models.py:1878
 msgid "assign this owner"
 msgstr "dodijelite ovog vlasnika"
 
-#: documents/models.py:1874
+#: documents/models.py:1885
 msgid "grant view permissions to these users"
 msgstr "dodijeli ovlasti pregleda ovim korisnicima"
 
-#: documents/models.py:1881
+#: documents/models.py:1892
 msgid "grant view permissions to these groups"
 msgstr "dodijeli ovlasti pregleda ovim grupama"
 
-#: documents/models.py:1888
+#: documents/models.py:1899
 msgid "grant change permissions to these users"
 msgstr "dodijelite ovlasti za promjenu ovim korisnicima"
 
-#: documents/models.py:1895
+#: documents/models.py:1906
 msgid "grant change permissions to these groups"
 msgstr "dodijelite ovlasti za promjenu ovim grupama"
 
-#: documents/models.py:1902
+#: documents/models.py:1913
 msgid "assign these custom fields"
 msgstr "dodijeliti ova prilagođena polja"
 
-#: documents/models.py:1906
+#: documents/models.py:1917
 msgid "custom field values"
 msgstr "vrijednosti prilagođenih polja"
 
-#: documents/models.py:1910
+#: documents/models.py:1921
 msgid "Optional values to assign to the custom fields."
 msgstr "Neobavezne vrijednosti za dodjelu prilagođenim poljima."
 
-#: documents/models.py:1919
+#: documents/models.py:1930
 msgid "remove these tag(s)"
 msgstr "ukloni ovu oznaku(e)"
 
-#: documents/models.py:1924
+#: documents/models.py:1935
 msgid "remove all tags"
 msgstr "ukloni sve oznake"
 
-#: documents/models.py:1931
+#: documents/models.py:1942
 msgid "remove these document type(s)"
 msgstr "ukloni ove vrste dokumenata"
 
-#: documents/models.py:1936
+#: documents/models.py:1947
 msgid "remove all document types"
 msgstr "uklonite sve vrste dokumenata"
 
-#: documents/models.py:1943
+#: documents/models.py:1954
 msgid "remove these correspondent(s)"
 msgstr "ukloni ovog dopisnika"
 
-#: documents/models.py:1948
+#: documents/models.py:1959
 msgid "remove all correspondents"
 msgstr "ukloni sve dopisnike"
 
-#: documents/models.py:1955
+#: documents/models.py:1966
 msgid "remove these storage path(s)"
 msgstr "ukloni ove putanje pohrane"
 
-#: documents/models.py:1960
+#: documents/models.py:1971
 msgid "remove all storage paths"
 msgstr "ukloni sve putanje pohrane"
 
-#: documents/models.py:1967
+#: documents/models.py:1978
 msgid "remove these owner(s)"
 msgstr "ukloni ove vlasnike"
 
-#: documents/models.py:1972
+#: documents/models.py:1983
 msgid "remove all owners"
 msgstr "ukloni sve vlasnike"
 
-#: documents/models.py:1979
+#: documents/models.py:1990
 msgid "remove view permissions for these users"
 msgstr "ukloni ovlasti pregleda za ove korisnike"
 
-#: documents/models.py:1986
+#: documents/models.py:1997
 msgid "remove view permissions for these groups"
 msgstr "ukloni ovlasti pregleda za ove korisničke grupe"
 
-#: documents/models.py:1993
+#: documents/models.py:2004
 msgid "remove change permissions for these users"
 msgstr "ukloni ovlasti izmjena za ove korisnike"
 
-#: documents/models.py:2000
+#: documents/models.py:2011
 msgid "remove change permissions for these groups"
 msgstr "ukloni ovlasti izmjena za ove korisničke grupe"
 
-#: documents/models.py:2005
+#: documents/models.py:2016
 msgid "remove all permissions"
 msgstr "ukloni sve ovlasti"
 
-#: documents/models.py:2012
+#: documents/models.py:2023
 msgid "remove these custom fields"
 msgstr "ukloni ova prilagođena polja"
 
-#: documents/models.py:2017
+#: documents/models.py:2028
 msgid "remove all custom fields"
 msgstr "ukloni sva prilagođena polja"
 
-#: documents/models.py:2026
+#: documents/models.py:2037
 msgid "email"
 msgstr "email"
 
-#: documents/models.py:2035
+#: documents/models.py:2046
 msgid "webhook"
 msgstr "webhook"
 
-#: documents/models.py:2039
+#: documents/models.py:2050
 msgid "passwords"
 msgstr "lozinke"
 
-#: documents/models.py:2043
+#: documents/models.py:2054
 msgid "Passwords to try when removing PDF protection. Separate with commas or new lines."
 msgstr "Lozinke za pokušaj uklanjanja PDF zaštite. Odvojite zarezima ili novim redovima."
 
-#: documents/models.py:2048
+#: documents/models.py:2059
 msgid "AI suggestion fields"
 msgstr "Polja za prijedloge umjetne inteligencije"
 
-#: documents/models.py:2052
+#: documents/models.py:2063
 msgid "Which of the AI-suggested fields to apply to the document."
 msgstr "Koji se AI prijedlozi primjenjuju na dokument."
 
-#: documents/models.py:2057
+#: documents/models.py:2068
 msgid "create missing objects"
 msgstr "kreira nedostajuće objekte"
 
-#: documents/models.py:2060
+#: documents/models.py:2071
 msgid "Create suggested tags, correspondents, document types and storage paths that do not already exist instead of skipping them."
 msgstr "Automatski izradi nedostajuće oznake, pošiljatelje, vrste dokumenata i putanje."
 
-#: documents/models.py:2066
+#: documents/models.py:2077
 msgid "overwrite existing values"
 msgstr "prepiši postojeće vrijednosti"
 
-#: documents/models.py:2069
+#: documents/models.py:2080
 msgid "Apply suggestions even if the document already has a value for that field. Tags are always added to, never replaced."
 msgstr "Primijeni predloženo i na već popunjena polja. Oznake se uvijek nadodaju, bez brisanja postojećih."
 
-#: documents/models.py:2075
+#: documents/models.py:2086
 msgid "workflow action"
 msgstr "radnja tijeka rada"
 
-#: documents/models.py:2076
+#: documents/models.py:2087
 msgid "workflow actions"
 msgstr "radnje tijeka rada"
 
-#: documents/models.py:2091
+#: documents/models.py:2102
 msgid "triggers"
 msgstr "okidači"
 
-#: documents/models.py:2098
+#: documents/models.py:2109
 msgid "actions"
 msgstr "radnje"
 
-#: documents/models.py:2101 paperless_mail/models.py:154
+#: documents/models.py:2112 paperless_mail/models.py:154
 msgid "enabled"
 msgstr "omogućeno"
 
-#: documents/models.py:2112
+#: documents/models.py:2123
 msgid "workflow"
 msgstr "tijek rada"
 
-#: documents/models.py:2116
+#: documents/models.py:2127
 msgid "workflow trigger type"
 msgstr "vrste okidača tijekova rada"
 
-#: documents/models.py:2130
+#: documents/models.py:2141
 msgid "date run"
 msgstr "datum pokretanja"
 
-#: documents/models.py:2136
+#: documents/models.py:2147
 msgid "workflow run"
 msgstr "pokretanje tijeka rada"
 
-#: documents/models.py:2137
+#: documents/models.py:2148
 msgid "workflow runs"
 msgstr "tijek rada pokrenut"
 
