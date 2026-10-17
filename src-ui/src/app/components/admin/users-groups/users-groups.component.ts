@@ -116,8 +116,9 @@ export class UsersAndGroupsComponent
             $localize`Password has been changed, you will be logged out momentarily.`
           )
           setTimeout(() => {
+            const basePath = new URL(document.baseURI).pathname
             setLocationHref(
-              `${window.location.origin}/accounts/logout/?next=/accounts/login/?next=/`
+              `${window.location.origin}${basePath}accounts/logout/?next=${basePath}accounts/login/?next=${basePath}`
             )
           }, 2500)
         } else {

@@ -154,6 +154,31 @@ describe('UsersAndGroupsComponent', () => {
     jest.useRealTimers()
   })
 
+  it('should logout current user under base href if password changed', () => {
+    jest.useFakeTimers()
+    const base = document.createElement('base')
+    base.href = '/paperless/'
+    document.head.appendChild(base)
+    completeSetup()
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((refs) => (modal = refs[0]))
+    component.editUser(users[0])
+    const navSpy = jest
+      .spyOn(navUtils, 'setLocationHref')
+      .mockImplementation(() => {})
+    const editDialog = modal.componentInstance as UserEditDialogComponent
+    editDialog.passwordIsSet = true
+    settingsService.currentUser.set(users[0]) // simulate logged in as same user
+    editDialog.succeeded.emit(users[0])
+    fixture.detectChanges()
+    jest.advanceTimersByTime(2600)
+    expect(navSpy).toHaveBeenCalledWith(
+      `${window.location.origin}/paperless/accounts/logout/?next=/paperless/accounts/login/?next=/paperless/`
+    )
+    base.remove()
+    jest.useRealTimers()
+  })
+
   it('should support edit / create group, show error if needed', () => {
     completeSetup()
     let modal: NgbModalRef
