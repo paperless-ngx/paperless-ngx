@@ -1330,11 +1330,13 @@ class TestCryptExportImport(
         """
         GIVEN:
             - A mail account exists
+            - Application configuration contains a floating-point value
         WHEN:
             - Export command is called
             - Passphrase is provided
         THEN:
             - Output password is not plaintext
+            - The password and configuration value are restored on import
         """
         MailAccount.objects.create(
             name="Test Account",
