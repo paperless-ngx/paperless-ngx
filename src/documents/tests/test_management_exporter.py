@@ -1412,9 +1412,10 @@ class TestCryptExportImport(
         THEN:
             - The import succeeds and the float value is preserved
         """
-        config = ApplicationConfiguration.objects.first()
-        config.rotate_pages_threshold = 12.5
-        config.save()
+        ApplicationConfiguration.objects.update_or_create(
+            pk=1,
+            defaults={"rotate_pages_threshold": 12.5},
+        )
 
         call_command(
             "document_exporter",
@@ -1437,7 +1438,7 @@ class TestCryptExportImport(
         )
 
         self.assertEqual(
-            ApplicationConfiguration.objects.first().rotate_pages_threshold,
+            ApplicationConfiguration.objects.get().rotate_pages_threshold,
             12.5,
         )
 
