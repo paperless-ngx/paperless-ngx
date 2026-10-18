@@ -717,6 +717,7 @@ class Command(CryptMixin, PaperlessCommand):
                     json.dump(
                         self._decrypt_record_if_needed(record),
                         out,
+                        default=float,
                         indent=2,
                         ensure_ascii=False,
                     )
