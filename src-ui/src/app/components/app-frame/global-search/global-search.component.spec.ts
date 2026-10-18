@@ -471,6 +471,32 @@ describe('GlobalSearchComponent', () => {
     expect(toastInfoSpy).toHaveBeenCalled()
   })
 
+  it('should list semantic matches in their own section', () => {
+    component.searchResults.set({
+      ...searchResults,
+      total: searchResults.total + 1,
+      semantic_documents: [{ id: 2, title: 'Sublease agreement', tags: [] }],
+    } as any)
+    component.resultsDropdown.open()
+    fixture.detectChanges()
+
+    const headers = Array.from(
+      fixture.nativeElement.querySelectorAll('.dropdown-header')
+    ).map((h: HTMLElement) => h.textContent.trim())
+    expect(headers.slice(0, 2)).toEqual(['Documents', 'Similar by meaning'])
+    expect(fixture.nativeElement.textContent).toContain('Sublease agreement')
+  })
+
+  it('should not show a semantic section without semantic matches', () => {
+    component.searchResults.set(searchResults as any)
+    component.resultsDropdown.open()
+    fixture.detectChanges()
+
+    expect(fixture.nativeElement.textContent).not.toContain(
+      'Similar by meaning'
+    )
+  })
+
   it('should support reset', () => {
     const debounce = jest.spyOn(component.queryDebounce, 'next')
     const closeSpy = jest.spyOn(component.resultsDropdown, 'close')

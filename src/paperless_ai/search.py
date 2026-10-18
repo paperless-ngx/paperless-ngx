@@ -3,11 +3,12 @@
 Backs the opt-in ``semantic`` mode of the document search endpoints: the
 query is embedded and matched against the same index that powers document
 chat and AI suggestions, and the result is merged with the Tantivy keyword
-ranking via reciprocal rank fusion.
+ranking via weighted reciprocal rank fusion.
 """
 
 import logging
 from collections.abc import Iterable
+from collections.abc import Sequence
 
 from django.db.models import QuerySet
 
@@ -22,10 +23,9 @@ from paperless_ai.indexing import truncate_embedding_query
 
 logger = logging.getLogger("paperless_ai.search")
 
-# The most documents a semantic query contributes to a result list. A vector
-# search always returns its nearest neighbours, however distant, and raw
-# similarity scores are not comparable across embedding models, so the
-# contribution is capped rather than thresholded.
+# The most documents a semantic query contributes to a result list. Fewer
+# are returned when not that many reach the configured minimum similarity
+# (PAPERLESS_AI_LLM_SEMANTIC_SEARCH_MIN_SCORE).
 SEMANTIC_SEARCH_MAX_DOCUMENTS = 25
 
 # Chunks retrieved per query. A document is usually split into several
@@ -43,6 +43,14 @@ _VECTOR_FILTER_MAX_IDS = 10_000
 # (2009). Larger values flatten the advantage of the top ranks.
 RRF_K = 60
 
+# Weights of the keyword and semantic rankings in hybrid_ranking(). With the
+# semantic ranking at half the keyword weight, the best semantic-only match
+# (0.5 / (RRF_K + 1)) never outranks a keyword match within the first
+# RRF_K + 2 keyword results (1 / (RRF_K + rank)), so exact matches stay on
+# top while semantic agreement still reorders them.
+KEYWORD_WEIGHT = 1.0
+SEMANTIC_WEIGHT = 0.5
+
 
 def semantic_search_ids(
     query: str,
@@ -54,7 +62,9 @@ def semantic_search_ids(
     ``query``, best first.
 
     ``documents`` scopes the search and must already be permission-filtered
-    for the requesting user: no id outside it is ever returned.
+    for the requesting user: no id outside it is ever returned. Documents
+    less similar than ``PAPERLESS_AI_LLM_SEMANTIC_SEARCH_MIN_SCORE`` (cosine
+    similarity of their best chunk) are left out.
 
     Returns None when semantic search is unavailable (the LLM index is
     disabled, not built yet, built with a different embedding model, or the
@@ -112,14 +122,25 @@ def semantic_search_ids(
         )
         return None
 
-    # Nodes are chunks, best first: keep each document's best-ranked chunk
-    ranked_ids: list[int] = []
+    # Nodes are chunks, best first: score each document by its best chunk
+    best_scores: dict[int, float] = {}
     for node in nodes:
         try:
-            ranked_ids.append(int(node.metadata["document_id"]))
+            document_id = int(node.metadata["document_id"])
         except (KeyError, TypeError, ValueError):  # pragma: no cover
             continue
-    candidate_ids = list(dict.fromkeys(ranked_ids))
+        best_scores.setdefault(document_id, node.score or 0.0)
+    min_score = config.llm_semantic_search_min_score
+    candidate_ids = [
+        doc_id for doc_id, score in best_scores.items() if score >= min_score
+    ]
+    logger.debug(
+        "Semantic search kept %d of %d documents at min score %s: %s",
+        len(candidate_ids),
+        len(best_scores),
+        min_score,
+        ", ".join(f"{doc_id}={score:.3f}" for doc_id, score in best_scores.items()),
+    )
 
     # Re-check against the caller's queryset: an unfiltered search over a
     # large library may return any indexed document, and permissions can
@@ -130,21 +151,41 @@ def semantic_search_ids(
     return [doc_id for doc_id in candidate_ids if doc_id in allowed_ids][:limit]
 
 
+def hybrid_ranking(
+    keyword_ids: Iterable[int],
+    semantic_ids: Iterable[int],
+) -> list[tuple[int, float]]:
+    """Merge keyword and semantic search results, keyword matches weighted
+    above semantic ones (see KEYWORD_WEIGHT and SEMANTIC_WEIGHT).
+    """
+    return reciprocal_rank_fusion(
+        keyword_ids,
+        semantic_ids,
+        weights=(KEYWORD_WEIGHT, SEMANTIC_WEIGHT),
+    )
+
+
 def reciprocal_rank_fusion(
     *rankings: Iterable[int],
+    weights: Sequence[float] | None = None,
     k: int = RRF_K,
 ) -> list[tuple[int, float]]:
     """Merge ranked id lists into one ranking via reciprocal rank fusion.
 
-    Each id scores ``sum(1 / (k + rank))`` over the rankings it appears in.
-    Returns ``(id, score)`` pairs best first, with scores normalised so the
-    best is 1.0. Ties keep the order the ids were first seen in, so earlier
-    rankings win them.
+    Each id scores ``sum(weight / (k + rank))`` over the rankings it appears
+    in, every weight 1.0 unless ``weights`` gives one per ranking. Returns
+    ``(id, score)`` pairs best first, with scores normalised so the best is
+    1.0. Ties keep the order the ids were first seen in, so earlier rankings
+    win them.
     """
+    if weights is None:
+        weights = [1.0] * len(rankings)
+    if len(weights) != len(rankings):
+        raise ValueError("Expected one weight per ranking")
     scores: dict[int, float] = {}
-    for ranking in rankings:
+    for ranking, weight in zip(rankings, weights, strict=True):
         for rank, doc_id in enumerate(ranking, start=1):
-            scores[doc_id] = scores.get(doc_id, 0.0) + 1.0 / (k + rank)
+            scores[doc_id] = scores.get(doc_id, 0.0) + weight / (k + rank)
     if not scores:
         return []
     best = max(scores.values())

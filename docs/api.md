@@ -76,9 +76,11 @@ results:
   the document with id 1234.
 
 Add `semantic=true` to a `text` search to merge in
-[semantic search](usage.md#semantic-search) results from the LLM index. It is
-ignored when the LLM index is not enabled or not available, and for the other
-search parameters.
+[semantic search](usage.md#semantic-search) results from the LLM index, below
+the keyword matches. It is ignored when the LLM index is not enabled or not
+available, and for the other search parameters. On the global search endpoint
+`/api/search/`, `semantic=true` returns semantic-only matches separately, as
+`semantic_documents`.
 
 Pagination works exactly the same as it does for normal requests on this
 endpoint.

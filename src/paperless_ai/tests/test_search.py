@@ -24,6 +24,12 @@ def llm_index_enabled(settings: Settings, temp_llm_index_dir: Path) -> None:
 
 
 @pytest.fixture
+def no_min_score(settings: Settings) -> None:
+    """Keep every neighbour, however distant, to test scoping on its own."""
+    settings.LLM_SEMANTIC_SEARCH_MIN_SCORE = 0
+
+
+@pytest.fixture
 def concept_embedding(mocker: pytest_mock.MockerFixture) -> ConceptEmbedding:
     model = ConceptEmbedding()
     mocker.patch("paperless_ai.indexing.get_embedding_model", return_value=model)
@@ -61,17 +67,40 @@ class TestSemanticSearchIds:
         WHEN:
             - Searching for a synonym of one document's concept
         THEN:
-            - That document ranks first, although it shares no keyword
+            - That document is found, although it shares no keyword
+            - Documents about other concepts fall below the minimum score
         """
+        ids = search.semantic_search_ids("holiday trip", Document.objects.all())
+
+        assert ids == [indexed_library["holiday"].pk]
+
+    def test_min_score_is_configurable(
+        self,
+        indexed_library: dict[str, Document],
+        settings: Settings,
+    ) -> None:
+        """
+        GIVEN:
+            - An LLM index of documents about different concepts
+        WHEN:
+            - Searching with no minimum score, then with one above any match
+        THEN:
+            - Every document is returned best first, then none is
+        """
+        settings.LLM_SEMANTIC_SEARCH_MIN_SCORE = 0
         ids = search.semantic_search_ids("holiday trip", Document.objects.all())
 
         assert ids is not None
         assert ids[0] == indexed_library["holiday"].pk
         assert set(ids) == {doc.pk for doc in indexed_library.values()}
 
+        settings.LLM_SEMANTIC_SEARCH_MIN_SCORE = 1
+        assert search.semantic_search_ids("holiday trip", Document.objects.all()) == []
+
     def test_never_returns_documents_outside_queryset(
         self,
         indexed_library: dict[str, Document],
+        no_min_score: None,
     ) -> None:
         """
         GIVEN:
@@ -95,6 +124,7 @@ class TestSemanticSearchIds:
     def test_post_filters_when_too_many_documents_for_vector_filter(
         self,
         indexed_library: dict[str, Document],
+        no_min_score: None,
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         """
@@ -118,7 +148,11 @@ class TestSemanticSearchIds:
         assert hidden.pk not in ids
         assert len(ids) == 2
 
-    def test_respects_limit(self, indexed_library: dict[str, Document]) -> None:
+    def test_respects_limit(
+        self,
+        indexed_library: dict[str, Document],
+        no_min_score: None,
+    ) -> None:
         ids = search.semantic_search_ids(
             "holiday trip",
             Document.objects.all(),
@@ -214,3 +248,43 @@ class TestReciprocalRankFusion:
     def test_no_rankings(self) -> None:
         assert search.reciprocal_rank_fusion() == []
         assert search.reciprocal_rank_fusion([], []) == []
+
+    def test_weights_scale_each_ranking(self) -> None:
+        fused = search.reciprocal_rank_fusion([1], [2], weights=(1.0, 0.5))
+
+        assert fused == [(1, 1.0), (2, pytest.approx(0.5))]
+
+    def test_requires_one_weight_per_ranking(self) -> None:
+        with pytest.raises(ValueError, match="one weight per ranking"):
+            search.reciprocal_rank_fusion([1], [2], weights=(1.0,))
+
+
+class TestHybridRanking:
+    def test_keyword_matches_stay_above_semantic_only_matches(self) -> None:
+        """
+        GIVEN:
+            - The first RRF_K + 2 keyword results and a different best
+              semantic result
+        WHEN:
+            - Merging them
+        THEN:
+            - Every one of those keyword results ranks above the
+              semantic-only result
+        """
+        keyword_ids = list(range(1, search.RRF_K + 3))
+
+        fused_ids = [doc_id for doc_id, _ in search.hybrid_ranking(keyword_ids, [0])]
+
+        assert fused_ids == [*keyword_ids, 0]
+
+    def test_semantic_only_matches_outrank_weak_keyword_matches(self) -> None:
+        keyword_ids = list(range(1, search.RRF_K + 4))
+
+        fused_ids = [doc_id for doc_id, _ in search.hybrid_ranking(keyword_ids, [0])]
+
+        assert fused_ids.index(0) == search.RRF_K + 2
+
+    def test_semantic_agreement_reorders_keyword_matches(self) -> None:
+        fused_ids = [doc_id for doc_id, _ in search.hybrid_ranking([1, 2, 3], [3])]
+
+        assert fused_ids == [3, 1, 2]

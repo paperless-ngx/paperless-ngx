@@ -118,6 +118,11 @@ def _global_search_ids(response) -> list[int]:
     return [doc["id"] for doc in response.data["documents"]]
 
 
+def _semantic_ids(response) -> list[int]:
+    assert response.status_code == status.HTTP_200_OK, response.data
+    return [doc["id"] for doc in response.data["semantic_documents"]]
+
+
 class TestSemanticDocumentSearch:
     def test_keyword_search_by_default(
         self,
@@ -139,19 +144,18 @@ class TestSemanticDocumentSearch:
         WHEN:
             - Searching with semantic=true
         THEN:
-            - Semantic matches are added to the keyword matches
-            - Documents matching both ways rank first, the best scoring 1.0
+            - Semantic matches are added below the keyword matches
+            - Documents too dissimilar to the query are not added
+            - The best hit scores 1.0
         """
         response = admin_client.get("/api/documents/?text=holiday&semantic=true")
         ids = _result_ids(response)
 
+        # Keyword matches first, then the semantic-only ones; the unrelated
+        # document is below the minimum similarity
         assert set(ids[:2]) == {library["keyword"].pk, library["both"].pk}
-        assert {
-            library["keyword"].pk,
-            library["semantic"].pk,
-            library["private"].pk,
-        } <= set(ids)
-        assert response.data["count"] == len(ids)
+        assert set(ids[2:]) == {library["semantic"].pk, library["private"].pk}
+        assert response.data["count"] == 4
         hits = [doc["__search_hit__"] for doc in response.data["results"]]
         assert hits[0]["score"] == 1.0
         assert [hit["rank"] for hit in hits] == list(range(1, len(hits) + 1))
@@ -352,45 +356,71 @@ class TestSemanticGlobalSearch:
         admin_client: APIClient,
         library: dict[str, Document],
     ) -> None:
-        ids = _global_search_ids(admin_client.get("/api/search/?query=holiday"))
+        response = admin_client.get("/api/search/?query=holiday")
 
-        assert set(ids) == {library["keyword"].pk, library["both"].pk}
+        assert set(_global_search_ids(response)) == {
+            library["keyword"].pk,
+            library["both"].pk,
+        }
+        assert response.data["semantic_documents"] == []
 
-    def test_semantic_merges_semantic_matches(
+    def test_semantic_matches_listed_apart(
         self,
         admin_client: APIClient,
         library: dict[str, Document],
     ) -> None:
-        ids = _global_search_ids(
-            admin_client.get("/api/search/?query=holiday&semantic=true"),
-        )
+        """
+        GIVEN:
+            - Documents matching "holiday" by keyword, by meaning, or both
+        WHEN:
+            - Searching globally with semantic=true
+        THEN:
+            - The documents list keeps only the keyword matches
+            - The semantic-only matches are listed apart, without
+              repeating a keyword match or anything below the min score
+        """
+        response = admin_client.get("/api/search/?query=holiday&semantic=true")
 
-        assert set(ids[:2]) == {library["keyword"].pk, library["both"].pk}
-        assert ids[2] in {library["semantic"].pk, library["private"].pk}
+        assert set(_global_search_ids(response)) == {
+            library["keyword"].pk,
+            library["both"].pk,
+        }
+        assert set(_semantic_ids(response)) == {
+            library["semantic"].pk,
+            library["private"].pk,
+        }
+        assert response.data["total"] == 4
 
     def test_semantic_respects_permissions(
         self,
         viewer_client: APIClient,
         library: dict[str, Document],
     ) -> None:
-        ids = _global_search_ids(
-            viewer_client.get("/api/search/?query=holiday&semantic=true"),
-        )
+        response = viewer_client.get("/api/search/?query=holiday&semantic=true")
 
-        assert library["private"].pk not in ids
-        assert set(ids) == {
-            library["both"].pk,
-            library["keyword"].pk,
-            library["semantic"].pk,
-        }
+        assert _semantic_ids(response) == [library["semantic"].pk]
+
+    def test_semantic_limited_to_three(
+        self,
+        admin_client: APIClient,
+        library: dict[str, Document],
+    ) -> None:
+        for content in ("vacation photos", "trip receipts", "vacation rental"):
+            DocumentFactory.create(content=content)
+        indexing.update_llm_index(rebuild=True)
+
+        response = admin_client.get("/api/search/?query=holiday&semantic=true")
+
+        assert len(_semantic_ids(response)) == 3
 
     def test_semantic_ignored_for_db_only(
         self,
         admin_client: APIClient,
         library: dict[str, Document],
     ) -> None:
-        ids = _global_search_ids(
-            admin_client.get("/api/search/?query=holiday&semantic=true&db_only=true"),
+        response = admin_client.get(
+            "/api/search/?query=holiday&semantic=true&db_only=true",
         )
 
-        assert ids == [library["both"].pk]
+        assert _global_search_ids(response) == [library["both"].pk]
+        assert response.data["semantic_documents"] == []

@@ -2231,6 +2231,20 @@ used with the OpenAI-compatible backend to target a custom provider or local gat
 
     Defaults to true, which allows internal endpoints.
 
+#### [`PAPERLESS_AI_LLM_SEMANTIC_SEARCH_MIN_SCORE=<float>`](#PAPERLESS_AI_LLM_SEMANTIC_SEARCH_MIN_SCORE) {#PAPERLESS_AI_LLM_SEMANTIC_SEARCH_MIN_SCORE}
+
+: The minimum similarity, between 0 and 1, a document needs to be a
+[semantic search](usage.md#semantic-search) result. It is the cosine similarity
+between the query and the document's most similar chunk in the LLM index.
+
+    How similar unrelated documents look depends on the embedding model, so tune
+    this for yours: raise it if semantic search returns unrelated documents, lower
+    it if it misses related ones. Each semantic search logs the score of every
+    candidate document, by id, at debug level to `paperless.log`. 0 keeps every
+    candidate.
+
+    Defaults to 0.5.
+
 #### [`PAPERLESS_AI_LLM_EXTRA_PARAMS=<json>`](#PAPERLESS_AI_LLM_EXTRA_PARAMS) {#PAPERLESS_AI_LLM_EXTRA_PARAMS}
 
 : A JSON object of extra parameters sent with every LLM request, for providers that require a parameter Paperless does not

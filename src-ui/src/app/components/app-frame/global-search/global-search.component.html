@@ -86,6 +86,12 @@
                         <ng-container *ngTemplateOutlet="resultItemTemplate; context: {item: document, nameProp: 'title', type: DataType.Document, icon: 'file-text', date: document.created}"></ng-container>
                     }
                 }
+                @if (searchResults()?.semantic_documents?.length) {
+                    <h6 class="dropdown-header" i18n="@@searchResults.semantic_documents">Similar by meaning</h6>
+                    @for (document of searchResults().semantic_documents; track document.id) {
+                        <ng-container *ngTemplateOutlet="resultItemTemplate; context: {item: document, nameProp: 'title', type: DataType.Document, icon: 'file-text', date: document.created}"></ng-container>
+                    }
+                }
                 @if (searchResults()?.saved_views.length) {
                     <h6 class="dropdown-header" i18n="@@searchResults.saved_views">Saved Views</h6>
                     @for (saved_view of searchResults().saved_views; track saved_view.id) {

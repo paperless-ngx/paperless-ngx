@@ -2629,7 +2629,7 @@ class UnifiedSearchViewSet(DocumentViewSet):
         from documents.search import TantivyRelevanceList
         from documents.search import get_backend
         from documents.search import search_query_error_messages
-        from paperless_ai.search import reciprocal_rank_fusion
+        from paperless_ai.search import hybrid_ranking
 
         def parse_search_params() -> SearchParams:
             """Extract query string, search mode, and ordering from request."""
@@ -2731,7 +2731,7 @@ class UnifiedSearchViewSet(DocumentViewSet):
             )
             fused_scores: dict[int, float] = {}
             if is_hybrid:
-                fused_scores = dict(reciprocal_rank_fusion(all_ids, semantic_ids))
+                fused_scores = dict(hybrid_ranking(all_ids, semantic_ids))
                 all_ids = list(fused_scores)
             ordered_ids = intersect_and_order(
                 all_ids,
@@ -3873,8 +3873,8 @@ class SearchAutoCompleteView(GenericAPIView[Any]):
                 required=False,
                 type=bool,
                 description=(
-                    "Merge semantic (LLM index) results into the document "
-                    "results, when the LLM index is enabled"
+                    "Also return documents similar by meaning (LLM index) as "
+                    "semantic_documents, when the LLM index is enabled"
                 ),
             ),
         ],
@@ -3884,6 +3884,7 @@ class SearchAutoCompleteView(GenericAPIView[Any]):
                 fields={
                     "total": serializers.IntegerField(),
                     "documents": DocumentSerializer(many=True),
+                    "semantic_documents": DocumentSerializer(many=True),
                     "saved_views": SavedViewSerializer(many=True),
                     "tags": TagSerializer(many=True),
                     "correspondents": CorrespondentSerializer(many=True),
@@ -3921,7 +3922,9 @@ class GlobalSearchView(PassUserMixin):
         db_only = request.query_params.get("db_only", False)
 
         OBJECT_LIMIT = 3
+        SEMANTIC_OBJECT_LIMIT = 3
         docs = []
+        semantic_docs = []
         if request.user.has_perm("documents.view_document"):
             # Never more than OBJECT_LIMIT rows come back here, so annotating
             # is cheap -- and without it these results show the root
@@ -3941,29 +3944,33 @@ class GlobalSearchView(PassUserMixin):
                     search_mode=SearchMode.TEXT,
                     limit=OBJECT_LIMIT * 3,
                 )
-                if _semantic_search_requested(request.query_params):
-                    from paperless_ai.search import reciprocal_rank_fusion
-
-                    semantic_ids = _get_semantic_search_ids(
-                        backend,
-                        query,
-                        permitted_docs,
-                        user=user,
-                    )
-                    if semantic_ids is not None:
-                        matching_ids = [
-                            doc_id
-                            for doc_id, _ in reciprocal_rank_fusion(
-                                matching_ids,
-                                semantic_ids,
-                            )
-                        ]
                 docs_by_id = all_docs.in_bulk(matching_ids)
                 docs = [
                     docs_by_id[doc_id]
                     for doc_id in matching_ids
                     if doc_id in docs_by_id
                 ][:OBJECT_LIMIT]
+                if _semantic_search_requested(request.query_params):
+                    # Listed apart from the keyword matches, so those stay
+                    # first and a weaker semantic match never displaces one
+                    shown_ids = {doc.pk for doc in docs}
+                    semantic_ids = [
+                        doc_id
+                        for doc_id in _get_semantic_search_ids(
+                            backend,
+                            query,
+                            permitted_docs,
+                            user=user,
+                        )
+                        or []
+                        if doc_id not in shown_ids
+                    ][:SEMANTIC_OBJECT_LIMIT]
+                    semantic_docs_by_id = all_docs.in_bulk(semantic_ids)
+                    semantic_docs = [
+                        semantic_docs_by_id[doc_id]
+                        for doc_id in semantic_ids
+                        if doc_id in semantic_docs_by_id
+                    ]
         saved_views = (
             get_objects_for_user_owner_aware(
                 request.user,
@@ -4062,6 +4069,11 @@ class GlobalSearchView(PassUserMixin):
         }
 
         docs_serializer = DocumentSerializer(docs, many=True, context=context)
+        semantic_docs_serializer = DocumentSerializer(
+            semantic_docs,
+            many=True,
+            context=context,
+        )
         saved_views_serializer = SavedViewSerializer(
             saved_views,
             many=True,
@@ -4105,6 +4117,7 @@ class GlobalSearchView(PassUserMixin):
         return Response(
             {
                 "total": len(docs)
+                + len(semantic_docs)
                 + len(saved_views)
                 + len(tags)
                 + len(correspondents)
@@ -4117,6 +4130,7 @@ class GlobalSearchView(PassUserMixin):
                 + len(workflows)
                 + len(custom_fields),
                 "documents": docs_serializer.data,
+                "semantic_documents": semantic_docs_serializer.data,
                 "saved_views": saved_views_serializer.data,
                 "tags": tags_serializer.data,
                 "correspondents": correspondents_serializer.data,

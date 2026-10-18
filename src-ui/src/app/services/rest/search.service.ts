@@ -21,6 +21,7 @@ import { SettingsService } from '../settings.service'
 export interface GlobalSearchResult {
   total: number
   documents: Document[]
+  semantic_documents?: Document[]
   saved_views: SavedView[]
   correspondents: Correspondent[]
   document_types: DocumentType[]

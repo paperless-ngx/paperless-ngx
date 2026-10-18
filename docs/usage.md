@@ -353,10 +353,17 @@ documents by meaning rather than only by their words: a search for `vacation`
 can find a document that only mentions a "holiday".
 
 Semantic results come from the same LLM index used by document chat and AI
-suggestions. They are merged with the regular keyword results, so documents
-matching both ways rank first, and a search adds at most 25 semantic matches.
-As with any search, only documents the user has permission to view are
-returned. Advanced (full text query) searches are not affected.
+suggestions. Only documents at least as similar to the query as
+[`PAPERLESS_AI_LLM_SEMANTIC_SEARCH_MIN_SCORE`](configuration.md#PAPERLESS_AI_LLM_SEMANTIC_SEARCH_MIN_SCORE)
+count as matches, and a search adds at most 25 of them. As with any search,
+only documents the user has permission to view are returned. Advanced (full
+text query) searches are not affected.
+
+- In the document list, semantic matches are merged below the keyword matches:
+  keyword matches stay on top, ordered with a boost for those that also match
+  by meaning, and semantic-only matches follow.
+- In the global search, semantic-only matches are listed in their own
+  "Similar by meaning" section (up to 3), below the keyword "Documents".
 
 Searching embeds the query using the configured embedding backend, so each
 search makes one embedding request and may be slower than a keyword search.
