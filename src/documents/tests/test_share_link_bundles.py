@@ -7,6 +7,7 @@ from unittest import mock
 
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.test import override_settings
 from django.utils import timezone
 from rest_framework import serializers
 from rest_framework import status
@@ -224,6 +225,25 @@ class ShareLinkBundleAPITests(DirectoriesMixin, APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_302_FOUND)
         self.assertIn("sharelink_notfound=1", response["Location"])
+
+    @override_settings(LOGIN_URL="/paperless/accounts/login/")
+    def test_unknown_share_link_redirects_under_subpath(self) -> None:
+        """
+        GIVEN:
+            - Paperless is served under a subpath
+        WHEN:
+            - An unknown public share link is requested
+        THEN:
+            - The redirect to the login page keeps the subpath
+        """
+        self.client.logout()
+        response = self.client.get("/share/unknownsharelink/")
+
+        self.assertEqual(response.status_code, status.HTTP_302_FOUND)
+        self.assertEqual(
+            response["Location"],
+            "/paperless/accounts/login/?sharelink_notfound=1",
+        )
 
     def test_share_link_missing_file_redirects(self) -> None:
         """
