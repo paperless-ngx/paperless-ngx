@@ -50,6 +50,7 @@ from documents.settings import EXPORTER_FILE_NAME
 from documents.settings import EXPORTER_SHARE_LINK_BUNDLE_NAME
 from documents.settings import EXPORTER_THUMBNAIL_NAME
 from documents.tests.utils import SampleDirMixin
+from paperless.models import ApplicationConfiguration
 from paperless_mail.models import MailAccount
 from paperless_testing.assertions import FileSystemAssertsMixin
 from paperless_testing.dirs import DirectoriesMixin
@@ -1341,6 +1342,10 @@ class TestCryptExportImport(
             username="myusername",
             password="mypassword",
         )
+        ApplicationConfiguration.objects.update_or_create(
+            pk=1,
+            defaults={"rotate_pages_threshold": 15.5},
+        )
 
         app = SocialApp.objects.create(
             provider="test",
@@ -1384,6 +1389,7 @@ class TestCryptExportImport(
         self.assertNotEqual(mail_account_data["fields"]["password"], "mypassword")
 
         MailAccount.objects.all().delete()
+        ApplicationConfiguration.objects.all().delete()
 
         call_command(
             "document_importer",
@@ -1398,6 +1404,10 @@ class TestCryptExportImport(
 
         self.assertIsNotNone(account)
         self.assertEqual(account.password, "mypassword")
+        self.assertEqual(
+            ApplicationConfiguration.objects.get().rotate_pages_threshold,
+            15.5,
+        )
 
         social_token = SocialToken.objects.first()
         self.assertIsNotNone(social_token)
