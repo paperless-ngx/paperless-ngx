@@ -50,6 +50,7 @@ from documents.settings import EXPORTER_FILE_NAME
 from documents.settings import EXPORTER_SHARE_LINK_BUNDLE_NAME
 from documents.settings import EXPORTER_THUMBNAIL_NAME
 from documents.tests.utils import SampleDirMixin
+from paperless.models import ApplicationConfiguration
 from paperless_mail.models import MailAccount
 from paperless_testing.assertions import FileSystemAssertsMixin
 from paperless_testing.dirs import DirectoriesMixin
@@ -1401,6 +1402,45 @@ class TestCryptExportImport(
 
         social_token = SocialToken.objects.first()
         self.assertIsNotNone(social_token)
+
+    def test_import_passphrase_with_float_field(self) -> None:
+        """
+        GIVEN:
+            - An application configuration with a float field set
+        WHEN:
+            - Export and import are run with a passphrase
+        THEN:
+            - The import succeeds and the float value is preserved
+        """
+        ApplicationConfiguration.objects.update_or_create(
+            pk=1,
+            defaults={"rotate_pages_threshold": 12.5},
+        )
+
+        call_command(
+            "document_exporter",
+            "--no-progress-bar",
+            "--passphrase",
+            "securepassword",
+            self.target,
+            skip_checks=True,
+        )
+
+        ApplicationConfiguration.objects.all().delete()
+
+        call_command(
+            "document_importer",
+            "--no-progress-bar",
+            "--passphrase",
+            "securepassword",
+            self.target,
+            skip_checks=True,
+        )
+
+        self.assertEqual(
+            ApplicationConfiguration.objects.get().rotate_pages_threshold,
+            12.5,
+        )
 
     def test_import_crypt_no_passphrase(self) -> None:
         """
