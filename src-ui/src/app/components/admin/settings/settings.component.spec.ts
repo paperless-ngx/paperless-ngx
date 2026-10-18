@@ -307,7 +307,7 @@ describe('SettingsComponent', () => {
     expect(toastErrorSpy).toHaveBeenCalled()
     expect(storeSpy).toHaveBeenCalled()
     expect(appearanceSettingsSpy).not.toHaveBeenCalled()
-    expect(setSpy).toHaveBeenCalledTimes(35)
+    expect(setSpy).toHaveBeenCalledTimes(36)
     expect(setSpy).toHaveBeenCalledWith(SETTINGS_KEYS.SIDEBAR_HIDDEN_ITEMS, [
       HideableSidebarItemID.Workflows,
     ])
@@ -436,6 +436,32 @@ describe('SettingsComponent', () => {
     )
     settingsService.settingsSaved.emit(true)
     expect(maybeRefreshSpy).toHaveBeenCalled()
+  })
+
+  it('should not offer semantic search if the LLM index is disabled', () => {
+    completeSetup()
+    expect(fixture.nativeElement.textContent).not.toContain(
+      'Include semantic search results'
+    )
+  })
+
+  it('should offer semantic search if the LLM index is enabled', () => {
+    settingsService.set(SETTINGS_KEYS.LLM_INDEX_ENABLED, true)
+    completeSetup()
+    expect(fixture.nativeElement.textContent).toContain(
+      'Include semantic search results'
+    )
+  })
+
+  it('should save the semantic search setting', () => {
+    completeSetup()
+    jest.spyOn(settingsService, 'storeSettings').mockReturnValue(of(true))
+    const setSpy = jest.spyOn(settingsService, 'set')
+
+    component.settingsForm.get('searchSemantic').setValue(true)
+    component.saveSettings()
+
+    expect(setSpy).toHaveBeenCalledWith(SETTINGS_KEYS.SEARCH_SEMANTIC, true)
   })
 
   it('should support toggling document detail fields', () => {

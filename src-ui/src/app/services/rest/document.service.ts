@@ -11,7 +11,12 @@ import {
 } from 'src/app/data/document'
 import { DocumentMetadata } from 'src/app/data/document-metadata'
 import { DocumentSuggestions } from 'src/app/data/document-suggestions'
+import { Params } from '@angular/router'
 import { FilterRule } from 'src/app/data/filter-rule'
+import {
+  SEMANTIC_SEARCH_PARAMETER,
+  SIMPLE_TEXT_PARAMETER,
+} from 'src/app/data/filter-rule-type'
 import { Results, SelectionData } from 'src/app/data/results'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { queryParamsFromFilterRules } from '../../utils/query-params'
@@ -23,6 +28,7 @@ import {
 import { SettingsService } from '../settings.service'
 import { AbstractPaperlessService } from './abstract-paperless-service'
 import { CustomFieldsService } from './custom-fields.service'
+import { SearchService } from './search.service'
 
 export enum BulkEditSourceMode {
   LATEST_VERSION = 'latest_version',
@@ -82,6 +88,7 @@ export class DocumentService extends AbstractPaperlessService<Document> {
   private permissionsService = inject(PermissionsService)
   private settingsService = inject(SettingsService)
   private customFieldService = inject(CustomFieldsService)
+  private searchService = inject(SearchService)
 
   private _searchQuery: string
 
@@ -184,8 +191,23 @@ export class DocumentService extends AbstractPaperlessService<Document> {
       pageSize,
       sortField,
       sortReverse,
-      Object.assign(extraParams, queryParamsFromFilterRules(filterRules))
+      Object.assign(extraParams, this.filterQueryParams(filterRules))
     )
+  }
+
+  /**
+   * Query params for the filter rules, plus the semantic search flag for a
+   * title & content search if the user opted into semantic search.
+   */
+  filterQueryParams(filterRules: FilterRule[]): Params {
+    const params = queryParamsFromFilterRules(filterRules)
+    if (
+      params?.[SIMPLE_TEXT_PARAMETER] &&
+      this.searchService.semanticSearchEnabled
+    ) {
+      params[SEMANTIC_SEARCH_PARAMETER] = true
+    }
+    return params
   }
 
   listAllFilteredIds(filterRules?: FilterRule[]): Observable<number[]> {

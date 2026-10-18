@@ -164,6 +164,14 @@
               </div>
             </div>
 
+            @if (llmIndexEnabled) {
+              <div class="row">
+                <div class="col">
+                  <pngx-input-check i18n-title title="Include semantic search results" i18n-hint hint="Also find documents by meaning, using the AI index, in global search and title &amp; content search." formControlName="searchSemantic"></pngx-input-check>
+                </div>
+              </div>
+            }
+
             <div class="row mb-3">
               <div class="col-md-3 col-form-label pt-0">
                 <label for="searchLink" i18n>Full search links to</label>

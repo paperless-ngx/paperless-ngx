@@ -110,6 +110,7 @@ export const SETTINGS_KEYS = {
     'general-settings:document-details:hidden-fields',
   SEARCH_DB_ONLY: 'general-settings:search:db-only',
   SEARCH_FULL_TYPE: 'general-settings:search:more-link',
+  SEARCH_SEMANTIC: 'general-settings:search:semantic',
   PDF_EDITOR_DEFAULT_EDIT_MODE:
     'general-settings:document-editing:default-edit-mode',
   EMPTY_TRASH_DELAY: 'trash_delay',
@@ -117,6 +118,7 @@ export const SETTINGS_KEYS = {
   OUTLOOK_OAUTH_URL: 'outlook_oauth_url',
   EMAIL_ENABLED: 'email_enabled',
   AI_ENABLED: 'ai_enabled',
+  LLM_INDEX_ENABLED: 'llm_index_enabled',
   REMOTE_OCR_CONFIGURED: 'remote_ocr:configured',
   REMOTE_OCR_MODE: 'remote_ocr:mode',
 }
@@ -355,6 +357,11 @@ export const SETTINGS: UiSetting[] = [
     default: GlobalSearchType.TITLE_CONTENT,
   },
   {
+    key: SETTINGS_KEYS.SEARCH_SEMANTIC,
+    type: 'boolean',
+    default: false,
+  },
+  {
     key: SETTINGS_KEYS.EMPTY_TRASH_DELAY,
     type: 'number',
     default: 30,
@@ -381,6 +388,11 @@ export const SETTINGS: UiSetting[] = [
   },
   {
     key: SETTINGS_KEYS.AI_ENABLED,
+    type: 'boolean',
+    default: false,
+  },
+  {
+    key: SETTINGS_KEYS.LLM_INDEX_ENABLED,
     type: 'boolean',
     default: false,
   },

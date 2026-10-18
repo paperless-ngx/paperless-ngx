@@ -75,6 +75,11 @@ results:
 - `/api/documents/?more_like_id=1234`: Search for documents similar to
   the document with id 1234.
 
+Add `semantic=true` to a `text` search to merge in
+[semantic search](usage.md#semantic-search) results from the LLM index. It is
+ignored when the LLM index is not enabled or not available, and for the other
+search parameters.
+
 Pagination works exactly the same as it does for normal requests on this
 endpoint.
 

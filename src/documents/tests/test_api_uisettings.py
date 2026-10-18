@@ -60,6 +60,7 @@ class TestApiUiSettings(DirectoriesMixin, APITestCase):
                 },
                 "email_enabled": False,
                 "ai_enabled": False,
+                "llm_index_enabled": False,
                 "remote_ocr": {
                     "configured": False,
                     "mode": "always",
@@ -157,6 +158,25 @@ class TestApiUiSettings(DirectoriesMixin, APITestCase):
             "Expected a dictionary",
             str(response.data["settings"]),
         )
+
+    @override_settings(
+        AI_ENABLED=True,
+        LLM_EMBEDDING_BACKEND="ollama",
+    )
+    def test_settings_reports_llm_index_enabled(self) -> None:
+        """
+        GIVEN:
+            - AI enabled with an embedding backend configured
+        WHEN:
+            - The ui_settings endpoint is called
+        THEN:
+            - The UI is told the LLM index is enabled, so it can offer
+              semantic search
+        """
+        response = self.client.get(self.ENDPOINT, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(response.data["settings"]["llm_index_enabled"])
 
     @override_settings(
         REMOTE_OCR_ENGINE="azureai",

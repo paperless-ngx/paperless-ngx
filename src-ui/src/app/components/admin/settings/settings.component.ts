@@ -189,6 +189,7 @@ export class SettingsComponent
     documentDetailsHiddenFields: new FormControl([]),
     searchDbOnly: new FormControl(null),
     searchLink: new FormControl(null),
+    searchSemantic: new FormControl(null),
 
     notificationsConsumerNewDocument: new FormControl(null),
     notificationsConsumerSuccess: new FormControl(null),
@@ -223,6 +224,10 @@ export class SettingsComponent
 
   get aiEnabled(): boolean {
     return this.settings.get(SETTINGS_KEYS.AI_ENABLED)
+  }
+
+  get llmIndexEnabled(): boolean {
+    return this.settings.get(SETTINGS_KEYS.LLM_INDEX_ENABLED)
   }
 
   public readonly documentDetailFieldOptions = documentDetailFieldOptions
@@ -419,6 +424,7 @@ export class SettingsComponent
       ),
       searchDbOnly: this.settings.get(SETTINGS_KEYS.SEARCH_DB_ONLY),
       searchLink: this.settings.get(SETTINGS_KEYS.SEARCH_FULL_TYPE),
+      searchSemantic: this.settings.get(SETTINGS_KEYS.SEARCH_SEMANTIC),
     }
   }
 
@@ -650,6 +656,10 @@ export class SettingsComponent
     this.settings.set(
       SETTINGS_KEYS.SEARCH_FULL_TYPE,
       this.settingsForm.value.searchLink
+    )
+    this.settings.set(
+      SETTINGS_KEYS.SEARCH_SEMANTIC,
+      this.settingsForm.value.searchSemantic
     )
     this.settings.setLanguage(this.settingsForm.value.displayLanguage)
     this.settings

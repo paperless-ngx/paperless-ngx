@@ -277,6 +277,7 @@ if settings.AUDIT_LOG_ENABLED:
     from auditlog.models import LogEntry
 
 if TYPE_CHECKING:
+    from documents.search import TantivyBackend
     from paperless_ai.base_model import TaxonomyChoiceDict
 
 
@@ -290,6 +291,8 @@ logger = logging.getLogger("paperless.api")
 _TANTIVY_INTERSECT_THRESHOLD = 5_000
 _TANTIVY_SEARCH_PARAM_NAMES = ("text", "title_search", "query", "more_like_id")
 _TANTIVY_COMBINABLE_SEARCH_PARAMS = ({"text", "query"}, {"title_search", "query"})
+# Opt-in flag merging semantic (LLM index) results into a simple text search
+_SEMANTIC_SEARCH_PARAM = "semantic"
 
 # whoosh-compat's fieldname tagger (used only for SearchMode.QUERY, via the
 # whoosh grammar in parse_user_query) is O(n^2) in plain word characters:
@@ -343,6 +346,40 @@ def _get_tantivy_query_and_mode(params):
         if value is not None and len(value) > _MAX_QUERY_LENGTH:
             raise QueryTooLongError(len(value), _MAX_QUERY_LENGTH)
     return raw, mode, filter_query
+
+
+def _semantic_search_requested(params) -> bool:
+    return get_boolean(str(params.get(_SEMANTIC_SEARCH_PARAM, "false")))
+
+
+def _get_semantic_search_ids(
+    backend: "TantivyBackend",
+    query_str: str,
+    documents: QuerySet[Document],
+    *,
+    user: User | None,
+    filter_query: str | None = None,
+) -> list[int] | None:
+    """Ids of the documents in ``documents`` semantically similar to
+    ``query_str``, best first, or None when semantic search is unavailable
+    and the caller should fall back to keyword search alone.
+    """
+    from documents.search import SearchMode
+    from paperless_ai.search import semantic_search_ids
+
+    semantic_ids = semantic_search_ids(query_str, documents)
+    if semantic_ids and filter_query is not None:
+        # The vector index knows no advanced query syntax, so let Tantivy
+        # apply the accompanying filter query (e.g. a relative date range).
+        matching_ids = set(
+            backend.search_ids(
+                filter_query,
+                user=user,
+                search_mode=SearchMode.QUERY,
+            ),
+        )
+        semantic_ids = [doc_id for doc_id in semantic_ids if doc_id in matching_ids]
+    return semantic_ids
 
 
 def _get_more_like_id(query_params: dict[str, Any], user: User | None) -> int:
@@ -2524,6 +2561,15 @@ class ChatStreamingView(GenericAPIView[Any]):
                 description="Advanced Tantivy search query string",
             ),
             OpenApiParameter(
+                name="semantic",
+                type=OpenApiTypes.BOOL,
+                location=OpenApiParameter.QUERY,
+                description=(
+                    "Merge semantic (LLM index) results into a `text` search, "
+                    "when the LLM index is enabled"
+                ),
+            ),
+            OpenApiParameter(
                 name="full_perms",
                 type=OpenApiTypes.BOOL,
                 location=OpenApiParameter.QUERY,
@@ -2577,11 +2623,13 @@ class UnifiedSearchViewSet(DocumentViewSet):
             return super().list(request)
 
         from documents.search import SearchHit
+        from documents.search import SearchMode
         from documents.search import SearchQueryError
         from documents.search import TantivyBackend
         from documents.search import TantivyRelevanceList
         from documents.search import get_backend
         from documents.search import search_query_error_messages
+        from paperless_ai.search import reciprocal_rank_fusion
 
         def parse_search_params() -> SearchParams:
             """Extract query string, search mode, and ordering from request."""
@@ -2656,20 +2704,45 @@ class UnifiedSearchViewSet(DocumentViewSet):
             # "score" is not a real Tantivy sort field — it means relevance order,
             # which is Tantivy's default when no sort field is specified.
             is_score_sort = sort_field_name == "score"
+            semantic_ids = (
+                _get_semantic_search_ids(
+                    backend,
+                    query_str,
+                    filtered_qs,
+                    user=user,
+                    filter_query=filter_query,
+                )
+                if search_mode is SearchMode.TEXT
+                and _semantic_search_requested(request.query_params)
+                else None
+            )
+            is_hybrid = semantic_ids is not None
             all_ids = backend.search_ids(
                 query_str,
                 user=user,
                 sort_field=(
-                    None if (not use_tantivy_sort or is_score_sort) else sort_field_name
+                    None
+                    if (is_hybrid or not use_tantivy_sort or is_score_sort)
+                    else sort_field_name
                 ),
                 sort_reverse=sort_reverse,
                 search_mode=search_mode,
                 filter_query=filter_query,
             )
+            fused_scores: dict[int, float] = {}
+            if is_hybrid:
+                fused_scores = dict(reciprocal_rank_fusion(all_ids, semantic_ids))
+                all_ids = list(fused_scores)
             ordered_ids = intersect_and_order(
                 all_ids,
                 filtered_qs,
-                use_tantivy_sort=use_tantivy_sort,
+                # The fused ranking is relevance-ordered, any other ordering
+                # comes from the ORM
+                use_tantivy_sort=(
+                    sort_field_name in (None, "score")
+                    if is_hybrid
+                    else use_tantivy_sort
+                ),
             )
             # Tantivy returns relevance results best-first (descending score).
             # ordering=score (ascending, worst-first) requires a reversal.
@@ -2684,6 +2757,19 @@ class UnifiedSearchViewSet(DocumentViewSet):
                 search_mode=search_mode,
                 rank_start=page_offset + 1,
             )
+            if is_hybrid:
+                # highlight_hits() only returns keyword matches, so add the
+                # semantic-only ones and score every hit by its fused rank
+                highlights = {hit["id"]: hit["highlights"] for hit in page_hits}
+                page_hits = [
+                    SearchHit(
+                        id=doc_id,
+                        score=fused_scores[doc_id],
+                        rank=rank,
+                        highlights=highlights.get(doc_id, {}),
+                    )
+                    for rank, doc_id in enumerate(page_ids, start=page_offset + 1)
+                ]
             return SearchResultPage(
                 ordered_ids=ordered_ids,
                 hits=page_hits,
@@ -2891,6 +2977,7 @@ class DocumentSelectionMixin:
         *,
         user: User,
         filters: dict[str, Any],
+        documents: QuerySet[Document],
     ) -> list[int] | None:
         search_filters = [
             filter_name
@@ -2901,6 +2988,7 @@ class DocumentSelectionMixin:
             return None
         _validate_tantivy_search_params(search_filters)
 
+        from documents.search import SearchMode
         from documents.search import SearchQueryError
         from documents.search import get_backend
         from documents.search import search_query_error_messages
@@ -2927,6 +3015,20 @@ class DocumentSelectionMixin:
                     search_mode=search_mode,
                     filter_query=filter_query,
                 )
+                if search_mode is SearchMode.TEXT and _semantic_search_requested(
+                    filters,
+                ):
+                    # Same scope as the search list endpoint (the ORM-filtered
+                    # documents), so a selection matches what was displayed
+                    semantic_ids = _get_semantic_search_ids(
+                        backend,
+                        query_str,
+                        documents,
+                        user=search_user,
+                        filter_query=filter_query,
+                    )
+                    if semantic_ids is not None:
+                        search_ids = list(dict.fromkeys([*search_ids, *semantic_ids]))
         except SearchQueryError as e:
             # Same user-fixable-query mapping as the search list endpoint:
             # a bad date/number in a bulk selection filter is a 400 naming
@@ -2950,7 +3052,7 @@ class DocumentSelectionMixin:
         orm_filters = {
             key: value
             for key, value in filters.items()
-            if key not in _TANTIVY_SEARCH_PARAM_NAMES
+            if key not in (*_TANTIVY_SEARCH_PARAM_NAMES, _SEMANTIC_SEARCH_PARAM)
         }
         # Operations are addressed to roots, a caller that wants
         # to act on a specific version passes its id explicitly instead
@@ -2968,6 +3070,7 @@ class DocumentSelectionMixin:
         search_filtered_ids = self._get_search_document_ids(
             user=user,
             filters=filters,
+            documents=filtered_documents,
         )
         if search_filtered_ids is not None:
             filtered_documents = filtered_documents.filter(pk__in=search_filtered_ids)
@@ -3765,6 +3868,15 @@ class SearchAutoCompleteView(GenericAPIView[Any]):
                 type=bool,
                 description="Search only the database",
             ),
+            OpenApiParameter(
+                name="semantic",
+                required=False,
+                type=bool,
+                description=(
+                    "Merge semantic (LLM index) results into the document "
+                    "results, when the LLM index is enabled"
+                ),
+            ),
         ],
         responses={
             (200, "application/json"): inline_serializer(
@@ -3814,21 +3926,38 @@ class GlobalSearchView(PassUserMixin):
             # Never more than OBJECT_LIMIT rows come back here, so annotating
             # is cheap -- and without it these results show the root
             # document's superseded content.
-            all_docs = annotate_effective_content(
-                Document.objects.filter(
-                    id__in=permitted_document_ids(request.user),
-                ),
+            permitted_docs = Document.objects.filter(
+                id__in=permitted_document_ids(request.user),
             )
+            all_docs = annotate_effective_content(permitted_docs)
             if db_only:
                 docs = all_docs.filter(title__icontains=query)[:OBJECT_LIMIT]
             else:
                 user = None if request.user.is_superuser else request.user
-                matching_ids = get_backend().search_ids(
+                backend = get_backend()
+                matching_ids = backend.search_ids(
                     query,
                     user=user,
                     search_mode=SearchMode.TEXT,
                     limit=OBJECT_LIMIT * 3,
                 )
+                if _semantic_search_requested(request.query_params):
+                    from paperless_ai.search import reciprocal_rank_fusion
+
+                    semantic_ids = _get_semantic_search_ids(
+                        backend,
+                        query,
+                        permitted_docs,
+                        user=user,
+                    )
+                    if semantic_ids is not None:
+                        matching_ids = [
+                            doc_id
+                            for doc_id, _ in reciprocal_rank_fusion(
+                                matching_ids,
+                                semantic_ids,
+                            )
+                        ]
                 docs_by_id = all_docs.in_bulk(matching_ids)
                 docs = [
                     docs_by_id[doc_id]
@@ -4318,6 +4447,7 @@ class UiSettingsView(GenericAPIView[Any]):
         ai_config = AIConfig()
 
         ui_settings["ai_enabled"] = ai_config.ai_enabled
+        ui_settings["llm_index_enabled"] = ai_config.llm_index_enabled
 
         user_resp = {
             "id": user.id,

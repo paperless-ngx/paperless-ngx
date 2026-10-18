@@ -10,7 +10,10 @@ import {
   DOCUMENT_SORT_FIELDS,
   DOCUMENT_SORT_FIELDS_FULLTEXT,
 } from 'src/app/data/document'
-import { FILTER_SIMPLE_TITLE } from 'src/app/data/filter-rule-type'
+import {
+  FILTER_SIMPLE_TEXT,
+  FILTER_SIMPLE_TITLE,
+} from 'src/app/data/filter-rule-type'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { environment } from 'src/environments/environment'
 import { PermissionsService } from '../permissions.service'
@@ -147,6 +150,42 @@ describe(`DocumentService`, () => {
       `${environment.apiBaseUrl}${endpoint}/?page=1&page_size=100000&fields=id&title_search=apple`
     )
     expect(req.request.method).toEqual('GET')
+  })
+
+  it('should request semantic results for a title & content search if enabled', () => {
+    settingsService.set(SETTINGS_KEYS.SEARCH_SEMANTIC, true)
+    settingsService.set(SETTINGS_KEYS.LLM_INDEX_ENABLED, true)
+    subscription = service
+      .listAllFilteredIds([
+        {
+          rule_type: FILTER_SIMPLE_TEXT,
+          value: 'apple',
+        },
+      ])
+      .subscribe()
+    httpTestingController.expectOne(
+      `${environment.apiBaseUrl}${endpoint}/?page=1&page_size=100000&fields=id&text=apple&semantic=true`
+    )
+
+    subscription = service
+      .listAllFilteredIds([
+        {
+          rule_type: FILTER_SIMPLE_TITLE,
+          value: 'apple',
+        },
+      ])
+      .subscribe()
+    httpTestingController.expectOne(
+      `${environment.apiBaseUrl}${endpoint}/?page=1&page_size=100000&fields=id&title_search=apple`
+    )
+  })
+
+  it('should not request semantic results if the LLM index is disabled', () => {
+    settingsService.set(SETTINGS_KEYS.SEARCH_SEMANTIC, true)
+    expect(
+      service.filterQueryParams([{ rule_type: FILTER_SIMPLE_TEXT, value: 'a' }])
+    ).toEqual({ text: 'a' })
+    expect(service.filterQueryParams(null)).toBeNull()
   })
 
   it('should call appropriate api endpoint for uploading a document', () => {

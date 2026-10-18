@@ -50,7 +50,6 @@ import { TagService } from 'src/app/services/rest/tag.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { flattenTags } from 'src/app/utils/flatten-tags'
-import { queryParamsFromFilterRules } from 'src/app/utils/query-params'
 import { MergeAsVersionsConfirmDialogComponent } from '../../common/confirm-dialog/merge-as-versions-confirm-dialog/merge-as-versions-confirm-dialog.component'
 import { MergeConfirmDialogComponent } from '../../common/confirm-dialog/merge-confirm-dialog/merge-confirm-dialog.component'
 import { ReprocessConfirmDialogComponent } from '../../common/confirm-dialog/reprocess-confirm-dialog/reprocess-confirm-dialog.component'
@@ -360,7 +359,7 @@ export class BulkEditorComponent
     if (this.list.allSelected) {
       return {
         all: true,
-        filters: queryParamsFromFilterRules(this.list.filterRules),
+        filters: this.documentService.filterQueryParams(this.list.filterRules),
         excluded_documents: Array.from(this.list.excluded),
       }
     }

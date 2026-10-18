@@ -59,4 +59,27 @@ describe('SearchService', () => {
       `${environment.apiBaseUrl}search/?query=${query}&db_only=true`
     )
   })
+
+  it('should request semantic results on globalSearch if enabled', () => {
+    const query = 'apple'
+    settingsService.set(SETTINGS_KEYS.SEARCH_SEMANTIC, true)
+    service.globalSearch(query).subscribe()
+    // not offered by the server
+    httpTestingController.expectOne(
+      `${environment.apiBaseUrl}search/?query=${query}`
+    )
+
+    settingsService.set(SETTINGS_KEYS.LLM_INDEX_ENABLED, true)
+    service.globalSearch(query).subscribe()
+    httpTestingController.expectOne(
+      `${environment.apiBaseUrl}search/?query=${query}&semantic=true`
+    )
+
+    // database-only search has no semantic results
+    settingsService.set(SETTINGS_KEYS.SEARCH_DB_ONLY, true)
+    subscription = service.globalSearch(query).subscribe()
+    httpTestingController.expectOne(
+      `${environment.apiBaseUrl}search/?query=${query}&db_only=true`
+    )
+  })
 })

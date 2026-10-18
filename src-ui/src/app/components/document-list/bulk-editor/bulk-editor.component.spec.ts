@@ -14,10 +14,11 @@ import { of, throwError } from 'rxjs'
 import { Correspondent } from 'src/app/data/correspondent'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import { DocumentType } from 'src/app/data/document-type'
-import { FILTER_TITLE } from 'src/app/data/filter-rule-type'
+import { FILTER_SIMPLE_TEXT, FILTER_TITLE } from 'src/app/data/filter-rule-type'
 import { Results } from 'src/app/data/results'
 import { StoragePath } from 'src/app/data/storage-path'
 import { Tag } from 'src/app/data/tag'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { FilterPipe } from 'src/app/pipes/filter.pipe'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import {
@@ -426,6 +427,34 @@ describe('BulkEditorComponent', () => {
       adjustedSelectionData.selected_tags
     )
     expect(component.tagSelectionModel.selectionSize()).toEqual(1)
+  })
+
+  it('should include semantic search in the filters of an all-filtered selection', () => {
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
+    const settingsService = TestBed.inject(SettingsService)
+    settingsService.set(SETTINGS_KEYS.LLM_INDEX_ENABLED, true)
+    settingsService.set(SETTINGS_KEYS.SEARCH_SEMANTIC, true)
+    fixture.detectChanges()
+    jest
+      .spyOn(documentListViewService, 'allSelected', 'get')
+      .mockReturnValue(true)
+    jest
+      .spyOn(documentListViewService, 'excluded', 'get')
+      .mockReturnValue(new Set([4]))
+    jest
+      .spyOn(documentListViewService, 'filterRules', 'get')
+      .mockReturnValue([{ rule_type: FILTER_SIMPLE_TEXT, value: 'apple' }])
+    const getSelectionDataSpy = jest
+      .spyOn(documentService, 'getSelectionData')
+      .mockReturnValue(of(selectionData))
+
+    component.openTagsDropdown()
+
+    expect(getSelectionDataSpy).toHaveBeenCalledWith({
+      all: true,
+      filters: { text: 'apple', semantic: true },
+      excluded_documents: [4],
+    })
   })
 
   it('should apply list selection data to document types menu when all filtered documents are selected', () => {

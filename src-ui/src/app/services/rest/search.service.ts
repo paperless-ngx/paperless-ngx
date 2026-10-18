@@ -5,6 +5,7 @@ import { Correspondent } from 'src/app/data/correspondent'
 import { CustomField } from 'src/app/data/custom-field'
 import { Document } from 'src/app/data/document'
 import { DocumentType } from 'src/app/data/document-type'
+import { SEMANTIC_SEARCH_PARAMETER } from 'src/app/data/filter-rule-type'
 import { Group } from 'src/app/data/group'
 import { MailAccount } from 'src/app/data/mail-account'
 import { MailRule } from 'src/app/data/mail-rule'
@@ -53,6 +54,8 @@ export class SearchService {
     let params = new HttpParams().set('query', query)
     if (this.searchDbOnly) {
       params = params.set('db_only', true)
+    } else if (this.semanticSearchEnabled) {
+      params = params.set(SEMANTIC_SEARCH_PARAMETER, true)
     }
     return this.http.get<GlobalSearchResult>(
       `${environment.apiBaseUrl}search/`,
@@ -62,5 +65,12 @@ export class SearchService {
 
   public get searchDbOnly(): boolean {
     return this.settingsService.get(SETTINGS_KEYS.SEARCH_DB_ONLY)
+  }
+
+  public get semanticSearchEnabled(): boolean {
+    return (
+      this.settingsService.get(SETTINGS_KEYS.LLM_INDEX_ENABLED) &&
+      this.settingsService.get(SETTINGS_KEYS.SEARCH_SEMANTIC)
+    )
   }
 }

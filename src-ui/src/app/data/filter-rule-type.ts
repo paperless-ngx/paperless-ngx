@@ -71,6 +71,7 @@ export const FILTER_MIME_TYPE = 47
 
 export const SIMPLE_TEXT_PARAMETER = 'text'
 export const SIMPLE_TITLE_PARAMETER = 'title_search'
+export const SEMANTIC_SEARCH_PARAMETER = 'semantic'
 
 export const FILTER_RULE_TYPES: FilterRuleType[] = [
   {

@@ -344,6 +344,26 @@ disable the existing classifier-based suggestion system. Currently, both remote
 
 Paperless-ngx can use an AI LLM model to answer questions about a document or across multiple documents. Again, this feature works best when RAG is enabled. The chat feature is available in the upper app toolbar and will switch between chatting across multiple documents or a single document based on the current view.
 
+### Semantic Search {#semantic-search}
+
+If the LLM index is enabled, each user can opt into semantic search under
+_Settings_ > _General_ > _Global search_ with "Include semantic search results".
+The global search and the "Title & content" document search then also find
+documents by meaning rather than only by their words: a search for `vacation`
+can find a document that only mentions a "holiday".
+
+Semantic results come from the same LLM index used by document chat and AI
+suggestions. They are merged with the regular keyword results, so documents
+matching both ways rank first, and a search adds at most 25 semantic matches.
+As with any search, only documents the user has permission to view are
+returned. Advanced (full text query) searches are not affected.
+
+Searching embeds the query using the configured embedding backend, so each
+search makes one embedding request and may be slower than a keyword search.
+If the LLM index has not been built yet, was built with a different embedding
+model, or the embedding backend is unavailable, the search silently falls back
+to keyword results only.
+
 ## Sharing documents from Paperless-ngx
 
 Paperless-ngx supports sharing documents with other users by assigning them [permissions](#object-permissions)
@@ -901,6 +921,8 @@ objects Paperless-ngx uses, including documents, tags, workflows, etc. Only
 objects for which the user has appropriate permissions are returned. For
 documents, if there are < 3 results, "advanced" search results (which use
 the document index) will also be included. This can be disabled under settings.
+If the LLM index is enabled, [semantic search](#semantic-search) results can be
+included too.
 
 ### Document searches
 
