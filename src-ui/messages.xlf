@@ -1824,7 +1824,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/suggestions-dropdown/suggestions-dropdown.component.html</context>
-          <context context-type="linenumber">35</context>
+          <context context-type="linenumber">34</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
@@ -3581,7 +3581,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/suggestions-dropdown/suggestions-dropdown.component.html</context>
-          <context context-type="linenumber">47</context>
+          <context context-type="linenumber">46</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
@@ -7731,21 +7731,21 @@
         <source>Show suggestions</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/suggestions-dropdown/suggestions-dropdown.component.html</context>
-          <context context-type="linenumber">24,25</context>
+          <context context-type="linenumber">23,24</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3834115140127576673" datatype="html">
         <source>No novel suggestions</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/suggestions-dropdown/suggestions-dropdown.component.html</context>
-          <context context-type="linenumber">31,32</context>
+          <context context-type="linenumber">30,31</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4369111787961525769" datatype="html">
         <source>Document Types</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/suggestions-dropdown/suggestions-dropdown.component.html</context>
-          <context context-type="linenumber">41</context>
+          <context context-type="linenumber">40</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/statistics-widget/statistics-widget.component.html</context>
@@ -7756,42 +7756,42 @@
         <source>{VAR_PLURAL, plural, =1 {1 suggestion available below} other {<x id="INTERPOLATION"/> suggestions available below}}</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/suggestions-dropdown/suggestions-dropdown.component.html</context>
-          <context context-type="linenumber">54</context>
+          <context context-type="linenumber">53</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4169875112244042673" datatype="html">
         <source>Suggestion options</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/suggestions-dropdown/suggestions-dropdown.component.html</context>
-          <context context-type="linenumber">65,66</context>
+          <context context-type="linenumber">63,64</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3145824396228856507" datatype="html">
         <source>Not using default</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/suggestions-dropdown/suggestions-dropdown.component.html</context>
-          <context context-type="linenumber">69,70</context>
+          <context context-type="linenumber">67,68</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8102623853570619759" datatype="html">
         <source>Suggest using:</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/suggestions-dropdown/suggestions-dropdown.component.html</context>
-          <context context-type="linenumber">74,75</context>
+          <context context-type="linenumber">72,73</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5799391967036896978" datatype="html">
         <source>ML</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/suggestions-dropdown/suggestions-dropdown.component.html</context>
-          <context context-type="linenumber">77</context>
+          <context context-type="linenumber">75</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3484984238852181071" datatype="html">
         <source>AI</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/suggestions-dropdown/suggestions-dropdown.component.html</context>
-          <context context-type="linenumber">81</context>
+          <context context-type="linenumber">79</context>
         </context-group>
       </trans-unit>
       <trans-unit id="9180110319941008393" datatype="html">
