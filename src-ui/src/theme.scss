@@ -26,6 +26,11 @@
   --pngx-card-hover-border: var(--bs-tertiary-color);
   --pngx-focus-alpha: 0.3;
   --pngx-toast-max-width: 340px;
+  --pngx-toast-bg: rgba(255, 255, 255, 0.94);
+  --pngx-toast-success: hsl(140, 52%, 30%);
+  --pngx-toast-info: hsl(205, 64%, 38%);
+  --pngx-toast-error: hsl(350, 79%, 40%);
+  --pngx-toast-error-bg: hsl(350, 80%, 96%);
   --bs-info: var(--pngx-bg-alt2);
   --bs-info-rgb: 233, 236, 239;
   @media screen and (min-width: 1024px) {
@@ -54,10 +59,6 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,%3csvg xmlns='h
     .form-check-input:checked[type=radio] {
       --bs-form-check-bg-image: #{$form-check-radio-checked-bg-image-dark};
     }
-  }
-
-  .toast .btn-close {
-    filter: none !important;
   }
 }
 
@@ -90,6 +91,11 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,%3csvg xmlns='h
   color-scheme: dark;
   --pngx-body-color-accent: #{$text-color-dark-bg-accent};
   --pngx-bg-alt: #242529;
+  --pngx-toast-bg: rgba(36, 40, 43, 0.96);
+  --pngx-toast-success: hsl(140, 45%, 55%);
+  --pngx-toast-info: hsl(205, 70%, 64%);
+  --pngx-toast-error: hsl(350, 72%, 62%);
+  --pngx-toast-error-bg: hsl(350, 35%, 18%);
   --pngx-bg-alt2: #232323;
   --pngx-bg-darker: #121315;
   --pngx-bg-disabled: var(--pngx-bg-alt);
@@ -300,16 +306,6 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,%3csvg xmlns='h
 
   .modal .btn-close, .alert .btn-close, .toast .btn-close {
     filter: invert(1) grayscale(100%) brightness(200%);
-  }
-
-  .toast {
-    background-color: hsla(var(--pngx-primary), calc(var(--pngx-primary-lightness) - 15%), 0.9);
-  }
-
-  .toast,
-  .toast .btn,
-  .toast .btn-close {
-    color: var(--pngx-primary-text-contrast);
   }
 
   .dropdown-item {

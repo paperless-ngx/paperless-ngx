@@ -133,9 +133,7 @@ describe('ToastComponent', () => {
     fixture.detectChanges()
     const el: HTMLElement = fixture.nativeElement
     expect(el.querySelector('i-bs[name="check-circle"]')).not.toBeNull()
-    expect(el.querySelector('ngb-toast').classList).not.toContain(
-      'bg-danger-subtle'
-    )
+    expect(el.querySelector('ngb-toast').classList).not.toContain('toast-error')
 
     fixture = TestBed.createComponent(ToastComponent)
     fixture.componentInstance.toast = {
@@ -149,7 +147,7 @@ describe('ToastComponent', () => {
       errorEl.querySelector('i-bs[name="exclamation-triangle"]')
     ).not.toBeNull()
     expect(errorEl.querySelector('ngb-toast').classList).toContain(
-      'bg-danger-subtle'
+      'toast-error'
     )
 
     fixture = TestBed.createComponent(ToastComponent)
