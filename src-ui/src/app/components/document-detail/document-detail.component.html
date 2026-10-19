@@ -73,7 +73,7 @@
     <button class="btn btn-sm btn-outline-primary" id="sendDropdown" ngbDropdownToggle aria-label="Send" i18n-aria-label>
       <i-bs name="send"></i-bs><div class="d-none d-sm-inline ms-1"><ng-container i18n>Send</ng-container></div>
     </button>
-    <div ngbDropdownMenu aria-labelledby="actionsDropdown" class="shadow">
+    <div ngbDropdownMenu aria-labelledby="sendDropdown" class="shadow">
       <button ngbDropdownItem (click)="openShareLinks()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.ShareLink }">
         <i-bs name="link" class="me-1"></i-bs><span i18n>Share Links</span>
       </button>
