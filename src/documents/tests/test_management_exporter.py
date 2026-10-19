@@ -50,6 +50,7 @@ from documents.settings import EXPORTER_FILE_NAME
 from documents.settings import EXPORTER_SHARE_LINK_BUNDLE_NAME
 from documents.settings import EXPORTER_THUMBNAIL_NAME
 from documents.tests.utils import SampleDirMixin
+from paperless.models import ApplicationConfiguration
 from paperless_mail.models import MailAccount
 from paperless_testing.assertions import FileSystemAssertsMixin
 from paperless_testing.dirs import DirectoriesMixin
@@ -1402,6 +1403,45 @@ class TestCryptExportImport(
         social_token = SocialToken.objects.first()
         self.assertIsNotNone(social_token)
 
+    def test_import_passphrase_with_float_field(self) -> None:
+        """
+        GIVEN:
+            - An application configuration with a float field set
+        WHEN:
+            - Export and import are run with a passphrase
+        THEN:
+            - The import succeeds and the float value is preserved
+        """
+        ApplicationConfiguration.objects.update_or_create(
+            pk=1,
+            defaults={"rotate_pages_threshold": 12.5},
+        )
+
+        call_command(
+            "document_exporter",
+            "--no-progress-bar",
+            "--passphrase",
+            "securepassword",
+            self.target,
+            skip_checks=True,
+        )
+
+        ApplicationConfiguration.objects.all().delete()
+
+        call_command(
+            "document_importer",
+            "--no-progress-bar",
+            "--passphrase",
+            "securepassword",
+            self.target,
+            skip_checks=True,
+        )
+
+        self.assertEqual(
+            ApplicationConfiguration.objects.get().rotate_pages_threshold,
+            12.5,
+        )
+
     def test_import_crypt_no_passphrase(self) -> None:
         """
         GIVEN:
@@ -1537,3 +1577,70 @@ class TestExportDerivedFileNameCollisions:
             assert (
                 target / record[EXPORTER_ARCHIVE_NAME]
             ).read_text() == f"archive {pk}"
+
+    def test_long_titles_export_within_file_name_limit(
+        self,
+        paperless_dirs: PaperlessDirs,
+        tmp_path: Path,
+    ) -> None:
+        """
+        GIVEN:
+            - Two documents with the same created date and the same title
+            - The title alone is longer than 255 bytes and contains umlauts
+        WHEN:
+            - The exporter runs
+        THEN:
+            - The export finishes with distinct original, thumbnail and archive names
+            - Every exported file name fits in the byte limit
+            - Each exported file holds its own document's content
+        """
+        for pk in (1, 2):
+            (paperless_dirs.originals_dir / f"{pk:07}.pdf").write_bytes(
+                f"original {pk}".encode(),
+            )
+            (paperless_dirs.archive_dir / f"{pk:07}.pdf").write_bytes(
+                f"archive {pk}".encode(),
+            )
+            (paperless_dirs.thumbnail_dir / f"{pk:07}.webp").write_bytes(
+                f"thumbnail {pk}".encode(),
+            )
+            DocumentFactory(
+                pk=pk,
+                title="Bestellbestätigung " * 15,
+                created=date(2026, 10, 15),
+                filename=f"{pk:07}.pdf",
+                archive_filename=f"{pk:07}.pdf",
+                mime_type="application/pdf",
+            )
+
+        target = tmp_path / "export"
+        target.mkdir()
+        call_command(
+            "document_exporter",
+            str(target),
+            "--no-progress-bar",
+            skip_checks=True,
+        )
+
+        manifest = json.loads((target / "manifest.json").read_text())
+        records = {r["pk"]: r for r in manifest if r["model"] == "documents.document"}
+
+        for key in (
+            EXPORTER_FILE_NAME,
+            EXPORTER_THUMBNAIL_NAME,
+            EXPORTER_ARCHIVE_NAME,
+        ):
+            assert records[1][key] != records[2][key]
+
+        for pk in (1, 2):
+            record = records[pk]
+            for key, content in (
+                (EXPORTER_FILE_NAME, f"original {pk}"),
+                (EXPORTER_THUMBNAIL_NAME, f"thumbnail {pk}"),
+                (EXPORTER_ARCHIVE_NAME, f"archive {pk}"),
+            ):
+                assert (
+                    len(Path(record[key]).name.encode())
+                    <= Document.MAX_PUBLIC_FILENAME_BYTES
+                )
+                assert (target / record[key]).read_text() == content

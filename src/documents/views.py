@@ -3932,7 +3932,12 @@ class GlobalSearchView(PassUserMixin):
             "request": request,
         }
 
-        docs_serializer = DocumentSerializer(docs, many=True, context=context)
+        docs_serializer = DocumentSerializer(
+            docs,
+            many=True,
+            context=context,
+            fields=("id", "title", "created"),
+        )
         saved_views_serializer = SavedViewSerializer(
             saved_views,
             many=True,
@@ -4911,7 +4916,7 @@ class SharedLinkView(View):
                 share_link.expiration is not None
                 and share_link.expiration < timezone.now()
             ):
-                return HttpResponseRedirect("/accounts/login/?sharelink_expired=1")
+                return HttpResponseRedirect(f"{settings.LOGIN_URL}?sharelink_expired=1")
             try:
                 return serve_file(
                     doc=share_link.document,
@@ -4920,14 +4925,16 @@ class SharedLinkView(View):
                     disposition="inline",
                 )
             except FileNotFoundError:
-                return HttpResponseRedirect("/accounts/login/?sharelink_notfound=1")
+                return HttpResponseRedirect(
+                    f"{settings.LOGIN_URL}?sharelink_notfound=1",
+                )
 
         bundle = ShareLinkBundle.objects.filter(slug=slug).first()
         if bundle is None:
-            return HttpResponseRedirect("/accounts/login/?sharelink_notfound=1")
+            return HttpResponseRedirect(f"{settings.LOGIN_URL}?sharelink_notfound=1")
 
         if bundle.expiration is not None and bundle.expiration < timezone.now():
-            return HttpResponseRedirect("/accounts/login/?sharelink_expired=1")
+            return HttpResponseRedirect(f"{settings.LOGIN_URL}?sharelink_expired=1")
 
         if bundle.status in {
             ShareLinkBundle.Status.PENDING,

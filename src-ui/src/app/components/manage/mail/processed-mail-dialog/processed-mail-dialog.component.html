@@ -93,15 +93,17 @@
         [disabled]="selectedMailIds().size === 0"
         (confirm)="deleteSelected()">
       </pngx-confirm-button>
-      <div class="ms-auto">
-        <ngb-pagination
-          [collectionSize]="processedMails().length"
-          [(page)]="page"
-          [pageSize]="50"
-          [maxSize]="5"
-          (pageChange)="loadProcessedMails()">
-        </ngb-pagination>
-      </div>
+      @if (processedMails().length > 50) {
+        <div class="ms-auto">
+          <ngb-pagination
+            [collectionSize]="processedMails().length"
+            [(page)]="page"
+            [pageSize]="50"
+            [maxSize]="5"
+            (pageChange)="loadProcessedMails()">
+          </ngb-pagination>
+        </div>
+      }
     </div>
   }
 </div>
