@@ -25,6 +25,8 @@
             @if (displayFields().includes(field)) {
               <th
                 scope="col"
+                class="text-truncate"
+                [title]="getColumnTitle(field)"
                 [ngClass]="{
                   'd-none d-md-table-cell': i > 1,
                   'w-25': field === DisplayField.CREATED || field === DisplayField.ADDED
