@@ -13,7 +13,7 @@
     (versionsUpdated)="onVersionsUpdated($event)"
   />
 
-  <div class="btn-group">
+  <div class="btn-group ms-4">
     <button (click)="download()" class="btn btn-sm btn-outline-primary" [disabled]="downloading()" aria-label="Download" i18n-aria-label>
       @if (downloading()) {
         <div class="spinner-border spinner-border-sm" role="status"></div>
