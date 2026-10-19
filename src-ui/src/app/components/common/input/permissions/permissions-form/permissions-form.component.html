@@ -1,5 +1,7 @@
 @if (!accordion) {
-  <h5 i18n>Permissions</h5>
+  @if (title?.length > 0) {
+    <h5>{{title}}</h5>
+  }
   <ng-container [ngTemplateOutlet]="permissionsForm"></ng-container>
 }
 @if (accordion) {
