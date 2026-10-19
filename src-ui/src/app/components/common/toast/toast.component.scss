@@ -3,26 +3,24 @@
 }
 
 .toast {
+    --pngx-toast-accent: var(--pngx-toast-info);
     background-color: var(--pngx-toast-bg);
     color: var(--bs-body-color);
     overflow: hidden;
 
+    &.toast-success {
+        --pngx-toast-accent: var(--pngx-toast-success);
+    }
+
     &.toast-error {
+        --pngx-toast-accent: var(--pngx-toast-error);
         background-color: var(--pngx-toast-error-bg);
         border-color: color-mix(in srgb, var(--pngx-toast-error) 35%, transparent);
     }
 }
 
-.toast-icon-success {
-    color: var(--pngx-toast-success);
-}
-
-.toast-icon-info {
-    color: var(--pngx-toast-info);
-}
-
-.toast-icon-error {
-    color: var(--pngx-toast-error);
+.toast-icon {
+    color: var(--pngx-toast-accent);
 }
 
 // countdown thin line

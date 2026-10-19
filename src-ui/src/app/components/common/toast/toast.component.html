@@ -1,6 +1,7 @@
 <ngb-toast
     [autohide]="false"
     [class.mb-2]="true"
+    [class.toast-success]="toast.level === ToastLevel.Success"
     [class.toast-error]="toast.level === ToastLevel.Error"
     (mouseenter)="setHovered(true)"
     (mouseleave)="setHovered(false)"
@@ -15,13 +16,13 @@
         <div class="d-flex align-items-top">
         @switch (toast.level) {
             @case (ToastLevel.Success) {
-                <i-bs width="0.9em" height="0.9em" name="check-circle" class="toast-icon-success"></i-bs>
+                <i-bs width="0.9em" height="0.9em" name="check-circle" class="toast-icon"></i-bs>
             }
             @case (ToastLevel.Error) {
-                <i-bs width="0.9em" height="0.9em" name="exclamation-triangle" class="toast-icon-error"></i-bs>
+                <i-bs width="0.9em" height="0.9em" name="exclamation-triangle" class="toast-icon"></i-bs>
             }
             @default {
-                <i-bs width="0.9em" height="0.9em" name="info-circle" class="toast-icon-info"></i-bs>
+                <i-bs width="0.9em" height="0.9em" name="info-circle" class="toast-icon"></i-bs>
             }
         }
         <div>
