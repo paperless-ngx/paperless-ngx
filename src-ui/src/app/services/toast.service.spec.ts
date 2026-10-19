@@ -68,6 +68,18 @@ describe('ToastService', () => {
     })
   })
 
+  it('keeps showSuccess toasts out of the toast list', () => {
+    let toasts: Toast[] = []
+    const popups: Toast[] = []
+    toastService.getToasts().subscribe((t) => (toasts = [...t]))
+    toastService.showToast.subscribe((t) => popups.push(t))
+
+    toastService.showSuccess('Saved')
+
+    expect(popups.map((t) => t.content)).toEqual(['Saved'])
+    expect(toasts).toHaveLength(0)
+  })
+
   it('keeps showInfo toasts out of the toast list', () => {
     let toasts: Toast[] = []
     const popups: Toast[] = []

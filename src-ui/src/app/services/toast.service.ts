@@ -84,7 +84,12 @@ export class ToastService {
 
   /** For confirming that something the user did has completed */
   showSuccess(content: string, delay: number = 5000) {
-    this.show({ content: content, delay: delay, level: ToastLevel.Success })
+    this.show({
+      content: content,
+      delay: delay,
+      level: ToastLevel.Success,
+      persistent: false,
+    })
   }
 
   closeToast(toast: Toast) {
