@@ -99,11 +99,16 @@ describe('TrashComponent', () => {
     modal.componentInstance.confirmClicked.next()
     expect(toastErrorSpy).toHaveBeenCalled()
 
+    let toasts
+    toastService.getToasts().subscribe((allToasts) => {
+      toasts = [...allToasts]
+    })
     trashSpy.mockReturnValue(of('OK'))
     component.delete(documentsInTrash[0])
     expect(modal).toBeDefined()
     modal.componentInstance.confirmClicked.next()
     expect(trashSpy).toHaveBeenCalled()
+    expect(toasts[0].content).toContain('deleted')
   })
 
   it('should support empty trash, show error if needed', () => {
@@ -168,13 +173,15 @@ describe('TrashComponent', () => {
   })
 
   it('should offer link to restored document', () => {
-    let toast
+    let toasts
     const navigateSpy = jest.spyOn(router, 'navigate')
-    toastService.showToast.subscribe((t) => (toast = t))
+    toastService.getToasts().subscribe((allToasts) => {
+      toasts = [...allToasts]
+    })
     jest.spyOn(trashService, 'restoreDocuments').mockReturnValue(of('OK'))
     component.restore(documentsInTrash[0])
-    expect(toast.persistent).toBe(false)
-    toast.action()
+    expect(toasts.length).toEqual(1)
+    toasts[0].action()
     expect(navigateSpy).toHaveBeenCalledWith([
       'documents',
       documentsInTrash[0].id,

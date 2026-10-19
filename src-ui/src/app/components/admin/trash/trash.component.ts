@@ -87,9 +87,11 @@ export class TrashComponent
         modal.componentInstance.buttonsEnabled.set(false)
         this.trashService.emptyTrash([document.id]).subscribe({
           next: () => {
-            this.toastService.showSuccess(
-              $localize`Document "${document.title}" deleted`
-            )
+            this.toastService.show({
+              content: $localize`Document "${document.title}" deleted`,
+              delay: 5000,
+              level: ToastLevel.Success,
+            })
             modal.close()
             this.reload()
           },
@@ -122,7 +124,11 @@ export class TrashComponent
           .emptyTrash(documents ? Array.from(documents) : null)
           .subscribe({
             next: () => {
-              this.toastService.showSuccess($localize`Document(s) deleted`)
+              this.toastService.show({
+                content: $localize`Document(s) deleted`,
+                delay: 5000,
+                level: ToastLevel.Success,
+              })
               this.allToggled.set(false)
               modal.close()
               this.reload()
@@ -145,7 +151,6 @@ export class TrashComponent
           content: $localize`Document "${document.title}" restored`,
           delay: 5000,
           level: ToastLevel.Success,
-          persistent: false,
           actionName: $localize`Open document`,
           action: () => {
             this.router.navigate(['documents', document.id])
@@ -167,7 +172,11 @@ export class TrashComponent
       .restoreDocuments(documents ? Array.from(documents) : null)
       .subscribe({
         next: () => {
-          this.toastService.showSuccess($localize`Document(s) restored`)
+          this.toastService.show({
+            content: $localize`Document(s) restored`,
+            delay: 5000,
+            level: ToastLevel.Success,
+          })
           this.allToggled.set(false)
           this.reload()
         },
