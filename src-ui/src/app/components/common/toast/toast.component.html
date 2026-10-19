@@ -1,13 +1,16 @@
 <ngb-toast
-    [autohide]="autohide"
-    [delay]="toast.delay"
+    [autohide]="false"
     [class]="toast.classname"
     [class.mb-2]="true"
+    (mouseenter)="setHovered(true)"
+    (mouseleave)="setHovered(false)"
+    (focusin)="setFocused(true)"
+    (focusout)="setFocused(false)"
     (shown)="onShown(toast)"
     (hidden)="hidden.emit(toast)">
         @if (autohide) {
-            <ngb-progressbar class="position-absolute h-100 w-100 top-90 start-0 bottom-0 end-0 pe-none" type="dark" [max]="toast.delay" [value]="toast.delayRemaining"></ngb-progressbar>
-            <span class="visually-hidden">{{ toast.delayRemaining / 1000 | number: '1.0-0' }} seconds</span>
+            <ngb-progressbar class="position-absolute h-100 w-100 top-90 start-0 bottom-0 end-0 pe-none" type="dark" [max]="toast.delay" [value]="delayRemaining()"></ngb-progressbar>
+            <span class="visually-hidden">{{ delayRemaining() / 1000 | number: '1.0-0' }} seconds</span>
         }
         <div class="d-flex align-items-top">
         @if (!toast.error) {

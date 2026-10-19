@@ -46,8 +46,80 @@ describe('ToastComponent', () => {
     component.toast = toast2
     fixture.detectChanges()
     component.onShown(toast2)
+    jest.advanceTimersByTime(5000 + 150) // ticks every 150ms
+    expect(component.delayRemaining()).toEqual(0)
+    jest.useRealTimers()
+  })
+
+  it('should start the progress bar full before the countdown begins', () => {
+    component.toast = { content: 'Info', delay: 3000 }
+    fixture.detectChanges()
+    expect(component.delayRemaining()).toEqual(3000)
+  })
+
+  it('should hide the toast when the countdown ends', () => {
+    jest.useFakeTimers()
+    const toast = { content: 'Info', delay: 3000 }
+    component.toast = toast
+    fixture.detectChanges()
+    const hideSpy = jest.spyOn(component.ngbToast, 'hide')
+    component.onShown(toast)
+    jest.advanceTimersByTime(2850)
+    expect(hideSpy).not.toHaveBeenCalled()
+    jest.advanceTimersByTime(300)
+    expect(hideSpy).toHaveBeenCalled()
+    jest.useRealTimers()
+  })
+
+  it('should pause the countdown while hovered', () => {
+    jest.useFakeTimers()
+    const toast = { content: 'Info', delay: 3000 }
+    component.toast = toast
+    fixture.detectChanges()
+    const hideSpy = jest.spyOn(component.ngbToast, 'hide')
+    const el: HTMLElement = fixture.nativeElement.querySelector('ngb-toast')
+    component.onShown(toast)
+    jest.advanceTimersByTime(1500)
+    el.dispatchEvent(new MouseEvent('mouseenter'))
+    const remaining = component.delayRemaining()
+    jest.advanceTimersByTime(10000)
+    expect(component.delayRemaining()).toEqual(remaining)
+    expect(hideSpy).not.toHaveBeenCalled()
+
+    el.dispatchEvent(new MouseEvent('mouseleave'))
+    jest.advanceTimersByTime(remaining + 150)
+    expect(hideSpy).toHaveBeenCalled()
+    jest.useRealTimers()
+  })
+
+  it('should pause the countdown while focus is inside', () => {
+    jest.useFakeTimers()
+    const toast = { content: 'Info', delay: 3000 }
+    component.toast = toast
+    fixture.detectChanges()
+    const el: HTMLElement = fixture.nativeElement.querySelector('ngb-toast')
+    component.onShown(toast)
+    el.dispatchEvent(new FocusEvent('focusin'))
+    // mouse leaving doesn't resume while focus is still inside
+    el.dispatchEvent(new MouseEvent('mouseenter'))
+    el.dispatchEvent(new MouseEvent('mouseleave'))
     jest.advanceTimersByTime(5000)
-    expect(component.toast.delayRemaining).toEqual(0)
+    expect(component.delayRemaining()).toEqual(3000)
+    el.dispatchEvent(new FocusEvent('focusout'))
+    jest.advanceTimersByTime(3000)
+    expect(component.delayRemaining()).toEqual(0)
+    jest.useRealTimers()
+  })
+
+  it('should not count down without autohide', () => {
+    jest.useFakeTimers()
+    const toast = { content: 'Info', delay: 3000 }
+    component.toast = toast
+    component.autohide = false
+    fixture.detectChanges()
+    component.onShown(toast)
+    jest.advanceTimersByTime(5000)
+    expect(component.delayRemaining()).toBeNull()
     jest.useRealTimers()
   })
 

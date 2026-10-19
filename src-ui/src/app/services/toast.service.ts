@@ -9,8 +9,6 @@ export interface Toast {
 
   delay: number
 
-  delayRemaining?: number
-
   action?: any
 
   actionName?: string

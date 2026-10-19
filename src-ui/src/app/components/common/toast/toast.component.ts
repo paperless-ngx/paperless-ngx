@@ -2,18 +2,23 @@ import { Clipboard } from '@angular/cdk/clipboard'
 import { DecimalPipe } from '@angular/common'
 import {
   Component,
+  DestroyRef,
   EventEmitter,
   Input,
+  OnInit,
   Output,
+  ViewChild,
   inject,
   signal,
 } from '@angular/core'
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import {
   NgbProgressbarModule,
+  NgbToast,
   NgbToastModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { interval, take } from 'rxjs'
+import { Subscription, interval, takeWhile } from 'rxjs'
 import { Toast } from 'src/app/services/toast.service'
 
 @Component({
@@ -27,9 +32,17 @@ import { Toast } from 'src/app/services/toast.service'
   templateUrl: './toast.component.html',
   styleUrl: './toast.component.scss',
 })
-export class ToastComponent {
+export class ToastComponent implements OnInit {
   private clipboard = inject(Clipboard)
+  private destroyRef = inject(DestroyRef)
   readonly copied = signal(false)
+  readonly delayRemaining = signal<number>(null)
+
+  @ViewChild(NgbToast) ngbToast: NgbToast
+
+  private hovered = false
+  private focused = false
+  private countdown: Subscription
 
   @Input() toast: Toast
 
@@ -39,19 +52,42 @@ export class ToastComponent {
 
   @Output() closed: EventEmitter<Toast> = new EventEmitter<Toast>()
 
+  ngOnInit(): void {
+    if (this.autohide) this.delayRemaining.set(this.toast.delay)
+  }
+
+  get paused(): boolean {
+    return this.hovered || this.focused
+  }
+
+  setHovered(hovered: boolean) {
+    this.hovered = hovered
+  }
+
+  setFocused(focused: boolean) {
+    this.focused = focused
+  }
+
   onShown(toast: Toast) {
     if (!this.autohide) return
 
     const refreshInterval = 150
-    const delay = toast.delay - 500 // for fade animation
+    this.delayRemaining.set(toast.delay)
 
-    interval(refreshInterval)
-      .pipe(take(Math.round(delay / refreshInterval)))
-      .subscribe((count) => {
-        toast.delayRemaining = Math.max(
-          0,
-          delay - refreshInterval * (count + 1)
+    this.countdown?.unsubscribe()
+    this.countdown = interval(refreshInterval)
+      .pipe(
+        takeWhile(() => this.delayRemaining() > 0),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe(() => {
+        if (this.paused) return
+        this.delayRemaining.update((remaining) =>
+          Math.max(0, remaining - refreshInterval)
         )
+        if (this.delayRemaining() === 0) {
+          this.ngbToast?.hide()
+        }
       })
   }
 
