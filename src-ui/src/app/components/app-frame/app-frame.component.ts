@@ -173,6 +173,8 @@ export class AppFrameComponent
           this.toastService.showError(message.message)
           break
         case DjangoMessageLevel.SUCCESS:
+          this.toastService.showSuccess(message.message)
+          break
         case DjangoMessageLevel.INFO:
         case DjangoMessageLevel.DEBUG:
           this.toastService.showInfo(message.message)
@@ -479,7 +481,7 @@ export class AppFrameComponent
 
     this.settingsService.updateSidebarViewsSort(sidebarViews).subscribe({
       next: () => {
-        this.toastService.showInfo($localize`Sidebar views updated`)
+        this.toastService.showSuccess($localize`Sidebar views updated`)
       },
       error: (e) => {
         this.toastService.showError($localize`Error updating sidebar views`, e)

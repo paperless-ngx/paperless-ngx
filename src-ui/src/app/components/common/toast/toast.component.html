@@ -1,7 +1,9 @@
 <ngb-toast
     [autohide]="false"
-    [class]="toast.classname"
     [class.mb-2]="true"
+    [class.bg-danger-subtle]="toast.level === ToastLevel.Error"
+    [class.border-danger-subtle]="toast.level === ToastLevel.Error"
+    [class.text-danger-emphasis]="toast.level === ToastLevel.Error"
     (mouseenter)="setHovered(true)"
     (mouseleave)="setHovered(false)"
     (focusin)="setFocused(true)"
@@ -13,11 +15,16 @@
             <span class="visually-hidden">{{ delayRemaining() / 1000 | number: '1.0-0' }} seconds</span>
         }
         <div class="d-flex align-items-top">
-        @if (!toast.error) {
-            <i-bs width="0.9em" height="0.9em" name="info-circle"></i-bs>
-        }
-        @if (toast.error) {
-            <i-bs width="0.9em" height="0.9em" name="exclamation-triangle"></i-bs>
+        @switch (toast.level) {
+            @case (ToastLevel.Success) {
+                <i-bs width="0.9em" height="0.9em" name="check-circle" class="text-success"></i-bs>
+            }
+            @case (ToastLevel.Error) {
+                <i-bs width="0.9em" height="0.9em" name="exclamation-triangle" class="text-danger"></i-bs>
+            }
+            @default {
+                <i-bs width="0.9em" height="0.9em" name="info-circle"></i-bs>
+            }
         }
         <div>
             <p class="ms-2 mb-0 text-break">{{toast.content}}</p>

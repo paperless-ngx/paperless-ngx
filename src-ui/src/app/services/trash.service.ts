@@ -5,7 +5,7 @@ import { environment } from 'src/environments/environment'
 import { Document } from '../data/document'
 import { Results } from '../data/results'
 import { DocumentListViewService } from './document-list-view.service'
-import { ToastService } from './toast.service'
+import { ToastLevel, ToastService } from './toast.service'
 
 @Injectable({
   providedIn: 'root',
@@ -47,6 +47,7 @@ export class TrashService {
     this.toastService.show({
       content,
       delay: 10000,
+      level: ToastLevel.Success,
       actionName: canUndo ? $localize`Undo` : undefined,
       action: canUndo ? () => this.undoMoveToTrash(documents) : undefined,
     })
@@ -58,6 +59,7 @@ export class TrashService {
         this.toastService.show({
           content: $localize`Document(s) restored`,
           delay: 5000,
+          level: ToastLevel.Success,
         })
         this.documentListViewService.reload()
       },

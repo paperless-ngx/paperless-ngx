@@ -507,7 +507,7 @@ describe('AppFrameComponent', () => {
 
   it('should update saved view sorting on drag + drop, show info', () => {
     const settingsSpy = jest.spyOn(settingsService, 'updateSidebarViewsSort')
-    const toastSpy = jest.spyOn(toastService, 'showInfo')
+    const toastSpy = jest.spyOn(toastService, 'showSuccess')
     jest.spyOn(settingsService, 'storeSettings').mockReturnValue(of(true))
     component.onDrop({ previousIndex: 0, currentIndex: 1 } as CdkDragDrop<
       SavedView[]
@@ -549,7 +549,7 @@ describe('AppFrameComponent', () => {
 
   it('should show toasts for django messages', () => {
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    const toastInfoSpy = jest.spyOn(toastService, 'showSuccess')
     jest.spyOn(messagesService, 'get').mockReturnValue([
       { level: DjangoMessageLevel.WARNING, message: 'Test warning' },
       { level: DjangoMessageLevel.ERROR, message: 'Test error' },

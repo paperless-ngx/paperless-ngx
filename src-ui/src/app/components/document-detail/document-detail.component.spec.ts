@@ -778,7 +778,7 @@ describe('DocumentDetailComponent', () => {
     component.title.set('Foo Bar')
     const closeSpy = jest.spyOn(component, 'close')
     const patchSpy = jest.spyOn(documentService, 'patch')
-    const toastSpy = jest.spyOn(toastService, 'showInfo')
+    const toastSpy = jest.spyOn(toastService, 'showSuccess')
     patchSpy.mockImplementation((o) => of(doc))
     component.save(true)
     expect(patchSpy).toHaveBeenCalled()
@@ -793,7 +793,7 @@ describe('DocumentDetailComponent', () => {
     component.title.set('Foo Bar')
     const closeSpy = jest.spyOn(component, 'close')
     const patchSpy = jest.spyOn(documentService, 'patch')
-    const toastSpy = jest.spyOn(toastService, 'showInfo')
+    const toastSpy = jest.spyOn(toastService, 'showSuccess')
     patchSpy.mockImplementation((o) => of(doc))
     component.save()
     expect(patchSpy).toHaveBeenCalled()
@@ -839,7 +839,7 @@ describe('DocumentDetailComponent', () => {
     component.title.set('Foo Bar')
     const closeSpy = jest.spyOn(component, 'close')
     const patchSpy = jest.spyOn(documentService, 'patch')
-    const toastSpy = jest.spyOn(toastService, 'showInfo')
+    const toastSpy = jest.spyOn(toastService, 'showSuccess')
     patchSpy.mockImplementation(() =>
       throwError(() => new Error('failed to save'))
     )
@@ -1011,7 +1011,7 @@ describe('DocumentDetailComponent', () => {
     let openModal: NgbModalRef
     modalService.activeInstances.subscribe((modal) => (openModal = modal[0]))
     const modalSpy = jest.spyOn(modalService, 'open')
-    const toastSpy = jest.spyOn(toastService, 'showInfo')
+    const toastSpy = jest.spyOn(toastService, 'showSuccess')
     component.reprocess()
     const modalCloseSpy = jest.spyOn(openModal, 'close')
     openModal.componentInstance.confirmClicked.next()
@@ -1743,7 +1743,7 @@ describe('DocumentDetailComponent', () => {
   it('should queue incoming update while network is active and flush after', () => {
     initNormally()
     const loadSpy = jest.spyOn(component as any, 'loadDocument')
-    const toastSpy = jest.spyOn(toastService, 'showInfo')
+    const toastSpy = jest.spyOn(toastService, 'showSuccess')
 
     component.networkActive.set(true)
     ;(component as any).handleIncomingDocumentUpdated({
@@ -1765,7 +1765,7 @@ describe('DocumentDetailComponent', () => {
   it('should ignore queued incoming update matching local save modified', () => {
     initNormally()
     const loadSpy = jest.spyOn(component as any, 'loadDocument')
-    const toastSpy = jest.spyOn(toastService, 'showInfo')
+    const toastSpy = jest.spyOn(toastService, 'showSuccess')
 
     component.networkActive.set(true)
     ;(component as any).lastLocalSaveModified = '2026-02-17T00:00:00+00:00'
@@ -1890,7 +1890,7 @@ describe('DocumentDetailComponent', () => {
       .spyOn(component as any, 'loadDocument')
       .mockImplementation(() => {})
     const notifySpy = jest.spyOn(component.docChangeNotifier, 'next')
-    const toastSpy = jest.spyOn(toastService, 'showInfo')
+    const toastSpy = jest.spyOn(toastService, 'showSuccess')
 
     ;(component as any).reloadRemoteVersion()
 

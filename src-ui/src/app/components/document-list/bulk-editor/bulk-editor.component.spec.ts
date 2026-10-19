@@ -1432,7 +1432,7 @@ describe('BulkEditorComponent', () => {
     const mergeAsVersionsSpy = jest
       .spyOn(documentService, 'mergeDocumentsAsVersions')
       .mockReturnValue(of(true))
-    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    const toastInfoSpy = jest.spyOn(toastService, 'showSuccess')
     fixture.detectChanges()
 
     component.mergeSelectedAsVersions()
@@ -1474,7 +1474,7 @@ describe('BulkEditorComponent', () => {
     jest
       .spyOn(documentService, 'mergeDocumentsAsVersions')
       .mockReturnValue(throwError(() => new Error('failed')))
-    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    const toastInfoSpy = jest.spyOn(toastService, 'showSuccess')
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
     fixture.detectChanges()
 
@@ -1862,7 +1862,7 @@ describe('BulkEditorComponent', () => {
       .spyOn(documentListViewService, 'selected', 'get')
       .mockReturnValue(new Set([3, 4]))
     fixture.detectChanges()
-    const toastServiceShowInfoSpy = jest.spyOn(toastService, 'showInfo')
+    const toastServiceShowInfoSpy = jest.spyOn(toastService, 'showSuccess')
     const toastServiceShowErrorSpy = jest.spyOn(toastService, 'showError')
     const listReloadSpy = jest.spyOn(documentListViewService, 'reload')
 
@@ -1932,7 +1932,7 @@ describe('BulkEditorComponent', () => {
     ;(shareLinkBundleService.createBundle as jest.Mock).mockReturnValueOnce(
       of({ id: 42 })
     )
-    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    const toastInfoSpy = jest.spyOn(toastService, 'showSuccess')
 
     component.createShareLinkBundle()
 

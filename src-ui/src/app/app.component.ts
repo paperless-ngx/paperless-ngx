@@ -14,7 +14,7 @@ import {
 } from './services/permissions.service'
 import { SettingsService } from './services/settings.service'
 import { TasksService } from './services/tasks.service'
-import { ToastService } from './services/toast.service'
+import { ToastLevel, ToastService } from './services/toast.service'
 import { WebsocketStatusService } from './services/websocket-status.service'
 
 @Component({
@@ -92,6 +92,7 @@ export class AppComponent implements OnInit, OnDestroy {
             this.toastService.show({
               content: $localize`Document ${status.filename} was added to Paperless-ngx.`,
               delay: 10000,
+              level: ToastLevel.Success,
               actionName: $localize`Open document`,
               action: () => {
                 this.router.navigate(['documents', status.documentId])
@@ -101,6 +102,7 @@ export class AppComponent implements OnInit, OnDestroy {
             this.toastService.show({
               content: $localize`Document ${status.filename} was added to Paperless-ngx.`,
               delay: 10000,
+              level: ToastLevel.Success,
             })
           }
         }

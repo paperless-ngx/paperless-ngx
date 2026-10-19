@@ -316,7 +316,7 @@ export class BulkEditorComponent
       next: () => {
         this.handleOperationSuccess(modal, options.clearSelection ?? false)
         if (options.successMessage) {
-          this.toastService.showInfo(options.successMessage)
+          this.toastService.showSuccess(options.successMessage)
         }
       },
       error: (error) => this.handleOperationError(modal, error),
@@ -1089,7 +1089,7 @@ export class BulkEditorComponent
     dialog.selection = this.getSelectionQuery()
     dialog.selectionCount = this.getSelectionSize()
     dialog.succeeded.subscribe((result) => {
-      this.toastService.showInfo($localize`Custom fields updated.`)
+      this.toastService.showSuccess($localize`Custom fields updated.`)
       this.list.reload()
       this.list.reduceSelectionToFilter()
       this.list.selected.forEach((id) => {

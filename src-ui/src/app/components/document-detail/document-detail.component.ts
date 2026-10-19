@@ -1351,7 +1351,7 @@ export class DocumentDetailComponent
           this.store.next(newValues)
           this.openDocumentService.setDirty(this.document(), false)
           this.openDocumentService.save()
-          this.toastService.showInfo(
+          this.toastService.showSuccess(
             $localize`Document "${newValues.title}" saved successfully.`
           )
           this.networkActive.set(false)
@@ -1379,7 +1379,7 @@ export class DocumentDetailComponent
           if (!canEdit) {
             // document was 'given away'
             this.openDocumentService.setDirty(this.document(), false)
-            this.toastService.showInfo(
+            this.toastService.showSuccess(
               $localize`Document "${this.document().title}" saved successfully.`
             )
             this.close()

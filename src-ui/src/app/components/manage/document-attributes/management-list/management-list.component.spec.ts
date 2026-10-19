@@ -160,7 +160,7 @@ describe('ManagementListComponent', () => {
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    const toastInfoSpy = jest.spyOn(toastService, 'showSuccess')
     const reloadSpy = jest.spyOn(component, 'reloadData')
 
     component.openCreateDialog()
@@ -183,7 +183,7 @@ describe('ManagementListComponent', () => {
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    const toastInfoSpy = jest.spyOn(toastService, 'showSuccess')
     const reloadSpy = jest.spyOn(component, 'reloadData')
 
     component.openEditDialog(tags[0])
@@ -387,7 +387,7 @@ describe('ManagementListComponent', () => {
     expect(bulkEditPermsSpy).toHaveBeenCalled()
     expect(errorToastSpy).toHaveBeenCalled()
 
-    const successToastSpy = jest.spyOn(toastService, 'showInfo')
+    const successToastSpy = jest.spyOn(toastService, 'showSuccess')
     bulkEditPermsSpy.mockReturnValueOnce(of('OK'))
     modal.componentInstance.confirmClicked.emit({
       permissions: {},
@@ -452,7 +452,7 @@ describe('ManagementListComponent', () => {
     )
     expect(errorToastSpy).toHaveBeenCalled()
 
-    const successToastSpy = jest.spyOn(toastService, 'showInfo')
+    const successToastSpy = jest.spyOn(toastService, 'showSuccess')
     bulkEditSpy.mockReturnValueOnce(of('OK'))
     modal.componentInstance.confirmClicked.emit(null)
     expect(bulkEditSpy).toHaveBeenCalled()

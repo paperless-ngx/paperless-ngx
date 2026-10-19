@@ -2,6 +2,12 @@ import { Injectable } from '@angular/core'
 import { Subject } from 'rxjs'
 import { v4 as uuidv4 } from 'uuid'
 
+export enum ToastLevel {
+  Info = 'info',
+  Success = 'success',
+  Error = 'error',
+}
+
 export interface Toast {
   id?: string
 
@@ -13,7 +19,8 @@ export interface Toast {
 
   actionName?: string
 
-  classname?: string
+  /** Defaults to ToastLevel.Info */
+  level?: ToastLevel
 
   error?: any
 }
@@ -56,13 +63,18 @@ export class ToastService {
     this.show({
       content: content,
       delay: delay,
-      classname: 'error',
+      level: ToastLevel.Error,
       error,
     })
   }
 
   showInfo(content: string, delay: number = 5000) {
     this.show({ content: content, delay: delay })
+  }
+
+  /** For confirming that something the user did has completed */
+  showSuccess(content: string, delay: number = 5000) {
+    this.show({ content: content, delay: delay, level: ToastLevel.Success })
   }
 
   closeToast(toast: Toast) {

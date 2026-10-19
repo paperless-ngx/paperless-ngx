@@ -679,7 +679,7 @@ export class SettingsService {
         .subscribe({
           next: () => {
             this.updateAppearanceSettings()
-            this.toastService.showInfo(successMessage)
+            this.toastService.showSuccess(successMessage)
           },
           error: (e) => {
             this.toastService.showError(errorMessage)

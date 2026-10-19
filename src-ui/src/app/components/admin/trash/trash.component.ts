@@ -11,7 +11,7 @@ import { takeUntil, tap } from 'rxjs'
 import { Document } from 'src/app/data/document'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { SettingsService } from 'src/app/services/settings.service'
-import { ToastService } from 'src/app/services/toast.service'
+import { ToastLevel, ToastService } from 'src/app/services/toast.service'
 import { TrashService } from 'src/app/services/trash.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
@@ -87,7 +87,7 @@ export class TrashComponent
         modal.componentInstance.buttonsEnabled.set(false)
         this.trashService.emptyTrash([document.id]).subscribe({
           next: () => {
-            this.toastService.showInfo(
+            this.toastService.showSuccess(
               $localize`Document "${document.title}" deleted`
             )
             modal.close()
@@ -122,7 +122,7 @@ export class TrashComponent
           .emptyTrash(documents ? Array.from(documents) : null)
           .subscribe({
             next: () => {
-              this.toastService.showInfo($localize`Document(s) deleted`)
+              this.toastService.showSuccess($localize`Document(s) deleted`)
               this.allToggled.set(false)
               modal.close()
               this.reload()
@@ -144,6 +144,7 @@ export class TrashComponent
         this.toastService.show({
           content: $localize`Document "${document.title}" restored`,
           delay: 5000,
+          level: ToastLevel.Success,
           actionName: $localize`Open document`,
           action: () => {
             this.router.navigate(['documents', document.id])
@@ -165,7 +166,7 @@ export class TrashComponent
       .restoreDocuments(documents ? Array.from(documents) : null)
       .subscribe({
         next: () => {
-          this.toastService.showInfo($localize`Document(s) restored`)
+          this.toastService.showSuccess($localize`Document(s) restored`)
           this.allToggled.set(false)
           this.reload()
         },

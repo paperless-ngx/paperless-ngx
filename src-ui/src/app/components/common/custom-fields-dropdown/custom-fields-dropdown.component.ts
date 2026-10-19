@@ -129,7 +129,9 @@ export class CustomFieldsDropdownComponent extends LoadingComponentWithPermissio
     modal.componentInstance.succeeded
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((newField) => {
-        this.toastService.showInfo($localize`Saved field "${newField.name}".`)
+        this.toastService.showSuccess(
+          $localize`Saved field "${newField.name}".`
+        )
         this.customFieldsService.clearCache()
         this.getFields()
         this.created.emit(newField)

@@ -63,7 +63,7 @@ import {
   SettingsService,
 } from 'src/app/services/settings.service'
 import { SystemStatusService } from 'src/app/services/system-status.service'
-import { Toast, ToastService } from 'src/app/services/toast.service'
+import { Toast, ToastLevel, ToastService } from 'src/app/services/toast.service'
 import { locationReload } from 'src/app/utils/navigation'
 import { CheckComponent } from '../../common/input/check/check.component'
 import { ColorComponent } from '../../common/input/color/color.component'
@@ -664,6 +664,7 @@ export class SettingsComponent
           let savedToast: Toast = {
             content: $localize`Settings were saved successfully.`,
             delay: 5000,
+            level: ToastLevel.Success,
           }
           if (reloadRequired) {
             savedToast.content = $localize`Settings were saved successfully. Reload is required to apply some changes.`

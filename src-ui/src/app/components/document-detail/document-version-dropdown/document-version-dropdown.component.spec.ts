@@ -33,7 +33,7 @@ describe('DocumentVersionDropdownComponent', () => {
       | 'updateVersionLabel'
     >
   >
-  let toastService: jest.Mocked<Pick<ToastService, 'showError' | 'showInfo'>>
+  let toastService: jest.Mocked<Pick<ToastService, 'showError' | 'showSuccess'>>
   let finished$: Subject<{ taskId: string }>
   let failed$: Subject<{ taskId: string; message?: string }>
   let modalService: jest.Mocked<Pick<NgbModal, 'open'>>

@@ -82,7 +82,9 @@ export class CustomFieldsComponent
     modal.componentInstance.succeeded
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((newField) => {
-        this.toastService.showInfo($localize`Saved field "${newField.name}".`)
+        this.toastService.showSuccess(
+          $localize`Saved field "${newField.name}".`
+        )
         this.customFieldsService.clearCache()
         this.settingsService.initializeDisplayFields()
         this.documentService.reload()
@@ -109,7 +111,9 @@ export class CustomFieldsComponent
       this.customFieldsService.delete(field).subscribe({
         next: () => {
           modal.close()
-          this.toastService.showInfo($localize`Deleted field "${field.name}"`)
+          this.toastService.showSuccess(
+            $localize`Deleted field "${field.name}"`
+          )
           this.customFieldsService.clearCache()
           this.settingsService.initializeDisplayFields()
           this.documentService.reload()

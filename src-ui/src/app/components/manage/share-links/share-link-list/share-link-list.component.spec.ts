@@ -15,7 +15,7 @@ describe('ShareLinkListComponent', () => {
   let fixture: ComponentFixture<ShareLinkListComponent>
   let service: jest.Mocked<Pick<ShareLinkService, 'list' | 'delete'>>
   let clipboard: Clipboard
-  let toastService: jest.Mocked<Pick<ToastService, 'showInfo' | 'showError'>>
+  let toastService: jest.Mocked<Pick<ToastService, 'showSuccess' | 'showError'>>
 
   const link = {
     id: 1,

@@ -100,7 +100,7 @@ describe('ProfileEditDialogComponent', () => {
     expect(errorSpy).toHaveBeenCalled()
 
     updateSpy.mockClear()
-    const infoSpy = jest.spyOn(toastService, 'showInfo')
+    const infoSpy = jest.spyOn(toastService, 'showSuccess')
     component.form.patchValue(newProfile)
     updateSpy.mockReturnValueOnce(of(newProfile))
     component.save()
@@ -373,7 +373,7 @@ describe('ProfileEditDialogComponent', () => {
   it('should activate totp', () => {
     const activateSpy = jest.spyOn(profileService, 'activateTotp')
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    const toastInfoSpy = jest.spyOn(toastService, 'showSuccess')
     const error = new Error('failed to activate totp')
     activateSpy.mockReturnValueOnce(throwError(() => error))
     component.totpSettings.set({
@@ -405,7 +405,7 @@ describe('ProfileEditDialogComponent', () => {
   it('should deactivate totp', () => {
     const deactivateSpy = jest.spyOn(profileService, 'deactivateTotp')
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    const toastInfoSpy = jest.spyOn(toastService, 'showSuccess')
     const error = new Error('failed to deactivate totp')
     deactivateSpy.mockReturnValueOnce(throwError(() => error))
     component.deactivateTotp()

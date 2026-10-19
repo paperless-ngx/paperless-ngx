@@ -101,7 +101,7 @@ describe('UsersAndGroupsComponent', () => {
     component.editUser(users[0])
     const editDialog = modal.componentInstance as UserEditDialogComponent
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    const toastInfoSpy = jest.spyOn(toastService, 'showSuccess')
     editDialog.failed.emit()
     expect(toastErrorSpy).toHaveBeenCalled()
     settingsService.currentUser.set(users[1]) // simulate logged in as different user
@@ -120,7 +120,7 @@ describe('UsersAndGroupsComponent', () => {
     const deleteDialog = modal.componentInstance as ConfirmDialogComponent
     const deleteSpy = jest.spyOn(userService, 'delete')
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    const toastInfoSpy = jest.spyOn(toastService, 'showSuccess')
     const listAllSpy = jest.spyOn(userService, 'listAll')
     deleteSpy.mockReturnValueOnce(
       throwError(() => new Error('error deleting user'))
@@ -186,7 +186,7 @@ describe('UsersAndGroupsComponent', () => {
     component.editGroup(groups[0])
     const editDialog = modal.componentInstance as GroupEditDialogComponent
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    const toastInfoSpy = jest.spyOn(toastService, 'showSuccess')
     editDialog.failed.emit()
     expect(toastErrorSpy).toHaveBeenCalled()
     editDialog.succeeded.emit(groups[0])
@@ -204,7 +204,7 @@ describe('UsersAndGroupsComponent', () => {
     const deleteDialog = modal.componentInstance as ConfirmDialogComponent
     const deleteSpy = jest.spyOn(groupService, 'delete')
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    const toastInfoSpy = jest.spyOn(toastService, 'showSuccess')
     const listAllSpy = jest.spyOn(groupService, 'listAll')
     deleteSpy.mockReturnValueOnce(
       throwError(() => new Error('error deleting group'))

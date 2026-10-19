@@ -128,7 +128,7 @@ describe('WorkflowsComponent', () => {
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    const toastInfoSpy = jest.spyOn(toastService, 'showSuccess')
     const reloadSpy = jest.spyOn(component, 'reload')
 
     const createButton = fixture.debugElement.queryAll(By.css('button'))[1]
@@ -152,7 +152,7 @@ describe('WorkflowsComponent', () => {
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    const toastInfoSpy = jest.spyOn(toastService, 'showSuccess')
     const reloadSpy = jest.spyOn(component, 'reload')
 
     const editButton = fixture.debugElement.queryAll(By.css('button'))[2]
@@ -268,7 +268,7 @@ describe('WorkflowsComponent', () => {
       By.css('input[type="checkbox"]')
     )
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    const toastInfoSpy = jest.spyOn(toastService, 'showSuccess')
     // fail first
     patchSpy.mockReturnValueOnce(
       throwError(() => new Error('Error getting config'))

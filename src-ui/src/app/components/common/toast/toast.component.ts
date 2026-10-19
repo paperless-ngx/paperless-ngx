@@ -19,7 +19,7 @@ import {
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Subscription, interval, takeWhile } from 'rxjs'
-import { Toast } from 'src/app/services/toast.service'
+import { Toast, ToastLevel } from 'src/app/services/toast.service'
 
 @Component({
   selector: 'pngx-toast',
@@ -36,6 +36,7 @@ export class ToastComponent implements OnInit {
   private clipboard = inject(Clipboard)
   private destroyRef = inject(DestroyRef)
   readonly copied = signal(false)
+  readonly ToastLevel = ToastLevel
   readonly delayRemaining = signal<number>(null)
 
   @ViewChild(NgbToast) ngbToast: NgbToast

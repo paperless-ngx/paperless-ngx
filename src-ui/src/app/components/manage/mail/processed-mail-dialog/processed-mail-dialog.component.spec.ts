@@ -96,7 +96,7 @@ describe('ProcessedMailDialogComponent', () => {
     // select a couple of mails and delete
     component.selectedMailIds().add(5)
     component.selectedMailIds().add(6)
-    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    const toastInfoSpy = jest.spyOn(toastService, 'showSuccess')
     component.deleteSelected()
 
     const delReq = httpTestingController.expectOne(

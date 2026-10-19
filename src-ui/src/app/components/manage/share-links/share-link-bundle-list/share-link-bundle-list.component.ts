@@ -178,7 +178,7 @@ export class ShareLinkBundleListComponent
         if (this.bundles().length === 1 && this.page() > 1) {
           this.page.update((page) => page - 1)
         }
-        this.toastService.showInfo($localize`Share link bundle deleted.`)
+        this.toastService.showSuccess($localize`Share link bundle deleted.`)
         this.triggerRefresh(false)
       },
       error: (e) => {
