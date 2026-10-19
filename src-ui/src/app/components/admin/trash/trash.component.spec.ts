@@ -168,15 +168,13 @@ describe('TrashComponent', () => {
   })
 
   it('should offer link to restored document', () => {
-    let toasts
+    let toast
     const navigateSpy = jest.spyOn(router, 'navigate')
-    toastService.getToasts().subscribe((allToasts) => {
-      toasts = [...allToasts]
-    })
+    toastService.showToast.subscribe((t) => (toast = t))
     jest.spyOn(trashService, 'restoreDocuments').mockReturnValue(of('OK'))
     component.restore(documentsInTrash[0])
-    expect(toasts.length).toEqual(1)
-    toasts[0].action()
+    expect(toast.persistent).toBe(false)
+    toast.action()
     expect(navigateSpy).toHaveBeenCalledWith([
       'documents',
       documentsInTrash[0].id,

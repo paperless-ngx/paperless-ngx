@@ -145,6 +145,7 @@ export class TrashComponent
           content: $localize`Document "${document.title}" restored`,
           delay: 5000,
           level: ToastLevel.Success,
+          persistent: false,
           actionName: $localize`Open document`,
           action: () => {
             this.router.navigate(['documents', document.id])

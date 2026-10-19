@@ -665,8 +665,10 @@ export class SettingsComponent
             content: $localize`Settings were saved successfully.`,
             delay: 5000,
             level: ToastLevel.Success,
+            persistent: false,
           }
           if (reloadRequired) {
+            savedToast.persistent = true
             savedToast.content = $localize`Settings were saved successfully. Reload is required to apply some changes.`
             savedToast.actionName = $localize`Reload now`
             savedToast.action = () => {

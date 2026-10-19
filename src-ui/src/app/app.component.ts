@@ -133,6 +133,7 @@ export class AppComponent implements OnInit, OnDestroy {
           this.toastService.show({
             content: $localize`Document ${status.filename} is being processed by Paperless-ngx.`,
             delay: 5000,
+            persistent: false,
           })
         }
       })

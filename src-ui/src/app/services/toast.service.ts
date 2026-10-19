@@ -23,6 +23,12 @@ export interface Toast {
   level?: ToastLevel
 
   error?: any
+
+  /**
+   * Whether the toast is kept in the notifications dropdown after its popup
+   * closes. Defaults to true.
+   */
+  persistent?: boolean
 }
 
 @Injectable({
@@ -52,11 +58,15 @@ export class ToastService {
         toast.error = JSON.parse(toast.error)
       } catch (e) {}
     }
-    this.toasts.unshift(toast)
-    if (!this._suppressPopupToasts) {
+    const persistent = toast.persistent !== false
+    if (persistent) {
+      this.toasts.unshift(toast)
+      this.toastsSubject.next(this.toasts)
+    }
+    // Popups are suppressed while the dropdown is open
+    if (!this._suppressPopupToasts || !persistent) {
       this.showToast.next(toast)
     }
-    this.toastsSubject.next(this.toasts)
   }
 
   showError(content: string, error: any = null, delay: number = 10000) {
@@ -69,7 +79,7 @@ export class ToastService {
   }
 
   showInfo(content: string, delay: number = 5000) {
-    this.show({ content: content, delay: delay })
+    this.show({ content: content, delay: delay, persistent: false })
   }
 
   /** For confirming that something the user did has completed */

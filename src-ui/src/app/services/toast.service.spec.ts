@@ -68,6 +68,41 @@ describe('ToastService', () => {
     })
   })
 
+  it('keeps showInfo toasts out of the toast list', () => {
+    let toasts: Toast[] = []
+    const popups: Toast[] = []
+    toastService.getToasts().subscribe((t) => (toasts = [...t]))
+    toastService.showToast.subscribe((t) => popups.push(t))
+
+    toastService.showInfo('Info toast')
+    toastService.showError('Error toast')
+
+    expect(popups.map((t) => t.content)).toEqual(['Info toast', 'Error toast'])
+    expect(toasts.map((t) => t.content)).toEqual(['Error toast'])
+  })
+
+  it('adds toasts to the list unless persistent is false', () => {
+    let toasts: Toast[] = []
+    toastService.getToasts().subscribe((t) => (toasts = [...t]))
+
+    toastService.show({ content: 'kept', delay: 5000 })
+    toastService.show({ content: 'kept too', delay: 5000, persistent: true })
+    toastService.show({ content: 'popup only', delay: 5000, persistent: false })
+
+    expect(toasts.map((t) => t.content)).toEqual(['kept too', 'kept'])
+  })
+
+  it('still pops up non-persistent toasts while popups are suppressed', () => {
+    const popups: Toast[] = []
+    toastService.suppressPopupToasts = true
+    toastService.showToast.subscribe((t) => popups.push(t))
+
+    toastService.show({ content: 'kept', delay: 5000 })
+    toastService.showInfo('popup only')
+
+    expect(popups.map((t) => t?.content)).toEqual(['popup only'])
+  })
+
   it('removes toast on close', () => {
     const toast = {
       title: 'Title',
