@@ -4,12 +4,16 @@ import { Observable } from 'rxjs'
 import { environment } from 'src/environments/environment'
 import { Document } from '../data/document'
 import { Results } from '../data/results'
+import { DocumentListViewService } from './document-list-view.service'
+import { ToastService } from './toast.service'
 
 @Injectable({
   providedIn: 'root',
 })
 export class TrashService {
   private http = inject(HttpClient)
+  private toastService = inject(ToastService)
+  private documentListViewService = inject(DocumentListViewService)
 
   public getTrash(page: number = 1): Observable<Results<Document>> {
     const httpParams = new HttpParams().set('page', page.toString())
@@ -32,6 +36,34 @@ export class TrashService {
     return this.http.post(`${environment.apiBaseUrl}trash/`, {
       action: 'restore',
       documents,
+    })
+  }
+
+  /**
+   * Shows a toast with an Undo action when possible
+   */
+  public notifyMovedToTrash(content: string, documents?: number[]) {
+    const canUndo = documents?.length > 0
+    this.toastService.show({
+      content,
+      delay: 10000,
+      actionName: canUndo ? $localize`Undo` : undefined,
+      action: canUndo ? () => this.undoMoveToTrash(documents) : undefined,
+    })
+  }
+
+  private undoMoveToTrash(documents: number[]) {
+    this.restoreDocuments(documents).subscribe({
+      next: () => {
+        this.toastService.show({
+          content: $localize`Document(s) restored`,
+          delay: 5000,
+        })
+        this.documentListViewService.reload()
+      },
+      error: (e) => {
+        this.toastService.showError($localize`Error restoring document(s)`, e)
+      },
     })
   }
 }
