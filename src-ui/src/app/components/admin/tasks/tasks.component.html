@@ -178,10 +178,9 @@
               <div>{{ taskDisplayName(task) }}</div>
               <div class="small text-muted">
                 @if (taskShowsSeparateTypeLabel(task)) {
-                  <span>{{ task.task_type_display }}</span>
-                  <span class="mx-1">&bull;</span>
+                  <span class="me-2">{{ task.task_type_display }}</span>
                 }
-                <span>{{ task.trigger_source_display }}</span>
+                <span class="text-nowrap"><i-bs class="me-1" width="1em" height="1em" name="box-arrow-in-right"></i-bs>{{ task.trigger_source_display }}</span>
               </div>
             </td>
             <td class="d-none d-lg-table-cell created-col">{{ task.date_created | customDate:'short' }}</td>
