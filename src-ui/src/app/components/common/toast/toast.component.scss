@@ -10,6 +10,8 @@
 
     &.toast-success {
         --pngx-toast-accent: var(--pngx-toast-success);
+        background-color: var(--pngx-toast-success-bg);
+        border-color: color-mix(in srgb, var(--pngx-toast-success) 30%, transparent);
     }
 
     &.toast-error {

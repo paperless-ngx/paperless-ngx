@@ -27,7 +27,8 @@
   --pngx-focus-alpha: 0.3;
   --pngx-toast-max-width: 340px;
   --pngx-toast-bg: rgba(255, 255, 255, 0.94);
-  --pngx-toast-success: hsl(145, 63%, 34%);
+  --pngx-toast-success: hsl(var(--pngx-primary), 30%);
+  --pngx-toast-success-bg: hsl(var(--pngx-primary), 94%);
   --pngx-toast-info: hsl(211, 86%, 47%);
   --pngx-toast-error: hsl(352, 78%, 45%);
   --pngx-toast-error-bg: hsl(352, 80%, 96%);
@@ -92,7 +93,8 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,%3csvg xmlns='h
   --pngx-body-color-accent: #{$text-color-dark-bg-accent};
   --pngx-bg-alt: #242529;
   --pngx-toast-bg: rgba(36, 40, 43, 0.96);
-  --pngx-toast-success: hsl(145, 63%, 56%);
+  --pngx-toast-success: hsl(var(--pngx-primary), 60%);
+  --pngx-toast-success-bg: hsl(var(--pngx-primary), 14%);
   --pngx-toast-info: hsl(211, 95%, 68%);
   --pngx-toast-error: hsl(352, 90%, 68%);
   --pngx-toast-error-bg: hsl(352, 45%, 20%);
