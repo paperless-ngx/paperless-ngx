@@ -20,7 +20,15 @@ import {
 } from '@ng-bootstrap/ng-bootstrap'
 import { saveAs } from 'file-saver'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { first, map, Observable, Subject, switchMap, takeUntil } from 'rxjs'
+import {
+  first,
+  map,
+  Observable,
+  Subject,
+  switchMap,
+  takeUntil,
+  tap,
+} from 'rxjs'
 import { ConfirmDialogComponent } from 'src/app/components/common/confirm-dialog/confirm-dialog.component'
 import { CustomField } from 'src/app/data/custom-field'
 import { MatchingModel } from 'src/app/data/matching-model'
@@ -49,6 +57,7 @@ import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { TagService } from 'src/app/services/rest/tag.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
+import { TrashService } from 'src/app/services/trash.service'
 import { flattenTags } from 'src/app/utils/flatten-tags'
 import { queryParamsFromFilterRules } from 'src/app/utils/query-params'
 import { MergeAsVersionsConfirmDialogComponent } from '../../common/confirm-dialog/merge-as-versions-confirm-dialog/merge-as-versions-confirm-dialog.component'
@@ -99,6 +108,7 @@ export class BulkEditorComponent
   private openDocumentService = inject(OpenDocumentsService)
   private settings = inject(SettingsService)
   private toastService = inject(ToastService)
+  private trashService = inject(TrashService)
   private storagePathService = inject(StoragePathService)
   private customFieldService = inject(CustomFieldsService)
   public readonly permissionService = inject(PermissionsService)
@@ -884,17 +894,31 @@ export class BulkEditorComponent
         .pipe(takeUntil(this.unsubscribeNotifier))
         .subscribe(() => {
           modal.componentInstance.buttonsEnabled.set(false)
-          this.executeDocumentAction(
-            modal,
-            this.documentService.deleteDocuments(this.getSelectionQuery())
-          )
+          this.deleteSelected(modal)
         })
     } else {
-      this.executeDocumentAction(
-        null,
-        this.documentService.deleteDocuments(this.getSelectionQuery())
-      )
+      this.deleteSelected(null)
     }
+  }
+
+  private deleteSelected(modal: NgbModalRef) {
+    const documents = this.list.allSelected
+      ? null
+      : Array.from(this.list.selected)
+    const count = this.getSelectionSize()
+    this.executeDocumentAction(
+      modal,
+      this.documentService
+        .deleteDocuments(this.getSelectionQuery())
+        .pipe(
+          tap(() =>
+            this.trashService.notifyMovedToTrash(
+              $localize`Moved ${count} document(s) to the trash`,
+              documents
+            )
+          )
+        )
+    )
   }
 
   downloadSelected() {
