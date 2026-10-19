@@ -95,6 +95,7 @@ import { TagService } from 'src/app/services/rest/tag.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
+import { TrashService } from 'src/app/services/trash.service'
 import { WebsocketStatusService } from 'src/app/services/websocket-status.service'
 import { getFilenameFromContentDisposition } from 'src/app/utils/http'
 import { ISODateAdapter } from 'src/app/utils/ngb-iso-date-adapter'
@@ -221,6 +222,7 @@ export class DocumentDetailComponent
   private documentListViewService = inject(DocumentListViewService)
   private documentTitlePipe = inject(DocumentTitlePipe)
   private toastService = inject(ToastService)
+  private trashService = inject(TrashService)
   private settings = inject(SettingsService)
   private storagePathService = inject(StoragePathService)
   private permissionsService = inject(PermissionsService)
@@ -1490,6 +1492,10 @@ export class DocumentDetailComponent
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe({
         next: () => {
+          this.trashService.notifyMovedToTrash(
+            $localize`Moved "${this.document().title}" to the trash`,
+            [this.document().id]
+          )
           modal.close()
           this.close()
         },
