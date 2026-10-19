@@ -70,6 +70,17 @@ form {
   max-height: 75vh;
 }
 
+.dropdown.show {
+  // Hide the search icon when the dropdown is shown
+  i-bs[name="search"] {
+    display: none !important;
+  }
+
+  .form-control {
+    padding-left: 0.5rem;
+  }
+}
+
 .dropdown-item {
   &:has(button:focus) {
     background-color: var(--pngx-bg-darker);
