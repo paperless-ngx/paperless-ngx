@@ -226,22 +226,34 @@ describe('TasksComponent', () => {
     httpTestingController
       .expectOne(
         (req) =>
-          req.url === `${environment.apiBaseUrl}tasks/` &&
-          req.params.get('acknowledged') === 'false' &&
-          req.params.get('page_size') === '25' &&
-          req.params.get('page') === '1'
-      )
-      .flush(paginatedTasks)
-
-    httpTestingController
-      .expectOne(
-        (req) =>
           req.url === `${environment.apiBaseUrl}tasks/status_counts/` &&
           req.params.get('acknowledged') === 'false' &&
           !req.params.has('status')
       )
       .flush(sectionCountResponse)
+
+    flushTaskLists(10)
   })
+
+  // answers task list requests with the fixture tasks matching their status filter
+  function flushTaskLists(pageSize: number, count?: number) {
+    httpTestingController
+      .match(
+        (req) =>
+          req.url === `${environment.apiBaseUrl}tasks/` &&
+          req.params.get('page_size') === `${pageSize}`
+      )
+      .forEach((req) => {
+        const statuses = req.request.params.getAll('status')
+        const results = tasks.filter((task) => statuses.includes(task.status))
+        req.flush({ count: count ?? results.length, results })
+      })
+  }
+
+  function selectSection(section: TaskSection, count: number) {
+    component.setSection(section)
+    flushTaskLists(25, count)
+  }
 
   it('should display task sections with counts', () => {
     expect(component.selectedSection).toBe(TaskSection.All)
@@ -338,6 +350,7 @@ describe('TasksComponent', () => {
   })
 
   it('should render pagination controls next to the task filter', () => {
+    selectSection(TaskSection.Completed, 30)
     fixture.detectChanges()
 
     const controls = fixture.debugElement.query(By.css('.task-controls'))
@@ -346,6 +359,51 @@ describe('TasksComponent', () => {
 
     expect(search).not.toBeNull()
     expect(pagination).not.toBeNull()
+  })
+
+  it('should only paginate a section with more than one page of tasks', () => {
+    const pagination = () =>
+      fixture.debugElement.query(By.css('ngb-pagination'))
+
+    fixture.detectChanges()
+    expect(pagination()).toBeNull()
+
+    selectSection(TaskSection.Completed, 2)
+    fixture.detectChanges()
+    expect(pagination()).toBeNull()
+  })
+
+  it('should load the all tasks overview one section at a time', () => {
+    expect(component.tasksForSection(TaskSection.NeedsAttention)).toHaveLength(
+      2
+    )
+    expect(component.tasksForSection(TaskSection.InProgress)).toHaveLength(3)
+    expect(component.tasksForSection(TaskSection.Completed)).toHaveLength(2)
+    expect(component.totalTasks()).toBe(7)
+  })
+
+  it('should show section totals and link truncated sections to their full list', () => {
+    component.sectionCounts.update((counts) => ({
+      ...counts,
+      [TaskSection.Completed]: 27,
+    }))
+    fixture.detectChanges()
+
+    const header = (label: string) =>
+      fixture.debugElement
+        .queryAll(By.css('.section-header'))
+        .find((h) => h.nativeElement.textContent.includes(label))
+
+    expect(header('Needs attention').nativeElement.textContent).toContain(
+      '2 tasks'
+    )
+    expect(header('Needs attention').query(By.css('button'))).toBeNull()
+
+    expect(header('Recently completed').nativeElement.textContent).toContain(
+      '27 tasks'
+    )
+    header('Recently completed').query(By.css('button')).nativeElement.click()
+    expect(component.selectedSection).toBe(TaskSection.Completed)
   })
 
   it('should apply the selected section to the server-side task query', () => {
@@ -368,55 +426,56 @@ describe('TasksComponent', () => {
   it('should apply task type and trigger source filters to the server-side task query', () => {
     component.setTaskType(PaperlessTaskType.SanityCheck)
 
-    httpTestingController
-      .expectOne(
+    expect(
+      httpTestingController.match(
         (request) =>
           request.url === `${environment.apiBaseUrl}tasks/` &&
-          request.params.get('page_size') === '25' &&
+          request.params.get('page_size') === '10' &&
           request.params.get('task_type') === PaperlessTaskType.SanityCheck
       )
-      .flush({ count: 1, results: [tasks[6]] })
+    ).toHaveLength(3)
 
     component.setTriggerSource(PaperlessTaskTriggerSource.System)
 
-    httpTestingController
-      .expectOne(
+    expect(
+      httpTestingController.match(
         (request) =>
           request.url === `${environment.apiBaseUrl}tasks/` &&
-          request.params.get('page_size') === '25' &&
+          request.params.get('page_size') === '10' &&
           request.params.get('task_type') === PaperlessTaskType.SanityCheck &&
           request.params.get('trigger_source') ===
             PaperlessTaskTriggerSource.System
       )
-      .flush({ count: 1, results: [tasks[6]] })
+    ).toHaveLength(3)
   })
 
   it('should apply text filters to the server-side task query', () => {
     component.filterText = 'invoice'
     jest.advanceTimersByTime(150)
 
-    httpTestingController
-      .expectOne(
+    expect(
+      httpTestingController.match(
         (request) =>
           request.url === `${environment.apiBaseUrl}tasks/` &&
-          request.params.get('page_size') === '25' &&
+          request.params.get('page_size') === '10' &&
           request.params.get('name') === 'invoice'
       )
-      .flush({ count: 1, results: [tasks[0]] })
+    ).toHaveLength(3)
 
     component.setFilterTarget(TaskFilterTargetID.Result)
 
-    httpTestingController
-      .expectOne(
+    expect(
+      httpTestingController.match(
         (request) =>
           request.url === `${environment.apiBaseUrl}tasks/` &&
-          request.params.get('page_size') === '25' &&
+          request.params.get('page_size') === '10' &&
           request.params.get('result') === 'invoice'
       )
-      .flush({ count: 0, results: [] })
+    ).toHaveLength(3)
   })
 
   it('should load a different task page when pagination changes', () => {
+    selectSection(TaskSection.Completed, 30)
     component.setPage(2)
 
     const pageTwoTasks = {
@@ -440,6 +499,7 @@ describe('TasksComponent', () => {
   })
 
   it('should not replace section counts with current-page counts', () => {
+    selectSection(TaskSection.Completed, 30)
     component.setPage(2)
 
     httpTestingController
@@ -455,9 +515,19 @@ describe('TasksComponent', () => {
         results: [tasks[0]],
       })
 
+    expect(component.sectionCount(TaskSection.All)).toBe(7)
     expect(component.sectionCount(TaskSection.NeedsAttention)).toBe(2)
     expect(component.sectionCount(TaskSection.InProgress)).toBe(3)
     expect(component.sectionCount(TaskSection.Completed)).toBe(2)
+  })
+
+  it('should stop loading when the overview fails to load', () => {
+    component.setSection(TaskSection.All)
+    httpTestingController
+      .match((req) => req.params.get('page_size') === '10')[0]
+      .flush('', { status: 500, statusText: 'Error' })
+
+    expect(component.loading()).toBe(false)
   })
 
   it('should expose stable task type options and disable empty ones', () => {
