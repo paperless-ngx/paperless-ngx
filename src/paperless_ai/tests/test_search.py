@@ -229,6 +229,44 @@ class TestSemanticSearchIds:
         assert "embedding backend unreachable" in caplog.text
 
 
+@pytest.mark.django_db
+class TestSemanticSearchEmbeddedMetadata:
+    @pytest.fixture
+    def titled_document(self, db: None) -> Document:
+        # The title names the concept, the (garbled OCR) content does not
+        return DocumentFactory.create(
+            title="Vacation booking",
+            content="xq7 vqcatlon b00king",
+        )
+
+    def test_title_found_only_with_embedded_metadata(
+        self,
+        llm_index_enabled: None,
+        concept_embedding: ConceptEmbedding,
+        titled_document: Document,
+        settings: Settings,
+    ) -> None:
+        """
+        GIVEN:
+            - A document whose title, but not content, matches a query
+        WHEN:
+            - Indexing it without, then with, embedded metadata headers
+        THEN:
+            - Semantic search finds it only with the headers
+        """
+        indexing.update_llm_index(rebuild=True)
+        assert search.semantic_search_ids("holiday", Document.objects.all()) == []
+
+        settings.LLM_INDEX_EMBED_METADATA = True
+        # Not rebuilt yet: the index no longer matches the configuration
+        assert search.semantic_search_ids("holiday", Document.objects.all()) is None
+
+        indexing.update_llm_index(rebuild=True)
+        assert search.semantic_search_ids("holiday", Document.objects.all()) == [
+            titled_document.pk,
+        ]
+
+
 class TestReciprocalRankFusion:
     def test_documents_in_both_rankings_rank_first(self) -> None:
         fused = search.reciprocal_rank_fusion([1, 2, 3], [3, 4])

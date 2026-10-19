@@ -19,6 +19,11 @@ from paperless_ai.client import PLACEHOLDER_API_KEY
 OCR_LEADER_REGEX = re.compile(r"[._\-\u00b7]{4,}")
 HORIZONTAL_WHITESPACE_REGEX = re.compile(r"[ \t\u00a0]+")
 
+# build_llm_index_header(): the longest header, in characters. It is embedded
+# with every chunk, so it must leave the chunk's own text the room it needs in
+# small-context embedding models.
+LLM_INDEX_HEADER_MAX_LENGTH = 300
+
 
 def get_embedding_model(config: AIConfig) -> "BaseEmbedding":
     match config.llm_embedding_backend:
@@ -120,6 +125,31 @@ def get_configured_model_name(config: AIConfig) -> str:
 def _normalize_llm_index_text(text: str) -> str:
     text = OCR_LEADER_REGEX.sub(" ", text)
     return HORIZONTAL_WHITESPACE_REGEX.sub(" ", text)
+
+
+def build_llm_index_header(
+    *,
+    title: str | None,
+    document_type: str | None,
+    correspondent: str | None,
+    tags: list[str],
+) -> str:
+    """A compact line naming a document, embedded with each of its chunks
+    when PAPERLESS_AI_LLM_INDEX_EMBED_METADATA is enabled: curated titles,
+    types, correspondents and tags are often a better semantic signal than
+    the (OCR) content alone.
+    """
+    parts = [
+        title,
+        f"Type: {document_type}" if document_type else None,
+        f"From: {correspondent}" if correspondent else None,
+        f"Tags: {', '.join(tags)}" if tags else None,
+    ]
+    header = _normalize_llm_index_text(" · ".join(part for part in parts if part))
+    header = " ".join(header.split())
+    if len(header) > LLM_INDEX_HEADER_MAX_LENGTH:
+        header = header[: LLM_INDEX_HEADER_MAX_LENGTH - 1].rstrip() + "…"
+    return header
 
 
 def build_llm_index_text(doc: Document) -> str:

@@ -2162,6 +2162,27 @@ retrieval quality.
 
     Defaults to 1024.
 
+#### [`PAPERLESS_AI_LLM_INDEX_EMBED_METADATA=<bool>`](#PAPERLESS_AI_LLM_INDEX_EMBED_METADATA) {#PAPERLESS_AI_LLM_INDEX_EMBED_METADATA}
+
+: If enabled, every chunk of a document in the LLM index is embedded together
+with a short header naming the document: its title, document type,
+correspondent and tags, for example
+`Rental agreement · Type: Contract · From: ACME Properties · Tags: Housing`.
+Curated titles, types and tags are often a better match for a
+[semantic search](usage.md#semantic-search) or AI suggestion than the document
+text alone, especially when the OCR text is poor or in another language.
+
+    The header is capped at 300 characters, and it is only used for the embeddings:
+    the LLM already receives these fields. It adds tokens to every embedding request,
+    so with small-context embedding models you may need to lower
+    [`PAPERLESS_AI_LLM_EMBEDDING_CHUNK_SIZE`](#PAPERLESS_AI_LLM_EMBEDDING_CHUNK_SIZE).
+
+    Changing this setting requires rebuilding the LLM index
+    (`document_llmindex rebuild`). Until then semantic search falls back to keyword
+    search, and the next scheduled index update rebuilds it.
+
+    Defaults to false.
+
 #### [`PAPERLESS_AI_LLM_CONTEXT_SIZE=<int>`](#PAPERLESS_AI_LLM_CONTEXT_SIZE) {#PAPERLESS_AI_LLM_CONTEXT_SIZE}
 
 : The context size to use for AI prompts and RAG retrieval. For Ollama backends, this is also sent

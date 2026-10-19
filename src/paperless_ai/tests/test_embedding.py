@@ -8,7 +8,9 @@ from django.conf import settings
 from documents.models import Document
 from paperless.models import LLMEmbeddingBackend
 from paperless_ai.client import PLACEHOLDER_API_KEY
+from paperless_ai.embedding import LLM_INDEX_HEADER_MAX_LENGTH
 from paperless_ai.embedding import _normalize_llm_index_text
+from paperless_ai.embedding import build_llm_index_header
 from paperless_ai.embedding import build_llm_index_text
 from paperless_ai.embedding import get_configured_model_name
 from paperless_ai.embedding import get_embedding_model
@@ -339,3 +341,49 @@ def test_normalize_llm_index_text_collapses_ocr_leaders_without_joining_lines():
 
 def test_normalize_llm_index_text_collapses_non_breaking_spaces():
     assert _normalize_llm_index_text("A\u00a0........\u00a0B") == "A B"
+
+
+class TestBuildLlmIndexHeader:
+    def test_names_title_type_correspondent_and_tags(self) -> None:
+        header = build_llm_index_header(
+            title="Meldebestätigung",
+            document_type="Housing",
+            correspondent="Bezirksamt Pankow",
+            tags=["Berlin", "Relocation"],
+        )
+
+        assert header == (
+            "Meldebestätigung · Type: Housing · From: Bezirksamt Pankow · "
+            "Tags: Berlin, Relocation"
+        )
+
+    def test_omits_missing_fields(self) -> None:
+        header = build_llm_index_header(
+            title="Scan 001",
+            document_type=None,
+            correspondent=None,
+            tags=[],
+        )
+
+        assert header == "Scan 001"
+
+    def test_is_capped(self) -> None:
+        header = build_llm_index_header(
+            title="title " * 100,
+            document_type="Housing",
+            correspondent=None,
+            tags=[f"tag {i}" for i in range(100)],
+        )
+
+        assert len(header) == LLM_INDEX_HEADER_MAX_LENGTH
+        assert header.endswith("…")
+
+    def test_collapses_whitespace(self) -> None:
+        header = build_llm_index_header(
+            title="Rental\n  agreement",
+            document_type=None,
+            correspondent=None,
+            tags=[],
+        )
+
+        assert header == "Rental agreement"

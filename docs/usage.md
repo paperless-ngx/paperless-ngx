@@ -363,7 +363,11 @@ text query) searches are not affected.
   keyword matches stay on top, ordered with a boost for those that also match
   by meaning, and semantic-only matches follow.
 - In the global search, semantic-only matches are listed in their own
-  "Similar by meaning" section (up to 3), below the keyword "Documents".
+  "Similar by meaning" section (up to 5), below the keyword "Documents".
+
+By default only a document's text, notes and custom fields are embedded. Enable
+[`PAPERLESS_AI_LLM_INDEX_EMBED_METADATA`](configuration.md#PAPERLESS_AI_LLM_INDEX_EMBED_METADATA)
+to also match documents by their title, type, correspondent and tags.
 
 Searching embeds the query using the configured embedding backend, so each
 search makes one embedding request and may be slower than a keyword search.

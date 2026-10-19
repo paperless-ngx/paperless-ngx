@@ -3873,8 +3873,8 @@ class SearchAutoCompleteView(GenericAPIView[Any]):
                 required=False,
                 type=bool,
                 description=(
-                    "Also return documents similar by meaning (LLM index) as "
-                    "semantic_documents, when the LLM index is enabled"
+                    "Also return up to 5 documents similar by meaning (LLM "
+                    "index) as semantic_documents, when the LLM index is enabled"
                 ),
             ),
         ],
@@ -3922,7 +3922,7 @@ class GlobalSearchView(PassUserMixin):
         db_only = request.query_params.get("db_only", False)
 
         OBJECT_LIMIT = 3
-        SEMANTIC_OBJECT_LIMIT = 3
+        SEMANTIC_OBJECT_LIMIT = 5
         docs = []
         semantic_docs = []
         if request.user.has_perm("documents.view_document"):

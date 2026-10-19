@@ -88,6 +88,95 @@ def test_build_document_node_excludes_metadata_from_embedding(
 
 
 @pytest.mark.django_db
+def test_build_document_node_embeds_metadata_header_in_every_chunk(
+    real_document: Document,
+) -> None:
+    """
+    GIVEN:
+        - A document with a type, correspondent and tags, long enough to
+          span several chunks
+    WHEN:
+        - Building its nodes with embed_metadata=True
+    THEN:
+        - Every chunk's embedding text starts with the metadata header
+        - The header is never shown to the LLM, which gets the fields
+          themselves
+    """
+    real_document.document_type = DocumentType.objects.create(name="Housing")
+    real_document.correspondent = Correspondent.objects.create(name="Bezirksamt")
+    real_document.content = "registration " * 2000
+    real_document.save()
+    real_document.tags.create(name="Berlin Relocation")
+
+    nodes = indexing.build_document_node(
+        real_document,
+        chunk_size=512,
+        embed_metadata=True,
+    )
+
+    header = (
+        "Test Document · Type: Housing · From: Bezirksamt · Tags: Berlin Relocation"
+    )
+    assert len(nodes) > 1
+    for node in nodes:
+        embed_text = node.get_content(metadata_mode=MetadataMode.EMBED)
+        assert embed_text.startswith(f"document: {header}\n")
+        llm_text = node.get_content(metadata_mode=MetadataMode.LLM)
+        assert header not in llm_text
+        assert "title: Test Document" in llm_text
+
+
+@pytest.mark.django_db
+def test_build_document_node_omits_metadata_header_by_default(
+    real_document: Document,
+) -> None:
+    nodes = indexing.build_document_node(real_document)
+
+    assert indexing.EMBED_HEADER_METADATA_KEY not in nodes[0].metadata
+
+
+def test_index_config_name_records_embedded_metadata() -> None:
+    config = MagicMock()
+    config.llm_index_embed_metadata = False
+    with patch(
+        "paperless_ai.indexing.get_configured_model_name",
+        return_value="bge-m3",
+    ):
+        assert indexing.get_index_config_name(config) == "bge-m3"
+        config.llm_index_embed_metadata = True
+        assert indexing.get_index_config_name(config) == "bge-m3+metadata"
+
+
+@pytest.mark.django_db
+def test_update_llm_index_rebuilds_when_embed_metadata_changes(
+    temp_llm_index_dir: Path,
+    real_document: Document,
+    mock_embed_model: FakeEmbedding,
+    settings,
+) -> None:
+    """
+    GIVEN:
+        - An LLM index built without metadata headers
+    WHEN:
+        - PAPERLESS_AI_LLM_INDEX_EMBED_METADATA is enabled and the index is
+          updated incrementally
+    THEN:
+        - The change is detected and the index is rebuilt, recording it
+    """
+    settings.AI_ENABLED = True
+    settings.LLM_EMBEDDING_BACKEND = "ollama"
+    indexing.update_llm_index(rebuild=True)
+    with indexing.get_vector_store() as store:
+        assert store.stored_model_name() == "embeddinggemma"
+
+    settings.LLM_INDEX_EMBED_METADATA = True
+    indexing.update_llm_index(rebuild=False)
+
+    with indexing.get_vector_store() as store:
+        assert store.stored_model_name() == "embeddinggemma+metadata"
+
+
+@pytest.mark.django_db
 def test_build_document_node_structured_fields_in_metadata(
     real_document: Document,
 ) -> None:
@@ -196,6 +285,7 @@ def test_update_llm_index(
 ) -> None:
     mock_config = MagicMock()
     mock_config.llm_embedding_chunk_size = 512
+    mock_config.llm_index_embed_metadata = False
     with (
         patch("documents.models.Document.objects.all") as mock_all,
         patch("paperless_ai.indexing.AIConfig", return_value=mock_config) as ai_config,
@@ -211,7 +301,11 @@ def test_update_llm_index(
         indexing.update_llm_index(rebuild=True)
 
         ai_config.assert_called_once()
-        build_document_node.assert_called_once_with(real_document, chunk_size=512)
+        build_document_node.assert_called_once_with(
+            real_document,
+            chunk_size=512,
+            embed_metadata=False,
+        )
 
 
 @pytest.mark.django_db

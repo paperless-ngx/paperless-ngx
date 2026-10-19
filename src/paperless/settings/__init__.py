@@ -1223,6 +1223,11 @@ LLM_EMBEDDING_CHUNK_SIZE = get_int_from_env(
 )
 if LLM_EMBEDDING_CHUNK_SIZE < 1:
     raise ImproperlyConfigured("PAPERLESS_AI_LLM_EMBEDDING_CHUNK_SIZE must be >= 1")
+# Embed a short title/type/correspondent/tags header with every index chunk
+LLM_INDEX_EMBED_METADATA = get_bool_from_env(
+    "PAPERLESS_AI_LLM_INDEX_EMBED_METADATA",
+    "false",
+)
 LLM_CONTEXT_SIZE = get_int_from_env("PAPERLESS_AI_LLM_CONTEXT_SIZE", 8192)
 if LLM_CONTEXT_SIZE < 1:
     raise ImproperlyConfigured("PAPERLESS_AI_LLM_CONTEXT_SIZE must be >= 1")

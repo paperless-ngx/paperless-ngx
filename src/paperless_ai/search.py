@@ -15,8 +15,8 @@ from django.db.models import QuerySet
 from documents.models import Document
 from paperless.config import AIConfig
 from paperless_ai.db import db_connection_released
-from paperless_ai.embedding import get_configured_model_name
 from paperless_ai.indexing import document_id_filters
+from paperless_ai.indexing import get_index_config_name
 from paperless_ai.indexing import load_or_build_index
 from paperless_ai.indexing import read_store
 from paperless_ai.indexing import truncate_embedding_query
@@ -94,10 +94,11 @@ def semantic_search_ids(
             if not store.table_exists():
                 logger.debug("Semantic search skipped: LLM index not built yet.")
                 return None
-            if store.config_mismatch(get_configured_model_name(config)):
+            if store.config_mismatch(get_index_config_name(config)):
                 logger.warning(
                     "Semantic search skipped: the LLM index was built with a "
-                    "different embedding model. Rebuild the index to enable it.",
+                    "different embedding configuration. Rebuild the index to "
+                    "enable it.",
                 )
                 return None
             index = load_or_build_index(config, store)

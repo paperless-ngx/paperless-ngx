@@ -21,6 +21,7 @@ from documents.versioning import annotate_effective_content
 from documents.versioning import root_document_ids
 from paperless.config import AIConfig
 from paperless_ai.db import db_connection_released
+from paperless_ai.embedding import build_llm_index_header
 from paperless_ai.embedding import build_llm_index_text
 from paperless_ai.embedding import get_configured_model_name
 from paperless_ai.embedding import get_embedding_model
@@ -36,6 +37,11 @@ logger = logging.getLogger("paperless_ai.indexing")
 
 RAG_NUM_OUTPUT = 512
 RAG_CHUNK_OVERLAP = 200
+
+# build_document_node(): the node metadata key of the embedded header (see
+# PAPERLESS_AI_LLM_INDEX_EMBED_METADATA). Embedding only, never shown to the
+# LLM, which already gets the same fields as their own metadata keys.
+EMBED_HEADER_METADATA_KEY = "document"
 
 # update_llm_index(): row count per .iterator() batch when streaming
 # documents for a rebuild/update via QuerySetStream, matching
@@ -259,10 +265,17 @@ def build_document_node(
     document: Document,
     *,
     chunk_size: int | None = None,
+    embed_metadata: bool | None = None,
 ) -> list["BaseNode"]:
     """
     Given a Document, returns parsed Nodes ready for indexing.
+
+    With ``embed_metadata`` (default: PAPERLESS_AI_LLM_INDEX_EMBED_METADATA),
+    every node's embedding also covers a short header naming the document's
+    title, type, correspondent and tags.
     """
+    if embed_metadata is None:
+        embed_metadata = AIConfig().llm_index_embed_metadata
     text = build_llm_index_text(document)
     metadata = {
         "document_id": str(document.id),
@@ -277,19 +290,35 @@ def build_document_node(
         "added": document.added.isoformat() if document.added else None,
         "modified": document.modified.isoformat(),
     }
+    excluded_embed_metadata_keys = list(metadata.keys())
+    excluded_llm_metadata_keys = ["document_id"]
+    if embed_metadata:
+        # Prepended to every chunk by llama-index, so a chunk is matched with
+        # what the document is, not only with its slice of the text. The node
+        # parser budgets chunks for the longer of the embedding and LLM
+        # metadata; the LLM metadata already holds these fields and more, so
+        # the capped header does not shrink the chunks.
+        metadata[EMBED_HEADER_METADATA_KEY] = build_llm_index_header(
+            title=metadata["title"],
+            document_type=metadata["document_type"],
+            correspondent=metadata["correspondent"],
+            tags=metadata["tags"],
+        )
+        excluded_llm_metadata_keys.append(EMBED_HEADER_METADATA_KEY)
+
     from llama_index.core import Document as LlamaDocument
     from llama_index.core.node_parser import SimpleNodeParser
 
-    # Exclude all metadata keys from the embedding text — build_llm_index_text
-    # already encodes this info in the body, so prepending it again would double
-    # the token count and exceed embedding models with small context windows
-    # (e.g. nomic-embed-text via Ollama defaults to num_ctx=2048).
+    # Exclude the other metadata keys from the embedding text, as a full
+    # "key: value" listing of them would multiply the token count and exceed
+    # embedding models with small context windows (e.g. nomic-embed-text via
+    # Ollama defaults to num_ctx=2048).
     doc = LlamaDocument(
         id_=str(document.id),
         text=text,
         metadata=metadata,
-        excluded_embed_metadata_keys=list(metadata.keys()),
-        excluded_llm_metadata_keys=["document_id"],
+        excluded_embed_metadata_keys=excluded_embed_metadata_keys,
+        excluded_llm_metadata_keys=excluded_llm_metadata_keys,
     )
     chunk_size = chunk_size or get_rag_chunk_size()
     parser = SimpleNodeParser(
@@ -314,6 +343,16 @@ def load_or_build_index(config: AIConfig, store: "PaperlessSqliteVecVectorStore"
         vector_store=store,
         embed_model=embed_model,
     )
+
+
+def get_index_config_name(config: AIConfig) -> str:
+    """Name what the index's embeddings depend on: the embedding model, and
+    whether metadata headers are embedded. Recorded with the index (as its
+    model name), so changing either is detected as a config mismatch and
+    forces a rebuild.
+    """
+    model_name = get_configured_model_name(config)
+    return f"{model_name}+metadata" if config.llm_index_embed_metadata else model_name
 
 
 def llm_index_exists() -> bool:
@@ -458,12 +497,14 @@ def update_llm_index(
         return "No documents found to index."
 
     config = AIConfig()
-    model_name = get_configured_model_name(config)
+    model_name = get_index_config_name(config)
 
     if not rebuild:
         with read_store() as store:
             if store.table_exists() and store.config_mismatch(model_name):
-                logger.warning("Embedding model changed; forcing LLM index rebuild.")
+                logger.warning(
+                    "Embedding configuration changed; forcing LLM index rebuild.",
+                )
                 rebuild = True
 
     if no_documents:
@@ -479,7 +520,11 @@ def update_llm_index(
             for document in iter_wrapper(
                 QuerySetStream(documents, chunk_size=_INDEX_STREAM_CHUNK_SIZE),
             ):
-                nodes = build_document_node(document, chunk_size=chunk_size)
+                nodes = build_document_node(
+                    document,
+                    chunk_size=chunk_size,
+                    embed_metadata=config.llm_index_embed_metadata,
+                )
                 _embed_nodes(nodes, embed_model)
                 store.add(nodes)
             msg = "LLM index rebuilt successfully."
@@ -497,7 +542,11 @@ def update_llm_index(
                 doc_id = str(document.id)
                 if existing.get(doc_id) == document.modified.isoformat():
                     continue
-                nodes = build_document_node(document, chunk_size=chunk_size)
+                nodes = build_document_node(
+                    document,
+                    chunk_size=chunk_size,
+                    embed_metadata=config.llm_index_embed_metadata,
+                )
                 _embed_nodes(nodes, embed_model)
                 store.upsert_document(doc_id, nodes)
                 changed += 1
@@ -522,11 +571,12 @@ def llm_index_add_or_update_document(document: Document):
     new_nodes = build_document_node(
         document,
         chunk_size=config.llm_embedding_chunk_size,
+        embed_metadata=config.llm_index_embed_metadata,
     )
     if new_nodes:
         _embed_nodes(new_nodes, get_embedding_model(config))
 
-    with write_store(embed_model_name=get_configured_model_name(config)) as store:
+    with write_store(embed_model_name=get_index_config_name(config)) as store:
         migration_result = _check_and_run_migrations(store)
         if migration_result is MigrationCheckResult.REEMBED_REQUIRED:
             logger.warning(

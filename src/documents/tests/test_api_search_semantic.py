@@ -400,18 +400,18 @@ class TestSemanticGlobalSearch:
 
         assert _semantic_ids(response) == [library["semantic"].pk]
 
-    def test_semantic_limited_to_three(
+    def test_semantic_limited_to_five(
         self,
         admin_client: APIClient,
         library: dict[str, Document],
     ) -> None:
-        for content in ("vacation photos", "trip receipts", "vacation rental"):
+        for content in ("vacation photos", "trip receipts", "vacation rental", "trip"):
             DocumentFactory.create(content=content)
         indexing.update_llm_index(rebuild=True)
 
         response = admin_client.get("/api/search/?query=holiday&semantic=true")
 
-        assert len(_semantic_ids(response)) == 3
+        assert len(_semantic_ids(response)) == 5
 
     def test_semantic_ignored_for_db_only(
         self,
