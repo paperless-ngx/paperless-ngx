@@ -29,6 +29,12 @@ export interface Toast {
    * closes. Defaults to true.
    */
   persistent?: boolean
+
+  /**
+   * Adds the toast to the notifications dropdown without a popup, e.g. when
+   * the same information is already on screen. Defaults to false.
+   */
+  silent?: boolean
 }
 
 @Injectable({
@@ -64,7 +70,7 @@ export class ToastService {
       this.toastsSubject.next(this.toasts)
     }
     // Popups are suppressed while the dropdown is open
-    if (!this._suppressPopupToasts || !persistent) {
+    if (!toast.silent && (!this._suppressPopupToasts || !persistent)) {
       this.showToast.next(toast)
     }
   }

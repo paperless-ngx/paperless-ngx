@@ -166,4 +166,16 @@ describe('ToastService', () => {
       ToastLevel.Error,
     ])
   })
+
+  it('adds silent toasts to the list without a popup', () => {
+    let toasts: Toast[] = []
+    const popups: Toast[] = []
+    toastService.getToasts().subscribe((t) => (toasts = [...t]))
+    toastService.showToast.subscribe((t) => popups.push(t))
+
+    toastService.show({ content: 'Recorded', delay: 5000, silent: true })
+
+    expect(toasts.map((t) => t.content)).toEqual(['Recorded'])
+    expect(popups).toHaveLength(0)
+  })
 })
