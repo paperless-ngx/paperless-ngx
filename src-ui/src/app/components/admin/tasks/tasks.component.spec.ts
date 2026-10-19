@@ -400,7 +400,7 @@ describe('TasksComponent', () => {
     expect(header('Needs attention').query(By.css('button'))).toBeNull()
 
     expect(header('Recently completed').nativeElement.textContent).toContain(
-      '27 tasks'
+      '2 of 27 tasks'
     )
     header('Recently completed').query(By.css('button')).nativeElement.click()
     expect(component.selectedSection).toBe(TaskSection.Completed)

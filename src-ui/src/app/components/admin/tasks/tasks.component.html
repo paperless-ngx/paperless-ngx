@@ -117,19 +117,20 @@
 </div>
 
 <ng-template let-tasks="tasks" let-section="section" #tasksTemplate>
-  <div class="section-header d-flex align-items-center justify-content-between mb-2">
-    <div>
-      <h5 class="mb-0">{{ sectionLabel(section) }}</h5>
-      @let count = sectionCount(section);
-      <div class="small text-muted">
+  <div class="section-header mb-2">
+    <h5 class="mb-0">{{ sectionLabel(section) }}</h5>
+    @let count = sectionCount(section);
+    @let hasMore = selectedSection === TaskSection.All && count > tasks.length;
+    <div class="small text-muted">
+      @if (hasMore) {
+        <ng-container i18n>{{tasks.length}} of {{count}} tasks</ng-container>
+        <button class="btn btn-link show-all p-0 ms-2 align-baseline" type="button" (click)="setSection(section)">
+          <ng-container i18n>Show all</ng-container><i-bs class="ms-1" width="1em" height="1em" name="arrow-right"></i-bs>
+        </button>
+      } @else {
         <ng-container i18n>{count, plural, =1 {1 task} other {{{count}} tasks}}</ng-container>
-      </div>
+      }
     </div>
-    @if (selectedSection === TaskSection.All && sectionCount(section) > tasks.length) {
-      <button class="btn btn-sm btn-link" type="button" (click)="setSection(section)">
-        <ng-container i18n>Show all</ng-container><i-bs class="ms-1" width="1em" height="1em" name="arrow-right"></i-bs>
-      </button>
-    }
   </div>
 
   <div class="card border table-responsive mb-3">
