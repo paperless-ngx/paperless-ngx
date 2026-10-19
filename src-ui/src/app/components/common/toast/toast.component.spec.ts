@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing'
 
 import { Clipboard } from '@angular/cdk/clipboard'
 import { allIcons, NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { ToastLevel } from 'src/app/services/toast.service'
 import { ToastComponent } from './toast.component'
 
 const toast1 = {
@@ -121,6 +122,42 @@ describe('ToastComponent', () => {
     jest.advanceTimersByTime(5000)
     expect(component.delayRemaining()).toBeNull()
     jest.useRealTimers()
+  })
+
+  it('should show an icon and colors for each level', () => {
+    component.toast = {
+      content: 'Saved',
+      delay: 5000,
+      level: ToastLevel.Success,
+    }
+    fixture.detectChanges()
+    const el: HTMLElement = fixture.nativeElement
+    expect(el.querySelector('i-bs[name="check-circle"]')).not.toBeNull()
+    expect(el.querySelector('ngb-toast').classList).not.toContain(
+      'bg-danger-subtle'
+    )
+
+    fixture = TestBed.createComponent(ToastComponent)
+    fixture.componentInstance.toast = {
+      content: 'Failed',
+      delay: 5000,
+      level: ToastLevel.Error,
+    }
+    fixture.detectChanges()
+    const errorEl: HTMLElement = fixture.nativeElement
+    expect(
+      errorEl.querySelector('i-bs[name="exclamation-triangle"]')
+    ).not.toBeNull()
+    expect(errorEl.querySelector('ngb-toast').classList).toContain(
+      'bg-danger-subtle'
+    )
+
+    fixture = TestBed.createComponent(ToastComponent)
+    fixture.componentInstance.toast = { content: 'Started', delay: 5000 }
+    fixture.detectChanges()
+    expect(
+      fixture.nativeElement.querySelector('i-bs[name="info-circle"]')
+    ).not.toBeNull()
   })
 
   it('should show an error if given with toast', () => {

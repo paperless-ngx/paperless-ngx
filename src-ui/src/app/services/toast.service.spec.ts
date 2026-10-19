@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing'
-import { ToastService } from './toast.service'
+import { Toast, ToastLevel, ToastService } from './toast.service'
 
 describe('ToastService', () => {
   let toastService: ToastService
@@ -105,5 +105,18 @@ describe('ToastService', () => {
 
     toastService.suppressPopupToasts = true
     toastService.showInfo('Info toast')
+  })
+
+  it('sets the level for showSuccess, showInfo and showError', () => {
+    const shown: Toast[] = []
+    toastService.showToast.subscribe((t) => shown.push(t))
+    toastService.showSuccess('Saved')
+    toastService.showInfo('Started')
+    toastService.showError('Failed')
+    expect(shown.map((t) => t.level)).toEqual([
+      ToastLevel.Success,
+      undefined,
+      ToastLevel.Error,
+    ])
   })
 })

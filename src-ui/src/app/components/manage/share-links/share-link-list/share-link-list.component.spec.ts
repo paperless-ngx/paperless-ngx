@@ -33,7 +33,7 @@ describe('ShareLinkListComponent', () => {
       delete: jest.fn().mockReturnValue(of(true)),
     }
     toastService = {
-      showInfo: jest.fn(),
+      showSuccess: jest.fn(),
       showError: jest.fn(),
     }
 
@@ -130,7 +130,7 @@ describe('ShareLinkListComponent', () => {
 
     expect(component.copiedID()).toBe(link.id)
     expect(fixture.nativeElement.querySelector('.badge.show')).not.toBeNull()
-    expect(toastService.showInfo).not.toHaveBeenCalled()
+    expect(toastService.showSuccess).not.toHaveBeenCalled()
 
     jest.advanceTimersByTime(3000)
     expect(component.copiedID()).toBeNull()
@@ -142,7 +142,7 @@ describe('ShareLinkListComponent', () => {
 
     expect(service.delete).toHaveBeenCalledWith(link)
     expect(service.list).toHaveBeenCalledTimes(2)
-    expect(toastService.showInfo).toHaveBeenCalled()
+    expect(toastService.showSuccess).toHaveBeenCalled()
   })
 
   it('shows an error when loading fails', () => {

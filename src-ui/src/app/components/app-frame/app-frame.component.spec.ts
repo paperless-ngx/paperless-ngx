@@ -549,7 +549,8 @@ describe('AppFrameComponent', () => {
 
   it('should show toasts for django messages', () => {
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const toastInfoSpy = jest.spyOn(toastService, 'showSuccess')
+    const toastSuccessSpy = jest.spyOn(toastService, 'showSuccess')
+    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
     jest.spyOn(messagesService, 'get').mockReturnValue([
       { level: DjangoMessageLevel.WARNING, message: 'Test warning' },
       { level: DjangoMessageLevel.ERROR, message: 'Test error' },
@@ -559,7 +560,8 @@ describe('AppFrameComponent', () => {
     ])
     component.ngOnInit()
     expect(toastErrorSpy).toHaveBeenCalledTimes(2)
-    expect(toastInfoSpy).toHaveBeenCalledTimes(3)
+    expect(toastSuccessSpy).toHaveBeenCalledTimes(1)
+    expect(toastInfoSpy).toHaveBeenCalledTimes(2)
   })
 
   it('should call maybeRefreshDocumentCounts after saved views reload', () => {

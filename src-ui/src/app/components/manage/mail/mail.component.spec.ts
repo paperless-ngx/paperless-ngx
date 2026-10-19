@@ -220,7 +220,7 @@ describe('MailComponent', () => {
     completeSetup()
     const processSpy = jest.spyOn(mailAccountService, 'processAccount')
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const toastInfoSpy = jest.spyOn(toastService, 'showSuccess')
+    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
     component.processAccount(mailAccounts[0] as MailAccount)
     expect(processSpy).toHaveBeenCalled()
     processSpy.mockReturnValueOnce(

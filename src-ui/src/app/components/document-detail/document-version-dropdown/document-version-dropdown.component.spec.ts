@@ -33,7 +33,9 @@ describe('DocumentVersionDropdownComponent', () => {
       | 'updateVersionLabel'
     >
   >
-  let toastService: jest.Mocked<Pick<ToastService, 'showError' | 'showSuccess'>>
+  let toastService: jest.Mocked<
+    Pick<ToastService, 'showError' | 'showInfo' | 'showSuccess'>
+  >
   let finished$: Subject<{ taskId: string }>
   let failed$: Subject<{ taskId: string; message?: string }>
   let modalService: jest.Mocked<Pick<NgbModal, 'open'>>
@@ -55,6 +57,7 @@ describe('DocumentVersionDropdownComponent', () => {
     toastService = {
       showError: jest.fn(),
       showInfo: jest.fn(),
+      showSuccess: jest.fn(),
     }
     permissionsService = {
       currentUserCan: jest.fn().mockReturnValue(true),
@@ -416,6 +419,6 @@ describe('DocumentVersionDropdownComponent', () => {
     expect(selectedEmitSpy).toHaveBeenCalledWith(2)
     expect(component.newVersionLabel).toEqual('')
     expect(modal.close).toHaveBeenCalled()
-    expect(toastService.showInfo).toHaveBeenCalled()
+    expect(toastService.showSuccess).toHaveBeenCalled()
   })
 })

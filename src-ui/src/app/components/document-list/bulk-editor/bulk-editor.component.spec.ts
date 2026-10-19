@@ -1432,7 +1432,7 @@ describe('BulkEditorComponent', () => {
     const mergeAsVersionsSpy = jest
       .spyOn(documentService, 'mergeDocumentsAsVersions')
       .mockReturnValue(of(true))
-    const toastInfoSpy = jest.spyOn(toastService, 'showSuccess')
+    const toastSuccessSpy = jest.spyOn(toastService, 'showSuccess')
     fixture.detectChanges()
 
     component.mergeSelectedAsVersions()
@@ -1448,7 +1448,9 @@ describe('BulkEditorComponent', () => {
       `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
     )
     expect(documentListViewService.selected.size).toEqual(0)
-    expect(toastInfoSpy).toHaveBeenCalledWith('Documents merged as versions.')
+    expect(toastSuccessSpy).toHaveBeenCalledWith(
+      'Documents merged as versions.'
+    )
   })
 
   it('should not report success when merging documents as versions fails', () => {
@@ -1474,7 +1476,7 @@ describe('BulkEditorComponent', () => {
     jest
       .spyOn(documentService, 'mergeDocumentsAsVersions')
       .mockReturnValue(throwError(() => new Error('failed')))
-    const toastInfoSpy = jest.spyOn(toastService, 'showSuccess')
+    const toastSuccessSpy = jest.spyOn(toastService, 'showSuccess')
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
     fixture.detectChanges()
 
@@ -1483,7 +1485,7 @@ describe('BulkEditorComponent', () => {
     modal.componentInstance.confirm()
 
     expect(toastErrorSpy).toHaveBeenCalled()
-    expect(toastInfoSpy).not.toHaveBeenCalled()
+    expect(toastSuccessSpy).not.toHaveBeenCalled()
   })
 
   it('should support bulk download with archive, originals or both and file formatting', () => {
@@ -1932,7 +1934,7 @@ describe('BulkEditorComponent', () => {
     ;(shareLinkBundleService.createBundle as jest.Mock).mockReturnValueOnce(
       of({ id: 42 })
     )
-    const toastInfoSpy = jest.spyOn(toastService, 'showSuccess')
+    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
 
     component.createShareLinkBundle()
 
