@@ -1,25 +1,4 @@
 <pngx-page-header [title]="title()" [id]="documentId()">
-  @if (archiveContentRenderType === ContentRenderType.PDF && !useNativePdfViewer) {
-    @if (previewNumPages()) {
-      <div class="input-group input-group-sm ms-2 d-none d-md-flex">
-        <div class="input-group-text" i18n>Page</div>
-          <input class="form-control flex-grow-0 w-auto" type="number" min="1" [max]="previewNumPages()" [ngModel]="previewCurrentPage()" (ngModelChange)="previewCurrentPage.set($event)" />
-        <div class="input-group-text" i18n>of {{previewNumPages()}}</div>
-      </div>
-    }
-    <div class="input-group input-group-sm me-md-5 d-none d-md-flex">
-      <button class="btn btn-outline-secondary" (click)="decreaseZoom()" i18n>-</button>
-      <select class="form-select" (change)="setZoom($event.target.value)" [ngModel]="currentZoom">
-        @for (setting of zoomSettings; track setting) {
-          <option [value]="setting">
-            {{ getZoomSettingTitle(setting) }}
-          </option>
-        }
-      </select>
-      <button class="btn btn-outline-secondary" (click)="increaseZoom()" i18n>+</button>
-    </div>
-  }
-
   <button type="button" class="btn btn-sm btn-outline-danger me-md-4" (click)="delete()" [disabled]="!userIsOwner" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Document }" aria-label="Delete" i18n-aria-label>
     <i-bs width="1.2em" height="1.2em" name="trash"></i-bs><span class="d-none d-lg-inline ps-1" i18n>Delete</span>
   </button>
@@ -499,6 +478,29 @@
               (loadError)="onError($event)"
               (afterLoadComplete)="pdfPreviewLoaded($event)">
             </pngx-pdf-viewer>
+            <div class="position-absolute bottom-0 start-50 translate-middle-x z-1 mb-3 d-flex gap-2 p-1 bg-body border rounded shadow">
+              @if (previewNumPages()) {
+                <div class="input-group input-group-sm w-auto flex-nowrap">
+                  <input class="form-control flex-grow-0 w-auto" type="number" min="1" [max]="previewNumPages()" [ngModelOptions]="{standalone: true}" [ngModel]="previewCurrentPage()" (ngModelChange)="previewCurrentPage.set($event)" aria-label="Page" i18n-aria-label />
+                  <div class="input-group-text" i18n>of {{previewNumPages()}}</div>
+                </div>
+              }
+              <div class="input-group input-group-sm w-auto flex-nowrap">
+                <button class="btn btn-outline-secondary" (click)="decreaseZoom()" aria-label="Zoom out" i18n-aria-label>
+                  <i-bs width="1em" height="1em" name="dash"></i-bs>
+                </button>
+                <select class="form-select" (change)="setZoom($event.target.value)" [ngModelOptions]="{standalone: true}" [ngModel]="currentZoom" aria-label="Zoom" i18n-aria-label>
+                  @for (setting of zoomSettings; track setting) {
+                    <option [value]="setting">
+                      {{ getZoomSettingTitle(setting) }}
+                    </option>
+                  }
+                </select>
+                <button class="btn btn-outline-secondary" (click)="increaseZoom()" aria-label="Zoom in" i18n-aria-label>
+                  <i-bs width="1em" height="1em" name="plus"></i-bs>
+                </button>
+              </div>
+            </div>
           </div>
         } @else {
           <object [data]="previewUrl() | safeUrl" class="preview-sticky" width="100%"></object>
