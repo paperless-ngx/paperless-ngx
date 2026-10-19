@@ -92,8 +92,8 @@
 
     <form [formGroup]='documentForm' (ngSubmit)="save()">
 
-      <div class="btn-toolbar justify-content-end mb-1 pb-3 gap-2 row-gap-2 border-bottom">
-        <div class="btn-group me-auto">
+      <div class="btn-toolbar mb-1 pb-3 gap-2 row-gap-2 border-bottom">
+        <div class="btn-group">
           <button type="button" class="btn btn-sm btn-outline-secondary" i18n-title title="Close" (click)="close()">
             <i-bs width="1.2em" height="1.2em" name="x"></i-bs>
           </button>
@@ -106,43 +106,30 @@
         </div>
 
         <ng-container *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }">
-          <div class="d-flex gap-2">
-            <div class="btn-group">
-              <pngx-suggestions-dropdown *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }"
-                [disabled]="!userCanEdit || suggestionsLoading()"
-                [loading]="suggestionsLoading()"
-                [suggestions]="suggestions()"
-                [aiEnabled]="aiEnabled"
-                [source]="suggestionSource"
-                [defaultSource]="defaultSuggestionSource"
-                [fetchedSources]="fetchedSuggestionSources()"
-                [appliedTags]="documentForm.value.tags"
-                [appliedCorrespondent]="documentForm.value.correspondent"
-                [appliedDocumentType]="documentForm.value.document_type"
-                [appliedStoragePath]="documentForm.value.storage_path"
-                [appliedTitle]="documentForm.value.title"
-                [appliedCreated]="documentForm.value.created"
-                (getSuggestions)="getSuggestions($event)"
-                (sourceChange)="suggestionSourceOverride.set($event)"
-                (addTag)="createTag($event)"
-                (addDocumentType)="createDocumentType($event)"
-                (addCorrespondent)="createCorrespondent($event)">
-              </pngx-suggestions-dropdown>
-            </div>
-
-            <div class="btn-group">
-              <pngx-custom-fields-dropdown
-                *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.CustomField }"
-                [documentId]="documentId()"
-                [disabled]="!userCanEdit"
-                [existingFields]="document()?.custom_fields"
-                (created)="refreshCustomFields()"
-                (added)="addField($event)">
-              </pngx-custom-fields-dropdown>
-            </div>
+          <div class="btn-group ms-3">
+            <pngx-suggestions-dropdown *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }"
+              [disabled]="!userCanEdit || suggestionsLoading()"
+              [loading]="suggestionsLoading()"
+              [suggestions]="suggestions()"
+              [aiEnabled]="aiEnabled"
+              [source]="suggestionSource"
+              [defaultSource]="defaultSuggestionSource"
+              [fetchedSources]="fetchedSuggestionSources()"
+              [appliedTags]="documentForm.value.tags"
+              [appliedCorrespondent]="documentForm.value.correspondent"
+              [appliedDocumentType]="documentForm.value.document_type"
+              [appliedStoragePath]="documentForm.value.storage_path"
+              [appliedTitle]="documentForm.value.title"
+              [appliedCreated]="documentForm.value.created"
+              (getSuggestions)="getSuggestions($event)"
+              (sourceChange)="suggestionSourceOverride.set($event)"
+              (addTag)="createTag($event)"
+              (addDocumentType)="createDocumentType($event)"
+              (addCorrespondent)="createCorrespondent($event)">
+            </pngx-suggestions-dropdown>
           </div>
 
-          <div class="ps-3">
+          <div class="ms-auto">
             <ng-container *ngTemplateOutlet="saveButtons"></ng-container>
           </div>
         </ng-container>
@@ -269,8 +256,20 @@
               }
             </div>
 
-            <div class="d-flex justify-content-end border-top pt-3">
-              <ng-container *ngTemplateOutlet="saveButtons"></ng-container>
+            <div class="d-flex border-top pt-3">
+              <ng-container *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }">
+                <pngx-custom-fields-dropdown
+                  *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.CustomField }"
+                  [documentId]="documentId()"
+                  [disabled]="!userCanEdit"
+                  [existingFields]="document()?.custom_fields"
+                  (created)="refreshCustomFields()"
+                  (added)="addField($event)">
+                </pngx-custom-fields-dropdown>
+              </ng-container>
+              <div class="ms-auto">
+                <ng-container *ngTemplateOutlet="saveButtons"></ng-container>
+              </div>
             </div>
           </ng-template>
         </li>
