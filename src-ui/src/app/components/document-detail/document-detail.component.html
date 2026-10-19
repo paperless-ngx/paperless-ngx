@@ -306,9 +306,9 @@
                     <td i18n>Original filename</td>
                     <td>{{metadata()?.original_filename}}</td>
                   </tr>
-                  <tr>
+                  <tr class="align-middle">
                     <td i18n>Original SHA256 checksum</td>
-                    <td>{{metadata()?.original_checksum}}</td>
+                    <td><span class="badge bg-light font-monospace text-wrap text-break text-start">{{metadata()?.original_checksum}}</span></td>
                   </tr>
                   <tr>
                     <td i18n>Original file size</td>
@@ -319,9 +319,9 @@
                     <td>{{metadata()?.original_mime_type}}</td>
                   </tr>
                   @if (metadata()?.has_archive_version) {
-                    <tr>
+                    <tr class="align-middle">
                       <td i18n>Archive SHA256 checksum</td>
-                      <td>{{metadata()?.archive_checksum}}</td>
+                      <td><span class="badge bg-light font-monospace text-wrap text-break text-start">{{metadata()?.archive_checksum}}</span></td>
                     </tr>
                   }
                   @if (metadata()?.has_archive_version) {
