@@ -370,6 +370,15 @@ instead of being removed from the filesystem. Only the original version is kept.
 
     This setting was previously named PAPERLESS_TRASH_DIR.
 
+#### [`PAPERLESS_SCRATCH_DIR=<path>`](#PAPERLESS_SCRATCH_DIR) {#PAPERLESS_SCRATCH_DIR}
+
+: This folder is used as a temporary workspace for multiple paperless operations, including
+consuming documents, editing, and the document exporter.
+
+    This must be writeable by the user running paperless.
+
+    Defaults to "/tmp/paperless".
+
 #### [`PAPERLESS_MEDIA_ROOT=<path>`](#PAPERLESS_MEDIA_ROOT) {#PAPERLESS_MEDIA_ROOT}
 
 : This is where your documents and thumbnails are stored.
