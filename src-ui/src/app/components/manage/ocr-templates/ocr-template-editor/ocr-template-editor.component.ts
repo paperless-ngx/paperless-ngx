@@ -272,11 +272,10 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
       : null
   }
 
-  /** Snapshot of the editor state as last loaded or saved. */
-  private savedState = ''
+  private initialState = ''
 
   get isDirty(): boolean {
-    return this.editorState() !== this.savedState
+    return this.editorState() !== this.initialState
   }
 
   private editorState(): string {
@@ -288,10 +287,6 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
       combine_formats: Object.fromEntries(formats),
       sample_document: this.previewDocId ?? null,
     })
-  }
-
-  private markSaved() {
-    this.savedState = this.editorState()
   }
 
   get dialogTitle(): string {
@@ -337,7 +332,7 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
         this.loadPreview()
       }
     }
-    this.markSaved()
+    this.initialState = this.editorState()
   }
 
   searchDocuments = (text$: Observable<string>): Observable<Document[]> =>
@@ -883,14 +878,7 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
 
     obs.pipe(takeUntil(this.destroy$)).subscribe({
       next: (saved) => {
-        const idx = this.selectedZoneIndex
-        this.template = saved
-        this.isNew = false
-        this.selectedZoneIndex = idx
-        this.saving = false
-        this.markSaved()
         this.toastService.showInfo($localize`OCR template saved.`)
-        this.changeDetector.markForCheck()
         this.succeeded.emit(saved)
         this.activeModal.close(saved)
       },

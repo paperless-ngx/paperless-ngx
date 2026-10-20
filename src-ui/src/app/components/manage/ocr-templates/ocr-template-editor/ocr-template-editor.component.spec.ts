@@ -397,7 +397,7 @@ describe('OcrTemplateEditorComponent', () => {
     expect(customZone.name).toBe('New name')
   })
 
-  it('tracks unsaved changes against the last loaded or saved state', () => {
+  it('tracks unsaved changes against the initial state', () => {
     fixture.detectChanges()
     expect(component.isDirty).toBe(false)
 
@@ -407,8 +407,7 @@ describe('OcrTemplateEditorComponent', () => {
     component.template.name = 'Invoices'
     expect(component.isDirty).toBe(true)
 
-    templates.create.mockReturnValue(of({ ...component.template, id: 3 }))
-    component.save()
+    component.template.name = ''
     expect(component.isDirty).toBe(false)
 
     component.previewDocId = 5
@@ -431,10 +430,12 @@ describe('OcrTemplateEditorComponent', () => {
     component.onOverlayPointerUp(pointer(700, 700))
     expect(component.template.zones).toHaveLength(0)
 
-    pending.next({ ...component.template, id: 3 })
+    const saved = { ...component.template, id: 3 }
+    const succeeded = jest.spyOn(component.succeeded, 'emit')
+    pending.next(saved)
     pending.complete()
-    expect(component.saving).toBe(false)
-    expect(activeModal.close).toHaveBeenCalledWith(component.template)
+    expect(succeeded).toHaveBeenCalledWith(saved)
+    expect(activeModal.close).toHaveBeenCalledWith(saved)
   })
 
   it('stops an active move and unlocks editing without losing changes after a failed save', () => {
