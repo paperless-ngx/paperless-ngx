@@ -43,6 +43,13 @@ describe('PageHeaderComponent', () => {
     expect(titleSpy).toHaveBeenCalledWith(`Foo Bar - ${environment.appTitle}`)
   })
 
+  it('should set html title to just the app title until a title is available', () => {
+    const titleSpy = jest.spyOn(titleService, 'setTitle')
+    fixture.componentRef.setInput('title', undefined)
+    fixture.detectChanges()
+    expect(titleSpy).toHaveBeenCalledWith(environment.appTitle)
+  })
+
   it('should copy id to clipboard, reset after 3 seconds', () => {
     jest.useFakeTimers()
     fixture.componentRef.setInput('id', 42)
