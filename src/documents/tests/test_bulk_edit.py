@@ -21,7 +21,6 @@ from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
-from documents.models import OcrTemplate
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.permissions import set_permissions_for_objects
@@ -1981,45 +1980,28 @@ class TestBulkEditRunZoneOcr:
     def mock_task(self, mocker: MockerFixture) -> mock.MagicMock:
         return mocker.patch("documents.bulk_edit.extract_zones")
 
-    def test_queues_documents_with_an_enabled_template(
+    def test_queues_every_selected_document(
         self,
         mock_task: mock.MagicMock,
     ) -> None:
         """
         GIVEN:
-            - Documents whose type has enabled templates, a disabled template,
-              or no type at all
+            - Selected documents
         WHEN:
-            - run_zone_ocr is called with all of them
+            - run_zone_ocr is called with them
         THEN:
-            - Only the document with an enabled template is queued, once
+            - Each document is queued once, templates are matched when its
+              task runs
         """
-        invoice = DocumentType.objects.create(name="Invoice")
-        receipt = DocumentType.objects.create(name="Receipt")
-        for name in ("Invoices", "More invoices"):
-            OcrTemplate.objects.create(
-                name=name,
-                document_type=invoice,
-                source_width=1000,
-                source_height=1000,
-            )
-        OcrTemplate.objects.create(
-            name="Receipts",
-            document_type=receipt,
-            source_width=1000,
-            source_height=1000,
-            enabled=False,
-        )
-        templated = DocumentFactory(document_type=invoice)
-        others = [DocumentFactory(document_type=receipt), DocumentFactory()]
+        docs = DocumentFactory.create_batch(2)
 
-        result = bulk_edit.run_zone_ocr([templated.id, *(d.id for d in others)])
+        result = bulk_edit.run_zone_ocr([doc.id for doc in docs])
 
         assert result == "OK"
-        mock_task.apply_async.assert_called_once()
-        assert mock_task.apply_async.call_args.kwargs["kwargs"] == {
-            "document_id": templated.id,
-        }
+        assert [
+            call.kwargs["kwargs"]["document_id"]
+            for call in mock_task.apply_async.call_args_list
+        ] == [doc.id for doc in docs]
 
     def test_task_runs_extraction(self, mocker: MockerFixture) -> None:
         """

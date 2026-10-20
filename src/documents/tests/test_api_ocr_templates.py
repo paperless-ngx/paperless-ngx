@@ -9,12 +9,14 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from documents.models import CustomField
-from documents.models import DocumentType
+from documents.models import MatchingModel
 from documents.models import OcrTemplate
 from documents.models import OcrTemplateZone
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import DocumentFactory
 from paperless_testing.permissions import grant_object
+
+CONTENT = "Northwind Power & Light statement"
 
 
 class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
@@ -24,7 +26,6 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
         self.user = User.objects.create_superuser(username="temp_admin")
         self.client.force_authenticate(user=self.user)
 
-        self.doc_type = DocumentType.objects.create(name="Invoice")
         self.custom_field_text = CustomField.objects.create(
             name="Invoice Number",
             data_type=CustomField.FieldDataType.STRING,
@@ -47,7 +48,8 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
     def _make_template_data(self, **overrides):
         data = {
             "name": "Invoice Template",
-            "document_type": self.doc_type.pk,
+            "match": "Northwind",
+            "matching_algorithm": MatchingModel.MATCH_ANY,
             "default_page": 0,
             "source_width": 2480,
             "source_height": 3508,
@@ -103,7 +105,8 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
 
         result = resp.json()
         self.assertEqual(result["name"], "Invoice Template")
-        self.assertEqual(result["document_type"], self.doc_type.pk)
+        self.assertEqual(result["match"], "Northwind")
+        self.assertEqual(result["matching_algorithm"], MatchingModel.MATCH_ANY)
         self.assertEqual(len(result["zones"]), 1)
         self.assertEqual(result["zones"][0]["name"], "Invoice Number")
         self.assertEqual(OcrTemplate.objects.count(), 1)
@@ -144,7 +147,7 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
         def template(name, owner=None):
             return OcrTemplate.objects.create(
                 name=name,
-                document_type=self.doc_type,
+                match="Northwind",
                 source_width=1000,
                 source_height=1000,
                 owner=owner,
@@ -182,7 +185,7 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
         )
         template = OcrTemplate.objects.create(
             name="Private",
-            document_type=self.doc_type,
+            match="Northwind",
             source_width=1000,
             source_height=1000,
             owner=other,
@@ -200,6 +203,27 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
         template.refresh_from_db()
         self.assertEqual(template.name, "Renamed")
         self.assertEqual(template.owner, other)
+
+    def test_create_template_rejects_automatic_matching(self):
+        """
+        GIVEN:
+            - A template payload with automatic matching
+        WHEN:
+            - API request to create it
+        THEN:
+            - The request is rejected, automatic matching needs assigned
+              documents to learn from
+        """
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                self._make_template_data(matching_algorithm=MatchingModel.MATCH_AUTO),
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(OcrTemplate.objects.count(), 0)
 
     def test_create_template_multiple_zones(self):
         """
@@ -342,7 +366,7 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
     def test_list_templates(self):
         template = OcrTemplate.objects.create(
             name="Test Template",
-            document_type=self.doc_type,
+            match="Northwind",
             source_width=2480,
             source_height=3508,
         )
@@ -373,7 +397,7 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
         """PUT should replace all zones with the new set."""
         template = OcrTemplate.objects.create(
             name="Old Name",
-            document_type=self.doc_type,
+            match="Northwind",
             source_width=2480,
             source_height=3508,
         )
@@ -413,7 +437,7 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
     def test_delete_template_cascades_zones(self):
         template = OcrTemplate.objects.create(
             name="To Delete",
-            document_type=self.doc_type,
+            match="Northwind",
             source_width=2480,
             source_height=3508,
         )
@@ -441,7 +465,7 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
     def test_patch_toggle_enabled(self):
         template = OcrTemplate.objects.create(
             name="Toggle Test",
-            document_type=self.doc_type,
+            match="Northwind",
             source_width=2480,
             source_height=3508,
             enabled=True,
@@ -460,7 +484,7 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
         """PATCH without zones field should not delete existing zones."""
         template = OcrTemplate.objects.create(
             name="Patch Test",
-            document_type=self.doc_type,
+            match="Northwind",
             source_width=2480,
             source_height=3508,
         )
@@ -493,28 +517,34 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
         )
 
     @patch("documents.zone_ocr.run_zone_extraction")
-    def test_run_zone_ocr_without_document_type_is_skipped(self, extract):
-        document = DocumentFactory()
+    def test_run_zone_ocr_without_matching_template_is_skipped(self, extract):
+        document = DocumentFactory(content=CONTENT)
+        OcrTemplate.objects.create(
+            name="Other sender",
+            match="Contoso",
+            source_width=1000,
+            source_height=1000,
+        )
 
         response = self.client.post(f"/api/documents/{document.pk}/run-zone-ocr/")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(
             response.json(),
-            {"status": "skipped", "reason": "no_document_type", "results": []},
+            {"status": "skipped", "reason": "no_template", "results": []},
         )
         extract.assert_not_called()
 
     @patch("documents.zone_ocr.run_zone_extraction")
     def test_run_zone_ocr_without_enabled_template_is_skipped(self, extract):
-        document = DocumentFactory(document_type=self.doc_type)
+        document = DocumentFactory(content=CONTENT)
 
         for enabled in (None, False):
             with self.subTest(enabled=enabled):
                 if enabled is False:
                     OcrTemplate.objects.create(
                         name="Disabled template",
-                        document_type=self.doc_type,
+                        match="Northwind",
                         source_width=1000,
                         source_height=1000,
                         enabled=False,
@@ -580,7 +610,7 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
                 codename__in=["view_document", "change_document"],
             ),
         )
-        document = DocumentFactory(document_type=self.doc_type, owner=owner)
+        document = DocumentFactory(content=CONTENT, owner=owner)
         self.client.force_authenticate(user=user)
 
         response = self.client.post(f"/api/documents/{document.pk}/run-zone-ocr/")
@@ -594,7 +624,7 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
         user.user_permissions.add(
             *Permission.objects.filter(codename__in=["view_document", "add_document"]),
         )
-        document = DocumentFactory(document_type=self.doc_type, owner=user)
+        document = DocumentFactory(content=CONTENT, owner=user)
         self.client.force_authenticate(user=user)
 
         response = self.client.post(f"/api/documents/{document.pk}/run-zone-ocr/")
@@ -610,11 +640,11 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
     @patch("documents.zone_ocr.run_zone_extraction")
     def test_run_zone_ocr_skips_templates_private_to_the_requester(self, extract):
         owner = User.objects.create_user(username="document_owner")
-        document = DocumentFactory(document_type=self.doc_type, owner=owner)
+        document = DocumentFactory(content=CONTENT, owner=owner)
         OcrTemplate.objects.create(
             name="Requester's private template",
             owner=self.user,
-            document_type=self.doc_type,
+            match="Northwind",
             source_width=100,
             source_height=100,
         )
@@ -638,7 +668,7 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
         extract,
     ):
         owner = User.objects.create_user(username="document_owner")
-        document = DocumentFactory(document_type=self.doc_type, owner=owner)
+        document = DocumentFactory(content=CONTENT, owner=owner)
         document.source_path.write_bytes(b"test PDF")
         for name, template_owner in [
             ("Owned", owner),
@@ -649,7 +679,7 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
             template = OcrTemplate.objects.create(
                 name=name,
                 owner=template_owner,
-                document_type=self.doc_type,
+                match="Northwind",
                 source_width=100,
                 source_height=100,
             )
@@ -684,7 +714,7 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
         template = OcrTemplate.objects.create(
             name="Shared",
             owner=self.user,
-            document_type=self.doc_type,
+            match="Northwind",
             source_width=100,
             source_height=100,
         )
@@ -706,10 +736,10 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
 
     @patch("documents.zone_ocr.run_zone_extraction")
     def test_run_zone_ocr_missing_file_is_an_error(self, extract):
-        document = DocumentFactory(document_type=self.doc_type)
+        document = DocumentFactory(content=CONTENT)
         OcrTemplate.objects.create(
             name="Template",
-            document_type=self.doc_type,
+            match="Northwind",
             source_width=1000,
             source_height=1000,
         )
@@ -723,13 +753,13 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
     @patch("documents.zone_ocr.run_zone_extraction")
     def test_run_zone_ocr_reports_completed_results(self, extract):
         document = DocumentFactory(
-            document_type=self.doc_type,
+            content=CONTENT,
             mime_type="application/pdf",
         )
         document.source_path.write_bytes(b"test PDF")
         template = OcrTemplate.objects.create(
             name="Template",
-            document_type=self.doc_type,
+            match="Northwind",
             source_width=1000,
             source_height=1000,
         )

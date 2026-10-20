@@ -2286,7 +2286,7 @@ class DocumentViewSet(
             fields={
                 "status": serializers.ChoiceField(choices=["completed", "skipped"]),
                 "reason": serializers.ChoiceField(
-                    choices=["no_document_type", "no_template"],
+                    choices=["no_template"],
                     required=False,
                 ),
                 "results": serializers.ListField(child=serializers.DictField()),
@@ -2307,15 +2307,10 @@ class DocumentViewSet(
         ) or not has_perms_owner_aware(request.user, "change_document", document):
             return HttpResponseForbidden("Insufficient permissions")
 
-        if not document.document_type_id:
-            return Response(
-                {"status": "skipped", "reason": "no_document_type", "results": []},
-            )
-
         from documents.zone_ocr import get_templates_for_document
 
         templates = get_templates_for_document(document)
-        if not templates.exists():
+        if not templates:
             return Response(
                 {"status": "skipped", "reason": "no_template", "results": []},
             )
@@ -2334,7 +2329,7 @@ class DocumentViewSet(
         # Collect results
         results = []
         builtin_labels = {"title": "Title", "asn": "ASN", "created": "Created"}
-        for template in templates.prefetch_related("zones", "zones__custom_field"):
+        for template in templates:
             for zone in template.zones.all():
                 target = getattr(zone, "target", None) or "custom_field"
                 if target == "custom_field" and zone.custom_field_id:

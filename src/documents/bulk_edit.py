@@ -1236,19 +1236,10 @@ def remove_doclink(
 
 def run_zone_ocr(doc_ids: list[int]) -> Literal["OK"]:
     """
-    Queue zone OCR for the given documents. Documents whose type has no enabled
-    OCR template are skipped.
+    Queue zone OCR for the given documents. Templates are matched against each
+    document's content when its task runs.
     """
-    document_ids = (
-        Document.objects.filter(
-            id__in=doc_ids,
-            document_type__ocr_templates__enabled=True,
-        )
-        .order_by()
-        .values_list("id", flat=True)
-        .distinct()
-    )
-    for document_id in document_ids:
+    for document_id in doc_ids:
         extract_zones.apply_async(
             kwargs={"document_id": document_id},
             headers={"trigger_source": PaperlessTask.TriggerSource.MANUAL},

@@ -12,10 +12,9 @@ from django.test import TestCase
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
-from documents.models import DocumentType
+from documents.models import MatchingModel
 from documents.models import OcrTemplate
 from documents.models import OcrTemplateZone
-from documents.signals.handlers import run_zone_ocr_on_type_change
 from documents.zone_ocr import _apply_transform
 from documents.zone_ocr import _convert_value
 from documents.zone_ocr import _detect_mime
@@ -32,32 +31,33 @@ class TestTemplateVisibility(DirectoriesMixin, TestCase):
         super().setUp()
         self.owner = User.objects.create_user(username="document_owner")
         self.other = User.objects.create_user(username="other_owner")
-        self.doc_type = DocumentType.objects.create(name="Invoice")
-        self.document = DocumentFactory(owner=self.owner, document_type=self.doc_type)
+        self.document = DocumentFactory(
+            owner=self.owner,
+            content="Northwind Power & Light statement",
+        )
         self.mine = self.template("Mine", owner=self.owner)
         self.unowned = self.template("Unowned")
         self.private = self.template("Private", owner=self.other)
 
     def template(self, name, **kwargs):
+        kwargs.setdefault("match", "Northwind")
+        kwargs.setdefault("matching_algorithm", MatchingModel.MATCH_ANY)
         return OcrTemplate.objects.create(
             name=name,
-            document_type=self.doc_type,
             source_width=100,
             source_height=100,
             **kwargs,
         )
 
-    def test_only_owned_unowned_and_shared_templates_apply(self):
+    def test_only_matching_owned_unowned_and_shared_templates_apply(self):
         shared = self.template("Shared", owner=self.other)
         grant_object(self.owner, shared, "view_ocrtemplate")
         self.template("Disabled", owner=self.owner, enabled=False)
-        other_type = DocumentType.objects.create(name="Other")
-        OcrTemplate.objects.create(
-            name="Wrong type",
+        self.template("Other sender", owner=self.owner, match="Contoso")
+        self.template(
+            "No matching",
             owner=self.owner,
-            document_type=other_type,
-            source_width=100,
-            source_height=100,
+            matching_algorithm=MatchingModel.MATCH_NONE,
         )
         self.assertCountEqual(
             get_templates_for_document(self.document),
@@ -72,16 +72,13 @@ class TestTemplateVisibility(DirectoriesMixin, TestCase):
 
     def test_unowned_documents_only_use_unowned_templates(self):
         self.document.owner = None
-        self.assertQuerySetEqual(
-            get_templates_for_document(self.document),
-            [self.unowned],
-        )
+        self.assertEqual(get_templates_for_document(self.document), [self.unowned])
 
     def test_versions_use_the_root_documents_owner(self):
         version = DocumentFactory(
             root_document=self.document,
             owner=self.other,
-            document_type=self.doc_type,
+            content=self.document.content,
         )
         self.assertCountEqual(
             get_templates_for_document(version),
@@ -97,7 +94,7 @@ class TestTemplateVisibility(DirectoriesMixin, TestCase):
 
     def test_inactive_owner_has_no_templates(self):
         self.owner.is_active = False
-        self.assertFalse(get_templates_for_document(self.document).exists())
+        self.assertEqual(get_templates_for_document(self.document), [])
 
     @patch("documents.zone_ocr._process_template")
     def test_extraction_never_processes_private_templates(self, process):
@@ -119,26 +116,6 @@ class TestTemplateVisibility(DirectoriesMixin, TestCase):
             [call.args[2] for call in process.call_args_list],
             [self.mine, self.unowned],
         )
-
-    @patch("documents.zone_ocr.run_zone_extraction")
-    def test_type_change_skips_documents_with_only_private_templates(self, extract):
-        self.mine.delete()
-        self.unowned.delete()
-        self.document.source_path.write_bytes(b"test PDF")
-        self.document._old_document_type_id = None
-
-        run_zone_ocr_on_type_change(Document, self.document)
-
-        extract.assert_not_called()
-
-    @patch("documents.zone_ocr.run_zone_extraction")
-    def test_type_change_runs_when_a_template_is_visible(self, extract):
-        self.document.source_path.write_bytes(b"test PDF")
-        self.document._old_document_type_id = None
-
-        run_zone_ocr_on_type_change(Document, self.document)
-
-        extract.assert_called_once_with(self.document, None)
 
 
 class TestApplyTransform(TestCase):
@@ -393,36 +370,45 @@ class TestRunZoneExtraction(TestCase):
     """Tests for the full extraction pipeline."""
 
     def setUp(self):
-        self.doc_type = DocumentType.objects.create(name="Invoice")
         self.custom_field = CustomField.objects.create(
             name="Invoice Number",
             data_type=CustomField.FieldDataType.STRING,
         )
 
-    def test_skips_document_without_type(self):
-        doc = Document.objects.create(
-            title="No Type",
-            content="test",
-            mime_type="application/pdf",
+    @patch("documents.zone_ocr._process_template")
+    def test_skips_template_that_does_not_match(self, mock_process):
+        template = OcrTemplate.objects.create(
+            name="Other sender",
+            match="Contoso",
+            source_width=2480,
+            source_height=3508,
         )
-        run_zone_extraction(doc, Path("/nonexistent"))
-        self.assertEqual(CustomFieldInstance.objects.count(), 0)
-
-    def test_skips_document_without_matching_template(self):
-        other_type = DocumentType.objects.create(name="Other")
+        OcrTemplateZone.objects.create(
+            template=template,
+            name="Zone",
+            custom_field=self.custom_field,
+            x=0,
+            y=0,
+            width=100,
+            height=50,
+        )
         doc = Document.objects.create(
             title="No Template",
             content="test",
             mime_type="application/pdf",
-            document_type=other_type,
         )
-        run_zone_extraction(doc, Path("/nonexistent"))
-        self.assertEqual(CustomFieldInstance.objects.count(), 0)
+
+        with tempfile.NamedTemporaryFile(suffix=".pdf") as f:
+            f.write(b"%PDF-1.4 fake")
+            f.flush()
+            run_zone_extraction(doc, Path(f.name))
+
+        mock_process.assert_not_called()
 
     def test_skips_disabled_template(self):
         template = OcrTemplate.objects.create(
             name="Disabled",
-            document_type=self.doc_type,
+            match="test",
             source_width=2480,
             source_height=3508,
             enabled=False,
@@ -441,7 +427,6 @@ class TestRunZoneExtraction(TestCase):
             title="Test",
             content="test",
             mime_type="application/pdf",
-            document_type=self.doc_type,
         )
         run_zone_extraction(doc, Path("/nonexistent"))
         self.assertEqual(CustomFieldInstance.objects.count(), 0)
@@ -449,7 +434,7 @@ class TestRunZoneExtraction(TestCase):
     def test_skips_template_with_no_zones(self):
         OcrTemplate.objects.create(
             name="Empty",
-            document_type=self.doc_type,
+            match="test",
             source_width=2480,
             source_height=3508,
             enabled=True,
@@ -459,7 +444,6 @@ class TestRunZoneExtraction(TestCase):
             title="Test",
             content="test",
             mime_type="application/pdf",
-            document_type=self.doc_type,
         )
 
         with tempfile.NamedTemporaryFile(suffix=".pdf") as f:
@@ -472,7 +456,7 @@ class TestRunZoneExtraction(TestCase):
     def test_calls_process_for_enabled_template(self, mock_process):
         template = OcrTemplate.objects.create(
             name="Active",
-            document_type=self.doc_type,
+            match="test",
             source_width=2480,
             source_height=3508,
             enabled=True,
@@ -491,7 +475,6 @@ class TestRunZoneExtraction(TestCase):
             title="Test",
             content="test",
             mime_type="application/pdf",
-            document_type=self.doc_type,
         )
 
         with tempfile.NamedTemporaryFile(suffix=".pdf") as f:
@@ -508,7 +491,7 @@ class TestRunZoneExtraction(TestCase):
 
         template = OcrTemplate.objects.create(
             name="Failing",
-            document_type=self.doc_type,
+            match="test",
             source_width=2480,
             source_height=3508,
             enabled=True,
@@ -527,7 +510,6 @@ class TestRunZoneExtraction(TestCase):
             title="Test",
             content="test",
             mime_type="application/pdf",
-            document_type=self.doc_type,
         )
 
         with tempfile.NamedTemporaryFile(suffix=".pdf") as f:
@@ -542,18 +524,17 @@ class TestRunZoneExtraction(TestCase):
             title="Test",
             content="test",
             mime_type="application/pdf",
-            document_type=self.doc_type,
         )
         # No template, so it exits early — but shouldn't crash on None
         run_zone_extraction(doc, None)
 
     @patch("documents.zone_ocr._process_template")
     def test_multiple_templates_all_process(self, mock_process):
-        """Multiple enabled templates for the same type should all run."""
+        """Multiple matching templates should all run."""
         for i in range(3):
             template = OcrTemplate.objects.create(
                 name=f"Template {i}",
-                document_type=self.doc_type,
+                match="test",
                 source_width=2480,
                 source_height=3508,
                 enabled=True,
@@ -572,7 +553,6 @@ class TestRunZoneExtraction(TestCase):
             title="Test",
             content="test",
             mime_type="application/pdf",
-            document_type=self.doc_type,
         )
 
         with tempfile.NamedTemporaryFile(suffix=".pdf") as f:

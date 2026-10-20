@@ -21,6 +21,7 @@ from pathlib import Path
 from django.conf import settings
 from PIL import Image
 
+from documents.matching import matches
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
@@ -33,19 +34,18 @@ from documents.versioning import get_root_document
 logger = logging.getLogger("paperless.zone_ocr")
 
 
-def get_templates_for_document(document: Document):
+def get_templates_for_document(document: Document) -> list[OcrTemplate]:
     """
-    The enabled templates for the document's type that its owner can view, the
-    same rule as matching. A version is owned through its root document.
+    The enabled templates that match the document's content and that its owner
+    can view, the same rule as matching. A version is owned through its root
+    document.
     """
-    templates = OcrTemplate.objects.filter(
-        document_type_id=document.document_type_id,
-        enabled=True,
-    )
     owner = get_root_document(document).owner
-    return templates.filter(
+    templates = OcrTemplate.objects.filter(
+        enabled=True,
         id__in=permitted_object_ids(owner, OcrTemplate, "view_ocrtemplate"),
-    )
+    ).prefetch_related("zones", "zones__custom_field")
+    return [template for template in templates if matches(template, document)]
 
 
 def run_zone_extraction(
@@ -53,18 +53,11 @@ def run_zone_extraction(
     original_file: Path | None,
 ) -> None:
     """
-    Run zone-based OCR extraction for a document if its type has an active template.
+    Run zone-based OCR extraction for every template that matches a document.
     Called from the document_consumption_finished signal handler.
     """
-    if not document.document_type_id:
-        return
-
-    templates = get_templates_for_document(document).prefetch_related(
-        "zones",
-        "zones__custom_field",
-    )
-
-    if not templates.exists():
+    templates = get_templates_for_document(document)
+    if not templates:
         return
 
     # Resolve the document file: prefer archive (PDF/A), then source, then signal arg
