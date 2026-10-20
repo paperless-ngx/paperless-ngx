@@ -19,6 +19,7 @@ import {
   NgbTypeaheadModule,
   NgbTypeaheadSelectItemEvent,
 } from '@ng-bootstrap/ng-bootstrap'
+import { DirtyComponent } from '@ngneat/dirty-check-forms'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import {
   catchError,
@@ -142,7 +143,9 @@ const RESIZE_CURSOR: Record<ResizeHandle, string> = {
   templateUrl: './ocr-template-editor.component.html',
   styleUrls: ['./ocr-template-editor.component.scss'],
 })
-export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
+export class OcrTemplateEditorComponent
+  implements OnInit, OnDestroy, DirtyComponent
+{
   private readonly route = inject(ActivatedRoute)
   private readonly templateService = inject(OcrTemplateService)
   private readonly customFieldsService = inject(CustomFieldsService)
@@ -269,6 +272,30 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
       : null
   }
 
+  /** Snapshot of the editor state as last loaded or saved. */
+  private savedState = ''
+
+  get isDirty(): boolean {
+    return this.editorState() !== this.savedState
+  }
+
+  readonly isDirty$ = () => this.isDirty
+
+  private editorState(): string {
+    const formats = Object.entries(this.template.combine_formats ?? {}).filter(
+      ([, format]) => format
+    )
+    return JSON.stringify({
+      ...this.template,
+      combine_formats: Object.fromEntries(formats),
+      sample_document: this.previewDocId ?? null,
+    })
+  }
+
+  private markSaved() {
+    this.savedState = this.editorState()
+  }
+
   get pageTitle(): string {
     return this.isNew
       ? $localize`New OCR Template`
@@ -313,6 +340,7 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
             this.previewDocId = t.sample_document
             this.loadPreview()
           }
+          this.markSaved()
         })
     } else {
       const qp = this.route.snapshot.queryParams
@@ -325,6 +353,7 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
         this.previewDocId = docId
         this.loadPreview()
       }
+      this.markSaved()
     }
   }
 
@@ -896,6 +925,7 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
         this.isNew = false
         this.selectedZoneIndex = idx
         this.saving = false
+        this.markSaved()
         this.toastService.showInfo($localize`OCR template saved.`)
         this.changeDetector.markForCheck()
       },

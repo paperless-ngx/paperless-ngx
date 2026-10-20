@@ -292,6 +292,7 @@ export const routes: Routes = [
       {
         path: 'ocr-templates/new',
         component: OcrTemplateEditorComponent,
+        canDeactivate: [DirtyFormGuard],
         canActivate: [PermissionsGuard],
         data: {
           requiredPermission: {
@@ -304,6 +305,7 @@ export const routes: Routes = [
       {
         path: 'ocr-templates/:id',
         component: OcrTemplateEditorComponent,
+        canDeactivate: [DirtyFormGuard],
         canActivate: [PermissionsGuard],
         data: {
           requiredPermission: {

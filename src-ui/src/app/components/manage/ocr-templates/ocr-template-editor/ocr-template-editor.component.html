@@ -2,7 +2,7 @@
   <a routerLink="/ocr-templates" class="btn btn-sm btn-outline-secondary" title="Close" i18n-title aria-label="Close" i18n-aria-label>
     <i-bs width="1.2em" height="1.2em" name="x"></i-bs><span class="d-none d-lg-inline ps-1" i18n>Close</span>
   </a>
-  <button type="button" class="btn btn-sm btn-primary" (click)="save()" [disabled]="saving">
+  <button type="button" class="btn btn-sm btn-primary" (click)="save()" [disabled]="saving || !isDirty">
     @if (saving) {
       <span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
     }

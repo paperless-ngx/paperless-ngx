@@ -301,6 +301,24 @@ describe('OcrTemplateEditorComponent', () => {
     })
   })
 
+  it('tracks unsaved changes against the last loaded or saved state', () => {
+    fixture.detectChanges()
+    expect(component.isDirty$()).toBe(false)
+
+    component.template.combine_formats = { '1': '' }
+    expect(component.isDirty).toBe(false)
+
+    component.template.name = 'Invoices'
+    expect(component.isDirty).toBe(true)
+
+    templates.create.mockReturnValue(of({ ...component.template, id: 3 }))
+    component.save()
+    expect(component.isDirty).toBe(false)
+
+    component.previewDocId = 5
+    expect(component.isDirty).toBe(true)
+  })
+
   it('hides results when extraction settings or geometry change', () => {
     const selected = zone()
     component.template.zones = [selected]
