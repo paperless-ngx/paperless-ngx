@@ -1286,91 +1286,36 @@ describe('BulkEditorComponent', () => {
     ) // listAllFilteredIds
   })
 
-  it('finishes bulk zone OCR despite skipped and failed documents and refreshes the list', () => {
+  it('should support run zone ocr', () => {
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((m) => (modal = m[0]))
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
     jest
-      .spyOn(documentListViewService, 'selected', 'get')
-      .mockReturnValue(new Set([3, 4, 5, 6]))
-    const modalSpy = jest.spyOn(modalService, 'open')
-    const refreshSpy = jest
-      .spyOn(component as any, 'handleOperationSuccess')
-      .mockImplementation(() => {})
-    const errorSpy = jest.spyOn(toastService, 'showError')
-
-    component.runZoneOcrSelected()
-    const modal = modalSpy.mock.results[0].value
-    modal.componentInstance.confirm()
-    const requests = [3, 4, 5, 6].map((id) =>
-      httpTestingController.expectOne(
-        `${environment.apiBaseUrl}documents/${id}/run-zone-ocr/`
-      )
-    )
-    requests[1].flush({
-      status: 'skipped',
-      reason: 'no_document_type',
-      results: [],
-    })
-    requests[2].flush({ status: 'skipped', reason: 'no_template', results: [] })
-    requests[3].flush(
-      { error: 'OCR failed' },
-      { status: 500, statusText: 'Server Error' }
-    )
-
-    expect(requests[0].cancelled).toBe(false)
-    expect(refreshSpy).not.toHaveBeenCalled()
-    requests[0].flush({ status: 'completed', results: [] })
-
-    expect(refreshSpy).toHaveBeenCalledWith(modal, false)
-    expect(errorSpy).toHaveBeenCalledWith(
-      'Zone OCR: 1 completed, 2 skipped, 1 failed. Failed documents: 6',
-      [{ document: 6, error: { error: 'OCR failed' } }]
-    )
-  })
-
-  it.each([
-    [403, 'Permission denied'],
-    [404, 'Document file not found'],
-    [500, 'OCR failed'],
-  ])('reports a %s OCR error as a failure, not a skip', (status, message) => {
-    jest
-      .spyOn(documentListViewService, 'selected', 'get')
-      .mockReturnValue(new Set([3]))
-    const modalSpy = jest.spyOn(modalService, 'open')
-    jest
-      .spyOn(component as any, 'handleOperationSuccess')
-      .mockImplementation(() => {})
-    const errorSpy = jest.spyOn(toastService, 'showError')
-
-    component.runZoneOcrSelected()
-    modalSpy.mock.results[0].value.componentInstance.confirm()
-    httpTestingController
-      .expectOne(`${environment.apiBaseUrl}documents/3/run-zone-ocr/`)
-      .flush({ error: message }, { status, statusText: 'Error' })
-
-    expect(errorSpy).toHaveBeenCalledWith(
-      'Zone OCR: 0 completed, 0 skipped, 1 failed. Failed documents: 3',
-      [{ document: 3, error: { error: message } }]
-    )
-  })
-
-  it('reports a successful bulk zone OCR run', () => {
+      .spyOn(documentListViewService, 'documents', 'get')
+      .mockReturnValue([{ id: 3 }, { id: 4 }])
     jest
       .spyOn(documentListViewService, 'selected', 'get')
       .mockReturnValue(new Set([3, 4]))
     jest
-      .spyOn(documentService, 'runZoneOcr')
-      .mockReturnValue(of({ status: 'completed', results: [] }))
-    const modalSpy = jest.spyOn(modalService, 'open')
-    jest
-      .spyOn(component as any, 'handleOperationSuccess')
-      .mockImplementation(() => {})
-    const infoSpy = jest.spyOn(toastService, 'showInfo')
-
+      .spyOn(permissionsService, 'currentUserHasObjectPermissions')
+      .mockReturnValue(true)
+    fixture.detectChanges()
     component.runZoneOcrSelected()
-    modalSpy.mock.results[0].value.componentInstance.confirm()
-
-    expect(infoSpy).toHaveBeenCalledWith(
-      'Zone OCR: 2 completed, 0 skipped, 0 failed.'
+    expect(modal).not.toBeUndefined()
+    modal.componentInstance.confirm()
+    let req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/run_zone_ocr/`
     )
+    req.flush(true)
+    expect(req.request.body).toEqual({
+      documents: [3, 4],
+    })
+    httpTestingController.match(
+      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
+    ) // list reload
+    httpTestingController.match(
+      `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
+    ) // listAllFilteredIds
   })
 
   it('should support rotate', () => {

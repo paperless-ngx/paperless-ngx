@@ -361,6 +361,12 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     })
   }
 
+  runZoneOcrDocuments(selection: DocumentSelectionQuery) {
+    return this.http.post(this.getResourceUrl(null, 'run_zone_ocr'), {
+      ...selection,
+    })
+  }
+
   runZoneOcr(id: number): Observable<OcrZoneRunResponse> {
     return this.http.post<OcrZoneRunResponse>(
       this.getResourceUrl(id, 'run-zone-ocr'),

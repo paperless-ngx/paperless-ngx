@@ -21,12 +21,9 @@ import {
 import { saveAs } from 'file-saver'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import {
-  catchError,
   first,
-  forkJoin,
   map,
   Observable,
-  of,
   Subject,
   switchMap,
   takeUntil,
@@ -970,54 +967,20 @@ export class BulkEditorComponent
   }
 
   runZoneOcrSelected() {
-    const ids = Array.from(this.list.selected)
-    if (!ids.length) return
     const modal = this.modalService.open(ConfirmDialogComponent, {
       backdrop: 'static',
     })
-    modal.componentInstance.title = $localize`Run Zone OCR`
-    modal.componentInstance.messageBold = $localize`Run zone OCR on ${this.getSelectionSize()} selected document(s)?`
-    modal.componentInstance.message = $localize`Each document's type template (if it has one) is applied, overwriting the mapped fields.`
+    modal.componentInstance.title = $localize`Run zone OCR confirm`
+    modal.componentInstance.messageBold = $localize`This operation will run zone OCR on ${this.getSelectionSize()} selected document(s).`
+    modal.componentInstance.message = $localize`Fields mapped by each document type's OCR template will be overwritten.`
+    modal.componentInstance.btnClass = 'btn-warning'
     modal.componentInstance.btnCaption = $localize`Proceed`
     modal.componentInstance.confirmClicked
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
-        modal.componentInstance.buttonsEnabled.set(false)
         this.executeDocumentAction(
           modal,
-          forkJoin(
-            ids.map((id) =>
-              this.documentService.runZoneOcr(id).pipe(
-                map(({ status }) => ({ id, status })),
-                catchError((error) =>
-                  of({ id, status: 'failed' as const, error })
-                )
-              )
-            )
-          ).pipe(
-            tap((results) => {
-              const completed = results.filter(
-                (r) => r.status === 'completed'
-              ).length
-              const skipped = results.filter(
-                (r) => r.status === 'skipped'
-              ).length
-              const failed = results.filter((r) => r.status === 'failed')
-              const summary = $localize`Zone OCR: ${completed} completed, ${skipped} skipped, ${failed.length} failed.`
-              if (failed.length) {
-                const failedIds = failed.map((r) => r.id).join(', ')
-                this.toastService.showError(
-                  `${summary} ${$localize`Failed documents: ${failedIds}`}`,
-                  failed.map((r) => ({
-                    document: r.id,
-                    error: r.error.error ?? r.error.message,
-                  }))
-                )
-              } else {
-                this.toastService.showInfo(summary)
-              }
-            })
-          )
+          this.documentService.runZoneOcrDocuments(this.getSelectionQuery())
         )
       })
   }
