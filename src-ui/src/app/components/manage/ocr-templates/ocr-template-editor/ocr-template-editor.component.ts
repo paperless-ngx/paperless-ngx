@@ -13,6 +13,7 @@ import {
 import { FormsModule } from '@angular/forms'
 import { ActivatedRoute, RouterModule } from '@angular/router'
 import {
+  NgbModal,
   NgbNavModule,
   NgbPopoverModule,
   NgbTypeaheadModule,
@@ -31,12 +32,14 @@ import {
   takeUntil,
   tap,
 } from 'rxjs'
+import { EditDialogMode } from 'src/app/components/common/edit-dialog/edit-dialog.component'
+import { CustomFieldEditDialogComponent } from 'src/app/components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
 import { NumberComponent } from 'src/app/components/common/input/number/number.component'
 import { SelectComponent } from 'src/app/components/common/input/select/select.component'
 import { SwitchComponent } from 'src/app/components/common/input/switch/switch.component'
 import { TextComponent } from 'src/app/components/common/input/text/text.component'
 import { PageHeaderComponent } from 'src/app/components/common/page-header/page-header.component'
-import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
+import { CustomField } from 'src/app/data/custom-field'
 import { Document } from 'src/app/data/document'
 import { DocumentType } from 'src/app/data/document-type'
 import {
@@ -47,6 +50,7 @@ import {
   isOcrBuiltinTarget,
   OCR_BUILTIN_TARGETS,
   OCR_LANGUAGE_OPTIONS,
+  OCR_SUPPORTED_FIELD_TYPES,
   OCR_ZONE_TARGET,
   OCR_ZONE_TRANSFORM,
   OcrBuiltinTarget,
@@ -155,6 +159,7 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
   private readonly correspondentService = inject(CorrespondentService)
   private readonly documentService = inject(DocumentService)
   private readonly toastService = inject(ToastService)
+  private readonly modalService = inject(NgbModal)
   private readonly changeDetector = inject(ChangeDetectorRef)
   private readonly destroy$ = new Subject<void>()
   private readonly cancelZoneTest$ = new Subject<void>()
@@ -192,10 +197,10 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
   }
 
   private _customFields: CustomField[] = []
-  /** Items for the zone field select: built-in targets, then custom fields. */
-  fieldItems: { id: ZoneFieldSelection; name: string }[] = [
+  /** Items for the zone field select: built-in targets, then custom fields OCR can write to. */
+  readonly fieldItems = signal<{ id: ZoneFieldSelection; name: string }[]>([
     ...OCR_BUILTIN_TARGETS,
-  ]
+  ])
 
   get customFields(): CustomField[] {
     return this._customFields
@@ -203,10 +208,12 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
 
   set customFields(fields: CustomField[]) {
     this._customFields = fields
-    this.fieldItems = [
+    this.fieldItems.set([
       ...OCR_BUILTIN_TARGETS,
-      ...fields.map((cf) => ({ id: cf.id, name: cf.name })),
-    ]
+      ...fields
+        .filter((cf) => OCR_SUPPORTED_FIELD_TYPES.includes(cf.data_type))
+        .map((cf) => ({ id: cf.id, name: cf.name })),
+    ])
   }
   documentTypes: DocumentType[] = []
   transformOptions = TRANSFORM_OPTIONS
@@ -265,21 +272,6 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
   get zoneTesting(): boolean {
     return this.isCurrentZoneTest() && this.zoneTest().result === null
   }
-
-  showQuickCreate = false
-  quickCreateName = ''
-  quickCreateType = CustomFieldDataType.String
-  quickCreateForZoneIndex: number | null = null
-  quickCreateTypes = [
-    { id: CustomFieldDataType.String, name: $localize`String` },
-    { id: CustomFieldDataType.Integer, name: $localize`Integer` },
-    { id: CustomFieldDataType.Float, name: $localize`Float` },
-    { id: CustomFieldDataType.Date, name: $localize`Date` },
-    { id: CustomFieldDataType.Monetary, name: $localize`Monetary` },
-    { id: CustomFieldDataType.Boolean, name: $localize`Boolean` },
-    { id: CustomFieldDataType.Url, name: $localize`URL` },
-    { id: CustomFieldDataType.LongText, name: $localize`Long Text` },
-  ]
 
   get selectedZone(): OcrTemplateZone | null {
     return this.selectedZoneIndex !== null
@@ -1092,50 +1084,30 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     return dt ? dt.name : `Type #${id}`
   }
 
-  openQuickCreate(zoneIndex: number | null, name?: string) {
-    if (zoneIndex === null) return
-    this.quickCreateForZoneIndex = zoneIndex
-    this.quickCreateName = name || this.template.zones[zoneIndex]?.name || ''
-    this.quickCreateType = CustomFieldDataType.String
-    this.showQuickCreate = true
-  }
-
-  cancelQuickCreate() {
-    this.showQuickCreate = false
-    this.quickCreateForZoneIndex = null
-  }
-
-  submitQuickCreate() {
-    if (!this.quickCreateName.trim()) return
-
-    this.templateService
-      .quickCreateField(this.quickCreateName.trim(), this.quickCreateType)
+  createField(name?: string) {
+    const zone = this.selectedZone
+    const modal = this.modalService.open(CustomFieldEditDialogComponent)
+    modal.componentInstance.dialogMode.set(EditDialogMode.CREATE)
+    modal.componentInstance.object = { name: name || zone?.name }
+    modal.componentInstance.succeeded
       .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (result) => {
-          this.customFieldsService.clearCache()
-          this.customFieldsService
-            .listAll()
-            .pipe(takeUntil(this.destroy$))
-            .subscribe((r) => {
-              this.customFields = r.results
-              if (this.quickCreateForZoneIndex !== null) {
-                this.template.zones[this.quickCreateForZoneIndex].custom_field =
-                  result.id
-                this.template.zones[this.quickCreateForZoneIndex].target =
-                  OCR_ZONE_TARGET.CustomField
-              }
-              this.showQuickCreate = false
-              this.quickCreateForZoneIndex = null
-              this.changeDetector.markForCheck()
-            })
-        },
-        error: (err) => {
-          this.toastService.showError(
-            $localize`Failed to create custom field.`,
-            err
-          )
-        },
+      .subscribe((field: CustomField) => {
+        this.toastService.showSuccess($localize`Saved field "${field.name}".`)
+        this.customFieldsService.clearCache()
+        this.customFieldsService
+          .listAll()
+          .pipe(takeUntil(this.destroy$))
+          .subscribe((r) => {
+            if (zone && OCR_SUPPORTED_FIELD_TYPES.includes(field.data_type)) {
+              this.setZoneField(zone, field.id)
+            }
+            this.customFields = r.results
+          })
+      })
+    modal.componentInstance.failed
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((e) => {
+        this.toastService.showError($localize`Error saving field.`, e)
       })
   }
 

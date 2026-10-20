@@ -77,45 +77,15 @@
               <pngx-input-text [(ngModel)]="zone.name" title="Name" i18n-title></pngx-input-text>
 
               <pngx-input-select
-                [items]="fieldItems"
+                [items]="fieldItems()"
                 [ngModel]="zoneFieldValue(zone)"
                 (ngModelChange)="setZoneField(zone, $event)"
-                (createNew)="openQuickCreate(selectedZoneIndex, $event)"
+                (createNew)="createField($event)"
                 title="Field"
                 i18n-title
                 hint="Where the extracted value is written."
                 i18n-hint
               ></pngx-input-select>
-
-              @if (showQuickCreate) {
-                <div class="card mb-3 border-primary">
-                  <div class="card-body">
-                    <h6 class="card-title" i18n>Create Custom Field</h6>
-                    <div class="mb-2">
-                      <label class="form-label small" i18n>Field Name</label>
-                      <input type="text" class="form-control form-control-sm"
-                        [(ngModel)]="quickCreateName" placeholder="e.g. Invoice Number" />
-                    </div>
-                    <div class="mb-2">
-                      <label class="form-label small" i18n>Field Type</label>
-                      <select class="form-select form-select-sm" [(ngModel)]="quickCreateType">
-                        @for (t of quickCreateTypes; track t.id) {
-                          <option [ngValue]="t.id">{{ t.name }}</option>
-                        }
-                      </select>
-                    </div>
-                    <div class="d-flex gap-2">
-                      <button class="btn btn-primary btn-sm" (click)="submitQuickCreate()"
-                        [disabled]="!quickCreateName.trim()" i18n>
-                        Create & Assign
-                      </button>
-                      <button class="btn btn-outline-secondary btn-sm" (click)="cancelQuickCreate()" i18n>
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              }
 
               @if (isFieldShared(zone)) {
                 <div class="card mb-3 border-info">

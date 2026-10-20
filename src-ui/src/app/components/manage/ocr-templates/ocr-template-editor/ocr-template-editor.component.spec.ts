@@ -1,7 +1,9 @@
 import { ElementRef } from '@angular/core'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { ActivatedRoute } from '@angular/router'
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { of, Subject, throwError } from 'rxjs'
+import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import { Document } from 'src/app/data/document'
 import { OcrTemplateZone, OcrZoneTestResult } from 'src/app/data/ocr-template'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
@@ -39,6 +41,7 @@ describe('OcrTemplateEditorComponent', () => {
     testZone: jest.fn(),
     getPageImageUrl: (id: number, page: number) => `/preview/${id}/${page}`,
   }
+  const modal = { open: jest.fn() }
 
   beforeEach(async () => {
     documents.list.mockReset().mockReturnValue(of({ results: [] }))
@@ -56,10 +59,17 @@ describe('OcrTemplateEditorComponent', () => {
         ...[CustomFieldsService, DocumentTypeService, CorrespondentService].map(
           (provide) => ({
             provide,
-            useValue: { listAll: () => of({ results: [] }) },
+            useValue: {
+              listAll: () => of({ results: [] }),
+              clearCache: jest.fn(),
+            },
           })
         ),
-        { provide: ToastService, useValue: {} },
+        { provide: NgbModal, useValue: modal },
+        {
+          provide: ToastService,
+          useValue: { showSuccess: jest.fn(), showError: jest.fn() },
+        },
       ],
     })
       .overrideComponent(OcrTemplateEditorComponent, {
@@ -214,6 +224,48 @@ describe('OcrTemplateEditorComponent', () => {
     component.deleteSelectedZone()
     expect(component.template.zones.length).toBe(1)
     expect(component.selectedZone).toBeNull()
+  })
+
+  it('creates a custom field in the dialog and assigns it to the zone', () => {
+    const succeeded = new Subject<CustomField>()
+    const dialog = {
+      dialogMode: { set: jest.fn() },
+      object: null,
+      succeeded,
+      failed: new Subject(),
+    }
+    modal.open.mockReturnValue({ componentInstance: dialog })
+    const created = {
+      id: 5,
+      name: 'Total',
+      data_type: CustomFieldDataType.Monetary,
+    }
+    TestBed.inject(CustomFieldsService).listAll = () =>
+      of({
+        count: 2,
+        all: [5, 6],
+        results: [
+          created,
+          { id: 6, name: 'Status', data_type: CustomFieldDataType.Select },
+        ],
+      })
+    component.template.zones = [zone()]
+    component.selectZone(0)
+
+    component.createField()
+    expect(dialog.object).toEqual({ name: 'Invoice number' })
+    succeeded.next(created)
+
+    expect(component.template.zones[0]).toMatchObject({
+      target: 'custom_field',
+      custom_field: 5,
+    })
+    expect(component.fieldItems().map((item) => item.id)).toEqual([
+      'title',
+      'asn',
+      'created',
+      5,
+    ])
   })
 
   it('hides results when extraction settings or geometry change', () => {

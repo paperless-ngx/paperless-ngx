@@ -1,3 +1,4 @@
+import { CustomFieldDataType } from './custom-field'
 import { ObjectWithId } from './object-with-id'
 
 export type OcrZoneTarget = 'custom_field' | 'title' | 'asn' | 'created'
@@ -41,6 +42,18 @@ export function isOcrBuiltinTarget(value: unknown): value is OcrBuiltinTarget {
     value === OCR_ZONE_TARGET.Created
   )
 }
+
+/** Custom field types zone OCR can write to. See models.py OCR_SUPPORTED_FIELD_TYPES. */
+export const OCR_SUPPORTED_FIELD_TYPES: CustomFieldDataType[] = [
+  CustomFieldDataType.String,
+  CustomFieldDataType.Url,
+  CustomFieldDataType.Date,
+  CustomFieldDataType.Integer,
+  CustomFieldDataType.Float,
+  CustomFieldDataType.Monetary,
+  CustomFieldDataType.LongText,
+  CustomFieldDataType.Boolean,
+]
 
 export const OCR_BUILTIN_TARGETS = [
   { id: OCR_ZONE_TARGET.Title, name: $localize`Title` },

@@ -2381,7 +2381,7 @@ class OcrTemplateZone(models.Model):
 
 # Custom field data types that zone OCR can extract into. DOCUMENTLINK and
 # SELECT are excluded (they reference other objects, not free text). Single
-# source of truth for the serializer, the quick-create endpoint and the engine.
+# source of truth for the serializer and the engine.
 OCR_SUPPORTED_FIELD_TYPES = frozenset(
     {
         CustomField.FieldDataType.STRING,

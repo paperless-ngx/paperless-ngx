@@ -151,7 +151,6 @@ from documents.matching import match_correspondents
 from documents.matching import match_document_types
 from documents.matching import match_storage_paths
 from documents.matching import match_tags
-from documents.models import OCR_SUPPORTED_FIELD_TYPES
 from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
@@ -5952,59 +5951,4 @@ class OcrTemplateViewSet(ModelViewSet):
                 "regex": zone.validation_regex,
                 "regex_match": regex_match,
             },
-        )
-
-    @action(detail=False, methods=["post"], url_path="quick-create-field")
-    def quick_create_field(self, request):
-        """Create a custom field inline from the template editor.
-
-        Accepts: {"name": "Invoice Number", "data_type": "string"}
-        Returns the created field so the frontend can immediately use it.
-        """
-        name = request.data.get("name", "").strip()
-        data_type = request.data.get("data_type", "").strip()
-
-        if not name:
-            return Response(
-                {"error": "Field name is required"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        if data_type not in OCR_SUPPORTED_FIELD_TYPES:
-            return Response(
-                {
-                    "error": f"Unsupported data type '{data_type}'. "
-                    f"Supported: {', '.join(sorted(OCR_SUPPORTED_FIELD_TYPES))}",
-                },
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        # Check if field already exists
-        existing = CustomField.objects.filter(name=name).first()
-        if existing:
-            return Response(
-                {
-                    "id": existing.pk,
-                    "name": existing.name,
-                    "data_type": existing.data_type,
-                    "created": False,
-                },
-            )
-
-        # Check user has permission to create custom fields
-        if not request.user.has_perm("documents.add_customfield"):
-            return Response(
-                {"error": "You don't have permission to create custom fields"},
-                status=status.HTTP_403_FORBIDDEN,
-            )
-
-        field = CustomField.objects.create(name=name, data_type=data_type)
-        return Response(
-            {
-                "id": field.pk,
-                "name": field.name,
-                "data_type": field.data_type,
-                "created": True,
-            },
-            status=status.HTTP_201_CREATED,
         )
