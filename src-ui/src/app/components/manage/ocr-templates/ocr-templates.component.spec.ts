@@ -284,4 +284,17 @@ describe('OcrTemplatesComponent', () => {
     expect(toastSuccessSpy).toHaveBeenCalled()
     expect(reloadSpy).toHaveBeenCalled()
   })
+
+  it.each([true, false])(
+    'reports the enabled state %s after the update succeeds',
+    (enabled) => {
+      const template = { ...templates[0], enabled }
+      jest.spyOn(ocrTemplateService, 'patch').mockReturnValue(of(template))
+      const toast = jest.spyOn(toastService, 'showSuccess')
+      component.toggleTemplateEnabled(template)
+      expect(toast).toHaveBeenCalledWith(
+        `${enabled ? 'Enabled' : 'Disabled'} OCR template "${template.name}"`
+      )
+    }
+  )
 })

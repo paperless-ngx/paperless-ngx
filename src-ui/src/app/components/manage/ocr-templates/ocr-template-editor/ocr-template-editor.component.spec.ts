@@ -30,6 +30,7 @@ import { DocumentService } from 'src/app/services/rest/document.service'
 import { OcrTemplateService } from 'src/app/services/rest/ocr-template.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { ToastService } from 'src/app/services/toast.service'
 import { OcrTemplateEditorComponent } from './ocr-template-editor.component'
 
 const customFields: CustomField[] = [
@@ -128,6 +129,354 @@ describe('OcrTemplateEditorComponent', () => {
     component.overlayRef = new ElementRef(overlay)
     component.pageLoaded.set(true)
   }
+
+  function fieldDialog() {
+    const dialog = {
+      dialogMode: { set: jest.fn() },
+      object: null,
+      succeeded: new Subject<CustomField>(),
+      failed: new Subject(),
+    }
+    jest
+      .spyOn(modalService, 'open')
+      .mockReturnValue({ componentInstance: dialog } as any)
+    return dialog
+  }
+
+  it('updates screen-sized overlay units when the preview image resizes', () => {
+    let resize: ResizeObserverCallback
+    const observer = {
+      observe: jest.fn(),
+      unobserve: jest.fn(),
+      disconnect: jest.fn(),
+    }
+    const resizeObserver = jest
+      .spyOn(globalThis, 'ResizeObserver')
+      .mockImplementation((callback) => {
+        resize = callback
+        return observer
+      })
+    const image = document.createElement('img')
+    const ref = new ElementRef(image)
+    component.pageImage = ref
+    expect(observer.observe).toHaveBeenCalledWith(image)
+    resize([], observer)
+    expect(component.overlayUnitSize(8)).toBe(8)
+
+    Object.defineProperties(image, {
+      naturalWidth: { value: 1000 },
+      clientWidth: { value: 500 },
+    })
+    resize([], observer)
+    expect(component.overlayUnitSize(8)).toBe(16)
+    expect(component.overlayFontSize()).toBe(24)
+
+    component.pageImage = undefined
+    expect(observer.disconnect).toHaveBeenCalledTimes(1)
+    fixture.destroy()
+    expect(observer.disconnect).toHaveBeenCalledTimes(2)
+    resizeObserver.mockRestore()
+  })
+
+  it('renders loaded image dimensions, zone labels, and selection handles', () => {
+    component.object = {
+      ...component.template,
+      id: 3,
+      sample_document: 5,
+      zones: [zone()],
+    }
+    component.selectedZoneIndex = 0
+    fixture.detectChanges()
+    const image = fixture.nativeElement.querySelector('img')
+    Object.defineProperties(image, {
+      naturalWidth: { value: 1000 },
+      naturalHeight: { value: 1500 },
+    })
+    image.dispatchEvent(new Event('load'))
+    fixture.detectChanges()
+
+    expect(component.template).toMatchObject({
+      source_width: 1000,
+      source_height: 1500,
+    })
+    expect(
+      fixture.nativeElement
+        .querySelector('.zone-overlay')
+        .getAttribute('viewBox')
+    ).toBe('0 0 1000 1500')
+    expect(
+      fixture.nativeElement.querySelector('.zone-label').textContent
+    ).toContain('Invoice number')
+    expect(
+      fixture.nativeElement.querySelectorAll('.zone-resize-handle')
+    ).toHaveLength(8)
+    expect(component.zoneLabel(zone({ name: '' }), 2)).toBe('Zone 3')
+    expect(component.zoneLabelY({ x: 0, y: 0, w: 100, h: 100 })).toBe(14)
+  })
+
+  it('offers the supported language and transform choices', () => {
+    expect(component.languageOptions.map((option) => option.id)).toContain(
+      'eng'
+    )
+    expect(component.transformOptions.map((option) => option.id)).toEqual(
+      Object.values(OcrZoneTransform)
+    )
+  })
+
+  it('clamps page navigation and supports one-based page input', () => {
+    component.setSampleDocument([5])
+    component.previewPageDisplay = 2
+    expect(component.previewPage).toBe(1)
+    expect(component.previewPageDisplay).toBe(2)
+    expect(component.pageImageUrl).toContain('/5/1/')
+    component.pageLoaded.set(true)
+    component.goToPage(1)
+    expect(component.pageLoaded()).toBe(true)
+    component.goToPage(Infinity)
+    component.goToPage(NaN)
+    expect(component.previewPage).toBe(1)
+    component.goToPage(99)
+    expect(component.previewPage).toBe(2)
+    expect(component.pageLoaded()).toBe(false)
+    component.goToPage(-5)
+    expect(component.previewPage).toBe(0)
+    component.previewPageCount.set(null)
+    component.goToPage(4.7)
+    expect(component.previewPage).toBe(4)
+  })
+
+  it('limits zoom and resets it to the original size', () => {
+    for (let i = 0; i < 20; i++) component.zoomIn()
+    expect(component.zoom).toBe(4)
+    for (let i = 0; i < 20; i++) component.zoomOut()
+    expect(component.zoom).toBe(0.5)
+    component.resetZoom()
+    expect(component.zoom).toBe(1)
+  })
+
+  it('moves last-page zones to the last page and can pin them to a page', () => {
+    component.setSampleDocument([5])
+    const selected = zone()
+    component.template.zones = [selected]
+    expect(component.isLastPageZone(selected)).toBe(false)
+    component.setLastPageZone(selected, true)
+    expect(selected.page).toBe(-1)
+    expect(component.isLastPageZone(selected)).toBe(true)
+    component.selectZone(0)
+    expect(component.previewPage).toBe(2)
+    component.setLastPageZone(selected, false)
+    expect(selected.page).toBe(3)
+  })
+
+  it('ignores page-count errors from a previous sample document', () => {
+    const pending = new Subject<Document>()
+    jest
+      .spyOn(documentService, 'get')
+      .mockReturnValueOnce(pending)
+      .mockReturnValueOnce(of({ id: 6 }))
+    component.setSampleDocument([5])
+    component.setSampleDocument([6])
+    pending.error(new Error('Old document failed'))
+    expect(component.pageFailed()).toBe(false)
+    expect(component.previewPageCount()).toBeNull()
+  })
+
+  it('ignores non-primary, unloaded, and saving pointer gestures', () => {
+    prepareOverlay()
+    component.onOverlayPointerDown(
+      new MouseEvent('pointerdown', { button: 2 }) as PointerEvent
+    )
+    expect(component.drawingRect()).toBeNull()
+    component.pageLoaded.set(false)
+    component.onOverlayPointerDown(pointer(100, 100))
+    expect(component.drawingRect()).toBeNull()
+    component.pageLoaded.set(true)
+    component.saving.set(true)
+    component.onOverlayPointerDown(pointer(100, 100))
+    expect(component.drawingRect()).toBeNull()
+  })
+
+  it('ignores pointer events when the SVG coordinate transform is unavailable', () => {
+    component.onOverlayPointerDown(pointer(100, 100))
+    expect(component.drawingRect()).toBeNull()
+    prepareOverlay()
+    jest
+      .spyOn(component.overlayRef.nativeElement, 'getScreenCTM')
+      .mockReturnValue(null)
+    component.onOverlayPointerDown(pointer(100, 100))
+    component.onOverlayPointerMove(pointer(200, 200))
+    expect(component.drawingRect()).toBeNull()
+  })
+
+  it('updates a drawing only for its captured pointer', () => {
+    prepareOverlay()
+    component.onOverlayPointerDown(pointer(100, 100))
+    component.onOverlayPointerDown(pointer(500, 500, 2))
+    component.onOverlayPointerMove(pointer(900, 900, 2))
+    expect(component.drawingRect()).toEqual({ x: 100, y: 100, w: 0, h: 0 })
+    component.onOverlayPointerMove(pointer(250, 200))
+    expect(component.drawingRect()).toEqual({ x: 100, y: 100, w: 150, h: 100 })
+    component.onOverlayPointerUp(pointer(250, 200))
+    expect(component.template.zones[0]).toMatchObject({
+      x: 100,
+      y: 100,
+      width: 150,
+      height: 100,
+    })
+  })
+
+  it('resizes a selected zone using its corner handle', () => {
+    prepareOverlay()
+    const selected = zone()
+    component.template.zones = [selected]
+    component.selectZone(0)
+    component.onOverlayPointerDown(pointer(100, 100))
+    component.onOverlayPointerMove(pointer(50, 75))
+    component.onOverlayPointerUp(pointer(60, 80))
+    expect(selected).toMatchObject({ x: 60, y: 80, width: 240, height: 120 })
+    expect(component.template.zones).toHaveLength(1)
+  })
+
+  it('shows the appropriate cursor over handles, zones, and empty space', () => {
+    prepareOverlay()
+    component.template.zones = [zone()]
+    component.onOverlayPointerMove(pointer(150, 150))
+    expect(component.overlayCursor).toBe('move')
+    component.selectZone(0)
+    component.onOverlayPointerMove(pointer(100, 100))
+    expect(component.overlayCursor).toBe('nw-resize')
+    component.onOverlayPointerMove(pointer(500, 500))
+    expect(component.overlayCursor).toBe('crosshair')
+    component.template.zones[0].page = 2
+    component.onOverlayPointerMove(pointer(100, 100))
+    expect(component.zoneDisplayRect(0)).toBeNull()
+    expect(component.overlayCursor).toBe('crosshair')
+  })
+
+  it('cancels only the captured pointer and tolerates an already-lost capture', () => {
+    prepareOverlay()
+    component.onOverlayPointerCancel(pointer(100, 100))
+    component.onOverlayPointerDown(pointer(100, 100))
+    component.onOverlayPointerCancel(pointer(150, 150, 2))
+    expect(component.drawingRect()).not.toBeNull()
+    jest
+      .spyOn(component.overlayRef.nativeElement, 'hasPointerCapture')
+      .mockReturnValue(false)
+    component.onOverlayPointerCancel(pointer(150, 150))
+    expect(component.drawingRect()).toBeNull()
+    expect(
+      component.overlayRef.nativeElement.releasePointerCapture
+    ).not.toHaveBeenCalled()
+    expect(component.template.zones).toEqual([])
+  })
+
+  it('preserves the selected zone when an earlier or later zone is removed', () => {
+    component.template.zones = [zone(), zone(), zone(), zone()]
+    component.selectZone(1)
+    const selected = component.selectedZone
+    component.removeZone(3)
+    expect(component.selectedZone).toBe(selected)
+    component.removeZone(0)
+    expect(component.selectedZoneIndex).toBe(0)
+    expect(component.selectedZone).toBe(selected)
+    component.selectZone(99)
+    expect(component.selectedZone).toBeNull()
+  })
+
+  it('does not test zones without a selection or a sample document', () => {
+    const test = jest.spyOn(templateService, 'testZone')
+    component.testZone()
+    component.template.zones = [zone()]
+    component.selectZone(0)
+    component.testZone()
+    expect(test).not.toHaveBeenCalled()
+  })
+
+  it.each([
+    {
+      response: { error: { error: 'OCR unavailable' } },
+      message: 'OCR unavailable',
+    },
+    { response: new Error('Network failure'), message: 'Test failed' },
+  ])('shows zone-test errors: $message', ({ response, message }) => {
+    component.template.zones = [zone({ page: undefined })]
+    component.selectZone(0)
+    component.setSampleDocument([5])
+    jest
+      .spyOn(templateService, 'testZone')
+      .mockReturnValue(throwError(() => response))
+    component.testZone()
+    expect(component.zoneTestResult).toEqual({ error: message })
+    expect(component.zoneTesting).toBe(false)
+    expect(templateService.testZone).toHaveBeenCalledWith(
+      5,
+      expect.objectContaining({ page: 1 })
+    )
+  })
+
+  it('switches between built-in targets, custom fields, and an unassigned field', () => {
+    const selected = zone()
+    expect(component.zoneFieldValue(selected)).toBe(1)
+    component.setZoneField(selected, OcrZoneTarget.Title)
+    expect(component.zoneFieldValue(selected)).toBe(OcrZoneTarget.Title)
+    expect(selected.custom_field).toBeNull()
+    component.setZoneField(selected, 7)
+    expect(selected).toMatchObject({
+      target: OcrZoneTarget.CustomField,
+      custom_field: 7,
+    })
+    component.setZoneField(selected, null)
+    expect(component.zoneFieldValue(selected)).toBeNull()
+    expect(component.zonesForField(selected)).toEqual([])
+    component.setCombineFormat(selected, 'Ignored')
+    expect(component.template.combine_formats).toEqual({})
+  })
+
+  it('creates combine formats when absent and leaves implicit formats alone on rename', () => {
+    const selected = zone({ target: OcrZoneTarget.Title, custom_field: null })
+    component.template.combine_formats = undefined
+    component.renameZone(selected, 'Renamed')
+    expect(selected.name).toBe('Renamed')
+    expect(component.getCombineFormat(selected)).toBe('')
+    component.setCombineFormat(selected, '{Renamed} ')
+    component.insertCombineToken(selected, selected)
+    expect(component.template.combine_formats).toEqual({
+      title: '{Renamed} {Renamed}',
+    })
+  })
+
+  it('saves templates without combine formats', () => {
+    component.template.combine_formats = undefined
+    fixture.detectChanges()
+    expect(component.isDirty).toBe(false)
+    jest
+      .spyOn(templateService, 'create')
+      .mockReturnValue(of(component.template))
+    component.save()
+    expect(component.template.combine_formats).toBeUndefined()
+  })
+
+  it('does not assign unsupported custom field types and surfaces creation failures', () => {
+    component.template.zones = [zone({ custom_field: null })]
+    component.selectZone(0)
+    const dialog = fieldDialog()
+    const error = jest.spyOn(TestBed.inject(ToastService), 'showError')
+    component.createField('Status')
+    expect(dialog.object).toEqual({ name: 'Status' })
+    dialog.succeeded.next(customFields[1])
+    expect(component.selectedZone.custom_field).toBeNull()
+    const failure = new Error('Could not save')
+    dialog.failed.next(failure)
+    expect(error).toHaveBeenCalledWith('Error saving field.', failure)
+  })
+
+  it('refreshes field choices when a field is created without a selected zone', () => {
+    const dialog = fieldDialog()
+    component.createField('Total')
+    dialog.succeeded.next(customFields[0])
+    expect(component.customFields()).toEqual(customFields)
+    expect(component.selectedZone).toBeNull()
+  })
 
   it('should edit a copy of the template and load its sample document', () => {
     const original: OcrTemplate = {

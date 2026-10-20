@@ -109,4 +109,10 @@ describe('OcrTemplateEditorZoneListComponent', () => {
     expect(selectSpy).toHaveBeenCalledWith(0)
     expect(removeSpy).toHaveBeenCalledWith(0)
   })
+
+  it('does not label an unknown built-in target', () => {
+    expect(
+      component.getZoneTargetName(zone({ target: 'unknown' as OcrZoneTarget }))
+    ).toBe('')
+  })
 })

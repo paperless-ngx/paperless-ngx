@@ -95,6 +95,36 @@ describe('OCR template editor geometry', () => {
     expect(findHandleAt({ x: 19, y: 20 }, rect, 10)).toBe('nw')
   })
 
+  it('returns no zone when the point is outside every rectangle', () => {
+    expect(
+      findZoneAt({ x: 900, y: 900 }, [zone()], 0, 1, {
+        width: 1000,
+        height: 1000,
+      })
+    ).toBeNull()
+  })
+
+  it('resizes north-west edges while keeping the opposite corner fixed', () => {
+    const z = zone({ x: 100, y: 200, width: 300, height: 400 })
+    resizeZone(z, 'nw', { x: 50, y: 100 }, { width: 1000, height: 1000 })
+    expect(z).toMatchObject({ x: 50, y: 100, width: 350, height: 500 })
+    resizeZone(z, 'nw', { x: 900, y: 900 }, { width: 1000, height: 1000 })
+    expect(z).toMatchObject({ x: 390, y: 590, width: 10, height: 10 })
+  })
+
+  it('clamps resized north-west edges to the source image bounds', () => {
+    const z = zone({
+      x: 50,
+      y: 50,
+      width: 100,
+      height: 100,
+      zone_source_width: 200,
+      zone_source_height: 300,
+    })
+    resizeZone(z, 'nw', { x: -50, y: -50 }, { width: 400, height: 600 })
+    expect(z).toMatchObject({ x: 0, y: 0, width: 150, height: 150 })
+  })
+
   it('uses the rendered handle positions for hit testing', () => {
     const rect = { x: 10, y: 20, w: 100, h: 200 }
     const handles = getResizeHandles(rect)
