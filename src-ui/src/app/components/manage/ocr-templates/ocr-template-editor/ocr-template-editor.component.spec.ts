@@ -306,6 +306,53 @@ describe('OcrTemplateEditorComponent', () => {
     })
   })
 
+  it("updates only exact tokens in the renamed zone's field format", () => {
+    const first = { ...zone(), name: 'First [value]' }
+    component.template.zones = [first, { ...zone(), name: 'Second' }]
+    component.template.combine_formats = {
+      '1': 'First [value]: {First [value]} / { First [value] } / {Second} / {First [value] extra}',
+      '2': '{First [value]}',
+    }
+
+    component.renameZone(first, 'Invoice number')
+
+    expect(first.name).toBe('Invoice number')
+    expect(component.template.combine_formats).toEqual({
+      '1': 'First [value]: {Invoice number} / {Invoice number} / {Second} / {First [value] extra}',
+      '2': '{First [value]}',
+    })
+  })
+
+  it('keeps tokens in sync when a name is cleared and entered again', () => {
+    const first = { ...zone(), name: 'First' }
+    component.template.combine_formats = { '1': '{First} - {Second}' }
+
+    component.renameZone(first, '')
+    component.renameZone(first, 'Renamed')
+
+    expect(component.getCombineFormat(first)).toBe('{Renamed} - {Second}')
+  })
+
+  it('updates built-in field formats and leaves automatic combining implicit', () => {
+    const titleZone = {
+      ...zone(),
+      name: 'First',
+      target: 'title' as const,
+      custom_field: null,
+    }
+    component.template.combine_formats = { title: '{First} / {Second}' }
+
+    component.renameZone(titleZone, 'Renamed')
+    expect(component.template.combine_formats.title).toBe(
+      '{Renamed} / {Second}'
+    )
+
+    const customZone = zone()
+    component.renameZone(customZone, 'New name')
+    expect(component.template.combine_formats['1']).toBeUndefined()
+    expect(customZone.name).toBe('New name')
+  })
+
   it('tracks unsaved changes against the last loaded or saved state', () => {
     fixture.detectChanges()
     expect(component.isDirty$()).toBe(false)

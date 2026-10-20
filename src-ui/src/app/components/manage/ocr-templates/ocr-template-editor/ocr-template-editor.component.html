@@ -74,7 +74,7 @@
                 }
               }
 
-              <pngx-input-text [(ngModel)]="zone.name" title="Name" i18n-title></pngx-input-text>
+              <pngx-input-text [ngModel]="zone.name" (ngModelChange)="renameZone(zone, $event)" title="Name" i18n-title></pngx-input-text>
 
               <pngx-input-select
                 [items]="fieldItems()"

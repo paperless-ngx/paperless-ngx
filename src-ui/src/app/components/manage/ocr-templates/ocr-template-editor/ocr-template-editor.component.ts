@@ -34,8 +34,8 @@ import {
   takeUntil,
   tap,
 } from 'rxjs'
-import { EditDialogMode } from 'src/app/components/common/edit-dialog/edit-dialog.component'
 import { CustomFieldEditDialogComponent } from 'src/app/components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
+import { EditDialogMode } from 'src/app/components/common/edit-dialog/edit-dialog.component'
 import { NumberComponent } from 'src/app/components/common/input/number/number.component'
 import { SelectComponent } from 'src/app/components/common/input/select/select.component'
 import { SwitchComponent } from 'src/app/components/common/input/switch/switch.component'
@@ -978,6 +978,20 @@ export class OcrTemplateEditorComponent
 
   isFieldShared(zone: OcrTemplateZone): boolean {
     return this.zonesForField(zone).length > 1
+  }
+
+  renameZone(zone: OcrTemplateZone, name: string) {
+    const oldName = zone.name.trim()
+    const format = this.getCombineFormat(zone)
+    if (format) {
+      this.setCombineFormat(
+        zone,
+        format.replace(/\{([^{}]*)\}/g, (token, tokenName: string) =>
+          tokenName.trim() === oldName ? `{${name}}` : token
+        )
+      )
+    }
+    zone.name = name
   }
 
   getCombineFormat(zone: OcrTemplateZone): string {
