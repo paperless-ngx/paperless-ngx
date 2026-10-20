@@ -109,6 +109,98 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(OcrTemplate.objects.count(), 1)
         self.assertEqual(OcrTemplateZone.objects.count(), 1)
 
+    def test_create_template_sets_owner(self):
+        """
+        GIVEN:
+            - A user creating an OCR template
+        WHEN:
+            - API request to create it without an owner
+        THEN:
+            - The requesting user owns the template
+        """
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(self._make_template_data()),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(OcrTemplate.objects.get().owner, self.user)
+
+    def test_list_only_shows_permitted_templates(self):
+        """
+        GIVEN:
+            - Templates that are unowned, owned by the user, owned by another
+              user, and owned by another user but shared with the user
+        WHEN:
+            - The user lists OCR templates
+        THEN:
+            - Only the unowned, owned and shared templates are returned
+        """
+        other = User.objects.create_user(username="other")
+        user = User.objects.create_user(username="template_viewer")
+        user.user_permissions.add(Permission.objects.get(codename="view_ocrtemplate"))
+
+        def template(name, owner=None):
+            return OcrTemplate.objects.create(
+                name=name,
+                document_type=self.doc_type,
+                source_width=1000,
+                source_height=1000,
+                owner=owner,
+            )
+
+        template("Unowned")
+        template("Mine", owner=user)
+        template("Private", owner=other)
+        grant_object(user, template("Shared", owner=other), "view_ocrtemplate")
+        self.client.force_authenticate(user=user)
+
+        response = self.client.get(self.ENDPOINT)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertCountEqual(
+            [t["name"] for t in response.json()["results"]],
+            ["Unowned", "Mine", "Shared"],
+        )
+
+    def test_cannot_change_another_users_template(self):
+        """
+        GIVEN:
+            - A template owned by another user
+        WHEN:
+            - A user with global change permission tries to update it
+        THEN:
+            - The update is refused until the user is granted change on it
+        """
+        other = User.objects.create_user(username="other")
+        user = User.objects.create_user(username="template_editor")
+        user.user_permissions.add(
+            *Permission.objects.filter(
+                codename__in=["view_ocrtemplate", "change_ocrtemplate"],
+            ),
+        )
+        template = OcrTemplate.objects.create(
+            name="Private",
+            document_type=self.doc_type,
+            source_width=1000,
+            source_height=1000,
+            owner=other,
+        )
+        grant_object(user, template, "view_ocrtemplate")
+        self.client.force_authenticate(user=user)
+        url = f"{self.ENDPOINT}{template.pk}/"
+
+        response = self.client.patch(url, {"name": "Renamed"}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        grant_object(user, template, "change_ocrtemplate")
+        response = self.client.patch(url, {"name": "Renamed"}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        template.refresh_from_db()
+        self.assertEqual(template.name, "Renamed")
+        self.assertEqual(template.owner, other)
+
     def test_create_template_multiple_zones(self):
         """
         GIVEN:

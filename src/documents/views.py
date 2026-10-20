@@ -5835,11 +5835,13 @@ def serve_logo(request: HttpRequest, filename: str | None = None) -> FileRespons
     )
 
 
-class OcrTemplateViewSet(ModelViewSet):
+class OcrTemplateViewSet(BulkPermissionMixin, PassUserMixin, ModelViewSet[OcrTemplate]):
     """CRUD for OCR templates with zone definitions."""
 
+    model = OcrTemplate
+
     queryset = (
-        OcrTemplate.objects.all()
+        OcrTemplate.objects.select_related("owner")
         .prefetch_related(
             "zones",
             "zones__custom_field",
@@ -5847,8 +5849,13 @@ class OcrTemplateViewSet(ModelViewSet):
         .order_by("name")
     )
     serializer_class = OcrTemplateSerializer
-    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
     pagination_class = StandardPagination
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    filter_backends = (
+        OrderingFilter,
+        PermittedObjectsFilter,
+    )
+    ordering_fields = ("name",)
 
     @action(
         detail=False,

@@ -2151,7 +2151,7 @@ class WorkflowRun(SoftDeleteModel):
         return f"WorkflowRun of {self.workflow} at {self.run_at} on {self.document}"
 
 
-class OcrTemplate(models.Model):
+class OcrTemplate(ModelWithOwner):
     """
     Defines a set of OCR extraction zones for a specific document type.
 

@@ -3781,7 +3781,7 @@ class OcrTemplateZoneSerializer(serializers.ModelSerializer):
         return value
 
 
-class OcrTemplateSerializer(serializers.ModelSerializer):
+class OcrTemplateSerializer(OwnedObjectSerializer):
     zones = OcrTemplateZoneSerializer(many=True, required=False)
 
     class Meta:
@@ -3798,6 +3798,10 @@ class OcrTemplateSerializer(serializers.ModelSerializer):
             "created",
             "updated",
             "zones",
+            "owner",
+            "permissions",
+            "user_can_change",
+            "set_permissions",
         ]
         read_only_fields = ["created", "updated"]
 
@@ -3842,17 +3846,14 @@ class OcrTemplateSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         zones_data = validated_data.pop("zones", [])
-        template = OcrTemplate.objects.create(**validated_data)
+        template = super().create(validated_data)
         for zone_data in zones_data:
             OcrTemplateZone.objects.create(template=template, **zone_data)
         return template
 
     def update(self, instance, validated_data):
         zones_data = validated_data.pop("zones", None)
-
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-        instance.save()
+        instance = super().update(instance, validated_data)
 
         if zones_data is not None:
             # Replace all zones with the new set
