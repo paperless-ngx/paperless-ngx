@@ -979,8 +979,6 @@ GNUPG_HOME = os.getenv("HOME", "/tmp")
 # Convert is part of the ImageMagick package
 CONVERT_BINARY = os.getenv("PAPERLESS_CONVERT_BINARY", "convert")
 
-GS_BINARY = os.getenv("PAPERLESS_GS_BINARY", "gs")
-
 # Fallback layout for .eml consumption
 EMAIL_PARSE_DEFAULT_LAYOUT = get_int_from_env(
     "PAPERLESS_EMAIL_PARSE_DEFAULT_LAYOUT",

@@ -1877,7 +1877,10 @@ the literal path for that program.
 
 #### [`PAPERLESS_GS_BINARY=<path>`](#PAPERLESS_GS_BINARY) {#PAPERLESS_GS_BINARY}
 
-: Defaults to "gs".
+!!! warning
+
+    Deprecated and has no effect, since nothing in Paperless-ngx calls
+    Ghostscript by this path. It will be removed in a future release.
 
 ## Docker-specific options {#docker}
 
