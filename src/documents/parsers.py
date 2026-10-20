@@ -7,6 +7,7 @@ import subprocess
 import tempfile
 from pathlib import Path
 from typing import TYPE_CHECKING
+from typing import Final
 
 from django.conf import settings
 
@@ -74,14 +75,14 @@ def get_default_thumbnail() -> Path:
     return (Path(__file__).parent / "resources" / "document.webp").resolve()
 
 
-_THUMBNAIL_MAX_WIDTH = 500
-_THUMBNAIL_MAX_HEIGHT = 5000
+_THUMBNAIL_MAX_WIDTH: Final[int] = 500
+_THUMBNAIL_MAX_HEIGHT: Final[int] = 5000
 # Used only when the page geometry cannot be read
-_THUMBNAIL_FALLBACK_DPI = 150
+_THUMBNAIL_FALLBACK_DPI: Final[int] = 150
 # Applied before supersampling, so tiny pages are not enlarged
-_THUMBNAIL_MAX_DPI = 300
+_THUMBNAIL_MAX_DPI: Final[int] = 300
 # Rendering at a multiple and downsampling keeps text crisper
-_THUMBNAIL_SUPERSAMPLE = 2
+_THUMBNAIL_SUPERSAMPLE: Final[int] = 2
 
 
 def rasterize_pdf_page_to_png(
