@@ -105,6 +105,7 @@ import { DocumentDetailFieldID } from '../admin/settings/settings.component'
 import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.component'
 import { PasswordRemovalConfirmDialogComponent } from '../common/confirm-dialog/password-removal-confirm-dialog/password-removal-confirm-dialog.component'
 import { ReprocessConfirmDialogComponent } from '../common/confirm-dialog/reprocess-confirm-dialog/reprocess-confirm-dialog.component'
+import { ZoneOcrConfirmDialogComponent } from '../common/confirm-dialog/zone-ocr-confirm-dialog/zone-ocr-confirm-dialog.component'
 import { CustomFieldsDropdownComponent } from '../common/custom-fields-dropdown/custom-fields-dropdown.component'
 import { CorrespondentEditDialogComponent } from '../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
 import { DocumentTypeEditDialogComponent } from '../common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
@@ -1565,34 +1566,34 @@ export class DocumentDetailComponent
   runZoneOcr() {
     if (this.networkActive()) return
     const documentId = this.documentId()
-    if (!this.hasLocalEdits(this.document())) {
-      this.executeZoneOcr(documentId)
-      return
-    }
-
-    const modal = this.modalService.open(ConfirmDialogComponent, {
+    const modal = this.modalService.open(ZoneOcrConfirmDialogComponent, {
       backdrop: 'static',
     })
-    modal.componentInstance.title = $localize`Unsaved Changes`
-    modal.componentInstance.messageBold = $localize`You have unsaved changes.`
-    modal.componentInstance.message = $localize`Running Zone OCR will discard them.`
-    modal.componentInstance.btnClass = 'btn-warning'
-    modal.componentInstance.btnCaption = $localize`Run Zone OCR`
-    modal.componentInstance.confirmClicked
+    const dialog = modal.componentInstance as ZoneOcrConfirmDialogComponent
+    dialog.title = $localize`Run Zone OCR`
+    dialog.btnCaption = $localize`Run Zone OCR`
+    if (this.hasLocalEdits(this.document())) {
+      dialog.messageBold = $localize`You have unsaved changes.`
+      dialog.message = $localize`Running Zone OCR will discard them.`
+      dialog.btnClass = 'btn-warning'
+    } else {
+      dialog.message = $localize`Fields filled by the template will be overwritten.`
+    }
+    dialog.confirmClicked
       .pipe(first(), takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
         modal.close()
         if (this.documentId() === documentId && !this.networkActive()) {
-          this.executeZoneOcr(documentId)
+          this.executeZoneOcr(documentId, dialog.template)
         }
       })
   }
 
-  private executeZoneOcr(documentId: number) {
+  private executeZoneOcr(documentId: number, templateId: number | null) {
     this.zoneOcrRunning.set(true)
     this.networkActive.set(true)
     this.documentsService
-      .runZoneOcr(documentId)
+      .runZoneOcr(documentId, templateId)
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe({
         next: (response) => {

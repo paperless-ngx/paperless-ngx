@@ -64,8 +64,8 @@
       <button
         ngbDropdownItem
         (click)="runZoneOcr()"
-        [disabled]="!userCanEdit || !document()?.document_type || networkActive()"
-        *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.OcrTemplate }"
+        [disabled]="!userCanEdit || networkActive()"
+        *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.OcrTemplate }"
       >
         <i-bs width="1em" height="1em" name="file-earmark-ruled" class="me-1"></i-bs><span i18n>Run Zone OCR</span>
       </button>

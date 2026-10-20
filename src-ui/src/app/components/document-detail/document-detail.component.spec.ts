@@ -1916,9 +1916,17 @@ describe('DocumentDetailComponent', () => {
       .mockImplementation(() => {})
     const notifySpy = jest.spyOn(component.docChangeNotifier, 'next')
     const toastSpy = jest.spyOn(toastService, 'showInfo')
+    const modalSpy = jest.spyOn(modalService, 'open')
 
     component.runZoneOcr()
+    const dialog = modalSpy.mock.results[0].value.componentInstance
+    expect(dialog.message).toBe(
+      'Fields filled by the template will be overwritten.'
+    )
+    dialog.template = 3
+    dialog.confirmClicked.emit()
 
+    expect(documentService.runZoneOcr).toHaveBeenCalledWith(doc.id, 3)
     expect(toastSpy).toHaveBeenCalledWith(
       'Filled 1 of 2 fields. No value found for: Due'
     )
@@ -1936,9 +1944,12 @@ describe('DocumentDetailComponent', () => {
     jest.spyOn(component as any, 'loadDocument').mockImplementation(() => {})
     const runSpy = jest.spyOn(documentService, 'runZoneOcr')
     const toastSpy = jest.spyOn(toastService, 'showInfo')
+    const modalSpy = jest.spyOn(modalService, 'open')
 
     runSpy.mockReturnValueOnce(of({ status: 'completed', results: [] }))
     component.runZoneOcr()
+    modalSpy.mock.results[0].value.componentInstance.confirmClicked.emit()
+    expect(runSpy).toHaveBeenCalledWith(doc.id, null)
     expect(toastSpy).toHaveBeenLastCalledWith(
       'Zone OCR found no fields to fill.'
     )
@@ -1953,6 +1964,7 @@ describe('DocumentDetailComponent', () => {
       })
     )
     component.runZoneOcr()
+    modalSpy.mock.results[1].value.componentInstance.confirmClicked.emit()
     expect(toastSpy).toHaveBeenLastCalledWith('Filled 1 of 1 fields.')
   })
 
@@ -1988,13 +2000,14 @@ describe('DocumentDetailComponent', () => {
     component.runZoneOcr()
     modalSpy.mock.results[0].value.componentInstance.confirmClicked.emit()
 
-    expect(runSpy).toHaveBeenCalledWith(doc.id)
+    expect(runSpy).toHaveBeenCalledWith(doc.id, null)
     expect(component.zoneOcrRunning()).toBe(true)
     expect(component.networkActive()).toBe(true)
     const saveSpy = jest.spyOn(documentService, 'patch')
     component.save()
     expect(saveSpy).not.toHaveBeenCalled()
     component.runZoneOcr()
+    expect(modalSpy).toHaveBeenCalledTimes(1)
     expect(runSpy).toHaveBeenCalledTimes(1)
     pending.error(new Error('failed'))
     expect(component.zoneOcrRunning()).toBe(false)
@@ -2008,8 +2021,10 @@ describe('DocumentDetailComponent', () => {
     const pending = new Subject<any>()
     jest.spyOn(documentService, 'runZoneOcr').mockReturnValue(pending)
     const loadSpy = jest.spyOn(component as any, 'loadDocument')
+    const modalSpy = jest.spyOn(modalService, 'open')
 
     component.runZoneOcr()
+    modalSpy.mock.results[0].value.componentInstance.confirmClicked.emit()
     component.documentId.set(99)
     pending.next({ results: [] })
 
@@ -2048,8 +2063,10 @@ describe('DocumentDetailComponent', () => {
       .mockReturnValue(throwError(() => new Error('nope')))
     const loadSpy = jest.spyOn(component as any, 'loadDocument')
     const errorSpy = jest.spyOn(toastService, 'showError')
+    const modalSpy = jest.spyOn(modalService, 'open')
 
     component.runZoneOcr()
+    modalSpy.mock.results[0].value.componentInstance.confirmClicked.emit()
 
     expect(errorSpy).toHaveBeenCalledWith(
       'Error running zone OCR.',

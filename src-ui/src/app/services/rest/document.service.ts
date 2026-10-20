@@ -367,10 +367,13 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     })
   }
 
-  runZoneOcr(id: number): Observable<OcrZoneRunResponse> {
+  runZoneOcr(
+    id: number,
+    templateId: number | null = null
+  ): Observable<OcrZoneRunResponse> {
     return this.http.post<OcrZoneRunResponse>(
       this.getResourceUrl(id, 'run-zone-ocr'),
-      {}
+      templateId ? { template: templateId } : {}
     )
   }
 
