@@ -1,11 +1,11 @@
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core'
 import { FormsModule } from '@angular/forms'
-import { Router } from '@angular/router'
 import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { delay, takeUntil, tap } from 'rxjs'
+import { delay, firstValueFrom, takeUntil, tap } from 'rxjs'
 import { OcrTemplate } from 'src/app/data/ocr-template'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
+import { DirtyFormGuard } from 'src/app/guards/dirty-form.guard'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { OcrTemplateService } from 'src/app/services/rest/ocr-template.service'
@@ -13,6 +13,7 @@ import { ToastService } from 'src/app/services/toast.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
+import { OcrTemplateEditorComponent } from './ocr-template-editor/ocr-template-editor.component'
 
 @Component({
   selector: 'pngx-ocr-templates',
@@ -31,8 +32,8 @@ export class OcrTemplatesComponent
 {
   private readonly service = inject(OcrTemplateService)
   private readonly documentTypeService = inject(DocumentTypeService)
-  private readonly router = inject(Router)
   private readonly modalService = inject(NgbModal)
+  private readonly dirtyFormGuard = inject(DirtyFormGuard)
   private readonly toastService = inject(ToastService)
   private readonly changeDetector = inject(ChangeDetectorRef)
   permissionsService = inject(PermissionsService)
@@ -75,11 +76,29 @@ export class OcrTemplatesComponent
   }
 
   createTemplate() {
-    this.router.navigate(['/ocr-templates', 'new'])
+    this.editTemplate()
   }
 
-  editTemplate(t: OcrTemplate) {
-    this.router.navigate(['/ocr-templates', t.id])
+  editTemplate(t?: OcrTemplate) {
+    const modal = this.modalService.open(OcrTemplateEditorComponent, {
+      backdrop: 'static',
+      keyboard: false,
+      size: 'xl',
+      fullscreen: 'lg',
+      scrollable: true,
+      ariaLabelledBy: 'ocr-template-editor-title',
+      beforeDismiss: () => {
+        const editor: OcrTemplateEditorComponent = modal.componentInstance
+        if (editor.saving) return false
+        return editor.isDirty
+          ? firstValueFrom(this.dirtyFormGuard.confirmChanges())
+          : true
+      },
+    })
+    modal.componentInstance.object = t
+    modal.componentInstance.succeeded
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => this.reload())
   }
 
   toggleTemplate(t: OcrTemplate) {

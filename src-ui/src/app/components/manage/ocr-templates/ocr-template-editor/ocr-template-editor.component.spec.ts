@@ -1,11 +1,14 @@
 import { ElementRef } from '@angular/core'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { ActivatedRoute } from '@angular/router'
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
+import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { of, Subject, throwError } from 'rxjs'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import { Document } from 'src/app/data/document'
-import { OcrTemplateZone, OcrZoneTestResult } from 'src/app/data/ocr-template'
+import {
+  OcrTemplate,
+  OcrTemplateZone,
+  OcrZoneTestResult,
+} from 'src/app/data/ocr-template'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
@@ -40,22 +43,23 @@ describe('OcrTemplateEditorComponent', () => {
   const templates = {
     testZone: jest.fn(),
     create: jest.fn(),
+    update: jest.fn(),
     getPageImageUrl: (id: number, page: number) => `/preview/${id}/${page}`,
   }
   const modal = { open: jest.fn() }
+  const activeModal = { close: jest.fn(), dismiss: jest.fn() }
 
   beforeEach(async () => {
     documents.list.mockReset().mockReturnValue(of({ results: [] }))
     documents.get.mockReset().mockReturnValue(of({ id: 1, page_count: 3 }))
     templates.testZone.mockReset()
     templates.create.mockReset()
+    templates.update.mockReset()
+    activeModal.close.mockReset()
     await TestBed.configureTestingModule({
       imports: [OcrTemplateEditorComponent],
       providers: [
-        {
-          provide: ActivatedRoute,
-          useValue: { snapshot: { paramMap: new Map() } },
-        },
+        { provide: NgbActiveModal, useValue: activeModal },
         { provide: DocumentService, useValue: documents },
         { provide: OcrTemplateService, useValue: templates },
         ...[CustomFieldsService, DocumentTypeService, CorrespondentService].map(
@@ -123,6 +127,46 @@ describe('OcrTemplateEditorComponent', () => {
       { pointerId }
     ) as PointerEvent
   }
+
+  it('edits a copy of the supplied template and restores its sample document', () => {
+    const original: OcrTemplate = {
+      ...component.template,
+      id: 3,
+      name: 'Invoices',
+      sample_document: 5,
+      zones: [zone()],
+      combine_formats: { '1': '{Invoice number}' },
+    }
+    component.object = original
+    fixture.detectChanges()
+
+    expect(component.isNew).toBe(false)
+    expect(component.previewDocId).toBe(5)
+    expect(component.pageImageUrl).toBe('/preview/5/0')
+    expect(component.isDirty).toBe(false)
+    component.template.name = 'Edited'
+    component.template.zones[0].x = 500
+    component.template.combine_formats['1'] = 'Edited format'
+    expect(original.name).toBe('Invoices')
+    expect(original.zones[0].x).toBe(100)
+    expect(original.combine_formats['1']).toBe('{Invoice number}')
+  })
+
+  it('updates an existing template, notifies the list, and closes the dialog', () => {
+    component.object = { ...component.template, id: 3, name: 'Invoices' }
+    fixture.detectChanges()
+    component.template.name = 'Renamed'
+    const saved = { ...component.template }
+    templates.update.mockReturnValue(of(saved))
+    const succeeded = jest.spyOn(component.succeeded, 'emit')
+
+    component.save()
+
+    expect(templates.update).toHaveBeenCalledWith(component.template)
+    expect(templates.create).not.toHaveBeenCalled()
+    expect(succeeded).toHaveBeenCalledWith(saved)
+    expect(activeModal.close).toHaveBeenCalledWith(saved)
+  })
 
   it('searches across document metadata even when a template document type is set', () => {
     jest.useFakeTimers()
@@ -355,7 +399,7 @@ describe('OcrTemplateEditorComponent', () => {
 
   it('tracks unsaved changes against the last loaded or saved state', () => {
     fixture.detectChanges()
-    expect(component.isDirty$()).toBe(false)
+    expect(component.isDirty).toBe(false)
 
     component.template.combine_formats = { '1': '' }
     expect(component.isDirty).toBe(false)
@@ -390,9 +434,7 @@ describe('OcrTemplateEditorComponent', () => {
     pending.next({ ...component.template, id: 3 })
     pending.complete()
     expect(component.saving).toBe(false)
-    component.onOverlayPointerDown(pointer(500, 500))
-    component.onOverlayPointerUp(pointer(700, 700))
-    expect(component.template.zones).toHaveLength(1)
+    expect(activeModal.close).toHaveBeenCalledWith(component.template)
   })
 
   it('stops an active move and unlocks editing without losing changes after a failed save', () => {

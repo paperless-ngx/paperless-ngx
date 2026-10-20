@@ -1,15 +1,12 @@
-<pngx-page-header [title]="pageTitle" [id]="template.id">
-  <a routerLink="/ocr-templates" class="btn btn-sm btn-outline-secondary" title="Close" i18n-title aria-label="Close" i18n-aria-label>
-    <i-bs width="1.2em" height="1.2em" name="x"></i-bs><span class="d-none d-lg-inline ps-1" i18n>Close</span>
-  </a>
-  <button type="button" class="btn btn-sm btn-primary" (click)="save()" [disabled]="saving || !isDirty">
-    @if (saving) {
-      <span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
-    }
-    <span i18n>Save</span>
-  </button>
-</pngx-page-header>
+<div class="modal-header">
+  <h4 class="modal-title" id="ocr-template-editor-title">{{ dialogTitle }}</h4>
+  @if (template.id) {
+    <span class="badge bg-primary text-primary-text-contrast ms-2">ID: {{ template.id }}</span>
+  }
+  <button type="button" class="btn-close" (click)="activeModal.dismiss()" [disabled]="saving" aria-label="Close" i18n-aria-label></button>
+</div>
 
+<div class="modal-body">
 <div class="row" [attr.inert]="saving ? '' : null" [attr.aria-busy]="saving">
   <div class="col-lg-4 mb-3">
     <ul ngbNav #nav="ngbNav" [(activeId)]="activeTab" class="nav-underline flex-nowrap flex-md-wrap overflow-auto">
@@ -343,3 +340,13 @@
       </div>
     </div>
   </div>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-outline-secondary" (click)="activeModal.dismiss()" [disabled]="saving" i18n>Cancel</button>
+  <button type="button" class="btn btn-primary" (click)="save()" [disabled]="saving || !isDirty">
+    @if (saving) {
+      <span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
+    }
+    <span i18n>Save</span>
+  </button>
+</div>

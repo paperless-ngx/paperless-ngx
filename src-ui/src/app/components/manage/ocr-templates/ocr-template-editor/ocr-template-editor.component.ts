@@ -4,23 +4,25 @@ import {
   ChangeDetectorRef,
   Component,
   ElementRef,
+  EventEmitter,
   HostListener,
   inject,
+  Input,
   OnDestroy,
   OnInit,
+  Output,
   signal,
   ViewChild,
 } from '@angular/core'
 import { FormsModule } from '@angular/forms'
-import { ActivatedRoute, RouterModule } from '@angular/router'
 import {
+  NgbActiveModal,
   NgbModal,
   NgbNavModule,
   NgbPopoverModule,
   NgbTypeaheadModule,
   NgbTypeaheadSelectItemEvent,
 } from '@ng-bootstrap/ng-bootstrap'
-import { DirtyComponent } from '@ngneat/dirty-check-forms'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import {
   catchError,
@@ -40,7 +42,6 @@ import { NumberComponent } from 'src/app/components/common/input/number/number.c
 import { SelectComponent } from 'src/app/components/common/input/select/select.component'
 import { SwitchComponent } from 'src/app/components/common/input/switch/switch.component'
 import { TextComponent } from 'src/app/components/common/input/text/text.component'
-import { PageHeaderComponent } from 'src/app/components/common/page-header/page-header.component'
 import { CustomField } from 'src/app/data/custom-field'
 import { Document } from 'src/app/data/document'
 import { DocumentType } from 'src/app/data/document-type'
@@ -128,14 +129,12 @@ const RESIZE_CURSOR: Record<ResizeHandle, string> = {
   standalone: true,
   imports: [
     DragDropModule,
-    PageHeaderComponent,
     NumberComponent,
     TextComponent,
     SelectComponent,
     SwitchComponent,
     CommonModule,
     FormsModule,
-    RouterModule,
     NgbNavModule,
     NgbPopoverModule,
     NgbTypeaheadModule,
@@ -145,10 +144,8 @@ const RESIZE_CURSOR: Record<ResizeHandle, string> = {
   templateUrl: './ocr-template-editor.component.html',
   styleUrls: ['./ocr-template-editor.component.scss'],
 })
-export class OcrTemplateEditorComponent
-  implements OnInit, OnDestroy, DirtyComponent
-{
-  private readonly route = inject(ActivatedRoute)
+export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
+  readonly activeModal = inject(NgbActiveModal)
   private readonly templateService = inject(OcrTemplateService)
   private readonly customFieldsService = inject(CustomFieldsService)
   private readonly documentTypeService = inject(DocumentTypeService)
@@ -160,6 +157,9 @@ export class OcrTemplateEditorComponent
   private readonly destroy$ = new Subject<void>()
   private readonly cancelZoneTest$ = new Subject<void>()
   private readonly customDateFormatZones = new WeakSet<OcrTemplateZone>()
+
+  @Input() object: OcrTemplate
+  @Output() succeeded = new EventEmitter<OcrTemplate>()
 
   @ViewChild('zoneOverlay') overlayRef: ElementRef<SVGSVGElement>
   imageRef: ElementRef<HTMLImageElement>
@@ -281,8 +281,6 @@ export class OcrTemplateEditorComponent
     return this.editorState() !== this.savedState
   }
 
-  readonly isDirty$ = () => this.isDirty
-
   private editorState(): string {
     const formats = Object.entries(this.template.combine_formats ?? {}).filter(
       ([, format]) => format
@@ -298,7 +296,7 @@ export class OcrTemplateEditorComponent
     this.savedState = this.editorState()
   }
 
-  get pageTitle(): string {
+  get dialogTitle(): string {
     return this.isNew
       ? $localize`New OCR Template`
       : $localize`Edit OCR Template`
@@ -329,24 +327,19 @@ export class OcrTemplateEditorComponent
         this.changeDetector.markForCheck()
       })
 
-    const id = this.route.snapshot.paramMap.get('id')
-    if (id) {
+    if (this.object) {
       this.isNew = false
-      this.templateService
-        .get(parseInt(id))
-        .pipe(takeUntil(this.destroy$))
-        .subscribe((t) => {
-          this.template = t
-          this.changeDetector.markForCheck()
-          if (t.sample_document) {
-            this.previewDocId = t.sample_document
-            this.loadPreview()
-          }
-          this.markSaved()
-        })
-    } else {
-      this.markSaved()
+      this.template = {
+        ...this.object,
+        zones: this.object.zones.map((zone) => ({ ...zone })),
+        combine_formats: { ...this.object.combine_formats },
+      }
+      if (this.template.sample_document) {
+        this.previewDocId = this.template.sample_document
+        this.loadPreview()
+      }
     }
+    this.markSaved()
   }
 
   searchDocuments = (text$: Observable<string>): Observable<Document[]> =>
@@ -923,6 +916,8 @@ export class OcrTemplateEditorComponent
         this.markSaved()
         this.toastService.showInfo($localize`OCR template saved.`)
         this.changeDetector.markForCheck()
+        this.succeeded.emit(saved)
+        this.activeModal.close(saved)
       },
       error: (e) => {
         this.saving = false

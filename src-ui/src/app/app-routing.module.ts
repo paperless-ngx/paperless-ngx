@@ -13,7 +13,6 @@ import { DocumentDetailComponent } from './components/document-detail/document-d
 import { DocumentListComponent } from './components/document-list/document-list.component'
 import { DocumentAttributesComponent } from './components/manage/document-attributes/document-attributes.component'
 import { MailComponent } from './components/manage/mail/mail.component'
-import { OcrTemplateEditorComponent } from './components/manage/ocr-templates/ocr-template-editor/ocr-template-editor.component'
 import { OcrTemplatesComponent } from './components/manage/ocr-templates/ocr-templates.component'
 import { SavedViewsComponent } from './components/manage/saved-views/saved-views.component'
 import { ShareLinksComponent } from './components/manage/share-links/share-links.component'
@@ -287,32 +286,6 @@ export const routes: Routes = [
             type: PermissionType.OcrTemplate,
           },
           componentName: 'OcrTemplatesComponent',
-        },
-      },
-      {
-        path: 'ocr-templates/new',
-        component: OcrTemplateEditorComponent,
-        canDeactivate: [DirtyFormGuard],
-        canActivate: [PermissionsGuard],
-        data: {
-          requiredPermission: {
-            action: PermissionAction.Add,
-            type: PermissionType.OcrTemplate,
-          },
-          componentName: 'OcrTemplateEditorComponent',
-        },
-      },
-      {
-        path: 'ocr-templates/:id',
-        component: OcrTemplateEditorComponent,
-        canDeactivate: [DirtyFormGuard],
-        canActivate: [PermissionsGuard],
-        data: {
-          requiredPermission: {
-            action: PermissionAction.Change,
-            type: PermissionType.OcrTemplate,
-          },
-          componentName: 'OcrTemplateEditorComponent',
         },
       },
       {
