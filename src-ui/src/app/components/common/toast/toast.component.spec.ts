@@ -230,4 +230,20 @@ describe('ToastComponent', () => {
     fixture.detectChanges()
     expect(fixture.nativeElement.textContent).toContain('Just now')
   })
+
+  it('should update the relative timestamp as time passes', () => {
+    jest.useFakeTimers()
+    jest.setSystemTime(new Date('2026-10-19T12:00:00Z'))
+    component.toast = { content: 'Saved', delay: 5000, timestamp: new Date() }
+    component.autohide = false
+    fixture.componentRef.setInput('now', new Date())
+    fixture.detectChanges()
+    expect(fixture.nativeElement.textContent).toContain('Just now')
+
+    jest.setSystemTime(new Date('2026-10-19T12:03:00Z'))
+    fixture.componentRef.setInput('now', new Date())
+    fixture.detectChanges()
+    expect(fixture.nativeElement.textContent).toContain('3 minutes ago')
+    jest.useRealTimers()
+  })
 })

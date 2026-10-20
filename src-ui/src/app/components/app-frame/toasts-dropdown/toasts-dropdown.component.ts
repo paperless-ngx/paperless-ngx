@@ -1,11 +1,11 @@
-import { Component, computed, inject } from '@angular/core'
-import { toSignal } from '@angular/core/rxjs-interop'
+import { Component, DestroyRef, computed, inject, signal } from '@angular/core'
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop'
 import {
   NgbDropdownModule,
   NgbProgressbarModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { map } from 'rxjs'
+import { Subscription, interval, map } from 'rxjs'
 import { Toast, ToastLevel, ToastService } from 'src/app/services/toast.service'
 import { ToastComponent } from '../../common/toast/toast.component'
 
@@ -22,6 +22,11 @@ import { ToastComponent } from '../../common/toast/toast.component'
 })
 export class ToastsDropdownComponent {
   toastService = inject(ToastService)
+  private destroyRef = inject(DestroyRef)
+  private clock: Subscription
+
+  /** Drives the relative timestamps, ticks only while the dropdown is open */
+  readonly now = signal(new Date())
 
   readonly toasts = toSignal(
     this.toastService.getToasts().pipe(map((toasts) => [...toasts])),
@@ -36,6 +41,13 @@ export class ToastsDropdownComponent {
 
   onOpenChange(open: boolean): void {
     this.toastService.suppressPopupToasts = open
-    if (open) this.toastService.markAllRead()
+    this.clock?.unsubscribe()
+    if (open) {
+      this.toastService.markAllRead()
+      this.now.set(new Date())
+      this.clock = interval(30000)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe(() => this.now.set(new Date()))
+    }
   }
 }

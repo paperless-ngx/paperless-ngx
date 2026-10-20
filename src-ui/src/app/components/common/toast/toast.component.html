@@ -28,7 +28,7 @@
         <div>
             <p class="ms-2 mb-0 text-break">{{toast.content}}</p>
             @if (!autohide && toast.timestamp) {
-                <p class="ms-2 mb-0 small opacity-75">{{toast.timestamp | customDate: 'relative'}}</p>
+                <p class="ms-2 mb-0 small opacity-75">{{relativeTimestamp}}</p>
             }
             @if (toast.error) {
             <details class="ms-2">

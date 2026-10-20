@@ -124,4 +124,18 @@ describe('ToastsDropdownComponent', () => {
     component.onOpenChange(true)
     expect(markSpy).toHaveBeenCalled()
   })
+
+  it('should tick the clock only while open', () => {
+    jest.useFakeTimers()
+    component.onOpenChange(true)
+    const opened = component.now()
+    jest.advanceTimersByTime(30000)
+    const ticked = component.now()
+    expect(ticked).not.toBe(opened)
+
+    component.onOpenChange(false)
+    jest.advanceTimersByTime(60000)
+    expect(component.now()).toBe(ticked)
+    jest.useRealTimers()
+  })
 })

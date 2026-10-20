@@ -1,5 +1,5 @@
 import { Clipboard } from '@angular/cdk/clipboard'
-import { DecimalPipe } from '@angular/common'
+import { DatePipe, DecimalPipe } from '@angular/common'
 import {
   Component,
   DestroyRef,
@@ -25,7 +25,6 @@ import { Toast, ToastLevel } from 'src/app/services/toast.service'
 @Component({
   selector: 'pngx-toast',
   imports: [
-    CustomDatePipe,
     DecimalPipe,
     NgbToastModule,
     NgbProgressbarModule,
@@ -33,9 +32,11 @@ import { Toast, ToastLevel } from 'src/app/services/toast.service'
   ],
   templateUrl: './toast.component.html',
   styleUrl: './toast.component.scss',
+  providers: [DatePipe, CustomDatePipe],
 })
 export class ToastComponent implements OnInit {
   private clipboard = inject(Clipboard)
+  private customDatePipe = inject(CustomDatePipe)
   private destroyRef = inject(DestroyRef)
   readonly copied = signal(false)
   readonly ToastLevel = ToastLevel
@@ -51,6 +52,9 @@ export class ToastComponent implements OnInit {
 
   @Input() autohide: boolean = true
 
+  /** Each new value re-renders the relative timestamp */
+  @Input() now: Date
+
   @Output() hidden: EventEmitter<Toast> = new EventEmitter<Toast>()
 
   @Output() closed: EventEmitter<Toast> = new EventEmitter<Toast>()
@@ -60,6 +64,10 @@ export class ToastComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.autohide) this.delayRemaining.set(this.toast.delay)
+  }
+
+  get relativeTimestamp(): string {
+    return this.customDatePipe.transform(this.toast.timestamp, 'relative')
   }
 
   get paused(): boolean {
