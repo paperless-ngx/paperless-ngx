@@ -147,6 +147,8 @@ def remove_alpha_channel(source: Path, dest: Path) -> Path:
             save_kwargs["dpi"] = im.info["dpi"]
         if "icc_profile" in im.info:
             save_kwargs["icc_profile"] = im.info["icc_profile"]
+        if image_format == "WEBP":
+            save_kwargs["lossless"] = True
         if len(frames) > 1:
             save_kwargs["save_all"] = True
             save_kwargs["append_images"] = frames[1:]
