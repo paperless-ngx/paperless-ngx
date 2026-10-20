@@ -578,6 +578,7 @@ ul.pagination {
 }
 
 .dropdown-menu {
+  --bs-dropdown-font-size: var(--pngx-body-font-size);
   background-color: var(--bs-body-bg);
 
   .dropdown-divider {

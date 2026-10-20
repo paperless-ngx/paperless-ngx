@@ -46,19 +46,19 @@
     </button>
     <div ngbDropdownMenu aria-labelledby="actionsDropdown" class="shadow">
       <button ngbDropdownItem (click)="reprocess()" [disabled]="!userCanEdit || !userIsOwner">
-        <i-bs width="1em" height="1em" name="arrow-counterclockwise" class="me-1"></i-bs><span i18n>Reprocess</span>
+        <i-bs width="1em" height="1em" name="arrow-counterclockwise" class="me-2"></i-bs><span i18n>Reprocess</span>
       </button>
 
       <button ngbDropdownItem (click)="printDocument()" [hidden]="useNativePdfViewer || isMobile">
-        <i-bs width="1em" height="1em" name="printer" class="me-1"></i-bs><span i18n>Print</span>
+        <i-bs width="1em" height="1em" name="printer" class="me-2"></i-bs><span i18n>Print</span>
       </button>
 
       <button ngbDropdownItem (click)="moreLike()">
-        <i-bs width="1em" height="1em" name="diagram-3" class="me-1"></i-bs><span i18n>More like this</span>
+        <i-bs width="1em" height="1em" name="diagram-3" class="me-2"></i-bs><span i18n>More like this</span>
       </button>
 
       <button ngbDropdownItem (click)="editPdf()" [disabled]="!userIsOwner || !userCanEdit || originalContentRenderType !== ContentRenderType.PDF">
-        <i-bs name="pencil" class="me-1"></i-bs><ng-container i18n>PDF Editor</ng-container>
+        <i-bs name="pencil" class="me-2"></i-bs><ng-container i18n>PDF Editor</ng-container>
       </button>
 
       <div class="d-flex" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.OcrTemplate }">
@@ -79,7 +79,7 @@
 
       @if (userIsOwner && (requiresPassword || password)) {
         <button ngbDropdownItem (click)="removePassword()" [disabled]="!password">
-          <i-bs name="unlock" class="me-1"></i-bs><ng-container i18n>Remove Password</ng-container>
+          <i-bs name="unlock" class="me-2"></i-bs><ng-container i18n>Remove Password</ng-container>
         </button>
       }
     </div>
@@ -91,11 +91,11 @@
     </button>
     <div ngbDropdownMenu aria-labelledby="sendDropdown" class="shadow">
       <button ngbDropdownItem (click)="openShareLinks()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.ShareLink }">
-        <i-bs name="link" class="me-1"></i-bs><span i18n>Share Links</span>
+        <i-bs name="link" class="me-2"></i-bs><span i18n>Share Links</span>
       </button>
       @if (emailEnabled) {
         <button ngbDropdownItem (click)="openEmailDocument()">
-          <i-bs name="envelope" class="me-1"></i-bs><span i18n>Email</span>
+          <i-bs name="envelope" class="me-2"></i-bs><span i18n>Email</span>
         </button>
       }
     </div>

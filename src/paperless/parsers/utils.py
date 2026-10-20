@@ -10,7 +10,9 @@ from __future__ import annotations
 
 import codecs
 import logging
+import os
 import re
+import subprocess
 import tempfile
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -24,6 +26,15 @@ logger = logging.getLogger("paperless.parsers.utils")
 # Minimum character count for a PDF to be considered "born-digital" (has real text).
 # Used by both the consumer (archive decision) and the tesseract parser (skip-OCR decision).
 PDF_TEXT_MIN_LENGTH: Final[int] = 50
+
+_PDFINFO_PAGE_SIZE: Final[re.Pattern[str]] = re.compile(
+    r"^Page\s+1 size:\s+([\d.eE+-]+) x ([\d.eE+-]+) pts",
+    re.MULTILINE,
+)
+_PDFINFO_PAGE_ROTATION: Final[re.Pattern[str]] = re.compile(
+    r"^Page\s+1 rot:\s+(\d+)",
+    re.MULTILINE,
+)
 
 
 def is_tagged_pdf(
@@ -263,6 +274,61 @@ def get_page_count_for_pdf(
     except Exception as e:
         _log.warning("Unable to determine PDF page count for %s: %s", document_path, e)
         return None
+
+
+def get_pdf_first_page_size_points(
+    path: Path,
+    log: logging.Logger | None = None,
+) -> tuple[float, float] | None:
+    """Return the first page's (width, height) in PDF points, post-rotation.
+
+    Asks ``pdfinfo`` rather than reading the page boxes directly, so the size
+    matches what ``pdftoppm -cropbox`` renders, including poppler's clipping of
+    the CropBox to the MediaBox. pdfinfo reports the box size before rotation,
+    so width and height are swapped for 90/270 rotation.
+
+    Parameters
+    ----------
+    path:
+        Absolute path to the PDF file.
+    log:
+        Logger for warnings.  Falls back to the module-level logger when omitted.
+
+    Returns
+    -------
+    tuple[float, float] | None
+        ``(width_points, height_points)``, or ``None`` if pdfinfo fails, the
+        file has no pages, or the page size is degenerate.
+    """
+    _log = log or logger
+    try:
+        proc = subprocess.run(
+            ["pdfinfo", "-f", "1", "-l", "1", str(path)],
+            capture_output=True,
+            check=True,
+            text=True,
+            errors="ignore",
+            # The labels parsed below are localized
+            env={**os.environ, "LC_ALL": "C"},
+        )
+    except (OSError, subprocess.CalledProcessError) as e:
+        _log.warning("Could not determine PDF page size for %s: %s", path, e)
+        return None
+
+    size_match = _PDFINFO_PAGE_SIZE.search(proc.stdout)
+    if size_match is None:
+        _log.warning("Could not determine PDF page size for %s", path)
+        return None
+
+    width = float(size_match.group(1))
+    height = float(size_match.group(2))
+    if width <= 0 or height <= 0:
+        return None
+
+    rotation_match = _PDFINFO_PAGE_ROTATION.search(proc.stdout)
+    if rotation_match is not None and int(rotation_match.group(1)) in (90, 270):
+        width, height = height, width
+    return width, height
 
 
 def extract_pdf_metadata(

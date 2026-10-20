@@ -1315,29 +1315,17 @@ valid crontab(5) expression describing when to run.
 
 #### [`PAPERLESS_CONVERT_MEMORY_LIMIT=<num>`](#PAPERLESS_CONVERT_MEMORY_LIMIT) {#PAPERLESS_CONVERT_MEMORY_LIMIT}
 
-: On smaller systems, or even in the case of Very Large Documents, the
-consumer may explode, complaining about how it's "unable to extend
-pixel cache". In such cases, try setting this to a reasonably low
-value, like 32. The default is to use whatever is necessary to do
-everything without writing to disk, and units are in megabytes.
+!!! warning
 
-    For more information on how to use this value, you should search the
-    web for "MAGICK_MEMORY_LIMIT".
-
-    Defaults to 0, which disables the limit.
+    Deprecated and has no effect, since PDF thumbnails no longer use
+    ImageMagick. It will be removed in a future release.
 
 #### [`PAPERLESS_CONVERT_TMPDIR=<path>`](#PAPERLESS_CONVERT_TMPDIR) {#PAPERLESS_CONVERT_TMPDIR}
 
-: Similar to the memory limit, if you've got a small system and your
-OS mounts /tmp as tmpfs, you should set this to a path that's on a
-physical disk, like /home/your_user/tmp or something. ImageMagick
-will use this as scratch space when crunching through very large
-documents.
+!!! warning
 
-    For more information on how to use this value, you should search the
-    web for "MAGICK_TMPDIR".
-
-    Default is none, which disables the temporary directory.
+    Deprecated and has no effect, since PDF thumbnails no longer use
+    ImageMagick. It will be removed in a future release.
 
 #### [`PAPERLESS_APPS=<string>`](#PAPERLESS_APPS) {#PAPERLESS_APPS}
 
@@ -1885,11 +1873,17 @@ the literal path for that program.
 
 #### [`PAPERLESS_CONVERT_BINARY=<path>`](#PAPERLESS_CONVERT_BINARY) {#PAPERLESS_CONVERT_BINARY}
 
-: Defaults to "convert".
+!!! warning
+
+    Deprecated and has no effect, since Paperless-ngx no longer uses
+    ImageMagick. It will be removed in a future release.
 
 #### [`PAPERLESS_GS_BINARY=<path>`](#PAPERLESS_GS_BINARY) {#PAPERLESS_GS_BINARY}
 
-: Defaults to "gs".
+!!! warning
+
+    Deprecated and has no effect, since nothing in Paperless-ngx calls
+    Ghostscript by this path. It will be removed in a future release.
 
 ## Docker-specific options {#docker}
 
