@@ -1,5 +1,5 @@
 import { CustomFieldDataType } from './custom-field'
-import { ObjectWithId } from './object-with-id'
+import { ObjectWithPermissions } from './object-with-permissions'
 
 export enum OcrZoneTarget {
   CustomField = 'custom_field',
@@ -64,7 +64,7 @@ export interface OcrTemplateZone {
   zone_source_height?: number
 }
 
-export interface OcrTemplate extends ObjectWithId {
+export interface OcrTemplate extends ObjectWithPermissions {
   name: string
   document_type: number
   sample_document: number | null

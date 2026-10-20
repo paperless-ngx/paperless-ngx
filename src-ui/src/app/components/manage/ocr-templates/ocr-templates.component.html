@@ -31,12 +31,12 @@
   @for (template of templates(); track template.id) {
     <li class="list-group-item">
       <div class="row fade" [class.show]="show()">
-        <div class="col d-flex align-items-center"><button class="btn btn-link p-0 text-start" type="button" (click)="editTemplate(template)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.OcrTemplate)">{{template.name}}</button></div>
+        <div class="col d-flex align-items-center"><button class="btn btn-link p-0 text-start" type="button" (click)="editTemplate(template)" [disabled]="!userCanEdit(template)">{{template.name}}</button></div>
         <div class="col d-flex align-items-center d-none d-sm-flex">{{getDocumentTypeName(template)}}</div>
         <div class="col d-flex align-items-center d-none d-sm-flex"><code>{{template.zones.length}}</code></div>
         <div class="col d-flex align-items-center">
           <div class="form-check form-switch mb-0">
-            <input type="checkbox" class="form-check-input cursor-pointer" [id]="template.id+'_enable'" [(ngModel)]="template.enabled" (change)="toggleTemplateEnabled(template)" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.OcrTemplate }">
+            <input type="checkbox" class="form-check-input cursor-pointer" [id]="template.id+'_enable'" [(ngModel)]="template.enabled" (change)="toggleTemplateEnabled(template)" [disabled]="!userCanEdit(template)" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.OcrTemplate }">
             <label class="form-check-label cursor-pointer" [for]="template.id+'_enable'">
               <code> @if(template.enabled) { <ng-container i18n>Enabled</ng-container> } @else { <span i18n class="text-muted">Disabled</span> }</code>
             </label>
@@ -50,17 +50,17 @@
                 <i-bs name="three-dots-vertical"></i-bs>
               </button>
               <div ngbDropdownMenu aria-labelledby="actionsMenuMobile{{template.id}}">
-                <button (click)="editTemplate(template)" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.OcrTemplate }" ngbDropdownItem i18n>Edit</button>
-                <button (click)="deleteTemplate(template)" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.OcrTemplate }" ngbDropdownItem i18n>Delete</button>
+                <button (click)="editTemplate(template)" [disabled]="!userCanEdit(template)" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.OcrTemplate }" ngbDropdownItem i18n>Edit</button>
+                <button (click)="deleteTemplate(template)" [disabled]="!permissionsService.currentUserOwnsObject(template)" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.OcrTemplate }" ngbDropdownItem i18n>Delete</button>
               </div>
             </div>
           </div>
           <div class="btn-toolbar d-none d-sm-flex gap-2" role="toolbar">
             <div class="btn-group">
-              <button *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.OcrTemplate }" class="btn btn-sm btn-outline-secondary" type="button" (click)="editTemplate(template)">
+              <button *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.OcrTemplate }" [disabled]="!userCanEdit(template)" class="btn btn-sm btn-outline-secondary" type="button" (click)="editTemplate(template)">
                 <i-bs width="1em" height="1em" name="pencil" class="me-1"></i-bs><ng-container i18n>Edit</ng-container>
               </button>
-              <button *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.OcrTemplate }" class="btn btn-sm btn-outline-danger" type="button" (click)="deleteTemplate(template)">
+              <button *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.OcrTemplate }" [disabled]="!permissionsService.currentUserOwnsObject(template)" class="btn btn-sm btn-outline-danger" type="button" (click)="deleteTemplate(template)">
                 <i-bs width="1em" height="1em" name="trash" class="me-1"></i-bs><ng-container i18n>Delete</ng-container>
               </button>
             </div>

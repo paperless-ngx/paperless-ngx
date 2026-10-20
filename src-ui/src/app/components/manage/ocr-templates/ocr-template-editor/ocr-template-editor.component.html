@@ -24,6 +24,11 @@
 
             <pngx-input-select [(ngModel)]="template.document_type" [items]="documentTypes()" bindLabel="name" bindValue="id" title="Document type" i18n-title></pngx-input-select>
 
+            <div *pngxIfOwner="object">
+              <hr />
+              <pngx-permissions-form [users]="users()" [accordion]="false" [(ngModel)]="permissionsForm"></pngx-permissions-form>
+            </div>
+
           </ng-template>
         </li>
 

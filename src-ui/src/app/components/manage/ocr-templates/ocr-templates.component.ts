@@ -7,7 +7,11 @@ import { DocumentType } from 'src/app/data/document-type'
 import { OcrTemplate } from 'src/app/data/ocr-template'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { DirtyFormGuard } from 'src/app/guards/dirty-form.guard'
-import { PermissionsService } from 'src/app/services/permissions.service'
+import {
+  PermissionAction,
+  PermissionType,
+  PermissionsService,
+} from 'src/app/services/permissions.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { OcrTemplateService } from 'src/app/services/rest/ocr-template.service'
 import { ToastService } from 'src/app/services/toast.service'
@@ -71,6 +75,7 @@ export class OcrTemplatesComponent
   }
 
   editTemplate(template?: OcrTemplate) {
+    if (template && !this.userCanEdit(template)) return
     const modal = this.modalService.open(OcrTemplateEditorComponent, {
       backdrop: 'static',
       keyboard: false,
@@ -105,6 +110,7 @@ export class OcrTemplatesComponent
   }
 
   toggleTemplateEnabled(template: OcrTemplate) {
+    if (!this.userCanEdit(template)) return
     this.ocrTemplateService
       .patch({ id: template.id, enabled: template.enabled } as OcrTemplate)
       .subscribe({
@@ -127,6 +133,14 @@ export class OcrTemplatesComponent
   }
 
   deleteTemplate(template: OcrTemplate) {
+    if (
+      !this.permissionsService.currentUserCan(
+        PermissionAction.Delete,
+        PermissionType.OcrTemplate
+      ) ||
+      !this.permissionsService.currentUserOwnsObject(template)
+    )
+      return
     const modal = this.modalService.open(ConfirmDialogComponent, {
       backdrop: 'static',
     })
@@ -155,5 +169,18 @@ export class OcrTemplatesComponent
         },
       })
     })
+  }
+
+  userCanEdit(template: OcrTemplate): boolean {
+    return (
+      this.permissionsService.currentUserCan(
+        PermissionAction.Change,
+        PermissionType.OcrTemplate
+      ) &&
+      this.permissionsService.currentUserHasObjectPermissions(
+        PermissionAction.Change,
+        template
+      )
+    )
   }
 }

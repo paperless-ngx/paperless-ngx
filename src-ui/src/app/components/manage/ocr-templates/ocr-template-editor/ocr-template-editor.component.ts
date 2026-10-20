@@ -25,6 +25,10 @@ import { CustomFieldEditDialogComponent } from 'src/app/components/common/edit-d
 import { EditDialogMode } from 'src/app/components/common/edit-dialog/edit-dialog.component'
 import { DocumentLinkComponent } from 'src/app/components/common/input/document-link/document-link.component'
 import { NumberComponent } from 'src/app/components/common/input/number/number.component'
+import {
+  PermissionsFormComponent,
+  PermissionsFormObject,
+} from 'src/app/components/common/input/permissions/permissions-form/permissions-form.component'
 import { SelectComponent } from 'src/app/components/common/input/select/select.component'
 import { SwitchComponent } from 'src/app/components/common/input/switch/switch.component'
 import { TextComponent } from 'src/app/components/common/input/text/text.component'
@@ -38,14 +42,20 @@ import {
   OcrTemplate,
   OcrTemplateZone,
   OcrZoneTarget,
-  OcrZoneTransform,
   OcrZoneTestResult,
+  OcrZoneTransform,
   ZoneTestRequest,
 } from 'src/app/data/ocr-template'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { User } from 'src/app/data/user'
+import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
+import { PermissionsService } from 'src/app/services/permissions.service'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { OcrTemplateService } from 'src/app/services/rest/ocr-template.service'
+import { UserService } from 'src/app/services/rest/user.service'
+import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { OcrTemplateEditorZoneListComponent } from './ocr-template-editor-zone-list/ocr-template-editor-zone-list.component'
 import {
@@ -135,6 +145,8 @@ const RESIZE_CURSOR: Record<ResizeHandle, string> = {
     NgbNavModule,
     NgxBootstrapIconsModule,
     OcrTemplateEditorZoneListComponent,
+    PermissionsFormComponent,
+    IfOwnerDirective,
   ],
   templateUrl: './ocr-template-editor.component.html',
   styleUrls: ['./ocr-template-editor.component.scss'],
@@ -147,6 +159,9 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
   private readonly documentService = inject(DocumentService)
   private readonly toastService = inject(ToastService)
   private readonly modalService = inject(NgbModal)
+  private readonly userService = inject(UserService)
+  private readonly settingsService = inject(SettingsService)
+  private readonly permissionsService = inject(PermissionsService)
   private readonly destroy$ = new Subject<void>()
   private readonly cancelZoneTest$ = new Subject<void>()
 
@@ -195,6 +210,8 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
       .map((field) => ({ id: field.id, name: field.name })),
   ])
   public readonly documentTypes = signal<DocumentType[]>([])
+  public readonly users = signal<User[]>([])
+  permissionsForm: PermissionsFormObject = {}
   public readonly OcrZoneTransform = OcrZoneTransform
   public readonly saving = signal(false)
 
@@ -271,6 +288,7 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
       ...this.template,
       combine_formats: Object.fromEntries(formats),
       sample_document: this.previewDocId ?? null,
+      permissions_form: this.permissionsForm,
     })
   }
 
@@ -281,6 +299,10 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.userService
+      .listAll()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((r) => this.users.set(r.results))
     this.customFieldsService
       .listAll()
       .pipe(takeUntil(this.destroy$))
@@ -305,6 +327,42 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
         this.setSampleDocument([this.template.sample_document])
       }
     }
+    const permissions = this.object?.permissions
+    this.permissionsForm = this.object
+      ? {
+          owner: this.object.owner,
+          set_permissions: {
+            view: {
+              users: [...(permissions?.view.users ?? [])],
+              groups: [...(permissions?.view.groups ?? [])],
+            },
+            change: {
+              users: [...(permissions?.change.users ?? [])],
+              groups: [...(permissions?.change.groups ?? [])],
+            },
+          },
+        }
+      : {
+          owner: this.settingsService.get(SETTINGS_KEYS.DEFAULT_PERMS_OWNER),
+          set_permissions: {
+            view: {
+              users: this.settingsService.get(
+                SETTINGS_KEYS.DEFAULT_PERMS_VIEW_USERS
+              ),
+              groups: this.settingsService.get(
+                SETTINGS_KEYS.DEFAULT_PERMS_VIEW_GROUPS
+              ),
+            },
+            change: {
+              users: this.settingsService.get(
+                SETTINGS_KEYS.DEFAULT_PERMS_EDIT_USERS
+              ),
+              groups: this.settingsService.get(
+                SETTINGS_KEYS.DEFAULT_PERMS_EDIT_GROUPS
+              ),
+            },
+          },
+        }
     this.initialState = this.editorState()
   }
 
@@ -741,9 +799,12 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     this.saving.set(true)
     this.pruneCombineFormats()
     this.template.sample_document = this.previewDocId
+    const payload = this.permissionsService.currentUserOwnsObject(this.object)
+      ? { ...this.template, ...this.permissionsForm }
+      : this.template
     const obs = this.template.id
-      ? this.templateService.update(this.template)
-      : this.templateService.create(this.template)
+      ? this.templateService.update(payload)
+      : this.templateService.create(payload)
 
     obs.pipe(takeUntil(this.destroy$)).subscribe({
       next: (saved) => {

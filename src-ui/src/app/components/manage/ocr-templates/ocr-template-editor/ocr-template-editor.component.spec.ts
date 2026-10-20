@@ -2,9 +2,11 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ElementRef } from '@angular/core'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
+import { By } from '@angular/platform-browser'
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { allIcons, NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { of, Subject, throwError } from 'rxjs'
+import { PermissionsFormComponent } from 'src/app/components/common/input/permissions/permissions-form/permissions-form.component'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import { Document } from 'src/app/data/document'
 import {
@@ -14,10 +16,15 @@ import {
   OcrZoneTestResult,
   OcrZoneTransform,
 } from 'src/app/data/ocr-template'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { User } from 'src/app/data/user'
+import { PermissionsService } from 'src/app/services/permissions.service'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { OcrTemplateService } from 'src/app/services/rest/ocr-template.service'
+import { UserService } from 'src/app/services/rest/user.service'
+import { SettingsService } from 'src/app/services/settings.service'
 import { OcrTemplateEditorComponent } from './ocr-template-editor.component'
 
 const customFields: CustomField[] = [
@@ -76,6 +83,10 @@ describe('OcrTemplateEditorComponent', () => {
     jest
       .spyOn(TestBed.inject(DocumentTypeService), 'listAll')
       .mockReturnValue(of({ count: 0, all: [], results: [] }))
+    jest
+      .spyOn(TestBed.inject(UserService), 'listAll')
+      .mockReturnValue(of({ count: 0, all: [], results: [] }))
+    TestBed.inject(PermissionsService).initialize([], { id: 1 } as User)
     documentService = TestBed.inject(DocumentService)
     jest
       .spyOn(documentService, 'get')
@@ -145,6 +156,92 @@ describe('OcrTemplateEditorComponent', () => {
   it('should fill the document type from a new sample document', () => {
     component.setSampleDocument([5])
     expect(component.template.document_type).toEqual(2)
+  })
+
+  it('should initialize new template permissions from saved defaults', () => {
+    const defaults = {
+      [SETTINGS_KEYS.DEFAULT_PERMS_OWNER]: 1,
+      [SETTINGS_KEYS.DEFAULT_PERMS_VIEW_USERS]: [2],
+      [SETTINGS_KEYS.DEFAULT_PERMS_VIEW_GROUPS]: [3],
+      [SETTINGS_KEYS.DEFAULT_PERMS_EDIT_USERS]: [],
+      [SETTINGS_KEYS.DEFAULT_PERMS_EDIT_GROUPS]: [4],
+    }
+    jest
+      .spyOn(TestBed.inject(SettingsService), 'get')
+      .mockImplementation((key) => defaults[key])
+    fixture.detectChanges()
+    expect(component.permissionsForm).toEqual({
+      owner: 1,
+      set_permissions: {
+        view: { users: [2], groups: [3] },
+        change: { users: [], groups: [4] },
+      },
+    })
+    expect(
+      fixture.debugElement.query(By.directive(PermissionsFormComponent))
+    ).toBeTruthy()
+    expect(component.isDirty).toBe(false)
+    const create = jest
+      .spyOn(templateService, 'create')
+      .mockReturnValue(of({ ...component.template, id: 3 }))
+    component.save()
+    expect(create).toHaveBeenCalledWith(
+      expect.objectContaining(component.permissionsForm)
+    )
+  })
+
+  it('should copy existing permissions and track changes without mutating the list item', () => {
+    component.object = {
+      ...component.template,
+      id: 3,
+      owner: 1,
+      permissions: {
+        view: { users: [2], groups: [] },
+        change: { users: [], groups: [3] },
+      },
+    }
+    fixture.detectChanges()
+    expect(component.permissionsForm.owner).toBe(1)
+    expect(component.isDirty).toBe(false)
+    component.permissionsForm.set_permissions.view.users.push(4)
+    expect(component.isDirty).toBe(true)
+    expect(component.object.permissions.view.users).toEqual([2])
+    const update = jest
+      .spyOn(templateService, 'update')
+      .mockReturnValue(of(component.template))
+    component.save()
+    expect(update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        owner: 1,
+        set_permissions: {
+          view: { users: [2, 4], groups: [] },
+          change: { users: [], groups: [3] },
+        },
+      })
+    )
+  })
+
+  it('should hide sharing controls and omit permission changes for a shared editor', () => {
+    component.object = {
+      ...component.template,
+      id: 3,
+      owner: 2,
+      user_can_change: true,
+    }
+    fixture.detectChanges()
+    expect(
+      fixture.debugElement.query(By.directive(PermissionsFormComponent))
+    ).toBeNull()
+    component.permissionsForm = {
+      owner: 1,
+      set_permissions: { view: { users: [1] } },
+    }
+    const update = jest
+      .spyOn(templateService, 'update')
+      .mockReturnValue(of(component.template))
+    component.save()
+    expect(update.mock.calls[0][0].owner).toBe(2)
+    expect(update.mock.calls[0][0]).not.toHaveProperty('set_permissions')
   })
 
   it('should keep only the last picked sample document', () => {
