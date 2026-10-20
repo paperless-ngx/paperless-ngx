@@ -21,9 +21,11 @@ from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
+from documents.models import OcrTemplate
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.permissions import set_permissions_for_objects
+from documents.tasks import extract_zones
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import DocumentFactory
 from paperless_testing.permissions import grant_object
@@ -1971,6 +1973,69 @@ class TestPDFActions(DirectoriesMixin, TestCase):
 
         self.assertIn("wrong password", str(exc.exception))
         self.assertIn("Error removing password from document", cm.output[0])
+
+
+@pytest.mark.django_db
+class TestBulkEditRunZoneOcr:
+    @pytest.fixture
+    def mock_task(self, mocker: MockerFixture) -> mock.MagicMock:
+        return mocker.patch("documents.bulk_edit.extract_zones")
+
+    def test_queues_documents_with_an_enabled_template(
+        self,
+        mock_task: mock.MagicMock,
+    ) -> None:
+        """
+        GIVEN:
+            - Documents whose type has enabled templates, a disabled template,
+              or no type at all
+        WHEN:
+            - run_zone_ocr is called with all of them
+        THEN:
+            - Only the document with an enabled template is queued, once
+        """
+        invoice = DocumentType.objects.create(name="Invoice")
+        receipt = DocumentType.objects.create(name="Receipt")
+        for name in ("Invoices", "More invoices"):
+            OcrTemplate.objects.create(
+                name=name,
+                document_type=invoice,
+                source_width=1000,
+                source_height=1000,
+            )
+        OcrTemplate.objects.create(
+            name="Receipts",
+            document_type=receipt,
+            source_width=1000,
+            source_height=1000,
+            enabled=False,
+        )
+        templated = DocumentFactory(document_type=invoice)
+        others = [DocumentFactory(document_type=receipt), DocumentFactory()]
+
+        result = bulk_edit.run_zone_ocr([templated.id, *(d.id for d in others)])
+
+        assert result == "OK"
+        mock_task.apply_async.assert_called_once()
+        assert mock_task.apply_async.call_args.kwargs["kwargs"] == {
+            "document_id": templated.id,
+        }
+
+    def test_task_runs_extraction(self, mocker: MockerFixture) -> None:
+        """
+        GIVEN:
+            - A queued zone OCR task
+        WHEN:
+            - The task runs
+        THEN:
+            - Zone extraction runs on the stored document
+        """
+        extract = mocker.patch("documents.tasks.run_zone_extraction")
+        doc = DocumentFactory()
+
+        extract_zones(doc.id)
+
+        extract.assert_called_once_with(doc, None)
 
 
 @pytest.mark.django_db

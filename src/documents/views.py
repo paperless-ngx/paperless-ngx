@@ -212,6 +212,7 @@ from documents.serialisers import RemovePasswordDocumentsSerializer
 from documents.serialisers import ReprocessDocumentsSerializer
 from documents.serialisers import RotateDocumentsSerializer
 from documents.serialisers import RunTaskSerializer
+from documents.serialisers import RunZoneOcrDocumentsSerializer
 from documents.serialisers import SavedViewSerializer
 from documents.serialisers import SearchResultSerializer
 from documents.serialisers import SerializerWithPerms
@@ -2298,6 +2299,8 @@ class DocumentViewSet(
             document = Document.objects.get(pk=pk)
         except Document.DoesNotExist:
             raise Http404
+        if not has_perms_owner_aware(request.user, "change_document", document):
+            return HttpResponseForbidden("Insufficient permissions")
 
         if not document.document_type_id:
             return Response(
@@ -3505,6 +3508,33 @@ class ReprocessDocumentsView(DocumentOperationPermissionMixin):
             method=bulk_edit.reprocess,
             validated_data=serializer.validated_data,
             operation_label="document reprocess",
+        )
+
+
+@extend_schema_view(
+    post=extend_schema(
+        operation_id="documents_run_zone_ocr_bulk",
+        description="Run OCR template zone extraction on selected documents",
+        responses={
+            200: inline_serializer(
+                name="RunZoneOcrDocumentsResult",
+                fields={
+                    "result": serializers.CharField(),
+                },
+            ),
+        },
+    ),
+)
+class RunZoneOcrDocumentsView(DocumentOperationPermissionMixin):
+    serializer_class = RunZoneOcrDocumentsSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return self._execute_document_action(
+            method=bulk_edit.run_zone_ocr,
+            validated_data=serializer.validated_data,
+            operation_label="document zone OCR",
         )
 
 

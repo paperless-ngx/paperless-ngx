@@ -1856,6 +1856,10 @@ class ReprocessDocumentsSerializer(DocumentSelectionSerializer):
     remote_ocr = serializers.BooleanField(required=False, default=False)
 
 
+class RunZoneOcrDocumentsSerializer(DocumentSelectionSerializer):
+    pass
+
+
 class BulkEditSerializer(
     SerializerWithPerms,
     DocumentSelectionSerializer,

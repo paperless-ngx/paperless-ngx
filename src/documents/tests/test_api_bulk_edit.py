@@ -583,6 +583,28 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(args[0], [self.doc1.id])
         self.assertEqual(kwargs, {"remote_ocr": True})
 
+    @mock.patch("documents.views.bulk_edit.run_zone_ocr")
+    def test_run_zone_ocr_documents_endpoint(self, m) -> None:
+        """
+        GIVEN:
+            - API data to run zone OCR on a document
+        WHEN:
+            - API is called
+        THEN:
+            - run_zone_ocr is called with the document
+        """
+        self.setup_mock(m, "run_zone_ocr")
+        response = self.client.post(
+            "/api/documents/run_zone_ocr/",
+            json.dumps({"documents": [self.doc1.id]}),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        m.assert_called_once()
+        args, kwargs = m.call_args
+        self.assertEqual(args[0], [self.doc1.id])
+        self.assertEqual(kwargs, {})
+
     @mock.patch("documents.serialisers.bulk_edit.set_storage_path")
     def test_api_set_storage_path(self, m) -> None:
         """

@@ -36,6 +36,7 @@ from documents.views import RemoteVersionView
 from documents.views import RemovePasswordDocumentsView
 from documents.views import ReprocessDocumentsView
 from documents.views import RotateDocumentsView
+from documents.views import RunZoneOcrDocumentsView
 from documents.views import SavedViewViewSet
 from documents.views import SearchAutoCompleteView
 from documents.views import SelectionDataView
@@ -167,6 +168,11 @@ urlpatterns = [
                                 "^reprocess/",
                                 ReprocessDocumentsView.as_view(),
                                 name="reprocess_documents",
+                            ),
+                            re_path(
+                                "^run_zone_ocr/",
+                                RunZoneOcrDocumentsView.as_view(),
+                                name="run_zone_ocr_documents",
                             ),
                             re_path(
                                 "^rotate/",

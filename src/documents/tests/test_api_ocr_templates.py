@@ -3,6 +3,7 @@
 import json
 from unittest.mock import patch
 
+from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -435,6 +436,26 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
                     response.json(),
                     {"status": "skipped", "reason": "no_template", "results": []},
                 )
+        extract.assert_not_called()
+
+    @patch("documents.zone_ocr.run_zone_extraction")
+    def test_run_zone_ocr_requires_change_permission_on_the_document(
+        self,
+        extract,
+    ):
+        owner = User.objects.create_user(username="owner")
+        user = User.objects.create_user(username="editor")
+        user.user_permissions.add(
+            *Permission.objects.filter(
+                codename__in=["view_document", "change_document"],
+            ),
+        )
+        document = DocumentFactory(document_type=self.doc_type, owner=owner)
+        self.client.force_authenticate(user=user)
+
+        response = self.client.post(f"/api/documents/{document.pk}/run-zone-ocr/")
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         extract.assert_not_called()
 
     def test_run_zone_ocr_missing_document_is_an_error(self):

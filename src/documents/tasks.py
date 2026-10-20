@@ -69,6 +69,7 @@ from documents.utils import compute_checksum
 from documents.utils import identity
 from documents.versioning import annotate_effective_content
 from documents.workflows.utils import get_workflows_for_trigger
+from documents.zone_ocr import run_zone_extraction
 from paperless.config import AIConfig
 from paperless.config import BarcodeConfig
 from paperless.config import RemoteOCRConfig
@@ -366,6 +367,12 @@ def _read_barcodes_for_reprocess(document: Document) -> list[StoredBarcode] | No
     except Exception as e:
         logger.warning(f"Could not read barcodes of document {document}: {e}")
         return None
+
+
+@shared_task
+def extract_zones(document_id: int) -> None:
+    """Run the document type's enabled OCR templates against a stored document."""
+    run_zone_extraction(Document.objects.get(id=document_id), None)
 
 
 @shared_task
