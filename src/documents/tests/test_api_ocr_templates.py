@@ -14,6 +14,7 @@ from documents.models import OcrTemplate
 from documents.models import OcrTemplateZone
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import DocumentFactory
+from paperless_testing.permissions import grant_object
 
 
 class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
@@ -437,6 +438,22 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
                     {"status": "skipped", "reason": "no_template", "results": []},
                 )
         extract.assert_not_called()
+
+    def test_document_page_image_requires_view_permission_on_the_document(self):
+        owner = User.objects.create_user(username="owner")
+        user = User.objects.create_user(username="template_editor")
+        user.user_permissions.add(Permission.objects.get(codename="view_ocrtemplate"))
+        document = DocumentFactory(owner=owner)
+        self.client.force_authenticate(user=user)
+        url = f"{self.ENDPOINT}document-page-image/{document.pk}/0/"
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        grant_object(user, document, "view_document")
+        response = self.client.get(url)
+        # Past the permission check; the factory document has no file on disk.
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     @patch("documents.zone_ocr.run_zone_extraction")
     def test_run_zone_ocr_requires_change_permission_on_the_document(

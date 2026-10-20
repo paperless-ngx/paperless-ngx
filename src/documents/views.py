@@ -5857,9 +5857,14 @@ class OcrTemplateViewSet(ModelViewSet):
         as images that users can draw zones on.
         """
         try:
-            document = Document.objects.get(pk=doc_id)
+            document = Document.objects.select_related(
+                "root_document__owner",
+            ).get(pk=doc_id)
         except Document.DoesNotExist:
             raise Http404("Document not found")
+
+        if not has_perms_owner_aware(request.user, "view_document", document):
+            return HttpResponseForbidden("Insufficient permissions")
 
         page_num = int(page)
 
@@ -5899,9 +5904,11 @@ class OcrTemplateViewSet(ModelViewSet):
                     timeout=30,
                 )
             except subprocess.CalledProcessError as e:
-                raise Http404(
-                    f"Failed to render page: {e.stderr.decode(errors='replace')[:200]}",
+                logger.warning(
+                    f"Failed to render page {page_num} of document {document.pk}: "
+                    f"{e.stderr.decode(errors='replace')[:200]}",
                 )
+                raise Http404("Failed to render page")
             except FileNotFoundError:
                 raise Http404("pdftoppm not available - is poppler-utils installed?")
 
