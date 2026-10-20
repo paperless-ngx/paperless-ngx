@@ -1,9 +1,9 @@
 """Tests for the OCR Template API."""
 
 import json
-from asyncio import subprocess
+import subprocess
+from pathlib import Path
 from unittest.mock import patch
-from zipfile import Path
 
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
@@ -895,6 +895,27 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         extract.assert_not_called()
+
+    @patch("documents.zone_ocr.run_zone_extraction")
+    def test_run_zone_ocr_does_not_require_document_upload_permission(self, extract):
+        user = User.objects.create_user(username="document_editor")
+        user.user_permissions.add(Permission.objects.get(codename="change_document"))
+        document = DocumentFactory(owner=user, content=CONTENT)
+        document.source_path.write_bytes(b"test PDF")
+        OcrTemplate.objects.create(
+            name="Matching",
+            owner=user,
+            source_width=100,
+            source_height=100,
+            match="Northwind",
+            matching_algorithm=MatchingModel.MATCH_ANY,
+        )
+        self.client.force_authenticate(user)
+
+        response = self.client.post(f"/api/documents/{document.pk}/run-zone-ocr/")
+
+        self.assertEqual(response.status_code, 200)
+        extract.assert_called_once()
 
     def test_run_zone_ocr_missing_document_is_an_error(self):
         response = self.client.post("/api/documents/99999/run-zone-ocr/")
