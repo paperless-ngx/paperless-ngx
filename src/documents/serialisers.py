@@ -3785,6 +3785,16 @@ class OcrTemplateZoneSerializer(serializers.ModelSerializer):
             )
         return value
 
+    def validate(self, data):
+        # A template PATCH still replaces each zone in full.
+        if self.root.partial:
+            for name, field in self.fields.items():
+                if field.required and name not in data:
+                    raise serializers.ValidationError(
+                        {name: field.error_messages["required"]},
+                    )
+        return data
+
 
 class OcrTemplateZoneTestSerializer(OcrTemplateZoneSerializer):
     name = serializers.CharField(default="test")
