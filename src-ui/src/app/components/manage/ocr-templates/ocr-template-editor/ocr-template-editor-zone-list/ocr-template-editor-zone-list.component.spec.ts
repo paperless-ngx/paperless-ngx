@@ -56,6 +56,23 @@ describe('OcrTemplateEditorZoneListComponent', () => {
     expect(text).toContain('Last page')
   })
 
+  it('marks zones that share a field', () => {
+    component.zones = [
+      zone(),
+      zone({ name: 'Zone 2' }),
+      zone({ name: 'Zone 3', custom_field: 8 }),
+    ]
+    fixture.detectChanges()
+
+    expect(component.isCombined(component.zones[0])).toBe(true)
+    expect(component.isCombined(component.zones[2])).toBe(false)
+    expect(
+      fixture.nativeElement.querySelectorAll(
+        '[title="Combined with other zones"]'
+      ).length
+    ).toBe(2)
+  })
+
   it('emits select and remove events', () => {
     component.zones = [zone()]
     const selectSpy = jest.spyOn(component.zoneSelected, 'emit')

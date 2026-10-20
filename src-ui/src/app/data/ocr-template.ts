@@ -43,6 +43,15 @@ export function isOcrBuiltinTarget(value: unknown): value is OcrBuiltinTarget {
   )
 }
 
+/** The field a zone writes to, keyed by OcrTemplate.combine_formats. */
+export function getZoneFieldKey(zone: OcrTemplateZone): string | null {
+  const target = zone.target || DEFAULT_OCR_ZONE_TARGET
+  if (target !== OCR_ZONE_TARGET.CustomField) return target
+  return zone.custom_field === null || zone.custom_field === undefined
+    ? null
+    : String(zone.custom_field)
+}
+
 /** Custom field types zone OCR can write to. See models.py OCR_SUPPORTED_FIELD_TYPES. */
 export const OCR_SUPPORTED_FIELD_TYPES: CustomFieldDataType[] = [
   CustomFieldDataType.String,

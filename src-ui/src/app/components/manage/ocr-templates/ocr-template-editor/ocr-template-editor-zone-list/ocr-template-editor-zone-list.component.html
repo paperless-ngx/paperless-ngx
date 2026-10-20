@@ -7,7 +7,12 @@
         <span class="p-2 rounded flex-shrink-0" [style.background-color]="zoneColor(i)" aria-hidden="true"></span>
         <div class="flex-grow-1 text-truncate">
           <button type="button" class="btn btn-link p-0 fw-semibold text-reset text-decoration-none text-truncate mw-100 stretched-link" (click)="zoneSelected.emit(i)">{{ zone.name }}</button>
-          <div class="small text-muted text-truncate">{{ getZoneTargetName(zone) }}</div>
+          <div class="small text-muted text-truncate">
+            {{ getZoneTargetName(zone) }}
+            @if (isCombined(zone)) {
+              <i-bs name="link" class="ms-1" title="Combined with other zones" i18n-title></i-bs>
+            }
+          </div>
         </div>
         <small class="text-muted text-nowrap">
           @if (zone.page === -1) {

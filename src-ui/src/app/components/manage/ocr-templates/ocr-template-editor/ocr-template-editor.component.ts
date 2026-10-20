@@ -47,6 +47,7 @@ import {
   DEFAULT_OCR_ZONE_LANGUAGE,
   DEFAULT_OCR_ZONE_TARGET,
   DEFAULT_OCR_ZONE_TRANSFORM,
+  getZoneFieldKey,
   isOcrBuiltinTarget,
   OCR_BUILTIN_TARGETS,
   OCR_LANGUAGE_OPTIONS,
@@ -309,7 +310,6 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
         .pipe(takeUntil(this.destroy$))
         .subscribe((t) => {
           this.template = t
-          this.template.combine_formats ??= {}
           this.changeDetector.markForCheck()
           if (t.sample_document) {
             this.previewDocId = t.sample_document
@@ -827,7 +827,6 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     this.clearZoneTest()
     const zone = this.template.zones[index]
     if (zone) {
-      this.seedCombineDefault(zone)
       this.goToPage(this.zonePage(zone) - 1)
     }
   }
@@ -965,18 +964,12 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
       zone.target = OCR_ZONE_TARGET.CustomField
       zone.custom_field = typeof value === 'number' ? value : null
     }
-    this.seedCombineDefault(zone)
-  }
-
-  fieldKeyFor(zone: OcrTemplateZone): string | null {
-    const v = this.zoneFieldValue(zone)
-    return v === null || v === undefined ? null : String(v)
   }
 
   zonesForField(zone: OcrTemplateZone): OcrTemplateZone[] {
-    const key = this.fieldKeyFor(zone)
+    const key = getZoneFieldKey(zone)
     if (!key) return []
-    return this.template.zones.filter((z) => this.fieldKeyFor(z) === key)
+    return this.template.zones.filter((z) => getZoneFieldKey(z) === key)
   }
 
   isFieldShared(zone: OcrTemplateZone): boolean {
@@ -984,47 +977,37 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
   }
 
   getCombineFormat(zone: OcrTemplateZone): string {
-    const key = this.fieldKeyFor(zone)
-    return (key && this.template.combine_formats?.[key]) || ''
+    return this.template.combine_formats?.[getZoneFieldKey(zone)] ?? ''
   }
 
   setCombineFormat(zone: OcrTemplateZone, value: string) {
-    const key = this.fieldKeyFor(zone)
+    const key = getZoneFieldKey(zone)
     if (!key) return
     this.template.combine_formats ??= {}
     this.template.combine_formats[key] = value
   }
 
+  defaultCombineFormat(zone: OcrTemplateZone): string {
+    return this.zonesForField(zone)
+      .map((z) => `{${z.name}}`)
+      .join(' ')
+  }
+
   insertCombineToken(zone: OcrTemplateZone, tokenZone: OcrTemplateZone) {
-    const token = `{${tokenZone.name}}`
     const current = this.getCombineFormat(zone)
     const sep = current && !current.endsWith(' ') ? ' ' : ''
-    this.setCombineFormat(zone, `${current}${sep}${token}`)
+    this.setCombineFormat(zone, `${current}${sep}{${tokenZone.name}}`)
   }
 
-  private seedCombineDefault(zone: OcrTemplateZone) {
-    const key = this.fieldKeyFor(zone)
-    if (!key) return
-    const shared = this.zonesForField(zone)
-    if (shared.length <= 1) return
-    this.template.combine_formats ??= {}
-    if (!this.template.combine_formats[key]) {
-      this.template.combine_formats[key] = shared
-        .map((z) => `{${z.name}}`)
-        .join(' ')
-    }
-  }
-
+  /** Drop formats that are empty or whose field no longer has several zones. */
   private pruneCombineFormats() {
     const formats = this.template.combine_formats
     if (!formats) return
-    const counts = new Map<string, number>()
-    for (const z of this.template.zones) {
-      const key = this.fieldKeyFor(z)
-      if (key) counts.set(key, (counts.get(key) ?? 0) + 1)
-    }
-    for (const key of Object.keys(formats)) {
-      if ((counts.get(key) ?? 0) <= 1) delete formats[key]
+    const keys = this.template.zones.map(getZoneFieldKey)
+    for (const [key, format] of Object.entries(formats)) {
+      if (!format || keys.filter((k) => k === key).length < 2) {
+        delete formats[key]
+      }
     }
   }
 

@@ -39,6 +39,7 @@ describe('OcrTemplateEditorComponent', () => {
   }
   const templates = {
     testZone: jest.fn(),
+    create: jest.fn(),
     getPageImageUrl: (id: number, page: number) => `/preview/${id}/${page}`,
   }
   const modal = { open: jest.fn() }
@@ -266,6 +267,28 @@ describe('OcrTemplateEditorComponent', () => {
       'created',
       5,
     ])
+  })
+
+  it('builds a combine format for zones sharing a field and prunes stale ones', () => {
+    const first = { ...zone(), name: 'First' }
+    const second = { ...zone(), name: 'Second' }
+    const other = { ...zone(), name: 'Other', custom_field: 2 }
+    component.template.zones = [first, second, other]
+    component.template.combine_formats = { '2': '{Other}' }
+
+    expect(component.isFieldShared(first)).toBe(true)
+    expect(component.isFieldShared(other)).toBe(false)
+    expect(component.defaultCombineFormat(first)).toBe('{First} {Second}')
+
+    component.insertCombineToken(first, second)
+    component.insertCombineToken(first, first)
+    expect(component.getCombineFormat(second)).toBe('{Second} {First}')
+
+    templates.create.mockReturnValue(of(component.template))
+    component.save()
+    expect(component.template.combine_formats).toEqual({
+      '1': '{Second} {First}',
+    })
   })
 
   it('hides results when extraction settings or geometry change', () => {
