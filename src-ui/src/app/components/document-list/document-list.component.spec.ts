@@ -487,7 +487,7 @@ describe('DocumentListComponent', () => {
     delete modifiedView.name
     const savedViewServicePatch = jest.spyOn(savedViewService, 'patch')
     savedViewServicePatch.mockReturnValue(of(modifiedView))
-    const toastSpy = jest.spyOn(toastService, 'showInfo')
+    const toastSpy = jest.spyOn(toastService, 'showSuccess')
 
     component.saveViewConfig()
     expect(savedViewServicePatch).toHaveBeenCalledWith(modifiedView)
@@ -592,7 +592,7 @@ describe('DocumentListComponent', () => {
     let openModal: NgbModalRef
     modalService.activeInstances.subscribe((modal) => (openModal = modal[0]))
     const modalSpy = jest.spyOn(modalService, 'open')
-    const toastSpy = jest.spyOn(toastService, 'showInfo')
+    const toastSpy = jest.spyOn(toastService, 'showSuccess')
     const savedViewServiceCreate = jest.spyOn(savedViewService, 'create')
     jest
       .spyOn(savedViewService, 'dashboardViews', 'get')

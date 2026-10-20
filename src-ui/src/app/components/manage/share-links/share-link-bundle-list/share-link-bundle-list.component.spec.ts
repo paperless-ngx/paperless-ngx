@@ -22,6 +22,7 @@ class MockShareLinkBundleService {
 
 class MockToastService {
   showInfo = jest.fn()
+  showSuccess = jest.fn()
   showError = jest.fn()
 }
 
@@ -210,7 +211,7 @@ describe('ShareLinkBundleListComponent', () => {
     component.delete(sampleBundle())
 
     expect(service.delete).toHaveBeenCalled()
-    expect(toastService.showInfo).toHaveBeenCalledWith(
+    expect(toastService.showSuccess).toHaveBeenCalledWith(
       expect.stringContaining('deleted.')
     )
     expect(service.list).toHaveBeenCalledTimes(2)

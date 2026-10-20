@@ -151,7 +151,7 @@ export class ShareLinkListComponent
         if (this.links().length === 1 && this.page() > 1) {
           this.page.update((page) => page - 1)
         }
-        this.toastService.showInfo($localize`Share link deleted.`)
+        this.toastService.showSuccess($localize`Share link deleted.`)
         this.reload()
       },
       error: (error) => {

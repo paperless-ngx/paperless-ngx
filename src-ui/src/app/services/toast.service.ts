@@ -2,6 +2,12 @@ import { Injectable } from '@angular/core'
 import { Subject } from 'rxjs'
 import { v4 as uuidv4 } from 'uuid'
 
+export enum ToastLevel {
+  Info = 'info',
+  Success = 'success',
+  Error = 'error',
+}
+
 export interface Toast {
   id?: string
 
@@ -9,15 +15,32 @@ export interface Toast {
 
   delay: number
 
-  delayRemaining?: number
-
   action?: any
 
   actionName?: string
 
-  classname?: string
+  /** Defaults to ToastLevel.Info */
+  level?: ToastLevel
 
   error?: any
+
+  /**
+   * Whether the toast is kept in the notifications dropdown after its popup
+   * closes. Defaults to true.
+   */
+  persistent?: boolean
+
+  /**
+   * Adds the toast to the notifications dropdown without a popup, e.g. when
+   * the same information is already on screen. Defaults to false.
+   */
+  silent?: boolean
+
+  /** When the toast was shown, set automatically */
+  timestamp?: Date
+
+  /** Whether the toast has been seen in the notifications dropdown */
+  read?: boolean
 }
 
 @Injectable({
@@ -42,29 +65,51 @@ export class ToastService {
     if (!toast.id) {
       toast.id = uuidv4()
     }
+    toast.timestamp ??= new Date()
     if (typeof toast.error === 'string') {
       try {
         toast.error = JSON.parse(toast.error)
       } catch (e) {}
     }
-    this.toasts.unshift(toast)
-    if (!this._suppressPopupToasts) {
+    const persistent = toast.persistent !== false
+    if (persistent) {
+      // the dropdown is open, so it's seen as it arrives
+      toast.read = !!this._suppressPopupToasts
+      this.toasts.unshift(toast)
+      this.toastsSubject.next(this.toasts)
+    }
+    // Popups are suppressed while the dropdown is open
+    if (!toast.silent && (!this._suppressPopupToasts || !persistent)) {
       this.showToast.next(toast)
     }
-    this.toastsSubject.next(this.toasts)
   }
 
   showError(content: string, error: any = null, delay: number = 10000) {
     this.show({
       content: content,
       delay: delay,
-      classname: 'error',
+      level: ToastLevel.Error,
       error,
     })
   }
 
   showInfo(content: string, delay: number = 5000) {
-    this.show({ content: content, delay: delay })
+    this.show({ content: content, delay: delay, persistent: false })
+  }
+
+  /** For confirming that something the user did has completed */
+  showSuccess(content: string, delay: number = 5000) {
+    this.show({
+      content: content,
+      delay: delay,
+      level: ToastLevel.Success,
+      persistent: false,
+    })
+  }
+
+  markAllRead() {
+    this.toasts.forEach((toast) => (toast.read = true))
+    this.toastsSubject.next(this.toasts)
   }
 
   closeToast(toast: Toast) {

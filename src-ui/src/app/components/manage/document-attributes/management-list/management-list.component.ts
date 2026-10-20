@@ -224,7 +224,7 @@ export abstract class ManagementListComponent<T extends MatchingModel>
     activeModal.componentInstance.dialogMode.set(EditDialogMode.CREATE)
     activeModal.componentInstance.succeeded.subscribe(() => {
       this.reloadData()
-      this.toastService.showInfo(
+      this.toastService.showSuccess(
         $localize`Successfully created ${this.typeName}.`
       )
     })
@@ -244,7 +244,7 @@ export abstract class ManagementListComponent<T extends MatchingModel>
     activeModal.componentInstance.dialogMode.set(EditDialogMode.EDIT)
     activeModal.componentInstance.succeeded.subscribe(() => {
       this.reloadData()
-      this.toastService.showInfo(
+      this.toastService.showSuccess(
         $localize`Successfully updated ${this.typeName} "${object.name}".`
       )
     })
@@ -428,7 +428,7 @@ export abstract class ManagementListComponent<T extends MatchingModel>
           .subscribe({
             next: () => {
               modal.close()
-              this.toastService.showInfo(
+              this.toastService.showSuccess(
                 $localize`Permissions updated successfully`
               )
               this.reloadData()
@@ -468,7 +468,9 @@ export abstract class ManagementListComponent<T extends MatchingModel>
         .subscribe({
           next: () => {
             modal.close()
-            this.toastService.showInfo($localize`Objects deleted successfully`)
+            this.toastService.showSuccess(
+              $localize`Objects deleted successfully`
+            )
             this.reloadData()
           },
           error: (error) => {

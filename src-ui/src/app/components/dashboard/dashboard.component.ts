@@ -87,7 +87,7 @@ export class DashboardComponent extends ComponentWithPermissions {
       .updateDashboardViewsSort(this.dashboardViews())
       .subscribe({
         next: () => {
-          this.toastService.showInfo($localize`Dashboard updated`)
+          this.toastService.showSuccess($localize`Dashboard updated`)
         },
         error: (e) => {
           this.toastService.showError($localize`Error updating dashboard`, e)

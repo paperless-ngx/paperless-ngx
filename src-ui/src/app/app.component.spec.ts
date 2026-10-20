@@ -19,6 +19,7 @@ import { PermissionsGuard } from './guards/permissions.guard'
 import { HotKeyService } from './services/hot-key.service'
 import { PermissionsService } from './services/permissions.service'
 import { SettingsService } from './services/settings.service'
+import { TasksService } from './services/tasks.service'
 import { Toast, ToastService } from './services/toast.service'
 import {
   FileStatus,
@@ -34,6 +35,7 @@ describe('AppComponent', () => {
   let toastService: ToastService
   let router: Router
   let settingsService: SettingsService
+  let tasksService: TasksService
   let hotKeyService: HotKeyService
 
   beforeEach(async () => {
@@ -60,6 +62,7 @@ describe('AppComponent', () => {
     websocketStatusService = TestBed.inject(WebsocketStatusService)
     permissionsService = TestBed.inject(PermissionsService)
     settingsService = TestBed.inject(SettingsService)
+    tasksService = TestBed.inject(TasksService)
     toastService = TestBed.inject(ToastService)
     router = TestBed.inject(Router)
     hotKeyService = TestBed.inject(HotKeyService)
@@ -117,30 +120,33 @@ describe('AppComponent', () => {
     expect(toast.action).toBeUndefined()
   })
 
-  it('should display toast on document added', () => {
-    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
+  it('should only reload tasks when a document is detected', () => {
     const toastSpy = jest.spyOn(toastService, 'show')
+    const reloadSpy = jest.spyOn(tasksService, 'reload')
     const fileStatusSubject = new Subject<FileStatus>()
     jest
       .spyOn(websocketStatusService, 'onDocumentDetected')
       .mockReturnValue(fileStatusSubject)
     component.ngOnInit()
     fileStatusSubject.next(new FileStatus())
-    expect(toastSpy).toHaveBeenCalled()
+    expect(reloadSpy).toHaveBeenCalled()
+    expect(toastSpy).not.toHaveBeenCalled()
   })
 
-  it('should suppress dashboard notifications if set', () => {
+  it('should add consumed documents to the bell without a popup', () => {
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
-    jest.spyOn(settingsService, 'get').mockReturnValue(true)
-    jest.spyOn(router, 'url', 'get').mockReturnValue('/dashboard')
-    const toastSpy = jest.spyOn(toastService, 'show')
+    const popupSpy = jest.fn()
+    toastService.showToast.subscribe(popupSpy)
+    let toasts: Toast[] = []
+    toastService.getToasts().subscribe((t) => (toasts = [...t]))
     const fileStatusSubject = new Subject<FileStatus>()
     jest
-      .spyOn(websocketStatusService, 'onDocumentDetected')
+      .spyOn(websocketStatusService, 'onDocumentConsumptionFinished')
       .mockReturnValue(fileStatusSubject)
     component.ngOnInit()
     fileStatusSubject.next(new FileStatus())
-    expect(toastSpy).not.toHaveBeenCalled()
+    expect(toasts).toHaveLength(1)
+    expect(popupSpy).not.toHaveBeenCalled()
   })
 
   it('should display toast on document failed', () => {

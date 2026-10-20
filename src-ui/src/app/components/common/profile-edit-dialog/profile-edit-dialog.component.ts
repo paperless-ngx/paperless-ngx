@@ -204,7 +204,7 @@ export class ProfileEditDialogComponent
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe({
         next: () => {
-          this.toastService.showInfo($localize`Profile updated successfully`)
+          this.toastService.showSuccess($localize`Profile updated successfully`)
           if (passwordChanged) {
             this.toastService.showInfo(
               $localize`Password has been changed, you will be logged out momentarily.`
@@ -307,7 +307,9 @@ export class ProfileEditDialogComponent
           this.recoveryCodes.set(activationResponse.recovery_codes)
           this.form.get('totp_code').enable()
           if (activationResponse.success) {
-            this.toastService.showInfo($localize`TOTP activated successfully`)
+            this.toastService.showSuccess(
+              $localize`TOTP activated successfully`
+            )
           } else {
             this.toastService.showError($localize`Error activating TOTP`)
           }
@@ -331,7 +333,9 @@ export class ProfileEditDialogComponent
           this.isTotpEnabled.set(!success)
           this.recoveryCodes.set(null)
           if (success) {
-            this.toastService.showInfo($localize`TOTP deactivated successfully`)
+            this.toastService.showSuccess(
+              $localize`TOTP deactivated successfully`
+            )
           } else {
             this.toastService.showError($localize`Error deactivating TOTP`)
           }

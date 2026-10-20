@@ -3,7 +3,7 @@ import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { Subject } from 'rxjs'
-import { Toast, ToastService } from 'src/app/services/toast.service'
+import { Toast, ToastLevel, ToastService } from 'src/app/services/toast.service'
 import { ToastsDropdownComponent } from './toasts-dropdown.component'
 
 const toasts = [
@@ -89,5 +89,74 @@ describe('ToastsDropdownComponent', () => {
     const spy = jest.spyOn(toastService, 'suppressPopupToasts', 'set')
     component.onOpenChange(true)
     expect(spy).toHaveBeenCalledWith(true)
+  })
+
+  it('should badge unread toasts, red when one is an error', () => {
+    toastsSubject.next([
+      { id: 'a', content: 'Read', delay: 5000, read: true },
+      { id: 'b', content: 'Unread', delay: 5000, read: false },
+    ])
+    fixture.detectChanges()
+    let badge: HTMLElement = fixture.nativeElement.querySelector(
+      '.notification-count'
+    )
+    expect(badge.textContent.trim()).toEqual('1')
+    expect(badge.classList).toContain('bg-secondary')
+
+    toastsSubject.next([
+      { id: 'c', content: 'Failed', delay: 5000, level: ToastLevel.Error },
+    ])
+    fixture.detectChanges()
+    badge = fixture.nativeElement.querySelector('.notification-count')
+    expect(badge.classList).toContain('bg-danger')
+
+    toastsSubject.next([{ id: 'd', content: 'Seen', delay: 5000, read: true }])
+    fixture.detectChanges()
+    expect(
+      fixture.nativeElement.querySelector('.notification-count')
+    ).toBeNull()
+  })
+
+  it('should mark all toasts read when opened', () => {
+    const markSpy = jest.spyOn(toastService, 'markAllRead')
+    component.onOpenChange(false)
+    expect(markSpy).not.toHaveBeenCalled()
+    component.onOpenChange(true)
+    expect(markSpy).toHaveBeenCalled()
+  })
+
+  it('should tick the clock only while open', () => {
+    jest.useFakeTimers()
+    component.onOpenChange(true)
+    const opened = component.now()
+    jest.advanceTimersByTime(30000)
+    const ticked = component.now()
+    expect(ticked).not.toBe(opened)
+
+    component.onOpenChange(false)
+    jest.advanceTimersByTime(60000)
+    expect(component.now()).toBe(ticked)
+    jest.useRealTimers()
+  })
+
+  it('should mark toasts that were unread when opened as new', () => {
+    toastsSubject.next([
+      { id: 'a', content: 'Seen', delay: 5000, read: true },
+      { id: 'b', content: 'Unseen', delay: 5000, read: false },
+    ])
+    fixture.detectChanges()
+    component.onOpenChange(true)
+    expect([...component.newIds()]).toEqual(['b'])
+    component.onOpenChange(false)
+    expect(component.newIds().size).toEqual(0)
+  })
+
+  it('should clear the toast and close the menu when an action is used', () => {
+    const toast = { id: 'a', content: 'Moved', delay: 5000 }
+    const closeToastSpy = jest.spyOn(toastService, 'closeToast')
+    const closeSpy = jest.spyOn(component.dropdown, 'close')
+    component.onActioned(toast)
+    expect(closeToastSpy).toHaveBeenCalledWith(toast)
+    expect(closeSpy).toHaveBeenCalled()
   })
 })

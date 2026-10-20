@@ -55,6 +55,7 @@ import { SwitchComponent } from '../common/input/switch/switch.component'
 import { BrandMarkComponent } from '../common/logo/brand-mark/brand-mark.component'
 import { LogoComponent } from '../common/logo/logo.component'
 import { ProfileEditDialogComponent } from '../common/profile-edit-dialog/profile-edit-dialog.component'
+import { UploadStatusTrayComponent } from '../common/upload-status-tray/upload-status-tray.component'
 import { DocumentDetailComponent } from '../document-detail/document-detail.component'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
 import { GlobalSearchComponent } from './global-search/global-search.component'
@@ -85,6 +86,7 @@ const SCROLL_THRESHOLD = 16
     TourNgBootstrap,
     FormsModule,
     SwitchComponent,
+    UploadStatusTrayComponent,
   ],
 })
 export class AppFrameComponent
@@ -173,6 +175,8 @@ export class AppFrameComponent
           this.toastService.showError(message.message)
           break
         case DjangoMessageLevel.SUCCESS:
+          this.toastService.showSuccess(message.message)
+          break
         case DjangoMessageLevel.INFO:
         case DjangoMessageLevel.DEBUG:
           this.toastService.showInfo(message.message)
@@ -479,7 +483,7 @@ export class AppFrameComponent
 
     this.settingsService.updateSidebarViewsSort(sidebarViews).subscribe({
       next: () => {
-        this.toastService.showInfo($localize`Sidebar views updated`)
+        this.toastService.showSuccess($localize`Sidebar views updated`)
       },
       error: (e) => {
         this.toastService.showError($localize`Error updating sidebar views`, e)

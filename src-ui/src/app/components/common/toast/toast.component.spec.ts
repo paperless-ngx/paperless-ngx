@@ -1,7 +1,11 @@
+import { DatePipe } from '@angular/common'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 
 import { Clipboard } from '@angular/cdk/clipboard'
 import { allIcons, NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { ToastLevel } from 'src/app/services/toast.service'
 import { ToastComponent } from './toast.component'
 
 const toast1 = {
@@ -30,6 +34,11 @@ describe('ToastComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [ToastComponent, NgxBootstrapIconsModule.pick(allIcons)],
+      providers: [
+        DatePipe,
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+      ],
     }).compileComponents()
 
     fixture = TestBed.createComponent(ToastComponent)
@@ -46,9 +55,115 @@ describe('ToastComponent', () => {
     component.toast = toast2
     fixture.detectChanges()
     component.onShown(toast2)
-    jest.advanceTimersByTime(5000)
-    expect(component.toast.delayRemaining).toEqual(0)
+    jest.advanceTimersByTime(5000 + 150) // ticks every 150ms
+    expect(component.delayRemaining()).toEqual(0)
     jest.useRealTimers()
+  })
+
+  it('should start the progress bar full before the countdown begins', () => {
+    component.toast = { content: 'Info', delay: 3000 }
+    fixture.detectChanges()
+    expect(component.delayRemaining()).toEqual(3000)
+  })
+
+  it('should hide the toast when the countdown ends', () => {
+    jest.useFakeTimers()
+    const toast = { content: 'Info', delay: 3000 }
+    component.toast = toast
+    fixture.detectChanges()
+    const hideSpy = jest.spyOn(component.ngbToast, 'hide')
+    component.onShown(toast)
+    jest.advanceTimersByTime(2850)
+    expect(hideSpy).not.toHaveBeenCalled()
+    jest.advanceTimersByTime(300)
+    expect(hideSpy).toHaveBeenCalled()
+    jest.useRealTimers()
+  })
+
+  it('should pause the countdown while hovered', () => {
+    jest.useFakeTimers()
+    const toast = { content: 'Info', delay: 3000 }
+    component.toast = toast
+    fixture.detectChanges()
+    const hideSpy = jest.spyOn(component.ngbToast, 'hide')
+    const el: HTMLElement = fixture.nativeElement.querySelector('ngb-toast')
+    component.onShown(toast)
+    jest.advanceTimersByTime(1500)
+    el.dispatchEvent(new MouseEvent('mouseenter'))
+    const remaining = component.delayRemaining()
+    jest.advanceTimersByTime(10000)
+    expect(component.delayRemaining()).toEqual(remaining)
+    expect(hideSpy).not.toHaveBeenCalled()
+
+    el.dispatchEvent(new MouseEvent('mouseleave'))
+    jest.advanceTimersByTime(remaining + 150)
+    expect(hideSpy).toHaveBeenCalled()
+    jest.useRealTimers()
+  })
+
+  it('should pause the countdown while focus is inside', () => {
+    jest.useFakeTimers()
+    const toast = { content: 'Info', delay: 3000 }
+    component.toast = toast
+    fixture.detectChanges()
+    const el: HTMLElement = fixture.nativeElement.querySelector('ngb-toast')
+    component.onShown(toast)
+    el.dispatchEvent(new FocusEvent('focusin'))
+    // mouse leaving doesn't resume while focus is still inside
+    el.dispatchEvent(new MouseEvent('mouseenter'))
+    el.dispatchEvent(new MouseEvent('mouseleave'))
+    jest.advanceTimersByTime(5000)
+    expect(component.delayRemaining()).toEqual(3000)
+    el.dispatchEvent(new FocusEvent('focusout'))
+    jest.advanceTimersByTime(3000)
+    expect(component.delayRemaining()).toEqual(0)
+    jest.useRealTimers()
+  })
+
+  it('should not count down without autohide', () => {
+    jest.useFakeTimers()
+    const toast = { content: 'Info', delay: 3000 }
+    component.toast = toast
+    component.autohide = false
+    fixture.detectChanges()
+    component.onShown(toast)
+    jest.advanceTimersByTime(5000)
+    expect(component.delayRemaining()).toBeNull()
+    jest.useRealTimers()
+  })
+
+  it('should show an icon and colors for each level', () => {
+    component.toast = {
+      content: 'Saved',
+      delay: 5000,
+      level: ToastLevel.Success,
+    }
+    fixture.detectChanges()
+    const el: HTMLElement = fixture.nativeElement
+    expect(el.querySelector('i-bs[name="check-circle"]')).not.toBeNull()
+    expect(el.querySelector('ngb-toast').classList).not.toContain('toast-error')
+
+    fixture = TestBed.createComponent(ToastComponent)
+    fixture.componentInstance.toast = {
+      content: 'Failed',
+      delay: 5000,
+      level: ToastLevel.Error,
+    }
+    fixture.detectChanges()
+    const errorEl: HTMLElement = fixture.nativeElement
+    expect(
+      errorEl.querySelector('i-bs[name="exclamation-triangle"]')
+    ).not.toBeNull()
+    expect(errorEl.querySelector('ngb-toast').classList).toContain(
+      'toast-error'
+    )
+
+    fixture = TestBed.createComponent(ToastComponent)
+    fixture.componentInstance.toast = { content: 'Started', delay: 5000 }
+    fixture.detectChanges()
+    expect(
+      fixture.nativeElement.querySelector('i-bs[name="info-circle"]')
+    ).not.toBeNull()
   })
 
   it('should show an error if given with toast', () => {
@@ -87,5 +202,71 @@ describe('ToastComponent', () => {
     expect(
       component.getErrorText({ error: new Array(205).join('a') })
     ).toContain('...')
+  })
+
+  it('should emit actioned, not closed, when the action is clicked', () => {
+    const action = jest.fn()
+    component.toast = {
+      content: 'Moved',
+      delay: 5000,
+      action,
+      actionName: 'Undo',
+    }
+    fixture.detectChanges()
+    const closedSpy = jest.spyOn(component.closed, 'emit')
+    const actionedSpy = jest.spyOn(component.actioned, 'emit')
+    const button: HTMLButtonElement = [
+      ...fixture.nativeElement.querySelectorAll('button'),
+    ].find((b) => b.textContent.includes('Undo'))
+    button.click()
+    expect(actionedSpy).toHaveBeenCalled()
+    expect(closedSpy).not.toHaveBeenCalled()
+    expect(action).toHaveBeenCalled()
+  })
+
+  it('should show a relative timestamp in the notifications list', () => {
+    component.toast = { content: 'Saved', delay: 5000, timestamp: new Date() }
+    component.autohide = false
+    fixture.detectChanges()
+    expect(fixture.nativeElement.textContent).toContain('Just now')
+  })
+
+  it('should update the relative timestamp as time passes', () => {
+    jest.useFakeTimers()
+    jest.setSystemTime(new Date('2026-10-19T12:00:00Z'))
+    component.toast = { content: 'Saved', delay: 5000, timestamp: new Date() }
+    component.autohide = false
+    fixture.componentRef.setInput('now', new Date())
+    fixture.detectChanges()
+    expect(fixture.nativeElement.textContent).toContain('Just now')
+
+    jest.setSystemTime(new Date('2026-10-19T12:03:00Z'))
+    fixture.componentRef.setInput('now', new Date())
+    fixture.detectChanges()
+    expect(fixture.nativeElement.textContent).toContain('3 minutes ago')
+    jest.useRealTimers()
+  })
+
+  it('should show a compact action link in the notifications list', () => {
+    const action = jest.fn()
+    component.toast = {
+      content: 'Moved',
+      delay: 5000,
+      action,
+      actionName: 'Undo',
+      timestamp: new Date(),
+    }
+    component.autohide = false
+    fixture.detectChanges()
+    const link: HTMLButtonElement =
+      fixture.nativeElement.querySelector('.toast-action')
+    expect(link.textContent).toContain('Undo')
+    expect(
+      fixture.nativeElement.querySelector('.btn-outline-secondary')
+    ).toBeNull()
+    const actionedSpy = jest.spyOn(component.actioned, 'emit')
+    link.click()
+    expect(actionedSpy).toHaveBeenCalled()
+    expect(action).toHaveBeenCalled()
   })
 })
