@@ -36,7 +36,7 @@ class TestApplyTransform(TestCase):
         self.assertEqual(_apply_transform("HELLO WORLD", "lowercase"), "hello world")
 
     def test_numeric_basic(self):
-        self.assertEqual(_apply_transform("INV-2026-001", "numeric"), "2026-001")
+        self.assertEqual(_apply_transform("Invoice 2026-001", "numeric"), "2026-001")
 
     def test_numeric_with_currency(self):
         self.assertEqual(_apply_transform("€1,234.56", "numeric"), "1,234.56")
@@ -44,32 +44,40 @@ class TestApplyTransform(TestCase):
     def test_numeric_empty_result_falls_back(self):
         self.assertEqual(_apply_transform("abc", "numeric"), "abc")
 
-    def test_date_dmy_dots(self):
-        self.assertEqual(_apply_transform("13.04.2026", "date_dmy"), "2026-04-13")
+    def test_date_with_format(self):
+        self.assertEqual(
+            _apply_transform("13.04.2026", "date", "%d.%m.%Y"),
+            "2026-04-13",
+        )
+        self.assertEqual(
+            _apply_transform("01/12/2025", "date", "%d/%m/%Y"),
+            "2025-12-01",
+        )
 
-    def test_date_dmy_slashes(self):
-        self.assertEqual(_apply_transform("01/12/2025", "date_dmy"), "2025-12-01")
+    def test_date_two_digit_year(self):
+        self.assertEqual(
+            _apply_transform("13.04.26", "date", "%d.%m.%y"),
+            "2026-04-13",
+        )
 
-    def test_date_dmy_two_digit_year(self):
-        self.assertEqual(_apply_transform("13.04.26", "date_dmy"), "2026-04-13")
+    def test_date_auto_detect(self):
+        self.assertEqual(_apply_transform("2026-04-13", "date"), "2026-04-13")
+        self.assertEqual(_apply_transform("2026/04/13", "date"), "2026-04-13")
+        self.assertEqual(_apply_transform("13 April 2026", "date"), "2026-04-13")
 
-    def test_date_dmy_with_prefix(self):
-        self.assertEqual(_apply_transform("Date: 01/12/2025", "date_dmy"), "2025-12-01")
+    def test_date_format_mismatch_falls_back_to_auto_detect(self):
+        self.assertEqual(
+            _apply_transform("2026-04-13", "date", "%d.%m.%Y"),
+            "2026-04-13",
+        )
 
-    def test_date_dmy_invalid_falls_back(self):
-        self.assertEqual(_apply_transform("32.13.2026", "date_dmy"), "32.13.2026")
-
-    def test_date_dmy_no_match_falls_back(self):
-        self.assertEqual(_apply_transform("not a date", "date_dmy"), "not a date")
-
-    def test_date_ymd_dashes(self):
-        self.assertEqual(_apply_transform("2026-04-13", "date_ymd"), "2026-04-13")
-
-    def test_date_ymd_slashes(self):
-        self.assertEqual(_apply_transform("2026/04/13", "date_ymd"), "2026-04-13")
-
-    def test_date_ymd_invalid_falls_back(self):
-        self.assertEqual(_apply_transform("2026-13-32", "date_ymd"), "2026-13-32")
+    def test_date_invalid_returns_text(self):
+        self.assertEqual(
+            _apply_transform("32.13.2026", "date", "%d.%m.%Y"),
+            "32.13.2026",
+        )
+        self.assertEqual(_apply_transform("2026-13-32", "date"), "2026-13-32")
+        self.assertEqual(_apply_transform("not a date", "date"), "not a date")
 
     def test_empty_string(self):
         self.assertEqual(_apply_transform("", "strip"), "")
