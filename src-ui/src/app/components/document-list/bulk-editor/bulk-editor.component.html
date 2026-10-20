@@ -100,7 +100,7 @@
           </button>
           @if (permissionService.currentUserCan(PermissionAction.View, PermissionType.OcrTemplate)) {
             <button ngbDropdownItem (click)="runZoneOcrSelected()" [disabled]="!userCanEditAll">
-              <i-bs name="bounding-box-circles" class="me-1"></i-bs><ng-container i18n>Run Zone OCR</ng-container>
+              <i-bs name="bounding-box-circles" class="me-2"></i-bs><ng-container i18n>Run Zone OCR</ng-container>
             </button>
           }
         </div>
