@@ -40,7 +40,7 @@
     (change)="onChange(selectedDocumentIDs)">
     <ng-template ng-label-tmp let-document="item">
       <div class="d-flex align-items-center">
-        @if (!disabled) {
+        @if (!disabled && multiple) {
           <button class="btn p-0 lh-1" (click)="unselect(document)" (mousedown)="$event.stopImmediatePropagation()" type="button" title="Remove link" i18n-title><i-bs name="x"></i-bs></button>
         }
         @if (document.title) {
