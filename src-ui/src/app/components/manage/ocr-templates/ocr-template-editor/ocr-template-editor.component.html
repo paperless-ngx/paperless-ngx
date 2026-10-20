@@ -7,10 +7,10 @@
 </div>
 
 <div class="modal-body d-flex flex-column">
-<div class="row gx-3 editor-layout flex-grow-1 flex-lg-nowrap" [attr.inert]="saving() ? '' : null" [attr.aria-busy]="saving()">
-  <div class="col-lg-4 mb-3 mb-lg-0 overflow-auto">
-    <ul ngbNav #nav="ngbNav" [(activeId)]="activeTab" class="nav-underline flex-nowrap flex-md-wrap overflow-auto">
-        <li ngbNavItem="settings">
+  <div class="row gx-3 editor-layout flex-grow-1 flex-lg-nowrap" [attr.inert]="saving() ? '' : null" [attr.aria-busy]="saving()">
+    <div class="col-lg-4 mb-3 mb-lg-0 overflow-auto">
+      <ul ngbNav #nav="ngbNav" [(activeId)]="activeTab" class="nav-underline flex-nowrap flex-md-wrap overflow-auto">
+        <li ngbNavItem="template">
           <a ngbNavLink i18n>Template</a>
           <ng-template ngbNavContent>
             <div class="row mb-3">
@@ -54,9 +54,21 @@
                 } @else {
                   <dl class="row small border rounded mx-0 py-2 mb-3">
                     <dt class="col-4" i18n>OCR text</dt>
-                    <dd class="col-8"><code>{{ result.raw_text || '(nothing detected)' }}</code></dd>
+                    <dd class="col-8">
+                      @if (result.raw_text) {
+                        <code>{{ result.raw_text }}</code>
+                      } @else {
+                        <span class="text-muted" i18n>Nothing detected</span>
+                      }
+                    </dd>
                     <dt class="col-4" i18n>Value</dt>
-                    <dd class="col-8" [class.mb-0]="!result.regex"><code>{{ result.value || '(empty)' }}</code></dd>
+                    <dd class="col-8" [class.mb-0]="!result.regex">
+                      @if (result.value) {
+                        <code>{{ result.value }}</code>
+                      } @else {
+                        <span class="text-muted" i18n>Empty</span>
+                      }
+                    </dd>
                     @if (result.regex) {
                       <dt class="col-4" i18n>Validation</dt>
                       <dd class="col-8 mb-0">
@@ -141,7 +153,7 @@
                 ></pngx-input-text>
               }
 
-              <pngx-input-text [(ngModel)]="zone.validation_regex" title="Validation regex" i18n-title placeholder="e.g. \d{2}\.\d{2}\.\d{4}" hint="The value must match this pattern to be applied." i18n-hint></pngx-input-text>
+              <pngx-input-text [(ngModel)]="zone.validation_regex" title="Validation regex" i18n-title placeholder="\d{2}\.\d{2}\.\d{4}" hint="The value must match this pattern to be applied." i18n-hint></pngx-input-text>
             } @else {
               <pngx-ocr-template-zone-list
                 [zones]="template.zones"
@@ -224,7 +236,7 @@
                           [attr.width]="rect.w"
                           [attr.height]="rect.h"
                           [attr.stroke]="zoneColor(i)"
-                          [attr.fill]="zoneColor(i) + '33'"
+                          [attr.fill]="zoneColor(i)"
                         ></rect>
                         <text
                           class="zone-label fw-semibold pe-none"

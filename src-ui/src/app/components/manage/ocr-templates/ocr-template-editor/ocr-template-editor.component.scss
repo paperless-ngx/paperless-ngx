@@ -32,6 +32,7 @@
 }
 
 .zone-rect {
+  fill-opacity: 0.2;
   stroke-width: 2;
 }
 
@@ -55,8 +56,9 @@
 }
 
 .zone-drawing-rect {
-  fill: rgba(105, 219, 124, 0.25);
-  stroke: #69db7c;
+  fill: var(--bs-primary);
+  fill-opacity: 0.2;
+  stroke: var(--bs-primary);
   stroke-dasharray: 5 5;
   stroke-width: 2;
 }

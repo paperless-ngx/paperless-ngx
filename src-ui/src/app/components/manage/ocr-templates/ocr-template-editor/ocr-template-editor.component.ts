@@ -67,7 +67,7 @@ import {
   resizeZone,
 } from './zone-geometry'
 
-type ActiveTab = 'settings' | 'zones'
+type ActiveTab = 'template' | 'zones'
 type ZoneFieldSelection = OcrZoneTarget | number | null
 type OverlayInteraction =
   | { kind: 'idle' }
@@ -235,7 +235,7 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     this.goToPage(value - 1)
   }
 
-  activeTab: ActiveTab = 'settings'
+  activeTab: ActiveTab = 'template'
 
   selectedZoneIndex: number | null = null
   private overlayInteraction: OverlayInteraction = NO_OVERLAY_INTERACTION
