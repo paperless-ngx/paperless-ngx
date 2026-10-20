@@ -1587,15 +1587,6 @@ export class DocumentDetailComponent
     })
   }
 
-  createOcrTemplate() {
-    this.router.navigate(['/ocr-templates', 'new'], {
-      queryParams: {
-        document_type: this.document().document_type,
-        sample_document: this.document().id,
-      },
-    })
-  }
-
   private getSelectedNonLatestVersionId(): number | null {
     const versions = this.document()?.versions ?? []
     if (!versions.length || !this.selectedVersionId()) {

@@ -70,14 +70,6 @@
         <i-bs width="1em" height="1em" name="file-earmark-ruled" class="me-1"></i-bs><span i18n>Run Zone OCR</span>
       </button>
 
-      <button
-        ngbDropdownItem
-        (click)="createOcrTemplate()"
-        *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.OcrTemplate }"
-      >
-        <i-bs width="1em" height="1em" name="file-earmark-medical" class="me-1"></i-bs><span i18n>Create OCR Template</span>
-      </button>
-
       @if (userIsOwner && (requiresPassword || password)) {
         <button ngbDropdownItem (click)="removePassword()" [disabled]="!password">
           <i-bs name="unlock" class="me-1"></i-bs><ng-container i18n>Remove Password</ng-container>

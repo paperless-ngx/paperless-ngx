@@ -345,16 +345,6 @@ export class OcrTemplateEditorComponent
           this.markSaved()
         })
     } else {
-      const qp = this.route.snapshot.queryParams
-      if (qp['document_type']) {
-        this.template.document_type = parseInt(qp['document_type'])
-      }
-      if (qp['sample_document']) {
-        const docId = parseInt(qp['sample_document'])
-        this.template.sample_document = docId
-        this.previewDocId = docId
-        this.loadPreview()
-      }
       this.markSaved()
     }
   }

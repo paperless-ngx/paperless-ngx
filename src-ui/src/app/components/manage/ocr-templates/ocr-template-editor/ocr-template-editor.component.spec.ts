@@ -53,7 +53,7 @@ describe('OcrTemplateEditorComponent', () => {
       providers: [
         {
           provide: ActivatedRoute,
-          useValue: { snapshot: { paramMap: new Map(), queryParams: {} } },
+          useValue: { snapshot: { paramMap: new Map() } },
         },
         { provide: DocumentService, useValue: documents },
         { provide: OcrTemplateService, useValue: templates },
