@@ -266,6 +266,7 @@ export class DocumentDetailComponent
   readonly error = signal<any>(undefined)
 
   readonly networkActive = signal(false)
+  readonly zoneOcrRunning = signal(false)
 
   readonly documentId = signal<number>(undefined)
   readonly document = signal<Document>(undefined)
@@ -543,7 +544,11 @@ export class DocumentDetailComponent
       )
   }
 
-  private loadDocument(documentId: number, forceRemote: boolean = false): void {
+  private loadDocument(
+    documentId: number,
+    forceRemote: boolean = false,
+    onComplete?: () => void
+  ): void {
     let redirectedToRoot = false
     this.closeIncomingUpdateModal()
     this.pendingIncomingUpdate = null
@@ -600,7 +605,8 @@ export class DocumentDetailComponent
         }),
         first(),
         takeUntil(this.unsubscribeNotifier),
-        takeUntil(this.docChangeNotifier)
+        takeUntil(this.docChangeNotifier),
+        finalize(() => onComplete?.())
       )
       .subscribe({
         next: (doc) => {
@@ -1334,6 +1340,7 @@ export class DocumentDetailComponent
   }
 
   save(close: boolean = false, savedCallback: () => void = null) {
+    if (this.zoneOcrRunning()) return
     this.networkActive.set(true)
     ;(document.activeElement as HTMLElement)?.dispatchEvent(new Event('change'))
     this.documentsService
@@ -1555,35 +1562,76 @@ export class DocumentDetailComponent
   }
 
   runZoneOcr() {
-    this.documentsService.runZoneOcr(this.document().id).subscribe({
-      next: (res) => {
-        const results = res.results ?? []
-        if (results.length) {
-          const failed = results.filter(
-            (r) =>
-              r.value === null ||
-              r.value === undefined ||
-              `${r.value}`.trim() === ''
-          )
-          const filled = results.length - failed.length
-          let msg = $localize`Filled ${filled} of ${results.length} fields`
-          if (failed.length) {
-            const names = failed.map((r) => r.zone).join(', ')
-            msg = `${msg}. ${$localize`Failed to match zones: ${names}`}`
-          }
-          this.toastService.showInfo(msg)
-        } else {
-          this.toastService.showInfo(
-            $localize`Zone OCR ran but no results extracted.`
-          )
-        }
-        this.docChangeNotifier.next(this.documentId())
-        this.loadDocument(this.documentId(), true)
-      },
-      error: (error) => {
-        this.toastService.showError($localize`Zone OCR failed`, error)
-      },
+    if (this.networkActive()) return
+    const documentId = this.documentId()
+    if (!this.hasLocalEdits(this.document())) {
+      this.executeZoneOcr(documentId)
+      return
+    }
+
+    const modal = this.modalService.open(ConfirmDialogComponent, {
+      backdrop: 'static',
     })
+    modal.componentInstance.title = $localize`Unsaved Changes`
+    modal.componentInstance.messageBold = $localize`You have unsaved changes.`
+    modal.componentInstance.message = $localize`Running Zone OCR will discard them.`
+    modal.componentInstance.btnClass = 'btn-warning'
+    modal.componentInstance.btnCaption = $localize`Run Zone OCR`
+    modal.componentInstance.confirmClicked
+      .pipe(first(), takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        modal.close()
+        if (this.documentId() === documentId && !this.networkActive()) {
+          this.executeZoneOcr(documentId)
+        }
+      })
+  }
+
+  private executeZoneOcr(documentId: number) {
+    this.zoneOcrRunning.set(true)
+    this.networkActive.set(true)
+    const finish = () => {
+      this.zoneOcrRunning.set(false)
+      this.networkActive.set(false)
+      this.flushPendingIncomingUpdate()
+    }
+    this.documentsService
+      .runZoneOcr(documentId)
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe({
+        next: (res) => {
+          if (this.documentId() !== documentId) {
+            finish()
+            return
+          }
+          const results = res.results ?? []
+          if (results.length) {
+            const failed = results.filter(
+              (r) =>
+                r.value === null ||
+                r.value === undefined ||
+                `${r.value}`.trim() === ''
+            )
+            const filled = results.length - failed.length
+            let msg = $localize`Filled ${filled} of ${results.length} fields`
+            if (failed.length) {
+              const names = failed.map((r) => r.zone).join(', ')
+              msg = `${msg}. ${$localize`Failed to match zones: ${names}`}`
+            }
+            this.toastService.showInfo(msg)
+          } else {
+            this.toastService.showInfo(
+              $localize`Zone OCR ran but no results extracted.`
+            )
+          }
+          this.docChangeNotifier.next(documentId)
+          this.loadDocument(documentId, true, finish)
+        },
+        error: (error) => {
+          finish()
+          this.toastService.showError($localize`Zone OCR failed`, error)
+        },
+      })
   }
 
   private getSelectedNonLatestVersionId(): number | null {

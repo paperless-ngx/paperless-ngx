@@ -64,7 +64,7 @@
       <button
         ngbDropdownItem
         (click)="runZoneOcr()"
-        [disabled]="!userCanEdit || !document()?.document_type"
+        [disabled]="!userCanEdit || !document()?.document_type || networkActive()"
         *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.OcrTemplate }"
       >
         <i-bs width="1em" height="1em" name="file-earmark-ruled" class="me-1"></i-bs><span i18n>Run Zone OCR</span>
@@ -99,7 +99,7 @@
 <div class="row">
   <div class="col-md-6 col-xl-5 mb-4">
 
-    <form [formGroup]='documentForm' (ngSubmit)="save()">
+    <form [formGroup]='documentForm' (ngSubmit)="save()" [attr.inert]="zoneOcrRunning() ? '' : null" [attr.aria-busy]="zoneOcrRunning()">
 
       <div class="btn-toolbar mb-1 pb-3 gap-2 row-gap-2 border-bottom">
         <div class="btn-group">

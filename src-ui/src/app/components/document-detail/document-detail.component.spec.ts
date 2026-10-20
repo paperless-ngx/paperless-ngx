@@ -1923,7 +1923,73 @@ describe('DocumentDetailComponent', () => {
       'Filled 1 of 2 fields. Failed to match zones: Due'
     )
     expect(notifySpy).toHaveBeenCalledWith(doc.id)
-    expect(loadSpy).toHaveBeenCalledWith(doc.id, true)
+    expect(loadSpy).toHaveBeenCalledWith(doc.id, true, expect.any(Function))
+    expect(component.zoneOcrRunning()).toBe(true)
+    loadSpy.mock.calls[0][2]()
+    expect(component.zoneOcrRunning()).toBe(false)
+    expect(component.networkActive()).toBe(false)
+  })
+
+  it('asks before running zone OCR on a dirty document and leaves edits intact on cancel', () => {
+    component.documentId.set(doc.id)
+    component.document.set({ ...doc, __changedFields: ['title'] })
+    component.documentForm.patchValue({ title: 'Unsaved title' })
+    const runSpy = jest.spyOn(documentService, 'runZoneOcr')
+    const modalSpy = jest.spyOn(modalService, 'open')
+
+    component.runZoneOcr()
+
+    const modal = modalSpy.mock.results[0].value
+    expect(modal.componentInstance.message).toBe(
+      'Running Zone OCR will discard them.'
+    )
+    expect(runSpy).not.toHaveBeenCalled()
+    modal.componentInstance.cancel()
+    expect(runSpy).not.toHaveBeenCalled()
+    expect(component.documentForm.get('title').value).toBe('Unsaved title')
+    expect(component.zoneOcrRunning()).toBe(false)
+  })
+
+  it('runs zone OCR only after confirmation and prevents duplicate requests', () => {
+    component.documentId.set(doc.id)
+    component.document.set({ ...doc, __changedFields: ['title'] })
+    const pending = new Subject<any>()
+    const runSpy = jest
+      .spyOn(documentService, 'runZoneOcr')
+      .mockReturnValue(pending)
+    const modalSpy = jest.spyOn(modalService, 'open')
+
+    component.runZoneOcr()
+    modalSpy.mock.results[0].value.componentInstance.confirmClicked.emit()
+
+    expect(runSpy).toHaveBeenCalledWith(doc.id)
+    expect(component.zoneOcrRunning()).toBe(true)
+    expect(component.networkActive()).toBe(true)
+    const saveSpy = jest.spyOn(documentService, 'patch')
+    component.save()
+    expect(saveSpy).not.toHaveBeenCalled()
+    component.runZoneOcr()
+    expect(runSpy).toHaveBeenCalledTimes(1)
+    pending.error(new Error('failed'))
+    expect(component.zoneOcrRunning()).toBe(false)
+    expect(component.networkActive()).toBe(false)
+    expect(component.document().__changedFields).toEqual(['title'])
+  })
+
+  it('does not reload a different document when zone OCR finishes', () => {
+    component.documentId.set(doc.id)
+    component.document.set({ ...doc, __changedFields: [] })
+    const pending = new Subject<any>()
+    jest.spyOn(documentService, 'runZoneOcr').mockReturnValue(pending)
+    const loadSpy = jest.spyOn(component as any, 'loadDocument')
+
+    component.runZoneOcr()
+    component.documentId.set(99)
+    pending.next({ results: [] })
+
+    expect(loadSpy).not.toHaveBeenCalled()
+    expect(component.zoneOcrRunning()).toBe(false)
+    pending.complete()
   })
 
   it('should show an error when zone OCR fails', () => {
@@ -1938,6 +2004,8 @@ describe('DocumentDetailComponent', () => {
 
     expect(errorSpy).toHaveBeenCalledWith('Zone OCR failed', expect.any(Error))
     expect(loadSpy).not.toHaveBeenCalled()
+    expect(component.zoneOcrRunning()).toBe(false)
+    expect(component.networkActive()).toBe(false)
   })
 
   it('should change preview element by render type', () => {
