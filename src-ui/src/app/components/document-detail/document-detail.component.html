@@ -61,14 +61,21 @@
         <i-bs name="pencil" class="me-1"></i-bs><ng-container i18n>PDF Editor</ng-container>
       </button>
 
-      <button
-        ngbDropdownItem
-        (click)="runZoneOcr()"
-        [disabled]="!userCanEdit || networkActive()"
-        *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.OcrTemplate }"
-      >
-        <i-bs width="1em" height="1em" name="file-earmark-ruled" class="me-1"></i-bs><span i18n>Run Zone OCR</span>
-      </button>
+      <div class="d-flex" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.OcrTemplate }">
+        <button ngbDropdownItem (click)="runZoneOcr()" [disabled]="!userCanEdit || networkActive()">
+          <i-bs width="1em" height="1em" name="file-earmark-ruled" class="me-1"></i-bs><span i18n>Run Zone OCR</span>
+        </button>
+        <button
+          ngbDropdownItem
+          class="w-auto flex-shrink-0 px-2"
+          (click)="runZoneOcrWithOptions()"
+          [disabled]="!userCanEdit || networkActive()"
+          title="Choose OCR template"
+          i18n-title
+        >
+          <i-bs width="1em" height="1em" name="sliders2"></i-bs>
+        </button>
+      </div>
 
       @if (userIsOwner && (requiresPassword || password)) {
         <button ngbDropdownItem (click)="removePassword()" [disabled]="!password">

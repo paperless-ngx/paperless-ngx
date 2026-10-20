@@ -1563,7 +1563,34 @@ export class DocumentDetailComponent
     })
   }
 
+  /** Runs every template that matches, confirming only over unsaved changes. */
   runZoneOcr() {
+    if (this.networkActive()) return
+    const documentId = this.documentId()
+    if (!this.hasLocalEdits(this.document())) {
+      this.executeZoneOcr(documentId, null)
+      return
+    }
+    const modal = this.modalService.open(ConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.title = $localize`Run Zone OCR`
+    modal.componentInstance.messageBold = $localize`You have unsaved changes.`
+    modal.componentInstance.message = $localize`Running Zone OCR will discard them.`
+    modal.componentInstance.btnClass = 'btn-warning'
+    modal.componentInstance.btnCaption = $localize`Run Zone OCR`
+    modal.componentInstance.confirmClicked
+      .pipe(first(), takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        modal.close()
+        if (this.documentId() === documentId && !this.networkActive()) {
+          this.executeZoneOcr(documentId, null)
+        }
+      })
+  }
+
+  /** Opens the dialog to pick which template to run. */
+  runZoneOcrWithOptions() {
     if (this.networkActive()) return
     const documentId = this.documentId()
     const modal = this.modalService.open(ZoneOcrConfirmDialogComponent, {

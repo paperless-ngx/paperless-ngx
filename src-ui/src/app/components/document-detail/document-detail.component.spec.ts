@@ -1918,7 +1918,7 @@ describe('DocumentDetailComponent', () => {
     const toastSpy = jest.spyOn(toastService, 'showInfo')
     const modalSpy = jest.spyOn(modalService, 'open')
 
-    component.runZoneOcr()
+    component.runZoneOcrWithOptions()
     const dialog = modalSpy.mock.results[0].value.componentInstance
     expect(dialog.message).toBe(
       'Fields filled by the template will be overwritten.'
@@ -1948,7 +1948,7 @@ describe('DocumentDetailComponent', () => {
 
     runSpy.mockReturnValueOnce(of({ status: 'completed', results: [] }))
     component.runZoneOcr()
-    modalSpy.mock.results[0].value.componentInstance.confirmClicked.emit()
+    expect(modalSpy).not.toHaveBeenCalled()
     expect(runSpy).toHaveBeenCalledWith(doc.id, null)
     expect(toastSpy).toHaveBeenLastCalledWith(
       'Zone OCR found no fields to fill.'
@@ -1964,7 +1964,6 @@ describe('DocumentDetailComponent', () => {
       })
     )
     component.runZoneOcr()
-    modalSpy.mock.results[1].value.componentInstance.confirmClicked.emit()
     expect(toastSpy).toHaveBeenLastCalledWith('Filled 1 of 1 fields.')
   })
 
@@ -1986,6 +1985,24 @@ describe('DocumentDetailComponent', () => {
     expect(runSpy).not.toHaveBeenCalled()
     expect(component.documentForm.get('title').value).toBe('Unsaved title')
     expect(component.zoneOcrRunning()).toBe(false)
+  })
+
+  it('should warn about unsaved changes in the zone OCR options dialog', () => {
+    component.documentId.set(doc.id)
+    component.document.set({ ...doc, __changedFields: ['title'] })
+    const runSpy = jest.spyOn(documentService, 'runZoneOcr')
+    const modalSpy = jest.spyOn(modalService, 'open')
+
+    component.runZoneOcrWithOptions()
+
+    const dialog = modalSpy.mock.results[0].value.componentInstance
+    expect(dialog.message).toBe('Running Zone OCR will discard them.')
+    expect(dialog.btnClass).toBe('btn-warning')
+    dialog.cancel()
+    expect(runSpy).not.toHaveBeenCalled()
+    component.networkActive.set(true)
+    component.runZoneOcrWithOptions()
+    expect(modalSpy).toHaveBeenCalledTimes(1)
   })
 
   it('should not allow saving or a second zone OCR run while one is running', () => {
@@ -2021,10 +2038,8 @@ describe('DocumentDetailComponent', () => {
     const pending = new Subject<any>()
     jest.spyOn(documentService, 'runZoneOcr').mockReturnValue(pending)
     const loadSpy = jest.spyOn(component as any, 'loadDocument')
-    const modalSpy = jest.spyOn(modalService, 'open')
 
     component.runZoneOcr()
-    modalSpy.mock.results[0].value.componentInstance.confirmClicked.emit()
     component.documentId.set(99)
     pending.next({ results: [] })
 
@@ -2063,10 +2078,8 @@ describe('DocumentDetailComponent', () => {
       .mockReturnValue(throwError(() => new Error('nope')))
     const loadSpy = jest.spyOn(component as any, 'loadDocument')
     const errorSpy = jest.spyOn(toastService, 'showError')
-    const modalSpy = jest.spyOn(modalService, 'open')
 
     component.runZoneOcr()
-    modalSpy.mock.results[0].value.componentInstance.confirmClicked.emit()
 
     expect(errorSpy).toHaveBeenCalledWith(
       'Error running zone OCR.',
