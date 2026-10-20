@@ -2,7 +2,8 @@ import { Component, OnInit, inject, signal } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { delay, firstValueFrom, takeUntil, tap } from 'rxjs'
+import { firstValueFrom, takeUntil, tap } from 'rxjs'
+import { DocumentType } from 'src/app/data/document-type'
 import { OcrTemplate } from 'src/app/data/ocr-template'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { DirtyFormGuard } from 'src/app/guards/dirty-form.guard'
@@ -30,36 +31,31 @@ export class OcrTemplatesComponent
   extends LoadingComponentWithPermissions
   implements OnInit
 {
-  private readonly service = inject(OcrTemplateService)
-  private readonly documentTypeService = inject(DocumentTypeService)
-  private readonly modalService = inject(NgbModal)
-  private readonly dirtyFormGuard = inject(DirtyFormGuard)
-  private readonly toastService = inject(ToastService)
+  private ocrTemplateService = inject(OcrTemplateService)
+  private documentTypeService = inject(DocumentTypeService)
   permissionsService = inject(PermissionsService)
+  private modalService = inject(NgbModal)
+  private dirtyFormGuard = inject(DirtyFormGuard)
+  private toastService = inject(ToastService)
 
   readonly templates = signal<OcrTemplate[]>([])
-  private readonly documentTypeNames = signal(new Map<number, string>())
+  private readonly documentTypes = signal<DocumentType[]>([])
 
   ngOnInit() {
     this.documentTypeService
       .listAll()
       .pipe(takeUntil(this.unsubscribeNotifier))
-      .subscribe((r) => {
-        this.documentTypeNames.set(
-          new Map(r.results.map((dt) => [dt.id, dt.name]))
-        )
-      })
+      .subscribe((r) => this.documentTypes.set(r.results))
     this.reload()
   }
 
   reload() {
     this.loading.set(true)
-    this.service
+    this.ocrTemplateService
       .listAll()
       .pipe(
         takeUntil(this.unsubscribeNotifier),
-        tap((r) => this.templates.set(r.results)),
-        delay(100)
+        tap((r) => this.templates.set(r.results))
       )
       .subscribe(() => {
         this.show.set(true)
@@ -67,18 +63,14 @@ export class OcrTemplatesComponent
       })
   }
 
-  getDocumentTypeName(t: OcrTemplate): string {
+  getDocumentTypeName(template: OcrTemplate): string {
     return (
-      this.documentTypeNames().get(t.document_type) ??
-      `${t.document_type ?? ''}`
+      this.documentTypes().find((dt) => dt.id === template.document_type)
+        ?.name ?? ''
     )
   }
 
-  createTemplate() {
-    this.editTemplate()
-  }
-
-  editTemplate(t?: OcrTemplate) {
+  editTemplate(template?: OcrTemplate) {
     const modal = this.modalService.open(OcrTemplateEditorComponent, {
       backdrop: 'static',
       keyboard: false,
@@ -89,71 +81,79 @@ export class OcrTemplatesComponent
       beforeDismiss: () => {
         const editor: OcrTemplateEditorComponent = modal.componentInstance
         if (editor.saving()) return false
-        return editor.isDirty
-          ? firstValueFrom(
-              this.dirtyFormGuard.confirmChanges(undefined, $localize`Close`)
-            )
-          : true
+        if (!editor.isDirty) return true
+        return firstValueFrom(
+          this.dirtyFormGuard.confirmChanges(undefined, $localize`Close`)
+        )
       },
     })
-    modal.componentInstance.object = t
+    modal.componentInstance.object = template
     modal.componentInstance.succeeded
       .pipe(takeUntil(this.unsubscribeNotifier))
-      .subscribe(() => this.reload())
+      .subscribe((saved: OcrTemplate) => {
+        this.toastService.showSuccess(
+          $localize`Saved OCR template "${saved.name}".`
+        )
+        this.ocrTemplateService.clearCache()
+        this.reload()
+      })
+    modal.componentInstance.failed
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe((e) => {
+        this.toastService.showError($localize`Error saving OCR template.`, e)
+      })
   }
 
-  toggleTemplate(t: OcrTemplate, enabled: boolean) {
-    this.templates.update((templates) =>
-      templates.map((template) =>
-        template.id === t.id ? { ...template, enabled } : template
-      )
-    )
-    this.service.patch({ ...t, enabled }).subscribe({
-      error: (error) => {
-        this.templates.update((templates) =>
-          templates.map((template) =>
-            template.id === t.id
-              ? { ...template, enabled: t.enabled }
-              : template
+  toggleTemplateEnabled(template: OcrTemplate) {
+    this.ocrTemplateService
+      .patch({ id: template.id, enabled: template.enabled } as OcrTemplate)
+      .subscribe({
+        next: () => {
+          this.toastService.showSuccess(
+            template.enabled
+              ? $localize`Enabled OCR template "${template.name}"`
+              : $localize`Disabled OCR template "${template.name}"`
           )
-        )
-        this.toastService.showError(
-          $localize`Error updating OCR template.`,
-          error
-        )
-      },
-    })
+          this.reload()
+        },
+        error: (e) => {
+          this.toastService.showError(
+            $localize`Error toggling OCR template "${template.name}".`,
+            e
+          )
+          this.reload()
+        },
+      })
   }
 
-  deleteTemplate(t: OcrTemplate) {
+  deleteTemplate(template: OcrTemplate) {
     const modal = this.modalService.open(ConfirmDialogComponent, {
       backdrop: 'static',
     })
-    modal.componentInstance.title = $localize`Delete OCR Template`
-    modal.componentInstance.messageBold = t.name
-    modal.componentInstance.message = $localize`Do you really want to delete this OCR template?`
+    modal.componentInstance.title = $localize`Confirm delete OCR template`
+    modal.componentInstance.messageBold = $localize`This operation will permanently delete this OCR template.`
+    modal.componentInstance.message = $localize`This operation cannot be undone.`
     modal.componentInstance.btnClass = 'btn-danger'
-    modal.componentInstance.btnCaption = $localize`Delete`
-    modal.componentInstance.confirmClicked
-      .pipe(takeUntil(this.unsubscribeNotifier))
-      .subscribe(() => {
-        modal.componentInstance.buttonsEnabled.set(false)
-        this.service
-          .delete(t)
-          .pipe(takeUntil(this.unsubscribeNotifier))
-          .subscribe({
-            next: () => {
-              modal.close()
-              this.reload()
-            },
-            error: (error) => {
-              modal.componentInstance.buttonsEnabled.set(true)
-              this.toastService.showError(
-                $localize`Error deleting OCR template.`,
-                error
-              )
-            },
-          })
+    modal.componentInstance.btnCaption = $localize`Proceed`
+    modal.componentInstance.confirmClicked.subscribe(() => {
+      modal.componentInstance.buttonsEnabled.set(false)
+      this.ocrTemplateService.delete(template).subscribe({
+        next: () => {
+          modal.close()
+          this.toastService.showSuccess(
+            $localize`Deleted OCR template "${template.name}".`
+          )
+          this.ocrTemplateService.clearCache()
+          this.reload()
+        },
+        error: (e) => {
+          modal.componentInstance.buttonsEnabled.set(true)
+          this.toastService.showError(
+            $localize`Error deleting OCR template "${template.name}".`,
+            e
+          )
+        },
       })
+    })
   }
 }

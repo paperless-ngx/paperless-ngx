@@ -182,7 +182,7 @@ describe('OcrTemplateEditorComponent', () => {
     expect(templates.update).toHaveBeenCalledWith(component.template)
     expect(templates.create).not.toHaveBeenCalled()
     expect(succeeded).toHaveBeenCalledWith(saved)
-    expect(activeModal.close).toHaveBeenCalledWith(saved)
+    expect(activeModal.close).toHaveBeenCalled()
   })
 
   it('searches across document metadata even when a template document type is set', () => {
@@ -527,7 +527,7 @@ describe('OcrTemplateEditorComponent', () => {
     pending.next(saved)
     pending.complete()
     expect(succeeded).toHaveBeenCalledWith(saved)
-    expect(activeModal.close).toHaveBeenCalledWith(saved)
+    expect(activeModal.close).toHaveBeenCalled()
   })
 
   it('stops an active move and unlocks editing without losing changes after a failed save', () => {

@@ -153,6 +153,7 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
 
   @Input() object: OcrTemplate
   @Output() succeeded = new EventEmitter<OcrTemplate>()
+  @Output() failed = new EventEmitter()
 
   @ViewChild('zoneOverlay') overlayRef: ElementRef<SVGSVGElement>
   imageRef: ElementRef<HTMLImageElement>
@@ -856,13 +857,12 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
 
     obs.pipe(takeUntil(this.destroy$)).subscribe({
       next: (saved) => {
-        this.toastService.showInfo($localize`OCR template saved.`)
+        this.activeModal.close()
         this.succeeded.emit(saved)
-        this.activeModal.close(saved)
       },
       error: (e) => {
         this.saving.set(false)
-        this.toastService.showError($localize`Error saving OCR template.`, e)
+        this.failed.emit(e)
       },
     })
   }
