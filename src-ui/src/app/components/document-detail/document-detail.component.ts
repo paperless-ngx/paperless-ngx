@@ -1577,9 +1577,8 @@ export class DocumentDetailComponent
             $localize`Zone OCR ran but no results extracted.`
           )
         }
-        this.documentsService
-          .get(this.documentId())
-          .subscribe((doc) => this.updateComponent(doc))
+        this.docChangeNotifier.next(this.documentId())
+        this.loadDocument(this.documentId(), true)
       },
       error: (error) => {
         this.toastService.showError($localize`Zone OCR failed`, error)

@@ -1900,6 +1900,46 @@ describe('DocumentDetailComponent', () => {
     expect(toastSpy).toHaveBeenCalledWith('Document reloaded.')
   })
 
+  it('should run zone OCR, report results and force-reload the document', () => {
+    component.documentId.set(doc.id)
+    component.document.set(doc)
+    jest.spyOn(documentService, 'runZoneOcr').mockReturnValue(
+      of({
+        results: [
+          { zone: 'Total', value: '102.10' },
+          { zone: 'Due', value: '' },
+        ],
+      } as any)
+    )
+    const loadSpy = jest
+      .spyOn(component as any, 'loadDocument')
+      .mockImplementation(() => {})
+    const notifySpy = jest.spyOn(component.docChangeNotifier, 'next')
+    const toastSpy = jest.spyOn(toastService, 'showInfo')
+
+    component.runZoneOcr()
+
+    expect(toastSpy).toHaveBeenCalledWith(
+      'Filled 1 of 2 fields. Failed to match zones: Due'
+    )
+    expect(notifySpy).toHaveBeenCalledWith(doc.id)
+    expect(loadSpy).toHaveBeenCalledWith(doc.id, true)
+  })
+
+  it('should show an error when zone OCR fails', () => {
+    component.document.set(doc)
+    jest
+      .spyOn(documentService, 'runZoneOcr')
+      .mockReturnValue(throwError(() => new Error('nope')))
+    const loadSpy = jest.spyOn(component as any, 'loadDocument')
+    const errorSpy = jest.spyOn(toastService, 'showError')
+
+    component.runZoneOcr()
+
+    expect(errorSpy).toHaveBeenCalledWith('Zone OCR failed', expect.any(Error))
+    expect(loadSpy).not.toHaveBeenCalled()
+  })
+
   it('should change preview element by render type', () => {
     initNormally()
     component.document.update((document) => ({
