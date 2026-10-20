@@ -459,6 +459,28 @@ describe('OcrTemplateEditorComponent', () => {
     expect(component.template.zones[0].x).toBe(200)
   })
 
+  it('keeps the language selection reference stable until its value changes', () => {
+    const selected = zone()
+    selected.ocr_language = 'deu+eng'
+    const languages = component.ocrLanguageArray(selected)
+
+    expect(languages).toEqual(['deu', 'eng'])
+    expect(component.ocrLanguageArray(selected)).toBe(languages)
+
+    component.setOcrLanguages(selected, ['fra'])
+    expect(selected.ocr_language).toBe('fra')
+    const updated = component.ocrLanguageArray(selected)
+    expect(updated).toEqual(['fra'])
+    expect(updated).not.toBe(languages)
+    expect(component.ocrLanguageArray(selected)).toBe(updated)
+
+    component.setOcrLanguages(selected, null)
+    expect(selected.ocr_language).toBe('')
+    const empty = component.ocrLanguageArray(selected)
+    expect(empty).toEqual([])
+    expect(component.ocrLanguageArray(selected)).toBe(empty)
+  })
+
   it('hides results when extraction settings or geometry change', () => {
     const selected = zone()
     component.template.zones = [selected]

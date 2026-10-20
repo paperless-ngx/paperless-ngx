@@ -191,7 +191,6 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
   }
 
   private _customFields: CustomField[] = []
-  /** Items for the zone field select: built-in targets, then custom fields OCR can write to. */
   readonly fieldItems = signal<{ id: ZoneFieldSelection; name: string }[]>([
     ...OCR_BUILTIN_TARGETS,
   ])
@@ -211,11 +210,8 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
   }
   documentTypes: DocumentType[] = []
   transformOptions = TRANSFORM_OPTIONS
-  builtinTargets = OCR_BUILTIN_TARGETS
-  dateFormatOptions = DATE_FORMAT_OPTIONS
   ocrLanguageOptions = OCR_LANGUAGE_OPTIONS
   dateTransform = OCR_ZONE_TRANSFORM.Date
-  customDateFormatChoice = CUSTOM_DATE_FORMAT_CHOICE
   noSampleDocumentTitle = $localize`Select a sample document to test this zone`
   dateFormatItems = [
     ...DATE_FORMAT_OPTIONS,
@@ -592,7 +588,7 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     if (this.selectedZoneIndex !== null) {
       const handle = this.findHandleAt(point, this.selectedZoneIndex)
       if (handle) {
-        this.overlayCursor = RESIZE_CURSOR[handle] || 'crosshair'
+        this.overlayCursor = RESIZE_CURSOR[handle]
         return
       }
     }
@@ -703,13 +699,7 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     return `0 0 ${imageSize.width} ${imageSize.height}`
   }
 
-  zoneColor(index: number): string {
-    return getZoneColor(index)
-  }
-
-  zoneFill(index: number): string {
-    return `${this.zoneColor(index)}33`
-  }
+  readonly zoneColor = getZoneColor
 
   zoneLabel(zone: OcrTemplateZone, index: number): string {
     return zone.name || `Zone ${index + 1}`
@@ -890,29 +880,24 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     })
   }
 
-  private ocrLangCache = new WeakMap<
+  private readonly ocrLanguageCache = new WeakMap<
     OcrTemplateZone,
-    { src: string; arr: string[] }
+    { language: string; languages: string[] }
   >()
 
   ocrLanguageArray(zone: OcrTemplateZone): string[] {
-    const src = zone.ocr_language || ''
-    const cached = this.ocrLangCache.get(zone)
-    if (cached && cached.src === src) return cached.arr
-    const arr = src ? src.split('+').filter(Boolean) : []
-    this.ocrLangCache.set(zone, { src, arr })
-    return arr
+    const language = zone.ocr_language || ''
+    const cached = this.ocrLanguageCache.get(zone)
+    if (cached?.language === language) return cached.languages
+    const languages = language.split('+').filter(Boolean)
+    this.ocrLanguageCache.set(zone, { language, languages })
+    return languages
   }
 
   setOcrLanguages(zone: OcrTemplateZone, langs: string[]) {
-    zone.ocr_language = (langs || []).join('+')
-    this.ocrLangCache.set(zone, {
-      src: zone.ocr_language,
-      arr: langs ? [...langs] : [],
-    })
+    zone.ocr_language = (langs ?? []).join('+')
   }
 
-  /** Value bound to the field select: a built-in id string or a custom-field id. */
   zoneFieldValue(zone: OcrTemplateZone): ZoneFieldSelection {
     const target = zone.target || DEFAULT_OCR_ZONE_TARGET
     return target === OCR_ZONE_TARGET.CustomField ? zone.custom_field : target
@@ -1008,15 +993,8 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     return (
       this.customDateFormatZones.has(zone) ||
       (!!zone.date_format &&
-        !this.dateFormatOptions.some(
-          (option) => option.id === zone.date_format
-        ))
+        !DATE_FORMAT_OPTIONS.some((option) => option.id === zone.date_format))
     )
-  }
-
-  getDocumentTypeName(id: number): string {
-    const dt = this.documentTypes.find((d) => d.id === id)
-    return dt ? dt.name : `Type #${id}`
   }
 
   createField(name?: string) {

@@ -240,7 +240,6 @@
                 alt="Sample document page"
                 i18n-alt
                 class="d-block w-100"
-                [style.visibility]="imageLoaded ? 'visible' : 'hidden'"
                 crossorigin="use-credentials"
               />
               @if (imageLoaded) {
@@ -267,7 +266,7 @@
                           [attr.width]="rect.w"
                           [attr.height]="rect.h"
                           [attr.stroke]="zoneColor(i)"
-                          [attr.fill]="zoneFill(i)"
+                          [attr.fill]="zoneColor(i) + '33'"
                         ></rect>
                         <text
                           class="zone-label fw-semibold pe-none"
