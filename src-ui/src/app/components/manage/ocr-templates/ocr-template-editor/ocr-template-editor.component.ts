@@ -330,7 +330,7 @@ export class OcrTemplateEditorComponent
       })
 
     const id = this.route.snapshot.paramMap.get('id')
-    if (id && id !== 'new') {
+    if (id) {
       this.isNew = false
       this.templateService
         .get(parseInt(id))
