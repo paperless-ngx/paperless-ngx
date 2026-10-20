@@ -496,6 +496,20 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         extract.assert_not_called()
 
+    @patch("documents.zone_ocr.run_zone_extraction")
+    def test_run_zone_ocr_requires_global_change_permission(self, extract):
+        user = User.objects.create_user(username="uploader")
+        user.user_permissions.add(
+            *Permission.objects.filter(codename__in=["view_document", "add_document"]),
+        )
+        document = DocumentFactory(document_type=self.doc_type, owner=user)
+        self.client.force_authenticate(user=user)
+
+        response = self.client.post(f"/api/documents/{document.pk}/run-zone-ocr/")
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        extract.assert_not_called()
+
     def test_run_zone_ocr_missing_document_is_an_error(self):
         response = self.client.post("/api/documents/99999/run-zone-ocr/")
 

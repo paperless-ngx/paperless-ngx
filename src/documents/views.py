@@ -2296,10 +2296,14 @@ class DocumentViewSet(
     def run_zone_ocr(self, request, pk=None):
         """Run zone-based OCR extraction on this document."""
         try:
-            document = Document.objects.get(pk=pk)
+            document = Document.objects.select_related(
+                "root_document__owner",
+            ).get(pk=pk)
         except Document.DoesNotExist:
             raise Http404
-        if not has_perms_owner_aware(request.user, "change_document", document):
+        if not request.user.has_perm(
+            "documents.change_document",
+        ) or not has_perms_owner_aware(request.user, "change_document", document):
             return HttpResponseForbidden("Insufficient permissions")
 
         if not document.document_type_id:
