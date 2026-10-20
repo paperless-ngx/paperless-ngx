@@ -1604,6 +1604,11 @@ export class DocumentDetailComponent
             finish()
             return
           }
+          if (res.status === 'skipped') {
+            finish()
+            this.toastService.showInfo($localize`Zone OCR skipped.`)
+            return
+          }
           const results = res.results ?? []
           if (results.length) {
             const failed = results.filter(

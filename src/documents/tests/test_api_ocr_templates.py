@@ -1,6 +1,7 @@
 """Tests for the OCR Template API."""
 
 import json
+from unittest.mock import patch
 
 from django.contrib.auth.models import User
 from rest_framework import status
@@ -11,6 +12,7 @@ from documents.models import DocumentType
 from documents.models import OcrTemplate
 from documents.models import OcrTemplateZone
 from paperless_testing.dirs import DirectoriesMixin
+from paperless_testing.factories import DocumentFactory
 
 
 class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
@@ -395,3 +397,105 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
             resp.status_code,
             (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN),
         )
+
+    @patch("documents.zone_ocr.run_zone_extraction")
+    def test_run_zone_ocr_without_document_type_is_skipped(self, extract):
+        document = DocumentFactory()
+
+        response = self.client.post(f"/api/documents/{document.pk}/run-zone-ocr/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            response.json(),
+            {"status": "skipped", "reason": "no_document_type", "results": []},
+        )
+        extract.assert_not_called()
+
+    @patch("documents.zone_ocr.run_zone_extraction")
+    def test_run_zone_ocr_without_enabled_template_is_skipped(self, extract):
+        document = DocumentFactory(document_type=self.doc_type)
+
+        for enabled in (None, False):
+            with self.subTest(enabled=enabled):
+                if enabled is False:
+                    OcrTemplate.objects.create(
+                        name="Disabled template",
+                        document_type=self.doc_type,
+                        source_width=1000,
+                        source_height=1000,
+                        enabled=False,
+                    )
+
+                response = self.client.post(
+                    f"/api/documents/{document.pk}/run-zone-ocr/",
+                )
+
+                self.assertEqual(response.status_code, status.HTTP_200_OK)
+                self.assertEqual(
+                    response.json(),
+                    {"status": "skipped", "reason": "no_template", "results": []},
+                )
+        extract.assert_not_called()
+
+    def test_run_zone_ocr_missing_document_is_an_error(self):
+        response = self.client.post("/api/documents/99999/run-zone-ocr/")
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    @patch("documents.zone_ocr.run_zone_extraction")
+    def test_run_zone_ocr_missing_file_is_an_error(self, extract):
+        document = DocumentFactory(document_type=self.doc_type)
+        OcrTemplate.objects.create(
+            name="Template",
+            document_type=self.doc_type,
+            source_width=1000,
+            source_height=1000,
+        )
+
+        response = self.client.post(f"/api/documents/{document.pk}/run-zone-ocr/")
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.json(), {"error": "Document file not found"})
+        extract.assert_not_called()
+
+    @patch("documents.zone_ocr.run_zone_extraction")
+    def test_run_zone_ocr_reports_completed_results(self, extract):
+        document = DocumentFactory(
+            document_type=self.doc_type,
+            mime_type="application/pdf",
+        )
+        document.source_path.write_bytes(b"test PDF")
+        template = OcrTemplate.objects.create(
+            name="Template",
+            document_type=self.doc_type,
+            source_width=1000,
+            source_height=1000,
+        )
+        OcrTemplateZone.objects.create(
+            template=template,
+            name="Title zone",
+            target="title",
+            x=0,
+            y=0,
+            width=100,
+            height=100,
+        )
+
+        response = self.client.post(f"/api/documents/{document.pk}/run-zone-ocr/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            response.json(),
+            {
+                "status": "completed",
+                "results": [
+                    {
+                        "template": template.name,
+                        "zone": "Title zone",
+                        "custom_field": "Title",
+                        "value": document.title,
+                    },
+                ],
+            },
+        )
+        extract.assert_called_once()

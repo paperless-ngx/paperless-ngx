@@ -1992,6 +1992,27 @@ describe('DocumentDetailComponent', () => {
     pending.complete()
   })
 
+  it('does not reload or discard local edits when zone OCR is skipped', () => {
+    component.documentId.set(doc.id)
+    component.document.set({ ...doc, __changedFields: ['title'] })
+    component.documentForm.patchValue({ title: 'Unsaved title' })
+    const modalSpy = jest.spyOn(modalService, 'open')
+    jest
+      .spyOn(documentService, 'runZoneOcr')
+      .mockReturnValue(of({ status: 'skipped', results: [] }))
+    const loadSpy = jest.spyOn(component as any, 'loadDocument')
+    const infoSpy = jest.spyOn(toastService, 'showInfo')
+
+    component.runZoneOcr()
+    modalSpy.mock.results[0].value.componentInstance.confirm()
+
+    expect(loadSpy).not.toHaveBeenCalled()
+    expect(component.documentForm.get('title').value).toBe('Unsaved title')
+    expect(component.zoneOcrRunning()).toBe(false)
+    expect(component.networkActive()).toBe(false)
+    expect(infoSpy).toHaveBeenCalledWith('Zone OCR skipped.')
+  })
+
   it('should show an error when zone OCR fails', () => {
     component.document.set(doc)
     jest

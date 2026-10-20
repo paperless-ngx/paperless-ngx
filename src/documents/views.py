@@ -2278,19 +2278,16 @@ class DocumentViewSet(
         return version_doc
 
     @extend_schema(
-        operation_id="documents_delete_version",
-        parameters=[
-            OpenApiParameter(
-                name="version_id",
-                type=OpenApiTypes.INT,
-                location=OpenApiParameter.PATH,
-            ),
-        ],
+        operation_id="documents_run_zone_ocr",
         responses=inline_serializer(
-            name="DeleteDocumentVersionResult",
+            name="RunZoneOcrResult",
             fields={
-                "result": serializers.CharField(),
-                "current_version_id": serializers.IntegerField(),
+                "status": serializers.ChoiceField(choices=["completed", "skipped"]),
+                "reason": serializers.ChoiceField(
+                    choices=["no_document_type", "no_template"],
+                    required=False,
+                ),
+                "results": serializers.ListField(child=serializers.DictField()),
             },
         ),
     )
@@ -2304,8 +2301,7 @@ class DocumentViewSet(
 
         if not document.document_type_id:
             return Response(
-                {"error": "Document has no type assigned"},
-                status=status.HTTP_400_BAD_REQUEST,
+                {"status": "skipped", "reason": "no_document_type", "results": []},
             )
 
         templates = OcrTemplate.objects.filter(
@@ -2314,8 +2310,7 @@ class DocumentViewSet(
         )
         if not templates.exists():
             return Response(
-                {"error": "No OCR templates found for this document type"},
-                status=status.HTTP_404_NOT_FOUND,
+                {"status": "skipped", "reason": "no_template", "results": []},
             )
 
         doc_path = document.archive_path or document.source_path
@@ -2359,8 +2354,25 @@ class DocumentViewSet(
                     },
                 )
 
-        return Response({"results": results})
+        return Response({"status": "completed", "results": results})
 
+    @extend_schema(
+        operation_id="documents_delete_version",
+        parameters=[
+            OpenApiParameter(
+                name="version_id",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.PATH,
+            ),
+        ],
+        responses=inline_serializer(
+            name="DeleteDocumentVersionResult",
+            fields={
+                "result": serializers.CharField(),
+                "current_version_id": serializers.IntegerField(),
+            },
+        ),
+    )
     @action(
         methods=["delete"],
         detail=True,

@@ -162,3 +162,9 @@ export interface OcrZoneRunResult {
   custom_field: string
   value: string | number | null
 }
+
+export interface OcrZoneRunResponse {
+  status: 'completed' | 'skipped'
+  reason?: 'no_document_type' | 'no_template'
+  results: OcrZoneRunResult[]
+}

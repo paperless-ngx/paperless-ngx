@@ -21,10 +21,12 @@ import {
 import { saveAs } from 'file-saver'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import {
+  catchError,
   first,
   forkJoin,
   map,
   Observable,
+  of,
   Subject,
   switchMap,
   takeUntil,
@@ -983,7 +985,39 @@ export class BulkEditorComponent
         modal.componentInstance.buttonsEnabled.set(false)
         this.executeDocumentAction(
           modal,
-          forkJoin(ids.map((id) => this.documentService.runZoneOcr(id)))
+          forkJoin(
+            ids.map((id) =>
+              this.documentService.runZoneOcr(id).pipe(
+                map(({ status }) => ({ id, status })),
+                catchError((error) =>
+                  of({ id, status: 'failed' as const, error })
+                )
+              )
+            )
+          ).pipe(
+            tap((results) => {
+              const completed = results.filter(
+                (r) => r.status === 'completed'
+              ).length
+              const skipped = results.filter(
+                (r) => r.status === 'skipped'
+              ).length
+              const failed = results.filter((r) => r.status === 'failed')
+              const summary = $localize`Zone OCR: ${completed} completed, ${skipped} skipped, ${failed.length} failed.`
+              if (failed.length) {
+                const failedIds = failed.map((r) => r.id).join(', ')
+                this.toastService.showError(
+                  `${summary} ${$localize`Failed documents: ${failedIds}`}`,
+                  failed.map((r) => ({
+                    document: r.id,
+                    error: r.error.error ?? r.error.message,
+                  }))
+                )
+              } else {
+                this.toastService.showInfo(summary)
+              }
+            })
+          )
         )
       })
   }
