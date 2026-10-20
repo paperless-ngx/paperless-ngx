@@ -72,6 +72,7 @@ import {
   DrawingRect,
   findHandleAt,
   findZoneAt,
+  getZoneColor,
   getZoneDisplayRect,
   getZonePage,
   HANDLE_SIZE,
@@ -109,16 +110,6 @@ interface ResizeHandleMarker extends Point {
 
 const CUSTOM_DATE_FORMAT_CHOICE = 'custom'
 const NO_OVERLAY_INTERACTION: OverlayInteraction = { kind: 'idle' }
-const ZONE_COLORS = [
-  '#4f8ff7',
-  '#ff6b6b',
-  '#51cf66',
-  '#ffd43b',
-  '#cc5de8',
-  '#ff922b',
-  '#20c997',
-  '#e599f7',
-]
 const RESIZE_CURSOR: Record<ResizeHandle, string> = {
   nw: 'nw-resize',
   ne: 'ne-resize',
@@ -738,7 +729,7 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
   }
 
   zoneColor(index: number): string {
-    return ZONE_COLORS[index % ZONE_COLORS.length]
+    return getZoneColor(index)
   }
 
   zoneFill(index: number): string {
@@ -960,11 +951,6 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     })
   }
 
-  getCustomFieldName(id: number): string {
-    const cf = this.customFields.find((f) => f.id === id)
-    return cf ? cf.name : `Field #${id}`
-  }
-
   /** Value bound to the field select: a built-in id string or a custom-field id. */
   zoneFieldValue(zone: OcrTemplateZone): ZoneFieldSelection {
     const target = zone.target || DEFAULT_OCR_ZONE_TARGET
@@ -1067,16 +1053,6 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
           (option) => option.id === zone.date_format
         ))
     )
-  }
-
-  getZoneTargetName(zone: OcrTemplateZone): string {
-    const target = zone.target || DEFAULT_OCR_ZONE_TARGET
-    if (target === OCR_ZONE_TARGET.CustomField) {
-      return zone.custom_field
-        ? this.getCustomFieldName(zone.custom_field)
-        : $localize`(no field)`
-    }
-    return this.builtinTargets.find((t) => t.id === target)?.name ?? target
   }
 
   getDocumentTypeName(id: number): string {

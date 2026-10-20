@@ -187,9 +187,6 @@
             } @else {
               <pngx-ocr-template-zone-list
                 [zones]="template.zones"
-                [selectedZoneIndex]="selectedZoneIndex"
-                [previewPage]="previewPage"
-                [previewPageCount]="previewPageCount"
                 [customFields]="customFields"
                 (zoneSelected)="selectZone($event)"
                 (zoneRemoved)="removeZone($event)"

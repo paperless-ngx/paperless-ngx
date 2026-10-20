@@ -41,19 +41,19 @@ describe('OcrTemplateEditorZoneListComponent', () => {
   it('shows empty state when no zones are defined', () => {
     fixture.detectChanges()
 
-    expect(fixture.nativeElement.textContent).toContain('No zones defined')
+    expect(fixture.nativeElement.textContent).toContain('No zones yet')
   })
 
-  it('renders zone target, size, and page', () => {
-    component.zones = [zone()]
+  it('renders zone name, target, and page', () => {
+    component.zones = [zone(), zone({ name: 'Zone 2', page: -1 })]
     component.customFields = [{ id: 7, name: 'Invoice Number' } as CustomField]
     fixture.detectChanges()
 
     const text = fixture.nativeElement.textContent
     expect(text).toContain('Zone 1')
     expect(text).toContain('Invoice Number')
-    expect(text).toContain('30x40px')
-    expect(text).toContain('p.1')
+    expect(text).toContain('Page 1')
+    expect(text).toContain('Last page')
   })
 
   it('emits select and remove events', () => {

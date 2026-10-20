@@ -36,6 +36,22 @@ export type ResizeHandle = 'n' | 's' | 'e' | 'w' | 'ne' | 'nw' | 'se' | 'sw'
 export const HANDLE_SIZE = 8
 export const MIN_ZONE_SIZE = 10
 
+const ZONE_COLORS = [
+  '#4f8ff7',
+  '#ff6b6b',
+  '#51cf66',
+  '#ffd43b',
+  '#cc5de8',
+  '#ff922b',
+  '#20c997',
+  '#e599f7',
+]
+
+/** Outline color for a zone, shared by the preview overlay and the zone list. */
+export function getZoneColor(index: number): string {
+  return ZONE_COLORS[index % ZONE_COLORS.length]
+}
+
 export function getZonePage(
   zone: OcrTemplateZone,
   previewPage: number,

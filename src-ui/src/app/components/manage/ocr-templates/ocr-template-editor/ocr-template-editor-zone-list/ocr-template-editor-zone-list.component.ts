@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { CustomField } from 'src/app/data/custom-field'
 import { OCR_BUILTIN_TARGETS, OcrTemplateZone } from 'src/app/data/ocr-template'
-import { getZonePage } from '../zone-geometry'
+import { getZoneColor } from '../zone-geometry'
 
 @Component({
   selector: 'pngx-ocr-template-zone-list',
@@ -11,17 +11,12 @@ import { getZonePage } from '../zone-geometry'
 })
 export class OcrTemplateEditorZoneListComponent {
   @Input() zones: OcrTemplateZone[] = []
-  @Input() selectedZoneIndex: number | null = null
-  @Input() previewPage = 0
-  @Input() previewPageCount: number | null = null
   @Input() customFields: CustomField[] = []
 
   @Output() zoneSelected = new EventEmitter<number>()
   @Output() zoneRemoved = new EventEmitter<number>()
 
-  zonePage(zone: OcrTemplateZone): number {
-    return getZonePage(zone, this.previewPage, this.previewPageCount)
-  }
+  readonly zoneColor = getZoneColor
 
   getZoneTargetName(zone: OcrTemplateZone): string {
     const target = zone.target || 'custom_field'
