@@ -6,7 +6,14 @@ import {
   moveItemInArray,
 } from '@angular/cdk/drag-drop'
 import { NgClass } from '@angular/common'
-import { Component, HostListener, inject, OnInit, signal } from '@angular/core'
+import {
+  Component,
+  HostListener,
+  inject,
+  OnInit,
+  signal,
+  viewChild,
+} from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { ActivatedRoute, Router, RouterModule } from '@angular/router'
 import {
@@ -49,6 +56,7 @@ import { SettingsService } from 'src/app/services/settings.service'
 import { TasksService } from 'src/app/services/tasks.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { UploadDocumentsService } from 'src/app/services/upload-documents.service'
+import { WebsocketStatusService } from 'src/app/services/websocket-status.service'
 import { environment } from 'src/environments/environment'
 import { ChatComponent } from '../chat/chat/chat.component'
 import { SwitchComponent } from '../common/input/switch/switch.component'
@@ -105,6 +113,9 @@ export class AppFrameComponent
   permissionsService = inject(PermissionsService)
   private djangoMessagesService = inject(DjangoMessagesService)
   private uploadDocumentsService = inject(UploadDocumentsService)
+  private websocketStatusService = inject(WebsocketStatusService)
+
+  private readonly uploadStatusTray = viewChild(UploadStatusTrayComponent)
 
   readonly appRemoteVersion = signal<AppRemoteVersion>(null)
   readonly isMenuCollapsed = signal(true)
@@ -523,6 +534,14 @@ export class AppFrameComponent
     input.value = ''
     if (!files.length) return
     this.uploadDocumentsService.uploadFiles(files)
+  }
+
+  get uploadsInProgress(): number {
+    return this.websocketStatusService.getConsumerStatusNotCompleted().length
+  }
+
+  showUploadStatus() {
+    this.uploadStatusTray()?.expand()
   }
 
   onLogout() {

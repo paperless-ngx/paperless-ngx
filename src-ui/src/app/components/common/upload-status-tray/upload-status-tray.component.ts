@@ -55,7 +55,7 @@ export class UploadStatusTrayComponent extends ComponentWithPermissions {
     this.uploadDocumentsService
       .onUploadsStarted()
       .pipe(takeUntilDestroyed())
-      .subscribe(() => this.collapsed.set(false))
+      .subscribe(() => this.expand())
   }
 
   get canAddDocuments(): boolean {
@@ -143,6 +143,10 @@ export class UploadStatusTrayComponent extends ComponentWithPermissions {
 
   toggleCollapsed() {
     this.collapsed.update((collapsed) => !collapsed)
+  }
+
+  expand() {
+    this.collapsed.set(false)
   }
 
   dismiss(status: FileStatus) {

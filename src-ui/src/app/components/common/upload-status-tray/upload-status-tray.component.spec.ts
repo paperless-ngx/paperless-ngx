@@ -105,6 +105,13 @@ describe('UploadStatusTrayComponent', () => {
     expect(component.collapsed()).toBe(false)
   })
 
+  it('should expand on request', () => {
+    component.toggleCollapsed()
+    expect(component.collapsed()).toBe(true)
+    component.expand()
+    expect(component.collapsed()).toBe(false)
+  })
+
   it('should expand when new uploads start', () => {
     const uploadDocumentsService = TestBed.inject(UploadDocumentsService)
     jest
