@@ -1,9 +1,9 @@
 .dropdown-menu {
-  width: var(--pngx-toast-max-width);
+  width: min(36rem, calc(100vw - 20px));
 }
 
 .chat-messages {
-  max-height: 350px;
+  max-height: min(60dvh, 36rem);
   overflow-y: auto;
   white-space: pre-wrap;
 }
@@ -16,24 +16,29 @@
   white-space: initial;
 }
 
-@media screen and (max-width: 400px) {
-  :host ::ng-deep .dropdown-menu-end {
-    right: -3rem;
+@media screen and (max-width: 575.98px) {
+  .chat-messages {
+    max-height: calc(100dvh - 12rem);
   }
 }
 
-.blinking-cursor {
-  font-weight: bold;
-  font-size: 1.2em;
-  animation: blink 1s step-end infinite;
+.chat-markdown.streaming ::ng-deep {
+  > :last-child:not(ul, ol, table)::after,
+  > :is(ul, ol):last-child > li:last-child::after {
+    content: '';
+    display: inline-block;
+    width: 2px;
+    height: 1.05em;
+    margin-left: 2px;
+    background-color: currentColor;
+    vertical-align: -0.15em;
+    animation: blink 1s step-end infinite;
+  }
 }
 
 @keyframes blink {
-  from, to {
-    opacity: 0;
-  }
   50% {
-    opacity: 1;
+    opacity: 0;
   }
 }
 
