@@ -18,10 +18,10 @@ export class OcrTemplateEditorZoneListComponent {
   @Input() zones: OcrTemplateZone[] = []
   @Input() customFields: CustomField[] = []
 
-  @Output() zoneSelected = new EventEmitter<number>()
-  @Output() zoneRemoved = new EventEmitter<number>()
+  @Output() public readonly zoneSelected = new EventEmitter<number>()
+  @Output() public readonly zoneRemoved = new EventEmitter<number>()
 
-  readonly zoneColor = getZoneColor
+  public readonly zoneColor = getZoneColor
 
   hasField(zone: OcrTemplateZone): boolean {
     return getZoneFieldKey(zone) !== null

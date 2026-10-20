@@ -64,37 +64,6 @@ export interface OcrTemplateZone {
   zone_source_height?: number
 }
 
-export const TRANSFORM_OPTIONS = [
-  { id: OcrZoneTransform.None, name: $localize`None` },
-  { id: OcrZoneTransform.Strip, name: $localize`Strip whitespace` },
-  { id: OcrZoneTransform.Uppercase, name: $localize`Uppercase` },
-  { id: OcrZoneTransform.Lowercase, name: $localize`Lowercase` },
-  { id: OcrZoneTransform.Numeric, name: $localize`Numeric only` },
-  {
-    id: OcrZoneTransform.StripPunctuation,
-    name: $localize`Remove leading/trailing punctuation`,
-  },
-  { id: OcrZoneTransform.Date, name: $localize`Parse date` },
-  { id: OcrZoneTransform.QrCode, name: $localize`Read QR/barcode` },
-]
-
-export const OCR_LANGUAGE_OPTIONS = [
-  { id: 'eng', name: $localize`English` },
-  { id: 'deu', name: $localize`German` },
-  { id: 'fra', name: $localize`French` },
-  { id: 'ita', name: $localize`Italian` },
-  { id: 'spa', name: $localize`Spanish` },
-  { id: 'por', name: $localize`Portuguese` },
-  { id: 'nld', name: $localize`Dutch` },
-]
-
-export const DATE_FORMAT_OPTIONS = [
-  { id: '', name: $localize`Auto-detect` },
-  { id: '%d.%m.%Y', name: 'DD.MM.YYYY' },
-  { id: '%Y/%m/%d', name: 'YYYY/MM/DD' },
-  { id: '%d/%m/%Y', name: 'DD/MM/YYYY' },
-]
-
 export interface OcrTemplate extends ObjectWithId {
   name: string
   document_type: number

@@ -35,7 +35,7 @@
                 <button type="button" class="btn btn-sm btn-link px-0 me-auto" (click)="deselectZone()">
                   <i-bs name="arrow-left" class="me-1"></i-bs><ng-container i18n>All zones</ng-container>
                 </button>
-                <button type="button" class="btn btn-sm btn-outline-primary" (click)="testZone()" [disabled]="!previewDocId || zoneTesting" [title]="previewDocId ? '' : noSampleDocumentTitle">
+                <button type="button" class="btn btn-sm btn-outline-primary" (click)="testZone()" [disabled]="!previewDocId || zoneTesting">
                   @if (zoneTesting) {
                     <span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
                   } @else {
@@ -43,7 +43,7 @@
                   }
                   <ng-container i18n>Test</ng-container>
                 </button>
-                <button type="button" class="btn btn-sm btn-outline-danger" (click)="deleteSelectedZone()" title="Delete zone" i18n-title aria-label="Delete zone" i18n-aria-label>
+                <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeZone(selectedZoneIndex)" title="Delete zone" i18n-title aria-label="Delete zone" i18n-aria-label>
                   <i-bs name="trash"></i-bs>
                 </button>
               </div>
@@ -117,7 +117,7 @@
               <h6 class="border-top pt-3 mt-1 mb-3" i18n>Processing</h6>
 
               <pngx-input-select
-                [items]="ocrLanguageOptions"
+                [items]="languageOptions"
                 [multiple]="true"
                 [ngModel]="ocrLanguageArray(zone)"
                 (ngModelChange)="setOcrLanguages(zone, $event)"
@@ -130,32 +130,15 @@
               <pngx-input-select [items]="transformOptions" [(ngModel)]="zone.transform" title="Transform" i18n-title></pngx-input-select>
 
               @if (zone.transform === OcrZoneTransform.Date) {
-                <pngx-input-select
-                  [items]="dateFormatItems"
-                  [ngModel]="dateFormatChoice(zone)"
-                  (ngModelChange)="setDateFormatChoice(zone, $event)"
+                <pngx-input-text
+                  [(ngModel)]="zone.date_format"
                   title="Date format"
                   i18n-title
-                ></pngx-input-select>
-                @if (usesCustomDateFormat(zone)) {
-                  <div class="input-group mt-n2 mb-3">
-                    <input type="text" class="form-control font-monospace" [(ngModel)]="zone.date_format" placeholder="%d.%m.%Y" aria-label="Custom date format" i18n-aria-label />
-                    <button class="btn btn-outline-secondary" type="button" [ngbPopover]="dateFmtHelp" [autoClose]="true" title="Date format help" i18n-title>
-                      <i-bs name="question-circle"></i-bs>
-                    </button>
-                  </div>
-                  <ng-template #dateFmtHelp>
-                    <p class="mb-1" i18n>Python date codes:</p>
-                    <ul class="mb-1 ps-3">
-                      <li><code>%d</code> <ng-container i18n>day (01-31)</ng-container></li>
-                      <li><code>%m</code> <ng-container i18n>month (01-12)</ng-container></li>
-                      <li><code>%Y</code> <ng-container i18n>year, 4-digit</ng-container></li>
-                      <li><code>%y</code> <ng-container i18n>year, 2-digit</ng-container></li>
-                      <li><code>%b</code> <ng-container i18n>month name (Jan)</ng-container></li>
-                    </ul>
-                    <span i18n>Example:</span> <code>%d.%m.%Y</code> -> 03.03.2026
-                  </ng-template>
-                }
+                  placeholder="Auto-detect"
+                  i18n-placeholder
+                  hint="Python date codes, e.g. %d.%m.%Y. Leave empty to detect the format automatically."
+                  i18n-hint
+                ></pngx-input-text>
               }
 
               <pngx-input-text [(ngModel)]="zone.validation_regex" title="Validation regex" i18n-title placeholder="e.g. \d{2}\.\d{2}\.\d{4}" hint="The value must match this pattern to be applied." i18n-hint></pngx-input-text>
@@ -176,62 +159,24 @@
 
     <div class="col-lg-8 d-flex flex-column">
       <div class="mb-2 flex-shrink-0">
-        <label class="visually-hidden" for="preview-document" i18n>Sample document</label>
-        <div class="input-group input-group-sm">
-          <span class="input-group-text">
-            @if (searchStatus() === 'loading') {
-              <span class="spinner-border spinner-border-sm" role="status"><span class="visually-hidden" i18n>Searching...</span></span>
-            } @else {
-              <i-bs name="file-text"></i-bs>
-            }
-          </span>
-          <input
-            id="preview-document"
-            type="text"
-            class="form-control"
-            [(ngModel)]="previewDocModel"
-            [ngbTypeahead]="searchDocuments"
-            #documentSearch="ngbTypeahead"
-            [inputFormatter]="documentFormatter"
-            [resultFormatter]="documentFormatter"
-            [resultTemplate]="documentResult"
-            (input)="searchStatus.set('idle')"
-            (selectItem)="onPreviewDocSelected($event)"
-            [editable]="false"
-            container="body"
-            popupClass="ocr-template-document-results col-11 col-md-6 overflow-y-auto"
-            placeholder="Search for a sample document..."
-            i18n-placeholder
-          />
-          @if (previewDocId) {
-            <button type="button" class="btn btn-outline-secondary" (click)="clearPreviewDoc(); documentSearch.dismissPopup()" title="Clear sample document" i18n-title aria-label="Clear sample document" i18n-aria-label>
-              <i-bs name="x"></i-bs>
-            </button>
-          }
-        </div>
-        <ng-template #documentResult let-document="result">
-          <span class="d-block text-wrap text-break">{{ documentFormatter(document) }}</span>
-        </ng-template>
+        <pngx-input-document-link
+          [ngModel]="sampleDocumentIds"
+          (ngModelChange)="setSampleDocument($event)"
+          [minimal]="true"
+          placeholder="Search for a sample document"
+          i18n-placeholder
+        ></pngx-input-document-link>
       </div>
-      @if (searchStatus() === 'empty' || searchStatus() === 'error') {
-        <div class="small mb-2" role="status" [class.text-danger]="searchStatus() === 'error'" [class.text-muted]="searchStatus() === 'empty'">
-          @if (searchStatus() === 'error') {
-            <span i18n>Document search failed.</span>
-          } @else {
-            <span i18n>No matching documents.</span>
-          }
-        </div>
-      }
       <div #previewContainer class="position-relative flex-grow-1 overflow-hidden">
-        <div class="h-100 overflow-auto border" [attr.aria-busy]="previewStatus() === 'loading'">
-          @if (previewStatus() === 'error') {
+        <div class="h-100 overflow-auto border" [attr.aria-busy]="previewDocId && !pageLoaded()">
+          @if (pageFailed()) {
             <div class="py-5 px-3 text-center" role="alert">
               <i-bs name="exclamation-triangle" width="32" height="32" class="text-warning"></i-bs>
-              <p class="my-3">{{ previewError() }}</p>
-              <button type="button" class="btn btn-sm btn-outline-secondary" (click)="loadPreview()"><i-bs name="arrow-clockwise" class="me-1"></i-bs><span i18n>Retry</span></button>
+              <p class="my-3" i18n>Could not load this page.</p>
+              <button type="button" class="btn btn-sm btn-outline-secondary" (click)="setSampleDocument(sampleDocumentIds)"><i-bs name="arrow-clockwise" class="me-1"></i-bs><span i18n>Retry</span></button>
             </div>
-          } @else if (pageImageUrl) {
-            <div class="position-relative" [class.d-none]="!imageLoaded" [style.width.%]="zoom * 100">
+          } @else if (previewDocId) {
+            <div class="position-relative" [class.d-none]="!pageLoaded()" [style.width.%]="zoom * 100">
               <img
                 #pageImage
                 [src]="pageImageUrl"
@@ -242,7 +187,7 @@
                 class="d-block w-100"
                 crossorigin="use-credentials"
               />
-              @if (imageLoaded) {
+              @if (pageLoaded()) {
                 <svg
                   #zoneOverlay
                   class="zone-overlay position-absolute top-0 start-0 w-100 h-100"
@@ -304,8 +249,8 @@
                 </svg>
               }
             </div>
-            @if (previewStatus() === 'loading') {
-              <div class="p-5 d-flex justify-content-center align-items-center" role="status">
+            @if (!pageLoaded()) {
+              <div class="p-5 d-flex justify-content-center align-items-center">
                 <div class="spinner-border" role="status">
                   <span class="visually-hidden" i18n>Loading page...</span>
                 </div>
@@ -318,20 +263,20 @@
             </div>
           }
         </div>
-        @if (previewDocId && previewStatus() !== 'error') {
+        @if (previewDocId && !pageFailed()) {
           <div class="position-absolute bottom-0 start-50 translate-middle-x z-1 mb-3">
             <div cdkDrag [cdkDragBoundary]="previewContainer" class="d-flex gap-2 p-1 bg-body border rounded shadow">
               <span cdkDragHandle class="d-flex align-items-center text-secondary" title="Move preview controls" i18n-title aria-label="Move preview controls" i18n-aria-label>
                 <i-bs name="grip-vertical"></i-bs>
               </span>
               <div class="input-group input-group-sm w-auto flex-nowrap">
-                <input class="form-control flex-grow-0 preview-page-input" type="number" min="1" [max]="previewPageCount()" [(ngModel)]="previewPageDisplay" [disabled]="previewStatus() === 'loading'" aria-label="Page" i18n-aria-label />
+                <input class="form-control flex-grow-0 preview-page-input" type="number" min="1" [max]="previewPageCount()" [(ngModel)]="previewPageDisplay" [disabled]="!pageLoaded()" aria-label="Page" i18n-aria-label />
                 <span class="input-group-text" i18n>of {{ previewPageCount() ?? '?' }}</span>
               </div>
               <div class="input-group input-group-sm w-auto flex-nowrap" role="group" aria-label="Zoom" i18n-aria-label>
-                <button type="button" class="btn btn-outline-secondary" aria-label="Zoom out" i18n-aria-label [disabled]="!imageLoaded || zoom <= 0.5" (click)="zoomOut()"><i-bs name="dash"></i-bs></button>
-                <button type="button" class="btn btn-outline-secondary preview-zoom" title="Reset zoom" i18n-title [disabled]="!imageLoaded" (click)="resetZoom()">{{ zoom | percent: '1.0-0' }}</button>
-                <button type="button" class="btn btn-outline-secondary" aria-label="Zoom in" i18n-aria-label [disabled]="!imageLoaded || zoom >= 4" (click)="zoomIn()"><i-bs name="plus"></i-bs></button>
+                <button type="button" class="btn btn-outline-secondary" aria-label="Zoom out" i18n-aria-label [disabled]="!pageLoaded() || zoom <= 0.5" (click)="zoomOut()"><i-bs name="dash"></i-bs></button>
+                <button type="button" class="btn btn-outline-secondary preview-zoom" title="Reset zoom" i18n-title [disabled]="!pageLoaded()" (click)="resetZoom()">{{ zoom | percent: '1.0-0' }}</button>
+                <button type="button" class="btn btn-outline-secondary" aria-label="Zoom in" i18n-aria-label [disabled]="!pageLoaded() || zoom >= 4" (click)="zoomIn()"><i-bs name="plus"></i-bs></button>
               </div>
             </div>
           </div>

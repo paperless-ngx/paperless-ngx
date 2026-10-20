@@ -19,48 +19,30 @@ import {
   NgbActiveModal,
   NgbModal,
   NgbNavModule,
-  NgbPopoverModule,
-  NgbTypeaheadModule,
-  NgbTypeaheadSelectItemEvent,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import {
-  catchError,
-  debounceTime,
-  distinctUntilChanged,
-  map,
-  Observable,
-  of,
-  Subject,
-  switchMap,
-  takeUntil,
-  tap,
-} from 'rxjs'
+import { Subject, takeUntil } from 'rxjs'
 import { CustomFieldEditDialogComponent } from 'src/app/components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
 import { EditDialogMode } from 'src/app/components/common/edit-dialog/edit-dialog.component'
+import { DocumentLinkComponent } from 'src/app/components/common/input/document-link/document-link.component'
 import { NumberComponent } from 'src/app/components/common/input/number/number.component'
 import { SelectComponent } from 'src/app/components/common/input/select/select.component'
 import { SwitchComponent } from 'src/app/components/common/input/switch/switch.component'
 import { TextComponent } from 'src/app/components/common/input/text/text.component'
 import { CustomField } from 'src/app/data/custom-field'
-import { Document } from 'src/app/data/document'
 import { DocumentType } from 'src/app/data/document-type'
 import {
-  DATE_FORMAT_OPTIONS,
   DEFAULT_OCR_ZONE_LANGUAGE,
   getZoneFieldKey,
   OCR_BUILTIN_TARGETS,
-  OCR_LANGUAGE_OPTIONS,
   OCR_SUPPORTED_FIELD_TYPES,
   OcrTemplate,
   OcrTemplateZone,
   OcrZoneTarget,
   OcrZoneTransform,
   OcrZoneTestResult,
-  TRANSFORM_OPTIONS,
   ZoneTestRequest,
 } from 'src/app/data/ocr-template'
-import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
@@ -100,12 +82,35 @@ type OverlayInteraction =
     }
 interface ZoneTest {
   zone: OcrTemplateZone
-  documentId: number
-  request: ZoneTestRequest
+  /** The sample document and zone settings the result was produced from. */
+  key: string
   result: OcrZoneTestResult | null
 }
 
-const CUSTOM_DATE_FORMAT_CHOICE = 'custom'
+export const ZONE_TRANSFORM_OPTIONS = [
+  { id: OcrZoneTransform.None, name: $localize`None` },
+  { id: OcrZoneTransform.Strip, name: $localize`Strip whitespace` },
+  { id: OcrZoneTransform.Uppercase, name: $localize`Uppercase` },
+  { id: OcrZoneTransform.Lowercase, name: $localize`Lowercase` },
+  { id: OcrZoneTransform.Numeric, name: $localize`Numeric only` },
+  {
+    id: OcrZoneTransform.StripPunctuation,
+    name: $localize`Remove leading/trailing punctuation`,
+  },
+  { id: OcrZoneTransform.Date, name: $localize`Parse date` },
+  { id: OcrZoneTransform.QrCode, name: $localize`Read QR/barcode` },
+]
+
+export const ZONE_LANGUAGE_OPTIONS = [
+  { id: 'eng', name: $localize`English` },
+  { id: 'deu', name: $localize`German` },
+  { id: 'fra', name: $localize`French` },
+  { id: 'ita', name: $localize`Italian` },
+  { id: 'spa', name: $localize`Spanish` },
+  { id: 'por', name: $localize`Portuguese` },
+  { id: 'nld', name: $localize`Dutch` },
+]
+
 const NO_OVERLAY_INTERACTION: OverlayInteraction = { kind: 'idle' }
 const RESIZE_CURSOR: Record<ResizeHandle, string> = {
   nw: 'nw-resize',
@@ -120,9 +125,9 @@ const RESIZE_CURSOR: Record<ResizeHandle, string> = {
 
 @Component({
   selector: 'pngx-ocr-template-editor',
-  standalone: true,
   imports: [
     DragDropModule,
+    DocumentLinkComponent,
     NumberComponent,
     TextComponent,
     SelectComponent,
@@ -130,8 +135,6 @@ const RESIZE_CURSOR: Record<ResizeHandle, string> = {
     CommonModule,
     FormsModule,
     NgbNavModule,
-    NgbPopoverModule,
-    NgbTypeaheadModule,
     NgxBootstrapIconsModule,
     OcrTemplateEditorZoneListComponent,
   ],
@@ -139,21 +142,19 @@ const RESIZE_CURSOR: Record<ResizeHandle, string> = {
   styleUrls: ['./ocr-template-editor.component.scss'],
 })
 export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
-  readonly activeModal = inject(NgbActiveModal)
+  public readonly activeModal = inject(NgbActiveModal)
   private readonly templateService = inject(OcrTemplateService)
   private readonly customFieldsService = inject(CustomFieldsService)
   private readonly documentTypeService = inject(DocumentTypeService)
-  private readonly correspondentService = inject(CorrespondentService)
   private readonly documentService = inject(DocumentService)
   private readonly toastService = inject(ToastService)
   private readonly modalService = inject(NgbModal)
   private readonly destroy$ = new Subject<void>()
   private readonly cancelZoneTest$ = new Subject<void>()
-  private readonly customDateFormatZones = new WeakSet<OcrTemplateZone>()
 
   @Input() object: OcrTemplate
-  @Output() succeeded = new EventEmitter<OcrTemplate>()
-  @Output() failed = new EventEmitter()
+  @Output() public readonly succeeded = new EventEmitter<OcrTemplate>()
+  @Output() public readonly failed = new EventEmitter()
 
   @ViewChild('zoneOverlay') overlayRef: ElementRef<SVGSVGElement>
   imageRef: ElementRef<HTMLImageElement>
@@ -186,42 +187,47 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     zones: [],
   }
 
-  readonly customFields = signal<CustomField[]>([])
-  readonly fieldItems = computed<{ id: ZoneFieldSelection; name: string }[]>(
-    () => [
-      ...OCR_BUILTIN_TARGETS,
-      ...this.customFields()
-        .filter((field) => OCR_SUPPORTED_FIELD_TYPES.includes(field.data_type))
-        .map((field) => ({ id: field.id, name: field.name })),
-    ]
-  )
-  readonly documentTypes = signal<DocumentType[]>([])
-  transformOptions = TRANSFORM_OPTIONS
-  ocrLanguageOptions = OCR_LANGUAGE_OPTIONS
-  readonly OcrZoneTransform = OcrZoneTransform
-  noSampleDocumentTitle = $localize`Select a sample document to test this zone`
-  dateFormatItems = [
-    ...DATE_FORMAT_OPTIONS,
-    { id: CUSTOM_DATE_FORMAT_CHOICE, name: $localize`Custom...` },
-  ]
-  isNew = true
-  readonly saving = signal(false)
+  public readonly customFields = signal<CustomField[]>([])
+  public readonly fieldItems = computed<
+    { id: ZoneFieldSelection; name: string }[]
+  >(() => [
+    ...OCR_BUILTIN_TARGETS,
+    ...this.customFields()
+      .filter((field) => OCR_SUPPORTED_FIELD_TYPES.includes(field.data_type))
+      .map((field) => ({ id: field.id, name: field.name })),
+  ])
+  public readonly documentTypes = signal<DocumentType[]>([])
+  public readonly OcrZoneTransform = OcrZoneTransform
+  public readonly saving = signal(false)
 
-  previewDocId: number | null = null
+  /** Bound to the document picker, which works with id arrays. */
+  sampleDocumentIds: number[] = []
   previewPage = 0
-  readonly previewPageCount = signal<number | null>(null)
-  private pageCountForDoc: number | null = null
-  pageImageUrl: string | null = null
-  readonly previewStatus = signal<'empty' | 'loading' | 'ready' | 'error'>(
-    'empty'
-  )
-  readonly previewError = signal('')
-  readonly searchStatus = signal<
-    'idle' | 'loading' | 'ready' | 'empty' | 'error'
-  >('idle')
+  public readonly previewPageCount = signal<number | null>(null)
+  public readonly pageLoaded = signal(false)
+  public readonly pageFailed = signal(false)
   zoom = 1
-  readonly previewDocModel = signal<Document | string>('')
-  private readonly correspondentNames = signal(new Map<number, string>())
+
+  get previewDocId(): number | null {
+    return this.sampleDocumentIds[0] ?? null
+  }
+
+  get pageImageUrl(): string | null {
+    return this.previewDocId
+      ? this.templateService.getPageImageUrl(
+          this.previewDocId,
+          this.previewPage
+        )
+      : null
+  }
+
+  get transformOptions() {
+    return ZONE_TRANSFORM_OPTIONS
+  }
+
+  get languageOptions() {
+    return ZONE_LANGUAGE_OPTIONS
+  }
 
   public get previewPageDisplay(): number {
     return this.previewPage + 1
@@ -238,10 +244,6 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
   overlayCursor = 'crosshair'
 
   private readonly zoneTest = signal<ZoneTest | null>(null)
-
-  get imageLoaded(): boolean {
-    return this.previewStatus() === 'ready'
-  }
 
   get zoneTestResult(): OcrZoneTestResult | null {
     return this.isCurrentZoneTest() ? this.zoneTest().result : null
@@ -275,9 +277,9 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
   }
 
   get dialogTitle(): string {
-    return this.isNew
-      ? $localize`New OCR Template`
-      : $localize`Edit OCR Template`
+    return this.template.id
+      ? $localize`Edit OCR Template`
+      : $localize`New OCR Template`
   }
 
   ngOnInit() {
@@ -295,131 +297,46 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
         this.documentTypes.set(r.results)
       })
 
-    this.correspondentService
-      .listAll()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((r) => {
-        this.correspondentNames.set(
-          new Map(r.results.map((c) => [c.id, c.name]))
-        )
-      })
-
     if (this.object) {
-      this.isNew = false
       this.template = {
         ...this.object,
         zones: this.object.zones.map((zone) => ({ ...zone })),
         combine_formats: { ...this.object.combine_formats },
       }
       if (this.template.sample_document) {
-        this.previewDocId = this.template.sample_document
-        this.loadPreview()
+        this.setSampleDocument([this.template.sample_document])
       }
     }
     this.initialState = this.editorState()
   }
 
-  searchDocuments = (text$: Observable<string>): Observable<Document[]> =>
-    text$.pipe(
-      map((term) => term.trim()),
-      debounceTime(250),
-      distinctUntilChanged(),
-      switchMap((term) => {
-        if (term.length < 2) {
-          this.searchStatus.set('idle')
-          return of([])
-        }
-        this.searchStatus.set('loading')
-        return this.documentService
-          .list(1, 10, 'created', true, {
-            search: term,
-            truncate_content: true,
-          })
-          .pipe(
-            map((r) => r.results),
-            tap((documents) => {
-              this.searchStatus.set(documents.length ? 'ready' : 'empty')
-            }),
-            catchError(() => {
-              this.searchStatus.set('error')
-              return of([])
-            })
-          )
-      })
-    )
-
-  documentFormatter = (doc: Document | string | null): string => {
-    if (!doc) return ''
-    if (typeof doc === 'string') return doc
-    const corr = doc.correspondent
-      ? this.correspondentNames().get(doc.correspondent)
-      : null
-    return corr
-      ? `#${doc.id} ${doc.title} (${corr})`
-      : `#${doc.id} ${doc.title}`
-  }
-
-  onPreviewDocSelected(event: NgbTypeaheadSelectItemEvent<Document>) {
-    event.preventDefault()
-    const doc: Document = event.item
-    this.previewDocModel.set(doc)
-    this.searchStatus.set('idle')
-    this.previewDocId = doc.id
-    if (!this.template.document_type && doc.document_type) {
-      this.template.document_type = doc.document_type
-    }
+  setSampleDocument(ids: number[]) {
+    const id = ids.at(-1)
+    this.sampleDocumentIds = id ? [id] : []
     this.previewPage = 0
-    this.loadPreview()
-  }
-
-  clearPreviewDoc() {
-    this.stopOverlayInteraction()
-    this.clearZoneTest()
-    this.previewDocModel.set('')
-    this.previewDocId = null
     this.previewPageCount.set(null)
-    this.pageCountForDoc = null
-    this.previewPage = 0
-    this.pageImageUrl = null
-    this.previewStatus.set('empty')
-    this.previewError.set('')
-    this.searchStatus.set('idle')
+    this.resetPage()
+    if (!id) return
+    this.documentService
+      .get(id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (doc) => {
+          if (this.previewDocId !== id) return
+          this.previewPageCount.set(doc.page_count ?? null)
+          this.template.document_type ??= doc.document_type
+        },
+        error: () => {
+          if (this.previewDocId === id) this.pageFailed.set(true)
+        },
+      })
   }
 
-  loadPreview() {
-    if (!this.previewDocId) return
+  private resetPage() {
     this.stopOverlayInteraction()
     this.clearZoneTest()
-    this.previewStatus.set('loading')
-    this.previewError.set('')
-    const documentId = this.previewDocId
-    if (this.pageCountForDoc !== documentId) {
-      this.pageCountForDoc = documentId
-      this.previewPageCount.set(null)
-      this.documentService
-        .get(documentId)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: (doc) => {
-            if (this.previewDocId !== documentId) return
-            this.previewPageCount.set(doc?.page_count ?? null)
-            if (doc && !this.previewDocModel()) this.previewDocModel.set(doc)
-          },
-          error: () => {
-            if (this.previewDocId !== documentId) return
-            this.previewPageCount.set(null)
-            this.pageCountForDoc = null
-            this.previewStatus.set('error')
-            this.previewError.set(
-              $localize`Could not load the selected document.`
-            )
-          },
-        })
-    }
-    this.pageImageUrl = this.templateService.getPageImageUrl(
-      this.previewDocId,
-      this.previewPage
-    )
+    this.pageLoaded.set(false)
+    this.pageFailed.set(false)
   }
 
   goToPage(page: number) {
@@ -429,7 +346,7 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     const clamped = Math.max(0, Math.min(Math.trunc(page), max))
     if (clamped === this.previewPage) return
     this.previewPage = clamped
-    this.loadPreview()
+    this.resetPage()
   }
 
   zoomIn() {
@@ -461,8 +378,7 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
   }
 
   onImageLoad() {
-    if (this.previewStatus() !== 'loading') return
-    this.previewStatus.set('ready')
+    this.pageLoaded.set(true)
     const img = this.imageRef.nativeElement
     this.template.source_width = img.naturalWidth
     this.template.source_height = img.naturalHeight
@@ -470,8 +386,7 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
 
   onImageError() {
     this.stopOverlayInteraction()
-    this.previewStatus.set('error')
-    this.previewError.set($localize`Could not load this page.`)
+    this.pageFailed.set(true)
   }
 
   @HostListener('document:keydown.escape')
@@ -483,11 +398,11 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     if (this.saving()) return
     if (event.button !== 0 || this.overlayInteraction.kind !== 'idle') return
     const point = this.svgPointFromEvent(event)
-    if (!this.imageLoaded || !point) return
+    if (!this.pageLoaded() || !point) return
     event.preventDefault()
 
     if (this.selectedZoneIndex !== null) {
-      const handle = this.findHandleAt(point, this.selectedZoneIndex)
+      const handle = this.handleAt(point, this.selectedZoneIndex)
       if (handle) {
         this.overlayInteraction = {
           kind: 'resizing',
@@ -500,7 +415,7 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
       }
     }
 
-    const clickedIdx = this.findZoneAt(point)
+    const clickedIdx = this.zoneIndexAt(point)
     if (clickedIdx !== null) {
       this.selectZone(clickedIdx)
       const zone = this.template.zones[clickedIdx]
@@ -546,10 +461,11 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     if (!point) return
 
     if (this.overlayInteraction.kind === 'resizing') {
-      this.applyResize(
-        this.overlayInteraction.zoneIndex,
+      resizeZone(
+        this.template.zones[this.overlayInteraction.zoneIndex],
         this.overlayInteraction.handle,
-        point
+        point,
+        this.imageNaturalSize()
       )
       return
     }
@@ -575,13 +491,13 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
 
   private updateOverlayCursor(point: Point) {
     if (this.selectedZoneIndex !== null) {
-      const handle = this.findHandleAt(point, this.selectedZoneIndex)
+      const handle = this.handleAt(point, this.selectedZoneIndex)
       if (handle) {
         this.overlayCursor = RESIZE_CURSOR[handle]
         return
       }
     }
-    this.overlayCursor = this.findZoneAt(point) !== null ? 'move' : 'crosshair'
+    this.overlayCursor = this.zoneIndexAt(point) !== null ? 'move' : 'crosshair'
   }
 
   onOverlayPointerUp(event: PointerEvent) {
@@ -649,31 +565,19 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
       : null
   }
 
-  zoneDisplayRect(zoneIdx: number): DisplayRect | null {
-    const img = this.imageRef?.nativeElement
-    if (!img || !img.naturalWidth) return null
-    const zone = this.template.zones[zoneIdx]
-    if (!zone) return null
+  /** The zone's rectangle on the overlay, or null if it's on another page. */
+  zoneDisplayRect(zoneIndex: number): DisplayRect | null {
+    const zone = this.template.zones[zoneIndex]
     if (!this.isOnCurrentPage(zone)) return null
     return getZoneDisplayRect(zone, this.imageNaturalSize())
   }
 
-  private findHandleAt(point: Point, zoneIdx: number): ResizeHandle | null {
-    const r = this.zoneDisplayRect(zoneIdx)
-    if (!r) return null
-    return findHandleAt(point, r, this.overlayHandleSize())
+  private handleAt(point: Point, zoneIndex: number): ResizeHandle | null {
+    const rect = this.zoneDisplayRect(zoneIndex)
+    return rect ? findHandleAt(point, rect, this.overlayHandleSize()) : null
   }
 
-  private applyResize(zoneIndex: number, handle: ResizeHandle, point: Point) {
-    const zone = this.template.zones[zoneIndex]
-    if (!zone) return
-    resizeZone(zone, handle, point, this.imageNaturalSize())
-  }
-
-  private findZoneAt(point: Point): number | null {
-    const img = this.imageRef.nativeElement
-    if (!img.naturalWidth) return null
-
+  private zoneIndexAt(point: Point): number | null {
     return findZoneAt(
       point,
       this.template.zones,
@@ -688,7 +592,7 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     return `0 0 ${imageSize.width} ${imageSize.height}`
   }
 
-  readonly zoneColor = getZoneColor
+  public readonly zoneColor = getZoneColor
 
   zoneLabel(zone: OcrTemplateZone, index: number): string {
     return zone.name || `Zone ${index + 1}`
@@ -698,7 +602,7 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     return Math.max(this.overlayUnitSize(14), rect.y - this.overlayUnitSize(4))
   }
 
-  readonly resizeHandles = getResizeHandles
+  public readonly resizeHandles = getResizeHandles
 
   overlayHandleSize(): number {
     return this.overlayUnitSize(HANDLE_SIZE)
@@ -783,15 +687,10 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     const zone = this.selectedZone
     if (!zone || !this.previewDocId) return
     this.clearZoneTest()
-    const test: ZoneTest = {
-      zone,
-      documentId: this.previewDocId,
-      request: this.zoneTestRequest(zone),
-      result: null,
-    }
+    const test: ZoneTest = { zone, key: this.zoneTestKey(zone), result: null }
     this.zoneTest.set(test)
     this.templateService
-      .testZone(test.documentId, test.request)
+      .testZone(this.previewDocId, this.zoneTestRequest(zone))
       .pipe(takeUntil(this.destroy$), takeUntil(this.cancelZoneTest$))
       .subscribe({
         next: (res) => this.zoneTest.set({ ...test, result: res }),
@@ -808,19 +707,17 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     this.zoneTest.set(null)
   }
 
+  /** A result is stale once its zone, settings or sample document change. */
   private isCurrentZoneTest(): boolean {
     const test = this.zoneTest()
-    if (
-      !test ||
-      test.zone !== this.selectedZone ||
-      test.documentId !== this.previewDocId
-    ) {
-      return false
-    }
-    const request = this.zoneTestRequest(test.zone)
-    return (Object.keys(request) as (keyof ZoneTestRequest)[]).every(
-      (key) => request[key] === test.request[key]
+    return (
+      test?.zone === this.selectedZone &&
+      test.key === this.zoneTestKey(test.zone)
     )
+  }
+
+  private zoneTestKey(zone: OcrTemplateZone): string {
+    return JSON.stringify([this.previewDocId, this.zoneTestRequest(zone)])
   }
 
   private zoneTestRequest(zone: OcrTemplateZone): ZoneTestRequest {
@@ -840,20 +737,15 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     }
   }
 
-  deleteSelectedZone() {
-    if (this.selectedZoneIndex === null) return
-    this.removeZone(this.selectedZoneIndex)
-  }
-
   save() {
     if (this.saving()) return
     this.stopOverlayInteraction()
     this.saving.set(true)
     this.pruneCombineFormats()
     this.template.sample_document = this.previewDocId
-    const obs = this.isNew
-      ? this.templateService.create(this.template)
-      : this.templateService.update(this.template)
+    const obs = this.template.id
+      ? this.templateService.update(this.template)
+      : this.templateService.create(this.template)
 
     obs.pipe(takeUntil(this.destroy$)).subscribe({
       next: (saved) => {
@@ -867,6 +759,8 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     })
   }
 
+  // ng-select needs a stable array between change detection runs, so the
+  // split language list is cached per zone until ocr_language changes.
   private readonly ocrLanguageCache = new WeakMap<
     OcrTemplateZone,
     { language: string; languages: string[] }
@@ -961,31 +855,6 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     }
   }
 
-  /** Value bound to the date-format select: a preset, '' (auto), or 'custom'. */
-  dateFormatChoice(zone: OcrTemplateZone): string {
-    return this.usesCustomDateFormat(zone)
-      ? CUSTOM_DATE_FORMAT_CHOICE
-      : zone.date_format || ''
-  }
-
-  setDateFormatChoice(zone: OcrTemplateZone, value: string) {
-    if (value === CUSTOM_DATE_FORMAT_CHOICE) {
-      this.customDateFormatZones.add(zone)
-      zone.date_format ||= ''
-    } else {
-      this.customDateFormatZones.delete(zone)
-      zone.date_format = value
-    }
-  }
-
-  usesCustomDateFormat(zone: OcrTemplateZone): boolean {
-    return (
-      this.customDateFormatZones.has(zone) ||
-      (!!zone.date_format &&
-        !DATE_FORMAT_OPTIONS.some((option) => option.id === zone.date_format))
-    )
-  }
-
   createField(name?: string) {
     const zone = this.selectedZone
     const modal = this.modalService.open(CustomFieldEditDialogComponent)
@@ -1015,7 +884,6 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.previewResizeObserver?.disconnect()
-    this.clearZoneTest()
     this.cancelZoneTest$.complete()
     this.destroy$.next()
     this.destroy$.complete()

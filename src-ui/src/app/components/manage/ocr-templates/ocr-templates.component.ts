@@ -31,14 +31,14 @@ export class OcrTemplatesComponent
   extends LoadingComponentWithPermissions
   implements OnInit
 {
-  private ocrTemplateService = inject(OcrTemplateService)
-  private documentTypeService = inject(DocumentTypeService)
-  permissionsService = inject(PermissionsService)
-  private modalService = inject(NgbModal)
-  private dirtyFormGuard = inject(DirtyFormGuard)
-  private toastService = inject(ToastService)
+  private readonly ocrTemplateService = inject(OcrTemplateService)
+  private readonly documentTypeService = inject(DocumentTypeService)
+  public readonly permissionsService = inject(PermissionsService)
+  private readonly modalService = inject(NgbModal)
+  private readonly dirtyFormGuard = inject(DirtyFormGuard)
+  private readonly toastService = inject(ToastService)
 
-  readonly templates = signal<OcrTemplate[]>([])
+  public readonly templates = signal<OcrTemplate[]>([])
   private readonly documentTypes = signal<DocumentType[]>([])
 
   ngOnInit() {
