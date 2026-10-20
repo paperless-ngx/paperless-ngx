@@ -66,6 +66,19 @@ describe('UploadDocumentsService', () => {
       .forEach((req) => req.flush('123-456'))
   })
 
+  it('emits when uploads start', () => {
+    const startedSpy = jest.fn()
+    uploadDocumentsService.onUploadsStarted().subscribe(startedSpy)
+    uploadDocumentsService.uploadFiles([])
+    expect(startedSpy).not.toHaveBeenCalled()
+    const file = new File(['one'], 'one.pdf')
+    uploadDocumentsService.uploadFiles([file])
+    expect(startedSpy).toHaveBeenCalledWith([file])
+    httpTestingController
+      .match(`${environment.apiBaseUrl}documents/post_document/`)
+      .forEach((req) => req.flush('123-456'))
+  })
+
   it('updates progress during upload and failure', () => {
     const file = new File(
       [new Blob(['testing'], { type: 'application/pdf' })],

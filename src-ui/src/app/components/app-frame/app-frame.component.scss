@@ -552,9 +552,22 @@ main {
   --bs-btn-active-bg: rgba(255, 255, 255, .3);
   color: var(--pngx-primary-text-contrast) !important; // .navbar .dropdown > .btn in styles.scss
 
-  &:not(:focus) {
-    box-shadow: 0 1px 3px rgba(0, 0, 0, .35), 0 1px 1px rgba(0, 0, 0, .2); // leave room for the .btn:focus ring
+  & + & {
+    border-left: 1px solid rgba(255, 255, 255, .2) !important;
   }
+
+  &:focus {
+    box-shadow: none;
+  }
+
+  &:focus-visible {
+    box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .5);
+  }
+}
+
+.header-upload-group {
+  border-radius: var(--bs-border-radius-sm);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .35), 0 1px 1px rgba(0, 0, 0, .2);
 }
 
 @media screen and (max-width: 575.98px) {

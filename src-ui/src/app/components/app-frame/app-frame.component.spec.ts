@@ -6,7 +6,7 @@ import {
 } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import { BrowserModule } from '@angular/platform-browser'
+import { BrowserModule, By } from '@angular/platform-browser'
 import { ActivatedRoute, Router } from '@angular/router'
 import { RouterTestingModule } from '@angular/router/testing'
 import { NgbModal, NgbModalModule, NgbModule } from '@ng-bootstrap/ng-bootstrap'
@@ -34,8 +34,10 @@ import { SettingsService } from 'src/app/services/settings.service'
 import { TasksService } from 'src/app/services/tasks.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { UploadDocumentsService } from 'src/app/services/upload-documents.service'
+import { WebsocketStatusService } from 'src/app/services/websocket-status.service'
 import { environment } from 'src/environments/environment'
 import { ProfileEditDialogComponent } from '../common/profile-edit-dialog/profile-edit-dialog.component'
+import { UploadStatusTrayComponent } from '../common/upload-status-tray/upload-status-tray.component'
 import { DocumentDetailComponent } from '../document-detail/document-detail.component'
 import { AppFrameComponent } from './app-frame.component'
 import { GlobalSearchComponent } from './global-search/global-search.component'
@@ -474,8 +476,24 @@ describe('AppFrameComponent', () => {
     jest.spyOn(input, 'files', 'get').mockReturnValue([file] as any)
 
     component.onFileSelected({ target: input } as unknown as Event)
-    expect(toastSpy).toHaveBeenCalled()
+    expect(toastSpy).not.toHaveBeenCalled()
     expect(uploadSpy).toHaveBeenCalledWith([file])
+  })
+
+  it('should show in-progress uploads and expand the status tray', () => {
+    const websocketStatusService = TestBed.inject(WebsocketStatusService)
+    expect(component.uploadsInProgress).toEqual(0)
+    websocketStatusService.newFileUpload('file.pdf')
+    expect(component.uploadsInProgress).toEqual(1)
+
+    fixture.detectChanges()
+    const tray = fixture.debugElement.query(
+      By.directive(UploadStatusTrayComponent)
+    ).componentInstance as UploadStatusTrayComponent
+    tray.toggleCollapsed()
+    expect(tray.collapsed()).toBe(true)
+    component.showUploadStatus()
+    expect(tray.collapsed()).toBe(false)
   })
 
   it('should not upload when no files are selected from the navbar', () => {

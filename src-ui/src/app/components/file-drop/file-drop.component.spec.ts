@@ -119,7 +119,7 @@ describe('FileDropComponent', () => {
     }
     component.onDrop(dragEvent as DragEvent)
     advanceTimers(3000)
-    expect(toastSpy).toHaveBeenCalled()
+    expect(toastSpy).not.toHaveBeenCalled()
     expect(uploadSpy).toHaveBeenCalled()
   })
 
@@ -159,7 +159,7 @@ describe('FileDropComponent', () => {
     component.onDrop(dragEvent as DragEvent)
     await flushPromises()
     advanceTimers(3000)
-    expect(toastSpy).toHaveBeenCalled()
+    expect(toastSpy).not.toHaveBeenCalled()
     expect(uploadSpy).toHaveBeenCalled()
   })
 
@@ -227,7 +227,7 @@ describe('FileDropComponent', () => {
     }
     component.onDrop(dragEvent as DragEvent)
     advanceTimers(3000)
-    expect(toastSpy).toHaveBeenCalled()
+    expect(toastSpy).not.toHaveBeenCalled()
     expect(uploadSpy).toHaveBeenCalled()
   })
 

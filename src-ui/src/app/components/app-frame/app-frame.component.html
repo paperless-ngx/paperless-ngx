@@ -31,11 +31,18 @@
     [class.mobile-hidden]="mobileSearchHidden()">
     <div class="col-12 header-search mx-auto d-flex align-items-stretch gap-3">
       <pngx-global-search class="flex-grow-1"></pngx-global-search>
-      <button *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.Document }"
-        class="btn btn-sm header-upload border-0 d-flex align-items-center justify-content-center flex-shrink-0 py-0 px-2" type="button"
-        (click)="fileUpload.click()" aria-label="Upload documents" i18n-aria-label>
-        <i-bs class="d-flex" width="1.1em" height="1.1em" name="file-earmark-arrow-up"></i-bs><span class="ms-2 d-sm-none d-md-inline" i18n>Upload</span>
-      </button>
+      <div *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.Document }" class="btn-group header-upload-group flex-shrink-0">
+        <button class="btn btn-sm header-upload border-0 d-flex align-items-center justify-content-center py-0 px-2" type="button"
+          (click)="fileUpload.click()" aria-label="Upload documents" i18n-aria-label>
+          <i-bs class="d-flex" width="1.1em" height="1.1em" name="file-earmark-arrow-up"></i-bs><span class="ms-2 d-sm-none d-md-inline" i18n>Upload</span>
+        </button>
+        @if (uploadsInProgress > 0) {
+          <button class="btn btn-sm header-upload border-0 d-flex align-items-center py-0 px-2" type="button"
+            (click)="showUploadStatus()" aria-label="Show document processing status" i18n-aria-label>
+            <span class="spinner-border spinner-border-sm" aria-hidden="true"></span><span class="ms-2 small">{{ uploadsInProgress }}</span>
+          </button>
+        }
+      </div>
     </div>
   </div>
   <ul ngbNav class="order-sm-3">

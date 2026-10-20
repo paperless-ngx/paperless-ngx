@@ -134,7 +134,6 @@ export class FileDropComponent {
       Promise.all(promises)
         .then((results) => {
           files.push(...[].concat(...results))
-          this.toastService.showInfo($localize`Initiating upload...`, 3000)
           this.uploadDocumentsService.uploadFiles(files)
         })
         .catch((e) => {
@@ -143,7 +142,6 @@ export class FileDropComponent {
           )
         })
     } else if (files.length) {
-      this.toastService.showInfo($localize`Initiating upload...`, 3000)
       this.uploadDocumentsService.uploadFiles(files)
     }
 
