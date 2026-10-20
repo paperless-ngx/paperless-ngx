@@ -24,6 +24,7 @@ from django.core.validators import MaxValueValidator
 from django.core.validators import MinValueValidator
 from django.core.validators import RegexValidator
 from django.core.validators import integer_validator
+from django.db import transaction
 from django.db.models import Count
 from django.db.models import Q
 from django.db.models.functions import Lower
@@ -3767,19 +3768,8 @@ class OcrTemplateZoneSerializer(serializers.ModelSerializer):
             "validation_regex",
         ]
 
-    def validate_width(self, value):
-        if value < 1:
-            raise serializers.ValidationError("Width must be at least 1.")
-        return value
-
-    def validate_height(self, value):
-        if value < 1:
-            raise serializers.ValidationError("Height must be at least 1.")
-        return value
-
     def validate_custom_field(self, value):
         if value is None:
-            # Built-in target (title/asn/created) — no custom field required.
             return value
         if value.data_type not in OCR_SUPPORTED_FIELD_TYPES:
             raise serializers.ValidationError(
@@ -3788,9 +3778,55 @@ class OcrTemplateZoneSerializer(serializers.ModelSerializer):
             )
         return value
 
+    def validate_page(self, value):
+        if value is not None and value != -1 and value < 1:
+            raise serializers.ValidationError(
+                "Page must be positive or -1 for the last page.",
+            )
+        return value
+
+
+class OcrTemplateZoneTestSerializer(OcrTemplateZoneSerializer):
+    name = serializers.CharField(default="test")
+    x = serializers.IntegerField(min_value=0, default=0)
+    y = serializers.IntegerField(min_value=0, default=0)
+    width = serializers.IntegerField(min_value=2)
+    height = serializers.IntegerField(min_value=2)
+
+    class Meta(OcrTemplateZoneSerializer.Meta):
+        fields = [
+            "name",
+            "x",
+            "y",
+            "width",
+            "height",
+            "page",
+            "ocr_language",
+            "transform",
+            "date_format",
+            "validation_regex",
+            "zone_source_width",
+            "zone_source_height",
+        ]
+        extra_kwargs = {
+            "zone_source_width": {"min_value": 1},
+            "zone_source_height": {"min_value": 1},
+        }
+
+
+class OcrTemplateTestSerializer(serializers.Serializer):
+    document = serializers.PrimaryKeyRelatedField(
+        queryset=Document.objects.select_related("root_document__owner"),
+    )
+    zone = OcrTemplateZoneTestSerializer()
+
 
 class OcrTemplateSerializer(MatchingModelSerializer, OwnedObjectSerializer):
     zones = OcrTemplateZoneSerializer(many=True, required=False)
+    combine_formats = serializers.DictField(
+        child=serializers.CharField(allow_blank=True, trim_whitespace=False),
+        required=False,
+    )
 
     # Templates are never assigned to documents
     slug = None
@@ -3826,45 +3862,38 @@ class OcrTemplateSerializer(MatchingModelSerializer, OwnedObjectSerializer):
             )
         return value
 
-    def validate_source_width(self, value):
-        if value < 1:
-            raise serializers.ValidationError("Source width must be at least 1.")
-        return value
-
-    def validate_source_height(self, value):
-        if value < 1:
-            raise serializers.ValidationError("Source height must be at least 1.")
-        return value
-
-    def validate_zones(self, zones_data):
-        """Validate zone coordinates are within the source dimensions."""
-        # source_width/height may not be in initial_data during partial updates
-        source_width = self.initial_data.get("source_width") or (
-            self.instance.source_width if self.instance else None
+    def validate(self, data):
+        data = super().validate(data)
+        zones = data.get("zones", [])
+        if (
+            self.instance
+            and "zones" not in data
+            and ("source_width" in data or "source_height" in data)
+        ):
+            zones = self.instance.zones.values()
+        source_width = data.get(
+            "source_width",
+            getattr(self.instance, "source_width", None),
         )
-        source_height = self.initial_data.get("source_height") or (
-            self.instance.source_height if self.instance else None
+        source_height = data.get(
+            "source_height",
+            getattr(self.instance, "source_height", None),
         )
+        for zone in zones:
+            width = zone.get("zone_source_width") or source_width
+            height = zone.get("zone_source_height") or source_height
+            if (
+                zone.get("x", 0) + zone.get("width", 0) > width
+                or zone.get("y", 0) + zone.get("height", 0) > height
+            ):
+                raise serializers.ValidationError(
+                    {
+                        "zones": f"Zone '{zone.get('name', '?')}' extends beyond its source dimensions.",
+                    },
+                )
+        return data
 
-        if source_width and source_height:
-            for zone in zones_data:
-                x = zone.get("x", 0)
-                y = zone.get("y", 0)
-                w = zone.get("width", 0)
-                h = zone.get("height", 0)
-                if x + w > int(source_width):
-                    raise serializers.ValidationError(
-                        f"Zone '{zone.get('name', '?')}' extends beyond source width "
-                        f"({x + w} > {source_width}).",
-                    )
-                if y + h > int(source_height):
-                    raise serializers.ValidationError(
-                        f"Zone '{zone.get('name', '?')}' extends beyond source height "
-                        f"({y + h} > {source_height}).",
-                    )
-
-        return zones_data
-
+    @transaction.atomic
     def create(self, validated_data):
         zones_data = validated_data.pop("zones", [])
         template = super().create(validated_data)
@@ -3872,12 +3901,12 @@ class OcrTemplateSerializer(MatchingModelSerializer, OwnedObjectSerializer):
             OcrTemplateZone.objects.create(template=template, **zone_data)
         return template
 
+    @transaction.atomic
     def update(self, instance, validated_data):
         zones_data = validated_data.pop("zones", None)
         instance = super().update(instance, validated_data)
 
         if zones_data is not None:
-            # Replace all zones with the new set
             instance.zones.all().delete()
             for zone_data in zones_data:
                 OcrTemplateZone.objects.create(template=instance, **zone_data)

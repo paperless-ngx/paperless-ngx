@@ -158,6 +158,7 @@ from documents.models import Document
 from documents.models import DocumentType
 from documents.models import Note
 from documents.models import OcrTemplate
+from documents.models import OcrTemplateZone
 from documents.models import PaperlessTask
 from documents.models import SavedView
 from documents.models import ShareLink
@@ -208,6 +209,7 @@ from documents.serialisers import MergeDocumentsAsVersionsSerializer
 from documents.serialisers import MergeDocumentsSerializer
 from documents.serialisers import NotesSerializer
 from documents.serialisers import OcrTemplateSerializer
+from documents.serialisers import OcrTemplateTestSerializer
 from documents.serialisers import PostDocumentSerializer
 from documents.serialisers import RemovePasswordDocumentsSerializer
 from documents.serialisers import ReprocessDocumentsSerializer
@@ -2310,12 +2312,10 @@ class DocumentViewSet(
         serializer.is_valid(raise_exception=True)
         template = serializer.validated_data.get("template")
 
-        try:
-            document = Document.objects.select_related(
-                "root_document__owner",
-            ).get(pk=pk)
-        except Document.DoesNotExist:
-            raise Http404
+        document = get_object_or_404(
+            Document.objects.select_related("root_document__owner"),
+            pk=pk,
+        )
         if not request.user.has_perm(
             "documents.change_document",
         ) or not has_perms_owner_aware(request.user, "change_document", document):
@@ -2349,27 +2349,28 @@ class DocumentViewSet(
 
         run_zone_extraction(document, None, templates=templates)
 
-        # Collect results
         results = []
         builtin_labels = {"title": "Title", "asn": "ASN", "created": "Created"}
+        builtin_values = {
+            "title": document.title,
+            "asn": document.archive_serial_number,
+            "created": document.created.isoformat() if document.created else None,
+        }
+        field_values = {
+            instance.field_id: instance.value
+            for instance in document.custom_fields.select_related("field")
+        }
         for template in templates:
             for zone in template.zones.all():
-                target = getattr(zone, "target", None) or "custom_field"
-                if target == "custom_field" and zone.custom_field_id:
-                    cf_instance = document.custom_fields.filter(
-                        field=zone.custom_field,
-                    ).first()
+                if (
+                    zone.target == OcrTemplateZone.TargetType.CUSTOM_FIELD
+                    and zone.custom_field_id
+                ):
                     field_name = zone.custom_field.name
-                    value = cf_instance.value if cf_instance else None
+                    value = field_values.get(zone.custom_field_id)
                 else:
-                    field_name = builtin_labels.get(target, target)
-                    value = {
-                        "title": document.title,
-                        "asn": document.archive_serial_number,
-                        "created": document.created.isoformat()
-                        if document.created
-                        else None,
-                    }.get(target)
+                    field_name = builtin_labels.get(zone.target, zone.target)
+                    value = builtin_values.get(zone.target)
                 results.append(
                     {
                         "template": template.name,
@@ -5887,24 +5888,17 @@ class OcrTemplateViewSet(BulkPermissionMixin, PassUserMixin, ModelViewSet[OcrTem
         url_path=r"document-page-image/(?P<doc_id>[0-9]+)/(?P<page>[0-9]+)",
     )
     def document_page_image(self, request, doc_id=None, page=None):
-        """Render a specific page of a document as a PNG image.
-
-        Used by the frontend template editor to display document pages
-        as images that users can draw zones on.
-        """
-        try:
-            document = Document.objects.select_related(
-                "root_document__owner",
-            ).get(pk=doc_id)
-        except Document.DoesNotExist:
-            raise Http404("Document not found")
+        """Render a page for the template editor's zone overlay."""
+        document = get_object_or_404(
+            Document.objects.select_related("root_document__owner"),
+            pk=doc_id,
+        )
 
         if not has_perms_owner_aware(request.user, "view_document", document):
             return HttpResponseForbidden("Insufficient permissions")
 
         page_num = int(page)
 
-        # Validate page number
         if document.page_count and page_num >= document.page_count:
             raise Http404(
                 f"Page {page_num} out of range (document has {document.page_count} pages)",
@@ -5914,7 +5908,6 @@ class OcrTemplateViewSet(BulkPermissionMixin, PassUserMixin, ModelViewSet[OcrTem
         if not doc_path or not Path(doc_path).is_file():
             raise Http404("Document file not found")
 
-        # Check if document is an image (single page, no PDF rendering needed)
         if document.mime_type and document.mime_type.startswith("image/"):
             content = Path(doc_path).read_bytes()
             return HttpResponse(content, content_type=document.mime_type)
@@ -5927,7 +5920,7 @@ class OcrTemplateViewSet(BulkPermissionMixin, PassUserMixin, ModelViewSet[OcrTem
                         "pdftoppm",
                         "-png",
                         "-r",
-                        "150",  # Lower DPI for preview
+                        "150",
                         "-f",
                         str(page_num + 1),
                         "-l",
@@ -5939,14 +5932,17 @@ class OcrTemplateViewSet(BulkPermissionMixin, PassUserMixin, ModelViewSet[OcrTem
                     capture_output=True,
                     timeout=30,
                 )
-            except subprocess.CalledProcessError as e:
+            except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as error:
                 logger.warning(
-                    f"Failed to render page {page_num} of document {document.pk}: "
-                    f"{e.stderr.decode(errors='replace')[:200]}",
+                    "Failed to render page %s of document %s: %s",
+                    page_num,
+                    document.pk,
+                    error,
                 )
-                raise Http404("Failed to render page")
-            except FileNotFoundError:
-                raise Http404("pdftoppm not available - is poppler-utils installed?")
+                raise Http404("Failed to render page") from error
+            except FileNotFoundError as error:
+                logger.warning("pdftoppm is not available")
+                raise Http404("Failed to render page") from error
 
             rendered = sorted(Path(tmp_dir).glob("page-*.png"))
             if not rendered:
@@ -5956,31 +5952,15 @@ class OcrTemplateViewSet(BulkPermissionMixin, PassUserMixin, ModelViewSet[OcrTem
 
         return HttpResponse(content, content_type="image/png")
 
+    @extend_schema(request=OcrTemplateTestSerializer)
     @action(detail=False, methods=["post"], url_path="test-zone")
     def test_zone(self, request):
-        """Run OCR on a single ad-hoc zone of a document and return what it
-        yields: the raw OCR text, the transformed value, and whether the
-        validation regex matches. Non-destructive - writes nothing. Used by the
-        editor's per-zone test so a user can tune the zone/regex before saving.
-
-        Accepts: {"document": <id>, "zone": {x, y, width, height, page,
-        ocr_language, transform, validation_regex, zone_source_width,
-        zone_source_height}}.
-        """
-        from documents.models import OcrTemplateZone
+        """Extract an ad-hoc zone without changing the document."""
         from documents.zone_ocr import extract_zone_preview
 
-        zone_data = request.data.get("zone") or {}
-
-        try:
-            document = Document.objects.select_related(
-                "root_document__owner",
-            ).get(pk=request.data.get("document"))
-        except (Document.DoesNotExist, ValueError, TypeError):
-            return Response(
-                {"error": "Document not found"},
-                status=status.HTTP_404_NOT_FOUND,
-            )
+        serializer = OcrTemplateTestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        document = serializer.validated_data["document"]
 
         if not has_perms_owner_aware(request.user, "view_document", document):
             return HttpResponseForbidden("Insufficient permissions")
@@ -5992,36 +5972,13 @@ class OcrTemplateViewSet(BulkPermissionMixin, PassUserMixin, ModelViewSet[OcrTem
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        try:
-            zone = OcrTemplateZone(
-                name=zone_data.get("name") or "test",
-                x=int(zone_data.get("x", 0)),
-                y=int(zone_data.get("y", 0)),
-                width=int(zone_data.get("width", 0)),
-                height=int(zone_data.get("height", 0)),
-                page=zone_data.get("page"),
-                ocr_language=zone_data.get("ocr_language") or "eng",
-                transform=zone_data.get("transform") or "strip",
-                date_format=zone_data.get("date_format") or "",
-                validation_regex=zone_data.get("validation_regex") or "",
-            )
-        except (ValueError, TypeError):
-            return Response(
-                {"error": "Invalid zone definition"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        if zone.width < 2 or zone.height < 2:
-            return Response(
-                {"error": "Zone is too small to test"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        zone = OcrTemplateZone(**serializer.validated_data["zone"])
 
         result = extract_zone_preview(
             Path(doc_path),
             zone,
-            int(zone_data.get("zone_source_width") or 0),
-            int(zone_data.get("zone_source_height") or 0),
+            zone.zone_source_width or 0,
+            zone.zone_source_height or 0,
             document.page_count,
         )
 
