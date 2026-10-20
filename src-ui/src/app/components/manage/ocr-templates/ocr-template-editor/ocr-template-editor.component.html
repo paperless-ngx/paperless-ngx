@@ -34,62 +34,88 @@
           <a ngbNavLink><ng-container i18n>Zones</ng-container> <span class="badge bg-primary ms-2">{{ template.zones.length }}</span></a>
           <ng-template ngbNavContent>
             @if (selectedZone; as zone) {
-              <div class="d-flex justify-content-between align-items-center mb-3">
-                <button type="button" class="btn btn-sm btn-link px-0" (click)="deselectZone()">
+              <div class="d-flex align-items-center gap-2 mb-3">
+                <button type="button" class="btn btn-sm btn-link px-0 me-auto" (click)="deselectZone()">
                   <i-bs name="arrow-left" class="me-1"></i-bs><ng-container i18n>All zones</ng-container>
                 </button>
-                <button type="button" class="btn btn-sm btn-outline-danger" (click)="deleteSelectedZone()">
-                  <i-bs name="trash" class="me-1"></i-bs><ng-container i18n>Delete zone</ng-container>
+                <button type="button" class="btn btn-sm btn-outline-primary" (click)="testZone()" [disabled]="!previewDocId || zoneTesting" [title]="previewDocId ? '' : noSampleDocumentTitle">
+                  @if (zoneTesting) {
+                    <span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
+                  } @else {
+                    <i-bs name="play-fill" class="me-1"></i-bs>
+                  }
+                  <ng-container i18n>Test</ng-container>
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-danger" (click)="deleteSelectedZone()" title="Delete zone" i18n-title aria-label="Delete zone" i18n-aria-label>
+                  <i-bs name="trash"></i-bs>
                 </button>
               </div>
 
-              <div class="mb-3">
-                <label class="form-label" i18n>Zone Name</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  [(ngModel)]="zone.name"
-                />
-              </div>
+              @if (zoneTestResult; as result) {
+                @if (result.error) {
+                  <div class="alert alert-warning py-2 mb-3 small" role="alert">{{ result.error }}</div>
+                } @else {
+                  <dl class="row small border rounded mx-0 py-2 mb-3">
+                    <dt class="col-4" i18n>OCR text</dt>
+                    <dd class="col-8"><code>{{ result.raw_text || '(nothing detected)' }}</code></dd>
+                    <dt class="col-4" i18n>Value</dt>
+                    <dd class="col-8" [class.mb-0]="!result.regex"><code>{{ result.value || '(empty)' }}</code></dd>
+                    @if (result.regex) {
+                      <dt class="col-4" i18n>Validation</dt>
+                      <dd class="col-8 mb-0">
+                        @if (result.regex_match) {
+                          <span class="badge bg-success" i18n>Regex matches</span>
+                        } @else {
+                          <span class="badge bg-danger" i18n>Regex does not match</span>
+                        }
+                      </dd>
+                    }
+                  </dl>
+                }
+              }
 
-              <div class="mb-3">
-                <label class="form-label" i18n>Page</label>
-                <input
-                  type="number"
-                  class="form-control"
-                  [(ngModel)]="zone.page"
-                  min="-1"
-                />
-                <small class="text-muted" i18n>Page this zone is on. Use -1 for the last page. Set automatically when you draw it.</small>
-              </div>
+              <pngx-input-text [(ngModel)]="zone.name" title="Name" i18n-title></pngx-input-text>
 
-              <div class="mb-3">
-                <label class="form-label" i18n>Field</label>
-                <div class="input-group">
-                  <select class="form-select" [ngModel]="zoneFieldValue(zone)" (ngModelChange)="setZoneField(zone, $event)">
-                    <optgroup label="Built-in fields" i18n-label>
-                      @for (t of builtinTargets; track t.id) {
-                        <option [ngValue]="t.id">{{ t.name }}</option>
-                      }
-                    </optgroup>
-                    <optgroup label="Custom fields" i18n-label>
-                      @for (cf of customFields; track cf.id) {
-                        <option [ngValue]="cf.id">{{ cf.name }} ({{ cf.data_type }})</option>
-                      }
-                    </optgroup>
-                  </select>
-                  <button
-                    class="btn btn-outline-secondary"
-                    type="button"
-                    (click)="openQuickCreate(selectedZoneIndex)"
-                    title="Create new custom field"
-                    i18n-title
-                  >
-                    <i-bs name="plus"></i-bs>
-                  </button>
+              <pngx-input-select
+                [items]="fieldItems"
+                [ngModel]="zoneFieldValue(zone)"
+                (ngModelChange)="setZoneField(zone, $event)"
+                (createNew)="openQuickCreate(selectedZoneIndex, $event)"
+                title="Field"
+                i18n-title
+                hint="Where the extracted value is written."
+                i18n-hint
+              ></pngx-input-select>
+
+              @if (showQuickCreate) {
+                <div class="card mb-3 border-primary">
+                  <div class="card-body">
+                    <h6 class="card-title" i18n>Create Custom Field</h6>
+                    <div class="mb-2">
+                      <label class="form-label small" i18n>Field Name</label>
+                      <input type="text" class="form-control form-control-sm"
+                        [(ngModel)]="quickCreateName" placeholder="e.g. Invoice Number" />
+                    </div>
+                    <div class="mb-2">
+                      <label class="form-label small" i18n>Field Type</label>
+                      <select class="form-select form-select-sm" [(ngModel)]="quickCreateType">
+                        @for (t of quickCreateTypes; track t.id) {
+                          <option [ngValue]="t.id">{{ t.name }}</option>
+                        }
+                      </select>
+                    </div>
+                    <div class="d-flex gap-2">
+                      <button class="btn btn-primary btn-sm" (click)="submitQuickCreate()"
+                        [disabled]="!quickCreateName.trim()" i18n>
+                        Create & Assign
+                      </button>
+                      <button class="btn btn-outline-secondary btn-sm" (click)="cancelQuickCreate()" i18n>
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
                 </div>
-                <small class="text-muted" i18n>Write the extracted value to a custom field, or to a built-in field (Title, ASN, Date created).</small>
-              </div>
+              }
 
               @if (isFieldShared(zone)) {
                 <div class="card mb-3 border-info">
@@ -132,141 +158,62 @@
                 </div>
               }
 
-              @if (showQuickCreate) {
-                <div class="card mb-3 border-primary">
-                  <div class="card-body">
-                    <h6 class="card-title" i18n>Create Custom Field</h6>
-                    <div class="mb-2">
-                      <label class="form-label small" i18n>Field Name</label>
-                      <input type="text" class="form-control form-control-sm"
-                        [(ngModel)]="quickCreateName" placeholder="e.g. Invoice Number" />
-                    </div>
-                    <div class="mb-2">
-                      <label class="form-label small" i18n>Field Type</label>
-                      <select class="form-select form-select-sm" [(ngModel)]="quickCreateType">
-                        @for (t of quickCreateTypes; track t.id) {
-                          <option [ngValue]="t.id">{{ t.name }}</option>
-                        }
-                      </select>
-                    </div>
-                    <div class="d-flex gap-2">
-                      <button class="btn btn-primary btn-sm" (click)="submitQuickCreate()"
-                        [disabled]="!quickCreateName.trim()" i18n>
-                        Create & Assign
-                      </button>
-                      <button class="btn btn-outline-secondary btn-sm" (click)="cancelQuickCreate()" i18n>
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              }
-
-              <div class="mb-3">
-                <label class="form-label" i18n>OCR Language</label>
-                <ng-select
-                  [items]="ocrLanguageOptions"
-                  bindLabel="name"
-                  bindValue="id"
-                  [multiple]="true"
-                  [closeOnSelect]="false"
-                  [ngModel]="ocrLanguageArray(zone)"
-                  (ngModelChange)="setOcrLanguages(zone, $event)"
-                  placeholder="Select languages"
-                  i18n-placeholder
-                ></ng-select>
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label" i18n>Transform</label>
-                <select class="form-select" [(ngModel)]="zone.transform">
-                  @for (opt of transformOptions; track opt.id) {
-                    <option [ngValue]="opt.id">{{ opt.name }}</option>
+              <div class="row align-items-end">
+                <div class="col">
+                  @if (!isLastPageZone(zone)) {
+                    <pngx-input-number [(ngModel)]="zone.page" [showAdd]="false" title="Page" i18n-title></pngx-input-number>
                   }
-                </select>
+                </div>
+                <div class="col-auto">
+                  <pngx-input-switch [ngModel]="isLastPageZone(zone)" (ngModelChange)="setLastPageZone(zone, $event)" [horizontal]="true" title="Last page" i18n-title></pngx-input-switch>
+                </div>
               </div>
+
+              <h6 class="border-top pt-3 mt-1 mb-3" i18n>Processing</h6>
+
+              <pngx-input-select
+                [items]="ocrLanguageOptions"
+                [multiple]="true"
+                [ngModel]="ocrLanguageArray(zone)"
+                (ngModelChange)="setOcrLanguages(zone, $event)"
+                title="OCR language"
+                i18n-title
+                placeholder="Select languages"
+                i18n-placeholder
+              ></pngx-input-select>
+
+              <pngx-input-select [items]="transformOptions" [(ngModel)]="zone.transform" title="Transform" i18n-title></pngx-input-select>
 
               @if (zone.transform === dateTransform) {
-                <div class="mb-3">
-                  <label class="form-label" i18n>Date format</label>
-                  <select class="form-select" [ngModel]="dateFormatChoice(zone)" (ngModelChange)="setDateFormatChoice(zone, $event)">
-                    @for (opt of dateFormatOptions; track opt.id) {
-                      <option [ngValue]="opt.id">{{ opt.name }}</option>
-                    }
-                    <option [ngValue]="customDateFormatChoice" i18n>Custom...</option>
-                  </select>
-                  @if (usesCustomDateFormat(zone)) {
-                    <div class="input-group mt-2">
-                      <input type="text" class="form-control font-monospace" [(ngModel)]="zone.date_format" placeholder="%d.%m.%Y" />
-                      <button class="btn btn-outline-secondary" type="button" [ngbPopover]="dateFmtHelp" [autoClose]="true" title="Date format help" i18n-title>
-                        <i-bs name="question-circle"></i-bs>
-                      </button>
-                    </div>
-                    <ng-template #dateFmtHelp>
-                      <p class="mb-1" i18n>Python date codes:</p>
-                      <ul class="mb-1 ps-3">
-                        <li><code>%d</code> <ng-container i18n>day (01-31)</ng-container></li>
-                        <li><code>%m</code> <ng-container i18n>month (01-12)</ng-container></li>
-                        <li><code>%Y</code> <ng-container i18n>year, 4-digit</ng-container></li>
-                        <li><code>%y</code> <ng-container i18n>year, 2-digit</ng-container></li>
-                        <li><code>%b</code> <ng-container i18n>month name (Jan)</ng-container></li>
-                      </ul>
-                      <span i18n>Example:</span> <code>%d.%m.%Y</code> -> 03.03.2026
-                    </ng-template>
-                  }
-                </div>
-              }
-
-              <div class="mb-3">
-                <label class="form-label" i18n>Validation Regex</label>
-                <input
-                  type="text"
-                  class="form-control font-monospace"
-                  [(ngModel)]="zone.validation_regex"
-                  placeholder="e.g. \d{2}\.\d{2}\.\d{4}"
-                >
-              </div>
-
-              <div class="text-muted small">
-                {{ zone.x }}, {{ zone.y }} - {{ zone.width }}x{{ zone.height }}px
-              </div>
-
-              <hr class="my-3" />
-              <h6 i18n>Test</h6>
-              @if (!previewDocId) {
-                <p class="text-muted small mb-0" i18n>
-                  No sample document selected.
-                </p>
-              } @else {
-                <button class="btn btn-sm btn-outline-secondary" (click)="testZone()" [disabled]="zoneTesting">
-                  @if (zoneTesting) {
-                    <span class="spinner-border spinner-border-sm me-1"></span>
-                  }
-                  <span i18n>Test this zone</span>
-                </button>
-                @if (zoneTestResult; as result) {
-                  @if (result.error) {
-                    <div class="alert alert-warning py-2 mt-2 mb-0 small" role="alert">{{ result.error }}</div>
-                  } @else {
-                    <dl class="row small mt-2 mb-0">
-                      <dt class="col-sm-4" i18n>OCR text</dt>
-                      <dd class="col-sm-8"><code>{{ result.raw_text || '(nothing detected)' }}</code></dd>
-                      <dt class="col-sm-4" i18n>Value</dt>
-                      <dd class="col-sm-8"><code>{{ result.value || '(empty)' }}</code></dd>
-                      @if (result.regex) {
-                        <dt class="col-sm-4" i18n>Validation</dt>
-                        <dd class="col-sm-8">
-                          @if (result.regex_match) {
-                            <span class="badge bg-success" i18n>Regex matches</span>
-                          } @else {
-                            <span class="badge bg-danger" i18n>Regex does not match</span>
-                          }
-                        </dd>
-                      }
-                    </dl>
-                  }
+                <pngx-input-select
+                  [items]="dateFormatItems"
+                  [ngModel]="dateFormatChoice(zone)"
+                  (ngModelChange)="setDateFormatChoice(zone, $event)"
+                  title="Date format"
+                  i18n-title
+                ></pngx-input-select>
+                @if (usesCustomDateFormat(zone)) {
+                  <div class="input-group mt-n2 mb-3">
+                    <input type="text" class="form-control font-monospace" [(ngModel)]="zone.date_format" placeholder="%d.%m.%Y" aria-label="Custom date format" i18n-aria-label />
+                    <button class="btn btn-outline-secondary" type="button" [ngbPopover]="dateFmtHelp" [autoClose]="true" title="Date format help" i18n-title>
+                      <i-bs name="question-circle"></i-bs>
+                    </button>
+                  </div>
+                  <ng-template #dateFmtHelp>
+                    <p class="mb-1" i18n>Python date codes:</p>
+                    <ul class="mb-1 ps-3">
+                      <li><code>%d</code> <ng-container i18n>day (01-31)</ng-container></li>
+                      <li><code>%m</code> <ng-container i18n>month (01-12)</ng-container></li>
+                      <li><code>%Y</code> <ng-container i18n>year, 4-digit</ng-container></li>
+                      <li><code>%y</code> <ng-container i18n>year, 2-digit</ng-container></li>
+                      <li><code>%b</code> <ng-container i18n>month name (Jan)</ng-container></li>
+                    </ul>
+                    <span i18n>Example:</span> <code>%d.%m.%Y</code> -> 03.03.2026
+                  </ng-template>
                 }
               }
+
+              <pngx-input-text [(ngModel)]="zone.validation_regex" title="Validation regex" i18n-title placeholder="e.g. \d{2}\.\d{2}\.\d{4}" hint="The value must match this pattern to be applied." i18n-hint></pngx-input-text>
             } @else {
               <pngx-ocr-template-zone-list
                 [zones]="template.zones"

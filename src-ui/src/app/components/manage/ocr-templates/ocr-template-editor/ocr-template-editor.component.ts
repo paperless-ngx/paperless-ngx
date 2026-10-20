@@ -18,7 +18,6 @@ import {
   NgbTypeaheadModule,
   NgbTypeaheadSelectItemEvent,
 } from '@ng-bootstrap/ng-bootstrap'
-import { NgSelectModule } from '@ng-select/ng-select'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import {
   catchError,
@@ -32,6 +31,7 @@ import {
   takeUntil,
   tap,
 } from 'rxjs'
+import { NumberComponent } from 'src/app/components/common/input/number/number.component'
 import { SelectComponent } from 'src/app/components/common/input/select/select.component'
 import { SwitchComponent } from 'src/app/components/common/input/switch/switch.component'
 import { TextComponent } from 'src/app/components/common/input/text/text.component'
@@ -131,6 +131,7 @@ const RESIZE_CURSOR: Record<ResizeHandle, string> = {
   standalone: true,
   imports: [
     PageHeaderComponent,
+    NumberComponent,
     TextComponent,
     SelectComponent,
     SwitchComponent,
@@ -140,7 +141,6 @@ const RESIZE_CURSOR: Record<ResizeHandle, string> = {
     NgbNavModule,
     NgbPopoverModule,
     NgbTypeaheadModule,
-    NgSelectModule,
     NgxBootstrapIconsModule,
     OcrTemplateEditorZoneListComponent,
   ],
@@ -191,7 +191,23 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     zones: [],
   }
 
-  customFields: CustomField[] = []
+  private _customFields: CustomField[] = []
+  /** Items for the zone field select: built-in targets, then custom fields. */
+  fieldItems: { id: ZoneFieldSelection; name: string }[] = [
+    ...OCR_BUILTIN_TARGETS,
+  ]
+
+  get customFields(): CustomField[] {
+    return this._customFields
+  }
+
+  set customFields(fields: CustomField[]) {
+    this._customFields = fields
+    this.fieldItems = [
+      ...OCR_BUILTIN_TARGETS,
+      ...fields.map((cf) => ({ id: cf.id, name: cf.name })),
+    ]
+  }
   documentTypes: DocumentType[] = []
   transformOptions = TRANSFORM_OPTIONS
   builtinTargets = OCR_BUILTIN_TARGETS
@@ -199,6 +215,11 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
   ocrLanguageOptions = OCR_LANGUAGE_OPTIONS
   dateTransform = OCR_ZONE_TRANSFORM.Date
   customDateFormatChoice = CUSTOM_DATE_FORMAT_CHOICE
+  noSampleDocumentTitle = $localize`Select a sample document to test this zone`
+  dateFormatItems = [
+    ...DATE_FORMAT_OPTIONS,
+    { id: CUSTOM_DATE_FORMAT_CHOICE, name: $localize`Custom...` },
+  ]
   isNew = true
   saving = false
 
@@ -231,18 +252,18 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
   overlayMode: OverlayMode = 'select'
   overlayCursor = 'default'
 
-  private zoneTest: ZoneTest | null = null
+  private readonly zoneTest = signal<ZoneTest | null>(null)
 
   get imageLoaded(): boolean {
     return this.previewStatus === 'ready'
   }
 
   get zoneTestResult(): OcrZoneTestResult | null {
-    return this.isCurrentZoneTest() ? this.zoneTest.result : null
+    return this.isCurrentZoneTest() ? this.zoneTest().result : null
   }
 
   get zoneTesting(): boolean {
-    return this.isCurrentZoneTest() && this.zoneTest.result === null
+    return this.isCurrentZoneTest() && this.zoneTest().result === null
   }
 
   showQuickCreate = false
@@ -452,6 +473,14 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
 
   zonePage(zone: OcrTemplateZone): number {
     return getZonePage(zone, this.previewPage, this.previewPageCount)
+  }
+
+  isLastPageZone(zone: OcrTemplateZone): boolean {
+    return zone.page === -1
+  }
+
+  setLastPageZone(zone: OcrTemplateZone, lastPage: boolean) {
+    zone.page = lastPage ? -1 : this.previewPage + 1
   }
 
   private isOnCurrentPage(zone: OcrTemplateZone): boolean {
@@ -835,31 +864,27 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
       request: this.zoneTestRequest(zone),
       result: null,
     }
-    this.zoneTest = test
+    this.zoneTest.set(test)
     this.templateService
       .testZone(test.documentId, test.request)
       .pipe(takeUntil(this.destroy$), takeUntil(this.cancelZoneTest$))
       .subscribe({
-        next: (res) => {
-          test.result = res
-          this.changeDetector.markForCheck()
-        },
-        error: (err) => {
-          test.result = {
-            error: err.error?.error || $localize`Test failed`,
-          }
-          this.changeDetector.markForCheck()
-        },
+        next: (res) => this.zoneTest.set({ ...test, result: res }),
+        error: (err) =>
+          this.zoneTest.set({
+            ...test,
+            result: { error: err.error?.error || $localize`Test failed` },
+          }),
       })
   }
 
   private clearZoneTest() {
     this.cancelZoneTest$.next()
-    this.zoneTest = null
+    this.zoneTest.set(null)
   }
 
   private isCurrentZoneTest(): boolean {
-    const test = this.zoneTest
+    const test = this.zoneTest()
     if (
       !test ||
       test.zone !== this.selectedZone ||
@@ -1067,10 +1092,10 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     return dt ? dt.name : `Type #${id}`
   }
 
-  openQuickCreate(zoneIndex: number | null) {
+  openQuickCreate(zoneIndex: number | null, name?: string) {
     if (zoneIndex === null) return
     this.quickCreateForZoneIndex = zoneIndex
-    this.quickCreateName = this.template.zones[zoneIndex]?.name || ''
+    this.quickCreateName = name || this.template.zones[zoneIndex]?.name || ''
     this.quickCreateType = CustomFieldDataType.String
     this.showQuickCreate = true
   }
