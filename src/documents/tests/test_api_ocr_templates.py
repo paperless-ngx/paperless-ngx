@@ -1,19 +1,24 @@
 """Tests for the OCR Template API."""
 
 import json
+from asyncio import subprocess
 from unittest.mock import patch
+from zipfile import Path
 
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
+from django.db import IntegrityError
 from rest_framework import status
 from rest_framework.test import APITestCase
 
 from documents.models import CustomField
+from documents.models import CustomFieldInstance
 from documents.models import MatchingModel
 from documents.models import OcrTemplate
 from documents.models import OcrTemplateZone
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import DocumentFactory
+from paperless_testing.permissions import grant_global
 from paperless_testing.permissions import grant_object
 
 CONTENT = "Northwind Power & Light statement"
@@ -360,6 +365,198 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
             content_type="application/json",
         )
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_zone_bounds_use_the_zones_own_source_dimensions(self):
+        data = self._make_template_data(
+            source_width=500,
+            source_height=500,
+            zones=[
+                self._make_zone_data(
+                    x=700,
+                    y=600,
+                    width=200,
+                    height=100,
+                    zone_source_width=1000,
+                    zone_source_height=1000,
+                ),
+            ],
+        )
+        response = self.client.post(self.ENDPOINT, data, format="json")
+        self.assertEqual(response.status_code, 201)
+        data["name"] = "Invalid bounds"
+        data["zones"][0]["zone_source_width"] = 800
+        response = self.client.post(self.ENDPOINT, data, format="json")
+        self.assertEqual(response.status_code, 400)
+
+    def test_changing_source_dimensions_checks_existing_zones(self):
+        response = self.client.post(
+            self.ENDPOINT,
+            self._make_template_data(zones=[self._make_zone_data()]),
+            format="json",
+        )
+        url = f"{self.ENDPOINT}{response.json()['id']}/"
+        response = self.client.patch(url, {"source_width": 200}, format="json")
+        self.assertEqual(response.status_code, 400)
+        response = self.client.patch(url, {"source_width": 1000}, format="json")
+        self.assertEqual(response.status_code, 200)
+
+    def test_partial_zone_replacement_uses_saved_dimensions(self):
+        template = OcrTemplate.objects.create(
+            name="Test",
+            owner=self.user,
+            source_width=1000,
+            source_height=1000,
+        )
+        url = f"{self.ENDPOINT}{template.pk}/"
+        for changes in [{"x": 900, "width": 200}, {"y": 990, "height": 50}]:
+            with self.subTest(changes=changes):
+                response = self.client.patch(
+                    url,
+                    {"zones": [self._make_zone_data(**changes)]},
+                    format="json",
+                )
+                self.assertEqual(response.status_code, 400)
+        response = self.client.patch(
+            url,
+            {"zones": [self._make_zone_data()]},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 200)
+
+    def test_partial_zone_replacement_requires_complete_zones(self):
+        template = OcrTemplate.objects.create(
+            name="Test",
+            owner=self.user,
+            source_width=1000,
+            source_height=1000,
+        )
+        zone = OcrTemplateZone.objects.create(
+            template=template,
+            name="Original",
+            x=0,
+            y=0,
+            width=10,
+            height=10,
+        )
+        response = self.client.patch(
+            f"{self.ENDPOINT}{template.pk}/",
+            {"zones": [{"name": "Incomplete"}]},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(list(template.zones.all()), [zone])
+
+    def test_custom_and_builtin_zones_can_have_no_custom_field(self):
+        data = self._make_template_data(
+            zones=[
+                self._make_zone_data(custom_field=None),
+                self._make_zone_data(name="Title", target="title", custom_field=None),
+            ],
+        )
+        response = self.client.post(self.ENDPOINT, data, format="json")
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(
+            [z["custom_field"] for z in response.json()["zones"]],
+            [None, None],
+        )
+        zone = OcrTemplateZone.objects.get(name="Title")
+        self.assertEqual(str(zone), f"{zone.template.name} -> Title")
+
+    def test_invalid_page_numbers_are_rejected(self):
+        for page in [0, -2, "invalid"]:
+            with self.subTest(page=page):
+                response = self.client.post(
+                    self.ENDPOINT,
+                    self._make_template_data(zones=[self._make_zone_data(page=page)]),
+                    format="json",
+                )
+                self.assertEqual(response.status_code, 400)
+
+    def test_combine_formats_must_map_keys_to_strings(self):
+        for formats in [[], "invalid", {"title": []}, {"title": None}]:
+            with self.subTest(formats=formats):
+                response = self.client.post(
+                    self.ENDPOINT,
+                    self._make_template_data(combine_formats=formats),
+                    format="json",
+                )
+                self.assertEqual(response.status_code, 400)
+        response = self.client.post(
+            self.ENDPOINT,
+            self._make_template_data(combine_formats={"title": " {A} - {B} "}),
+            format="json",
+        )
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.json()["combine_formats"], {"title": " {A} - {B} "})
+
+    def test_template_creation_rolls_back_when_a_zone_cannot_be_saved(self):
+        data = self._make_template_data(
+            zones=[self._make_zone_data(), self._make_zone_data(name="Broken")],
+        )
+        create = OcrTemplateZone.objects.create
+
+        def create_zone(**kwargs):
+            if kwargs["name"] == "Broken":
+                raise IntegrityError("Zone save failed")
+            return create(**kwargs)
+
+        with patch(
+            "documents.serialisers.OcrTemplateZone.objects.create",
+            side_effect=create_zone,
+        ):
+            with self.assertRaises(IntegrityError):
+                self.client.post(self.ENDPOINT, data, format="json")
+        self.assertEqual(OcrTemplate.objects.count(), 0)
+        self.assertEqual(OcrTemplateZone.objects.count(), 0)
+
+    def test_template_update_rolls_back_without_losing_previous_zones(self):
+        template = OcrTemplate.objects.create(
+            name="Original",
+            owner=self.user,
+            source_width=1000,
+            source_height=1000,
+        )
+        zone = OcrTemplateZone.objects.create(
+            template=template,
+            name="Original zone",
+            x=0,
+            y=0,
+            width=10,
+            height=10,
+        )
+        data = self._make_template_data(name="Changed", zones=[self._make_zone_data()])
+        with patch(
+            "documents.serialisers.OcrTemplateZone.objects.create",
+            side_effect=IntegrityError("Zone save failed"),
+        ):
+            with self.assertRaises(IntegrityError):
+                self.client.put(f"{self.ENDPOINT}{template.pk}/", data, format="json")
+        template.refresh_from_db()
+        self.assertEqual(template.name, "Original")
+        self.assertEqual(list(template.zones.all()), [zone])
+
+    def test_explicit_empty_zones_removes_all_zones(self):
+        template = OcrTemplate.objects.create(
+            name="Test",
+            owner=self.user,
+            source_width=1000,
+            source_height=1000,
+        )
+        OcrTemplateZone.objects.create(
+            template=template,
+            name="Zone",
+            x=0,
+            y=0,
+            width=10,
+            height=10,
+        )
+        response = self.client.patch(
+            f"{self.ENDPOINT}{template.pk}/",
+            {"zones": []},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(template.zones.exists())
 
     # --- List ---
 
@@ -858,3 +1055,269 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
             },
         )
         extract.assert_called_once()
+
+    @patch("documents.zone_ocr.run_zone_extraction")
+    def test_run_zone_ocr_reports_all_target_types_and_missing_values(self, extract):
+        document = DocumentFactory(content=CONTENT, archive_serial_number=123)
+        document.source_path.write_bytes(b"test PDF")
+        template = OcrTemplate.objects.create(
+            name="Test",
+            source_width=100,
+            source_height=100,
+        )
+        CustomFieldInstance.objects.create(
+            document=document,
+            field=self.custom_field_text,
+            value_text="INV-123",
+        )
+        for name, target, field in [
+            ("Present", "custom_field", self.custom_field_text),
+            ("Missing", "custom_field", self.custom_field_date),
+            ("Unassigned", "custom_field", None),
+            ("Title", "title", None),
+            ("ASN", "asn", None),
+            ("Created", "created", None),
+        ]:
+            OcrTemplateZone.objects.create(
+                template=template,
+                name=name,
+                target=target,
+                custom_field=field,
+                x=0,
+                y=0,
+                width=10,
+                height=10,
+            )
+        response = self.client.post(
+            f"/api/documents/{document.pk}/run-zone-ocr/",
+            {"template": template.pk},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 200)
+        values = {
+            result["zone"]: result["value"] for result in response.json()["results"]
+        }
+        self.assertEqual(
+            values,
+            {
+                "Present": "INV-123",
+                "Missing": None,
+                "Unassigned": None,
+                "Title": document.title,
+                "ASN": 123,
+                "Created": document.created.isoformat(),
+            },
+        )
+
+
+class TestOcrTemplatePreviewAPI(DirectoriesMixin, APITestCase):
+    def setUp(self):
+        super().setUp()
+        self.user = User.objects.create_user(username="template_editor")
+        grant_global(self.user, "view_ocrtemplate", "add_ocrtemplate")
+        self.client.force_authenticate(self.user)
+        self.document = DocumentFactory(
+            owner=self.user,
+            page_count=3,
+            mime_type="application/pdf",
+        )
+        self.document.source_path.write_bytes(b"test document")
+
+    def preview_url(self, document=None, page=0):
+        document = document or self.document
+        return f"/api/ocr_templates/document-page-image/{document.pk}/{page}/"
+
+    def preview_zone(self, **zone):
+        return self.client.post(
+            "/api/ocr_templates/test-zone/",
+            {
+                "document": self.document.pk,
+                "zone": {"width": 100, "height": 50, **zone},
+            },
+            format="json",
+        )
+
+    def test_missing_document_and_out_of_range_pages(self):
+        response = self.client.get("/api/ocr_templates/document-page-image/99999/0/")
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(self.client.get(self.preview_url(page=3)).status_code, 404)
+
+    @patch("documents.views.subprocess.run")
+    def test_serves_image_documents_without_running_poppler(self, render):
+        document = DocumentFactory(owner=self.user, mime_type="image/png")
+        document.source_path.write_bytes(b"image contents")
+        response = self.client.get(self.preview_url(document))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "image/png")
+        self.assertEqual(response.content, b"image contents")
+        render.assert_not_called()
+
+    @patch("documents.views.subprocess.run")
+    def test_renders_the_requested_pdf_page(self, render):
+        def render_page(command, **kwargs):
+            Path(command[-1] + "-2.png").write_bytes(b"rendered page")
+
+        render.side_effect = render_page
+        response = self.client.get(self.preview_url(page=1))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "image/png")
+        self.assertEqual(response.content, b"rendered page")
+        command = render.call_args.args[0]
+        self.assertEqual(
+            command[:9],
+            [
+                "pdftoppm",
+                "-png",
+                "-r",
+                "150",
+                "-f",
+                "2",
+                "-l",
+                "2",
+                str(self.document.source_path),
+            ],
+        )
+        self.assertEqual(
+            render.call_args.kwargs,
+            {"check": True, "capture_output": True, "timeout": 30},
+        )
+        self.assertFalse(Path(command[-1]).parent.exists())
+
+    @patch("documents.views.subprocess.run")
+    def test_render_failures_are_controlled_and_do_not_expose_paths(self, render):
+        for error in [
+            subprocess.CalledProcessError(
+                1,
+                ["pdftoppm"],
+                stderr=b"sensitive server path",
+            ),
+            subprocess.TimeoutExpired(["pdftoppm"], 30),
+            FileNotFoundError("pdftoppm"),
+        ]:
+            with self.subTest(error=error):
+                render.side_effect = error
+                response = self.client.get(self.preview_url())
+                self.assertEqual(response.status_code, 404)
+                self.assertNotIn("sensitive server path", str(response.content))
+
+    @patch("documents.views.subprocess.run")
+    def test_missing_render_output_returns_not_found(self, render):
+        self.assertEqual(self.client.get(self.preview_url()).status_code, 404)
+
+    @patch("documents.zone_ocr.extract_zone_preview")
+    def test_zone_preview_uses_validated_settings_and_does_not_write(self, extract):
+        extract.return_value = {"raw_text": " 123 ", "value": "123"}
+        response = self.preview_zone(
+            x="10",
+            y="20",
+            page=-1,
+            transform="numeric",
+            ocr_language="deu+eng",
+            validation_regex=r"\d+",
+            zone_source_width="1000",
+            zone_source_height=1500,
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json(),
+            {"raw_text": " 123 ", "value": "123", "regex": r"\d+", "regex_match": True},
+        )
+        path, zone, width, height, page_count = extract.call_args.args
+        self.assertEqual(path, self.document.source_path)
+        self.assertEqual(
+            (zone.x, zone.y, zone.width, zone.height, zone.page),
+            (10, 20, 100, 50, -1),
+        )
+        self.assertEqual(zone.name, "test")
+        self.assertEqual(zone.ocr_language, "deu+eng")
+        self.assertEqual(zone.transform, "numeric")
+        self.assertEqual((width, height, page_count), (1000, 1500, 3))
+        self.assertEqual(OcrTemplateZone.objects.count(), 0)
+
+    @patch("documents.zone_ocr.extract_zone_preview")
+    def test_zone_preview_reports_regex_failures_and_empty_results(self, extract):
+        for regex, value, expected in [
+            ("", "123", None),
+            (r"\d+", "abc", False),
+            (r"\d+", None, None),
+            ("[invalid", "123", False),
+        ]:
+            with self.subTest(regex=regex, value=value):
+                extract.return_value = {"raw_text": value, "value": value}
+                response = self.preview_zone(validation_regex=regex)
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(response.json()["regex_match"], expected)
+        self.assertEqual(extract.call_args.args[2:4], (0, 0))
+
+    @patch("documents.zone_ocr.extract_zone_preview")
+    def test_zone_preview_rejects_invalid_settings_before_extraction(self, extract):
+        for zone in [
+            {"width": 1},
+            {"height": 0},
+            {"x": -1},
+            {"y": -1},
+            {"width": "invalid"},
+            {"page": "invalid"},
+            {"page": 0},
+            {"page": -2},
+            {"transform": "invalid"},
+            {"ocr_language": "x" * 21},
+            {"zone_source_width": "invalid"},
+            {"zone_source_height": 0},
+        ]:
+            with self.subTest(zone=zone):
+                self.assertEqual(self.preview_zone(**zone).status_code, 400)
+        extract.assert_not_called()
+
+    @patch("documents.zone_ocr.extract_zone_preview")
+    def test_zone_preview_rejects_malformed_requests(self, extract):
+        for data in [
+            {},
+            {"document": "invalid", "zone": {}},
+            {"document": 99999, "zone": {}},
+            {"document": self.document.pk, "zone": None},
+            {"document": self.document.pk, "zone": []},
+        ]:
+            with self.subTest(data=data):
+                response = self.client.post(
+                    "/api/ocr_templates/test-zone/",
+                    data,
+                    format="json",
+                )
+                self.assertEqual(response.status_code, 400)
+        extract.assert_not_called()
+
+    @patch("documents.zone_ocr.extract_zone_preview")
+    @patch("documents.views.subprocess.run")
+    def test_versions_are_authorized_through_the_root_document(self, render, extract):
+        other = User.objects.create_user(username="private_owner")
+        root = DocumentFactory(owner=other)
+        version = DocumentFactory(
+            root_document=root,
+            owner=self.user,
+            mime_type="image/png",
+        )
+        version.source_path.write_bytes(b"private version")
+        data = {"document": version.pk, "zone": {"width": 100, "height": 50}}
+        self.assertEqual(self.client.get(self.preview_url(version)).status_code, 403)
+        self.assertEqual(
+            self.client.post(
+                "/api/ocr_templates/test-zone/",
+                data,
+                format="json",
+            ).status_code,
+            403,
+        )
+        render.assert_not_called()
+        extract.assert_not_called()
+        grant_object(self.user, root, "view_document")
+        extract.return_value = {"raw_text": None, "value": None}
+        self.assertEqual(self.client.get(self.preview_url(version)).status_code, 200)
+        self.assertEqual(
+            self.client.post(
+                "/api/ocr_templates/test-zone/",
+                data,
+                format="json",
+            ).status_code,
+            200,
+        )

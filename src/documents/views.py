@@ -2354,7 +2354,7 @@ class DocumentViewSet(
         builtin_values = {
             "title": document.title,
             "asn": document.archive_serial_number,
-            "created": document.created.isoformat() if document.created else None,
+            "created": document.created.isoformat(),
         }
         field_values = {
             instance.field_id: instance.value
