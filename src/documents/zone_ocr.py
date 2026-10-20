@@ -26,6 +26,7 @@ from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import OcrTemplate
 from documents.models import OcrTemplateZone
+from documents.regex import safe_regex_fullmatch
 
 logger = logging.getLogger("paperless.zone_ocr")
 
@@ -165,7 +166,7 @@ def _process_template(
             if (
                 extracted is not None
                 and zone.validation_regex
-                and not re.fullmatch(zone.validation_regex, extracted)
+                and not safe_regex_fullmatch(zone.validation_regex, extracted)
             ):
                 logger.info(
                     "Zone OCR: '%s' value %r rejected by regex '%s'",

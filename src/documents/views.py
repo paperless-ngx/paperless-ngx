@@ -186,6 +186,7 @@ from documents.permissions import permitted_object_ids
 from documents.permissions import set_permissions_for_objects
 from documents.permissions import user_is_unrestricted
 from documents.plugins.date_parsing import get_date_parser
+from documents.regex import safe_regex_fullmatch
 from documents.schema import generate_object_with_permissions_schema
 from documents.search import SearchHit
 from documents.serialisers import AcknowledgeTasksViewSerializer
@@ -5995,12 +5996,9 @@ class OcrTemplateViewSet(ModelViewSet):
 
         regex_match = None
         if zone.validation_regex and result.get("value") is not None:
-            try:
-                regex_match = (
-                    re.fullmatch(zone.validation_regex, result["value"]) is not None
-                )
-            except re.error:
-                regex_match = None
+            regex_match = (
+                safe_regex_fullmatch(zone.validation_regex, result["value"]) is not None
+            )
 
         return Response(
             {
