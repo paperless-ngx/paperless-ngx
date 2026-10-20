@@ -1856,7 +1856,15 @@ class ReprocessDocumentsSerializer(DocumentSelectionSerializer):
     remote_ocr = serializers.BooleanField(required=False, default=False)
 
 
-class RunZoneOcrDocumentsSerializer(DocumentSelectionSerializer):
+class RunZoneOcrSerializer(serializers.Serializer):
+    template = serializers.PrimaryKeyRelatedField(
+        queryset=OcrTemplate.objects.prefetch_related("zones", "zones__custom_field"),
+        required=False,
+        allow_null=True,
+    )
+
+
+class RunZoneOcrDocumentsSerializer(DocumentSelectionSerializer, RunZoneOcrSerializer):
     pass
 
 

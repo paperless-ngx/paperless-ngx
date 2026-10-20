@@ -214,6 +214,7 @@ from documents.serialisers import ReprocessDocumentsSerializer
 from documents.serialisers import RotateDocumentsSerializer
 from documents.serialisers import RunTaskSerializer
 from documents.serialisers import RunZoneOcrDocumentsSerializer
+from documents.serialisers import RunZoneOcrSerializer
 from documents.serialisers import SavedViewSerializer
 from documents.serialisers import SearchResultSerializer
 from documents.serialisers import SerializerWithPerms
@@ -2281,6 +2282,7 @@ class DocumentViewSet(
 
     @extend_schema(
         operation_id="documents_run_zone_ocr",
+        request=RunZoneOcrSerializer,
         responses=inline_serializer(
             name="RunZoneOcrResult",
             fields={
@@ -2295,7 +2297,14 @@ class DocumentViewSet(
     )
     @action(methods=["post"], detail=True, url_path="run-zone-ocr")
     def run_zone_ocr(self, request, pk=None):
-        """Run zone-based OCR extraction on this document."""
+        """
+        Run zone-based OCR extraction on this document, with the given template
+        or with every template that matches it.
+        """
+        serializer = RunZoneOcrSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        template = serializer.validated_data.get("template")
+
         try:
             document = Document.objects.select_related(
                 "root_document__owner",
@@ -2307,9 +2316,18 @@ class DocumentViewSet(
         ) or not has_perms_owner_aware(request.user, "change_document", document):
             return HttpResponseForbidden("Insufficient permissions")
 
+        if template is not None and not has_perms_owner_aware(
+            request.user,
+            "view_ocrtemplate",
+            template,
+        ):
+            return HttpResponseForbidden("Insufficient permissions")
+
         from documents.zone_ocr import get_templates_for_document
 
-        templates = get_templates_for_document(document)
+        templates = (
+            [template] if template is not None else get_templates_for_document(document)
+        )
         if not templates:
             return Response(
                 {"status": "skipped", "reason": "no_template", "results": []},
@@ -2324,7 +2342,7 @@ class DocumentViewSet(
 
         from documents.zone_ocr import run_zone_extraction
 
-        run_zone_extraction(document, None)
+        run_zone_extraction(document, None, templates=templates)
 
         # Collect results
         results = []
@@ -3530,6 +3548,13 @@ class RunZoneOcrDocumentsView(DocumentOperationPermissionMixin):
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        template = serializer.validated_data.get("template")
+        if template is not None and not has_perms_owner_aware(
+            request.user,
+            "view_ocrtemplate",
+            template,
+        ):
+            return HttpResponseForbidden("Insufficient permissions")
         return self._execute_document_action(
             method=bulk_edit.run_zone_ocr,
             validated_data=serializer.validated_data,

@@ -561,6 +561,73 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
                 )
         extract.assert_not_called()
 
+    @patch("documents.zone_ocr.run_zone_extraction")
+    def test_run_zone_ocr_applies_a_chosen_template(self, extract):
+        """
+        GIVEN:
+            - A disabled template that does not match the document
+        WHEN:
+            - Zone OCR is run on the document with that template chosen
+        THEN:
+            - The template is applied anyway, since it was chosen explicitly
+        """
+        document = DocumentFactory(content=CONTENT, mime_type="application/pdf")
+        document.source_path.write_bytes(b"test PDF")
+        template = OcrTemplate.objects.create(
+            name="Manual only",
+            match="Contoso",
+            enabled=False,
+            source_width=1000,
+            source_height=1000,
+        )
+
+        response = self.client.post(
+            f"/api/documents/{document.pk}/run-zone-ocr/",
+            {"template": template.pk},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json()["status"], "completed")
+        extract.assert_called_once_with(document, None, templates=[template])
+
+    @patch("documents.zone_ocr.run_zone_extraction")
+    def test_run_zone_ocr_rejects_a_template_the_user_cannot_view(self, extract):
+        user = User.objects.create_user(username="editor")
+        user.user_permissions.add(
+            *Permission.objects.filter(
+                codename__in=["view_document", "change_document"],
+            ),
+        )
+        document = DocumentFactory(content=CONTENT, owner=user)
+        template = OcrTemplate.objects.create(
+            name="Private",
+            owner=User.objects.create_user(username="other"),
+            source_width=1000,
+            source_height=1000,
+        )
+        self.client.force_authenticate(user=user)
+
+        response = self.client.post(
+            f"/api/documents/{document.pk}/run-zone-ocr/",
+            {"template": template.pk},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        extract.assert_not_called()
+
+    def test_run_zone_ocr_rejects_an_unknown_template(self):
+        document = DocumentFactory(content=CONTENT)
+
+        response = self.client.post(
+            f"/api/documents/{document.pk}/run-zone-ocr/",
+            {"template": 999},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_document_page_image_requires_view_permission_on_the_document(self):
         owner = User.objects.create_user(username="owner")
         user = User.objects.create_user(username="template_editor")

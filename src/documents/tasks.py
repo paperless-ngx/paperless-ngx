@@ -47,6 +47,7 @@ from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentBarcode
 from documents.models import DocumentType
+from documents.models import OcrTemplate
 from documents.models import PaperlessTask
 from documents.models import ShareLink
 from documents.models import ShareLinkBundle
@@ -370,9 +371,28 @@ def _read_barcodes_for_reprocess(document: Document) -> list[StoredBarcode] | No
 
 
 @shared_task
-def extract_zones(document_id: int) -> None:
-    """Run the document type's enabled OCR templates against a stored document."""
-    run_zone_extraction(Document.objects.get(id=document_id), None)
+def extract_zones(document_id: int, template_id: int | None = None) -> None:
+    """
+    Run an OCR template against a stored document, or every template that
+    matches it when no template is given.
+    """
+    document = Document.objects.get(id=document_id)
+    if template_id is None:
+        run_zone_extraction(document, None)
+        return
+
+    try:
+        template = OcrTemplate.objects.prefetch_related(
+            "zones",
+            "zones__custom_field",
+        ).get(id=template_id)
+    except OcrTemplate.DoesNotExist:
+        logger.warning(
+            "OCR template %s no longer exists, not running zone OCR",
+            template_id,
+        )
+        return
+    run_zone_extraction(document, None, templates=[template])
 
 
 @shared_task

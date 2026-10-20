@@ -51,12 +51,14 @@ def get_templates_for_document(document: Document) -> list[OcrTemplate]:
 def run_zone_extraction(
     document: Document,
     original_file: Path | None,
+    templates: list[OcrTemplate] | None = None,
 ) -> None:
     """
-    Run zone-based OCR extraction for every template that matches a document.
-    Called from the document_consumption_finished signal handler.
+    Run zone-based OCR extraction for the given templates, or for every
+    template that matches the document when none are given.
     """
-    templates = get_templates_for_document(document)
+    if templates is None:
+        templates = get_templates_for_document(document)
     if not templates:
         return
 
