@@ -163,6 +163,54 @@ class TestGetPdfFirstPageSizePoints:
         )
         assert get_pdf_first_page_size_points(pdf_path) == (300.0, 400.0)
 
+    def test_crop_box_clipped_to_media_box(self, tmp_path: Path) -> None:
+        """
+        GIVEN:
+            - A PDF page whose CropBox extends well past its MediaBox
+        WHEN:
+            - The first page size is requested
+        THEN:
+            - The size is the CropBox clipped to the MediaBox, as pdftoppm renders it
+        """
+        pdf_path = self._write_pdf(
+            tmp_path / "oversized-crop.pdf",
+            media_box=(0, 0, 200, 200),
+            crop_box=(-200, -200, 600, 600),
+        )
+        assert get_pdf_first_page_size_points(pdf_path) == (200.0, 200.0)
+
+    def test_crop_box_with_rotation(self, tmp_path: Path) -> None:
+        """
+        GIVEN:
+            - A rotated PDF page with a CropBox smaller than its MediaBox
+        WHEN:
+            - The first page size is requested
+        THEN:
+            - The CropBox size is returned with width and height swapped
+        """
+        pdf_path = self._write_pdf(
+            tmp_path / "cropped-rotated.pdf",
+            media_box=(0, 0, 600, 300),
+            crop_box=(100, 50, 400, 250),
+            page_rotate=270,
+        )
+        assert get_pdf_first_page_size_points(pdf_path) == (200.0, 300.0)
+
+    def test_pdfinfo_not_installed_returns_none(
+        self,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - The pdfinfo binary cannot be executed
+        WHEN:
+            - The first page size is requested
+        THEN:
+            - None is returned and nothing is raised
+        """
+        mocker.patch("subprocess.run", side_effect=FileNotFoundError("pdfinfo"))
+        assert get_pdf_first_page_size_points(SAMPLES / "simple-digital.pdf") is None
+
     def test_degenerate_box_returns_none(self, tmp_path: Path) -> None:
         """
         GIVEN:

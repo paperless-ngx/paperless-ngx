@@ -30,17 +30,18 @@ class TestChecks:
         settings.CONVERT_BINARY = "uuuhh"
         assert len(binaries_check(None)) == 1
 
-    def test_binaries_fail_pdftoppm(self, mocker: MockerFixture) -> None:
+    @pytest.mark.parametrize("binary", ["pdftoppm", "pdfinfo"])
+    def test_binaries_fail_poppler(self, mocker: MockerFixture, binary: str) -> None:
         real_which = shutil.which
         mocker.patch(
             "paperless.checks.shutil.which",
-            side_effect=lambda name: None if name == "pdftoppm" else real_which(name),
+            side_effect=lambda name: None if name == binary else real_which(name),
         )
 
         msgs = binaries_check(None)
 
         assert len(msgs) == 1
-        assert "pdftoppm" in msgs[0].msg
+        assert binary in msgs[0].msg
 
     @pytest.mark.usefixtures("paperless_dirs")
     def test_paths_check(self) -> None:
