@@ -10,7 +10,7 @@
   </button>
 </pngx-page-header>
 
-<div class="row">
+<div class="row" [attr.inert]="saving ? '' : null" [attr.aria-busy]="saving">
   <div class="col-lg-4 mb-3">
     <ul ngbNav #nav="ngbNav" [(activeId)]="activeTab" class="nav-underline flex-nowrap flex-md-wrap overflow-auto">
         <li ngbNavItem="settings">

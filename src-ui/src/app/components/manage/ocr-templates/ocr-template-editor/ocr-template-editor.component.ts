@@ -509,6 +509,7 @@ export class OcrTemplateEditorComponent
   }
 
   onOverlayPointerDown(event: PointerEvent) {
+    if (this.saving) return
     if (event.button !== 0 || this.overlayInteraction.kind !== 'idle') return
     const point = this.svgPointFromEvent(event)
     if (!this.imageLoaded || !point) return
@@ -903,6 +904,8 @@ export class OcrTemplateEditorComponent
   }
 
   save() {
+    if (this.saving) return
+    this.stopOverlayInteraction()
     this.saving = true
     this.pruneCombineFormats()
     this.template.sample_document = this.previewDocId

@@ -48,6 +48,7 @@ describe('OcrTemplateEditorComponent', () => {
     documents.list.mockReset().mockReturnValue(of({ results: [] }))
     documents.get.mockReset().mockReturnValue(of({ id: 1, page_count: 3 }))
     templates.testZone.mockReset()
+    templates.create.mockReset()
     await TestBed.configureTestingModule({
       imports: [OcrTemplateEditorComponent],
       providers: [
@@ -69,7 +70,11 @@ describe('OcrTemplateEditorComponent', () => {
         { provide: NgbModal, useValue: modal },
         {
           provide: ToastService,
-          useValue: { showSuccess: jest.fn(), showError: jest.fn() },
+          useValue: {
+            showInfo: jest.fn(),
+            showSuccess: jest.fn(),
+            showError: jest.fn(),
+          },
         },
       ],
     })
@@ -317,6 +322,51 @@ describe('OcrTemplateEditorComponent', () => {
 
     component.previewDocId = 5
     expect(component.isDirty).toBe(true)
+  })
+
+  it('cancels drawing and prevents new gestures or duplicate saves while saving', () => {
+    prepareOverlay()
+    const pending = new Subject<any>()
+    templates.create.mockReturnValue(pending)
+    component.onOverlayPointerDown(pointer(500, 500))
+
+    component.save()
+    expect(component.saving).toBe(true)
+    expect(component.drawingRect()).toBeNull()
+    component.save()
+    expect(templates.create).toHaveBeenCalledTimes(1)
+
+    component.onOverlayPointerDown(pointer(500, 500))
+    component.onOverlayPointerUp(pointer(700, 700))
+    expect(component.template.zones).toHaveLength(0)
+
+    pending.next({ ...component.template, id: 3 })
+    pending.complete()
+    expect(component.saving).toBe(false)
+    component.onOverlayPointerDown(pointer(500, 500))
+    component.onOverlayPointerUp(pointer(700, 700))
+    expect(component.template.zones).toHaveLength(1)
+  })
+
+  it('stops an active move and unlocks editing without losing changes after a failed save', () => {
+    fixture.detectChanges()
+    prepareOverlay()
+    component.template.zones = [zone()]
+    const pending = new Subject<any>()
+    templates.create.mockReturnValue(pending)
+    component.onOverlayPointerDown(pointer(150, 150))
+
+    component.save()
+    component.onOverlayPointerMove(pointer(250, 250))
+    component.onOverlayPointerUp(pointer(250, 250))
+    expect(component.template.zones[0].x).toBe(100)
+
+    pending.error(new Error('Save failed'))
+    expect(component.saving).toBe(false)
+    expect(component.isDirty).toBe(true)
+    component.onOverlayPointerDown(pointer(150, 150))
+    component.onOverlayPointerUp(pointer(250, 250))
+    expect(component.template.zones[0].x).toBe(200)
   })
 
   it('hides results when extraction settings or geometry change', () => {
