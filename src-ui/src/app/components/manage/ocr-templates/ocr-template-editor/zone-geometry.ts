@@ -33,6 +33,10 @@ export interface MoveStart {
 
 export type ResizeHandle = 'n' | 's' | 'e' | 'w' | 'ne' | 'nw' | 'se' | 'sw'
 
+export interface ResizeHandleMarker extends Point {
+  handle: ResizeHandle
+}
+
 export const HANDLE_SIZE = 8
 export const MIN_ZONE_SIZE = 10
 
@@ -70,7 +74,7 @@ export function isZoneOnPage(
   return getZonePage(zone, previewPage, previewPageCount) === previewPage + 1
 }
 
-export function getZoneSourceSize(
+function getZoneSourceSize(
   zone: OcrTemplateZone,
   imageSize: Dimensions
 ): Dimensions {
@@ -82,12 +86,12 @@ export function getZoneSourceSize(
 
 export function getZoneDisplayRect(
   zone: OcrTemplateZone,
-  canvasSize: Dimensions,
   imageSize: Dimensions
 ): DisplayRect {
   const sourceSize = getZoneSourceSize(zone, imageSize)
-  const scaleX = canvasSize.width / sourceSize.width
-  const scaleY = canvasSize.height / sourceSize.height
+  // The SVG viewBox uses the preview image's natural dimensions.
+  const scaleX = imageSize.width / sourceSize.width
+  const scaleY = imageSize.height / sourceSize.height
 
   return {
     x: zone.x * scaleX,
@@ -97,28 +101,30 @@ export function getZoneDisplayRect(
   }
 }
 
+export function getResizeHandles(rect: DisplayRect): ResizeHandleMarker[] {
+  return [
+    { handle: 'nw', x: rect.x, y: rect.y },
+    { handle: 'n', x: rect.x + rect.w / 2, y: rect.y },
+    { handle: 'ne', x: rect.x + rect.w, y: rect.y },
+    { handle: 'w', x: rect.x, y: rect.y + rect.h / 2 },
+    { handle: 'e', x: rect.x + rect.w, y: rect.y + rect.h / 2 },
+    { handle: 'sw', x: rect.x, y: rect.y + rect.h },
+    { handle: 's', x: rect.x + rect.w / 2, y: rect.y + rect.h },
+    { handle: 'se', x: rect.x + rect.w, y: rect.y + rect.h },
+  ]
+}
+
 export function findHandleAt(
   point: Point,
   rect: DisplayRect,
   handleSize = HANDLE_SIZE
 ): ResizeHandle | null {
-  const handles: [ResizeHandle, number, number][] = [
-    ['nw', rect.x, rect.y],
-    ['n', rect.x + rect.w / 2, rect.y],
-    ['ne', rect.x + rect.w, rect.y],
-    ['w', rect.x, rect.y + rect.h / 2],
-    ['e', rect.x + rect.w, rect.y + rect.h / 2],
-    ['sw', rect.x, rect.y + rect.h],
-    ['s', rect.x + rect.w / 2, rect.y + rect.h],
-    ['se', rect.x + rect.w, rect.y + rect.h],
-  ]
-
   return (
-    handles.find(
-      ([, x, y]) =>
+    getResizeHandles(rect).find(
+      ({ x, y }) =>
         Math.abs(point.x - x) <= handleSize &&
         Math.abs(point.y - y) <= handleSize
-    )?.[0] ?? null
+    )?.handle ?? null
   )
 }
 
@@ -127,13 +133,12 @@ export function findZoneAt(
   zones: OcrTemplateZone[],
   previewPage: number,
   previewPageCount: number | null,
-  canvasSize: Dimensions,
   imageSize: Dimensions
 ): number | null {
   for (let i = zones.length - 1; i >= 0; i--) {
     const zone = zones[i]
     if (!isZoneOnPage(zone, previewPage, previewPageCount)) continue
-    const rect = getZoneDisplayRect(zone, canvasSize, imageSize)
+    const rect = getZoneDisplayRect(zone, imageSize)
 
     if (
       point.x >= rect.x &&
@@ -152,12 +157,11 @@ export function moveZone(
   zone: OcrTemplateZone,
   point: Point,
   moveStart: MoveStart,
-  canvasSize: Dimensions,
   imageSize: Dimensions
 ) {
   const sourceSize = getZoneSourceSize(zone, imageSize)
-  const scaleX = sourceSize.width / canvasSize.width
-  const scaleY = sourceSize.height / canvasSize.height
+  const scaleX = sourceSize.width / imageSize.width
+  const scaleY = sourceSize.height / imageSize.height
   const dx = Math.round((point.x - moveStart.mouseX) * scaleX)
   const dy = Math.round((point.y - moveStart.mouseY) * scaleY)
 
@@ -169,12 +173,11 @@ export function resizeZone(
   zone: OcrTemplateZone,
   handle: ResizeHandle,
   point: Point,
-  canvasSize: Dimensions,
   imageSize: Dimensions
 ) {
   const sourceSize = getZoneSourceSize(zone, imageSize)
-  const scaleX = sourceSize.width / canvasSize.width
-  const scaleY = sourceSize.height / canvasSize.height
+  const scaleX = sourceSize.width / imageSize.width
+  const scaleY = sourceSize.height / imageSize.height
   const imageX = clamp(Math.round(point.x * scaleX), 0, sourceSize.width)
   const imageY = clamp(Math.round(point.y * scaleY), 0, sourceSize.height)
 
@@ -193,22 +196,6 @@ export function resizeZone(
   }
   if (handle.includes('s')) {
     zone.height = Math.max(MIN_ZONE_SIZE, imageY - zone.y)
-  }
-}
-
-export function sourceRectFromDrawing(
-  rect: DrawingRect,
-  canvasSize: Dimensions,
-  imageSize: Dimensions
-): DisplayRect {
-  const scaleX = imageSize.width / canvasSize.width
-  const scaleY = imageSize.height / canvasSize.height
-
-  return {
-    x: Math.round(Math.min(rect.startX, rect.endX) * scaleX),
-    y: Math.round(Math.min(rect.startY, rect.endY) * scaleY),
-    w: Math.round(Math.abs(rect.endX - rect.startX) * scaleX),
-    h: Math.round(Math.abs(rect.endY - rect.startY) * scaleY),
   }
 }
 

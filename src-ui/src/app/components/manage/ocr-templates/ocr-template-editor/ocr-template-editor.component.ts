@@ -76,6 +76,7 @@ import {
   DrawingRect,
   findHandleAt,
   findZoneAt,
+  getResizeHandles,
   getZoneColor,
   getZoneDisplayRect,
   getZonePage,
@@ -106,9 +107,6 @@ interface ZoneTest {
   documentId: number
   request: ZoneTestRequest
   result: OcrZoneTestResult | null
-}
-interface ResizeHandleMarker extends Point {
-  handle: ResizeHandle
 }
 
 const CUSTOM_DATE_FORMAT_CHOICE = 'custom'
@@ -581,7 +579,6 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
         this.template.zones[this.overlayInteraction.zoneIndex],
         point,
         this.overlayInteraction.start,
-        this.imageNaturalSize(),
         this.imageNaturalSize()
       )
       return
@@ -678,11 +675,7 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     const zone = this.template.zones[zoneIdx]
     if (!zone) return null
     if (!this.isOnCurrentPage(zone)) return null
-    return getZoneDisplayRect(
-      zone,
-      this.imageNaturalSize(),
-      this.imageNaturalSize()
-    )
+    return getZoneDisplayRect(zone, this.imageNaturalSize())
   }
 
   private findHandleAt(point: Point, zoneIdx: number): ResizeHandle | null {
@@ -694,13 +687,7 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
   private applyResize(zoneIndex: number, handle: ResizeHandle, point: Point) {
     const zone = this.template.zones[zoneIndex]
     if (!zone) return
-    resizeZone(
-      zone,
-      handle,
-      point,
-      this.imageNaturalSize(),
-      this.imageNaturalSize()
-    )
+    resizeZone(zone, handle, point, this.imageNaturalSize())
   }
 
   private findZoneAt(point: Point): number | null {
@@ -712,7 +699,6 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
       this.template.zones,
       this.previewPage,
       this.previewPageCount,
-      this.imageNaturalSize(),
       this.imageNaturalSize()
     )
   }
@@ -738,18 +724,7 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     return Math.max(this.overlayUnitSize(14), rect.y - this.overlayUnitSize(4))
   }
 
-  resizeHandles(rect: DisplayRect): ResizeHandleMarker[] {
-    return [
-      { handle: 'nw', x: rect.x, y: rect.y },
-      { handle: 'n', x: rect.x + rect.w / 2, y: rect.y },
-      { handle: 'ne', x: rect.x + rect.w, y: rect.y },
-      { handle: 'w', x: rect.x, y: rect.y + rect.h / 2 },
-      { handle: 'e', x: rect.x + rect.w, y: rect.y + rect.h / 2 },
-      { handle: 'sw', x: rect.x, y: rect.y + rect.h },
-      { handle: 's', x: rect.x + rect.w / 2, y: rect.y + rect.h },
-      { handle: 'se', x: rect.x + rect.w, y: rect.y + rect.h },
-    ]
-  }
+  readonly resizeHandles = getResizeHandles
 
   overlayHandleSize(): number {
     return this.overlayUnitSize(HANDLE_SIZE)
