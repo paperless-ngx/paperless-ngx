@@ -4,8 +4,14 @@
   min-height: 0;
 }
 
-.zone-preview-scroll {
-  max-height: 78vh;
+@media (min-width: 992px) {
+  .modal-body {
+    overflow: hidden;
+  }
+
+  .editor-layout {
+    min-height: 0;
+  }
 }
 
 .preview-page-input {

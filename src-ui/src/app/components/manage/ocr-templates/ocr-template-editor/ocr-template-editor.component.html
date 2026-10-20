@@ -6,9 +6,9 @@
   <button type="button" class="btn-close" (click)="activeModal.dismiss()" [disabled]="saving" aria-label="Close" i18n-aria-label></button>
 </div>
 
-<div class="modal-body">
-<div class="row" [attr.inert]="saving ? '' : null" [attr.aria-busy]="saving">
-  <div class="col-lg-4 mb-3">
+<div class="modal-body d-flex flex-column">
+<div class="row gx-3 editor-layout flex-grow-1 flex-lg-nowrap" [attr.inert]="saving ? '' : null" [attr.aria-busy]="saving">
+  <div class="col-lg-4 mb-3 mb-lg-0 overflow-auto">
     <ul ngbNav #nav="ngbNav" [(activeId)]="activeTab" class="nav-underline flex-nowrap flex-md-wrap overflow-auto">
         <li ngbNavItem="settings">
           <a ngbNavLink i18n>Template</a>
@@ -174,8 +174,8 @@
       <div [ngbNavOutlet]="nav" class="mt-3"></div>
     </div>
 
-    <div class="col-lg-8">
-      <div class="mb-2">
+    <div class="col-lg-8 d-flex flex-column">
+      <div class="mb-2 flex-shrink-0">
         <label class="visually-hidden" for="preview-document" i18n>Sample document</label>
         <div class="input-group input-group-sm">
           <span class="input-group-text">
@@ -222,8 +222,8 @@
           }
         </div>
       }
-      <div #previewContainer class="position-relative">
-        <div class="zone-preview-scroll overflow-auto border" [attr.aria-busy]="previewStatus === 'loading'">
+      <div #previewContainer class="position-relative flex-grow-1 overflow-hidden">
+        <div class="h-100 overflow-auto border" [attr.aria-busy]="previewStatus === 'loading'">
           @if (previewStatus === 'error') {
             <div class="py-5 px-3 text-center" role="alert">
               <i-bs name="exclamation-triangle" width="32" height="32" class="text-warning"></i-bs>

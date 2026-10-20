@@ -83,7 +83,7 @@ export class OcrTemplatesComponent
     const modal = this.modalService.open(OcrTemplateEditorComponent, {
       backdrop: 'static',
       keyboard: false,
-      size: 'xl',
+      size: 'xxl',
       fullscreen: 'lg',
       scrollable: true,
       ariaLabelledBy: 'ocr-template-editor-title',
