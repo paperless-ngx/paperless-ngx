@@ -117,15 +117,34 @@ export class OcrTemplatesComponent
   }
 
   deleteTemplate(t: OcrTemplate) {
-    const modal = this.modalService.open(ConfirmDialogComponent)
+    const modal = this.modalService.open(ConfirmDialogComponent, {
+      backdrop: 'static',
+    })
     modal.componentInstance.title = $localize`Delete OCR Template`
-    modal.componentInstance.messageBoldPart = t.name
+    modal.componentInstance.messageBold = t.name
     modal.componentInstance.message = $localize`Do you really want to delete this OCR template?`
     modal.componentInstance.btnClass = 'btn-danger'
     modal.componentInstance.btnCaption = $localize`Delete`
-    modal.componentInstance.confirmClicked.subscribe(() => {
-      modal.close()
-      this.service.delete(t).subscribe(() => this.reload())
-    })
+    modal.componentInstance.confirmClicked
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        modal.componentInstance.buttonsEnabled.set(false)
+        this.service
+          .delete(t)
+          .pipe(takeUntil(this.unsubscribeNotifier))
+          .subscribe({
+            next: () => {
+              modal.close()
+              this.reload()
+            },
+            error: (error) => {
+              modal.componentInstance.buttonsEnabled.set(true)
+              this.toastService.showError(
+                $localize`Error deleting OCR template.`,
+                error
+              )
+            },
+          })
+      })
   }
 }
