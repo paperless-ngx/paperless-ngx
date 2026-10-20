@@ -2151,27 +2151,14 @@ class WorkflowRun(SoftDeleteModel):
         return f"WorkflowRun of {self.workflow} at {self.run_at} on {self.document}"
 
 
-class OcrTemplate(ModelWithOwner):
+class OcrTemplate(MatchingModel):
     """
-    Defines a set of OCR extraction zones for a specific document type.
+    Defines a set of OCR extraction zones for documents with a common layout.
 
-    When a document of that type is consumed, each zone in the template is
-    cropped from the document image and OCR'd separately. The extracted text
-    is written to the configured custom field or built-in document field.
+    When a consumed document matches the template, each zone is cropped from
+    the document image and OCR'd separately. The extracted text is written to
+    the configured custom field or built-in document field.
     """
-
-    name = models.CharField(
-        _("name"),
-        max_length=128,
-    )
-
-    document_type = models.ForeignKey(
-        "documents.DocumentType",
-        on_delete=models.CASCADE,
-        related_name="ocr_templates",
-        verbose_name=_("document type"),
-        db_index=True,
-    )
 
     source_width = models.PositiveIntegerField(
         _("source width"),
@@ -2220,13 +2207,9 @@ class OcrTemplate(ModelWithOwner):
         auto_now=True,
     )
 
-    class Meta:
-        ordering = ("name",)
+    class Meta(MatchingModel.Meta):
         verbose_name = _("OCR template")
         verbose_name_plural = _("OCR templates")
-
-    def __str__(self) -> str:
-        return f"{self.name} ({self.document_type})"
 
 
 class OcrTemplateZone(models.Model):
