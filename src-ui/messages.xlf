@@ -3953,29 +3953,120 @@
           <context context-type="linenumber">21</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="7034531658243957622" datatype="html">
+        <source>Ask about this document</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/chat/chat/chat.component.html</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2784642599396678242" datatype="html">
+        <source>Ask about your documents</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/chat/chat/chat.component.html</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7835692693643268189" datatype="html">
+        <source>Clear chat</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/chat/chat/chat.component.html</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7152327329150387611" datatype="html">
+        <source>Answers come from your documents, with links to their sources.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/chat/chat/chat.component.html</context>
+          <context context-type="linenumber">25,26</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8518960802695658850" datatype="html">
+        <source>Still thinking...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/chat/chat/chat.component.html</context>
+          <context context-type="linenumber">34</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8763211465841977542" datatype="html">
+        <source>Thinking...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/chat/chat/chat.component.html</context>
+          <context context-type="linenumber">36</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3998597663055219440" datatype="html">
+        <source>Sources</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/chat/chat/chat.component.html</context>
+          <context context-type="linenumber">46,47</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="8066608938393600549" datatype="html">
         <source>Message</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/chat/chat/chat.component.html</context>
-          <context context-type="linenumber">34,35</context>
+          <context context-type="linenumber">61,62</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/email-document-dialog/email-document-dialog.component.html</context>
           <context context-type="linenumber">19,20</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="3133539296286953705" datatype="html">
+        <source>Stop</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/chat/chat/chat.component.html</context>
+          <context context-type="linenumber">74</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/chat/chat/chat.component.html</context>
+          <context context-type="linenumber">74</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6490688569532630280" datatype="html">
+        <source>Send</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/chat/chat/chat.component.html</context>
+          <context context-type="linenumber">78</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/chat/chat/chat.component.html</context>
+          <context context-type="linenumber">78</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
+          <context context-type="linenumber">94</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
+          <context context-type="linenumber">95</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
+          <context context-type="linenumber">111</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
+          <context context-type="linenumber">113</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/data/saved-view-icons.ts</context>
+          <context context-type="linenumber">79</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="3167745892412525370" datatype="html">
         <source>Ask a question about this document...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/chat/chat/chat.component.ts</context>
-          <context context-type="linenumber">51</context>
+          <context context-type="linenumber">61</context>
         </context-group>
       </trans-unit>
       <trans-unit id="224049052163028286" datatype="html">
         <source>Ask a question about a document...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/chat/chat/chat.component.ts</context>
-          <context context-type="linenumber">52</context>
+          <context context-type="linenumber">62</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8700121026680200191" datatype="html">
@@ -8473,29 +8564,6 @@
           <context context-type="linenumber">87</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="6490688569532630280" datatype="html">
-        <source>Send</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">94</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">95</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
-          <context context-type="linenumber">111</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
-          <context context-type="linenumber">113</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/data/saved-view-icons.ts</context>
-          <context context-type="linenumber">79</context>
-        </context-group>
-      </trans-unit>
       <trans-unit id="4452427314943113135" datatype="html">
         <source>Previous</source>
         <context-group purpose="location">
@@ -8511,7 +8579,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/main.ts</context>
-          <context context-type="linenumber">475</context>
+          <context context-type="linenumber">477</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5028777105388019087" datatype="html">
@@ -13230,14 +13298,14 @@
         <source>Prev</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/main.ts</context>
-          <context context-type="linenumber">474</context>
+          <context context-type="linenumber">476</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1241348629231510663" datatype="html">
         <source>End</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/main.ts</context>
-          <context context-type="linenumber">476</context>
+          <context context-type="linenumber">478</context>
         </context-group>
       </trans-unit>
     </body>
