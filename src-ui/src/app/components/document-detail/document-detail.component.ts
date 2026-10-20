@@ -64,6 +64,7 @@ import {
   FILTER_STORAGE_PATH,
 } from 'src/app/data/filter-rule-type'
 import { ObjectWithId } from 'src/app/data/object-with-id'
+import { OcrZoneRunResult } from 'src/app/data/ocr-template'
 import { StoragePath } from 'src/app/data/storage-path'
 import { Tag } from 'src/app/data/tag'
 import { SETTINGS_KEYS, SuggestionSource } from 'src/app/data/ui-settings'
@@ -1590,53 +1591,49 @@ export class DocumentDetailComponent
   private executeZoneOcr(documentId: number) {
     this.zoneOcrRunning.set(true)
     this.networkActive.set(true)
-    const finish = () => {
-      this.zoneOcrRunning.set(false)
-      this.networkActive.set(false)
-      this.flushPendingIncomingUpdate()
-    }
     this.documentsService
       .runZoneOcr(documentId)
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe({
-        next: (res) => {
-          if (this.documentId() !== documentId) {
-            finish()
-            return
-          }
-          if (res.status === 'skipped') {
-            finish()
-            this.toastService.showInfo($localize`Zone OCR skipped.`)
-            return
-          }
-          const results = res.results ?? []
-          if (results.length) {
-            const failed = results.filter(
-              (r) =>
-                r.value === null ||
-                r.value === undefined ||
-                `${r.value}`.trim() === ''
-            )
-            const filled = results.length - failed.length
-            let msg = $localize`Filled ${filled} of ${results.length} fields`
-            if (failed.length) {
-              const names = failed.map((r) => r.zone).join(', ')
-              msg = `${msg}. ${$localize`Failed to match zones: ${names}`}`
+        next: (response) => {
+          if (
+            this.documentId() !== documentId ||
+            response.status === 'skipped'
+          ) {
+            this.finishZoneOcr()
+            if (response.status === 'skipped') {
+              this.toastService.showInfo(
+                $localize`No OCR template applies to this document.`
+              )
             }
-            this.toastService.showInfo(msg)
-          } else {
-            this.toastService.showInfo(
-              $localize`Zone OCR ran but no results extracted.`
-            )
+            return
           }
+          this.toastService.showInfo(this.zoneOcrSummary(response.results))
           this.docChangeNotifier.next(documentId)
-          this.loadDocument(documentId, true, finish)
+          this.loadDocument(documentId, true, () => this.finishZoneOcr())
         },
         error: (error) => {
-          finish()
-          this.toastService.showError($localize`Zone OCR failed`, error)
+          this.finishZoneOcr()
+          this.toastService.showError($localize`Error running zone OCR.`, error)
         },
       })
+  }
+
+  private zoneOcrSummary(results: OcrZoneRunResult[]): string {
+    if (!results.length) return $localize`Zone OCR found no fields to fill.`
+    const missed = results
+      .filter((result) => !`${result.value ?? ''}`.trim())
+      .map((result) => result.zone)
+    const filled = results.length - missed.length
+    return missed.length
+      ? $localize`Filled ${filled} of ${results.length} fields. No value found for: ${missed.join(', ')}`
+      : $localize`Filled ${filled} of ${results.length} fields.`
+  }
+
+  private finishZoneOcr() {
+    this.zoneOcrRunning.set(false)
+    this.networkActive.set(false)
+    this.flushPendingIncomingUpdate()
   }
 
   private getSelectedNonLatestVersionId(): number | null {

@@ -1900,7 +1900,7 @@ describe('DocumentDetailComponent', () => {
     expect(toastSpy).toHaveBeenCalledWith('Document reloaded.')
   })
 
-  it('should run zone OCR, report results and force-reload the document', () => {
+  it('should run zone OCR, report results and reload the document', () => {
     component.documentId.set(doc.id)
     component.document.set(doc)
     jest.spyOn(documentService, 'runZoneOcr').mockReturnValue(
@@ -1920,7 +1920,7 @@ describe('DocumentDetailComponent', () => {
     component.runZoneOcr()
 
     expect(toastSpy).toHaveBeenCalledWith(
-      'Filled 1 of 2 fields. Failed to match zones: Due'
+      'Filled 1 of 2 fields. No value found for: Due'
     )
     expect(notifySpy).toHaveBeenCalledWith(doc.id)
     expect(loadSpy).toHaveBeenCalledWith(doc.id, true, expect.any(Function))
@@ -1930,7 +1930,33 @@ describe('DocumentDetailComponent', () => {
     expect(component.networkActive()).toBe(false)
   })
 
-  it('asks before running zone OCR on a dirty document and leaves edits intact on cancel', () => {
+  it('should summarize zone OCR results', () => {
+    component.documentId.set(doc.id)
+    component.document.set(doc)
+    jest.spyOn(component as any, 'loadDocument').mockImplementation(() => {})
+    const runSpy = jest.spyOn(documentService, 'runZoneOcr')
+    const toastSpy = jest.spyOn(toastService, 'showInfo')
+
+    runSpy.mockReturnValueOnce(of({ status: 'completed', results: [] }))
+    component.runZoneOcr()
+    expect(toastSpy).toHaveBeenLastCalledWith(
+      'Zone OCR found no fields to fill.'
+    )
+
+    component.networkActive.set(false)
+    runSpy.mockReturnValueOnce(
+      of({
+        status: 'completed',
+        results: [
+          { template: 'T', zone: 'Total', custom_field: 'Amount', value: 0 },
+        ],
+      })
+    )
+    component.runZoneOcr()
+    expect(toastSpy).toHaveBeenLastCalledWith('Filled 1 of 1 fields.')
+  })
+
+  it('should confirm before running zone OCR over unsaved changes', () => {
     component.documentId.set(doc.id)
     component.document.set({ ...doc, __changedFields: ['title'] })
     component.documentForm.patchValue({ title: 'Unsaved title' })
@@ -1950,7 +1976,7 @@ describe('DocumentDetailComponent', () => {
     expect(component.zoneOcrRunning()).toBe(false)
   })
 
-  it('runs zone OCR only after confirmation and prevents duplicate requests', () => {
+  it('should not allow saving or a second zone OCR run while one is running', () => {
     component.documentId.set(doc.id)
     component.document.set({ ...doc, __changedFields: ['title'] })
     const pending = new Subject<any>()
@@ -1976,7 +2002,7 @@ describe('DocumentDetailComponent', () => {
     expect(component.document().__changedFields).toEqual(['title'])
   })
 
-  it('does not reload a different document when zone OCR finishes', () => {
+  it('should not reload after zone OCR if another document is open', () => {
     component.documentId.set(doc.id)
     component.document.set({ ...doc, __changedFields: [] })
     const pending = new Subject<any>()
@@ -1992,7 +2018,7 @@ describe('DocumentDetailComponent', () => {
     pending.complete()
   })
 
-  it('does not reload or discard local edits when zone OCR is skipped', () => {
+  it('should keep unsaved changes when zone OCR is skipped', () => {
     component.documentId.set(doc.id)
     component.document.set({ ...doc, __changedFields: ['title'] })
     component.documentForm.patchValue({ title: 'Unsaved title' })
@@ -2010,7 +2036,9 @@ describe('DocumentDetailComponent', () => {
     expect(component.documentForm.get('title').value).toBe('Unsaved title')
     expect(component.zoneOcrRunning()).toBe(false)
     expect(component.networkActive()).toBe(false)
-    expect(infoSpy).toHaveBeenCalledWith('Zone OCR skipped.')
+    expect(infoSpy).toHaveBeenCalledWith(
+      'No OCR template applies to this document.'
+    )
   })
 
   it('should show an error when zone OCR fails', () => {
@@ -2023,7 +2051,10 @@ describe('DocumentDetailComponent', () => {
 
     component.runZoneOcr()
 
-    expect(errorSpy).toHaveBeenCalledWith('Zone OCR failed', expect.any(Error))
+    expect(errorSpy).toHaveBeenCalledWith(
+      'Error running zone OCR.',
+      expect.any(Error)
+    )
     expect(loadSpy).not.toHaveBeenCalled()
     expect(component.zoneOcrRunning()).toBe(false)
     expect(component.networkActive()).toBe(false)
