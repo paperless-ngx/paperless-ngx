@@ -5,6 +5,8 @@ from pathlib import Path
 from unittest.mock import MagicMock
 from unittest.mock import patch
 
+from django.contrib.auth.models import Group
+from django.contrib.auth.models import User
 from django.test import TestCase
 
 from documents.models import CustomField
@@ -13,11 +15,130 @@ from documents.models import Document
 from documents.models import DocumentType
 from documents.models import OcrTemplate
 from documents.models import OcrTemplateZone
+from documents.signals.handlers import run_zone_ocr_on_type_change
 from documents.zone_ocr import _apply_transform
 from documents.zone_ocr import _convert_value
 from documents.zone_ocr import _detect_mime
 from documents.zone_ocr import _resolve_doc_path
+from documents.zone_ocr import get_templates_for_document
 from documents.zone_ocr import run_zone_extraction
+from paperless_testing.dirs import DirectoriesMixin
+from paperless_testing.factories import DocumentFactory
+from paperless_testing.permissions import grant_object
+
+
+class TestTemplateVisibility(DirectoriesMixin, TestCase):
+    def setUp(self):
+        super().setUp()
+        self.owner = User.objects.create_user(username="document_owner")
+        self.other = User.objects.create_user(username="other_owner")
+        self.doc_type = DocumentType.objects.create(name="Invoice")
+        self.document = DocumentFactory(owner=self.owner, document_type=self.doc_type)
+        self.mine = self.template("Mine", owner=self.owner)
+        self.unowned = self.template("Unowned")
+        self.private = self.template("Private", owner=self.other)
+
+    def template(self, name, **kwargs):
+        return OcrTemplate.objects.create(
+            name=name,
+            document_type=self.doc_type,
+            source_width=100,
+            source_height=100,
+            **kwargs,
+        )
+
+    def test_only_owned_unowned_and_shared_templates_apply(self):
+        shared = self.template("Shared", owner=self.other)
+        grant_object(self.owner, shared, "view_ocrtemplate")
+        self.template("Disabled", owner=self.owner, enabled=False)
+        other_type = DocumentType.objects.create(name="Other")
+        OcrTemplate.objects.create(
+            name="Wrong type",
+            owner=self.owner,
+            document_type=other_type,
+            source_width=100,
+            source_height=100,
+        )
+        self.assertCountEqual(
+            get_templates_for_document(self.document),
+            [self.mine, self.unowned, shared],
+        )
+
+    def test_group_sharing_applies(self):
+        group = Group.objects.create(name="OCR users")
+        self.owner.groups.add(group)
+        grant_object(group, self.private, "view_ocrtemplate")
+        self.assertIn(self.private, get_templates_for_document(self.document))
+
+    def test_unowned_documents_only_use_unowned_templates(self):
+        self.document.owner = None
+        self.assertQuerySetEqual(
+            get_templates_for_document(self.document),
+            [self.unowned],
+        )
+
+    def test_versions_use_the_root_documents_owner(self):
+        version = DocumentFactory(
+            root_document=self.document,
+            owner=self.other,
+            document_type=self.doc_type,
+        )
+        self.assertCountEqual(
+            get_templates_for_document(version),
+            [self.mine, self.unowned],
+        )
+
+    def test_superuser_owner_can_use_all_visible_templates(self):
+        self.owner.is_superuser = True
+        self.assertCountEqual(
+            get_templates_for_document(self.document),
+            [self.mine, self.unowned, self.private],
+        )
+
+    def test_inactive_owner_has_no_templates(self):
+        self.owner.is_active = False
+        self.assertFalse(get_templates_for_document(self.document).exists())
+
+    @patch("documents.zone_ocr._process_template")
+    def test_extraction_never_processes_private_templates(self, process):
+        for template in (self.mine, self.unowned, self.private):
+            OcrTemplateZone.objects.create(
+                template=template,
+                name="Title",
+                target="title",
+                x=0,
+                y=0,
+                width=20,
+                height=20,
+            )
+        self.document.source_path.write_bytes(b"test PDF")
+
+        run_zone_extraction(self.document, None)
+
+        self.assertCountEqual(
+            [call.args[2] for call in process.call_args_list],
+            [self.mine, self.unowned],
+        )
+
+    @patch("documents.zone_ocr.run_zone_extraction")
+    def test_type_change_skips_documents_with_only_private_templates(self, extract):
+        self.mine.delete()
+        self.unowned.delete()
+        self.document.source_path.write_bytes(b"test PDF")
+        self.document._old_document_type_id = None
+
+        run_zone_ocr_on_type_change(Document, self.document)
+
+        extract.assert_not_called()
+
+    @patch("documents.zone_ocr.run_zone_extraction")
+    def test_type_change_runs_when_a_template_is_visible(self, extract):
+        self.document.source_path.write_bytes(b"test PDF")
+        self.document._old_document_type_id = None
+
+        run_zone_ocr_on_type_change(Document, self.document)
+
+        extract.assert_called_once_with(self.document, None)
 
 
 class TestApplyTransform(TestCase):

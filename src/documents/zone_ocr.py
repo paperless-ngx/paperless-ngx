@@ -43,11 +43,9 @@ def get_templates_for_document(document: Document):
         enabled=True,
     )
     owner = get_root_document(document).owner
-    if owner is not None:
-        templates = templates.filter(
-            id__in=permitted_object_ids(owner, OcrTemplate, "view_ocrtemplate"),
-        )
-    return templates
+    return templates.filter(
+        id__in=permitted_object_ids(owner, OcrTemplate, "view_ocrtemplate"),
+    )
 
 
 def run_zone_extraction(

@@ -608,6 +608,103 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     @patch("documents.zone_ocr.run_zone_extraction")
+    def test_run_zone_ocr_skips_templates_private_to_the_requester(self, extract):
+        owner = User.objects.create_user(username="document_owner")
+        document = DocumentFactory(document_type=self.doc_type, owner=owner)
+        OcrTemplate.objects.create(
+            name="Requester's private template",
+            owner=self.user,
+            document_type=self.doc_type,
+            source_width=100,
+            source_height=100,
+        )
+
+        response = self.client.post(f"/api/documents/{document.pk}/run-zone-ocr/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            response.json(),
+            {
+                "status": "skipped",
+                "reason": "no_template",
+                "results": [],
+            },
+        )
+        extract.assert_not_called()
+
+    @patch("documents.zone_ocr.run_zone_extraction")
+    def test_run_zone_ocr_reports_only_templates_visible_to_the_document_owner(
+        self,
+        extract,
+    ):
+        owner = User.objects.create_user(username="document_owner")
+        document = DocumentFactory(document_type=self.doc_type, owner=owner)
+        document.source_path.write_bytes(b"test PDF")
+        for name, template_owner in [
+            ("Owned", owner),
+            ("Unowned", None),
+            ("Shared", self.user),
+            ("Private", self.user),
+        ]:
+            template = OcrTemplate.objects.create(
+                name=name,
+                owner=template_owner,
+                document_type=self.doc_type,
+                source_width=100,
+                source_height=100,
+            )
+            OcrTemplateZone.objects.create(
+                template=template,
+                name=name,
+                target="title",
+                x=0,
+                y=0,
+                width=20,
+                height=20,
+            )
+            if name == "Shared":
+                grant_object(owner, template, "view_ocrtemplate")
+
+        response = self.client.post(f"/api/documents/{document.pk}/run-zone-ocr/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertCountEqual(
+            [result["template"] for result in response.json()["results"]],
+            ["Owned", "Unowned", "Shared"],
+        )
+        extract.assert_called_once()
+
+    def test_shared_editor_cannot_transfer_ownership_or_change_sharing(self):
+        editor = User.objects.create_user(username="shared_editor")
+        editor.user_permissions.add(
+            *Permission.objects.filter(
+                codename__in=["view_ocrtemplate", "change_ocrtemplate"],
+            ),
+        )
+        template = OcrTemplate.objects.create(
+            name="Shared",
+            owner=self.user,
+            document_type=self.doc_type,
+            source_width=100,
+            source_height=100,
+        )
+        grant_object(editor, template, "view_ocrtemplate", "change_ocrtemplate")
+        self.client.force_authenticate(editor)
+        for data in [
+            {"owner": editor.pk},
+            {"set_permissions": {"view": {"users": []}}},
+        ]:
+            with self.subTest(data=data):
+                response = self.client.patch(
+                    f"{self.ENDPOINT}{template.pk}/",
+                    data,
+                    format="json",
+                )
+                self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        template.refresh_from_db()
+        self.assertEqual(template.owner, self.user)
+
+    @patch("documents.zone_ocr.run_zone_extraction")
     def test_run_zone_ocr_missing_file_is_an_error(self, extract):
         document = DocumentFactory(document_type=self.doc_type)
         OcrTemplate.objects.create(
