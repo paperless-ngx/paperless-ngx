@@ -95,18 +95,24 @@ def rasterize_pdf_page_to_png(
     """
     Rasterizes the first page of a PDF to a PNG with pdftoppm.
     """
-    # -singlefile drops the page number and -png appends ".png", so pass the
-    # path without its suffix
     args = [
         "pdftoppm",
+        # Only the first page is needed, first and last page are both 1
         "-f",
         "1",
         "-l",
         "1",
+        # Resolution in DPI, which may be fractional
         "-r",
         str(dpi),
+        # Write a PNG
         "-png",
+        # Write exactly one file with no page number in its name. -png appends
+        # ".png" to the output root, so the path is passed without its suffix
         "-singlefile",
+        # Render the CropBox instead of the MediaBox, as a viewer would. This
+        # must be the same box get_pdf_first_page_size_points measures, or the
+        # DPI is computed for the wrong size
         "-cropbox",
         str(in_path),
         str(out_path.with_suffix("")),
