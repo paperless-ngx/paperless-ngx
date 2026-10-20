@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-19 15:40+0000\n"
+"POT-Creation-Date: 2026-10-20 05:26+0000\n"
 "PO-Revision-Date: 2022-02-17 04:17\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -1653,7 +1653,7 @@ msgid "workflow runs"
 msgstr ""
 
 #: documents/serialisers.py:515 documents/serialisers.py:872
-#: documents/serialisers.py:2902 documents/views.py:363 documents/views.py:2768
+#: documents/serialisers.py:2902 documents/views.py:363 documents/views.py:2773
 #: paperless_mail/serialisers.py:156
 msgid "Insufficient permissions."
 msgstr ""
@@ -1694,7 +1694,7 @@ msgstr ""
 msgid "Duplicate document identifiers are not allowed."
 msgstr ""
 
-#: documents/serialisers.py:2988 documents/views.py:4816
+#: documents/serialisers.py:2988 documents/views.py:4821
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr ""
@@ -1949,36 +1949,36 @@ msgstr ""
 msgid "Specify only one of text, title_search, query, or more_like_id."
 msgstr ""
 
-#: documents/views.py:356 documents/views.py:2765
+#: documents/views.py:356 documents/views.py:2770
 msgid "Invalid more_like_id"
 msgstr ""
 
-#: documents/views.py:1703
+#: documents/views.py:1708
 msgid "Invalid AI configuration."
 msgstr ""
 
-#: documents/views.py:1714
+#: documents/views.py:1719
 msgid "AI backend request timed out."
 msgstr ""
 
-#: documents/views.py:1726
+#: documents/views.py:1731
 msgid "AI backend rejected the request. Check logs for details."
 msgstr ""
 
-#: documents/views.py:4832
+#: documents/views.py:4837
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr ""
 
-#: documents/views.py:4879
+#: documents/views.py:4884
 msgid "Bundle is already being processed."
 msgstr ""
 
-#: documents/views.py:4945
+#: documents/views.py:4950
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr ""
 
-#: documents/views.py:4959
+#: documents/views.py:4964
 msgid "The share link bundle is unavailable."
 msgstr ""
 
