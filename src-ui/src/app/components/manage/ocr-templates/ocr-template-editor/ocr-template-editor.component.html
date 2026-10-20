@@ -190,11 +190,11 @@
             <input class="form-control flex-grow-0 preview-page-input" type="number" min="1" [max]="previewPageCount()" [(ngModel)]="previewPageDisplay" [disabled]="!pageLoaded()" aria-label="Page" i18n-aria-label />
             <span class="input-group-text" i18n>of {{ previewPageCount() ?? '?' }}</span>
           </div>
-          <div class="input-group w-auto flex-nowrap" role="group" aria-label="Zoom" i18n-aria-label>
+          <fieldset class="input-group w-auto flex-nowrap" aria-label="Zoom" i18n-aria-label>
             <button type="button" class="btn btn-outline-secondary" aria-label="Zoom out" i18n-aria-label [disabled]="!pageLoaded() || zoom <= 0.5" (click)="zoomOut()"><i-bs name="dash"></i-bs></button>
             <button type="button" class="btn btn-outline-secondary preview-zoom" title="Reset zoom" i18n-title [disabled]="!pageLoaded()" (click)="resetZoom()">{{ zoom | percent: '1.0-0' }}</button>
             <button type="button" class="btn btn-outline-secondary" aria-label="Zoom in" i18n-aria-label [disabled]="!pageLoaded() || zoom >= 4" (click)="zoomIn()"><i-bs name="plus"></i-bs></button>
-          </div>
+          </fieldset>
         }
       </div>
       <div class="flex-grow-1 overflow-hidden">
@@ -229,6 +229,7 @@
                   (pointerup)="onOverlayPointerUp($event)"
                   (pointercancel)="onOverlayPointerCancel($event)"
                   (lostpointercapture)="onOverlayPointerCancel($event)"
+                  aria-label="Zone overlay" i18n-aria-label
                 >
                   @for (zone of template.zones; track $index; let i = $index) {
                     @if (zoneDisplayRect(i); as rect) {
@@ -281,9 +282,9 @@
             </div>
             @if (!pageLoaded()) {
               <div class="p-5 d-flex justify-content-center align-items-center">
-                <div class="spinner-border" role="status">
+                <output class="spinner-border" role="status">
                   <span class="visually-hidden" i18n>Loading page...</span>
-                </div>
+                </output>
               </div>
             }
           } @else {

@@ -73,8 +73,8 @@ describe('OcrTemplateEditorZoneListComponent', () => {
     expect(
       fixture.nativeElement.querySelectorAll(
         '[title="Combined with other zones"]'
-      ).length
-    ).toBe(2)
+      )
+    ).toHaveLength(2)
   })
 
   it('warns only for zones without a field and clears the warning when assigned', () => {
