@@ -9,7 +9,7 @@ from django.db import models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("documents", "0021_widen_workflow_integer_fields"),
+        ("documents", "0027_documentbarcode"),
     ]
 
     operations = [
