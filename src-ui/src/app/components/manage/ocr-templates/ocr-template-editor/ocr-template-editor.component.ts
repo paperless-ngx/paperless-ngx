@@ -1,8 +1,8 @@
 import { DragDropModule } from '@angular/cdk/drag-drop'
 import { CommonModule } from '@angular/common'
 import {
-  ChangeDetectorRef,
   Component,
+  computed,
   ElementRef,
   EventEmitter,
   HostListener,
@@ -151,7 +151,6 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
   private readonly documentService = inject(DocumentService)
   private readonly toastService = inject(ToastService)
   private readonly modalService = inject(NgbModal)
-  private readonly changeDetector = inject(ChangeDetectorRef)
   private readonly destroy$ = new Subject<void>()
   private readonly cancelZoneTest$ = new Subject<void>()
   private readonly customDateFormatZones = new WeakSet<OcrTemplateZone>()
@@ -190,25 +189,16 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     zones: [],
   }
 
-  private _customFields: CustomField[] = []
-  readonly fieldItems = signal<{ id: ZoneFieldSelection; name: string }[]>([
-    ...OCR_BUILTIN_TARGETS,
-  ])
-
-  get customFields(): CustomField[] {
-    return this._customFields
-  }
-
-  set customFields(fields: CustomField[]) {
-    this._customFields = fields
-    this.fieldItems.set([
+  readonly customFields = signal<CustomField[]>([])
+  readonly fieldItems = computed<{ id: ZoneFieldSelection; name: string }[]>(
+    () => [
       ...OCR_BUILTIN_TARGETS,
-      ...fields
-        .filter((cf) => OCR_SUPPORTED_FIELD_TYPES.includes(cf.data_type))
-        .map((cf) => ({ id: cf.id, name: cf.name })),
-    ])
-  }
-  documentTypes: DocumentType[] = []
+      ...this.customFields()
+        .filter((field) => OCR_SUPPORTED_FIELD_TYPES.includes(field.data_type))
+        .map((field) => ({ id: field.id, name: field.name })),
+    ]
+  )
+  readonly documentTypes = signal<DocumentType[]>([])
   transformOptions = TRANSFORM_OPTIONS
   ocrLanguageOptions = OCR_LANGUAGE_OPTIONS
   dateTransform = OCR_ZONE_TRANSFORM.Date
@@ -218,21 +208,23 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     { id: CUSTOM_DATE_FORMAT_CHOICE, name: $localize`Custom...` },
   ]
   isNew = true
-  saving = false
+  readonly saving = signal(false)
 
   previewDocId: number | null = null
   previewPage = 0
-  previewPageCount: number | null = null
+  readonly previewPageCount = signal<number | null>(null)
   private pageCountForDoc: number | null = null
   pageImageUrl: string | null = null
-  previewStatus: 'empty' | 'loading' | 'ready' | 'error' = 'empty'
-  previewError = ''
+  readonly previewStatus = signal<'empty' | 'loading' | 'ready' | 'error'>(
+    'empty'
+  )
+  readonly previewError = signal('')
   readonly searchStatus = signal<
     'idle' | 'loading' | 'ready' | 'empty' | 'error'
   >('idle')
   zoom = 1
-  previewDocModel: Document | string = ''
-  private correspondentNames = new Map<number, string>()
+  readonly previewDocModel = signal<Document | string>('')
+  private readonly correspondentNames = signal(new Map<number, string>())
 
   public get previewPageDisplay(): number {
     return this.previewPage + 1
@@ -251,7 +243,7 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
   private readonly zoneTest = signal<ZoneTest | null>(null)
 
   get imageLoaded(): boolean {
-    return this.previewStatus === 'ready'
+    return this.previewStatus() === 'ready'
   }
 
   get zoneTestResult(): OcrZoneTestResult | null {
@@ -296,24 +288,23 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
       .listAll()
       .pipe(takeUntil(this.destroy$))
       .subscribe((r) => {
-        this.customFields = r.results
-        this.changeDetector.markForCheck()
+        this.customFields.set(r.results)
       })
 
     this.documentTypeService
       .listAll()
       .pipe(takeUntil(this.destroy$))
       .subscribe((r) => {
-        this.documentTypes = r.results
-        this.changeDetector.markForCheck()
+        this.documentTypes.set(r.results)
       })
 
     this.correspondentService
       .listAll()
       .pipe(takeUntil(this.destroy$))
       .subscribe((r) => {
-        this.correspondentNames = new Map(r.results.map((c) => [c.id, c.name]))
-        this.changeDetector.markForCheck()
+        this.correspondentNames.set(
+          new Map(r.results.map((c) => [c.id, c.name]))
+        )
       })
 
     if (this.object) {
@@ -364,7 +355,7 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     if (!doc) return ''
     if (typeof doc === 'string') return doc
     const corr = doc.correspondent
-      ? this.correspondentNames.get(doc.correspondent)
+      ? this.correspondentNames().get(doc.correspondent)
       : null
     return corr
       ? `#${doc.id} ${doc.title} (${corr})`
@@ -374,7 +365,7 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
   onPreviewDocSelected(event: NgbTypeaheadSelectItemEvent<Document>) {
     event.preventDefault()
     const doc: Document = event.item
-    this.previewDocModel = doc
+    this.previewDocModel.set(doc)
     this.searchStatus.set('idle')
     this.previewDocId = doc.id
     if (!this.template.document_type && doc.document_type) {
@@ -387,14 +378,14 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
   clearPreviewDoc() {
     this.stopOverlayInteraction()
     this.clearZoneTest()
-    this.previewDocModel = ''
+    this.previewDocModel.set('')
     this.previewDocId = null
-    this.previewPageCount = null
+    this.previewPageCount.set(null)
     this.pageCountForDoc = null
     this.previewPage = 0
     this.pageImageUrl = null
-    this.previewStatus = 'empty'
-    this.previewError = ''
+    this.previewStatus.set('empty')
+    this.previewError.set('')
     this.searchStatus.set('idle')
   }
 
@@ -402,29 +393,29 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     if (!this.previewDocId) return
     this.stopOverlayInteraction()
     this.clearZoneTest()
-    this.previewStatus = 'loading'
-    this.previewError = ''
+    this.previewStatus.set('loading')
+    this.previewError.set('')
     const documentId = this.previewDocId
     if (this.pageCountForDoc !== documentId) {
       this.pageCountForDoc = documentId
-      this.previewPageCount = null
+      this.previewPageCount.set(null)
       this.documentService
         .get(documentId)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: (doc) => {
             if (this.previewDocId !== documentId) return
-            this.previewPageCount = doc?.page_count ?? null
-            if (doc && !this.previewDocModel) this.previewDocModel = doc
-            this.changeDetector.markForCheck()
+            this.previewPageCount.set(doc?.page_count ?? null)
+            if (doc && !this.previewDocModel()) this.previewDocModel.set(doc)
           },
           error: () => {
             if (this.previewDocId !== documentId) return
-            this.previewPageCount = null
+            this.previewPageCount.set(null)
             this.pageCountForDoc = null
-            this.previewStatus = 'error'
-            this.previewError = $localize`Could not load the selected document.`
-            this.changeDetector.markForCheck()
+            this.previewStatus.set('error')
+            this.previewError.set(
+              $localize`Could not load the selected document.`
+            )
           },
         })
     }
@@ -436,7 +427,8 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
 
   goToPage(page: number) {
     if (!Number.isFinite(page)) return
-    const max = this.previewPageCount ? this.previewPageCount - 1 : page
+    const pageCount = this.previewPageCount()
+    const max = pageCount ? pageCount - 1 : page
     const clamped = Math.max(0, Math.min(Math.trunc(page), max))
     if (clamped === this.previewPage) return
     this.previewPage = clamped
@@ -456,7 +448,7 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
   }
 
   zonePage(zone: OcrTemplateZone): number {
-    return getZonePage(zone, this.previewPage, this.previewPageCount)
+    return getZonePage(zone, this.previewPage, this.previewPageCount())
   }
 
   isLastPageZone(zone: OcrTemplateZone): boolean {
@@ -468,12 +460,12 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
   }
 
   private isOnCurrentPage(zone: OcrTemplateZone): boolean {
-    return isZoneOnPage(zone, this.previewPage, this.previewPageCount)
+    return isZoneOnPage(zone, this.previewPage, this.previewPageCount())
   }
 
   onImageLoad() {
-    if (this.previewStatus !== 'loading') return
-    this.previewStatus = 'ready'
+    if (this.previewStatus() !== 'loading') return
+    this.previewStatus.set('ready')
     const img = this.imageRef.nativeElement
     this.template.source_width = img.naturalWidth
     this.template.source_height = img.naturalHeight
@@ -481,8 +473,8 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
 
   onImageError() {
     this.stopOverlayInteraction()
-    this.previewStatus = 'error'
-    this.previewError = $localize`Could not load this page.`
+    this.previewStatus.set('error')
+    this.previewError.set($localize`Could not load this page.`)
   }
 
   @HostListener('document:keydown.escape')
@@ -491,7 +483,7 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
   }
 
   onOverlayPointerDown(event: PointerEvent) {
-    if (this.saving) return
+    if (this.saving()) return
     if (event.button !== 0 || this.overlayInteraction.kind !== 'idle') return
     const point = this.svgPointFromEvent(event)
     if (!this.imageLoaded || !point) return
@@ -689,7 +681,7 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
       point,
       this.template.zones,
       this.previewPage,
-      this.previewPageCount,
+      this.previewPageCount(),
       this.imageNaturalSize()
     )
   }
@@ -857,9 +849,9 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
   }
 
   save() {
-    if (this.saving) return
+    if (this.saving()) return
     this.stopOverlayInteraction()
-    this.saving = true
+    this.saving.set(true)
     this.pruneCombineFormats()
     this.template.sample_document = this.previewDocId
     const obs = this.isNew
@@ -873,9 +865,8 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
         this.activeModal.close(saved)
       },
       error: (e) => {
-        this.saving = false
+        this.saving.set(false)
         this.toastService.showError($localize`Error saving OCR template.`, e)
-        this.changeDetector.markForCheck()
       },
     })
   }
@@ -1014,7 +1005,7 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
             if (zone && OCR_SUPPORTED_FIELD_TYPES.includes(field.data_type)) {
               this.setZoneField(zone, field.id)
             }
-            this.customFields = r.results
+            this.customFields.set(r.results)
           })
       })
     modal.componentInstance.failed

@@ -2,6 +2,7 @@ import { EventEmitter, signal, WritableSignal } from '@angular/core'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap'
 import { of, Subject } from 'rxjs'
+import { DocumentType } from 'src/app/data/document-type'
 import { OcrTemplate } from 'src/app/data/ocr-template'
 import { DirtyFormGuard } from 'src/app/guards/dirty-form.guard'
 import { PermissionsService } from 'src/app/services/permissions.service'
@@ -18,18 +19,19 @@ describe('OcrTemplatesComponent', () => {
   let options: NgbModalOptions
   const editor = {
     object: undefined as OcrTemplate,
-    saving: false,
+    saving: signal(false),
     isDirty: false,
     succeeded: new EventEmitter<OcrTemplate>(),
   }
   const modal = { open: jest.fn() }
   const dirtyFormGuard = { confirmChanges: jest.fn() }
-  const templates = { delete: jest.fn() }
+  const templates = { delete: jest.fn(), patch: jest.fn(), listAll: jest.fn() }
+  const documentTypes = { listAll: jest.fn() }
   const toast = { showError: jest.fn() }
 
   beforeEach(async () => {
     editor.object = undefined
-    editor.saving = false
+    editor.saving.set(false)
     editor.isDirty = false
     editor.succeeded = new EventEmitter<OcrTemplate>()
     modal.open.mockReset().mockImplementation((_, modalOptions) => {
@@ -38,6 +40,9 @@ describe('OcrTemplatesComponent', () => {
     })
     dirtyFormGuard.confirmChanges.mockReset().mockReturnValue(of(true))
     templates.delete.mockReset()
+    templates.patch.mockReset()
+    templates.listAll.mockReset().mockReturnValue(of({ results: [] }))
+    documentTypes.listAll.mockReset().mockReturnValue(of({ results: [] }))
     toast.showError.mockReset()
     await TestBed.configureTestingModule({
       imports: [OcrTemplatesComponent],
@@ -46,12 +51,21 @@ describe('OcrTemplatesComponent', () => {
         { provide: DirtyFormGuard, useValue: dirtyFormGuard },
         { provide: PermissionsService, useValue: {} },
         { provide: OcrTemplateService, useValue: templates },
-        { provide: DocumentTypeService, useValue: {} },
+        { provide: DocumentTypeService, useValue: documentTypes },
         { provide: ToastService, useValue: toast },
       ],
     })
       .overrideComponent(OcrTemplatesComponent, {
-        set: { template: '', imports: [] },
+        set: {
+          template: `
+            @for (template of templates(); track template.id) {
+              <span class="name">{{ template.name }}</span>
+              <span class="document-type">{{ getDocumentTypeName(template) }}</span>
+              <input type="checkbox" [checked]="template.enabled" />
+            }
+          `,
+          imports: [],
+        },
       })
       .compileComponents()
     fixture = TestBed.createComponent(OcrTemplatesComponent)
@@ -89,9 +103,55 @@ describe('OcrTemplatesComponent', () => {
     expect(await options.beforeDismiss()).toBe(true)
     expect(dirtyFormGuard.confirmChanges).toHaveBeenCalledTimes(2)
 
-    editor.saving = true
+    editor.saving.set(true)
     expect(options.beforeDismiss()).toBe(false)
     expect(dirtyFormGuard.confirmChanges).toHaveBeenCalledTimes(2)
+  })
+
+  it('renders asynchronously loaded templates and type names without manual change detection', async () => {
+    const pendingTemplates = new Subject<{ results: OcrTemplate[] }>()
+    const pendingTypes = new Subject<{ results: DocumentType[] }>()
+    templates.listAll.mockReturnValue(pendingTemplates)
+    documentTypes.listAll.mockReturnValue(pendingTypes)
+    fixture.detectChanges()
+
+    pendingTemplates.next({
+      results: [{ id: 3, name: 'Invoices', document_type: 2 } as OcrTemplate],
+    })
+    await fixture.whenStable()
+    expect(fixture.nativeElement.querySelector('.name').textContent).toBe(
+      'Invoices'
+    )
+
+    pendingTypes.next({ results: [{ id: 2, name: 'Invoice' } as DocumentType] })
+    await fixture.whenStable()
+    expect(
+      fixture.nativeElement.querySelector('.document-type').textContent
+    ).toBe('Invoice')
+  })
+
+  it('renders toggle rollback after an asynchronous failure without manual change detection', async () => {
+    const template = { id: 3, name: 'Invoices', enabled: true } as OcrTemplate
+    templates.listAll.mockReturnValue(of({ results: [template] }))
+    const pending = new Subject<OcrTemplate>()
+    templates.patch.mockReturnValue(pending)
+    fixture.detectChanges()
+
+    component.toggleTemplate(template, false)
+    await fixture.whenStable()
+    expect(fixture.nativeElement.querySelector('input').checked).toBe(false)
+    expect(templates.patch).toHaveBeenCalledWith({
+      ...template,
+      enabled: false,
+    })
+    expect(template.enabled).toBe(true)
+
+    const error = new Error('Update failed')
+    pending.error(error)
+    await fixture.whenStable()
+
+    expect(fixture.nativeElement.querySelector('input').checked).toBe(true)
+    expect(toast.showError).toHaveBeenCalledWith(expect.any(String), error)
   })
 
   describe('deletion', () => {

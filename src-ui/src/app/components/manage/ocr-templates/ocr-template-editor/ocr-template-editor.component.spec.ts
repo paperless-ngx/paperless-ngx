@@ -4,11 +4,13 @@ import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { of, Subject, throwError } from 'rxjs'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import { Document } from 'src/app/data/document'
+import { DocumentType } from 'src/app/data/document-type'
 import {
   OcrTemplate,
   OcrTemplateZone,
   OcrZoneTestResult,
 } from 'src/app/data/ocr-template'
+import { Results } from 'src/app/data/results'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
@@ -83,7 +85,19 @@ describe('OcrTemplateEditorComponent', () => {
       ],
     })
       .overrideComponent(OcrTemplateEditorComponent, {
-        set: { template: '{{ searchStatus() }}', imports: [] },
+        set: {
+          template: `
+            <span class="search-status">{{ searchStatus() }}</span>
+            <span class="document-type">{{ documentTypes()[0]?.name }}</span>
+            <span class="field">{{ fieldItems()[3]?.name }}</span>
+            <span class="preview-status">{{ previewStatus() }}</span>
+            <span class="preview-error">{{ previewError() }}</span>
+            <span class="page-count">{{ previewPageCount() }}</span>
+            <span class="preview-document">{{ documentFormatter(previewDocModel()) }}</span>
+            <button [disabled]="saving()">Save</button>
+          `,
+          imports: [],
+        },
       })
       .compileComponents()
     fixture = TestBed.createComponent(OcrTemplateEditorComponent)
@@ -118,7 +132,7 @@ describe('OcrTemplateEditorComponent', () => {
     })
     component.imageRef = new ElementRef(image)
     component.overlayRef = new ElementRef(overlay)
-    component.previewStatus = 'ready'
+    component.previewStatus.set('ready')
   }
 
   function pointer(x: number, y: number, pointerId = 1): PointerEvent {
@@ -217,7 +231,82 @@ describe('OcrTemplateEditorComponent', () => {
     pending.next({ results: [] })
     await fixture.whenStable()
 
-    expect(fixture.nativeElement.textContent).toBe('empty')
+    expect(
+      fixture.nativeElement.querySelector('.search-status').textContent
+    ).toBe('empty')
+  })
+
+  it('renders asynchronously loaded metadata without manual change detection', async () => {
+    const types = new Subject<Results<DocumentType>>()
+    const fields = new Subject<Results<CustomField>>()
+    jest
+      .spyOn(TestBed.inject(DocumentTypeService), 'listAll')
+      .mockReturnValue(types)
+    jest
+      .spyOn(TestBed.inject(CustomFieldsService), 'listAll')
+      .mockReturnValue(fields)
+    fixture.detectChanges()
+
+    types.next({
+      count: 1,
+      all: [2],
+      results: [{ id: 2, name: 'Invoice' } as DocumentType],
+    })
+    fields.next({
+      count: 1,
+      all: [5],
+      results: [
+        { id: 5, name: 'Total', data_type: CustomFieldDataType.Monetary },
+      ],
+    })
+    await fixture.whenStable()
+
+    expect(
+      fixture.nativeElement.querySelector('.document-type').textContent
+    ).toBe('Invoice')
+    expect(fixture.nativeElement.querySelector('.field').textContent).toBe(
+      'Total'
+    )
+  })
+
+  it('renders asynchronous preview metadata and errors without manual change detection', async () => {
+    fixture.detectChanges()
+    const pending = new Subject<Document>()
+    documents.get.mockReturnValue(pending)
+    component.previewDocId = 5
+    component.loadPreview()
+    pending.next({ id: 5, title: 'Invoice', page_count: 3 } as Document)
+    await fixture.whenStable()
+
+    expect(fixture.nativeElement.querySelector('.page-count').textContent).toBe(
+      '3'
+    )
+    expect(
+      fixture.nativeElement.querySelector('.preview-document').textContent
+    ).toBe('#5 Invoice')
+
+    pending.error(new Error('Offline'))
+    await fixture.whenStable()
+
+    expect(
+      fixture.nativeElement.querySelector('.preview-status').textContent
+    ).toBe('error')
+    expect(
+      fixture.nativeElement.querySelector('.preview-error').textContent
+    ).toBe('Could not load the selected document.')
+  })
+
+  it('re-enables saving after an asynchronous failure without manual change detection', async () => {
+    fixture.detectChanges()
+    const pending = new Subject<OcrTemplate>()
+    templates.create.mockReturnValue(pending)
+    component.save()
+    await fixture.whenStable()
+    expect(fixture.nativeElement.querySelector('button').disabled).toBe(true)
+
+    pending.error(new Error('Save failed'))
+    await fixture.whenStable()
+    expect(fixture.nativeElement.querySelector('button').disabled).toBe(false)
   })
 
   it('clears the selection on a click in empty space without adding a zone', () => {
@@ -421,7 +510,7 @@ describe('OcrTemplateEditorComponent', () => {
     component.onOverlayPointerDown(pointer(500, 500))
 
     component.save()
-    expect(component.saving).toBe(true)
+    expect(component.saving()).toBe(true)
     expect(component.drawingRect()).toBeNull()
     component.save()
     expect(templates.create).toHaveBeenCalledTimes(1)
@@ -452,7 +541,7 @@ describe('OcrTemplateEditorComponent', () => {
     expect(component.template.zones[0].x).toBe(100)
 
     pending.error(new Error('Save failed'))
-    expect(component.saving).toBe(false)
+    expect(component.saving()).toBe(false)
     expect(component.isDirty).toBe(true)
     component.onOverlayPointerDown(pointer(150, 150))
     component.onOverlayPointerUp(pointer(250, 250))
@@ -526,19 +615,19 @@ describe('OcrTemplateEditorComponent', () => {
     component.loadPreview()
     pending.next({ id: 1, page_count: 99 } as Document)
 
-    expect(component.previewPageCount).toBe(3)
+    expect(component.previewPageCount()).toBe(3)
   })
 
   it('can retry a failed preview and clear the selected document', () => {
     component.previewDocId = 1
     component.loadPreview()
     component.onImageError()
-    expect(component.previewStatus).toBe('error')
+    expect(component.previewStatus()).toBe('error')
 
     component.loadPreview()
-    expect(component.previewStatus).toBe('loading')
+    expect(component.previewStatus()).toBe('loading')
     component.clearPreviewDoc()
-    expect(component.previewStatus).toBe('empty')
+    expect(component.previewStatus()).toBe('empty')
     expect(component.pageImageUrl).toBeNull()
   })
 })

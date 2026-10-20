@@ -21,14 +21,14 @@
     </div>
   </li>
 
-  @if (loading() && templates.length === 0) {
+  @if (loading() && templates().length === 0) {
     <li class="list-group-item">
       <div class="spinner-border spinner-border-sm me-2" role="status"></div>
       <ng-container i18n>Loading...</ng-container>
     </li>
   }
 
-  @for (t of templates; track t.id) {
+  @for (t of templates(); track t.id) {
     <li class="list-group-item">
       <div class="row fade" [class.show]="show()">
         <div class="col d-flex align-items-center"><button class="btn btn-link p-0 text-start" type="button" (click)="editTemplate(t)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.OcrTemplate)">{{t.name}}</button></div>
@@ -36,7 +36,7 @@
         <div class="col d-flex align-items-center d-none d-sm-flex"><code>{{t.zones?.length || 0}}</code></div>
         <div class="col d-flex align-items-center">
           <div class="form-check form-switch mb-0">
-            <input type="checkbox" class="form-check-input cursor-pointer" [id]="t.id+'_enable'" [(ngModel)]="t.enabled" (change)="toggleTemplate(t)" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.OcrTemplate }">
+            <input type="checkbox" class="form-check-input cursor-pointer" [id]="t.id+'_enable'" [ngModel]="t.enabled" (ngModelChange)="toggleTemplate(t, $event)" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.OcrTemplate }">
             <label class="form-check-label cursor-pointer" [for]="t.id+'_enable'">
               <code> @if(t.enabled) { <ng-container i18n>Enabled</ng-container> } @else { <span i18n class="text-muted">Disabled</span> }</code>
             </label>
@@ -69,7 +69,7 @@
       </div>
     </li>
   }
-  @if (!loading() && templates.length === 0) {
+  @if (!loading() && templates().length === 0) {
     <li class="list-group-item" [class.show]="show()" i18n>No OCR templates defined.</li>
   }
 </ul>

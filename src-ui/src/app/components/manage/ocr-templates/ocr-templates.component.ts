@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core'
+import { Component, OnInit, inject, signal } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
@@ -35,21 +35,19 @@ export class OcrTemplatesComponent
   private readonly modalService = inject(NgbModal)
   private readonly dirtyFormGuard = inject(DirtyFormGuard)
   private readonly toastService = inject(ToastService)
-  private readonly changeDetector = inject(ChangeDetectorRef)
   permissionsService = inject(PermissionsService)
 
-  public templates: OcrTemplate[] = []
-  private documentTypeNames: Map<number, string> = new Map()
+  readonly templates = signal<OcrTemplate[]>([])
+  private readonly documentTypeNames = signal(new Map<number, string>())
 
   ngOnInit() {
     this.documentTypeService
       .listAll()
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((r) => {
-        this.documentTypeNames = new Map(
-          r.results.map((dt) => [dt.id, dt.name])
+        this.documentTypeNames.set(
+          new Map(r.results.map((dt) => [dt.id, dt.name]))
         )
-        this.changeDetector.markForCheck()
       })
     this.reload()
   }
@@ -60,7 +58,7 @@ export class OcrTemplatesComponent
       .listAll()
       .pipe(
         takeUntil(this.unsubscribeNotifier),
-        tap((r) => (this.templates = r.results)),
+        tap((r) => this.templates.set(r.results)),
         delay(100)
       )
       .subscribe(() => {
@@ -71,7 +69,8 @@ export class OcrTemplatesComponent
 
   getDocumentTypeName(t: OcrTemplate): string {
     return (
-      this.documentTypeNames.get(t.document_type) ?? `${t.document_type ?? ''}`
+      this.documentTypeNames().get(t.document_type) ??
+      `${t.document_type ?? ''}`
     )
   }
 
@@ -89,7 +88,7 @@ export class OcrTemplatesComponent
       ariaLabelledBy: 'ocr-template-editor-title',
       beforeDismiss: () => {
         const editor: OcrTemplateEditorComponent = modal.componentInstance
-        if (editor.saving) return false
+        if (editor.saving()) return false
         return editor.isDirty
           ? firstValueFrom(this.dirtyFormGuard.confirmChanges())
           : true
@@ -101,13 +100,21 @@ export class OcrTemplatesComponent
       .subscribe(() => this.reload())
   }
 
-  toggleTemplate(t: OcrTemplate) {
-    // ngModel has already flipped t.enabled; restore it if persistence fails.
-    const enabled = t.enabled
-    this.service.patch(t).subscribe({
+  toggleTemplate(t: OcrTemplate, enabled: boolean) {
+    this.templates.update((templates) =>
+      templates.map((template) =>
+        template.id === t.id ? { ...template, enabled } : template
+      )
+    )
+    this.service.patch({ ...t, enabled }).subscribe({
       error: (error) => {
-        t.enabled = !enabled
-        this.changeDetector.markForCheck()
+        this.templates.update((templates) =>
+          templates.map((template) =>
+            template.id === t.id
+              ? { ...template, enabled: t.enabled }
+              : template
+          )
+        )
         this.toastService.showError(
           $localize`Error updating OCR template.`,
           error

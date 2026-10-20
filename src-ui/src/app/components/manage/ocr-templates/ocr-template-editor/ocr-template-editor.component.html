@@ -3,11 +3,11 @@
   @if (template.id) {
     <span class="badge bg-primary text-primary-text-contrast ms-2">ID: {{ template.id }}</span>
   }
-  <button type="button" class="btn-close" (click)="activeModal.dismiss()" [disabled]="saving" aria-label="Close" i18n-aria-label></button>
+  <button type="button" class="btn-close" (click)="activeModal.dismiss()" [disabled]="saving()" aria-label="Close" i18n-aria-label></button>
 </div>
 
 <div class="modal-body d-flex flex-column">
-<div class="row gx-3 editor-layout flex-grow-1 flex-lg-nowrap" [attr.inert]="saving ? '' : null" [attr.aria-busy]="saving">
+<div class="row gx-3 editor-layout flex-grow-1 flex-lg-nowrap" [attr.inert]="saving() ? '' : null" [attr.aria-busy]="saving()">
   <div class="col-lg-4 mb-3 mb-lg-0 overflow-auto">
     <ul ngbNav #nav="ngbNav" [(activeId)]="activeTab" class="nav-underline flex-nowrap flex-md-wrap overflow-auto">
         <li ngbNavItem="settings">
@@ -22,7 +22,7 @@
               </div>
             </div>
 
-            <pngx-input-select [(ngModel)]="template.document_type" [items]="documentTypes" bindLabel="name" bindValue="id" title="Document type" i18n-title></pngx-input-select>
+            <pngx-input-select [(ngModel)]="template.document_type" [items]="documentTypes()" bindLabel="name" bindValue="id" title="Document type" i18n-title></pngx-input-select>
 
           </ng-template>
         </li>
@@ -162,7 +162,7 @@
             } @else {
               <pngx-ocr-template-zone-list
                 [zones]="template.zones"
-                [customFields]="customFields"
+                [customFields]="customFields()"
                 (zoneSelected)="selectZone($event)"
                 (zoneRemoved)="removeZone($event)"
               ></pngx-ocr-template-zone-list>
@@ -223,11 +223,11 @@
         </div>
       }
       <div #previewContainer class="position-relative flex-grow-1 overflow-hidden">
-        <div class="h-100 overflow-auto border" [attr.aria-busy]="previewStatus === 'loading'">
-          @if (previewStatus === 'error') {
+        <div class="h-100 overflow-auto border" [attr.aria-busy]="previewStatus() === 'loading'">
+          @if (previewStatus() === 'error') {
             <div class="py-5 px-3 text-center" role="alert">
               <i-bs name="exclamation-triangle" width="32" height="32" class="text-warning"></i-bs>
-              <p class="my-3">{{ previewError }}</p>
+              <p class="my-3">{{ previewError() }}</p>
               <button type="button" class="btn btn-sm btn-outline-secondary" (click)="loadPreview()"><i-bs name="arrow-clockwise" class="me-1"></i-bs><span i18n>Retry</span></button>
             </div>
           } @else if (pageImageUrl) {
@@ -304,7 +304,7 @@
                 </svg>
               }
             </div>
-            @if (previewStatus === 'loading') {
+            @if (previewStatus() === 'loading') {
               <div class="p-5 d-flex justify-content-center align-items-center" role="status">
                 <div class="spinner-border" role="status">
                   <span class="visually-hidden" i18n>Loading page...</span>
@@ -318,15 +318,15 @@
             </div>
           }
         </div>
-        @if (previewDocId && previewStatus !== 'error') {
+        @if (previewDocId && previewStatus() !== 'error') {
           <div class="position-absolute bottom-0 start-50 translate-middle-x z-1 mb-3">
             <div cdkDrag [cdkDragBoundary]="previewContainer" class="d-flex gap-2 p-1 bg-body border rounded shadow">
               <span cdkDragHandle class="d-flex align-items-center text-secondary" title="Move preview controls" i18n-title aria-label="Move preview controls" i18n-aria-label>
                 <i-bs name="grip-vertical"></i-bs>
               </span>
               <div class="input-group input-group-sm w-auto flex-nowrap">
-                <input class="form-control flex-grow-0 preview-page-input" type="number" min="1" [max]="previewPageCount" [(ngModel)]="previewPageDisplay" [disabled]="previewStatus === 'loading'" aria-label="Page" i18n-aria-label />
-                <span class="input-group-text" i18n>of {{ previewPageCount ?? '?' }}</span>
+                <input class="form-control flex-grow-0 preview-page-input" type="number" min="1" [max]="previewPageCount()" [(ngModel)]="previewPageDisplay" [disabled]="previewStatus() === 'loading'" aria-label="Page" i18n-aria-label />
+                <span class="input-group-text" i18n>of {{ previewPageCount() ?? '?' }}</span>
               </div>
               <div class="input-group input-group-sm w-auto flex-nowrap" role="group" aria-label="Zoom" i18n-aria-label>
                 <button type="button" class="btn btn-outline-secondary" aria-label="Zoom out" i18n-aria-label [disabled]="!imageLoaded || zoom <= 0.5" (click)="zoomOut()"><i-bs name="dash"></i-bs></button>
@@ -341,9 +341,9 @@
   </div>
 </div>
 <div class="modal-footer">
-  <button type="button" class="btn btn-outline-secondary" (click)="activeModal.dismiss()" [disabled]="saving" i18n>Cancel</button>
-  <button type="button" class="btn btn-primary" (click)="save()" [disabled]="saving || !isDirty">
-    @if (saving) {
+  <button type="button" class="btn btn-outline-secondary" (click)="activeModal.dismiss()" [disabled]="saving()" i18n>Cancel</button>
+  <button type="button" class="btn btn-primary" (click)="save()" [disabled]="saving() || !isDirty">
+    @if (saving()) {
       <span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
     }
     <span i18n>Save</span>
