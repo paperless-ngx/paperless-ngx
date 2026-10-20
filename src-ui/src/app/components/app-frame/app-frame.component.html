@@ -289,13 +289,16 @@
                 <pngx-input-switch class="position-absolute top-50 end-0 translate-middle-y me-1" [class.d-none]="slimSidebarEnabled || slimSidebarAnimating()" [compact]="true" title="Workflows" i18n-title [ngModel]="!settingsService.sidebarItemIsHidden(HideableSidebarItemID.Workflows)" (ngModelChange)="toggleSidebarItem(HideableSidebarItemID.Workflows, $event)"></pngx-input-switch>
               }
             </li>
-            <li class="nav-item app-link"
+            <li class="nav-item app-link position-relative" [class.d-none]="settingsService.sidebarItemIsHidden(HideableSidebarItemID.OcrTemplates) && !settingsService.organizingSidebarItems()"
               *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.OcrTemplate }">
-              <a class="nav-link" routerLink="ocr-templates" routerLinkActive="active" (click)="closeMenu()"
+              <a class="nav-link" [class.opacity-50]="settingsService.sidebarItemIsHidden(HideableSidebarItemID.OcrTemplates)" [class.pe-5]="settingsService.organizingSidebarItems() && !slimSidebarEnabled && !slimSidebarAnimating()" routerLink="ocr-templates" routerLinkActive="active" (click)="closeMenu()"
                 ngbPopover="OCR Templates" i18n-ngbPopover [disablePopover]="!slimSidebarPopoversEnabled" placement="end"
                 container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
                 <i-bs class="me-2" name="file-earmark-break"></i-bs><span class="nav-link-label"><ng-container i18n>OCR Templates</ng-container></span>
               </a>
+              @if (settingsService.organizingSidebarItems()) {
+                <pngx-input-switch class="position-absolute top-50 end-0 translate-middle-y me-1" [class.d-none]="slimSidebarEnabled || slimSidebarAnimating()" [compact]="true" title="OCR Templates" i18n-title [ngModel]="!settingsService.sidebarItemIsHidden(HideableSidebarItemID.OcrTemplates)" (ngModelChange)="toggleSidebarItem(HideableSidebarItemID.OcrTemplates, $event)"></pngx-input-switch>
+              }
             </li>
             <li class="nav-item app-link position-relative" [class.d-none]="settingsService.sidebarItemIsHidden(HideableSidebarItemID.Mail) && !settingsService.organizingSidebarItems()" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.MailAccount }"
               tourAnchor="tour.mail">
