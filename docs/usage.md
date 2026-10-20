@@ -799,20 +799,24 @@ OCR templates read text from fixed areas ("zones") of a document and write it to
 useful for documents that always share the same layout, such as bills from a particular utility. They allow you
 to draw a zone around the account number once, and every new bill gets its account number filled in.
 
-Each template belongs to a document type and runs on documents of that type.
+Like tags or document types, each template has a [matching algorithm](advanced_usage.md#matching) that
+decides which documents it automatically applies to (or not), based on their content.
 
 ### Creating a template
 
 1. Open **OCR Templates** under "Manage" and choose **Add Template**.
-2. Give the template a name and choose the document type it applies to.
-3. Search for a sample document of that type. Its pages are shown next to the template settings.
-4. Draw zones on the document, edit them as needed by clicking it.
+2. Give the template a name and set up its matching, for example **Any word** with the utility's name. Choose
+   **None** for a template that should only ever be run manually.
+3. Search for a sample document with the layout the template is for. Its pages are shown next to the template
+   settings.
+4. Draw zones on the document. Click a zone to select and edit it.
 5. Choose the field each zone fills.
 6. Use **Test** to run OCR on the selected zone of the sample document and see the text it finds and the value
    that would be written.
 
-Zones are positioned relative to the sample document's page, so templates work best when documents of that
-type have an identical layout.
+Zones are positioned relative to the sample document's page, so templates work best when the documents they
+match have an identical layout. Keep the matching specific enough that it only catches documents with that
+layout.
 
 ### Zone settings
 
@@ -839,19 +843,32 @@ is left empty, the values are joined with spaces in zone order.
 
 ### When templates run
 
-Enabled templates run:
+When a document is added, every enabled template that matches its content runs automatically. A template is
+only used for a document if the document's owner can view the template, so users' templates apply to their own
+documents, and unowned templates apply to everyone's. Templates run in name order, so if two templates fill the
+same field, the later one wins.
 
-- when a document is added and its document type has a template,
-- when a document's type is changed to one that has a template,
-- on demand, using **Run Zone OCR** from the actions menu on the document details page, or from the
-  bulk editor for the selected documents. Bulk runs are processed in the background.
+Turn off **Enabled** to pause a template without deleting it. Disabled templates never run automatically, but
+can still be run manually.
+
+### Running templates manually
+
+To run templates on documents that are already in Paperless-ngx, open the **Actions** menu on the document
+details page:
+
+- **Run Zone OCR** runs every enabled template that matches the document.
+- The button next to it opens a dialog where you can choose one template to run
+  instead. A template you choose runs even if it does not match the document or is disabled.
+
+The bulk editor's **Run Zone OCR** action opens the same dialog for the selected documents. Bulk runs are
+processed in the background.
 
 !!! warning
 
     Zone OCR overwrites the fields it fills. A zone that finds no value leaves its field unchanged.
 
-Managing OCR templates requires the OCR template permissions, and running zone OCR on documents requires
-permission to change them.
+Managing OCR templates requires the OCR template permissions. Running zone OCR on documents requires
+permission to change them, and choosing a template requires permission to view it.
 
 ## PDF Actions
 
