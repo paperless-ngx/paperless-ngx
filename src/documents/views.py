@@ -498,6 +498,11 @@ class BulkPermissionMixin:
         """
         context = super().get_serializer_context()
 
+        if getattr(self, "swagger_fake_view", False):
+            # Schema generation only needs the serializer shape; without a
+            # paginated page we'd otherwise scan the entire queryset below.
+            return context
+
         if getattr(self, "action", None) != "list":
             # Batching only pays off across a page of objects; for single-object
             # actions (retrieve, update, ...) the per-object fallback in
