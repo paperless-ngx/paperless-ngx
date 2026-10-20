@@ -158,8 +158,9 @@
     </div>
 
     <div class="col-lg-8 d-flex flex-column">
-      <div class="mb-2 flex-shrink-0">
+      <div class="d-flex flex-wrap gap-2 mb-2 flex-shrink-0">
         <pngx-input-document-link
+          class="flex-grow-1"
           [ngModel]="sampleDocumentIds"
           (ngModelChange)="setSampleDocument($event)"
           [minimal]="true"
@@ -167,8 +168,19 @@
           placeholder="Search for a sample document"
           i18n-placeholder
         ></pngx-input-document-link>
+        @if (previewDocId) {
+          <div class="input-group w-auto flex-nowrap">
+            <input class="form-control flex-grow-0 preview-page-input" type="number" min="1" [max]="previewPageCount()" [(ngModel)]="previewPageDisplay" [disabled]="!pageLoaded()" aria-label="Page" i18n-aria-label />
+            <span class="input-group-text" i18n>of {{ previewPageCount() ?? '?' }}</span>
+          </div>
+          <div class="input-group w-auto flex-nowrap" role="group" aria-label="Zoom" i18n-aria-label>
+            <button type="button" class="btn btn-outline-secondary" aria-label="Zoom out" i18n-aria-label [disabled]="!pageLoaded() || zoom <= 0.5" (click)="zoomOut()"><i-bs name="dash"></i-bs></button>
+            <button type="button" class="btn btn-outline-secondary preview-zoom" title="Reset zoom" i18n-title [disabled]="!pageLoaded()" (click)="resetZoom()">{{ zoom | percent: '1.0-0' }}</button>
+            <button type="button" class="btn btn-outline-secondary" aria-label="Zoom in" i18n-aria-label [disabled]="!pageLoaded() || zoom >= 4" (click)="zoomIn()"><i-bs name="plus"></i-bs></button>
+          </div>
+        }
       </div>
-      <div #previewContainer class="position-relative flex-grow-1 overflow-hidden">
+      <div class="flex-grow-1 overflow-hidden">
         <div class="h-100 overflow-auto border" [attr.aria-busy]="previewDocId && !pageLoaded()">
           @if (pageFailed()) {
             <div class="py-5 px-3 text-center" role="alert">
@@ -264,24 +276,6 @@
             </div>
           }
         </div>
-        @if (previewDocId && !pageFailed()) {
-          <div class="position-absolute bottom-0 start-50 translate-middle-x z-1 mb-3">
-            <div cdkDrag [cdkDragBoundary]="previewContainer" class="d-flex gap-2 p-1 bg-body border rounded shadow">
-              <span cdkDragHandle class="d-flex align-items-center text-secondary" title="Move preview controls" i18n-title aria-label="Move preview controls" i18n-aria-label>
-                <i-bs name="grip-vertical"></i-bs>
-              </span>
-              <div class="input-group input-group-sm w-auto flex-nowrap">
-                <input class="form-control flex-grow-0 preview-page-input" type="number" min="1" [max]="previewPageCount()" [(ngModel)]="previewPageDisplay" [disabled]="!pageLoaded()" aria-label="Page" i18n-aria-label />
-                <span class="input-group-text" i18n>of {{ previewPageCount() ?? '?' }}</span>
-              </div>
-              <div class="input-group input-group-sm w-auto flex-nowrap" role="group" aria-label="Zoom" i18n-aria-label>
-                <button type="button" class="btn btn-outline-secondary" aria-label="Zoom out" i18n-aria-label [disabled]="!pageLoaded() || zoom <= 0.5" (click)="zoomOut()"><i-bs name="dash"></i-bs></button>
-                <button type="button" class="btn btn-outline-secondary preview-zoom" title="Reset zoom" i18n-title [disabled]="!pageLoaded()" (click)="resetZoom()">{{ zoom | percent: '1.0-0' }}</button>
-                <button type="button" class="btn btn-outline-secondary" aria-label="Zoom in" i18n-aria-label [disabled]="!pageLoaded() || zoom >= 4" (click)="zoomIn()"><i-bs name="plus"></i-bs></button>
-              </div>
-            </div>
-          </div>
-        }
       </div>
     </div>
   </div>
