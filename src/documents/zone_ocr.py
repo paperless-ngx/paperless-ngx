@@ -26,9 +26,28 @@ from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import OcrTemplate
 from documents.models import OcrTemplateZone
+from documents.permissions import permitted_object_ids
 from documents.regex import safe_regex_fullmatch
+from documents.versioning import get_root_document
 
 logger = logging.getLogger("paperless.zone_ocr")
+
+
+def get_templates_for_document(document: Document):
+    """
+    The enabled templates for the document's type that its owner can view, the
+    same rule as matching. A version is owned through its root document.
+    """
+    templates = OcrTemplate.objects.filter(
+        document_type_id=document.document_type_id,
+        enabled=True,
+    )
+    owner = get_root_document(document).owner
+    if owner is not None:
+        templates = templates.filter(
+            id__in=permitted_object_ids(owner, OcrTemplate, "view_ocrtemplate"),
+        )
+    return templates
 
 
 def run_zone_extraction(
@@ -42,10 +61,10 @@ def run_zone_extraction(
     if not document.document_type_id:
         return
 
-    templates = OcrTemplate.objects.filter(
-        document_type_id=document.document_type_id,
-        enabled=True,
-    ).prefetch_related("zones", "zones__custom_field")
+    templates = get_templates_for_document(document).prefetch_related(
+        "zones",
+        "zones__custom_field",
+    )
 
     if not templates.exists():
         return

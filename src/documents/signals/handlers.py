@@ -1452,12 +1452,9 @@ def run_zone_ocr_on_type_change(sender, instance, *, created=False, **kwargs):
     if old_type == instance.document_type_id:
         return
 
-    from documents.models import OcrTemplate
+    from documents.zone_ocr import get_templates_for_document
 
-    if not OcrTemplate.objects.filter(
-        document_type_id=instance.document_type_id,
-        enabled=True,
-    ).exists():
+    if not get_templates_for_document(instance).exists():
         return
 
     try:

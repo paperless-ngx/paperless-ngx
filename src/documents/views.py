@@ -2312,10 +2312,9 @@ class DocumentViewSet(
                 {"status": "skipped", "reason": "no_document_type", "results": []},
             )
 
-        templates = OcrTemplate.objects.filter(
-            document_type_id=document.document_type_id,
-            enabled=True,
-        )
+        from documents.zone_ocr import get_templates_for_document
+
+        templates = get_templates_for_document(document)
         if not templates.exists():
             return Response(
                 {"status": "skipped", "reason": "no_template", "results": []},
