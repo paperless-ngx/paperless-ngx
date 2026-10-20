@@ -73,6 +73,25 @@ describe('OcrTemplateEditorZoneListComponent', () => {
     ).toBe(2)
   })
 
+  it('warns only for zones without a field and clears the warning when assigned', () => {
+    component.zones = [
+      zone({ custom_field: null }),
+      zone({ target: 'title', custom_field: null }),
+      zone(),
+    ]
+    fixture.detectChanges()
+
+    const warnings = () =>
+      fixture.nativeElement.querySelectorAll('.text-warning')
+    expect(warnings()).toHaveLength(1)
+    expect(warnings()[0].textContent).toContain('No field selected')
+
+    component.zones[0].custom_field = 7
+    fixture.componentRef.setInput('zones', [...component.zones])
+    fixture.detectChanges()
+    expect(warnings()).toHaveLength(0)
+  })
+
   it('emits select and remove events', () => {
     component.zones = [zone()]
     const selectSpy = jest.spyOn(component.zoneSelected, 'emit')

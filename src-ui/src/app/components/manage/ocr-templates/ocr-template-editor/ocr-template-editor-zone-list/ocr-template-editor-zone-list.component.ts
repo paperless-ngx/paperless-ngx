@@ -22,6 +22,10 @@ export class OcrTemplateEditorZoneListComponent {
 
   readonly zoneColor = getZoneColor
 
+  hasField(zone: OcrTemplateZone): boolean {
+    return getZoneFieldKey(zone) !== null
+  }
+
   isCombined(zone: OcrTemplateZone): boolean {
     const key = getZoneFieldKey(zone)
     return (
