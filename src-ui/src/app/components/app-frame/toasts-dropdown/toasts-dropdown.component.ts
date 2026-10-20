@@ -28,6 +28,9 @@ export class ToastsDropdownComponent {
   /** Drives the relative timestamps, ticks only while the dropdown is open */
   readonly now = signal(new Date())
 
+  /** Notifications that were unread when the dropdown was opened */
+  readonly newIds = signal(new Set<string>())
+
   readonly toasts = toSignal(
     this.toastService.getToasts().pipe(map((toasts) => [...toasts])),
     { initialValue: [] as Toast[] }
@@ -42,6 +45,7 @@ export class ToastsDropdownComponent {
   onOpenChange(open: boolean): void {
     this.toastService.suppressPopupToasts = open
     this.clock?.unsubscribe()
+    this.newIds.set(new Set(open ? this.unread().map((t) => t.id) : []))
     if (open) {
       this.toastService.markAllRead()
       this.now.set(new Date())

@@ -55,6 +55,9 @@ export class ToastComponent implements OnInit {
   /** Each new value re-renders the relative timestamp */
   @Input() now: Date
 
+  /** Marks a notification that arrived since the dropdown was last opened */
+  @Input() isNew: boolean = false
+
   @Output() hidden: EventEmitter<Toast> = new EventEmitter<Toast>()
 
   @Output() closed: EventEmitter<Toast> = new EventEmitter<Toast>()

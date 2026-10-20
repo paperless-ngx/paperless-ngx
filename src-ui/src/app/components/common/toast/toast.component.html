@@ -1,6 +1,8 @@
 <ngb-toast
     [autohide]="false"
-    [class.mb-2]="true"
+    [class.mb-2]="autohide"
+    [class.toast-list-item]="!autohide"
+    [class.toast-new]="isNew"
     [class.toast-success]="toast.level === ToastLevel.Success"
     [class.toast-error]="toast.level === ToastLevel.Error"
     (mouseenter)="setHovered(true)"
@@ -25,11 +27,8 @@
                 <i-bs width="0.9em" height="0.9em" name="info-circle" class="toast-icon"></i-bs>
             }
         }
-        <div>
+        <div class="toast-content">
             <p class="ms-2 mb-0 text-break">{{toast.content}}</p>
-            @if (!autohide && toast.timestamp) {
-                <p class="ms-2 mb-0 small opacity-75">{{relativeTimestamp}}</p>
-            }
             @if (toast.error) {
             <details class="ms-2">
                 <div class="mt-2 ms-n4 me-n2 small">
@@ -59,10 +58,16 @@
                 </div>
             </details>
             }
-            @if (toast.action) {
+            @if (autohide && toast.action) {
             <p class="mb-0 mt-2"><button class="btn btn-sm btn-outline-secondary" (click)="actioned.emit(toast); toast.action()">{{toast.actionName}}</button></p>
             }
+            @if (!autohide && toast.action) {
+            <button class="btn btn-sm toast-action ms-2 mt-2" (click)="actioned.emit(toast); toast.action()">{{toast.actionName}}</button>
+            }
         </div>
+        @if (!autohide && toast.timestamp) {
+            <span class="toast-time small text-body-secondary text-nowrap ms-auto ps-2">{{relativeTimestamp}}</span>
+        }
         <button type="button" class="btn-close ms-auto flex-shrink-0" data-bs-dismiss="toast" aria-label="Close" (click)="closed.emit(toast);"></button>
     </div>
 </ngb-toast>

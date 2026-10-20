@@ -32,6 +32,8 @@
   --pngx-toast-info: hsl(211, 86%, 47%);
   --pngx-toast-error: hsl(352, 78%, 45%);
   --pngx-toast-error-bg: hsl(352, 80%, 96%);
+  --pngx-toast-row-bg: #f3f5f4;
+  --pngx-toast-row-hover-bg: #eaeeec;
   --bs-info: var(--pngx-bg-alt2);
   --bs-info-rgb: 233, 236, 239;
   @media screen and (min-width: 1024px) {
@@ -98,6 +100,8 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,%3csvg xmlns='h
   --pngx-toast-info: hsl(211, 95%, 68%);
   --pngx-toast-error: hsl(352, 90%, 68%);
   --pngx-toast-error-bg: hsl(352, 45%, 20%);
+  --pngx-toast-row-bg: #26282c;
+  --pngx-toast-row-hover-bg: #2d2f34;
   --pngx-bg-alt2: #232323;
   --pngx-bg-darker: #121315;
   --pngx-bg-disabled: var(--pngx-bg-alt);

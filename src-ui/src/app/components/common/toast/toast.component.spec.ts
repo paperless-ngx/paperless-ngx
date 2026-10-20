@@ -246,4 +246,27 @@ describe('ToastComponent', () => {
     expect(fixture.nativeElement.textContent).toContain('3 minutes ago')
     jest.useRealTimers()
   })
+
+  it('should show a compact action link in the notifications list', () => {
+    const action = jest.fn()
+    component.toast = {
+      content: 'Moved',
+      delay: 5000,
+      action,
+      actionName: 'Undo',
+      timestamp: new Date(),
+    }
+    component.autohide = false
+    fixture.detectChanges()
+    const link: HTMLButtonElement =
+      fixture.nativeElement.querySelector('.toast-action')
+    expect(link.textContent).toContain('Undo')
+    expect(
+      fixture.nativeElement.querySelector('.btn-outline-secondary')
+    ).toBeNull()
+    const actionedSpy = jest.spyOn(component.actioned, 'emit')
+    link.click()
+    expect(actionedSpy).toHaveBeenCalled()
+    expect(action).toHaveBeenCalled()
+  })
 })

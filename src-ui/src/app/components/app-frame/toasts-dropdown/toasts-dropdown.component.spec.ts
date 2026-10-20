@@ -138,4 +138,16 @@ describe('ToastsDropdownComponent', () => {
     expect(component.now()).toBe(ticked)
     jest.useRealTimers()
   })
+
+  it('should mark toasts that were unread when opened as new', () => {
+    toastsSubject.next([
+      { id: 'a', content: 'Seen', delay: 5000, read: true },
+      { id: 'b', content: 'Unseen', delay: 5000, read: false },
+    ])
+    fixture.detectChanges()
+    component.onOpenChange(true)
+    expect([...component.newIds()]).toEqual(['b'])
+    component.onOpenChange(false)
+    expect(component.newIds().size).toEqual(0)
+  })
 })
