@@ -63,7 +63,7 @@ export function getZonePage(
 ): number {
   const page = zone.page ?? 1
   if (page === -1) return previewPageCount ?? previewPage + 1
-  return page >= 1 ? page : 1
+  return Math.max(page, 1)
 }
 
 export function isZoneOnPage(
