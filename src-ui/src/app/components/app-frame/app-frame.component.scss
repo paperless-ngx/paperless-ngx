@@ -646,8 +646,7 @@ main {
 }
 
 .dropdown-toggle::after {
-  margin-left: 0.4em;
-  vertical-align: 0.155em;
+  display: none;
 }
 
 .navbar .dropdown-menu {
