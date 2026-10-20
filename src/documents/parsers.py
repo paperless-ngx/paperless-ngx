@@ -140,16 +140,22 @@ def encode_thumbnail_webp(
             else:
                 flattened = im.convert("RGB")
 
-        if supersample > 1:
+        # One resize avoids a second, softer pass: undo the supersample and
+        # clamp to the bounds together, never enlarging
+        scale = min(
+            1 / supersample,
+            _THUMBNAIL_MAX_WIDTH / flattened.width,
+            _THUMBNAIL_MAX_HEIGHT / flattened.height,
+        )
+        if scale < 1:
             flattened = flattened.resize(
                 (
-                    max(1, round(flattened.width / supersample)),
-                    max(1, round(flattened.height / supersample)),
+                    max(1, round(flattened.width * scale)),
+                    max(1, round(flattened.height * scale)),
                 ),
                 Image.Resampling.LANCZOS,
             )
 
-        flattened.thumbnail((_THUMBNAIL_MAX_WIDTH, _THUMBNAIL_MAX_HEIGHT))
         flattened.save(out_path, format="WEBP")
     except (OSError, Image.DecompressionBombError) as e:
         raise ParseError(f"Unable to encode thumbnail from {png_path}") from e
