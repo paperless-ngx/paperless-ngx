@@ -1,4 +1,8 @@
-import { OcrTemplateZone } from 'src/app/data/ocr-template'
+import {
+  OcrTemplateZone,
+  OcrZoneTarget,
+  OcrZoneTransform,
+} from 'src/app/data/ocr-template'
 import {
   findHandleAt,
   findZoneAt,
@@ -13,7 +17,7 @@ import {
 function zone(overrides: Partial<OcrTemplateZone> = {}): OcrTemplateZone {
   return {
     name: 'Zone',
-    target: 'custom_field',
+    target: OcrZoneTarget.CustomField,
     custom_field: 1,
     x: 100,
     y: 200,
@@ -21,7 +25,7 @@ function zone(overrides: Partial<OcrTemplateZone> = {}): OcrTemplateZone {
     height: 400,
     page: 1,
     ocr_language: 'eng',
-    transform: 'strip',
+    transform: OcrZoneTransform.Strip,
     validation_regex: '',
     order: 0,
     ...overrides,

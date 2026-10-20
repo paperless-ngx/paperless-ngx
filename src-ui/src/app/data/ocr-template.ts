@@ -1,55 +1,30 @@
 import { CustomFieldDataType } from './custom-field'
 import { ObjectWithId } from './object-with-id'
 
-export type OcrZoneTarget = 'custom_field' | 'title' | 'asn' | 'created'
-export type OcrBuiltinTarget = Exclude<OcrZoneTarget, 'custom_field'>
-export type OcrZoneTransform =
-  | 'none'
-  | 'strip'
-  | 'uppercase'
-  | 'lowercase'
-  | 'numeric'
-  | 'strip_punctuation'
-  | 'date'
-  | 'qr_code'
-
-export const OCR_ZONE_TARGET = {
-  CustomField: 'custom_field',
-  Title: 'title',
-  Asn: 'asn',
-  Created: 'created',
-} as const satisfies Record<string, OcrZoneTarget>
-
-export const OCR_ZONE_TRANSFORM = {
-  None: 'none',
-  Strip: 'strip',
-  Uppercase: 'uppercase',
-  Lowercase: 'lowercase',
-  Numeric: 'numeric',
-  StripPunctuation: 'strip_punctuation',
-  Date: 'date',
-  QrCode: 'qr_code',
-} as const satisfies Record<string, OcrZoneTransform>
-
-export const DEFAULT_OCR_ZONE_TARGET = OCR_ZONE_TARGET.CustomField
-export const DEFAULT_OCR_ZONE_TRANSFORM = OCR_ZONE_TRANSFORM.Strip
-export const DEFAULT_OCR_ZONE_LANGUAGE = 'deu+eng'
-
-export function isOcrBuiltinTarget(value: unknown): value is OcrBuiltinTarget {
-  return (
-    value === OCR_ZONE_TARGET.Title ||
-    value === OCR_ZONE_TARGET.Asn ||
-    value === OCR_ZONE_TARGET.Created
-  )
+export enum OcrZoneTarget {
+  CustomField = 'custom_field',
+  Title = 'title',
+  Asn = 'asn',
+  Created = 'created',
 }
+
+export enum OcrZoneTransform {
+  None = 'none',
+  Strip = 'strip',
+  Uppercase = 'uppercase',
+  Lowercase = 'lowercase',
+  Numeric = 'numeric',
+  StripPunctuation = 'strip_punctuation',
+  Date = 'date',
+  QrCode = 'qr_code',
+}
+
+export const DEFAULT_OCR_ZONE_LANGUAGE = 'deu+eng'
 
 /** The field a zone writes to, keyed by OcrTemplate.combine_formats. */
 export function getZoneFieldKey(zone: OcrTemplateZone): string | null {
-  const target = zone.target || DEFAULT_OCR_ZONE_TARGET
-  if (target !== OCR_ZONE_TARGET.CustomField) return target
-  return zone.custom_field === null || zone.custom_field === undefined
-    ? null
-    : String(zone.custom_field)
+  if (zone.target !== OcrZoneTarget.CustomField) return zone.target
+  return zone.custom_field === null ? null : String(zone.custom_field)
 }
 
 /** Custom field types zone OCR can write to. See models.py OCR_SUPPORTED_FIELD_TYPES. */
@@ -65,15 +40,15 @@ export const OCR_SUPPORTED_FIELD_TYPES: CustomFieldDataType[] = [
 ]
 
 export const OCR_BUILTIN_TARGETS = [
-  { id: OCR_ZONE_TARGET.Title, name: $localize`Title` },
-  { id: OCR_ZONE_TARGET.Asn, name: $localize`Archive serial number` },
-  { id: OCR_ZONE_TARGET.Created, name: $localize`Date created` },
+  { id: OcrZoneTarget.Title, name: $localize`Title` },
+  { id: OcrZoneTarget.Asn, name: $localize`Archive serial number` },
+  { id: OcrZoneTarget.Created, name: $localize`Date created` },
 ]
 
 export interface OcrTemplateZone {
   id?: number
   name: string
-  target?: OcrZoneTarget
+  target: OcrZoneTarget
   custom_field: number | null
   page?: number
   x: number
@@ -90,17 +65,17 @@ export interface OcrTemplateZone {
 }
 
 export const TRANSFORM_OPTIONS = [
-  { id: OCR_ZONE_TRANSFORM.None, name: $localize`None` },
-  { id: OCR_ZONE_TRANSFORM.Strip, name: $localize`Strip whitespace` },
-  { id: OCR_ZONE_TRANSFORM.Uppercase, name: $localize`Uppercase` },
-  { id: OCR_ZONE_TRANSFORM.Lowercase, name: $localize`Lowercase` },
-  { id: OCR_ZONE_TRANSFORM.Numeric, name: $localize`Numeric only` },
+  { id: OcrZoneTransform.None, name: $localize`None` },
+  { id: OcrZoneTransform.Strip, name: $localize`Strip whitespace` },
+  { id: OcrZoneTransform.Uppercase, name: $localize`Uppercase` },
+  { id: OcrZoneTransform.Lowercase, name: $localize`Lowercase` },
+  { id: OcrZoneTransform.Numeric, name: $localize`Numeric only` },
   {
-    id: OCR_ZONE_TRANSFORM.StripPunctuation,
+    id: OcrZoneTransform.StripPunctuation,
     name: $localize`Remove leading/trailing punctuation`,
   },
-  { id: OCR_ZONE_TRANSFORM.Date, name: $localize`Parse date` },
-  { id: OCR_ZONE_TRANSFORM.QrCode, name: $localize`Read QR/barcode` },
+  { id: OcrZoneTransform.Date, name: $localize`Parse date` },
+  { id: OcrZoneTransform.QrCode, name: $localize`Read QR/barcode` },
 ]
 
 export const OCR_LANGUAGE_OPTIONS = [

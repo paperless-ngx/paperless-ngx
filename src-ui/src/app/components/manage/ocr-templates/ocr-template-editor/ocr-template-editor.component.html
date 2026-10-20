@@ -129,7 +129,7 @@
 
               <pngx-input-select [items]="transformOptions" [(ngModel)]="zone.transform" title="Transform" i18n-title></pngx-input-select>
 
-              @if (zone.transform === dateTransform) {
+              @if (zone.transform === OcrZoneTransform.Date) {
                 <pngx-input-select
                   [items]="dateFormatItems"
                   [ngModel]="dateFormatChoice(zone)"

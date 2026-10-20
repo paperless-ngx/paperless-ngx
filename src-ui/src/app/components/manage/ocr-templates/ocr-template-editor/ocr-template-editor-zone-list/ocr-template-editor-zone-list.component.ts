@@ -5,6 +5,7 @@ import {
   getZoneFieldKey,
   OCR_BUILTIN_TARGETS,
   OcrTemplateZone,
+  OcrZoneTarget,
 } from 'src/app/data/ocr-template'
 import { getZoneColor } from '../zone-geometry'
 
@@ -35,18 +36,15 @@ export class OcrTemplateEditorZoneListComponent {
   }
 
   getZoneTargetName(zone: OcrTemplateZone): string {
-    const target = zone.target || 'custom_field'
-    if (target === 'custom_field') {
-      return zone.custom_field
-        ? this.getCustomFieldName(zone.custom_field)
-        : $localize`(no field)`
+    if (zone.target === OcrZoneTarget.CustomField) {
+      return (
+        this.customFields.find((field) => field.id === zone.custom_field)
+          ?.name ?? ''
+      )
     }
-    return OCR_BUILTIN_TARGETS.find((t) => t.id === target)?.name ?? target
-  }
-
-  private getCustomFieldName(id: number): string {
     return (
-      this.customFields.find((field) => field.id === id)?.name ?? `Field #${id}`
+      OCR_BUILTIN_TARGETS.find((target) => target.id === zone.target)?.name ??
+      ''
     )
   }
 }

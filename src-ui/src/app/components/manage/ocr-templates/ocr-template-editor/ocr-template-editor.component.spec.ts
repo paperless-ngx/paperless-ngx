@@ -8,7 +8,9 @@ import { DocumentType } from 'src/app/data/document-type'
 import {
   OcrTemplate,
   OcrTemplateZone,
+  OcrZoneTarget,
   OcrZoneTestResult,
+  OcrZoneTransform,
 } from 'src/app/data/ocr-template'
 import { Results } from 'src/app/data/results'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
@@ -22,6 +24,7 @@ import { OcrTemplateEditorComponent } from './ocr-template-editor.component'
 function zone(): OcrTemplateZone {
   return {
     name: 'Invoice number',
+    target: OcrZoneTarget.CustomField,
     custom_field: 1,
     x: 100,
     y: 100,
@@ -29,7 +32,7 @@ function zone(): OcrTemplateZone {
     height: 100,
     page: 1,
     ocr_language: 'eng',
-    transform: 'strip',
+    transform: OcrZoneTransform.Strip,
     validation_regex: '',
     order: 0,
   }
@@ -406,13 +409,13 @@ describe('OcrTemplateEditorComponent', () => {
     succeeded.next(created)
 
     expect(component.template.zones[0]).toMatchObject({
-      target: 'custom_field',
+      target: OcrZoneTarget.CustomField,
       custom_field: 5,
     })
     expect(component.fieldItems().map((item) => item.id)).toEqual([
-      'title',
-      'asn',
-      'created',
+      OcrZoneTarget.Title,
+      OcrZoneTarget.Asn,
+      OcrZoneTarget.Created,
       5,
     ])
   })
@@ -470,7 +473,7 @@ describe('OcrTemplateEditorComponent', () => {
     const titleZone = {
       ...zone(),
       name: 'First',
-      target: 'title' as const,
+      target: OcrZoneTarget.Title,
       custom_field: null,
     }
     component.template.combine_formats = { title: '{First} / {Second}' }
@@ -579,7 +582,7 @@ describe('OcrTemplateEditorComponent', () => {
     component.testZone()
     expect(component.zoneTestResult?.value).toBe('123')
 
-    selected.transform = 'numeric'
+    selected.transform = OcrZoneTransform.Numeric
     expect(component.zoneTestResult).toBeNull()
     component.testZone()
     selected.width++

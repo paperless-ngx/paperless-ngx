@@ -1,13 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { CustomField } from 'src/app/data/custom-field'
-import { OcrTemplateZone } from 'src/app/data/ocr-template'
+import {
+  OcrTemplateZone,
+  OcrZoneTarget,
+  OcrZoneTransform,
+} from 'src/app/data/ocr-template'
 import { OcrTemplateEditorZoneListComponent } from './ocr-template-editor-zone-list.component'
 
 function zone(overrides: Partial<OcrTemplateZone> = {}): OcrTemplateZone {
   return {
     name: 'Zone 1',
-    target: 'custom_field',
+    target: OcrZoneTarget.CustomField,
     custom_field: 7,
     x: 10,
     y: 20,
@@ -15,7 +19,7 @@ function zone(overrides: Partial<OcrTemplateZone> = {}): OcrTemplateZone {
     height: 40,
     page: 1,
     ocr_language: 'eng',
-    transform: 'strip',
+    transform: OcrZoneTransform.Strip,
     validation_regex: '',
     order: 0,
     ...overrides,
@@ -76,7 +80,7 @@ describe('OcrTemplateEditorZoneListComponent', () => {
   it('warns only for zones without a field and clears the warning when assigned', () => {
     component.zones = [
       zone({ custom_field: null }),
-      zone({ target: 'title', custom_field: null }),
+      zone({ target: OcrZoneTarget.Title, custom_field: null }),
       zone(),
     ]
     fixture.detectChanges()

@@ -48,18 +48,14 @@ import { DocumentType } from 'src/app/data/document-type'
 import {
   DATE_FORMAT_OPTIONS,
   DEFAULT_OCR_ZONE_LANGUAGE,
-  DEFAULT_OCR_ZONE_TARGET,
-  DEFAULT_OCR_ZONE_TRANSFORM,
   getZoneFieldKey,
-  isOcrBuiltinTarget,
   OCR_BUILTIN_TARGETS,
   OCR_LANGUAGE_OPTIONS,
   OCR_SUPPORTED_FIELD_TYPES,
-  OCR_ZONE_TARGET,
-  OCR_ZONE_TRANSFORM,
-  OcrBuiltinTarget,
   OcrTemplate,
   OcrTemplateZone,
+  OcrZoneTarget,
+  OcrZoneTransform,
   OcrZoneTestResult,
   TRANSFORM_OPTIONS,
   ZoneTestRequest,
@@ -91,7 +87,7 @@ import {
 } from './zone-geometry'
 
 type ActiveTab = 'settings' | 'zones'
-type ZoneFieldSelection = OcrBuiltinTarget | number | null
+type ZoneFieldSelection = OcrZoneTarget | number | null
 type OverlayInteraction =
   | { kind: 'idle' }
   | { kind: 'drawing'; pointerId: number; rect: DrawingRect }
@@ -201,7 +197,7 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
   readonly documentTypes = signal<DocumentType[]>([])
   transformOptions = TRANSFORM_OPTIONS
   ocrLanguageOptions = OCR_LANGUAGE_OPTIONS
-  dateTransform = OCR_ZONE_TRANSFORM.Date
+  readonly OcrZoneTransform = OcrZoneTransform
   noSampleDocumentTitle = $localize`Select a sample document to test this zone`
   dateFormatItems = [
     ...DATE_FORMAT_OPTIONS,
@@ -610,7 +606,7 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     const imageSize = this.imageNaturalSize()
     return {
       name: `Zone ${this.template.zones.length + 1}`,
-      target: DEFAULT_OCR_ZONE_TARGET,
+      target: OcrZoneTarget.CustomField,
       custom_field: null,
       x: rect.x,
       y: rect.y,
@@ -618,7 +614,7 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
       height: rect.h,
       page: this.previewPageDisplay,
       ocr_language: DEFAULT_OCR_ZONE_LANGUAGE,
-      transform: DEFAULT_OCR_ZONE_TRANSFORM,
+      transform: OcrZoneTransform.Strip,
       date_format: '',
       validation_regex: '',
       order: this.template.zones.length,
@@ -889,18 +885,20 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     zone.ocr_language = (langs ?? []).join('+')
   }
 
+  /** The field select's value: a built-in target, or a custom field id. */
   zoneFieldValue(zone: OcrTemplateZone): ZoneFieldSelection {
-    const target = zone.target || DEFAULT_OCR_ZONE_TARGET
-    return target === OCR_ZONE_TARGET.CustomField ? zone.custom_field : target
+    return zone.target === OcrZoneTarget.CustomField
+      ? zone.custom_field
+      : zone.target
   }
 
   setZoneField(zone: OcrTemplateZone, value: ZoneFieldSelection) {
-    if (isOcrBuiltinTarget(value)) {
+    if (typeof value === 'string') {
       zone.target = value
       zone.custom_field = null
     } else {
-      zone.target = OCR_ZONE_TARGET.CustomField
-      zone.custom_field = typeof value === 'number' ? value : null
+      zone.target = OcrZoneTarget.CustomField
+      zone.custom_field = value
     }
   }
 
