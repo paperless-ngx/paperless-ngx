@@ -198,6 +198,24 @@ describe('OcrTemplateEditorComponent', () => {
     expect(component.overlayMode).toBe('select')
   })
 
+  it('opens the zone in the Zones tab and returns to the list', () => {
+    component.template.zones = [zone(), zone()]
+    component.activeTab = 'settings'
+
+    component.selectZone(1)
+    expect(component.activeTab).toBe('zones')
+    expect(component.selectedZone).toBe(component.template.zones[1])
+
+    component.deselectZone()
+    expect(component.selectedZone).toBeNull()
+    expect(component.activeTab).toBe('zones')
+
+    component.selectZone(0)
+    component.deleteSelectedZone()
+    expect(component.template.zones.length).toBe(1)
+    expect(component.selectedZone).toBeNull()
+  })
+
   it('hides results when extraction settings or geometry change', () => {
     const selected = zone()
     component.template.zones = [selected]

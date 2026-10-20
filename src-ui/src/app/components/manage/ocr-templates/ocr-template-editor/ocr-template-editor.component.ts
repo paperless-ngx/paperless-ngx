@@ -80,7 +80,7 @@ import {
   resizeZone,
 } from './zone-geometry'
 
-type ActiveTab = 'settings' | 'zones' | 'zone'
+type ActiveTab = 'settings' | 'zones'
 type ZoneFieldSelection = OcrBuiltinTarget | number | null
 type OverlayMode = 'select' | 'draw'
 type OverlayInteraction =
@@ -436,14 +436,6 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     if (clamped === this.previewPage) return
     this.previewPage = clamped
     this.loadPreview()
-  }
-
-  prevPage() {
-    this.goToPage(this.previewPage - 1)
-  }
-
-  nextPage() {
-    this.goToPage(this.previewPage + 1)
   }
 
   zoomIn() {
@@ -819,13 +811,18 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
 
   selectZone(index: number) {
     this.selectedZoneIndex = index
-    this.activeTab = 'zone'
+    this.activeTab = 'zones'
     this.clearZoneTest()
     const zone = this.template.zones[index]
     if (zone) {
       this.seedCombineDefault(zone)
       this.goToPage(this.zonePage(zone) - 1)
     }
+  }
+
+  deselectZone() {
+    this.selectedZoneIndex = null
+    this.clearZoneTest()
   }
 
   testZone() {
@@ -896,7 +893,6 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
   deleteSelectedZone() {
     if (this.selectedZoneIndex === null) return
     this.removeZone(this.selectedZoneIndex)
-    this.activeTab = 'zones'
   }
 
   save() {
