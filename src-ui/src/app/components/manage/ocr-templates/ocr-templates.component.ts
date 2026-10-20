@@ -90,7 +90,9 @@ export class OcrTemplatesComponent
         const editor: OcrTemplateEditorComponent = modal.componentInstance
         if (editor.saving()) return false
         return editor.isDirty
-          ? firstValueFrom(this.dirtyFormGuard.confirmChanges())
+          ? firstValueFrom(
+              this.dirtyFormGuard.confirmChanges(undefined, $localize`Close`)
+            )
           : true
       },
     })
