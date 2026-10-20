@@ -474,7 +474,7 @@ describe('AppFrameComponent', () => {
     jest.spyOn(input, 'files', 'get').mockReturnValue([file] as any)
 
     component.onFileSelected({ target: input } as unknown as Event)
-    expect(toastSpy).toHaveBeenCalled()
+    expect(toastSpy).not.toHaveBeenCalled()
     expect(uploadSpy).toHaveBeenCalledWith([file])
   })
 

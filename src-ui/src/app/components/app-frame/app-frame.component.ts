@@ -522,7 +522,6 @@ export class AppFrameComponent
     const files = Array.from(input.files ?? [])
     input.value = ''
     if (!files.length) return
-    this.toastService.showInfo($localize`Initiating upload...`, 3000)
     this.uploadDocumentsService.uploadFiles(files)
   }
 
