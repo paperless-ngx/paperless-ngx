@@ -22,7 +22,7 @@
     "@angular/forms": "~22.2.0",
     "@angular/localize": "~22.2.0",
     "@angular/platform-browser": "~22.2.0",
-    "@angular/router": "~22.2.0",
+    "@angular/router": "~22.2.1",
     "@ng-bootstrap/ng-bootstrap": "^21.0.0",
     "@ng-select/ng-select": "~24.1.2",
     "@ngneat/dirty-check-forms": "^3.0.3",
