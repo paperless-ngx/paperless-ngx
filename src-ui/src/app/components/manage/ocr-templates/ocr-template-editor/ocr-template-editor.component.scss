@@ -14,6 +14,10 @@
   min-width: 4rem;
 }
 
+.cdk-drag-handle {
+  cursor: move;
+}
+
 // The typeahead popup is appended to body.
 ::ng-deep .ocr-template-document-results {
   max-height: min(24rem, 60vh);

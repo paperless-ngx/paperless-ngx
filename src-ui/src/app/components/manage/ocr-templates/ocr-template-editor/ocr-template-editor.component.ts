@@ -1,3 +1,4 @@
+import { DragDropModule } from '@angular/cdk/drag-drop'
 import { CommonModule } from '@angular/common'
 import {
   ChangeDetectorRef,
@@ -126,6 +127,7 @@ const RESIZE_CURSOR: Record<ResizeHandle, string> = {
   selector: 'pngx-ocr-template-editor',
   standalone: true,
   imports: [
+    DragDropModule,
     PageHeaderComponent,
     NumberComponent,
     TextComponent,
