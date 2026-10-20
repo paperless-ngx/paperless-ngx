@@ -222,6 +222,22 @@ describe('TagsComponent', () => {
     expect(propagated).toEqual([2, 1])
   })
 
+  it('should not add parents or remove children when not preserving hierarchy', () => {
+    const parent: Tag = { id: 1, name: 'parent' }
+    const child: Tag = { id: 2, name: 'child', parent: 1 }
+    parent.children = [child]
+    component.tags = [parent, child]
+    component.preserveHierarchy = false
+
+    component.value = []
+    component.addTag(2)
+    expect(component.value).toEqual([2])
+
+    component.value = [1, 2]
+    component.removeTag(1)
+    expect(component.value).toEqual([2])
+  })
+
   it('should not duplicate parents when adding sibling nested tags', () => {
     const root: Tag = { id: 1, name: 'root' }
     const parent: Tag = { id: 2, name: 'parent', parent: 1 }

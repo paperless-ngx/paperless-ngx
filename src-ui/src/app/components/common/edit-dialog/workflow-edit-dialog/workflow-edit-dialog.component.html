@@ -209,6 +209,7 @@
                       @if (isTagsFilter(filter.get('type').value)) {
                         <pngx-input-tags
                           [allowCreate]="false"
+                          [preserveHierarchy]="false"
                           [title]="null"
                           formControlName="values"
                         ></pngx-input-tags>
@@ -320,7 +321,7 @@
             <h6 class="form-label" i18n>Remove tags</h6>
             <pngx-input-switch i18n-title title="Remove all" [horizontal]="true" formControlName="remove_all_tags"></pngx-input-switch>
             <div class="mt-n3">
-              <pngx-input-tags [allowCreate]="false" title="" formControlName="remove_tags"></pngx-input-tags>
+              <pngx-input-tags [allowCreate]="false" [preserveHierarchy]="false" title="" formControlName="remove_tags"></pngx-input-tags>
             </div>
 
             <h6 class="form-label" i18n>Remove correspondents</h6>

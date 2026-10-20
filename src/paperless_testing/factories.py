@@ -5,21 +5,20 @@ Factory-boy factories for documents app models.
 from __future__ import annotations
 
 import factory
-from django.contrib.auth import get_user_model
-from factory.django import DjangoModelFactory
+from django.contrib.auth.models import User
 
 from documents.models import Correspondent
 from documents.models import Document
+from documents.models import DocumentBarcode
 from documents.models import DocumentType
 from documents.models import MatchingModel
 from documents.models import PaperlessTask
 from documents.models import StoragePath
 from documents.models import Tag
+from paperless_testing.typed_factory import TypedModelFactory
 
-UserModelT = get_user_model()
 
-
-class CorrespondentFactory(DjangoModelFactory[Correspondent]):
+class CorrespondentFactory(TypedModelFactory[Correspondent]):
     class Meta:
         model = Correspondent
 
@@ -28,7 +27,7 @@ class CorrespondentFactory(DjangoModelFactory[Correspondent]):
     matching_algorithm = MatchingModel.MATCH_NONE
 
 
-class DocumentTypeFactory(DjangoModelFactory[DocumentType]):
+class DocumentTypeFactory(TypedModelFactory[DocumentType]):
     class Meta:
         model = DocumentType
 
@@ -37,7 +36,7 @@ class DocumentTypeFactory(DjangoModelFactory[DocumentType]):
     matching_algorithm = MatchingModel.MATCH_NONE
 
 
-class TagFactory(DjangoModelFactory[Tag]):
+class TagFactory(TypedModelFactory[Tag]):
     class Meta:
         model = Tag
 
@@ -47,7 +46,7 @@ class TagFactory(DjangoModelFactory[Tag]):
     is_inbox_tag = False
 
 
-class StoragePathFactory(DjangoModelFactory[StoragePath]):
+class StoragePathFactory(TypedModelFactory[StoragePath]):
     class Meta:
         model = StoragePath
 
@@ -59,7 +58,7 @@ class StoragePathFactory(DjangoModelFactory[StoragePath]):
     matching_algorithm = MatchingModel.MATCH_NONE
 
 
-class DocumentFactory(DjangoModelFactory[Document]):
+class DocumentFactory(TypedModelFactory[Document]):
     class Meta:
         model = Document
 
@@ -71,21 +70,34 @@ class DocumentFactory(DjangoModelFactory[Document]):
     storage_path = None
 
 
-class UserFactory(DjangoModelFactory[UserModelT]):
+class DocumentBarcodeFactory(TypedModelFactory[DocumentBarcode]):
     class Meta:
-        model = UserModelT
+        model = DocumentBarcode
+
+    document = factory.SubFactory(DocumentFactory)
+    page = 1
+    value = factory.Faker("uri")
+    format = DocumentBarcode.Format.QR_CODE
+
+
+class UserFactory(TypedModelFactory[User]):
+    class Meta:
+        model = User
 
     username = factory.Sequence(lambda n: f"user{n}")
     is_staff = False
     is_superuser = False
-    password = factory.django.Password("test")
+    # Hashing a real password costs about half a second per user, and no test
+    # authenticates with its password. None gives the unusable password
+    # create_user() gives.
+    password = factory.django.Password(None)
 
     class Params:
         superuser = factory.Trait(is_staff=True, is_superuser=True)
         staff = factory.Trait(is_staff=True)
 
 
-class PaperlessTaskFactory(DjangoModelFactory[PaperlessTask]):
+class PaperlessTaskFactory(TypedModelFactory[PaperlessTask]):
     class Meta:
         model = PaperlessTask
 

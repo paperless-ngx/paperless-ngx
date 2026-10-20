@@ -10,7 +10,7 @@ from documents.models import CustomField
 from documents.models import DocumentType
 from documents.models import OcrTemplate
 from documents.models import OcrTemplateZone
-from documents.tests.utils import DirectoriesMixin
+from paperless_testing.dirs import DirectoriesMixin
 
 
 class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):

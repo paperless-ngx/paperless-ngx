@@ -146,6 +146,19 @@ describe('DocumentListComponent', () => {
     expect(reloadSpy).toHaveBeenCalled()
   })
 
+  it('should stop reloading on document deleted after destroy', () => {
+    const reloadSpy = jest.spyOn(documentListService, 'reload')
+    const documentDeletedSubject = new Subject<boolean>()
+    jest
+      .spyOn(websocketStatusService, 'onDocumentDeleted')
+      .mockReturnValue(documentDeletedSubject)
+    fixture.detectChanges()
+    fixture.destroy()
+    reloadSpy.mockClear()
+    documentDeletedSubject.next(true)
+    expect(reloadSpy).not.toHaveBeenCalled()
+  })
+
   it('should show score sort fields on fulltext queries', () => {
     documentListService.setFilterRules([
       {
@@ -474,7 +487,7 @@ describe('DocumentListComponent', () => {
     delete modifiedView.name
     const savedViewServicePatch = jest.spyOn(savedViewService, 'patch')
     savedViewServicePatch.mockReturnValue(of(modifiedView))
-    const toastSpy = jest.spyOn(toastService, 'showInfo')
+    const toastSpy = jest.spyOn(toastService, 'showSuccess')
 
     component.saveViewConfig()
     expect(savedViewServicePatch).toHaveBeenCalledWith(modifiedView)
@@ -579,7 +592,7 @@ describe('DocumentListComponent', () => {
     let openModal: NgbModalRef
     modalService.activeInstances.subscribe((modal) => (openModal = modal[0]))
     const modalSpy = jest.spyOn(modalService, 'open')
-    const toastSpy = jest.spyOn(toastService, 'showInfo')
+    const toastSpy = jest.spyOn(toastService, 'showSuccess')
     const savedViewServiceCreate = jest.spyOn(savedViewService, 'create')
     jest
       .spyOn(savedViewService, 'dashboardViews', 'get')

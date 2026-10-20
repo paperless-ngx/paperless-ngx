@@ -17,9 +17,10 @@ from documents.models import Tag
 from documents.models import WorkflowAction
 from documents.sanity_checker import SanityCheckFailedException
 from documents.sanity_checker import SanityCheckMessages
-from documents.tests.test_classifier import dummy_preprocess
-from documents.tests.utils import DirectoriesMixin
-from documents.tests.utils import FileSystemAssertsMixin
+from documents.tests.helpers import dummy_preprocess
+from paperless_testing.assertions import FileSystemAssertsMixin
+from paperless_testing.dirs import DirectoriesMixin
+from paperless_testing.factories import DocumentFactory
 
 
 @pytest.mark.django_db
@@ -286,6 +287,80 @@ class TestUpdateContent(DirectoriesMixin, TestCase):
 
         tasks.update_document_content_maybe_archive_file(doc.pk)
         self.assertNotEqual(Document.objects.get(pk=doc.pk).content, "test")
+
+    def _create_root_with_version(self) -> tuple[Document, Document]:
+        sample1 = self.dirs.scratch_dir / "sample.pdf"
+        shutil.copy(
+            Path(__file__).parent
+            / "samples"
+            / "documents"
+            / "originals"
+            / "0000001.pdf",
+            sample1,
+        )
+        root = DocumentFactory(content="root content", mime_type="application/pdf")
+        version = DocumentFactory(
+            content="my document",
+            filename=sample1,
+            mime_type="application/pdf",
+            root_document=root,
+            version_index=1,
+        )
+        return root, version
+
+    @mock.patch("documents.tasks.clear_document_caches")
+    @mock.patch("documents.search.get_backend")
+    def test_update_content_version_clears_caches_for_root(
+        self,
+        mock_get_backend: mock.Mock,
+        mock_clear_caches: mock.Mock,
+    ) -> None:
+        """
+        GIVEN:
+            - A root document with a version
+        WHEN:
+            - Update content task is called for the version
+        THEN:
+            - The version's content is updated, not the root's
+            - The document is indexed
+            - Caches are cleared for both
+        """
+        root, version = self._create_root_with_version()
+
+        tasks.update_document_content_maybe_archive_file(version.pk)
+
+        self.assertNotEqual(
+            Document.objects.get(pk=version.pk).content,
+            "my document",
+        )
+        self.assertEqual(Document.objects.get(pk=root.pk).content, "root content")
+        mock_get_backend.return_value.add_or_update.assert_called_once()
+        mock_clear_caches.assert_has_calls(
+            [mock.call(version.pk), mock.call(root.pk)],
+        )
+
+    @override_settings(AI_ENABLED=True, LLM_EMBEDDING_BACKEND="huggingface")
+    @mock.patch("documents.tasks.llm_index_add_or_update_document")
+    @mock.patch("documents.search.get_backend")
+    def test_update_content_version_updates_llm_index(
+        self,
+        mock_get_backend: mock.Mock,
+        mock_llm_index: mock.Mock,
+    ) -> None:
+        """
+        GIVEN:
+            - A root document with a version
+            - The LLM index is enabled
+        WHEN:
+            - Update content task is called for the version
+        THEN:
+            - The LLM index is updated
+        """
+        _, version = self._create_root_with_version()
+
+        tasks.update_document_content_maybe_archive_file(version.pk)
+
+        mock_llm_index.assert_called_once()
 
 
 class TestUpdateContentRemoteOCR(DirectoriesMixin, TestCase):

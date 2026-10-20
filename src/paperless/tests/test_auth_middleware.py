@@ -1,10 +1,10 @@
 from django.contrib.auth.models import AnonymousUser
-from django.contrib.auth.models import User
 from django.test import RequestFactory
 from django.test import TestCase
 from django.test import override_settings
 
 from paperless.auth import AutoLoginMiddleware
+from paperless_testing.factories import UserFactory
 
 
 @override_settings(AUTO_LOGIN_USERNAME="autologin")
@@ -29,7 +29,7 @@ class TestAutoLoginMiddleware(TestCase):
         THEN:
             - That user is attached to the request
         """
-        user = User.objects.create_user(username="autologin")
+        user = UserFactory(username="autologin")
 
         request = self._process(self.factory.get("/"))
 
@@ -44,9 +44,27 @@ class TestAutoLoginMiddleware(TestCase):
         THEN:
             - The request is left anonymous rather than authenticated as them
         """
-        User.objects.create_user(username="autologin", is_active=False)
+        UserFactory(username="autologin", is_active=False)
 
         request = self.factory.get("/")
+        request.user = AnonymousUser()
+        self._process(request)
+
+        self.assertFalse(request.user.is_authenticated)
+
+    @override_settings(FORCE_SCRIPT_NAME="/paperless")
+    def test_token_request_is_not_logged_in_under_subpath(self) -> None:
+        """
+        GIVEN:
+            - Paperless is served under a subpath
+        WHEN:
+            - A token is requested via POST
+        THEN:
+            - The request is left anonymous so the posted credentials are used
+        """
+        UserFactory(username="autologin")
+
+        request = self.factory.post("/api/token/")
         request.user = AnonymousUser()
         self._process(request)
 

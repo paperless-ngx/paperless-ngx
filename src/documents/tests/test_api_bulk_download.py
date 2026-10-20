@@ -4,7 +4,6 @@ import json
 import shutil
 import zipfile
 
-from django.contrib.auth.models import User
 from django.test import override_settings
 from django.utils import timezone
 from rest_framework import status
@@ -13,9 +12,11 @@ from rest_framework.test import APITestCase
 from documents.models import Correspondent
 from documents.models import Document
 from documents.models import DocumentType
-from documents.tests.utils import DirectoriesMixin
 from documents.tests.utils import SampleDirMixin
-from documents.tests.utils import read_streaming_response
+from paperless_testing.dirs import DirectoriesMixin
+from paperless_testing.factories import UserFactory
+from paperless_testing.http import read_streaming_response
+from paperless_testing.permissions import grant_global
 
 
 class TestBulkDownload(DirectoriesMixin, SampleDirMixin, APITestCase):
@@ -24,7 +25,7 @@ class TestBulkDownload(DirectoriesMixin, SampleDirMixin, APITestCase):
     def setUp(self) -> None:
         super().setUp()
 
-        self.user = User.objects.create_superuser(username="temp_admin")
+        self.user = UserFactory(username="temp_admin", superuser=True)
         self.client.force_authenticate(user=self.user)
 
         self.doc1 = Document.objects.create(title="unrelated", checksum="A")
@@ -165,7 +166,15 @@ class TestBulkDownload(DirectoriesMixin, SampleDirMixin, APITestCase):
             ),
             content_type="application/json",
         )
-        response.close()
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response["Content-Type"], "application/zip")
+
+        with zipfile.ZipFile(io.BytesIO(read_streaming_response(response))) as zipf:
+            self.assertEqual(zipf.infolist()[0].compress_type, zipfile.ZIP_LZMA)
+
+            with self.doc2.source_file as f:
+                self.assertEqual(f.read(), zipf.read("2021-01-01 document A.pdf"))
 
     @override_settings(FILENAME_FORMAT="{correspondent}/{title}")
     def test_formatted_download_originals(self) -> None:
@@ -325,7 +334,8 @@ class TestBulkDownload(DirectoriesMixin, SampleDirMixin, APITestCase):
                 )
 
     def test_download_insufficient_permissions(self) -> None:
-        user = User.objects.create_user(username="temp_user")
+        user = UserFactory(username="temp_user")
+        grant_global(user, "view_document")
         self.client.force_authenticate(user=user)
 
         self.doc2.owner = self.user
@@ -339,3 +349,29 @@ class TestBulkDownload(DirectoriesMixin, SampleDirMixin, APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertEqual(response.content, b"Insufficient permissions")
+
+    def test_bad_search_query_returns_400(self) -> None:
+        """
+        GIVEN:
+            - Bulk download request selects documents via a saved-search
+              query filter
+        WHEN:
+            - The query contains a malformed field value (an invalid date)
+        THEN:
+            - The response is a 400 naming the bad value, exactly like the
+              search list endpoint, never a 500
+        """
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "all": True,
+                    "filters": {"query": "added:notadate"},
+                    "content": "originals",
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn(b"notadate", response.content)

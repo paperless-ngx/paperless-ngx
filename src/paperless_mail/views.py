@@ -18,6 +18,7 @@ from rest_framework import serializers
 from rest_framework.decorators import action
 from rest_framework.filters import OrderingFilter
 from rest_framework.generics import GenericAPIView
+from rest_framework.permissions import BasePermission
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
@@ -42,6 +43,15 @@ from paperless_mail.serialisers import MailAccountSerializer
 from paperless_mail.serialisers import MailRuleSerializer
 from paperless_mail.serialisers import ProcessedMailSerializer
 from paperless_mail.tasks import process_mail_accounts
+
+
+class DeleteProcessedMailPermissions(BasePermission):
+    def has_permission(self, request, view):
+        return bool(
+            request.user
+            and request.user.is_authenticated
+            and request.user.has_perm("paperless_mail.delete_processedmail"),
+        )
 
 
 @extend_schema_view(
@@ -206,7 +216,11 @@ class ProcessedMailViewSet(PassUserMixin, ReadOnlyModelViewSet[ProcessedMail]):
 
     queryset = ProcessedMail.objects.all().order_by("-processed")
 
-    @action(methods=["post"], detail=False)
+    @action(
+        methods=["post"],
+        detail=False,
+        permission_classes=[IsAuthenticated, DeleteProcessedMailPermissions],
+    )
     def bulk_delete(self, request):
         mail_ids = request.data.get("mail_ids", [])
         if not isinstance(mail_ids, list) or not all(

@@ -50,7 +50,15 @@ export class OpenDocumentsService {
     if (index > -1) {
       this.documentService.get(id).subscribe({
         next: (doc) => {
-          this.openDocuments[index] = doc
+          const openDoc = this.openDocuments.find((d) => d.id == id)
+          if (!openDoc) return
+          const unsavedEdits = Object.fromEntries(
+            (openDoc.__changedFields ?? []).map((field) => [
+              field,
+              openDoc[field],
+            ])
+          )
+          Object.assign(openDoc, doc, unsavedEdits)
           this.save()
         },
         error: () => {

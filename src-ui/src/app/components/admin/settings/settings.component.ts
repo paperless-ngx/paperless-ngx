@@ -39,7 +39,13 @@ import {
   SystemStatus,
   SystemStatusItemStatus,
 } from 'src/app/data/system-status'
-import { GlobalSearchType, SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import {
+  GlobalSearchType,
+  HIDEABLE_SIDEBAR_ITEM_IDS,
+  HideableSidebarItemID,
+  SETTINGS_KEYS,
+  SuggestionSource,
+} from 'src/app/data/ui-settings'
 import { User } from 'src/app/data/user'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
@@ -57,7 +63,7 @@ import {
   SettingsService,
 } from 'src/app/services/settings.service'
 import { SystemStatusService } from 'src/app/services/system-status.service'
-import { Toast, ToastService } from 'src/app/services/toast.service'
+import { Toast, ToastLevel, ToastService } from 'src/app/services/toast.service'
 import { locationReload } from 'src/app/utils/navigation'
 import { CheckComponent } from '../../common/input/check/check.component'
 import { ColorComponent } from '../../common/input/color/color.component'
@@ -101,6 +107,15 @@ const documentDetailFieldOptions = [
   { id: DocumentDetailFieldID.StoragePath, label: $localize`Storage path` },
   { id: DocumentDetailFieldID.Tags, label: $localize`Tags` },
 ]
+
+const sidebarItemLabels: Record<HideableSidebarItemID, string> = {
+  [HideableSidebarItemID.Dashboard]: $localize`Dashboard`,
+  [HideableSidebarItemID.SavedViews]: $localize`Saved Views`,
+  [HideableSidebarItemID.ShareLinks]: $localize`Share Links`,
+  [HideableSidebarItemID.Workflows]: $localize`Workflows`,
+  [HideableSidebarItemID.Mail]: $localize`Mail`,
+  [HideableSidebarItemID.Documentation]: $localize`Documentation`,
+}
 
 @Component({
   selector: 'pngx-settings',
@@ -149,6 +164,7 @@ export class SettingsComponent
     bulkEditApplyOnClose: new FormControl(null),
     documentListItemPerPage: new FormControl(null),
     slimSidebarEnabled: new FormControl(null),
+    sidebarHiddenItems: new FormControl<HideableSidebarItemID[]>([]),
     darkModeUseSystem: new FormControl(null),
     darkModeEnabled: new FormControl(null),
     darkModeInvertThumbs: new FormControl(null),
@@ -169,14 +185,13 @@ export class SettingsComponent
     documentEditingRemoveInboxTags: new FormControl(null),
     documentEditingOverlayThumbnail: new FormControl(null),
     documentEditingAutoSuggest: new FormControl(null),
+    documentEditingSuggestionSource: new FormControl(null),
     documentDetailsHiddenFields: new FormControl([]),
     searchDbOnly: new FormControl(null),
     searchLink: new FormControl(null),
 
-    notificationsConsumerNewDocument: new FormControl(null),
     notificationsConsumerSuccess: new FormControl(null),
     notificationsConsumerFailed: new FormControl(null),
-    notificationsConsumerSuppressOnDashboard: new FormControl(null),
 
     savedViewsWarnOnUnsavedChange: new FormControl(null),
     sidebarViewsShowCount: new FormControl(null),
@@ -186,6 +201,7 @@ export class SettingsComponent
 
   store: BehaviorSubject<any>
   storeSub: Subscription
+  sidebarItemsSub: Subscription
   isDirty$: Observable<boolean>
   isDirty: boolean = false
   unsubscribeNotifier: Subject<any> = new Subject()
@@ -201,8 +217,17 @@ export class SettingsComponent
   public readonly PdfZoomScale = PdfZoomScale
 
   public readonly PdfEditorEditMode = PdfEditorEditMode
+  public readonly SuggestionSource = SuggestionSource
+
+  get aiEnabled(): boolean {
+    return this.settings.get(SETTINGS_KEYS.AI_ENABLED)
+  }
 
   public readonly documentDetailFieldOptions = documentDetailFieldOptions
+  public readonly sidebarItemOptions = HIDEABLE_SIDEBAR_ITEM_IDS.map((id) => ({
+    id,
+    label: sidebarItemLabels[id],
+  }))
 
   get systemStatusHasErrors(): boolean {
     const status = this.systemStatus()
@@ -230,6 +255,10 @@ export class SettingsComponent
 
   constructor() {
     super()
+    this.sidebarItemsSub =
+      this.settings.sidebarHiddenItemsEditingChanged.subscribe((hiddenItems) =>
+        this.settingsForm.controls.sidebarHiddenItems.setValue(hiddenItems)
+      )
     this.settings.settingsSaved.subscribe(() => {
       if (!this.savePending) this.initialize()
       this.savedViewsService.maybeRefreshDocumentCounts()
@@ -279,14 +308,21 @@ export class SettingsComponent
 
     this.activatedRoute.paramMap.subscribe((paramMap) => {
       const section = paramMap.get('section')
+      let navID = SettingsNavIDs.General
       if (section) {
         const navIDKey: string = Object.keys(SettingsNavIDs).find(
           (navID) => navID.toLowerCase() == section
         )
         if (navIDKey) {
-          this.activeNavID.set(SettingsNavIDs[navIDKey])
+          navID = SettingsNavIDs[navIDKey]
         }
       }
+      this.activeNavID.set(navID)
+      this.settings.sidebarHiddenItemsEditing.set(
+        navID === SettingsNavIDs.General
+          ? [...this.settingsForm.controls.sidebarHiddenItems.value]
+          : null
+      )
     })
   }
 
@@ -310,6 +346,7 @@ export class SettingsComponent
         SETTINGS_KEYS.DOCUMENT_LIST_SIZE
       ),
       slimSidebarEnabled: this.settings.get(SETTINGS_KEYS.SLIM_SIDEBAR),
+      sidebarHiddenItems: this.settings.get(SETTINGS_KEYS.SIDEBAR_HIDDEN_ITEMS),
       darkModeUseSystem: this.settings.get(SETTINGS_KEYS.DARK_MODE_USE_SYSTEM),
       darkModeEnabled: this.settings.get(SETTINGS_KEYS.DARK_MODE_ENABLED),
       darkModeInvertThumbs: this.settings.get(
@@ -332,17 +369,11 @@ export class SettingsComponent
       updateCheckingEnabled: this.settings.get(
         SETTINGS_KEYS.UPDATE_CHECKING_ENABLED
       ),
-      notificationsConsumerNewDocument: this.settings.get(
-        SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_NEW_DOCUMENT
-      ),
       notificationsConsumerSuccess: this.settings.get(
         SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_SUCCESS
       ),
       notificationsConsumerFailed: this.settings.get(
         SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_FAILED
-      ),
-      notificationsConsumerSuppressOnDashboard: this.settings.get(
-        SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_SUPPRESS_ON_DASHBOARD
       ),
       savedViewsWarnOnUnsavedChange: this.settings.get(
         SETTINGS_KEYS.SAVED_VIEWS_WARN_ON_UNSAVED_CHANGE
@@ -371,6 +402,9 @@ export class SettingsComponent
       ),
       documentEditingAutoSuggest: this.settings.get(
         SETTINGS_KEYS.DOCUMENT_EDITING_AUTO_SUGGEST
+      ),
+      documentEditingSuggestionSource: this.settings.get(
+        SETTINGS_KEYS.DOCUMENT_EDITING_SUGGESTION_SOURCE
       ),
       documentDetailsHiddenFields: this.settings.get(
         SETTINGS_KEYS.DOCUMENT_DETAILS_HIDDEN_FIELDS
@@ -436,6 +470,12 @@ export class SettingsComponent
       this.settingsForm.patchValue(currentFormValue)
     }
 
+    if (this.settings.organizingSidebarItems()) {
+      this.settings.sidebarHiddenItemsEditing.set([
+        ...this.settingsForm.controls.sidebarHiddenItems.value,
+      ])
+    }
+
     if (this.canViewSystemStatus) {
       this.systemStatusService.get().subscribe((status) => {
         this.systemStatus.set(status)
@@ -444,8 +484,18 @@ export class SettingsComponent
   }
 
   ngOnDestroy() {
+    this.settings.sidebarHiddenItemsEditing.set(null)
     if (this.isDirty) this.settings.updateAppearanceSettings() // in case user changed appearance but didn't save
     this.storeSub && this.storeSub.unsubscribe()
+    this.sidebarItemsSub.unsubscribe()
+  }
+
+  isSidebarItemShown(item: HideableSidebarItemID): boolean {
+    return !(this.settingsForm.value.sidebarHiddenItems || []).includes(item)
+  }
+
+  toggleSidebarItem(item: HideableSidebarItemID, checked: boolean): void {
+    this.settings.updateSidebarItemVisibility(item, checked)
   }
 
   public saveSettings() {
@@ -472,6 +522,10 @@ export class SettingsComponent
     this.settings.set(
       SETTINGS_KEYS.SLIM_SIDEBAR,
       this.settingsForm.value.slimSidebarEnabled
+    )
+    this.settings.set(
+      SETTINGS_KEYS.SIDEBAR_HIDDEN_ITEMS,
+      this.settingsForm.value.sidebarHiddenItems
     )
     this.settings.set(
       SETTINGS_KEYS.DARK_MODE_USE_SYSTEM,
@@ -510,20 +564,12 @@ export class SettingsComponent
       this.settingsForm.value.dateFormat
     )
     this.settings.set(
-      SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_NEW_DOCUMENT,
-      this.settingsForm.value.notificationsConsumerNewDocument
-    )
-    this.settings.set(
       SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_SUCCESS,
       this.settingsForm.value.notificationsConsumerSuccess
     )
     this.settings.set(
       SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_FAILED,
       this.settingsForm.value.notificationsConsumerFailed
-    )
-    this.settings.set(
-      SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_SUPPRESS_ON_DASHBOARD,
-      this.settingsForm.value.notificationsConsumerSuppressOnDashboard
     )
     this.settings.set(
       SETTINGS_KEYS.NOTES_ENABLED,
@@ -574,6 +620,10 @@ export class SettingsComponent
       this.settingsForm.value.documentEditingAutoSuggest
     )
     this.settings.set(
+      SETTINGS_KEYS.DOCUMENT_EDITING_SUGGESTION_SOURCE,
+      this.settingsForm.value.documentEditingSuggestionSource
+    )
+    this.settings.set(
       SETTINGS_KEYS.DOCUMENT_DETAILS_HIDDEN_FIELDS,
       this.settingsForm.value.documentDetailsHiddenFields
     )
@@ -598,8 +648,11 @@ export class SettingsComponent
           let savedToast: Toast = {
             content: $localize`Settings were saved successfully.`,
             delay: 5000,
+            level: ToastLevel.Success,
+            persistent: false,
           }
           if (reloadRequired) {
+            savedToast.persistent = true
             savedToast.content = $localize`Settings were saved successfully. Reload is required to apply some changes.`
             savedToast.actionName = $localize`Reload now`
             savedToast.action = () => {
@@ -632,6 +685,11 @@ export class SettingsComponent
 
   reset() {
     this.settingsForm.patchValue(this.store.getValue())
+    if (this.settings.organizingSidebarItems()) {
+      this.settings.sidebarHiddenItemsEditing.set([
+        ...this.settingsForm.controls.sidebarHiddenItems.value,
+      ])
+    }
   }
 
   clearThemeColor() {

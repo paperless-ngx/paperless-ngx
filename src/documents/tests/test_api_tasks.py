@@ -11,22 +11,21 @@ from datetime import timedelta
 from unittest import mock
 
 import pytest
-from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.utils import timezone
-from guardian.shortcuts import assign_perm
 from rest_framework import status
 from rest_framework.test import APIClient
 
 from documents.filters import PaperlessTaskFilterSet
 from documents.models import PaperlessTask
-from documents.tests.factories import DocumentFactory
-from documents.tests.factories import PaperlessTaskFactory
+from paperless_testing.factories import DocumentFactory
+from paperless_testing.factories import PaperlessTaskFactory
+from paperless_testing.permissions import grant_global
+from paperless_testing.permissions import grant_object
 
 pytestmark = pytest.mark.api
 
 ENDPOINT = "/api/tasks/"
-ACCEPT_V10 = "application/json; version=10"
 ACCEPT_V9 = "application/json; version=9"
 
 
@@ -346,21 +345,16 @@ class TestGetTasksV10:
         self,
         admin_user: User,
         regular_user: User,
+        user_client: APIClient,
     ) -> None:
         """Regular users see their own tasks and unowned (system) tasks; other users' tasks are hidden."""
-        regular_user.user_permissions.add(
-            Permission.objects.get(codename="view_paperlesstask"),
-        )
-
-        client = APIClient()
-        client.force_authenticate(user=regular_user)
-        client.credentials(HTTP_ACCEPT=ACCEPT_V10)
+        grant_global(regular_user, "view_paperlesstask")
 
         PaperlessTaskFactory(owner=admin_user)  # other user — not visible
         unowned_task = PaperlessTaskFactory()  # unowned (system task) — visible
         own_task = PaperlessTaskFactory(owner=regular_user)
 
-        response = client.get(ENDPOINT)
+        response = user_client.get(ENDPOINT)
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data["count"] == 2
@@ -590,9 +584,7 @@ class TestGetTasksV9:
         regular_user: User,
     ) -> None:
         """Non-staff users see their own tasks plus unowned tasks via v9 API."""
-        regular_user.user_permissions.add(
-            Permission.objects.get(codename="view_paperlesstask"),
-        )
+        grant_global(regular_user, "view_paperlesstask")
 
         client = APIClient()
         client.force_authenticate(user=regular_user)
@@ -732,19 +724,17 @@ class TestAcknowledge:
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    def test_succeeds_with_change_permission(self, regular_user: User) -> None:
+    def test_succeeds_with_change_permission(
+        self,
+        regular_user: User,
+        user_client: APIClient,
+    ) -> None:
         """Users granted change_paperlesstask permission can acknowledge tasks."""
-        regular_user.user_permissions.add(
-            Permission.objects.get(codename="change_paperlesstask"),
-        )
+        grant_global(regular_user, "change_paperlesstask")
         regular_user.save()
 
-        client = APIClient()
-        client.force_authenticate(user=regular_user)
-        client.credentials(HTTP_ACCEPT=ACCEPT_V10)
-
         task = PaperlessTaskFactory()
-        response = client.post(
+        response = user_client.post(
             ENDPOINT + "acknowledge/",
             {"tasks": [task.id]},
             format="json",
@@ -807,9 +797,7 @@ class TestSummaryPermissions:
         regular_user,
     ) -> None:
         """A user with view_system_monitoring but no document permissions can access summary/."""
-        regular_user.user_permissions.add(
-            Permission.objects.get(codename="view_system_monitoring"),
-        )
+        grant_global(regular_user, "view_system_monitoring")
 
         response = user_client.get(ENDPOINT + "summary/")
 
@@ -822,9 +810,7 @@ class TestSummaryPermissions:
         admin_user,
     ) -> None:
         """Monitoring user sees aggregate data for all tasks, not just unowned ones."""
-        regular_user.user_permissions.add(
-            Permission.objects.get(codename="view_system_monitoring"),
-        )
+        grant_global(regular_user, "view_system_monitoring")
         PaperlessTaskFactory(
             owner=admin_user,
             task_type=PaperlessTask.TaskType.CONSUME_FILE,
@@ -845,9 +831,7 @@ class TestSummaryPermissions:
     ) -> None:
         """A regular user with view_paperlesstask but not view_system_monitoring sees only
         their own tasks and unowned tasks in the summary, not other users' tasks."""
-        regular_user.user_permissions.add(
-            Permission.objects.get(codename="view_paperlesstask"),
-        )
+        grant_global(regular_user, "view_paperlesstask")
 
         PaperlessTaskFactory(
             owner=regular_user,
@@ -1012,9 +996,7 @@ class TestDuplicateDocumentsPermissions:
 
     @pytest.fixture()
     def user_v9_client(self, regular_user: User) -> APIClient:
-        regular_user.user_permissions.add(
-            Permission.objects.get(codename="view_paperlesstask"),
-        )
+        grant_global(regular_user, "view_paperlesstask")
         client = APIClient()
         client.force_authenticate(user=regular_user)
         client.credentials(HTTP_ACCEPT=ACCEPT_V9)
@@ -1085,7 +1067,7 @@ class TestDuplicateDocumentsPermissions:
     ) -> None:
         """A user with explicit guardian view_document permission sees the duplicate_of document."""
         doc = DocumentFactory(owner=admin_user, title="Granted Doc")
-        assign_perm("view_document", regular_user, doc)
+        grant_object(regular_user, doc, "view_document")
         PaperlessTaskFactory(
             owner=regular_user,
             status=PaperlessTask.Status.SUCCESS,

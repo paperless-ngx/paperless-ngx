@@ -5,11 +5,10 @@ from typing import TYPE_CHECKING
 from unittest import mock
 
 from auditlog.models import LogEntry  # type: ignore[import-untyped]
-from django.contrib.auth.models import Permission
-from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase as DjangoTestCase
+from django.test import override_settings
 from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -18,10 +17,17 @@ from documents.data_models import DocumentSource
 from documents.filters import EffectiveContentFilter
 from documents.filters import TitleContentFilter
 from documents.models import Document
-from documents.tests.utils import DirectoriesMixin
-from documents.tests.utils import read_streaming_response
+from documents.models import Note
+from documents.models import ShareLink
 from documents.versioning import annotate_effective_content
 from documents.views import DocumentSelectionMixin
+from paperless_testing.dirs import DirectoriesMixin
+from paperless_testing.factories import DocumentFactory
+from paperless_testing.factories import UserFactory
+from paperless_testing.http import read_streaming_response
+from paperless_testing.permissions import grant_all_global
+from paperless_testing.permissions import grant_global
+from paperless_testing.permissions import grant_object
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -31,7 +37,7 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
     def setUp(self) -> None:
         super().setUp()
 
-        self.user = User.objects.create_superuser(username="temp_admin")
+        self.user = UserFactory(username="temp_admin", superuser=True)
         self.client.force_authenticate(user=self.user)
 
     def _make_pdf_upload(self, name: str = "version.pdf") -> SimpleUploadedFile:
@@ -89,11 +95,9 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_root_endpoint_returns_403_when_user_lacks_permission(self) -> None:
-        owner = User.objects.create_user(username="owner")
-        viewer = User.objects.create_user(username="viewer")
-        viewer.user_permissions.add(
-            Permission.objects.get(codename="view_document"),
-        )
+        owner = UserFactory(username="owner")
+        viewer = UserFactory(username="viewer")
+        grant_global(viewer, "view_document")
         root = Document.objects.create(
             title="root",
             checksum="root",
@@ -283,11 +287,9 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
         self.assertEqual(mock_backend.add_or_update.call_args[0][0].id, root.id)
 
     def test_delete_version_returns_403_without_permission(self) -> None:
-        owner = User.objects.create_user(username="owner")
-        other = User.objects.create_user(username="other")
-        other.user_permissions.add(
-            Permission.objects.get(codename="delete_document"),
-        )
+        owner = UserFactory(username="owner")
+        other = UserFactory(username="other")
+        grant_global(other, "delete_document")
         root = Document.objects.create(
             title="root",
             checksum="root",
@@ -371,11 +373,9 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
         self.assertTrue(resp.data["is_root"])
 
     def test_update_version_label_returns_403_without_permission(self) -> None:
-        owner = User.objects.create_user(username="owner")
-        other = User.objects.create_user(username="other")
-        other.user_permissions.add(
-            Permission.objects.get(codename="change_document"),
-        )
+        owner = UserFactory(username="owner")
+        other = UserFactory(username="other")
+        grant_global(other, "change_document")
         root = Document.objects.create(
             title="root",
             checksum="root",
@@ -553,11 +553,9 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_metadata_returns_403_when_user_lacks_permission(self) -> None:
-        owner = User.objects.create_user(username="owner")
-        other = User.objects.create_user(username="other")
-        other.user_permissions.add(
-            Permission.objects.get(codename="view_document"),
-        )
+        owner = UserFactory(username="owner")
+        other = UserFactory(username="other")
+        grant_global(other, "view_document")
         doc = Document.objects.create(
             title="root",
             checksum="root",
@@ -653,8 +651,8 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
         self.assertEqual(resp.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def test_update_version_returns_403_without_permission(self) -> None:
-        owner = User.objects.create_user(username="owner")
-        other = User.objects.create_user(username="other")
+        owner = UserFactory(username="owner")
+        other = UserFactory(username="other")
         root = Document.objects.create(
             title="root",
             checksum="root",
@@ -672,8 +670,8 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
         self.assertEqual(resp.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_update_version_requires_global_change_permission(self) -> None:
-        user = User.objects.create_user(username="add-only")
-        user.user_permissions.add(Permission.objects.get(codename="add_document"))
+        user = UserFactory(username="add-only")
+        grant_global(user, "add_document")
         root = Document.objects.create(
             title="root",
             checksum="root",
@@ -829,6 +827,26 @@ class TestDocumentVersioningApi(DirectoriesMixin, APITestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertEqual(resp.data["content"], "v1-content")
 
+    def test_page_count_resolves_to_latest_version(self) -> None:
+        root = DocumentFactory(page_count=2)
+        DocumentFactory(root_document=root, version_index=1, page_count=1)
+        unversioned = DocumentFactory(page_count=5)
+
+        resp = self.client.get("/api/documents/?fields=id,page_count")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            {doc["id"]: doc["page_count"] for doc in resp.data["results"]},
+            {root.id: 1, unversioned.id: 5},
+        )
+
+        resp = self.client.get(f"/api/documents/{root.id}/")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp.data["page_count"], 1)
+
+        resp = self.client.get(f"/api/documents/{root.id}/?version={root.id}")
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(resp.data["page_count"], 2)
+
     def _make_root_with_out_of_order_versions(self) -> tuple[Document, ...]:
         """
         A root whose newest version has a *lower* id than an older one, which is
@@ -978,7 +996,7 @@ class TestVersionAwareFilters(DjangoTestCase):
         superseded content -- selecting documents the list view, filtered by
         the same term, does not show.
         """
-        user = User.objects.create_superuser(username="bulk_selection")
+        user = UserFactory(username="bulk_selection", superuser=True)
 
         selected = DocumentSelectionMixin()._resolve_document_ids(
             user=user,
@@ -1005,7 +1023,7 @@ class TestBulkSelectionExcludesVersions(DjangoTestCase):
         "Select all matching" reconstructs the document list, which never
         contains version documents as rows of their own.
         """
-        user = User.objects.create_superuser(username="bulk_versions")
+        user = UserFactory(username="bulk_versions", superuser=True)
         root = Document.objects.create(
             title="shared-title root",
             checksum="bulk-root",
@@ -1030,3 +1048,152 @@ class TestBulkSelectionExcludesVersions(DjangoTestCase):
         )
 
         self.assertEqual(selected, [root.id])
+
+
+class TestVersionActionPermissions(DirectoriesMixin, APITestCase):
+    def setUp(self):
+        super().setUp()
+        self.user = UserFactory()
+        grant_all_global(self.user)
+        self.client.force_authenticate(self.user)
+        self.root = DocumentFactory(owner=UserFactory())
+        self.version = DocumentFactory(root_document=self.root, owner=None)
+
+    @override_settings(AUDIT_LOG_ENABLED=True)
+    def test_actions_reject_stale_version_ownership(self):
+        note = Note.objects.create(document=self.version, note="Version note")
+        for owner in (None, self.user):
+            self.version.owner = owner
+            self.version.save(update_fields=["owner"])
+            for action in (
+                "notes",
+                "suggestions",
+                "ai_suggestions",
+                "history",
+                "share_links",
+            ):
+                with self.subTest(owner=owner, action=action):
+                    response = self.client.get(
+                        f"/api/documents/{self.version.pk}/{action}/",
+                    )
+                    self.assertEqual(response.status_code, 403)
+            response = self.client.post(
+                f"/api/documents/{self.version.pk}/notes/",
+                {"note": "New note"},
+            )
+            self.assertEqual(response.status_code, 403)
+            response = self.client.delete(
+                f"/api/documents/{self.version.pk}/notes/?id={note.pk}",
+            )
+            self.assertEqual(response.status_code, 403)
+            response = self.client.post(
+                "/api/share_links/",
+                {"document": self.version.pk, "file_version": "original"},
+            )
+            self.assertEqual(response.status_code, 403)
+            response = self.client.post(
+                "/api/share_link_bundles/",
+                {"document_ids": [self.version.pk], "file_version": "original"},
+                format="json",
+            )
+            self.assertEqual(response.status_code, 400)
+            response = self.client.post(
+                "/api/documents/email/",
+                {
+                    "documents": [self.version.pk],
+                    "addresses": "recipient@example.com",
+                    "subject": "Version",
+                    "message": "Version",
+                },
+                format="json",
+            )
+            self.assertEqual(response.status_code, 403)
+            with (
+                mock.patch("documents.views.AIConfig") as ai_config,
+                mock.patch("documents.views.stream_chat_with_documents") as chat,
+            ):
+                ai_config.return_value.ai_enabled = True
+                response = self.client.post(
+                    "/api/documents/chat/",
+                    {"q": "Version?", "document_id": self.version.pk},
+                    format="json",
+                )
+            self.assertEqual(response.status_code, 403)
+            chat.assert_not_called()
+        self.assertTrue(Note.objects.filter(pk=note.pk).exists())
+        self.assertFalse(ShareLink.objects.exists())
+
+    @mock.patch("documents.views.build_share_link_bundle.apply_async")
+    def test_root_permissions_allow_sharing_a_private_version(self, build_mock):
+        self.version.owner = UserFactory()
+        self.version.save(update_fields=["owner"])
+        grant_object(self.user, self.root, "view_document", "change_document")
+        note = Note.objects.create(document=self.version, note="Version note")
+        response = self.client.get(f"/api/documents/{self.version.pk}/notes/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data[0]["id"], note.pk)
+        response = self.client.post(
+            "/api/share_links/",
+            {"document": self.version.pk, "file_version": "original"},
+        )
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(ShareLink.objects.get().document_id, self.version.pk)
+        response = self.client.get(f"/api/documents/{self.version.pk}/share_links/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        response = self.client.post(
+            "/api/share_link_bundles/",
+            {"document_ids": [self.version.pk], "file_version": "original"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 201)
+        build_mock.assert_called_once()
+
+    def test_root_view_permission_does_not_allow_note_changes(self):
+        grant_object(self.user, self.root, "view_document")
+        note = Note.objects.create(document=self.version, note="Version note")
+        response = self.client.get(f"/api/documents/{self.version.pk}/notes/")
+        self.assertEqual(response.status_code, 200)
+        response = self.client.post(
+            f"/api/documents/{self.version.pk}/notes/",
+            {"note": "New note"},
+        )
+        self.assertEqual(response.status_code, 403)
+        response = self.client.delete(
+            f"/api/documents/{self.version.pk}/notes/?id={note.pk}",
+        )
+        self.assertEqual(response.status_code, 403)
+        self.assertTrue(Note.objects.filter(pk=note.pk).exists())
+
+    @override_settings(AUDIT_LOG_ENABLED=True)
+    def test_history_uses_root_ownership(self):
+        self.root.owner = self.user
+        self.root.save(update_fields=["owner"])
+        self.version.owner = UserFactory()
+        self.version.save(update_fields=["owner"])
+        response = self.client.get(f"/api/documents/{self.version.pk}/history/")
+        self.assertEqual(response.status_code, 200)
+
+    def test_selection_data_rejects_stale_version_ownership(self):
+        for owner in (None, self.user):
+            self.version.owner = owner
+            self.version.save(update_fields=["owner"])
+            with self.subTest(owner=owner):
+                response = self.client.post(
+                    "/api/documents/selection_data/",
+                    {"documents": [self.version.pk]},
+                    format="json",
+                )
+                self.assertEqual(response.status_code, 403)
+
+    def test_selection_data_allows_private_version_of_permitted_root(self):
+        self.version.owner = UserFactory()
+        self.version.save(update_fields=["owner"])
+        grant_object(self.user, self.root, "view_document")
+        other = DocumentFactory(owner=self.user)
+        response = self.client.post(
+            "/api/documents/selection_data/",
+            {"documents": [self.version.pk, other.pk]},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 200)

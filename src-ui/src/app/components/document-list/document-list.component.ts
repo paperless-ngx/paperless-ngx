@@ -270,9 +270,12 @@ export class DocumentListComponent
         this.list.reload()
       })
 
-    this.websocketStatusService.onDocumentDeleted().subscribe(() => {
-      this.list.reload()
-    })
+    this.websocketStatusService
+      .onDocumentDeleted()
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        this.list.reload()
+      })
 
     this.route.paramMap
       .pipe(
@@ -415,7 +418,7 @@ export class DocumentListComponent
           next: (view) => {
             this.activeSavedView = view
             this.unmodifiedSavedView = view
-            this.toastService.showInfo(
+            this.toastService.showSuccess(
               $localize`View "${this.list.activeSavedViewTitle}" saved successfully.`
             )
             this.unmodifiedFilterRules.set(this.list.filterRules)
@@ -490,7 +493,7 @@ export class DocumentListComponent
               .subscribe({
                 next: () => {
                   modal.close()
-                  this.toastService.showInfo(
+                  this.toastService.showSuccess(
                     $localize`View "${savedView.name}" created successfully.`
                   )
                 },

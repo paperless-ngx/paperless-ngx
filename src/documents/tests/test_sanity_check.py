@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterable
 
     from documents.models import Document
-    from documents.tests.conftest import PaperlessDirs
+    from paperless_testing.dirs import PaperlessDirs
 
 
 class TestSanityCheckMessages:
@@ -46,14 +46,14 @@ class TestSanityCheckMessages:
 class TestCheckSanityNoDocuments:
     """Sanity checks against an empty archive."""
 
-    @pytest.mark.usefixtures("_media_settings")
+    @pytest.mark.usefixtures("paperless_dirs")
     def test_no_documents(self) -> None:
         messages = check_sanity()
         assert not messages.has_error
         assert not messages.has_warning
         assert messages.total_issue_count == 0
 
-    @pytest.mark.usefixtures("_media_settings")
+    @pytest.mark.usefixtures("paperless_dirs")
     def test_no_issues_logs_clean(self, caplog: pytest.LogCaptureFixture) -> None:
         messages = check_sanity()
         with caplog.at_level(logging.INFO, logger="paperless.sanity_checker"):
@@ -214,18 +214,17 @@ class TestCheckSanityOrphans:
         sample_doc: Document,
         paperless_dirs: PaperlessDirs,
     ) -> None:
-        (paperless_dirs.originals / "orphan.pdf").touch()
+        (paperless_dirs.originals_dir / "orphan.pdf").touch()
         messages = check_sanity()
         assert messages.has_warning
         assert any("Orphaned file" in m["message"] for m in messages[None])
 
-    @pytest.mark.usefixtures("_media_settings")
     def test_ignorable_files_not_flagged(
         self,
         paperless_dirs: PaperlessDirs,
     ) -> None:
-        (paperless_dirs.media / ".DS_Store").touch()
-        (paperless_dirs.media / "desktop.ini").touch()
+        (paperless_dirs.media_dir / ".DS_Store").touch()
+        (paperless_dirs.media_dir / "desktop.ini").touch()
         messages = check_sanity()
         assert not messages.has_warning
 
@@ -269,13 +268,13 @@ class TestCheckSanityLogMessages:
         paperless_dirs: PaperlessDirs,
         caplog: pytest.LogCaptureFixture,
     ) -> None:
-        (paperless_dirs.originals / "orphan.pdf").touch()
+        (paperless_dirs.originals_dir / "orphan.pdf").touch()
         messages = check_sanity()
         with caplog.at_level(logging.WARNING, logger="paperless.sanity_checker"):
             messages.log_messages()
         assert "Orphaned file" in caplog.text
 
-    @pytest.mark.usefixtures("_media_settings")
+    @pytest.mark.usefixtures("paperless_dirs")
     def test_logs_unknown_doc_pk(self, caplog: pytest.LogCaptureFixture) -> None:
         """A doc PK not in the DB logs 'Unknown' as the title."""
         messages = check_sanity()

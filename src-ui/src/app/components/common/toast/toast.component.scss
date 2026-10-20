@@ -2,19 +2,105 @@
     position: relative;
 }
 
-::ng-deep .toast.error {
-    border-color: hsla(350, 79%, 40%, 0.4); // bg-danger
+.toast {
+    --pngx-toast-accent: var(--pngx-toast-info);
+    background-color: var(--pngx-toast-bg);
+    color: var(--bs-body-color);
+    overflow: hidden;
+
+    &.toast-success {
+        --pngx-toast-accent: var(--pngx-toast-success);
+        background-color: var(--pngx-toast-success-bg);
+        border-color: color-mix(in srgb, var(--pngx-toast-success) 30%, transparent);
+    }
+
+    &.toast-error {
+        --pngx-toast-accent: var(--pngx-toast-error);
+        background-color: var(--pngx-toast-error-bg);
+        border-color: color-mix(in srgb, var(--pngx-toast-error) 35%, transparent);
+    }
 }
 
-::ng-deep .toast.error .toast-body {
-    background-color: hsla(350, 79%, 40%, 0.8); // bg-danger
-    border-top-left-radius: inherit;
-    border-top-right-radius: inherit;
-    border-bottom-left-radius: inherit;
-    border-bottom-right-radius: inherit;
+.toast-icon {
+    color: var(--pngx-toast-accent);
 }
 
+.toast-content {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.toast .btn-close {
+    font-size: .6rem;
+    margin-top: .3rem;
+    margin-left: .75rem !important;
+    opacity: .45;
+}
+
+.toast:hover .btn-close {
+    opacity: .85;
+}
+
+// compact rows in the notifications dropdown
+.toast.toast-list-item {
+    width: 100%;
+    max-width: none;
+    background-color: var(--pngx-toast-row-bg);
+    border: 0;
+    box-shadow: none;
+
+    &:hover {
+        background-color: var(--pngx-toast-row-hover-bg);
+    }
+
+    &.toast-error {
+        background-color: var(--pngx-toast-error-bg);
+    }
+
+    ::ng-deep .toast-body {
+        padding: .625rem .75rem;
+    }
+
+    .toast-time {
+        margin-top: .1rem;
+    }
+
+    // marks notifications that arrived since the dropdown was last opened
+    &.toast-new .toast-time::before {
+        content: '';
+        display: inline-block;
+        width: .45rem;
+        height: .45rem;
+        margin-right: .4rem;
+        vertical-align: .05rem;
+        border-radius: 50%;
+        background-color: var(--pngx-toast-info);
+    }
+}
+
+.toast-action {
+    --bs-btn-padding-y: .1rem;
+    --bs-btn-padding-x: .6rem;
+    --bs-btn-font-size: .8rem;
+    --bs-btn-font-weight: 600;
+    --bs-btn-color: var(--pngx-toast-accent);
+    --bs-btn-bg: color-mix(in srgb, var(--pngx-toast-accent) 14%, transparent);
+    --bs-btn-border-color: transparent;
+    --bs-btn-hover-color: var(--pngx-toast-accent);
+    --bs-btn-hover-bg: color-mix(in srgb, var(--pngx-toast-accent) 24%, transparent);
+    --bs-btn-hover-border-color: transparent;
+    --bs-btn-active-color: var(--pngx-toast-accent);
+    --bs-btn-active-bg: color-mix(in srgb, var(--pngx-toast-accent) 30%, transparent);
+    --bs-btn-active-border-color: transparent;
+}
+
+// countdown thin line
 .progress {
-    background-color: var(--pngx-primary);
-    opacity: .07;
+    height: 2px;
+    background-color: transparent;
+
+    ::ng-deep .progress-bar {
+        background-color: var(--bs-secondary-color);
+        opacity: .5;
+    }
 }

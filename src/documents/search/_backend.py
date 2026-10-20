@@ -7,6 +7,7 @@ import threading
 import time
 from datetime import UTC
 from datetime import datetime
+from datetime import timedelta
 from enum import StrEnum
 from itertools import islice
 from typing import TYPE_CHECKING
@@ -22,8 +23,8 @@ import tantivy
 from django.conf import settings
 from django.utils.timezone import get_current_timezone
 
-from documents.search._query import build_permission_filter
 from documents.search._query import extract_cjk_text
+from documents.search._query import normalize_search_text
 from documents.search._query import parse_simple_text_highlight_query
 from documents.search._query import parse_simple_text_query
 from documents.search._query import parse_simple_title_query
@@ -31,6 +32,7 @@ from documents.search._query import parse_user_query
 from documents.search._schema import _write_sentinels
 from documents.search._schema import build_schema
 from documents.search._schema import open_or_rebuild_index
+from documents.search._schema import rebuild_in_progress
 from documents.search._schema import wipe_index
 from documents.search._tokenizer import ascii_fold
 from documents.search._tokenizer import autocomplete_tokens
@@ -40,6 +42,7 @@ from documents.utils import QuerySetStream
 from documents.utils import identity
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
     from collections.abc import Iterator
     from collections.abc import Sequence
     from pathlib import Path
@@ -52,6 +55,19 @@ if TYPE_CHECKING:
     from documents.models import Document
 
 logger = logging.getLogger("paperless.search")
+
+# tantivy stores dates as signed 64-bit nanoseconds since the Unix epoch, which
+# covers 1677-09-21T00:12:43 to 2262-04-11T23:47:16 UTC
+_INDEX_DATE_NANOS_MIN: Final[int] = -(2**63)
+_INDEX_DATE_NANOS_MAX: Final[int] = 2**63 - 1
+_UNIX_EPOCH: Final[datetime] = datetime(1970, 1, 1, tzinfo=UTC)
+
+
+def _is_indexable_date(value: datetime) -> bool:
+    """Whether value, at whole-second precision, fits tantivy's date range."""
+    nanos = ((value - _UNIX_EPOCH) // timedelta(seconds=1)) * 1_000_000_000
+    return _INDEX_DATE_NANOS_MIN <= nanos <= _INDEX_DATE_NANOS_MAX
+
 
 _LOCK_TIMEOUT_SECONDS: Final[float] = 10.0  # per-attempt acquire timeout
 _LOCK_RETRY_ATTEMPTS: Final[int] = 4  # total attempts (1 initial + 3 retries)
@@ -195,52 +211,49 @@ class WriteBatch:
         return self._raw_writer
 
     def __enter__(self) -> Self:
-        if self._backend._path is not None:
-            lock_path = self._backend._path / ".tantivy.lock"
-            self._lock = filelock.FileLock(str(lock_path))
-            for attempt in range(_LOCK_RETRY_ATTEMPTS):
-                try:
-                    self._lock.acquire(timeout=self._lock_timeout)
-                    break
-                except filelock.Timeout:
-                    if attempt == _LOCK_RETRY_ATTEMPTS - 1:
-                        raise SearchIndexLockError(
-                            f"Could not acquire index lock after {_LOCK_RETRY_ATTEMPTS} "
-                            f"attempts (timeout={self._lock_timeout}s each)",
-                        )
-                    sleep_s = random.uniform(
-                        0,
-                        min(_LOCK_BACKOFF_CAP, _LOCK_BACKOFF_BASE * (2**attempt)),
+        lock_path = self._backend._path / ".tantivy.lock"
+        self._lock = filelock.FileLock(str(lock_path))
+        for attempt in range(_LOCK_RETRY_ATTEMPTS):
+            try:
+                self._lock.acquire(timeout=self._lock_timeout)
+                break
+            except filelock.Timeout:
+                if attempt == _LOCK_RETRY_ATTEMPTS - 1:
+                    raise SearchIndexLockError(
+                        f"Could not acquire index lock after {_LOCK_RETRY_ATTEMPTS} "
+                        f"attempts (timeout={self._lock_timeout}s each)",
                     )
-                    logger.debug(
-                        "Index lock contention; retrying in %.2fs (attempt %d/%d)",
-                        sleep_s,
-                        attempt + 1,
-                        _LOCK_RETRY_ATTEMPTS,
-                    )
-                    time.sleep(sleep_s)
+                sleep_s = random.uniform(
+                    0,
+                    min(_LOCK_BACKOFF_CAP, _LOCK_BACKOFF_BASE * (2**attempt)),
+                )
+                logger.debug(
+                    "Index lock contention; retrying in %.2fs (attempt %d/%d)",
+                    sleep_s,
+                    attempt + 1,
+                    _LOCK_RETRY_ATTEMPTS,
+                )
+                time.sleep(sleep_s)
 
-            # Open a fresh Index (and thus a fresh Tantivy ManagedDirectory)
-            # for the write, rather than reusing the process-local cached
-            # index. ManagedDirectory loads its GC bookkeeping (.managed.json)
-            # once, at construction, and never re-reads it; paperless runs
-            # several long-lived processes (Granian workers, Celery workers)
-            # that take turns writing under the file lock above. A cached,
-            # long-lived writer index would carry a stale managed-files view
-            # and, on commit, overwrite .managed.json with that stale view -
-            # permanently losing track of segment files other processes
-            # registered in the meantime, so they can never be garbage
-            # collected. Reopening fresh here always picks up the current
-            # on-disk state. The long-lived self._backend._index is used for
-            # reads only and is reloaded (not reopened) after commit below.
-            write_index = tantivy.Index(
-                build_schema(),
-                path=str(self._backend._path),
-            )
-            register_tokenizers(write_index, settings.SEARCH_LANGUAGE)
-            self._raw_writer = write_index.writer()
-        else:
-            self._raw_writer = self._backend._index.writer()
+        # Open a fresh Index (and thus a fresh Tantivy ManagedDirectory)
+        # for the write, rather than reusing the process-local cached
+        # index. ManagedDirectory loads its GC bookkeeping (.managed.json)
+        # once, at construction, and never re-reads it; paperless runs
+        # several long-lived processes (Granian workers, Celery workers)
+        # that take turns writing under the file lock above. A cached,
+        # long-lived writer index would carry a stale managed-files view
+        # and, on commit, overwrite .managed.json with that stale view -
+        # permanently losing track of segment files other processes
+        # registered in the meantime, so they can never be garbage
+        # collected. Reopening fresh here always picks up the current
+        # on-disk state. The long-lived self._backend._index is used for
+        # reads only and is reloaded (not reopened) after commit below.
+        write_index = tantivy.Index(
+            build_schema(),
+            path=str(self._backend._path),
+        )
+        register_tokenizers(write_index, settings.SEARCH_LANGUAGE)
+        self._raw_writer = write_index.writer()
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -271,9 +284,14 @@ class WriteBatch:
         and adding the new version. This ensures stale document data (e.g., after
         permission changes) doesn't persist in the index.
 
+        Only root documents are indexed, with their effective content, so a
+        version is indexed as its root document.
+
         Args:
             document: Django Document instance to index
         """
+        if document.root_document_id is not None:
+            document = document.root_document
         self.remove(document.pk)
         doc = self._backend._build_tantivy_doc(document)
         self._writer.add_document(doc)
@@ -298,22 +316,30 @@ class WriteBatch:
         An id with no matching document (e.g. deleted between the caller
         collecting ids and the batch running) is silently skipped, matching
         ``add_or_update()``'s existing single-document deferred-task behavior
-        rather than erroring or leaving a stale index entry.
+        rather than erroring or leaving a stale index entry. The id of a
+        version stands for its root document.
 
         Args:
             ids: Primary keys of Document instances to index
         """
         from documents.models import Document
         from documents.versioning import annotate_effective_content
+        from documents.versioning import root_document_ids
 
         ids = list(ids)
         if not ids:
             return
 
         queryset = annotate_effective_content(
-            Document.objects.filter(pk__in=ids)
+            Document.objects.filter(pk__in=root_document_ids(ids))
             .select_related("correspondent", "document_type", "storage_path", "owner")
-            .prefetch_related("tags", "notes__user", "custom_fields__field"),
+            .prefetch_related(
+                "tags",
+                "notes__user",
+                "custom_fields__field",
+                "barcodes",
+                "versions__barcodes",
+            ),
         )
         for document, grant in _DocumentViewerStream(queryset, chunk_size=1000):
             self.remove(document.pk)
@@ -325,14 +351,54 @@ class WriteBatch:
             self._writer.add_document(doc)
 
 
+def build_permission_filter(
+    schema: tantivy.Schema,
+    user: AbstractUser,
+    viewer_group_ids: Iterable[int] = (),
+) -> tantivy.Query:
+    """
+    Build a query filter for user document permissions.
+
+    Creates a query that matches only documents visible to the specified user
+    according to paperless-ngx permission rules:
+    - Public documents (no owner) are visible to all users
+    - Private documents are visible to their owner
+    - Documents explicitly shared with the user are visible
+    - Documents shared with one of the user's current groups are visible
+
+    Args:
+        schema: Tantivy schema for field validation
+        user: User to check permissions for
+        viewer_group_ids: Current group memberships for the user
+
+    Returns:
+        Tantivy query that filters results to visible documents
+    """
+    owner_any = tantivy.Query.exists_query("owner_id")
+    no_owner = tantivy.Query.boolean_query(
+        [
+            (tantivy.Occur.Must, tantivy.Query.all_query()),
+            (tantivy.Occur.MustNot, owner_any),
+        ],
+    )
+    owned = tantivy.Query.term_query(schema, "owner_id", user.pk)
+    shared = tantivy.Query.term_query(schema, "viewer_id", user.pk)
+    group_shared = [
+        tantivy.Query.term_query(schema, "viewer_group_id", group_id)
+        for group_id in viewer_group_ids
+    ]
+    return tantivy.Query.disjunction_max_query(
+        [no_owner, owned, shared, *group_shared],
+    )
+
+
 class TantivyBackend:
     """
     Tantivy search backend with explicit lifecycle management.
 
     Provides full-text search capabilities using the Tantivy search engine.
-    Supports in-memory indexes (for testing) and persistent on-disk indexes
-    (for production use). Handles document indexing, search queries, autocompletion,
-    and "more like this" functionality.
+    Keeps a persistent on-disk index. Handles document indexing, search queries,
+    autocompletion, and "more like this" functionality.
 
     The backend manages its own connection lifecycle and can be reset when
     the underlying index directory changes (e.g., during test isolation).
@@ -366,9 +432,7 @@ class TantivyBackend:
         },
     )
 
-    def __init__(self, path: Path | None = None):
-        # path=None → in-memory index (for tests)
-        # path=some_dir → on-disk index (for production)
+    def __init__(self, path: Path):
         self._path = path
         self._raw_index: tantivy.Index | None = None
         self._raw_schema: tantivy.Schema | None = None
@@ -387,16 +451,13 @@ class TantivyBackend:
         """
         Open or rebuild the index as needed.
 
-        For disk-based indexes, checks if rebuilding is needed due to schema
-        version or language changes. Registers custom tokenizers after opening.
+        Checks if rebuilding is needed due to schema version or language
+        changes. Registers custom tokenizers after opening.
         Safe to call multiple times - subsequent calls are no-ops.
         """
         if self._raw_index is not None:
             return  # pragma: no cover
-        if self._path is not None:
-            self._raw_index = open_or_rebuild_index(self._path)
-        else:
-            self._raw_index = tantivy.Index(build_schema())
+        self._raw_index = open_or_rebuild_index(self._path)
         register_tokenizers(self._raw_index, settings.SEARCH_LANGUAGE)
         self._raw_schema = self._raw_index.schema
 
@@ -421,6 +482,7 @@ class TantivyBackend:
     ) -> tantivy.Query:
         """Parse a user query string into a Tantivy Query object."""
         tz = get_current_timezone()
+        query = normalize_search_text(query)
         if search_mode is SearchMode.TEXT:
             return parse_simple_text_query(self._index, query)
         elif search_mode is SearchMode.TITLE:
@@ -469,79 +531,94 @@ class TantivyBackend:
         from guardian.shortcuts import get_groups_with_perms
         from guardian.shortcuts import get_users_with_perms
 
-        content = document.get_effective_content() or ""
+        # Every searchable string is normalized on the way in, and every
+        # query string on the way out (_parse_query), so the two agree on
+        # how a composed character is spelled. See normalize_search_text.
+        content = normalize_search_text(document.get_effective_content() or "")
+        title = normalize_search_text(document.title)
 
         doc = tantivy.Document()
 
         # Basic fields
         doc.add_unsigned("id", document.pk)
         doc.add_text("checksum", document.checksum)
-        doc.add_text("title", document.title)
-        doc.add_text("title_sort", document.title)
-        doc.add_text("simple_title", document.title)
+        doc.add_text("title", title)
+        doc.add_text("title_sort", title)
+        doc.add_text("simple_title", title)
         doc.add_text("content", content)
         doc.add_text("simple_content", content)
         # Bigram (character-ngram) fields exist for CJK substring search,
         # no need to bloat the bigram index with latin characters.
-        if cjk_title := extract_cjk_text(document.title):
+        if cjk_title := extract_cjk_text(title):
             doc.add_text("bigram_title", cjk_title)
         if content and (cjk_content := extract_cjk_text(content)):
             doc.add_text("bigram_content", cjk_content)
 
         # Original filename - only add if not None/empty
         if document.original_filename:
-            doc.add_text("original_filename", document.original_filename)
+            doc.add_text(
+                "original_filename",
+                normalize_search_text(document.original_filename),
+            )
 
         # Correspondent
         if document.correspondent:
-            doc.add_text("correspondent", document.correspondent.name)
-            doc.add_text("correspondent_sort", document.correspondent.name)
-            if cjk_corr := extract_cjk_text(document.correspondent.name):
+            correspondent = normalize_search_text(document.correspondent.name)
+            doc.add_text("correspondent", correspondent)
+            doc.add_text("correspondent_sort", correspondent)
+            if cjk_corr := extract_cjk_text(correspondent):
                 doc.add_text("bigram_correspondent", cjk_corr)
-            doc.add_unsigned("correspondent_id", document.correspondent_id)
 
         # Document type
         if document.document_type:
-            doc.add_text("document_type", document.document_type.name)
-            doc.add_text("type_sort", document.document_type.name)
-            if cjk_type := extract_cjk_text(document.document_type.name):
+            document_type = normalize_search_text(document.document_type.name)
+            doc.add_text("document_type", document_type)
+            doc.add_text("type_sort", document_type)
+            if cjk_type := extract_cjk_text(document_type):
                 doc.add_text("bigram_document_type", cjk_type)
-            doc.add_unsigned("document_type_id", document.document_type_id)
 
         # Storage path
         if document.storage_path:
-            doc.add_text("storage_path", document.storage_path.name)
-            doc.add_unsigned("storage_path_id", document.storage_path_id)
+            doc.add_text(
+                "storage_path",
+                normalize_search_text(document.storage_path.name),
+            )
 
         # Tags — collect names for autocomplete in the same pass
         tag_names: list[str] = []
         for tag in document.tags.all():
-            doc.add_text("tag", tag.name)
-            if cjk_tag := extract_cjk_text(tag.name):
+            tag_name = normalize_search_text(tag.name)
+            doc.add_text("tag", tag_name)
+            if cjk_tag := extract_cjk_text(tag_name):
                 doc.add_text("bigram_tag", cjk_tag)
-            doc.add_unsigned("tag_id", tag.pk)
-            tag_names.append(tag.name)
+            tag_names.append(tag_name)
 
         # Notes — JSON for structured queries (notes.user:alice, notes.note:text).
         # notes_text is a plain-text companion for snippet/highlight generation;
-        # tantivy's SnippetGenerator does not support JSON fields.
+        # tantivy's SnippetGenerator does not support JSON fields. It is not in
+        # _DEFAULT_SEARCH_FIELDS, so an unqualified query never searches it: a
+        # note matches through the JSON field or not at all.
         num_notes = 0
         note_texts: list[str] = []
         for note in document.notes.all():
             num_notes += 1
+            note_text = normalize_search_text(note.note)
             doc.add_json(
                 "notes",
                 {
-                    "note": note.note,
-                    "user": note.user.username if note.user else None,
+                    "note": note_text,
+                    "user": (
+                        normalize_search_text(note.user.username) if note.user else None
+                    ),
                 },
             )
-            note_texts.append(note.note)
+            note_texts.append(note_text)
         if note_texts:
             doc.add_text("notes_text", " ".join(note_texts))
 
-        # Custom fields — JSON for structured queries (custom_fields.name:x, custom_fields.value:y),
-        # companion text field for default full-text search.
+        # Custom fields: JSON for structured queries (custom_fields.name:x,
+        # custom_fields.value:y). There is no companion text field here, unlike
+        # notes: custom field values are reachable only through the JSON field.
         for cfi in document.custom_fields.all():
             search_value = cfi.value_for_search
             # Skip fields where there is no value yet
@@ -550,8 +627,18 @@ class TantivyBackend:
             doc.add_json(
                 "custom_fields",
                 {
-                    "name": cfi.field.name,
-                    "value": search_value,
+                    "name": normalize_search_text(cfi.field.name),
+                    "value": normalize_search_text(search_value),
+                },
+            )
+
+        # Barcodes: JSON field like custom_fields, only filled when stored
+        for barcode in document.get_effective_barcodes():
+            doc.add_json(
+                "barcodes",
+                {
+                    "value": normalize_search_text(barcode.value),
+                    "format": normalize_search_text(barcode.format),
                 },
             )
 
@@ -562,7 +649,15 @@ class TantivyBackend:
             document.created.day,
             tzinfo=UTC,
         )
-        doc.add_date("created", created_date)
+        if _is_indexable_date(created_date):
+            doc.add_date("created", created_date)
+        else:
+            logger.warning(
+                "Document %s has a created date (%s) outside the range the search "
+                "index can store; it will be indexed without a created date",
+                document.pk,
+                document.created,
+            )
         doc.add_date("modified", document.modified)
         doc.add_date("added", document.added)
 
@@ -605,11 +700,11 @@ class TantivyBackend:
             doc.add_unsigned("viewer_group_id", viewer_group_id)
 
         # Autocomplete words
-        text_sources = [document.title, content]
+        text_sources = [title, content]
         if document.correspondent:
-            text_sources.append(document.correspondent.name)
+            text_sources.append(correspondent)
         if document.document_type:
-            text_sources.append(document.document_type.name)
+            text_sources.append(document_type)
         text_sources.extend(tag_names)
 
         for word in sorted(_extract_autocomplete_words(text_sources)):
@@ -706,9 +801,22 @@ class TantivyBackend:
 
         self._ensure_open()
         user_query = self._parse_query(query, search_mode)
+        # _parse_query normalizes its own copy; the snippet queries below are
+        # built from the string directly, so normalize it here too.
+        query = normalize_search_text(query)
         highlight_query = user_query
         if search_mode is SearchMode.TEXT:
-            highlight_query = parse_simple_text_highlight_query(self._index, query)
+            try:
+                highlight_query = parse_simple_text_highlight_query(
+                    self._index,
+                    query,
+                )
+            except ValueError:
+                logger.debug(
+                    "Skipping simple text highlight query: token string is not "
+                    "valid tantivy query syntax: %r",
+                    query,
+                )
 
         # For notes_text snippet generation, we need a query that targets the
         # notes_text field directly. user_query may contain JSON-field terms
@@ -818,6 +926,7 @@ class TantivyBackend:
         sort_field: str | None = None,
         sort_reverse: bool = False,
         search_mode: SearchMode = SearchMode.QUERY,
+        filter_query: str | None = None,
         limit: int | None = None,
     ) -> list[int]:
         """
@@ -833,6 +942,7 @@ class TantivyBackend:
             sort_field: Field to sort by (None for relevance ranking)
             sort_reverse: Whether to reverse the sort order
             search_mode: Query parsing mode (QUERY, TEXT, or TITLE)
+            filter_query: Optional advanced query results must also match
             limit: Maximum number of IDs to return (None = all matching docs)
 
         Returns:
@@ -840,6 +950,13 @@ class TantivyBackend:
         """
         self._ensure_open()
         user_query = self._parse_query(query, search_mode)
+        if filter_query is not None:
+            user_query = user_query.and_must_match(
+                tantivy.Query.const_score_query(
+                    self._parse_query(filter_query, SearchMode.QUERY),
+                    0.0,  # zero so doesn't affect relevance
+                ),
+            )
         final_query = self._apply_permission_filter(user_query, user)
 
         searcher = self._index.searcher()
@@ -935,16 +1052,21 @@ class TantivyBackend:
         excluded from results.
 
         Args:
-            doc_id: Primary key of the reference document
+            doc_id: Primary key of the reference document, or of one of its
+                versions
             user: User for permission filtering (None for no filtering)
             limit: Maximum number of IDs to return (None = all matching docs)
 
         Returns:
             List of similar document IDs (excluding the original)
         """
+        from documents.versioning import root_document_ids
+
         self._ensure_open()
         searcher = self._index.searcher()
 
+        # Only root documents are indexed, so a version stands for its root
+        doc_id = next(iter(root_document_ids([doc_id])), doc_id)
         id_query = tantivy.Query.term_query(self._schema, "id", doc_id)
         results = searcher.search(id_query, limit=1)
 
@@ -1031,44 +1153,45 @@ class TantivyBackend:
                 writer's threads). Larger values buffer more docs in RAM before
                 flushing a segment, deferring merge work; they do not avoid it.
         """
-        # Create new index (on-disk or in-memory)
-        if self._path is not None:
-            wipe_index(self._path)
+        wipe_index(self._path)
+        # The marker covers the window where the empty index is already stamped
+        # as current but not yet populated, so an interrupted rebuild is retried.
+        with rebuild_in_progress(self._path):
             new_index = tantivy.Index(build_schema(), path=str(self._path))
             _write_sentinels(self._path)
-        else:
-            new_index = tantivy.Index(build_schema())
-        register_tokenizers(new_index, settings.SEARCH_LANGUAGE)
+            register_tokenizers(new_index, settings.SEARCH_LANGUAGE)
 
-        # Point instance at the new index so _build_tantivy_doc uses it
-        old_index, old_schema = self._raw_index, self._raw_schema
-        self._raw_index = new_index
-        self._raw_schema = new_index.schema
-        # Stream documents one-by-one (so the progress bar advances per
-        # document) while fetching viewer permissions one SQL query per chunk.
-        # The stream is Sized, so iter_wrapper can still discover the total.
-        documents_stream = _DocumentViewerStream(documents, chunk_size=1000)
-        try:
-            writer = new_index.writer(heap_size=writer_heap_bytes)
-            for document, (viewer_ids, viewer_group_ids) in iter_wrapper(
-                documents_stream,
-            ):
-                doc = self._build_tantivy_doc(
-                    document,
-                    viewer_ids=viewer_ids,
-                    viewer_group_ids=viewer_group_ids,
-                )
-                writer.add_document(doc)
-            writer.commit()
-            # Wait for background merge threads to finish so all segments are
-            # fully merged and persisted before the index is considered rebuilt.
-            writer.wait_merging_threads()
-            new_index.reload()
-        except BaseException:  # pragma: no cover
-            # Restore old index on failure so the backend remains usable
-            self._raw_index = old_index
-            self._raw_schema = old_schema
-            raise
+            # Point instance at the new index so _build_tantivy_doc uses it
+            old_index, old_schema = self._raw_index, self._raw_schema
+            self._raw_index = new_index
+            self._raw_schema = new_index.schema
+            # Stream documents one-by-one (so the progress bar advances per
+            # document) while fetching viewer permissions one SQL query per
+            # chunk. The stream is Sized, so iter_wrapper can still discover
+            # the total.
+            documents_stream = _DocumentViewerStream(documents, chunk_size=1000)
+            try:
+                writer = new_index.writer(heap_size=writer_heap_bytes)
+                for document, (viewer_ids, viewer_group_ids) in iter_wrapper(
+                    documents_stream,
+                ):
+                    doc = self._build_tantivy_doc(
+                        document,
+                        viewer_ids=viewer_ids,
+                        viewer_group_ids=viewer_group_ids,
+                    )
+                    writer.add_document(doc)
+                writer.commit()
+                # Wait for background merge threads to finish so all segments
+                # are fully merged and persisted before the index is considered
+                # rebuilt.
+                writer.wait_merging_threads()
+                new_index.reload()
+            except BaseException:  # pragma: no cover
+                # Restore old index on failure so the backend remains usable
+                self._raw_index = old_index
+                self._raw_schema = old_schema
+                raise
 
 
 def chunked(iterable, size):

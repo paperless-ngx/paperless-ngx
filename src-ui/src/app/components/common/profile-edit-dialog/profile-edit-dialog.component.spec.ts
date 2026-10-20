@@ -100,7 +100,7 @@ describe('ProfileEditDialogComponent', () => {
     expect(errorSpy).toHaveBeenCalled()
 
     updateSpy.mockClear()
-    const infoSpy = jest.spyOn(toastService, 'showInfo')
+    const infoSpy = jest.spyOn(toastService, 'showSuccess')
     component.form.patchValue(newProfile)
     updateSpy.mockReturnValueOnce(of(newProfile))
     component.save()
@@ -215,6 +215,38 @@ describe('ProfileEditDialogComponent', () => {
     expect(navSpy).toHaveBeenCalledWith(
       `${window.location.origin}/accounts/logout/?next=/accounts/login/?next=/`
     )
+    jest.useRealTimers()
+  })
+
+  it('should logout under base href on save if password changed', () => {
+    jest.useFakeTimers()
+    const base = document.createElement('base')
+    base.href = '/paperless/'
+    document.head.appendChild(base)
+    const getSpy = jest.spyOn(profileService, 'get')
+    getSpy.mockReturnValue(of(profile))
+    const getProvidersSpy = jest.spyOn(
+      profileService,
+      'getSocialAccountProviders'
+    )
+    getProvidersSpy.mockReturnValue(of(socialAccountProviders))
+    component.ngOnInit()
+    component['newPassword'] = 'new*pass'
+    component.form.get('password').patchValue('new*pass')
+    component.form.get('password_confirm').patchValue('new*pass')
+
+    const updateSpy = jest.spyOn(profileService, 'update')
+    updateSpy.mockReturnValue(of(null))
+    const navSpy = jest
+      .spyOn(navUtils, 'setLocationHref')
+      .mockImplementation(() => {})
+    component.save()
+    expect(updateSpy).toHaveBeenCalled()
+    jest.advanceTimersByTime(2600)
+    expect(navSpy).toHaveBeenCalledWith(
+      `${window.location.origin}/paperless/accounts/logout/?next=/paperless/accounts/login/?next=/paperless/`
+    )
+    base.remove()
     jest.useRealTimers()
   })
 
@@ -341,7 +373,7 @@ describe('ProfileEditDialogComponent', () => {
   it('should activate totp', () => {
     const activateSpy = jest.spyOn(profileService, 'activateTotp')
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    const toastInfoSpy = jest.spyOn(toastService, 'showSuccess')
     const error = new Error('failed to activate totp')
     activateSpy.mockReturnValueOnce(throwError(() => error))
     component.totpSettings.set({
@@ -373,7 +405,7 @@ describe('ProfileEditDialogComponent', () => {
   it('should deactivate totp', () => {
     const deactivateSpy = jest.spyOn(profileService, 'deactivateTotp')
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    const toastInfoSpy = jest.spyOn(toastService, 'showSuccess')
     const error = new Error('failed to deactivate totp')
     deactivateSpy.mockReturnValueOnce(throwError(() => error))
     component.deactivateTotp()

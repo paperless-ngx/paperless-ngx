@@ -14,7 +14,7 @@ permissions: {}
 jobs:
   wait-for-docker:
     name: Wait for Docker Build
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       checks: read
       statuses: read
@@ -30,7 +30,7 @@ jobs:
   build-release:
     name: Build Release
     needs: wait-for-docker
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
     steps:
@@ -40,7 +40,7 @@ jobs:
           persist-credentials: false
       # ---- Frontend Build ----
       - name: Install pnpm
-        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
+        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
         with:
           package_json_file: src-ui/package.json
       - name: Use Node.js 24
@@ -59,7 +59,7 @@ jobs:
         with:
           python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
       - name: Install uv
-        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
           version: ${{ env.DEFAULT_UV_VERSION }}
           enable-cache: false
@@ -70,9 +70,10 @@ jobs:
         run: |
           uv sync --python "${PYTHON_VERSION}" --dev --frozen
       - name: Install system dependencies
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -qq --no-install-recommends gettext liblept5
+        timeout-minutes: 12
+        uses: $/.github/actions/apt-install
+        with:
+          packages: gettext libleptonica6
       # ---- Build Documentation ----
       - name: Build documentation
         env:
@@ -144,7 +145,7 @@ jobs:
   publish-release:
     name: Publish Release
     needs: build-release
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: write
       pull-requests: write
@@ -196,7 +197,7 @@ jobs:
     name: Append Changelog
     needs: publish-release
     if: needs.publish-release.outputs.prerelease == 'false'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: write
       pull-requests: write
@@ -212,7 +213,7 @@ jobs:
         with:
           python-version: ${{ env.DEFAULT_PYTHON_VERSION }}
       - name: Install uv
-        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
           version: ${{ env.DEFAULT_UV_VERSION }}
           enable-cache: false

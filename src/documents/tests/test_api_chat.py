@@ -4,20 +4,22 @@ from typing import TYPE_CHECKING
 from unittest import mock
 
 import pytest
-from django.contrib.auth.models import Permission
-from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.test import APIClient
 from rest_framework.test import APITestCase
 
+from paperless_testing.factories import UserFactory
+from paperless_testing.permissions import grant_global
+
 if TYPE_CHECKING:
+    from django.contrib.auth.models import User
     from pytest_mock import MockerFixture
 
 
 class TestChatStreamingViewInputValidation(APITestCase):
     def setUp(self) -> None:
         super().setUp()
-        self.user = User.objects.create_superuser(username="temp_admin")
+        self.user = UserFactory(username="temp_admin", superuser=True)
         self.client.force_authenticate(user=self.user)
 
     def _mock_ai_enabled(self) -> mock.MagicMock:
@@ -37,6 +39,42 @@ class TestChatStreamingViewInputValidation(APITestCase):
                 format="json",
             )
         assert resp.status_code == status.HTTP_400_BAD_REQUEST
+
+    def test_answer_is_not_compressed(self) -> None:
+        """
+        GIVEN:
+            - A client that accepts compressed responses
+        WHEN:
+            - It asks the chat endpoint a question
+        THEN:
+            - The answer is streamed unencoded, chunk for chunk
+
+        The stream compressors buffer, so a compressed answer arrives in one
+        piece. The view cannot opt out by flagging the request: DRF's request
+        wrapper proxies reads but keeps writes to itself, so the flag never
+        reaches the Django request the middleware sees.
+        """
+        chunks = [f"token{i} " for i in range(40)]
+        with (
+            mock.patch(
+                "documents.views.AIConfig",
+                return_value=self._mock_ai_enabled(),
+            ),
+            mock.patch(
+                "documents.views.stream_chat_with_documents",
+                return_value=iter(chunks),
+            ),
+        ):
+            resp = self.client.post(
+                "/api/documents/chat/",
+                {"q": "What is in my archive?"},
+                format="json",
+                HTTP_ACCEPT_ENCODING="gzip, deflate, br, zstd",
+            )
+
+        assert resp.status_code == status.HTTP_200_OK
+        assert not resp.has_header("Content-Encoding")
+        assert list(resp.streaming_content) == [c.encode() for c in chunks]
 
     def test_missing_question_is_rejected(self) -> None:
         with mock.patch(
@@ -77,9 +115,7 @@ class TestChatStreamingViewUnrestrictedFlag:
         needs to reach the view at all. Model-level only: says nothing
         about which documents (if any) this user can actually see.
         """
-        regular_user.user_permissions.add(
-            *Permission.objects.filter(codename="view_document"),
-        )
+        grant_global(regular_user, "view_document")
         return user_client
 
     @pytest.mark.parametrize(

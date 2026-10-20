@@ -7,8 +7,9 @@ import {
 import { EventEmitter, signal } from '@angular/core'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { By } from '@angular/platform-browser'
+import { Router } from '@angular/router'
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { allIcons, NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { of, throwError } from 'rxjs'
 import { Correspondent } from 'src/app/data/correspondent'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
@@ -38,6 +39,7 @@ import { TagService } from 'src/app/services/rest/tag.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
+import { TrashService } from 'src/app/services/trash.service'
 import { environment } from 'src/environments/environment'
 import { CorrespondentEditDialogComponent } from '../../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
 import { CustomFieldEditDialogComponent } from '../../common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
@@ -46,7 +48,6 @@ import { StoragePathEditDialogComponent } from '../../common/edit-dialog/storage
 import { TagEditDialogComponent } from '../../common/edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
 import { FilterableDropdownComponent } from '../../common/filterable-dropdown/filterable-dropdown.component'
 import { ShareLinkBundleDialogComponent } from '../../common/share-link-bundle-dialog/share-link-bundle-dialog.component'
-import { ShareLinkBundleManageDialogComponent } from '../../common/share-link-bundle-manage-dialog/share-link-bundle-manage-dialog.component'
 import { BulkEditorComponent } from './bulk-editor.component'
 
 const selectionData: SelectionData = {
@@ -74,6 +75,7 @@ describe('BulkEditorComponent', () => {
   let documentListViewService: DocumentListViewService
   let documentService: DocumentService
   let toastService: ToastService
+  let trashService: TrashService
   let modalService: NgbModal
   let tagService: TagService
   let correspondentsService: CorrespondentService
@@ -82,6 +84,7 @@ describe('BulkEditorComponent', () => {
   let customFieldsService: CustomFieldsService
   let httpTestingController: HttpTestingController
   let shareLinkBundleService: ShareLinkBundleService
+  let router: Router
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
@@ -167,10 +170,13 @@ describe('BulkEditorComponent', () => {
           provide: ShareLinkBundleService,
           useValue: {
             createBundle: jest.fn(),
-            listAllBundles: jest.fn(),
             rebuildBundle: jest.fn(),
             delete: jest.fn(),
           },
+        },
+        {
+          provide: Router,
+          useValue: { navigate: jest.fn().mockResolvedValue(true) },
         },
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
@@ -181,6 +187,7 @@ describe('BulkEditorComponent', () => {
     documentListViewService = TestBed.inject(DocumentListViewService)
     documentService = TestBed.inject(DocumentService)
     toastService = TestBed.inject(ToastService)
+    trashService = TestBed.inject(TrashService)
     modalService = TestBed.inject(NgbModal)
     tagService = TestBed.inject(TagService)
     correspondentsService = TestBed.inject(CorrespondentService)
@@ -189,6 +196,7 @@ describe('BulkEditorComponent', () => {
     customFieldsService = TestBed.inject(CustomFieldsService)
     httpTestingController = TestBed.inject(HttpTestingController)
     shareLinkBundleService = TestBed.inject(ShareLinkBundleService)
+    router = TestBed.inject(Router)
 
     fixture = TestBed.createComponent(BulkEditorComponent)
     component = fixture.componentInstance
@@ -387,6 +395,42 @@ describe('BulkEditorComponent', () => {
     expect(component.tagSelectionModel.selectionSize()).toEqual(1)
   })
 
+  it('should request selection data for tags when documents are excluded from an all-filtered selection', () => {
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
+    fixture.detectChanges()
+    jest
+      .spyOn(documentListViewService, 'allSelected', 'get')
+      .mockReturnValue(true)
+    jest
+      .spyOn(documentListViewService, 'excluded', 'get')
+      .mockReturnValue(new Set([4]))
+    jest
+      .spyOn(documentListViewService, 'filterRules', 'get')
+      .mockReturnValue([{ rule_type: FILTER_TITLE, value: 'apple' }])
+    jest
+      .spyOn(documentListViewService, 'selectedCount', 'get')
+      .mockReturnValue(2)
+    const adjustedSelectionData: SelectionData = {
+      ...selectionData,
+      selected_tags: [{ id: 12, document_count: 2 }],
+    }
+    const getSelectionDataSpy = jest
+      .spyOn(documentService, 'getSelectionData')
+      .mockReturnValue(of(adjustedSelectionData))
+
+    component.openTagsDropdown()
+
+    expect(getSelectionDataSpy).toHaveBeenCalledWith({
+      all: true,
+      filters: { title_search: 'apple' },
+      excluded_documents: [4],
+    })
+    expect(component.tagDocumentCounts()).toEqual(
+      adjustedSelectionData.selected_tags
+    )
+    expect(component.tagSelectionModel.selectionSize()).toEqual(1)
+  })
+
   it('should apply list selection data to document types menu when all filtered documents are selected', () => {
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
     fixture.detectChanges()
@@ -455,6 +499,47 @@ describe('BulkEditorComponent', () => {
     )
   })
 
+  it('should request selection data for the other metadata menus when documents are excluded', () => {
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
+    fixture.detectChanges()
+    jest
+      .spyOn(documentListViewService, 'allSelected', 'get')
+      .mockReturnValue(true)
+    jest
+      .spyOn(documentListViewService, 'excluded', 'get')
+      .mockReturnValue(new Set([4]))
+    jest
+      .spyOn(documentListViewService, 'filterRules', 'get')
+      .mockReturnValue([{ rule_type: FILTER_TITLE, value: 'apple' }])
+    const getSelectionDataSpy = jest
+      .spyOn(documentService, 'getSelectionData')
+      .mockReturnValue(of(selectionData))
+
+    component.openDocumentTypeDropdown()
+    component.openCorrespondentDropdown()
+    component.openStoragePathDropdown()
+    component.openCustomFieldsDropdown()
+
+    expect(getSelectionDataSpy).toHaveBeenCalledTimes(4)
+    expect(getSelectionDataSpy).toHaveBeenCalledWith({
+      all: true,
+      filters: { title_search: 'apple' },
+      excluded_documents: [4],
+    })
+    expect(component.documentTypeDocumentCounts()).toEqual(
+      selectionData.selected_document_types
+    )
+    expect(component.correspondentDocumentCounts()).toEqual(
+      selectionData.selected_correspondents
+    )
+    expect(component.storagePathDocumentCounts()).toEqual(
+      selectionData.selected_storage_paths
+    )
+    expect(component.customFieldDocumentCounts()).toEqual(
+      selectionData.selected_custom_fields
+    )
+  })
+
   it('should execute modify tags bulk operation', () => {
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
     jest
@@ -496,16 +581,19 @@ describe('BulkEditorComponent', () => {
       .mockReturnValue([{ id: 3 }, { id: 4 }])
     jest
       .spyOn(documentListViewService, 'selected', 'get')
-      .mockReturnValue(new Set([3, 4]))
+      .mockReturnValue(new Set([3]))
     jest
       .spyOn(documentListViewService, 'allSelected', 'get')
       .mockReturnValue(true)
+    jest
+      .spyOn(documentListViewService, 'excluded', 'get')
+      .mockReturnValue(new Set([4]))
     jest
       .spyOn(documentListViewService, 'filterRules', 'get')
       .mockReturnValue([{ rule_type: FILTER_TITLE, value: 'apple' }])
     jest
       .spyOn(documentListViewService, 'selectedCount', 'get')
-      .mockReturnValue(25)
+      .mockReturnValue(24)
     jest
       .spyOn(permissionsService, 'currentUserHasObjectPermissions')
       .mockReturnValue(true)
@@ -524,6 +612,7 @@ describe('BulkEditorComponent', () => {
     expect(req.request.body).toEqual({
       all: true,
       filters: { title_search: 'apple' },
+      excluded_documents: [4],
       method: 'modify_tags',
       parameters: { add_tags: [101], remove_tags: [] },
     })
@@ -1078,10 +1167,14 @@ describe('BulkEditorComponent', () => {
     let req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}documents/delete/`
     )
+    const notifySpy = jest
+      .spyOn(trashService, 'notifyMovedToTrash')
+      .mockImplementation(() => {})
     req.flush(true)
     expect(req.request.body).toEqual({
       documents: [3, 4],
     })
+    expect(notifySpy).toHaveBeenCalledWith(expect.any(String), [3, 4])
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
     ) // list reload
@@ -1091,10 +1184,19 @@ describe('BulkEditorComponent', () => {
 
     component.showConfirmationDialogs = false
     fixture.detectChanges()
+    jest
+      .spyOn(documentListViewService, 'allSelected', 'get')
+      .mockReturnValue(true)
     component.applyDelete()
     req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}documents/delete/`
     )
+    req.flush(true)
+    // ids aren't known when all matching documents are selected, so no undo
+    expect(notifySpy).toHaveBeenLastCalledWith(expect.any(String), null)
+    httpTestingController.match(
+      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
+    ) // list reload
   })
 
   it('should not be accessible with insufficient global permissions', () => {
@@ -1330,7 +1432,7 @@ describe('BulkEditorComponent', () => {
     const mergeAsVersionsSpy = jest
       .spyOn(documentService, 'mergeDocumentsAsVersions')
       .mockReturnValue(of(true))
-    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    const toastSuccessSpy = jest.spyOn(toastService, 'showSuccess')
     fixture.detectChanges()
 
     component.mergeSelectedAsVersions()
@@ -1346,7 +1448,9 @@ describe('BulkEditorComponent', () => {
       `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
     )
     expect(documentListViewService.selected.size).toEqual(0)
-    expect(toastInfoSpy).toHaveBeenCalledWith('Documents merged as versions.')
+    expect(toastSuccessSpy).toHaveBeenCalledWith(
+      'Documents merged as versions.'
+    )
   })
 
   it('should not report success when merging documents as versions fails', () => {
@@ -1372,7 +1476,7 @@ describe('BulkEditorComponent', () => {
     jest
       .spyOn(documentService, 'mergeDocumentsAsVersions')
       .mockReturnValue(throwError(() => new Error('failed')))
-    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    const toastSuccessSpy = jest.spyOn(toastService, 'showSuccess')
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
     fixture.detectChanges()
 
@@ -1381,7 +1485,7 @@ describe('BulkEditorComponent', () => {
     modal.componentInstance.confirm()
 
     expect(toastErrorSpy).toHaveBeenCalled()
-    expect(toastInfoSpy).not.toHaveBeenCalled()
+    expect(toastSuccessSpy).not.toHaveBeenCalled()
   })
 
   it('should support bulk download with archive, originals or both and file formatting', () => {
@@ -1760,7 +1864,7 @@ describe('BulkEditorComponent', () => {
       .spyOn(documentListViewService, 'selected', 'get')
       .mockReturnValue(new Set([3, 4]))
     fixture.detectChanges()
-    const toastServiceShowInfoSpy = jest.spyOn(toastService, 'showInfo')
+    const toastServiceShowInfoSpy = jest.spyOn(toastService, 'showSuccess')
     const toastServiceShowErrorSpy = jest.spyOn(toastService, 'showError')
     const listReloadSpy = jest.spyOn(documentListViewService, 'reload')
 
@@ -1824,9 +1928,9 @@ describe('BulkEditorComponent', () => {
       },
     }
 
-    const openSpy = jest.spyOn(modalService, 'open')
-    openSpy.mockReturnValueOnce(modalRef as NgbModalRef)
-    openSpy.mockReturnValueOnce({} as NgbModalRef)
+    const openSpy = jest
+      .spyOn(modalService, 'open')
+      .mockReturnValueOnce(modalRef as NgbModalRef)
     ;(shareLinkBundleService.createBundle as jest.Mock).mockReturnValueOnce(
       of({ id: 42 })
     )
@@ -1860,11 +1964,9 @@ describe('BulkEditorComponent', () => {
 
     dialogInstance.onOpenManage()
     expect(modalRef.close).toHaveBeenCalled()
-    expect(openSpy).toHaveBeenNthCalledWith(
-      2,
-      ShareLinkBundleManageDialogComponent,
-      expect.objectContaining({ backdrop: 'static', size: 'lg' })
-    )
+    expect(router.navigate).toHaveBeenCalledWith(['/share-links'], {
+      queryParams: { type: 'bundles' },
+    })
     openSpy.mockRestore()
   })
 
@@ -1917,13 +2019,10 @@ describe('BulkEditorComponent', () => {
     openSpy.mockRestore()
   })
 
-  it('should open share link bundle management dialog', () => {
-    const openSpy = jest.spyOn(modalService, 'open')
+  it('should navigate to share link bundle management', () => {
     component.manageShareLinkBundles()
-    expect(openSpy).toHaveBeenCalledWith(
-      ShareLinkBundleManageDialogComponent,
-      expect.objectContaining({ backdrop: 'static', size: 'lg' })
-    )
-    openSpy.mockRestore()
+    expect(router.navigate).toHaveBeenCalledWith(['/share-links'], {
+      queryParams: { type: 'bundles' },
+    })
   })
 })

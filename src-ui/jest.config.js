@@ -15,6 +15,8 @@ module.exports = {
         tsconfig: '<rootDir>/tsconfig.spec.json',
         stringifyContentPathRegex: '\\.(html|svg)$',
         useESM: true,
+        // Disable the builder's deprecated override; tsconfig.spec.json enables isolation.
+        isolatedModules: false,
       },
     ],
   },
@@ -26,7 +28,7 @@ module.exports = {
     'abstract-paperless-service',
   ],
   transformIgnorePatterns: [
-    'node_modules/(?!.*(\\.mjs$|tslib|lodash-es|normalize-diacritics|@angular/common/locales/.*\\.js$))',
+    'node_modules/(?!.*(\\.mjs$|tslib|lodash-es|normalize-diacritics|marked|@angular/common/locales/.*\\.js$))',
   ],
   moduleNameMapper: {
     ...esmPreset.moduleNameMapper,

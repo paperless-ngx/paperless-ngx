@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core'
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { Router } from '@angular/router'
 import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap'
@@ -34,6 +34,7 @@ export class OcrTemplatesComponent
   private readonly router = inject(Router)
   private readonly modalService = inject(NgbModal)
   private readonly toastService = inject(ToastService)
+  private readonly changeDetector = inject(ChangeDetectorRef)
   permissionsService = inject(PermissionsService)
 
   public templates: OcrTemplate[] = []
@@ -47,12 +48,13 @@ export class OcrTemplatesComponent
         this.documentTypeNames = new Map(
           r.results.map((dt) => [dt.id, dt.name])
         )
+        this.changeDetector.markForCheck()
       })
     this.reload()
   }
 
   reload() {
-    this.loading = true
+    this.loading.set(true)
     this.service
       .listAll()
       .pipe(
@@ -61,8 +63,8 @@ export class OcrTemplatesComponent
         delay(100)
       )
       .subscribe(() => {
-        this.show = true
-        this.loading = false
+        this.show.set(true)
+        this.loading.set(false)
       })
   }
 
@@ -86,6 +88,7 @@ export class OcrTemplatesComponent
     this.service.patch(t).subscribe({
       error: (error) => {
         t.enabled = !enabled
+        this.changeDetector.markForCheck()
         this.toastService.showError(
           $localize`Error updating OCR template.`,
           error

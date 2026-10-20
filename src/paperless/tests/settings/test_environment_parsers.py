@@ -8,6 +8,7 @@ from paperless.settings.parsers import get_bool_from_env
 from paperless.settings.parsers import get_choice_from_env
 from paperless.settings.parsers import get_float_from_env
 from paperless.settings.parsers import get_int_from_env
+from paperless.settings.parsers import get_json_from_env
 from paperless.settings.parsers import get_list_from_env
 from paperless.settings.parsers import get_path_from_env
 from paperless.settings.parsers import parse_dict_from_str
@@ -611,3 +612,43 @@ class TestGetEnvChoice:
         result = get_choice_from_env("TEST_ENV", large_choices)
 
         assert result == "option_50"
+
+
+class TestGetJsonFromEnv:
+    @pytest.mark.parametrize(
+        ("env_value", "expected_type", "expected"),
+        [
+            pytest.param(None, list, ["default"], id="unset-uses-default"),
+            pytest.param('["a", "b"]', list, ["a", "b"], id="list"),
+            pytest.param('["a"]', None, ["a"], id="no-type-check"),
+        ],
+    )
+    def test_returns_value(
+        self,
+        mocker: MockerFixture,
+        env_value: str | None,
+        expected_type: type | None,
+        expected: list[str],
+    ) -> None:
+        env = {} if env_value is None else {"TEST_ENV": env_value}
+        mocker.patch.dict("os.environ", env, clear=True)
+
+        assert get_json_from_env("TEST_ENV", ["default"], expected_type) == expected
+
+    @pytest.mark.parametrize(
+        ("env_value", "match"),
+        [
+            pytest.param('["a", , "b"]', "'TEST_ENV' is not valid JSON", id="invalid"),
+            pytest.param('{"a": 1}', "must be a JSON list, got dict", id="wrong-type"),
+        ],
+    )
+    def test_raises(
+        self,
+        mocker: MockerFixture,
+        env_value: str,
+        match: str,
+    ) -> None:
+        mocker.patch.dict("os.environ", {"TEST_ENV": env_value})
+
+        with pytest.raises(ValueError, match=match):
+            get_json_from_env("TEST_ENV", [], list)

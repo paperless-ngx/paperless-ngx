@@ -1,15 +1,11 @@
 .dropdown-menu {
-  width: var(--pngx-toast-max-width);
+  width: min(36rem, calc(100vw - 20px));
 }
 
 .chat-messages {
-  max-height: 350px;
+  max-height: min(60dvh, 36rem);
   overflow-y: auto;
   white-space: pre-wrap;
-}
-
-.chat-references {
-  font-family: var(--bs-font-sans-serif);
 }
 
 .dropdown-toggle::after {
@@ -20,23 +16,44 @@
   white-space: initial;
 }
 
-@media screen and (max-width: 400px) {
-  :host ::ng-deep .dropdown-menu-end {
-    right: -3rem;
+@media screen and (max-width: 575.98px) {
+  .chat-messages {
+    max-height: calc(100dvh - 12rem);
   }
 }
 
-.blinking-cursor {
-  font-weight: bold;
-  font-size: 1.2em;
-  animation: blink 1s step-end infinite;
+.chat-markdown.streaming ::ng-deep {
+  > :last-child:not(ul, ol, table)::after,
+  > :is(ul, ol):last-child > li:last-child::after {
+    content: '';
+    display: inline-block;
+    width: 2px;
+    height: 1.05em;
+    margin-left: 2px;
+    background-color: currentColor;
+    vertical-align: -0.15em;
+    animation: blink 1s step-end infinite;
+  }
 }
 
 @keyframes blink {
-  from, to {
+  50% {
     opacity: 0;
   }
-  50% {
-    opacity: 1;
+}
+
+.chat-markdown ::ng-deep {
+  h1, h2, h3, h4, h5, h6 {
+    font-size: 1em;
+    font-weight: bold;
+  }
+
+  th, td {
+    padding: 0.15rem 0.4rem;
+    border: 1px solid var(--bs-border-color);
+  }
+
+  > :last-child {
+    margin-bottom: 0;
   }
 }

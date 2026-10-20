@@ -112,6 +112,22 @@
 
                 <pngx-input-check i18n-title title="Use 'slim' sidebar (icons only)" formControlName="slimSidebarEnabled"></pngx-input-check>
 
+                <p class="mb-2 mt-3" i18n>Sidebar items to show:</p>
+                @for (option of sidebarItemOptions; track option.id) {
+                  <div class="form-check">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      [id]="'sidebar-item-setting-' + option.id"
+                      [checked]="isSidebarItemShown(option.id)"
+                      (change)="toggleSidebarItem(option.id, $event.target.checked)"
+                    />
+                    <label class="form-check-label" [for]="'sidebar-item-setting-' + option.id">
+                      {{ option.label }}
+                    </label>
+                  </div>
+                }
+
               </div>
             </div>
 
@@ -236,6 +252,24 @@
                 <pngx-input-check i18n-title title="Automatically remove inbox tag(s) on save" formControlName="documentEditingRemoveInboxTags"></pngx-input-check>
               </div>
             </div>
+
+            @if (aiEnabled) {
+              <div class="row mb-3">
+                <div class="col-md-3 col-form-label pt-0">
+                  <span i18n>Suggestions default to</span>
+                </div>
+                <div class="col">
+                  <fieldset class="btn-group btn-group-sm">
+                    <input type="radio" class="btn-check" id="suggestionSourceBoth" [value]="SuggestionSource.Both" formControlName="documentEditingSuggestionSource">
+                    <label class="btn btn-outline-primary" for="suggestionSourceBoth"><ng-container i18n>Both</ng-container></label>
+                    <input type="radio" class="btn-check" id="suggestionSourceML" [value]="SuggestionSource.ML" formControlName="documentEditingSuggestionSource">
+                    <label class="btn btn-outline-primary" for="suggestionSourceML"><i-bs class="me-1" name="cpu"></i-bs><ng-container i18n>ML only</ng-container></label>
+                    <input type="radio" class="btn-check" id="suggestionSourceAI" [value]="SuggestionSource.AI" formControlName="documentEditingSuggestionSource">
+                    <label class="btn btn-outline-primary" for="suggestionSourceAI"><i-bs class="me-1" name="stars"></i-bs><ng-container i18n>AI only</ng-container></label>
+                  </fieldset>
+                </div>
+              </div>
+            }
 
             <div class="row">
               <div class="col">
@@ -391,10 +425,8 @@
 
         <div class="row">
           <div class="col">
-            <pngx-input-check i18n-title title="Show notifications when new documents are detected" formControlName="notificationsConsumerNewDocument"></pngx-input-check>
-            <pngx-input-check i18n-title title="Show notifications when document processing completes successfully" formControlName="notificationsConsumerSuccess"></pngx-input-check>
+            <pngx-input-check i18n-title title="Add notifications when document processing completes successfully" formControlName="notificationsConsumerSuccess" i18n-hint hint="These are added to the notifications menu without a popup, processing progress is shown at the bottom of the screen."></pngx-input-check>
             <pngx-input-check i18n-title title="Show notifications when document processing fails" formControlName="notificationsConsumerFailed"></pngx-input-check>
-            <pngx-input-check i18n-title title="Suppress notifications on dashboard" formControlName="notificationsConsumerSuppressOnDashboard" i18n-hint hint="This will suppress all messages about document processing status on the dashboard."></pngx-input-check>
           </div>
         </div>
 

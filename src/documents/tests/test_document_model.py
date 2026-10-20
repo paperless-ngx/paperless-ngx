@@ -4,13 +4,16 @@ from datetime import date
 from pathlib import Path
 from unittest import mock
 
+import pytest
 from django.test import TestCase
 from django.test import override_settings
 from faker import Faker
+from pytest_mock import MockerFixture
 
 from documents.models import Correspondent
 from documents.models import Document
 from documents.tasks import empty_trash
+from paperless_testing.factories import DocumentFactory
 
 
 class TestDocument(TestCase):
@@ -257,3 +260,72 @@ def test_suggestion_content() -> None:
     )
     doc.content = content_over_limit
     assert doc.suggestion_content == expected_cropped_content
+
+
+class TestPublicFilenameLength:
+    @pytest.fixture(autouse=True)
+    def _no_parser_registry(self, mocker: MockerFixture) -> None:
+        # The parser registry reads ApplicationConfiguration from the database
+        extensions = {"application/pdf": ".pdf", "image/jpeg": ".jpg"}
+        mocker.patch(
+            "documents.models.get_default_file_extension",
+            side_effect=extensions.__getitem__,
+        )
+
+    LIMIT = Document.MAX_PUBLIC_FILENAME_BYTES
+
+    @pytest.mark.parametrize(
+        ("title", "archive", "counter", "max_bytes", "tail"),
+        [
+            pytest.param("a" * 300, False, 0, LIMIT, ".jpg", id="ascii"),
+            pytest.param("a" * 300, True, 0, LIMIT, ".pdf", id="archive"),
+            pytest.param("ä" * 200, False, 0, LIMIT, ".jpg", id="umlaut"),
+            pytest.param("ä" * 200, False, 1, LIMIT, "_01.jpg", id="count"),
+            pytest.param("a" * 300, False, 1, 100, "_01.jpg", id="max"),
+        ],
+    )
+    def test_long_title_keeps_tail_within_limit(
+        self,
+        title: str,
+        *,
+        archive: bool,
+        counter: int,
+        max_bytes: int,
+        tail: str,
+    ) -> None:
+        """
+        GIVEN:
+            - A document whose title alone is longer than the byte limit
+        WHEN:
+            - The public file name is generated
+        THEN:
+            - The name ends with the counter and extension
+            - The name fits in the limit
+        """
+        name = DocumentFactory.build(
+            title=title,
+            mime_type="image/jpeg",
+        ).get_public_filename(
+            archive=archive,
+            counter=counter,
+            max_bytes=max_bytes,
+        )
+
+        assert name.endswith(tail)
+        assert len(name.encode()) <= max_bytes
+
+    def test_long_title_counters_give_distinct_names(self) -> None:
+        """
+        GIVEN:
+            - A document whose title alone is longer than the byte limit
+        WHEN:
+            - Public file names are generated with increasing counters
+        THEN:
+            - Each counter produces a distinct name
+        """
+        doc = DocumentFactory.build(title="ä" * 200, mime_type="application/pdf")
+
+        names = [doc.get_public_filename(counter=counter) for counter in range(3)]
+
+        assert len(set(names)) == 3
+        assert all(len(n.encode()) <= self.LIMIT for n in names)

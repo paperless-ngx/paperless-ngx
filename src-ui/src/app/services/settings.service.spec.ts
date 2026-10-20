@@ -14,7 +14,11 @@ import { CustomFieldDataType } from '../data/custom-field'
 import { DEFAULT_DISPLAY_FIELDS, DisplayField } from '../data/document'
 import { SavedView } from '../data/saved-view'
 import { RemoteOCRModeConfig } from '../data/paperless-config'
-import { SETTINGS_KEYS, UiSettings } from '../data/ui-settings'
+import {
+  HideableSidebarItemID,
+  SETTINGS_KEYS,
+  UiSettings,
+} from '../data/ui-settings'
 import { PermissionsService } from './permissions.service'
 import { CustomFieldsService } from './rest/custom-fields.service'
 import { SettingsService } from './settings.service'
@@ -163,7 +167,7 @@ describe('SettingsService', () => {
     expect(settingsService.getLanguage()).toEqual('')
     expect(settingsService.get(SETTINGS_KEYS.DARK_MODE_ENABLED)).toBeFalsy()
     expect(
-      settingsService.get(SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_NEW_DOCUMENT)
+      settingsService.get(SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_SUCCESS)
     ).toBeTruthy()
     expect(settingsService.get(SETTINGS_KEYS.DOCUMENT_LIST_SIZE)).toEqual(50)
     expect(settingsService.get(SETTINGS_KEYS.THEME_COLOR)).toEqual('#9fbf2f')
@@ -194,17 +198,14 @@ describe('SettingsService', () => {
 
     settingsService.setLanguage('de-de')
     settingsService.set(SETTINGS_KEYS.DARK_MODE_ENABLED, true)
-    settingsService.set(
-      SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_NEW_DOCUMENT,
-      false
-    )
+    settingsService.set(SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_SUCCESS, false)
     settingsService.set(SETTINGS_KEYS.DOCUMENT_LIST_SIZE, 25)
     settingsService.set(SETTINGS_KEYS.THEME_COLOR, '#000000')
 
     expect(settingsService.getLanguage()).toEqual('de-de')
     expect(settingsService.get(SETTINGS_KEYS.DARK_MODE_ENABLED)).toBeTruthy()
     expect(
-      settingsService.get(SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_NEW_DOCUMENT)
+      settingsService.get(SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_SUCCESS)
     ).toBeFalsy()
     expect(settingsService.get(SETTINGS_KEYS.DOCUMENT_LIST_SIZE)).toEqual(25)
     expect(settingsService.get(SETTINGS_KEYS.THEME_COLOR)).toEqual('#000000')
@@ -228,6 +229,35 @@ describe('SettingsService', () => {
     settingsService.set(SETTINGS_KEYS.NOTES_ENABLED, false)
 
     expect(notesEnabled()).toBeFalsy()
+  })
+
+  it('updates sidebar item visibility', () => {
+    httpTestingController
+      .expectOne(`${environment.apiBaseUrl}ui_settings/`)
+      .flush(ui_settings)
+
+    expect(
+      settingsService.sidebarItemIsHidden(HideableSidebarItemID.Workflows)
+    ).toBe(false)
+
+    settingsService.updateSidebarItemVisibility(
+      HideableSidebarItemID.Workflows,
+      false
+    )
+
+    expect(
+      settingsService.sidebarItemIsHidden(HideableSidebarItemID.Workflows)
+    ).toBe(true)
+    expect(settingsService.get(SETTINGS_KEYS.SIDEBAR_HIDDEN_ITEMS)).toEqual([])
+
+    settingsService.updateSidebarItemVisibility(
+      HideableSidebarItemID.Workflows,
+      true
+    )
+
+    expect(
+      settingsService.sidebarItemIsHidden(HideableSidebarItemID.Workflows)
+    ).toBe(false)
   })
 
   it('updates setting signals when settings are reinitialized', () => {

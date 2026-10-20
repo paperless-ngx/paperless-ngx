@@ -10,11 +10,6 @@ from documents.models import Correspondent
 from documents.models import DocumentType
 from documents.models import StoragePath
 from documents.models import Tag
-from documents.tests.factories import CorrespondentFactory
-from documents.tests.factories import DocumentTypeFactory
-from documents.tests.factories import StoragePathFactory
-from documents.tests.factories import TagFactory
-from documents.tests.factories import UserFactory
 from paperless_ai.matching import extract_unmatched_names
 from paperless_ai.matching import match_correspondents_by_name
 from paperless_ai.matching import match_document_types_by_name
@@ -24,6 +19,11 @@ from paperless_ai.matching import resolve_correspondent_ids
 from paperless_ai.matching import resolve_document_type_ids
 from paperless_ai.matching import resolve_storage_path_ids
 from paperless_ai.matching import resolve_tag_ids
+from paperless_testing.factories import CorrespondentFactory
+from paperless_testing.factories import DocumentTypeFactory
+from paperless_testing.factories import StoragePathFactory
+from paperless_testing.factories import TagFactory
+from paperless_testing.factories import UserFactory
 
 
 class TestAIMatching(TestCase):
@@ -154,27 +154,19 @@ class TestResolveTagIds:
         user = UserFactory.create()
         assert resolve_tag_ids([], user) == []
 
-    def test_user_none_means_unrestricted_not_owner_isnull(
-        self,
-        mocker: pytest_mock.MockerFixture,
-    ) -> None:
-        """GIVEN a tag owned by another user and user=None
-        WHEN resolving the tag's id
-        THEN the tag is returned unfiltered and permitted_object_ids is never
-            called - user=None means "no restriction", not the narrower
-            "only unowned rows" meaning permitted_object_ids(None, ...) has.
-            Same convention as build_taxonomy_candidates's own call site.
+    def test_user_none_only_resolves_unowned_tags(self) -> None:
+        """GIVEN a tag owned by another user, an unowned tag and user=None
+            (a workflow acting for an unowned document)
+        WHEN resolving both tags' ids
+        THEN only the unowned tag is returned - user=None must not expose
+            another user's private taxonomy.
         """
-        tag = TagFactory.create(name="Owned")
-        owner = UserFactory.create()
-        tag.owner = owner
-        tag.save()
-        spy = mocker.patch("documents.permissions.permitted_object_ids")
+        owned = TagFactory.create(name="Owned", owner=UserFactory.create())
+        unowned = TagFactory.create(name="Unowned", owner=None)
 
-        result = resolve_tag_ids([tag.pk], None)
+        result = resolve_tag_ids([owned.pk, unowned.pk], None)
 
-        assert result == [tag]
-        spy.assert_not_called()
+        assert result == [unowned]
 
 
 @pytest.mark.django_db

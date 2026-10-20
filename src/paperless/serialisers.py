@@ -216,6 +216,11 @@ class ApplicationConfigurationSerializer(
     externally_configured_variables = serializers.SerializerMethodField()
     user_args = serializers.JSONField(binary=True, allow_null=True)
     barcode_tag_mapping = serializers.JSONField(binary=True, allow_null=True)
+    llm_embedding_api_key = ObfuscatedPasswordField(
+        required=False,
+        allow_null=True,
+        max_length=1024,
+    )
     llm_api_key = ObfuscatedPasswordField(
         required=False,
         allow_null=True,
@@ -227,13 +232,35 @@ class ApplicationConfigurationSerializer(
         max_length=1024,
     )
 
-    OBFUSCATED_FIELDS = ("llm_api_key", "remote_ocr_api_key")
+    OBFUSCATED_FIELDS = (
+        "llm_embedding_api_key",
+        "llm_api_key",
+        "remote_ocr_api_key",
+    )
 
     def get_externally_configured_variables(
         self,
         instance: ApplicationConfiguration,
     ) -> list[str]:
         return sorted(name for name in os.environ if name.startswith("PAPERLESS_"))
+
+    @staticmethod
+    def _require_json_object(field: str, value: object) -> None:
+        if value is not None and not isinstance(value, dict):
+            raise serializers.ValidationError(f"{field} must be a JSON object.")
+
+    def validate_user_args(self, value):
+        self._require_json_object("user_args", value)
+        return value
+
+    def validate_barcode_tag_mapping(self, value):
+        self._require_json_object("barcode_tag_mapping", value)
+        # Each value is the regex substitute applied to a matching barcode
+        if value is not None and not all(isinstance(v, str) for v in value.values()):
+            raise serializers.ValidationError(
+                "barcode_tag_mapping values must be strings.",
+            )
+        return value
 
     def run_validation(self, data):
         # Empty strings treated as None to avoid unexpected behavior

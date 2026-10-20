@@ -3,7 +3,6 @@ from io import BytesIO
 from pathlib import Path
 from unittest.mock import patch
 
-from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import override_settings
 from PIL import Image
@@ -11,10 +10,11 @@ from PIL.PngImagePlugin import PngInfo
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from documents.tests.utils import DirectoriesMixin
-from documents.tests.utils import read_streaming_response
 from paperless.models import ApplicationConfiguration
 from paperless.models import ColorConvertChoices
+from paperless_testing.dirs import DirectoriesMixin
+from paperless_testing.factories import UserFactory
+from paperless_testing.http import read_streaming_response
 
 
 class TestApiAppConfig(DirectoriesMixin, APITestCase):
@@ -23,7 +23,7 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
     def setUp(self) -> None:
         super().setUp()
 
-        user = User.objects.create_superuser(username="temp_admin")
+        user = UserFactory(username="temp_admin", superuser=True)
         self.client.force_authenticate(user=user)
 
     def test_api_get_config(self) -> None:
@@ -74,6 +74,7 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
                 "barcode_enable_tag": None,
                 "barcode_tag_mapping": None,
                 "barcode_tag_split": None,
+                "barcode_store_values": None,
                 "remote_ocr_engine": None,
                 "remote_ocr_api_key": None,
                 "remote_ocr_endpoint": None,
@@ -81,6 +82,7 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
                 "ai_enabled": None,
                 "llm_embedding_backend": None,
                 "llm_embedding_model": None,
+                "llm_embedding_api_key": None,
                 "llm_embedding_endpoint": None,
                 "llm_embedding_chunk_size": None,
                 "llm_context_size": None,
@@ -194,6 +196,70 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
         self.assertEqual(config.language, None)
         self.assertEqual(config.barcode_tag_mapping, None)
 
+    def test_api_update_config_json_objects(self) -> None:
+        """
+        GIVEN:
+            - API request to update app config with JSON objects for the
+              user_args and barcode_tag_mapping JSONFields
+        WHEN:
+            - API is called
+        THEN:
+            - Correct HTTP response
+            - Both objects are stored as sent
+        """
+        user_args = {"unpaper_args": "--pre-rotate 90", "jobs": 2}
+        barcode_tag_mapping = {"TAG:(.*)": "\\g<1>", "ASN12.*": ""}
+        response = self.client.patch(
+            f"{self.ENDPOINT}1/",
+            json.dumps(
+                {
+                    "user_args": json.dumps(user_args),
+                    "barcode_tag_mapping": json.dumps(barcode_tag_mapping),
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        config = ApplicationConfiguration.objects.first()
+        assert config is not None
+        self.assertEqual(config.user_args, user_args)
+        self.assertEqual(config.barcode_tag_mapping, barcode_tag_mapping)
+
+    def test_api_update_config_rejects_invalid_json_objects(self) -> None:
+        """
+        GIVEN:
+            - API request to update app config with a JSON-encoded value that
+              is not an object for user_args or barcode_tag_mapping, or a
+              barcode_tag_mapping with a non-string substitute
+        WHEN:
+            - API is called
+        THEN:
+            - Request is rejected with a 400 naming the problem
+            - Config is not updated
+        """
+        not_objects = (True, 1, [1, 2, 3], "not a dict")
+        cases = [
+            (field, value, b"must be a JSON object")
+            for field in ("user_args", "barcode_tag_mapping")
+            for value in not_objects
+        ]
+        cases += [
+            ("barcode_tag_mapping", {"TAG:(.*)": 5}, b"values must be strings"),
+            ("barcode_tag_mapping", {"TAG:(.*)": None}, b"values must be strings"),
+        ]
+        for field, value, expected_message in cases:
+            with self.subTest(field=field, value=value):
+                response = self.client.patch(
+                    f"{self.ENDPOINT}1/",
+                    json.dumps({field: json.dumps(value)}),
+                    content_type="application/json",
+                )
+                self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+                self.assertIn(expected_message, response.content)
+                config = ApplicationConfiguration.objects.first()
+                assert config is not None
+                self.assertIsNone(getattr(config, field))
+
     def test_api_replace_app_logo(self) -> None:
         """
         GIVEN:
@@ -203,7 +269,7 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
         THEN:
             - old app_logo file is deleted
         """
-        admin = User.objects.create_superuser(username="admin")
+        admin = UserFactory(username="admin", superuser=True)
         self.client.force_login(user=admin)
         response = self.client.get("/logo/")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
@@ -857,6 +923,49 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
         self.assertEqual(ApplicationConfiguration.objects.count(), 1)
+
+    def test_update_llm_embedding_api_key(self) -> None:
+        """
+        GIVEN:
+            - Existing config with llm_embedding_api_key specified
+        WHEN:
+            - API to update llm_embedding_api_key is called with all *s
+            - API to update llm_embedding_api_key is called with empty string
+        THEN:
+            - llm_embedding_api_key is unchanged
+            - llm_embedding_api_key is set to None
+        """
+        config = ApplicationConfiguration.objects.first()
+        assert config is not None
+        config.llm_embedding_api_key = "1234567890"
+        config.save()
+
+        # Test with all *
+        response = self.client.patch(
+            f"{self.ENDPOINT}1/",
+            json.dumps(
+                {
+                    "llm_embedding_api_key": "*" * 32,
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        config.refresh_from_db()
+        self.assertEqual(config.llm_embedding_api_key, "1234567890")
+        # Test with empty string
+        response = self.client.patch(
+            f"{self.ENDPOINT}1/",
+            json.dumps(
+                {
+                    "llm_embedding_api_key": "",
+                },
+            ),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        config.refresh_from_db()
+        self.assertEqual(config.llm_embedding_api_key, None)
 
     def test_update_llm_api_key(self) -> None:
         """

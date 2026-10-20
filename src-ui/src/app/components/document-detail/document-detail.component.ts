@@ -28,7 +28,7 @@ import {
 import { dirtyCheck, DirtyComponent } from '@ngneat/dirty-check-forms'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { DeviceDetectorService } from 'ngx-device-detector'
-import { BehaviorSubject, Observable, of, Subject, timer } from 'rxjs'
+import { BehaviorSubject, merge, Observable, of, Subject, timer } from 'rxjs'
 import {
   catchError,
   debounceTime,
@@ -48,7 +48,10 @@ import { DataType } from 'src/app/data/datatype'
 import { Document, DocumentVersionInfo } from 'src/app/data/document'
 import { DocumentMetadata } from 'src/app/data/document-metadata'
 import { DocumentNote } from 'src/app/data/document-note'
-import { DocumentSuggestions } from 'src/app/data/document-suggestions'
+import {
+  DocumentSuggestions,
+  mergeSuggestions,
+} from 'src/app/data/document-suggestions'
 import { DocumentType } from 'src/app/data/document-type'
 import { FilterRule } from 'src/app/data/filter-rule'
 import {
@@ -63,7 +66,7 @@ import {
 import { ObjectWithId } from 'src/app/data/object-with-id'
 import { StoragePath } from 'src/app/data/storage-path'
 import { Tag } from 'src/app/data/tag'
-import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { SETTINGS_KEYS, SuggestionSource } from 'src/app/data/ui-settings'
 import { User } from 'src/app/data/user'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
@@ -92,14 +95,15 @@ import { TagService } from 'src/app/services/rest/tag.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
+import { TrashService } from 'src/app/services/trash.service'
 import { WebsocketStatusService } from 'src/app/services/websocket-status.service'
 import { getFilenameFromContentDisposition } from 'src/app/utils/http'
 import { ISODateAdapter } from 'src/app/utils/ngb-iso-date-adapter'
 import * as UTIF from 'utif'
 import { DocumentDetailFieldID } from '../admin/settings/settings.component'
 import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.component'
-import { ReprocessConfirmDialogComponent } from '../common/confirm-dialog/reprocess-confirm-dialog/reprocess-confirm-dialog.component'
 import { PasswordRemovalConfirmDialogComponent } from '../common/confirm-dialog/password-removal-confirm-dialog/password-removal-confirm-dialog.component'
+import { ReprocessConfirmDialogComponent } from '../common/confirm-dialog/reprocess-confirm-dialog/reprocess-confirm-dialog.component'
 import { CustomFieldsDropdownComponent } from '../common/custom-fields-dropdown/custom-fields-dropdown.component'
 import { CorrespondentEditDialogComponent } from '../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
 import { DocumentTypeEditDialogComponent } from '../common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
@@ -132,6 +136,7 @@ import { ShareLinksDialogComponent } from '../common/share-links-dialog/share-li
 import { SuggestionsDropdownComponent } from '../common/suggestions-dropdown/suggestions-dropdown.component'
 import { DocumentNotesComponent } from '../document-notes/document-notes.component'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
+import { DocumentBarcodesComponent } from './document-barcodes/document-barcodes.component'
 import { DocumentHistoryComponent } from './document-history/document-history.component'
 import { DocumentVersionDropdownComponent } from './document-version-dropdown/document-version-dropdown.component'
 import { MetadataCollapseComponent } from './metadata-collapse/metadata-collapse.component'
@@ -174,6 +179,7 @@ interface IncomingDocumentUpdate {
     DateComponent,
     DocumentLinkComponent,
     MetadataCollapseComponent,
+    DocumentBarcodesComponent,
     PermissionsFormComponent,
     SelectComponent,
     TagsComponent,
@@ -216,6 +222,7 @@ export class DocumentDetailComponent
   private documentListViewService = inject(DocumentListViewService)
   private documentTitlePipe = inject(DocumentTitlePipe)
   private toastService = inject(ToastService)
+  private trashService = inject(TrashService)
   private settings = inject(SettingsService)
   private storagePathService = inject(StoragePathService)
   private permissionsService = inject(PermissionsService)
@@ -240,6 +247,10 @@ export class DocumentDetailComponent
   private readonly autoSuggestSetting = this.settings.getSignal<boolean>(
     SETTINGS_KEYS.DOCUMENT_EDITING_AUTO_SUGGEST
   )
+  private readonly suggestionSourceSetting =
+    this.settings.getSignal<SuggestionSource>(
+      SETTINGS_KEYS.DOCUMENT_EDITING_SUGGESTION_SOURCE
+    )
   private readonly hiddenFieldsSetting = this.settings.getSignal<
     DocumentDetailFieldID[]
   >(SETTINGS_KEYS.DOCUMENT_DETAILS_HIDDEN_FIELDS)
@@ -261,6 +272,9 @@ export class DocumentDetailComponent
   readonly metadata = signal<DocumentMetadata>(undefined)
   readonly suggestions = signal<DocumentSuggestions>(undefined)
   readonly suggestionsLoading = signal(false)
+  // per-document, resets on navigation
+  readonly suggestionSourceOverride = signal<SuggestionSource>(null)
+  readonly fetchedSuggestionSources = signal<SuggestionSource[]>([])
   readonly users = signal<User[]>(undefined)
 
   readonly title = signal<string>(undefined)
@@ -304,6 +318,7 @@ export class DocumentDetailComponent
   isDirty$: Observable<boolean>
   unsubscribeNotifier: Subject<any> = new Subject()
   docChangeNotifier: Subject<any> = new Subject()
+  versionChangeNotifier: Subject<void> = new Subject()
   private incomingUpdateModal: NgbModalRef
   private pendingIncomingUpdate: IncomingDocumentUpdate
   private lastLocalSaveModified: string | null = null
@@ -364,6 +379,15 @@ export class DocumentDetailComponent
     return this.autoSuggestSetting()
   }
 
+  get defaultSuggestionSource(): SuggestionSource {
+    return this.aiEnabled ? this.suggestionSourceSetting() : SuggestionSource.ML
+  }
+
+  get suggestionSource(): SuggestionSource {
+    if (!this.aiEnabled) return SuggestionSource.ML
+    return this.suggestionSourceOverride() ?? this.defaultSuggestionSource
+  }
+
   get archiveContentRenderType(): ContentRenderType {
     const hasArchiveVersion =
       this.metadata()?.has_archive_version ??
@@ -417,7 +441,8 @@ export class DocumentDetailComponent
       .pipe(
         first(),
         takeUntil(this.unsubscribeNotifier),
-        takeUntil(this.docChangeNotifier)
+        takeUntil(this.docChangeNotifier),
+        takeUntil(this.versionChangeNotifier)
       )
       .subscribe({
         next: (result) => {
@@ -533,7 +558,8 @@ export class DocumentDetailComponent
       .pipe(
         first(),
         takeUntil(this.unsubscribeNotifier),
-        takeUntil(this.docChangeNotifier)
+        takeUntil(this.docChangeNotifier),
+        takeUntil(this.versionChangeNotifier)
       )
       .subscribe({
         next: (res) => this.previewText.set(res.toString()),
@@ -587,6 +613,8 @@ export class DocumentDetailComponent
           }
           this.documentId.set(doc.id)
           this.suggestions.set(null)
+          this.suggestionSourceOverride.set(null)
+          this.fetchedSuggestionSources.set([])
           const openDocument = this.openDocumentService.getOpenDocument(
             this.documentId()
           )
@@ -594,6 +622,13 @@ export class DocumentDetailComponent
           if (openDocument && doc?.duplicate_documents) {
             openDocument.duplicate_documents = doc.duplicate_documents
             this.openDocumentService.save()
+          }
+          // use server versions
+          if (openDocument) {
+            openDocument.versions = doc.versions
+            if (!openDocument.__changedFields?.includes('content')) {
+              openDocument.content = doc.content
+            }
           }
           let useDoc = openDocument || doc
           if (openDocument && forceRemote) {
@@ -642,7 +677,14 @@ export class DocumentDetailComponent
               this.documentForm.patchValue({ title: titleValue })
               this.documentForm.get('title').markAsDirty()
             })
+          const keepContentEdits =
+            useDoc.__selectedVersionId === this.selectedVersionId() &&
+            !!useDoc.__changedFields?.includes('content')
           this.setupDirtyTracking(useDoc, doc)
+          // Maybe load the stored version
+          if (useDoc.__selectedVersionId) {
+            this.selectVersion(this.selectedVersionId(), keepContentEdits)
+          }
         },
       })
   }
@@ -903,9 +945,11 @@ export class DocumentDetailComponent
 
   updateComponent(doc: Document) {
     this.document.set(doc)
-    // Default selected version is the newest version, which the API returns first
+    // Load the selected version, or default to API first (newest)
     const versions = doc.versions ?? []
-    this.selectedVersionId.set(versions.length ? versions[0].id : doc.id)
+    const selectedVersion =
+      versions.find((v) => v.id === doc.__selectedVersionId) ?? versions[0]
+    this.selectedVersionId.set(selectedVersion?.id ?? doc.id)
     this.previewLoaded.set(false)
     this.requiresPassword = false
     this.updateFormForCustomFields()
@@ -940,8 +984,12 @@ export class DocumentDetailComponent
   }
 
   // Update file preview and download target to a specific version (by document id)
-  selectVersion(versionId: number) {
+  selectVersion(versionId: number, keepContentEdits: boolean = false) {
+    this.versionChangeNotifier.next()
     this.selectedVersionId.set(versionId)
+    // remember so the version can be restored when returning to the document
+    this.document().__selectedVersionId = versionId
+    this.openDocumentService.save()
     this.previewLoaded.set(false)
     this.previewUrl.set(
       this.documentsService.getPreviewUrl(
@@ -963,20 +1011,20 @@ export class DocumentDetailComponent
       .pipe(
         first(),
         takeUntil(this.unsubscribeNotifier),
-        takeUntil(this.docChangeNotifier)
+        takeUntil(this.docChangeNotifier),
+        takeUntil(this.versionChangeNotifier)
       )
       .subscribe({
         next: (doc) => {
           const content = doc?.content ?? ''
-          this.document().content = content
-          this.documentForm.patchValue(
-            {
-              content,
-            },
-            {
-              emitEvent: false,
-            }
-          )
+          if (keepContentEdits) {
+            this.store.next({ ...this.store.value, content })
+          } else {
+            // Update in-place and avoid the debounce wait
+            this.store.value.content = content
+            this.documentForm.patchValue({ content })
+            this.documentForm.get('content').markAsPristine()
+          }
         },
         error: (error) => {
           this.toastService.showError(
@@ -991,7 +1039,8 @@ export class DocumentDetailComponent
       .pipe(
         first(),
         takeUntil(this.unsubscribeNotifier),
-        takeUntil(this.docChangeNotifier)
+        takeUntil(this.docChangeNotifier),
+        takeUntil(this.versionChangeNotifier)
       )
       .subscribe({
         next: (res) => this.previewText.set(res.toString()),
@@ -1005,7 +1054,39 @@ export class DocumentDetailComponent
   }
 
   onVersionSelected(versionId: number) {
-    this.selectVersion(versionId)
+    if (versionId === this.selectedVersionId()) return
+    // Bail if the selected version was just deleted.
+    const selectedVersionExists = this.document()?.versions?.some(
+      (v) => v.id === this.selectedVersionId()
+    )
+    if (this.networkActive() && selectedVersionExists) return
+    if (
+      !selectedVersionExists ||
+      this.documentForm.get('content').value === this.store.value.content
+    ) {
+      this.selectVersion(versionId)
+      return
+    }
+
+    // Confirm any unsaved content changes
+    const modal = this.modalService.open(ConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.title = $localize`Unsaved Changes`
+    modal.componentInstance.messageBold = $localize`You have unsaved changes to the content of this version.`
+    modal.componentInstance.message = $localize`Switching versions will discard them.`
+    modal.componentInstance.btnClass = 'btn-secondary'
+    modal.componentInstance.btnCaption = $localize`Discard and switch`
+    modal.componentInstance.alternativeBtnClass = 'btn-primary'
+    modal.componentInstance.alternativeBtnCaption = $localize`Save and switch`
+    modal.componentInstance.confirmClicked.pipe(first()).subscribe(() => {
+      modal.close()
+      this.selectVersion(versionId)
+    })
+    modal.componentInstance.alternativeClicked.pipe(first()).subscribe(() => {
+      modal.close()
+      this.save(false, () => this.selectVersion(versionId))
+    })
   }
 
   onVersionsUpdated(versions: DocumentVersionInfo[]) {
@@ -1021,29 +1102,44 @@ export class DocumentDetailComponent
     return this.documentForm.get('custom_fields') as FormArray
   }
 
-  getSuggestions() {
+  getSuggestions(source: SuggestionSource = this.suggestionSource) {
+    const sources = (
+      source === SuggestionSource.Both
+        ? [SuggestionSource.ML, SuggestionSource.AI]
+        : [source]
+    ).filter((s) => !this.fetchedSuggestionSources().includes(s))
+    if (!sources.length) return
+
     this.suggestionsLoading.set(true)
-    const suggestionsObservable = this.aiEnabled
-      ? this.documentsService.getAiSuggestions(this.documentId())
-      : this.documentsService.getSuggestions(this.documentId())
-    suggestionsObservable
+    merge(
+      ...sources.map((s) =>
+        (s === SuggestionSource.AI
+          ? this.documentsService.getAiSuggestions(this.documentId())
+          : this.documentsService.getSuggestions(this.documentId())
+        ).pipe(
+          first(),
+          map((result) => ({ source: s, result })),
+          catchError((error) => {
+            this.toastService.showError(
+              $localize`Error retrieving suggestions.`,
+              error
+            )
+            return of(null)
+          })
+        )
+      )
+    )
       .pipe(
-        first(),
         takeUntil(this.unsubscribeNotifier),
         takeUntil(this.docChangeNotifier),
         finalize(() => this.suggestionsLoading.set(false))
       )
-      .subscribe({
-        next: (result) => {
-          this.suggestions.set(result)
-        },
-        error: (error) => {
-          this.suggestions.set(null)
-          this.toastService.showError(
-            $localize`Error retrieving suggestions.`,
-            error
-          )
-        },
+      .subscribe((response) => {
+        if (!response) return
+        this.fetchedSuggestionSources.update((f) => [...f, response.source])
+        this.suggestions.set(
+          mergeSuggestions(this.suggestions(), response.result)
+        )
       })
   }
 
@@ -1060,7 +1156,7 @@ export class DocumentDetailComponent
           if (this.suggestions()) {
             this.suggestions.set({
               ...this.suggestions(),
-              suggested_tags: this.suggestions().suggested_tags.filter(
+              suggested_tags: (this.suggestions().suggested_tags ?? []).filter(
                 (tag) => tag !== newTag.name
               ),
             })
@@ -1099,10 +1195,12 @@ export class DocumentDetailComponent
         this.documentForm.get('document_type').setValue(newDocumentType.id)
         this.documentForm.get('document_type').markAsDirty()
         if (this.suggestions()) {
-          this.suggestions().suggested_document_types =
-            this.suggestions().suggested_document_types.filter(
-              (dt) => dt !== newName
-            )
+          this.suggestions.set({
+            ...this.suggestions(),
+            suggested_document_types: (
+              this.suggestions().suggested_document_types ?? []
+            ).filter((dt) => dt !== newName),
+          })
         }
       })
   }
@@ -1129,10 +1227,12 @@ export class DocumentDetailComponent
         this.documentForm.get('correspondent').setValue(newCorrespondent.id)
         this.documentForm.get('correspondent').markAsDirty()
         if (this.suggestions()) {
-          this.suggestions().suggested_correspondents =
-            this.suggestions().suggested_correspondents.filter(
-              (c) => c !== newName
-            )
+          this.suggestions.set({
+            ...this.suggestions(),
+            suggested_correspondents: (
+              this.suggestions().suggested_correspondents ?? []
+            ).filter((c) => c !== newName),
+          })
         }
       })
   }
@@ -1233,7 +1333,7 @@ export class DocumentDetailComponent
     return changes
   }
 
-  save(close: boolean = false) {
+  save(close: boolean = false, savedCallback: () => void = null) {
     this.networkActive.set(true)
     ;(document.activeElement as HTMLElement)?.dispatchEvent(new Event('change'))
     this.documentsService
@@ -1251,7 +1351,7 @@ export class DocumentDetailComponent
           this.store.next(newValues)
           this.openDocumentService.setDirty(this.document(), false)
           this.openDocumentService.save()
-          this.toastService.showInfo(
+          this.toastService.showSuccess(
             $localize`Document "${newValues.title}" saved successfully.`
           )
           this.networkActive.set(false)
@@ -1266,6 +1366,7 @@ export class DocumentDetailComponent
             this.flushPendingIncomingUpdate()
           }
           this.savedViewService.maybeRefreshDocumentCounts()
+          savedCallback?.()
         },
         error: (error) => {
           this.networkActive.set(false)
@@ -1278,7 +1379,7 @@ export class DocumentDetailComponent
           if (!canEdit) {
             // document was 'given away'
             this.openDocumentService.setDirty(this.document(), false)
-            this.toastService.showInfo(
+            this.toastService.showSuccess(
               $localize`Document "${this.document().title}" saved successfully.`
             )
             this.close()
@@ -1391,6 +1492,10 @@ export class DocumentDetailComponent
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe({
         next: () => {
+          this.trashService.notifyMovedToTrash(
+            $localize`Moved "${this.document().title}" to the trash`,
+            [this.document().id]
+          )
           modal.close()
           this.close()
         },
@@ -1450,7 +1555,7 @@ export class DocumentDetailComponent
   }
 
   runZoneOcr() {
-    this.documentsService.runZoneOcr(this.document.id).subscribe({
+    this.documentsService.runZoneOcr(this.document().id).subscribe({
       next: (res) => {
         const results = res.results ?? []
         if (results.length) {
@@ -1473,7 +1578,7 @@ export class DocumentDetailComponent
           )
         }
         this.documentsService
-          .get(this.documentId)
+          .get(this.documentId())
           .subscribe((doc) => this.updateComponent(doc))
       },
       error: (error) => {
@@ -1485,8 +1590,8 @@ export class DocumentDetailComponent
   createOcrTemplate() {
     this.router.navigate(['/ocr-templates', 'new'], {
       queryParams: {
-        document_type: this.document.document_type,
-        sample_document: this.document.id,
+        document_type: this.document().document_type,
+        sample_document: this.document().id,
       },
     })
   }

@@ -41,7 +41,9 @@ def get_embedding_model(config: AIConfig) -> "BaseEmbedding":
                 )
             return OpenAILikeEmbedding(
                 model_name=config.llm_embedding_model or "text-embedding-3-small",
-                api_key=config.llm_api_key or PLACEHOLDER_API_KEY,
+                api_key=config.llm_embedding_api_key
+                or config.llm_api_key
+                or PLACEHOLDER_API_KEY,
                 api_base=endpoint,
                 timeout=config.llm_request_timeout,
                 http_client=http_client,
@@ -133,6 +135,6 @@ def build_llm_index_text(doc: Document) -> str:
         lines.append(f"Custom Field - {instance.field.name}: {instance}")
 
     lines.append("\nContent:\n")
-    lines.append(doc.content or "")
+    lines.append(doc.get_effective_content() or "")
 
     return _normalize_llm_index_text("\n".join(lines))

@@ -13,10 +13,10 @@ import pytest
 from documents.file_handling import generate_filename
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
-from documents.tests.factories import CorrespondentFactory
-from documents.tests.factories import DocumentFactory
-from documents.tests.factories import StoragePathFactory
-from documents.tests.factories import TagFactory
+from paperless_testing.factories import CorrespondentFactory
+from paperless_testing.factories import DocumentFactory
+from paperless_testing.factories import StoragePathFactory
+from paperless_testing.factories import TagFactory
 
 
 @pytest.mark.django_db

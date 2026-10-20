@@ -12,6 +12,7 @@ import {
   FormsModule,
   ReactiveFormsModule,
 } from '@angular/forms'
+import { Router } from '@angular/router'
 import {
   NgbDropdownModule,
   NgbModal,
@@ -27,6 +28,7 @@ import {
   Subject,
   switchMap,
   takeUntil,
+  tap,
 } from 'rxjs'
 import { ConfirmDialogComponent } from 'src/app/components/common/confirm-dialog/confirm-dialog.component'
 import { CustomField } from 'src/app/data/custom-field'
@@ -56,6 +58,7 @@ import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { TagService } from 'src/app/services/rest/tag.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
+import { TrashService } from 'src/app/services/trash.service'
 import { flattenTags } from 'src/app/utils/flatten-tags'
 import { queryParamsFromFilterRules } from 'src/app/utils/query-params'
 import { MergeAsVersionsConfirmDialogComponent } from '../../common/confirm-dialog/merge-as-versions-confirm-dialog/merge-as-versions-confirm-dialog.component'
@@ -77,7 +80,6 @@ import {
 import { ToggleableItemState } from '../../common/filterable-dropdown/toggleable-dropdown-button/toggleable-dropdown-button.component'
 import { PermissionsDialogComponent } from '../../common/permissions-dialog/permissions-dialog.component'
 import { ShareLinkBundleDialogComponent } from '../../common/share-link-bundle-dialog/share-link-bundle-dialog.component'
-import { ShareLinkBundleManageDialogComponent } from '../../common/share-link-bundle-manage-dialog/share-link-bundle-manage-dialog.component'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 import { CustomFieldsBulkEditDialogComponent } from './custom-fields-bulk-edit-dialog/custom-fields-bulk-edit-dialog.component'
 
@@ -107,11 +109,13 @@ export class BulkEditorComponent
   private openDocumentService = inject(OpenDocumentsService)
   private settings = inject(SettingsService)
   private toastService = inject(ToastService)
+  private trashService = inject(TrashService)
   private storagePathService = inject(StoragePathService)
   private customFieldService = inject(CustomFieldsService)
   public readonly permissionService = inject(PermissionsService)
   private savedViewService = inject(SavedViewService)
   private readonly shareLinkBundleService = inject(ShareLinkBundleService)
+  private readonly router = inject(Router)
 
   tagSelectionModel = new FilterableDropdownSelectionModel(true)
   correspondentSelectionModel = new FilterableDropdownSelectionModel()
@@ -313,7 +317,7 @@ export class BulkEditorComponent
       next: () => {
         this.handleOperationSuccess(modal, options.clearSelection ?? false)
         if (options.successMessage) {
-          this.toastService.showInfo(options.successMessage)
+          this.toastService.showSuccess(options.successMessage)
         }
       },
       error: (error) => this.handleOperationError(modal, error),
@@ -368,6 +372,7 @@ export class BulkEditorComponent
       return {
         all: true,
         filters: queryParamsFromFilterRules(this.list.filterRules),
+        excluded_documents: Array.from(this.list.excluded),
       }
     }
 
@@ -381,7 +386,8 @@ export class BulkEditorComponent
   }
 
   openTagsDropdown() {
-    if (this.list.allSelected) {
+    // If none excluded, use the selection data already available in the list view, otherwise fetch
+    if (this.list.allSelected && this.list.excluded.size === 0) {
       const selectionData = this.list.selectionData
       this.tagDocumentCounts.set(selectionData?.selected_tags ?? [])
       this.applySelectionData(this.tagDocumentCounts(), this.tagSelectionModel)
@@ -389,7 +395,7 @@ export class BulkEditorComponent
     }
 
     this.documentService
-      .getSelectionData(Array.from(this.list.selected))
+      .getSelectionData(this.getSelectionQuery())
       .pipe(first())
       .subscribe((s) => {
         this.tagDocumentCounts.set(s.selected_tags)
@@ -398,7 +404,7 @@ export class BulkEditorComponent
   }
 
   openDocumentTypeDropdown() {
-    if (this.list.allSelected) {
+    if (this.list.allSelected && this.list.excluded.size === 0) {
       const selectionData = this.list.selectionData
       this.documentTypeDocumentCounts.set(
         selectionData?.selected_document_types ?? []
@@ -411,7 +417,7 @@ export class BulkEditorComponent
     }
 
     this.documentService
-      .getSelectionData(Array.from(this.list.selected))
+      .getSelectionData(this.getSelectionQuery())
       .pipe(first())
       .subscribe((s) => {
         this.documentTypeDocumentCounts.set(s.selected_document_types)
@@ -423,7 +429,7 @@ export class BulkEditorComponent
   }
 
   openCorrespondentDropdown() {
-    if (this.list.allSelected) {
+    if (this.list.allSelected && this.list.excluded.size === 0) {
       const selectionData = this.list.selectionData
       this.correspondentDocumentCounts.set(
         selectionData?.selected_correspondents ?? []
@@ -436,7 +442,7 @@ export class BulkEditorComponent
     }
 
     this.documentService
-      .getSelectionData(Array.from(this.list.selected))
+      .getSelectionData(this.getSelectionQuery())
       .pipe(first())
       .subscribe((s) => {
         this.correspondentDocumentCounts.set(s.selected_correspondents)
@@ -448,7 +454,7 @@ export class BulkEditorComponent
   }
 
   openStoragePathDropdown() {
-    if (this.list.allSelected) {
+    if (this.list.allSelected && this.list.excluded.size === 0) {
       const selectionData = this.list.selectionData
       this.storagePathDocumentCounts.set(
         selectionData?.selected_storage_paths ?? []
@@ -461,7 +467,7 @@ export class BulkEditorComponent
     }
 
     this.documentService
-      .getSelectionData(Array.from(this.list.selected))
+      .getSelectionData(this.getSelectionQuery())
       .pipe(first())
       .subscribe((s) => {
         this.storagePathDocumentCounts.set(s.selected_storage_paths)
@@ -473,7 +479,7 @@ export class BulkEditorComponent
   }
 
   openCustomFieldsDropdown() {
-    if (this.list.allSelected) {
+    if (this.list.allSelected && this.list.excluded.size === 0) {
       const selectionData = this.list.selectionData
       this.customFieldDocumentCounts.set(
         selectionData?.selected_custom_fields ?? []
@@ -486,7 +492,7 @@ export class BulkEditorComponent
     }
 
     this.documentService
-      .getSelectionData(Array.from(this.list.selected))
+      .getSelectionData(this.getSelectionQuery())
       .pipe(first())
       .subscribe((s) => {
         this.customFieldDocumentCounts.set(s.selected_custom_fields)
@@ -889,17 +895,31 @@ export class BulkEditorComponent
         .pipe(takeUntil(this.unsubscribeNotifier))
         .subscribe(() => {
           modal.componentInstance.buttonsEnabled.set(false)
-          this.executeDocumentAction(
-            modal,
-            this.documentService.deleteDocuments(this.getSelectionQuery())
-          )
+          this.deleteSelected(modal)
         })
     } else {
-      this.executeDocumentAction(
-        null,
-        this.documentService.deleteDocuments(this.getSelectionQuery())
-      )
+      this.deleteSelected(null)
     }
+  }
+
+  private deleteSelected(modal: NgbModalRef) {
+    const documents = this.list.allSelected
+      ? null
+      : Array.from(this.list.selected)
+    const count = this.getSelectionSize()
+    this.executeDocumentAction(
+      modal,
+      this.documentService
+        .deleteDocuments(this.getSelectionQuery())
+        .pipe(
+          tap(() =>
+            this.trashService.notifyMovedToTrash(
+              $localize`Moved ${count} document(s) to the trash`,
+              documents
+            )
+          )
+        )
+    )
   }
 
   downloadSelected() {
@@ -1091,7 +1111,7 @@ export class BulkEditorComponent
     dialog.selection = this.getSelectionQuery()
     dialog.selectionCount = this.getSelectionSize()
     dialog.succeeded.subscribe((result) => {
-      this.toastService.showInfo($localize`Custom fields updated.`)
+      this.toastService.showSuccess($localize`Custom fields updated.`)
       this.list.reload()
       this.list.reduceSelectionToFilter()
       this.list.selected.forEach((id) => {
@@ -1164,9 +1184,8 @@ export class BulkEditorComponent
   }
 
   manageShareLinkBundles() {
-    this.modalService.open(ShareLinkBundleManageDialogComponent, {
-      backdrop: 'static',
-      size: 'lg',
+    void this.router.navigate(['/share-links'], {
+      queryParams: { type: 'bundles' },
     })
   }
 

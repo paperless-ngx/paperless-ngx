@@ -15,6 +15,7 @@ from pytest_mock import MockerFixture
 from rest_framework.authtoken.models import Token
 
 from paperless.adapter import DrfTokenStrategy
+from paperless_testing.factories import UserFactory
 
 
 @pytest.mark.django_db
@@ -25,7 +26,7 @@ class TestCustomAccountAdapter:
         # With no accounts, signups should be allowed
         assert adapter.is_open_for_signup(None)
 
-        User.objects.create_user("testuser")
+        UserFactory(username="testuser")
 
         settings.ACCOUNT_ALLOW_SIGNUPS = True
         assert adapter.is_open_for_signup(None)
@@ -92,7 +93,7 @@ class TestCustomAccountAdapter:
     ) -> None:
         settings.ACCOUNT_DEFAULT_GROUPS = ["group1", "group2"]
         Group.objects.create(name="group1")
-        user = User.objects.create_user("testuser")
+        user = UserFactory(username="testuser")
         adapter = get_adapter()
         form = mocker.MagicMock(
             cleaned_data={
@@ -152,7 +153,7 @@ class TestCustomSocialAccountAdapter:
         settings.SOCIAL_ACCOUNT_DEFAULT_GROUPS = ["group1", "group2"]
         Group.objects.create(name="group1")
         adapter = get_social_adapter()
-        user = User.objects.create_user("testuser")
+        user = UserFactory(username="testuser")
         sociallogin = mocker.MagicMock(user=user)
 
         user = adapter.save_user(HttpRequest(), sociallogin, None)
@@ -187,7 +188,7 @@ class TestDrfTokenStrategy:
         THEN:
             - A new token is created and its key is returned
         """
-        user = User.objects.create_user("testuser")
+        user = UserFactory(username="testuser")
         request = HttpRequest()
         request.user = user
 
@@ -207,7 +208,7 @@ class TestDrfTokenStrategy:
         THEN:
             - The same token key is returned (no new token created)
         """
-        user = User.objects.create_user("testuser")
+        user = UserFactory(username="testuser")
         existing_token = Token.objects.create(user=user)
 
         request = HttpRequest()

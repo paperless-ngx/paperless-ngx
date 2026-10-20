@@ -1,12 +1,12 @@
 import json
+import logging
+from datetime import date
 from pathlib import Path
 
 import pytest
 from django.contrib.auth.models import Group
-from django.contrib.auth.models import User
 from django.db import connection
 from django.test.utils import CaptureQueriesContext
-from guardian.shortcuts import assign_perm
 from pytest_mock import MockerFixture
 
 from documents.models import CustomField
@@ -18,12 +18,16 @@ from documents.search._backend import TantivyBackend
 from documents.search._backend import WriteBatch
 from documents.search._backend import get_backend
 from documents.search._backend import reset_backend
+from documents.search._schema import REBUILD_MARKER
+from documents.search._schema import needs_rebuild
 from documents.signals.handlers import add_to_index
-from documents.tests.factories import CorrespondentFactory
-from documents.tests.factories import DocumentFactory
-from documents.tests.factories import DocumentTypeFactory
-from documents.tests.factories import TagFactory
-from documents.tests.factories import UserFactory
+from paperless_testing.dirs import PaperlessDirs
+from paperless_testing.factories import CorrespondentFactory
+from paperless_testing.factories import DocumentFactory
+from paperless_testing.factories import DocumentTypeFactory
+from paperless_testing.factories import TagFactory
+from paperless_testing.factories import UserFactory
+from paperless_testing.permissions import grant_object
 
 pytestmark = [pytest.mark.search, pytest.mark.django_db]
 
@@ -189,7 +193,7 @@ class TestAddOrUpdateIds:
             pk=1,
             owner=owner,
         )
-        assign_perm("view_document", user, doc)
+        grant_object(user, doc, "view_document")
 
         with backend.batch_update() as batch:
             batch.add_or_update_ids([doc.pk])
@@ -209,7 +213,7 @@ class TestAddOrUpdateIds:
             pk=1,
             owner=owner,
         )
-        assign_perm("view_document", group, doc)
+        grant_object(group, doc, "view_document")
 
         with backend.batch_update() as batch:
             batch.add_or_update_ids([doc.pk])
@@ -287,6 +291,80 @@ class TestAddOrUpdateIds:
 
         assert backend.search_ids("original", user=None) == []
         assert backend.search_ids("updated", user=None) == [doc.pk]
+
+
+class TestVersionsAreIndexedAsTheirRoot:
+    """Only root documents are indexed, with their effective content, so
+    every write path that is handed a version indexes its root instead."""
+
+    @staticmethod
+    def _root_with_version() -> tuple[Document, Document]:
+        root = DocumentFactory(title="Statement", content="stale text")
+        version = DocumentFactory(
+            title="Statement",
+            content="latest text",
+            root_document=root,
+            version_index=1,
+        )
+        return root, version
+
+    def test_add_or_update_indexes_the_root_of_a_version(
+        self,
+        backend: TantivyBackend,
+    ) -> None:
+        """
+        GIVEN:
+            - A root document with a version
+        WHEN:
+            - The version is passed to add_or_update
+        THEN:
+            - The root is indexed with the version's text, and the version is not
+        """
+        root, version = self._root_with_version()
+
+        backend.add_or_update(version)
+
+        assert backend.search_ids("latest", user=None) == [root.pk]
+        assert backend.search_ids("stale", user=None) == []
+
+    def test_add_or_update_ids_indexes_each_root_once(
+        self,
+        backend: TantivyBackend,
+    ) -> None:
+        """
+        GIVEN:
+            - A root document with a version
+        WHEN:
+            - Both ids are passed to add_or_update_ids
+        THEN:
+            - The root is indexed once and the version is not indexed
+        """
+        root, version = self._root_with_version()
+
+        with backend.batch_update() as batch:
+            batch.add_or_update_ids([version.pk, root.pk])
+
+        assert backend.search_ids("Statement", user=None) == [root.pk]
+        assert backend.search_ids("latest", user=None) == [root.pk]
+
+    def test_add_or_update_ids_resolves_a_lone_version(
+        self,
+        backend: TantivyBackend,
+    ) -> None:
+        """
+        GIVEN:
+            - A root document with a version
+        WHEN:
+            - Only the version's id is passed to add_or_update_ids
+        THEN:
+            - The root is indexed
+        """
+        root, version = self._root_with_version()
+
+        with backend.batch_update() as batch:
+            batch.add_or_update_ids([version.pk])
+
+        assert backend.search_ids("latest", user=None) == [root.pk]
 
 
 class TestSearch:
@@ -763,8 +841,8 @@ class TestSearchIds:
 
     def test_respects_permission_filter(self, backend: TantivyBackend) -> None:
         """search_ids must respect user permission filtering."""
-        owner = User.objects.create_user("ids_owner")
-        other = User.objects.create_user("ids_other")
+        owner = UserFactory(username="ids_owner")
+        other = UserFactory(username="ids_other")
         doc = Document.objects.create(
             title="private doc",
             content="secret keyword",
@@ -824,6 +902,53 @@ class TestRebuild:
         backend.rebuild(Document.objects.all(), iter_wrapper=wrapper)
         assert 30 in seen
 
+    def test_successful_rebuild_leaves_index_up_to_date(
+        self,
+        backend: TantivyBackend,
+        paperless_dirs: PaperlessDirs,
+    ) -> None:
+        """
+        GIVEN:
+            - A backend and one document
+        WHEN:
+            - rebuild() completes
+        THEN:
+            - needs_rebuild() is False and no rebuild marker remains
+        """
+        DocumentFactory.create()
+
+        backend.rebuild(Document.objects.all())
+
+        assert needs_rebuild(paperless_dirs.index_dir) is False
+        assert not (paperless_dirs.index_dir / REBUILD_MARKER).exists()
+
+    def test_interrupted_rebuild_is_retried(
+        self,
+        backend: TantivyBackend,
+        paperless_dirs: PaperlessDirs,
+    ) -> None:
+        """
+        GIVEN:
+            - A rebuild that dies while indexing documents (e.g. the database
+              connection is lost)
+        WHEN:
+            - needs_rebuild() is checked afterwards
+        THEN:
+            - It is True, even though the empty index was already stamped with
+              current settings, so the next start rebuilds instead of reporting
+              the index as up to date
+        """
+        DocumentFactory.create()
+
+        def die(pairs):
+            raise RuntimeError("terminating connection due to administrator command")
+            yield  # pragma: no cover
+
+        with pytest.raises(RuntimeError):
+            backend.rebuild(Document.objects.all(), iter_wrapper=die)
+
+        assert needs_rebuild(paperless_dirs.index_dir) is True
+
     def test_includes_group_granted_viewers(self, backend: TantivyBackend) -> None:
         """Rebuild must index viewer ids for group-only grants, not just direct ones.
 
@@ -843,7 +968,7 @@ class TestRebuild:
             content="group secret keyword",
             owner=owner,
         )
-        assign_perm("view_document", group, doc)
+        grant_object(group, doc, "view_document")
 
         backend.rebuild(Document.objects.all())
 
@@ -853,6 +978,79 @@ class TestRebuild:
             search_mode=SearchMode.QUERY,
         )
         assert ids == [doc.pk]
+
+
+class TestCreatedDateOutOfRange:
+    """The index stores dates as nanosecond i64 values (1677-09-22 to 2262-04-11).
+
+    A document whose created date falls outside that window must not abort
+    indexing: it is indexed without a created value and a warning names it.
+    """
+
+    @pytest.mark.parametrize(
+        ("created", "expected_warnings"),
+        [
+            pytest.param(date(1677, 9, 22), 0, id="first-representable-day"),
+            pytest.param(date(2262, 4, 11), 0, id="last-representable-day"),
+            pytest.param(date(1677, 9, 21), 1, id="day-before-first"),
+            pytest.param(date(2262, 4, 12), 1, id="day-after-last"),
+            pytest.param(date(16, 8, 30), 1, id="two-digit-year-read-as-year-16"),
+            pytest.param(date(9999, 12, 31), 1, id="max-python-date"),
+        ],
+    )
+    def test_add_or_update_indexes_document_and_warns_when_out_of_range(
+        self,
+        backend: TantivyBackend,
+        caplog: pytest.LogCaptureFixture,
+        created: date,
+        expected_warnings: int,
+    ) -> None:
+        """
+        GIVEN:
+            - A document with a created date at or beyond the index date limits
+        WHEN:
+            - The document is added to the index
+        THEN:
+            - The document is indexed and searchable either way
+            - A warning naming the document is logged only for out-of-range dates
+        """
+        doc = DocumentFactory(created=created, content="boundarycontent")
+
+        with caplog.at_level(logging.WARNING, logger="paperless.search"):
+            backend.add_or_update(doc)
+
+        assert backend.search_ids("boundarycontent", user=None) == [doc.pk]
+        warnings = [r for r in caplog.records if r.levelno == logging.WARNING]
+        assert len(warnings) == expected_warnings
+        if expected_warnings:
+            assert f"Document {doc.pk}" in warnings[0].getMessage()
+
+    def test_rebuild_continues_past_out_of_range_document(
+        self,
+        backend: TantivyBackend,
+        caplog: pytest.LogCaptureFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A document with an unrepresentable created date among valid ones
+        WHEN:
+            - The index is rebuilt
+        THEN:
+            - Rebuild completes and every document is searchable
+            - A warning names the offending document
+        """
+        good = DocumentFactory(created=date(2016, 8, 30), content="rebuildcontent")
+        bad = DocumentFactory(created=date(16, 8, 30), content="rebuildcontent")
+
+        with caplog.at_level(logging.WARNING, logger="paperless.search"):
+            backend.rebuild(Document.objects.all())
+
+        assert sorted(backend.search_ids("rebuildcontent", user=None)) == sorted(
+            [good.pk, bad.pk],
+        )
+        warnings = [r for r in caplog.records if r.levelno == logging.WARNING]
+        assert len(warnings) == 1
+        assert f"Document {bad.pk}" in warnings[0].getMessage()
 
 
 class TestAutocomplete:
@@ -938,6 +1136,34 @@ class TestMoreLikeThis:
         assert 150 not in ids
         assert 151 in ids
 
+    def test_more_like_this_ids_seeded_by_version_uses_root(
+        self,
+        backend: TantivyBackend,
+    ) -> None:
+        """A version is not indexed, so it must be looked up as its root."""
+        root = DocumentFactory.create(
+            title="Important document",
+            content="financial information report",
+        )
+        version = DocumentFactory.create(
+            title="Important document",
+            content="financial information report",
+            root_document=root,
+            version_index=1,
+        )
+        other = DocumentFactory.create(
+            title="Another document",
+            content="financial information report",
+        )
+        backend.add_or_update(root)
+        backend.add_or_update(other)
+
+        ids = backend.more_like_this_ids(doc_id=version.pk, user=None)
+
+        assert other.pk in ids
+        assert root.pk not in ids
+        assert version.pk not in ids
+
 
 class TestSingleton:
     """Test get_backend() and reset_backend() singleton lifecycle."""
@@ -948,7 +1174,8 @@ class TestSingleton:
         yield
         reset_backend()
 
-    def test_returns_same_instance_on_repeated_calls(self, index_dir) -> None:
+    @pytest.mark.usefixtures("paperless_dirs")
+    def test_returns_same_instance_on_repeated_calls(self) -> None:
         """Singleton pattern: repeated calls to get_backend() must return the same instance."""
         assert get_backend() is get_backend()
 
@@ -965,7 +1192,8 @@ class TestSingleton:
         assert b1 is not b2
         assert b2._path == tmp_path / "b"
 
-    def test_reset_forces_new_instance(self, index_dir) -> None:
+    @pytest.mark.usefixtures("paperless_dirs")
+    def test_reset_forces_new_instance(self) -> None:
         """reset_backend() must force creation of a new backend instance on next get_backend() call."""
         b1 = get_backend()
         reset_backend()
@@ -1071,7 +1299,7 @@ class TestFieldHandling:
 
     def test_notes_include_user_information(self, backend: TantivyBackend) -> None:
         """Notes must be indexed with user information when available for structured queries."""
-        user = User.objects.create_user("notewriter")
+        user = UserFactory(username="notewriter")
         doc = Document.objects.create(
             title="Doc with notes",
             content="test",
@@ -1173,7 +1401,7 @@ class TestHighlightHits:
         notes.note: prefix so the query targets notes content directly, but
         the snippet is generated from notes_text which stores the same text.
         """
-        user = User.objects.create_user("hl_noteuser")
+        user = UserFactory(username="hl_noteuser")
         doc = Document.objects.create(
             title="Doc with matching note",
             content="unrelated content",

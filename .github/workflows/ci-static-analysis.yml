@@ -15,7 +15,7 @@ permissions:
 jobs:
   zizmor:
     name: Run zizmor
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
       actions: read
@@ -26,10 +26,10 @@ jobs:
         with:
           persist-credentials: false
       - name: Run zizmor
-        uses: zizmorcore/zizmor-action@3dc1ecc9bcb9e94e9b2c709687979e1298497054 # v0.6.2
+        uses: zizmorcore/zizmor-action@cc914d7f3750a2d13d75c7f184a1060aa0e9d482 # v0.6.4
   semgrep:
     name: Semgrep CE
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     container:
       image: semgrep/semgrep:1.155.0@sha256:cc869c685dcc0fe497c86258da9f205397d8108e56d21a86082ea4886e52784d
     if: github.actor != 'dependabot[bot]'
@@ -44,7 +44,7 @@ jobs:
       - name: Run Semgrep
         run: semgrep scan --config auto --sarif-output results.sarif
       - name: Upload results to GitHub code scanning
-        uses: github/codeql-action/upload-sarif@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4.37.9
+        uses: github/codeql-action/upload-sarif@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4.38.2
         if: always()
         with:
           sarif_file: results.sarif

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import unicodedata
 from typing import TYPE_CHECKING
 from unittest import mock
@@ -7,8 +9,11 @@ import pytest
 from django.core.files.uploadedfile import SimpleUploadedFile
 
 if TYPE_CHECKING:
+    from rest_framework.test import APIClient
+
     from documents.data_models import ConsumableDocument
     from documents.data_models import DocumentMetadataOverrides
+    from paperless_testing.dirs import PaperlessDirs
 
 
 @pytest.fixture()
@@ -18,22 +23,14 @@ def consume_file_mock():
         yield m
 
 
-@pytest.fixture()
-def directories(tmp_path, settings, _media_settings):
-    scratch = tmp_path / "scratch"
-    scratch.mkdir()
-    settings.SCRATCH_DIR = scratch
-    return scratch
-
-
 @pytest.mark.django_db
 class TestPostDocumentNFCNormalization:
     def test_nfd_filename_normalized_to_nfc(
         self,
-        admin_client,
+        admin_client: APIClient,
         consume_file_mock: mock.MagicMock,
-        directories,
-    ):
+        paperless_dirs: PaperlessDirs,
+    ) -> None:
         """Uploaded file with NFD filename must have its name stored as NFC."""
         nfd = unicodedata.normalize("NFD", "Rechnung März.pdf")
         nfc = unicodedata.normalize("NFC", "Rechnung März.pdf")
@@ -69,10 +66,10 @@ class TestPostDocumentNFCNormalization:
 
     def test_already_nfc_filename_unchanged(
         self,
-        admin_client,
+        admin_client: APIClient,
         consume_file_mock: mock.MagicMock,
-        directories,
-    ):
+        paperless_dirs: PaperlessDirs,
+    ) -> None:
         """Uploaded file with already-NFC filename must pass through unchanged."""
         nfc = unicodedata.normalize("NFC", "Invoice_2024.pdf")
 

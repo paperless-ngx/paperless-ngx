@@ -40,7 +40,6 @@ LLM_SYSTEM_PROMPT = (
 
 # openai-python rejects empty keys since 2.34.0, "fake" is the stand-in from
 # llama-index's own OpenAILike docs https://docs.llamaindex.ai/en/stable/api_reference/llms/openai_like/
-# TODO: remove pending resolution of https://github.com/openai/openai-python/issues/3224
 PLACEHOLDER_API_KEY: Final = "fake"
 
 
@@ -76,6 +75,7 @@ class AIClient:
                 context_window=self.settings.llm_context_size,
                 request_timeout=self.settings.llm_request_timeout,
                 system_prompt=LLM_SYSTEM_PROMPT,
+                additional_kwargs=self.settings.llm_extra_params,
                 client=Client(
                     host=endpoint,
                     timeout=self.settings.llm_request_timeout,
@@ -112,6 +112,7 @@ class AIClient:
                 is_chat_model=True,
                 is_function_calling_model=True,
                 system_prompt=LLM_SYSTEM_PROMPT,
+                additional_kwargs=self.settings.llm_extra_params,
                 http_client=http_client,
                 async_http_client=async_http_client,
             )

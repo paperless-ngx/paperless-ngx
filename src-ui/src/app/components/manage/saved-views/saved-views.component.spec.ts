@@ -227,7 +227,7 @@ describe('SavedViewsComponent', () => {
   })
 
   it('should support delete saved view', () => {
-    const toastSpy = jest.spyOn(toastService, 'showInfo')
+    const toastSpy = jest.spyOn(toastService, 'showSuccess')
     const deleteSpy = jest.spyOn(savedViewService, 'delete')
     deleteSpy.mockReturnValue(of(true))
     component.deleteSavedView(savedViews[0] as SavedView)

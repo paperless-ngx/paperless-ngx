@@ -12,7 +12,9 @@ concurrency:
   cancel-in-progress: true
 env:
   DEFAULT_UV_VERSION: "0.12.x"
-  NLTK_DATA: "/usr/share/nltk_data"
+  # Match the Docker image: nltk refuses to read hardlinked data files, such as
+  # the copy bundled with llama-index when uv links packages from its cache
+  UV_LINK_MODE: copy
 permissions: {}
 jobs:
   changes:
@@ -78,7 +80,7 @@ jobs:
     needs: changes
     if: needs.changes.outputs.backend_changed == 'true'
     name: "Python ${{ matrix.python-version }}"
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
     strategy:
@@ -100,20 +102,19 @@ jobs:
         with:
           python-version: "${{ matrix.python-version }}"
       - name: Install uv
-        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
           version: ${{ env.DEFAULT_UV_VERSION }}
           enable-cache: true
           python-version: ${{ steps.setup-python.outputs.python-version }}
       - name: Install system dependencies
-        timeout-minutes: 10
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -qq --no-install-recommends \
-            unpaper tesseract-ocr imagemagick ghostscript poppler-utils
+        timeout-minutes: 12
+        uses: $/.github/actions/apt-install
+        with:
+          packages: unpaper tesseract-ocr imagemagick ghostscript poppler-utils
       - name: Configure ImageMagick
         run: |
-          sudo cp docker/rootfs/etc/ImageMagick-6/paperless-policy.xml /etc/ImageMagick-6/policy.xml
+          sudo cp docker/rootfs/etc/ImageMagick-6/paperless-policy.xml /etc/ImageMagick-7/policy.xml
       - name: Install Python dependencies
         env:
           PYTHON_VERSION: ${{ steps.setup-python.outputs.python-version }}
@@ -125,12 +126,8 @@ jobs:
       - name: List installed Python dependencies
         run: |
           uv pip list
-      - name: Install NLTK data
-        run: |
-          uv run python -m nltk.downloader punkt punkt_tab snowball_data stopwords -d "${NLTK_DATA}"
       - name: Run tests
         env:
-          NLTK_DATA: ${{ env.NLTK_DATA }}
           PAPERLESS_CI_TEST: 1
           PYTHON_VERSION: ${{ steps.setup-python.outputs.python-version }}
         run: |
@@ -141,13 +138,13 @@ jobs:
             pytest
       - name: Upload test results to Codecov
         if: always()
-        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
         with:
           flags: backend-python-${{ matrix.python-version }}
           files: junit.xml
           report_type: test_results
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
         with:
           flags: backend-python-${{ matrix.python-version }}
           files: coverage.xml
@@ -161,7 +158,7 @@ jobs:
     needs: changes
     if: needs.changes.outputs.backend_changed == 'true'
     name: Check project typing
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
     env:
@@ -178,7 +175,7 @@ jobs:
         with:
           python-version: "${{ env.DEFAULT_PYTHON }}"
       - name: Install uv
-        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
           version: ${{ env.DEFAULT_UV_VERSION }}
           enable-cache: true

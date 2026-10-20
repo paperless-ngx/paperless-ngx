@@ -2,14 +2,14 @@ from __future__ import annotations
 
 import factory
 from django.utils import timezone
-from factory.django import DjangoModelFactory
 
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 from paperless_mail.models import ProcessedMail
+from paperless_testing.typed_factory import TypedModelFactory
 
 
-class MailAccountFactory(DjangoModelFactory[MailAccount]):
+class MailAccountFactory(TypedModelFactory[MailAccount]):
     class Meta:
         model = MailAccount
 
@@ -24,7 +24,7 @@ class MailAccountFactory(DjangoModelFactory[MailAccount]):
     is_token = False
 
 
-class MailRuleFactory(DjangoModelFactory[MailRule]):
+class MailRuleFactory(TypedModelFactory[MailRule]):
     class Meta:
         model = MailRule
 
@@ -44,7 +44,7 @@ class MailRuleFactory(DjangoModelFactory[MailRule]):
     stop_processing = False
 
 
-class ProcessedMailFactory(DjangoModelFactory[ProcessedMail]):
+class ProcessedMailFactory(TypedModelFactory[ProcessedMail]):
     class Meta:
         model = ProcessedMail
 

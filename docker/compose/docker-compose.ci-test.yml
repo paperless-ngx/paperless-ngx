@@ -4,7 +4,7 @@
 # correct networking for the tests
 services:
   gotenberg:
-    image: docker.io/gotenberg/gotenberg:8.36
+    image: docker.io/gotenberg/gotenberg:8.37
     hostname: gotenberg
     container_name: gotenberg
     network_mode: host
@@ -14,7 +14,7 @@ services:
     command:
       - "gotenberg"
       - "--chromium-disable-javascript=true"
-      - "--chromium-allow-list=file:///tmp/.*"
+      - "--chromium-allow-list=^file:///tmp/.*"
       - "--log-level=warn"
       - "--log-format=text"
   tika:
@@ -24,7 +24,7 @@ services:
     network_mode: host
     restart: unless-stopped
   greenmail:
-    image: docker.io/greenmail/standalone:2.1.13
+    image: docker.io/greenmail/standalone:2.1.14
     hostname: greenmail
     container_name: greenmail
     environment:
@@ -35,7 +35,7 @@ services:
       - "3143:3143" # IMAP
     restart: unless-stopped
   nginx:
-    image: docker.io/nginx:1.31.5-alpine
+    image: docker.io/nginx:1.31.6-alpine
     hostname: nginx
     container_name: nginx
     ports:

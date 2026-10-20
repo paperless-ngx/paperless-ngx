@@ -21,7 +21,7 @@
     </div>
   </li>
 
-  @if (loading && templates.length === 0) {
+  @if (loading() && templates.length === 0) {
     <li class="list-group-item">
       <div class="spinner-border spinner-border-sm me-2" role="status"></div>
       <ng-container i18n>Loading...</ng-container>
@@ -30,7 +30,7 @@
 
   @for (t of templates; track t.id) {
     <li class="list-group-item">
-      <div class="row fade" [class.show]="show">
+      <div class="row fade" [class.show]="show()">
         <div class="col d-flex align-items-center"><button class="btn btn-link p-0 text-start" type="button" (click)="editTemplate(t)" [disabled]="!permissionsService.currentUserCan(PermissionAction.Change, PermissionType.OcrTemplate)">{{t.name}}</button></div>
         <div class="col d-flex align-items-center d-none d-sm-flex">{{getDocumentTypeName(t)}}</div>
         <div class="col d-flex align-items-center d-none d-sm-flex"><code>{{t.zones?.length || 0}}</code></div>
@@ -69,7 +69,7 @@
       </div>
     </li>
   }
-  @if (!loading && templates.length === 0) {
-    <li class="list-group-item" [class.show]="show" i18n>No OCR templates defined.</li>
+  @if (!loading() && templates.length === 0) {
+    <li class="list-group-item" [class.show]="show()" i18n>No OCR templates defined.</li>
   }
 </ul>

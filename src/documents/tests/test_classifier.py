@@ -1,16 +1,26 @@
-import re
+import pickle
 import warnings
+from datetime import UTC
+from datetime import datetime
 from pathlib import Path
 from unittest import mock
 
+import numpy as np
 import pytest
 from django.conf import settings
+from django.db import connection
 from django.test import TestCase
 from django.test import override_settings
+from django.test.utils import CaptureQueriesContext
+from pytest_django.fixtures import Settings
+from pytest_mock import MockerFixture
+from sklearn.neural_network import MLPClassifier
 
 from documents.classifier import ClassifierModelCorruptError
 from documents.classifier import DocumentClassifier
 from documents.classifier import IncompatibleClassifierVersionError
+from documents.classifier import _predict_with_threshold
+from documents.classifier import _text_analyzer
 from documents.classifier import load_classifier
 from documents.models import Correspondent
 from documents.models import Document
@@ -18,18 +28,13 @@ from documents.models import DocumentType
 from documents.models import MatchingModel
 from documents.models import StoragePath
 from documents.models import Tag
-from documents.tests.utils import DirectoriesMixin
+from documents.tests.helpers import dummy_preprocess
+from paperless.settings import CLASSIFIER_LANGUAGES
 from paperless.signed_pickle import HMAC_SIZE
 from paperless.signed_pickle import signed_pickle_dumps
-
-
-def dummy_preprocess(content: str, **kwargs):
-    """
-    Simpler, faster pre-processing for testing purposes
-    """
-    content = content.lower().strip()
-    content = re.sub(r"\s+", " ", content)
-    return content
+from paperless_testing.dirs import DirectoriesMixin
+from paperless_testing.factories import DocumentFactory
+from paperless_testing.factories import TagFactory
 
 
 class TestClassifier(DirectoriesMixin, TestCase):
@@ -625,6 +630,103 @@ class TestClassifier(DirectoriesMixin, TestCase):
         self.assertEqual(self.classifier.predict_storage_path(doc1.content), sp.pk)
         self.assertIsNone(self.classifier.predict_storage_path(doc2.content))
 
+    def test_predict_rejects_prediction_below_match_threshold(self) -> None:
+        """
+        GIVEN:
+            - Classifiers trained against test data with confident predictions
+        WHEN:
+            - CLASSIFIER_MATCH_THRESHOLD exceeds the model's confidence
+        THEN:
+            - Every predict_* method discards the match in favor of no match
+        """
+        c1 = Correspondent.objects.create(
+            name="c1",
+            matching_algorithm=Correspondent.MATCH_AUTO,
+        )
+        dt1 = DocumentType.objects.create(
+            name="dt1",
+            matching_algorithm=DocumentType.MATCH_AUTO,
+        )
+        sp1 = StoragePath.objects.create(
+            name="sp1",
+            matching_algorithm=StoragePath.MATCH_AUTO,
+        )
+
+        doc1 = Document.objects.create(
+            title="doc1",
+            content="this is a document from c1",
+            correspondent=c1,
+            document_type=dt1,
+            storage_path=sp1,
+            checksum="A",
+        )
+        Document.objects.create(
+            title="doc2",
+            content="this is a document from no one",
+            checksum="B",
+        )
+
+        self.classifier.train()
+
+        predictors = {
+            "correspondent": self.classifier.predict_correspondent,
+            "document_type": self.classifier.predict_document_type,
+            "storage_path": self.classifier.predict_storage_path,
+        }
+        # No real prediction can reach a confidence this high, so this
+        # isolates the threshold check from the model's actual output.
+        with override_settings(CLASSIFIER_MATCH_THRESHOLD=0.999999):
+            for name, predict in predictors.items():
+                with self.subTest(field=name):
+                    self.assertIsNone(predict(doc1.content))
+
+    def test_train_uses_balanced_sample_weight(self) -> None:
+        """
+        GIVEN:
+            - A training set with correspondents, document types and storage paths
+        WHEN:
+            - The classifier is trained
+        THEN:
+            - Each MLP classifier is fit with balanced sample weights, so that
+              over-represented classes don't dominate predictions
+        """
+        c1 = Correspondent.objects.create(
+            name="c1",
+            matching_algorithm=Correspondent.MATCH_AUTO,
+        )
+        dt1 = DocumentType.objects.create(
+            name="dt1",
+            matching_algorithm=DocumentType.MATCH_AUTO,
+        )
+        sp1 = StoragePath.objects.create(
+            name="sp1",
+            matching_algorithm=StoragePath.MATCH_AUTO,
+        )
+
+        Document.objects.create(
+            title="doc1",
+            content="this is a document from c1",
+            correspondent=c1,
+            document_type=dt1,
+            storage_path=sp1,
+            checksum="A",
+        )
+        Document.objects.create(
+            title="doc2",
+            content="this is a document from no one",
+            checksum="B",
+        )
+
+        with mock.patch(
+            "sklearn.utils.class_weight.compute_sample_weight",
+            return_value=None,
+        ) as mocked_compute_sample_weight:
+            self.classifier.train()
+
+        self.assertEqual(mocked_compute_sample_weight.call_count, 3)
+        for call in mocked_compute_sample_weight.call_args_list:
+            self.assertEqual(call.args[0], "balanced")
+
     def test_one_tag_predict(self) -> None:
         t1 = Tag.objects.create(name="t1", matching_algorithm=Tag.MATCH_AUTO, pk=12)
 
@@ -810,65 +912,416 @@ class TestClassifier(DirectoriesMixin, TestCase):
             load_classifier(raise_exception=True)
 
 
-def test_preprocess_content() -> None:
+class TestClassifierSave:
+    @pytest.fixture
+    def model_file(self, tmp_path: Path, settings: Settings) -> Path:
+        settings.MODEL_FILE = tmp_path / "classifier.pickle"
+        return settings.MODEL_FILE
+
+    @pytest.fixture
+    def classifier(self) -> DocumentClassifier:
+        classifier = DocumentClassifier()
+        classifier.last_doc_change_time = datetime(2026, 1, 2, 3, 4, 5, tzinfo=UTC)
+        classifier.last_auto_type_hash = b"\x01" * 32
+        return classifier
+
+    def test_save_writes_signed_pickle(
+        self,
+        model_file: Path,
+        classifier: DocumentClassifier,
+    ) -> None:
+        """
+        GIVEN:
+            - A classifier with training state
+        WHEN:
+            - The classifier is saved
+        THEN:
+            - The file is the HMAC of the pickled state followed by that pickle
+            - The pickle uses the highest protocol
+            - The saved state loads back into a new classifier
+            - No temporary file is left behind
+        """
+        classifier.save()
+
+        raw = model_file.read_bytes()
+        signature = raw[: DocumentClassifier.HMAC_SIZE]
+        data = raw[DocumentClassifier.HMAC_SIZE :]
+        assert signature == DocumentClassifier._compute_hmac(data)
+        # A pickle opens with the PROTO opcode followed by the protocol number
+        assert data[:2] == bytes([pickle.PROTO[0], pickle.HIGHEST_PROTOCOL])
+        assert pickle.loads(data)[:3] == (
+            DocumentClassifier.FORMAT_VERSION,
+            classifier.last_doc_change_time,
+            classifier.last_auto_type_hash,
+        )
+
+        loaded = DocumentClassifier()
+        loaded.load()
+        assert loaded.last_doc_change_time == classifier.last_doc_change_time
+        assert loaded.last_auto_type_hash == classifier.last_auto_type_hash
+
+        assert not model_file.with_name(f"{model_file.name}.part").exists()
+
+    def test_save_failure_removes_partial_file(
+        self,
+        model_file: Path,
+        classifier: DocumentClassifier,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - An existing classifier model file
+        WHEN:
+            - Saving a new classifier fails part way through writing
+        THEN:
+            - The error is raised
+            - The partially written temporary file is removed
+            - The existing model file is left untouched
+        """
+        model_file.write_bytes(b"existing model")
+        mocker.patch(
+            "documents.classifier.pickle.dump",
+            side_effect=RuntimeError("disk full"),
+        )
+
+        with pytest.raises(RuntimeError, match="disk full"):
+            classifier.save()
+
+        assert not model_file.with_name(f"{model_file.name}.part").exists()
+        assert model_file.read_bytes() == b"existing model"
+
+
+class _StubProbaClassifier:
+    """
+    A fake scikit-learn classifier exposing just enough of the API for
+    `_predict_with_threshold`: `classes_` and `predict_proba`.
+    """
+
+    def __init__(self, classes: list[int], probabilities: list[float]) -> None:
+        self.classes_ = np.array(classes)
+        self._probabilities = np.array([probabilities])
+
+    def predict_proba(self, X) -> np.ndarray:
+        return self._probabilities
+
+
+@pytest.mark.parametrize(
+    ("classes", "probabilities", "threshold", "expected"),
+    [
+        # confident prediction above the threshold is returned
+        ([-1, 3], [0.1, 0.9], 0.6, 3),
+        # prediction below the threshold is discarded
+        ([-1, 3], [0.45, 0.55], 0.6, None),
+        # boundary: exactly at the threshold is accepted, not discarded
+        ([-1, 3], [0.4, 0.6], 0.6, 3),
+        # the winning class is the "no match" pseudo-class, regardless of its
+        # own confidence
+        ([-1, 3], [0.99, 0.01], 0.0, None),
+        # threshold of 0.0 disables the confidence check entirely
+        ([-1, 3], [0.45, 0.55], 0.0, 3),
+    ],
+)
+def test_predict_with_threshold(classes, probabilities, threshold, expected) -> None:
+    classifier = _StubProbaClassifier(classes, probabilities)
+    result = _predict_with_threshold(classifier, X=None, threshold=threshold)
+    assert result == expected
+
+
+def test_classifier_match_threshold_default() -> None:
     """
     GIVEN:
-        - Advanced text processing is enabled (default)
-    WHEN:
-        - Classifier preprocesses a document's content
+        - No PAPERLESS_CLASSIFIER_MATCH_THRESHOLD environment variable is set
     THEN:
-        - Processed content matches the expected output (stemmed words)
+        - The classifier match threshold defaults to 0.3
     """
-    with (Path(__file__).parent / "samples" / "content.txt").open("r") as f:
-        content = f.read()
-    with (Path(__file__).parent / "samples" / "preprocessed_content_advanced.txt").open(
-        "r",
-    ) as f:
-        expected_preprocess_content = f.read().rstrip()
-    classifier = DocumentClassifier()
-    result = classifier.preprocess_content(content)
-    assert result == expected_preprocess_content
+    assert settings.CLASSIFIER_MATCH_THRESHOLD == 0.3
 
 
-def test_preprocess_content_nltk_disabled() -> None:
-    """
-    GIVEN:
-        - Advanced text processing is disabled
-    WHEN:
-        - Classifier preprocesses a document's content
-    THEN:
-        - Processed content matches the expected output (unstemmed words)
-    """
-    with (Path(__file__).parent / "samples" / "content.txt").open("r") as f:
-        content = f.read()
-    with (Path(__file__).parent / "samples" / "preprocessed_content.txt").open(
-        "r",
-    ) as f:
-        expected_preprocess_content = f.read().rstrip()
-    classifier = DocumentClassifier()
-    with mock.patch("documents.classifier.ADVANCED_TEXT_PROCESSING_ENABLED", new=False):
-        result = classifier.preprocess_content(content)
-    assert result == expected_preprocess_content
+class TestPredictWithThresholdSingleClass:
+    @pytest.fixture
+    def single_class_model(self) -> tuple[MLPClassifier, np.ndarray]:
+        X = np.random.default_rng(0).random((2, 5))
+        return MLPClassifier(tol=0.01, random_state=0).fit(X, [3, 3]), X[:1]
+
+    def test_returns_only_class(
+        self,
+        single_class_model: tuple[MLPClassifier, np.ndarray],
+    ) -> None:
+        """
+        GIVEN:
+            - A classifier fitted on a single class (every document shares one label)
+        WHEN:
+            - A prediction is requested with the threshold disabled
+        THEN:
+            - No error is raised and the only class is returned
+        """
+        classifier, X = single_class_model
+
+        assert _predict_with_threshold(classifier, X, threshold=0.0) == 3
+
+    def test_applies_threshold(
+        self,
+        single_class_model: tuple[MLPClassifier, np.ndarray],
+    ) -> None:
+        """
+        GIVEN:
+            - A classifier fitted on a single class
+        WHEN:
+            - A prediction is requested
+        THEN:
+            - The class's confidence is still compared against the threshold
+        """
+        classifier, X = single_class_model
+        confidence = classifier.predict_proba(X)[0][0]
+
+        assert _predict_with_threshold(classifier, X, threshold=confidence - 0.01) == 3
+        assert (
+            _predict_with_threshold(classifier, X, threshold=confidence + 0.01) is None
+        )
 
 
-def test_preprocess_content_nltk_load_fail(mocker) -> None:
-    """
-    GIVEN:
-        - NLTK stop words fail to load
-    WHEN:
-        - Classifier preprocesses a document's content
-    THEN:
-        - Processed content matches the expected output (unstemmed words)
-    """
-    _module = mocker.MagicMock(name="nltk_corpus_mock")
-    _module.stopwords.words.side_effect = AttributeError()
-    mocker.patch.dict("sys.modules", {"nltk.corpus": _module})
-    classifier = DocumentClassifier()
-    with (Path(__file__).parent / "samples" / "content.txt").open("r") as f:
-        content = f.read()
-    with (Path(__file__).parent / "samples" / "preprocessed_content.txt").open(
-        "r",
-    ) as f:
-        expected_preprocess_content = f.read().rstrip()
-    result = classifier.preprocess_content(content)
-    assert result == expected_preprocess_content
+class TestPreprocessContent:
+    @pytest.fixture
+    def samples(self) -> Path:
+        return Path(__file__).parent / "samples"
+
+    @pytest.fixture
+    def content(self, samples: Path) -> str:
+        return (samples / "content.txt").read_text()
+
+    def test_supported_language(
+        self,
+        settings: Settings,
+        samples: Path,
+        content: str,
+    ) -> None:
+        """
+        GIVEN:
+            - The classifier language is English, the default
+        WHEN:
+            - Document content is preprocessed
+        THEN:
+            - Stop words are removed and the remaining words are stemmed
+        """
+        settings.CLASSIFIER_LANGUAGE = "english"
+        expected = (samples / "preprocessed_content_advanced.txt").read_text()
+
+        assert DocumentClassifier().preprocess_content(content) == expected.rstrip()
+
+    def test_unsupported_language(
+        self,
+        settings: Settings,
+        samples: Path,
+        content: str,
+    ) -> None:
+        """
+        GIVEN:
+            - No classifier language (the OCR language has no stemming support)
+        WHEN:
+            - Document content is preprocessed
+        THEN:
+            - The content is only lowercased and split into words
+        """
+        settings.CLASSIFIER_LANGUAGE = None
+        expected = (samples / "preprocessed_content.txt").read_text()
+
+        assert DocumentClassifier().preprocess_content(content) == expected.rstrip()
+
+    @pytest.mark.parametrize(
+        "language",
+        [pytest.param("english", id="supported"), pytest.param(None, id="unsupported")],
+    )
+    def test_empty_content(self, settings: Settings, language: str | None) -> None:
+        """
+        GIVEN:
+            - Empty document content
+        WHEN:
+            - The content is preprocessed
+        THEN:
+            - The result is empty
+        """
+        settings.CLASSIFIER_LANGUAGE = language
+
+        assert DocumentClassifier().preprocess_content("") == ""
+
+
+@pytest.mark.django_db
+class TestClassifierTrainTagLabels:
+    @pytest.fixture(autouse=True)
+    def _simple_preprocess(self, mocker: MockerFixture) -> None:
+        mocker.patch.object(
+            DocumentClassifier,
+            "preprocess_content",
+            side_effect=dummy_preprocess,
+        )
+
+    @pytest.fixture
+    def auto_tags(self) -> list[Tag]:
+        return TagFactory.create_batch(2, matching_algorithm=MatchingModel.MATCH_AUTO)
+
+    def test_train_query_count_does_not_scale_with_documents(
+        self,
+        auto_tags: list[Tag],
+    ) -> None:
+        """
+        GIVEN:
+            - Documents with auto matching tags
+        WHEN:
+            - The classifier is trained, then more documents are added and it is
+              trained again
+        THEN:
+            - Both trainings run the same number of queries
+        """
+        for doc in DocumentFactory.create_batch(2):
+            doc.tags.set(auto_tags)
+
+        with CaptureQueriesContext(connection) as few_documents:
+            DocumentClassifier().train()
+
+        for doc in DocumentFactory.create_batch(6):
+            doc.tags.set(auto_tags)
+
+        with CaptureQueriesContext(connection) as more_documents:
+            DocumentClassifier().train()
+
+        assert len(more_documents) == len(few_documents)
+
+    def test_train_uses_only_auto_tags_as_labels(
+        self,
+        auto_tags: list[Tag],
+    ) -> None:
+        """
+        GIVEN:
+            - Documents with both auto matching and non auto matching tags
+        WHEN:
+            - The classifier is trained
+        THEN:
+            - Only the auto matching tags are used as tag labels
+        """
+        manual_tag = TagFactory(matching_algorithm=MatchingModel.MATCH_ANY)
+        first, second, third = DocumentFactory.create_batch(3)
+        first.tags.set([auto_tags[0], manual_tag])
+        second.tags.set([auto_tags[1], manual_tag])
+        third.tags.set([*auto_tags, manual_tag])
+
+        classifier = DocumentClassifier()
+        classifier.train()
+
+        assert list(classifier.tags_binarizer.classes_) == sorted(
+            tag.pk for tag in auto_tags
+        )
+
+
+@pytest.mark.django_db
+class TestClassifierTrainContent:
+    def test_train_content_follows_label_order_across_chunks(
+        self,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - More documents than fit in one content chunk
+        WHEN:
+            - The classifier is trained
+        THEN:
+            - Every document's content is preprocessed once, in document order
+        """
+        mocker.patch("documents.classifier._CONTENT_CHUNK_SIZE", 2)
+        docs = DocumentFactory.create_batch(5)
+        preprocess = mocker.patch.object(
+            DocumentClassifier,
+            "preprocess_content",
+            side_effect=dummy_preprocess,
+        )
+
+        DocumentClassifier().train()
+
+        assert [call.args[0] for call in preprocess.call_args_list] == [
+            doc.content for doc in sorted(docs, key=lambda doc: doc.pk)
+        ]
+
+    def test_train_document_deleted_while_training(
+        self,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - Two documents
+        WHEN:
+            - The second document is deleted after its labels were gathered, but
+              before its content is fetched
+        THEN:
+            - Training completes
+            - The deleted document is trained with empty content, keeping labels
+              and content aligned
+        """
+        mocker.patch("documents.classifier._CONTENT_CHUNK_SIZE", 1)
+        first, second = DocumentFactory.create_batch(2)
+
+        def delete_second_then_preprocess(content: str, **kwargs) -> str:
+            if content == first.content:
+                second.delete()
+            return dummy_preprocess(content)
+
+        preprocess = mocker.patch.object(
+            DocumentClassifier,
+            "preprocess_content",
+            side_effect=delete_second_then_preprocess,
+        )
+
+        assert DocumentClassifier().train()
+
+        assert [call.args[0] for call in preprocess.call_args_list] == [
+            first.content,
+            "",
+        ]
+
+
+class TestTextAnalyzer:
+    @pytest.mark.parametrize(
+        "language",
+        [
+            pytest.param(language, id=language)
+            for language in sorted(set(CLASSIFIER_LANGUAGES.values()))
+        ],
+    )
+    def test_builds_for_every_classifier_language(self, language: str) -> None:
+        """
+        GIVEN:
+            - A language the classifier supports
+        WHEN:
+            - Text is analyzed with its classifier language
+        THEN:
+            - Tokens are produced
+        """
+        assert _text_analyzer(language).analyze("Paperless invoice 2026")
+
+    def test_english_removes_snowball_stop_words(self) -> None:
+        """
+        GIVEN:
+            - English text with a contraction and stop words missing from
+              Tantivy's own English list
+        WHEN:
+            - The text is analyzed
+        THEN:
+            - All stop words are removed, including the contraction
+            - The remaining words are stemmed
+        """
+        tokens = _text_analyzer("english").analyze(
+            "They were about to pay the invoices, don't worry",
+        )
+
+        assert tokens == ["pay", "invoic", "worri"]
+
+    def test_keeps_underscores_within_tokens(self) -> None:
+        """
+        GIVEN:
+            - Text with a word joined by an underscore
+        WHEN:
+            - The text is analyzed
+        THEN:
+            - The word stays one token
+        """
+        tokens = _text_analyzer("english").analyze("tax_id")
+
+        assert tokens == ["tax_id"]

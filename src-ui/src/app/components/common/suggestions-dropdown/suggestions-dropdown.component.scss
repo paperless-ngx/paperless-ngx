@@ -1,3 +1,7 @@
 .suggestions-dropdown {
   min-width: 250px;
 }
+
+.btn-link.dropdown-toggle::after {
+  display: none;
+}

@@ -30,3 +30,27 @@ class TestBooleanConfigPrecedence(TestCase):
         config.save()
 
         self.assertTrue(AIConfig().ai_enabled)
+
+
+class TestAIConfigPrecedence(TestCase):
+    @override_settings(LLM_EMBEDDING_API_KEY="environment-embedding-key")
+    def test_database_embedding_api_key_overrides_environment_setting(self) -> None:
+        config, _ = ApplicationConfiguration.objects.get_or_create()
+        config.llm_embedding_api_key = "database-embedding-key"
+        config.save()
+
+        self.assertEqual(
+            AIConfig().llm_embedding_api_key,
+            "database-embedding-key",
+        )
+
+    @override_settings(LLM_EMBEDDING_API_KEY="environment-embedding-key")
+    def test_null_embedding_api_key_uses_environment_setting(self) -> None:
+        config, _ = ApplicationConfiguration.objects.get_or_create()
+        config.llm_embedding_api_key = None
+        config.save()
+
+        self.assertEqual(
+            AIConfig().llm_embedding_api_key,
+            "environment-embedding-key",
+        )

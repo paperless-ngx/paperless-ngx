@@ -430,11 +430,6 @@ to a positive number to enable polling and disable native filesystem notificatio
 This will reduce the size of generated PDF documents. You'll most likely need to compile this yourself, because this
 software has been patented until around 2017 and binary packages are not available for most distributions.
 
-**Optional: download the NLTK data**
-If using the NLTK machine-learning processing (see [`PAPERLESS_ENABLE_NLTK`](configuration.md#PAPERLESS_ENABLE_NLTK) for details),
-download the NLTK data for the Snowball Stemmer, Stopwords and Punkt tokenizer to `/usr/share/nltk_data`. Refer to the [NLTK
-instructions](https://www.nltk.org/data.html) for details on how to download the data.
-
 #### After installation
 
 Your Paperless-ngx instance should now be accessible at `http://localhost:8000` (or similar, depending on your configuration).
@@ -650,9 +645,6 @@ hardware, but a few settings can improve performance:
   `PAPERLESS_OCR_CLEAN=none`. This will speed up OCR times and use
   less memory at the expense of slightly worse OCR results.
 - If using Docker, consider setting [`PAPERLESS_WEBSERVER_WORKERS`](configuration.md#PAPERLESS_WEBSERVER_WORKERS) to 1. This will save some memory.
-- Consider setting [`PAPERLESS_ENABLE_NLTK`](configuration.md#PAPERLESS_ENABLE_NLTK) to false, to disable the
-  more advanced language processing, which can take more memory and
-  processing time.
 
 For details, refer to [configuration](configuration.md).
 

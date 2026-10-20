@@ -1,6 +1,6 @@
-<div class="mb-3">
-  <div class="row">
-    @if (!horizontal) {
+<div [class.mb-3]="!compact">
+  <div [class.row]="!compact">
+    @if (!horizontal && !compact) {
       <div class="d-flex align-items-center position-relative hidden-button-container col-md-3">
         <label class="form-label" [for]="inputId" [ngbTooltip]="showUnsetNote && isUnset ? tipContent: null" placement="end">
           {{title}}
@@ -17,8 +17,8 @@
     }
     <div [ngClass]="{'align-items-center': horizontal, 'd-flex': horizontal}">
       <div class="form-check form-switch">
-        <input #inputField type="checkbox" class="form-check-input" [id]="inputId" [(ngModel)]="value" [ngModelOptions]="{standalone: true}" (change)="onChange(value)" (blur)="onTouched()" [disabled]="disabled">
-        @if (horizontal) {
+        <input #inputField type="checkbox" class="form-check-input" [id]="inputId" [(ngModel)]="value" [ngModelOptions]="{standalone: true}" (change)="onChange(value)" (blur)="onTouched()" [disabled]="disabled" [attr.aria-label]="compact ? title : null">
+        @if (horizontal && !compact) {
           <label class="form-check-label" [class.text-muted]="showUnsetNote && isUnset" [for]="inputId" [ngbTooltip]="showUnsetNote && isUnset ? tipContent: null" placement="end">
             {{title}}
             @if (showUnsetNote && isUnset) {

@@ -14,7 +14,7 @@ import {
 } from './services/permissions.service'
 import { SettingsService } from './services/settings.service'
 import { TasksService } from './services/tasks.service'
-import { ToastService } from './services/toast.service'
+import { ToastLevel, ToastService } from './services/toast.service'
 import { WebsocketStatusService } from './services/websocket-status.service'
 
 @Component({
@@ -61,18 +61,6 @@ export class AppComponent implements OnInit, OnDestroy {
     }
   }
 
-  private showNotification(key) {
-    if (
-      this.router.url == '/dashboard' &&
-      this.settings.get(
-        SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_SUPPRESS_ON_DASHBOARD
-      )
-    ) {
-      return false
-    }
-    return this.settings.get(key)
-  }
-
   ngOnInit(): void {
     this.websocketStatusService.connect()
 
@@ -80,29 +68,22 @@ export class AppComponent implements OnInit, OnDestroy {
       .onDocumentConsumptionFinished()
       .subscribe((status) => {
         this.tasksService.reload()
-        if (
-          this.showNotification(SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_SUCCESS)
-        ) {
-          if (
-            this.permissionsService.currentUserCan(
-              PermissionAction.View,
-              PermissionType.Document
-            )
-          ) {
-            this.toastService.show({
-              content: $localize`Document ${status.filename} was added to Paperless-ngx.`,
-              delay: 10000,
-              actionName: $localize`Open document`,
-              action: () => {
-                this.router.navigate(['documents', status.documentId])
-              },
-            })
-          } else {
-            this.toastService.show({
-              content: $localize`Document ${status.filename} was added to Paperless-ngx.`,
-              delay: 10000,
-            })
-          }
+        if (this.settings.get(SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_SUCCESS)) {
+          const canView = this.permissionsService.currentUserCan(
+            PermissionAction.View,
+            PermissionType.Document
+          )
+          // the upload status tray already shows this, so only keep a record
+          this.toastService.show({
+            content: $localize`Document ${status.filename} was added to Paperless-ngx.`,
+            delay: 10000,
+            level: ToastLevel.Success,
+            silent: true,
+            actionName: canView ? $localize`Open document` : undefined,
+            action: canView
+              ? () => this.router.navigate(['documents', status.documentId])
+              : undefined,
+          })
         }
       })
 
@@ -110,9 +91,7 @@ export class AppComponent implements OnInit, OnDestroy {
       .onDocumentConsumptionFailed()
       .subscribe((status) => {
         this.tasksService.reload()
-        if (
-          this.showNotification(SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_FAILED)
-        ) {
+        if (this.settings.get(SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_FAILED)) {
           this.toastService.showError(
             $localize`Could not add ${status.filename}\: ${status.message}`
           )
@@ -121,18 +100,8 @@ export class AppComponent implements OnInit, OnDestroy {
 
     this.newDocumentSubscription = this.websocketStatusService
       .onDocumentDetected()
-      .subscribe((status) => {
+      .subscribe(() => {
         this.tasksService.reload()
-        if (
-          this.showNotification(
-            SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_NEW_DOCUMENT
-          )
-        ) {
-          this.toastService.show({
-            content: $localize`Document ${status.filename} is being processed by Paperless-ngx.`,
-            delay: 5000,
-          })
-        }
       })
 
     this.hotKeyService

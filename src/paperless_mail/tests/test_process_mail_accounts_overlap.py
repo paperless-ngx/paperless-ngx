@@ -2,15 +2,21 @@ from typing import Final
 
 import pytest
 import pytest_mock
+from django.core.cache import cache
 
-from documents.models import PaperlessTask
-from documents.tests.factories import PaperlessTaskFactory
 from paperless_mail import tasks
 from paperless_mail.tests.factories import MailAccountFactory
 from paperless_mail.tests.factories import MailRuleFactory
 
 NO_DOCUMENTS_ADDED: Final = "No new documents were added."
 SKIPPED: Final = "Skipped: mail account processing already in progress."
+
+
+@pytest.fixture(autouse=True)
+def _clear_mail_fetch_lock():
+    cache.delete(tasks.MAIL_FETCH_LOCK_KEY)
+    yield
+    cache.delete(tasks.MAIL_FETCH_LOCK_KEY)
 
 
 @pytest.mark.django_db
@@ -22,50 +28,20 @@ class TestProcessMailAccountsOverlap:
         account = MailAccountFactory.create()
         MailRuleFactory.create(account=account, enabled=True)
 
-    @pytest.mark.parametrize(
-        ("status", "expected_result", "expected_call_count"),
-        [
-            pytest.param(
-                PaperlessTask.Status.PENDING,
-                SKIPPED,
-                0,
-                id="pending-task-blocks",
-            ),
-            pytest.param(
-                PaperlessTask.Status.STARTED,
-                SKIPPED,
-                0,
-                id="started-task-blocks",
-            ),
-            pytest.param(
-                PaperlessTask.Status.SUCCESS,
-                NO_DOCUMENTS_ADDED,
-                1,
-                id="finished-task-does-not-block",
-            ),
-        ],
-    )
-    def test_skips_only_while_another_mail_fetch_task_runs(
+    def test_skips_while_lock_is_held(
         self,
         mocker: pytest_mock.MockerFixture,
-        status: PaperlessTask.Status,
-        expected_result: str,
-        expected_call_count: int,
     ) -> None:
         """
         GIVEN:
             - An enabled mail account with a rule
-            - Another mail fetch task row in the given status
+            - The mail fetch lock is already held by another run
         WHEN:
             - Mail accounts are processed
         THEN:
-            - Processing is skipped only if that other task is pending or running
+            - Processing is skipped and no account is handled
         """
-        PaperlessTaskFactory.create(
-            task_type=PaperlessTask.TaskType.MAIL_FETCH,
-            trigger_source=PaperlessTask.TriggerSource.SCHEDULED,
-            status=status,
-        )
+        cache.add(tasks.MAIL_FETCH_LOCK_KEY, "other-task-id", timeout=60)
 
         mocked_handle = mocker.patch.object(
             tasks.MailAccountHandler,
@@ -75,21 +51,21 @@ class TestProcessMailAccountsOverlap:
 
         result = tasks.process_mail_accounts()
 
-        assert mocked_handle.call_count == expected_call_count
-        assert result == expected_result
+        assert mocked_handle.call_count == 0
+        assert result == SKIPPED
 
-    def test_runs_when_no_other_mail_fetch_task_exists(
+    def test_runs_when_lock_is_free(
         self,
         mocker: pytest_mock.MockerFixture,
     ) -> None:
         """
         GIVEN:
             - An enabled mail account with a rule
-            - No other mail fetch task rows
+            - No mail fetch run currently holds the lock
         WHEN:
             - Mail accounts are processed
         THEN:
-            - The account is handled
+            - The account is handled and the lock is released afterwards
         """
         mocked_handle = mocker.patch.object(
             tasks.MailAccountHandler,
@@ -101,26 +77,48 @@ class TestProcessMailAccountsOverlap:
 
         mocked_handle.assert_called_once()
         assert result == NO_DOCUMENTS_ADDED
+        assert cache.get(tasks.MAIL_FETCH_LOCK_KEY) is None
 
-    def test_does_not_skip_due_to_its_own_task_row(
+    def test_releases_lock_even_if_handling_raises(
         self,
         mocker: pytest_mock.MockerFixture,
     ) -> None:
         """
         GIVEN:
             - An enabled mail account with a rule
-            - A running mail fetch task row belonging to this very task
+            - Handling the account raises an unexpected exception
         WHEN:
-            - Mail accounts are processed under that task id
+            - Mail accounts are processed
         THEN:
-            - The task does not skip itself and handles the account
+            - The lock is still released so the next run is not blocked forever
         """
-        PaperlessTaskFactory.create(
-            task_id="self-task-id",
-            task_type=PaperlessTask.TaskType.MAIL_FETCH,
-            trigger_source=PaperlessTask.TriggerSource.SCHEDULED,
-            status=PaperlessTask.Status.STARTED,
+        mocker.patch.object(
+            tasks.MailAccountHandler,
+            "handle_mail_account",
+            side_effect=RuntimeError("boom"),
         )
+
+        with pytest.raises(RuntimeError):
+            tasks.process_mail_accounts()
+
+        assert cache.get(tasks.MAIL_FETCH_LOCK_KEY) is None
+
+    def test_recovers_after_lock_ttl_expires(
+        self,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - An enabled mail account with a rule
+            - A lock left behind by a run that never released it (e.g. the
+              worker was killed mid-run) but whose TTL has since expired
+        WHEN:
+            - Mail accounts are processed
+        THEN:
+            - The account is handled instead of being permanently blocked
+        """
+        cache.add(tasks.MAIL_FETCH_LOCK_KEY, "dead-task-id", timeout=1)
+        cache.delete(tasks.MAIL_FETCH_LOCK_KEY)  # simulate TTL expiry
 
         mocked_handle = mocker.patch.object(
             tasks.MailAccountHandler,
@@ -128,7 +126,7 @@ class TestProcessMailAccountsOverlap:
             return_value=0,
         )
 
-        result = tasks.process_mail_accounts.apply(task_id="self-task-id").result
+        result = tasks.process_mail_accounts()
 
         mocked_handle.assert_called_once()
         assert result == NO_DOCUMENTS_ADDED

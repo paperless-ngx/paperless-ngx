@@ -151,7 +151,7 @@ describe('UserEditDialogComponent', () => {
       'deactivateTotp'
     )
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    const toastInfoSpy = jest.spyOn(toastService, 'showSuccess')
     deactivateSpy.mockReturnValueOnce(throwError(() => new Error('error')))
     component.deactivateTotp()
     expect(deactivateSpy).toHaveBeenCalled()

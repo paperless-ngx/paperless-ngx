@@ -580,7 +580,7 @@ describe('DocumentListViewService', () => {
     expect(documentListViewService.isSelected(documents[3])).toBeTruthy()
   })
 
-  it('should clear all-selected mode when toggling a single document', () => {
+  it('should exclude a toggled document while keeping all-selected mode', () => {
     documentListViewService.reload()
     const req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
@@ -592,8 +592,73 @@ describe('DocumentListViewService', () => {
 
     documentListViewService.toggleSelected(documents[0])
 
-    expect(documentListViewService.allSelected).toBeFalsy()
+    expect(documentListViewService.allSelected).toBeTruthy()
+    expect(documentListViewService.excluded).toEqual(new Set([documents[0].id]))
+    expect(documentListViewService.selectedCount).toEqual(documents.length - 1)
     expect(documentListViewService.isSelected(documents[0])).toBeFalsy()
+
+    documentListViewService.toggleSelected(documents[0])
+
+    expect(documentListViewService.excluded.size).toEqual(0)
+    expect(documentListViewService.selectedCount).toEqual(documents.length)
+    expect(documentListViewService.isSelected(documents[0])).toBeTruthy()
+  })
+
+  it('should preserve exclusions across pages', () => {
+    documentListViewService.pageSize = 3
+    let req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/?page=1&page_size=3&ordering=-created&truncate_content=true&include_selection_data=true`
+    )
+    req.flush({ count: documents.length, results: documents.slice(0, 3) })
+
+    documentListViewService.selectAll()
+    documentListViewService.toggleSelected(documents[0])
+    documentListViewService.currentPage = 2
+    req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/?page=2&page_size=3&ordering=-created&truncate_content=true&include_selection_data=true`
+    )
+    req.flush({ count: documents.length, results: documents.slice(3, 6) })
+
+    expect(documentListViewService.excluded).toEqual(new Set([documents[0].id]))
+    expect(documentListViewService.selectedCount).toEqual(documents.length - 1)
+    expect(documentListViewService.selected).toEqual(
+      new Set(documents.slice(3, 6).map((document) => document.id))
+    )
+
+    documentListViewService.currentPage = 1
+    req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/?page=1&page_size=3&ordering=-created&truncate_content=true&include_selection_data=true`
+    )
+    req.flush({ count: documents.length, results: documents.slice(0, 3) })
+
+    expect(documentListViewService.isSelected(documents[0])).toBeFalsy()
+    expect(documentListViewService.isSelected(documents[1])).toBeTruthy()
+  })
+
+  it('should clear exclusions when filters change', () => {
+    documentListViewService.reload()
+    let req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
+    )
+    req.flush(full_results)
+    documentListViewService.selectAll()
+    documentListViewService.toggleSelected(documents[0])
+
+    documentListViewService.setFilterRules(filterRules)
+    req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true&tags__id__all=9`
+    )
+    req.flush({ count: 3, results: documents.slice(0, 3) })
+
+    expect(documentListViewService.allSelected).toBeTruthy()
+    expect(documentListViewService.excluded.size).toEqual(0)
+    expect(documentListViewService.selectedCount).toEqual(3)
+
+    documentListViewService.setFilterRules([])
+    req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
+    )
+    req.flush(full_results)
   })
 
   it('should clear all-selected mode when selecting a range', () => {

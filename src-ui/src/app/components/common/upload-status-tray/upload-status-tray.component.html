@@ -1,0 +1,52 @@
+@if (canAddDocuments && getStatus().length > 0) {
+  <div class="fixed-bottom p-2 p-md-4 d-flex justify-content-end pe-none consumer-status-list" [ngClass]="slimSidebarEnabled ? 'col-slim' : 'offset-sidebar-expanded'">
+    <div class="col col-lg-4 col-xl-3 ps-0 pe-0 ps-lg-3 pe-lg-0 pe-auto overflow-y-auto">
+      <div class="card shadow-sm consumer-status-card">
+        <div class="card-body">
+          <div class="d-flex flex-wrap align-items-center column-gap-2">
+            <p class="m-0 small text-muted">{{getStatusSummary()}}</p>
+            <div class="d-flex align-items-center gap-2 ms-auto">
+              @if (getStatusCompleted().length > 0) {
+                <a class="btn-link small text-nowrap" (click)="dismissCompleted()" [routerLink]="[]">
+                  <span class="me-1" i18n="This button dismisses all status messages about processed documents in the tray (failed and successful)">Dismiss completed</span>
+                  <i-bs name="check2-all"></i-bs>
+                </a>
+              }
+              <button type="button" class="btn btn-sm btn-link p-0 text-muted" (click)="toggleCollapsed()"
+                [attr.aria-expanded]="!collapsed()" aria-label="Toggle document processing status" i18n-aria-label>
+                <i-bs [name]="collapsed() ? 'chevron-up' : 'chevron-down'"></i-bs>
+              </button>
+            </div>
+          </div>
+          @if (!collapsed()) {
+            @for (status of getStatus(); track status) {
+              <ng-container [ngTemplateOutlet]="consumerAlert" [ngTemplateOutletContext]="{ $implicit: status }"></ng-container>
+            }
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+<ng-template #consumerAlert let-status>
+  <ngb-alert type="secondary" class="mt-2 mb-0" [dismissible]="isFinished(status)" (closed)="dismiss(status)">
+    <h6 class="alert-heading">{{status.filename}}</h6>
+    @if (!isFinished(status) || (isFinished(status) && !status.documentId)) {
+      <p class="mb-0 pb-1">{{status.message}}</p>
+    }
+    <ngb-progressbar [value]="status.getProgress()" [max]="1" [type]="getStatusColor(status)"></ngb-progressbar>
+    <div *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
+      @if (isFinished(status)) {
+        <div>
+          @if (status.documentId) {
+            <a class="btn btn-sm btn-outline-primary btn-open" [routerLink]="['/documents', status.documentId]" (click)="dismiss(status)">
+              <small i18n>Open document</small>
+              <i-bs name="arrow-right-short"></i-bs>
+            </a>
+          }
+        </div>
+      }
+    </div>
+  </ngb-alert>
+</ng-template>

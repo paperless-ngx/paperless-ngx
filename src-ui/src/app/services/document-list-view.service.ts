@@ -86,6 +86,11 @@ export interface ListViewState {
   allSelected?: boolean
 
   /**
+   * Document IDs excluded from the full filtered result set.
+   */
+  excluded?: Set<number>
+
+  /**
    * The page size of the list view.
    */
   pageSize?: number
@@ -215,6 +220,7 @@ export class DocumentListViewService {
       filterRules: [],
       selected: new Set<number>(),
       allSelected: false,
+      excluded: new Set<number>(),
     }
   }
 
@@ -224,7 +230,9 @@ export class DocumentListViewService {
     }
 
     this.selected.clear()
-    this.documents?.forEach((doc) => this.selected.add(doc.id))
+    this.documents
+      ?.filter((doc) => !this.excluded.has(doc.id))
+      .forEach((doc) => this.selected.add(doc.id))
 
     if (!this.collectionSize) {
       this.selectNone()
@@ -491,14 +499,23 @@ export class DocumentListViewService {
     return this.activeListViewState.allSelected ?? false
   }
 
+  get excluded(): Set<number> {
+    this.trackState()
+    if (!this.activeListViewState.excluded) {
+      this.activeListViewState.excluded = new Set<number>()
+    }
+    return this.activeListViewState.excluded
+  }
+
   get selectedCount(): number {
-    return this.allSelected
-      ? (this.collectionSize ?? this.selected.size)
-      : this.selected.size
+    if (!this.allSelected || this.collectionSize == null) {
+      return this.selected.size
+    }
+    return Math.max(0, this.collectionSize - this.excluded.size)
   }
 
   get hasSelection(): boolean {
-    return this.allSelected || this.selected.size > 0
+    return this.selectedCount > 0
   }
 
   setSort(field: string, reverse: boolean) {
@@ -663,12 +680,14 @@ export class DocumentListViewService {
   selectNone() {
     this.activeListViewState.allSelected = false
     this.selected.clear()
+    this.excluded.clear()
     this.rangeSelectionAnchorIndex = this.lastRangeSelectionToIndex = null
     this.markChanged()
   }
 
   reduceSelectionToFilter() {
     if (this.allSelected) {
+      this.excluded.clear()
       return
     }
 
@@ -688,6 +707,7 @@ export class DocumentListViewService {
 
   selectAll() {
     this.activeListViewState.allSelected = true
+    this.excluded.clear()
     this.syncSelectedToCurrentPage()
     this.markChanged()
   }
@@ -695,6 +715,7 @@ export class DocumentListViewService {
   selectPage() {
     this.activeListViewState.allSelected = false
     this.selected.clear()
+    this.excluded.clear()
     this.documents.forEach((doc) => {
       this.selected.add(doc.id)
     })
@@ -702,15 +723,23 @@ export class DocumentListViewService {
   }
 
   isSelected(d: Document) {
-    return this.allSelected || this.selected.has(d.id)
+    return this.allSelected ? !this.excluded.has(d.id) : this.selected.has(d.id)
   }
 
   toggleSelected(d: Document): void {
     if (this.allSelected) {
-      this.activeListViewState.allSelected = false
+      if (this.excluded.has(d.id)) {
+        this.excluded.delete(d.id)
+        this.selected.add(d.id)
+      } else {
+        this.excluded.add(d.id)
+        this.selected.delete(d.id)
+      }
+    } else if (this.selected.has(d.id)) {
+      this.selected.delete(d.id)
+    } else {
+      this.selected.add(d.id)
     }
-    if (this.selected.has(d.id)) this.selected.delete(d.id)
-    else this.selected.add(d.id)
     this.rangeSelectionAnchorIndex = this.documentIndexInCurrentView(d.id)
     this.lastRangeSelectionToIndex = null
     this.markChanged()
@@ -719,6 +748,7 @@ export class DocumentListViewService {
   selectRangeTo(d: Document) {
     if (this.allSelected) {
       this.activeListViewState.allSelected = false
+      this.excluded.clear()
     }
 
     if (this.rangeSelectionAnchorIndex !== null) {

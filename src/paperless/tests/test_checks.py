@@ -1,6 +1,5 @@
 import os
 from collections.abc import Callable
-from dataclasses import dataclass
 from pathlib import Path
 from unittest import mock
 
@@ -19,35 +18,7 @@ from paperless.checks import check_v3_minimum_upgrade_version
 from paperless.checks import debug_mode_check
 from paperless.checks import paths_check
 from paperless.checks import settings_values_check
-
-
-@dataclass(frozen=True, slots=True)
-class PaperlessTestDirs:
-    data_dir: Path
-    media_dir: Path
-    consumption_dir: Path
-
-
-# TODO: consolidate with documents/tests/conftest.py PaperlessDirs/paperless_dirs
-#       once the paperless and documents test suites are ready to share fixtures.
-@pytest.fixture()
-def directories(tmp_path: Path, settings: Settings) -> PaperlessTestDirs:
-    data_dir = tmp_path / "data"
-    media_dir = tmp_path / "media"
-    consumption_dir = tmp_path / "consumption"
-
-    for d in (data_dir, media_dir, consumption_dir):
-        d.mkdir()
-
-    settings.DATA_DIR = data_dir
-    settings.MEDIA_ROOT = media_dir
-    settings.CONSUMPTION_DIR = consumption_dir
-
-    return PaperlessTestDirs(
-        data_dir=data_dir,
-        media_dir=media_dir,
-        consumption_dir=consumption_dir,
-    )
+from paperless_testing.dirs import PaperlessDirs
 
 
 class TestChecks:
@@ -58,7 +29,7 @@ class TestChecks:
         settings.CONVERT_BINARY = "uuuhh"
         assert len(binaries_check(None)) == 1
 
-    @pytest.mark.usefixtures("directories")
+    @pytest.mark.usefixtures("paperless_dirs")
     def test_paths_check(self) -> None:
         assert paths_check(None) == []
 
@@ -73,17 +44,17 @@ class TestChecks:
         for msg in msgs:
             assert msg.msg.endswith("is set but doesn't exist.")
 
-    def test_paths_check_no_access(self, directories: PaperlessTestDirs) -> None:
-        directories.data_dir.chmod(0o000)
-        directories.media_dir.chmod(0o000)
-        directories.consumption_dir.chmod(0o000)
+    def test_paths_check_no_access(self, paperless_dirs: PaperlessDirs) -> None:
+        paperless_dirs.data_dir.chmod(0o000)
+        paperless_dirs.media_dir.chmod(0o000)
+        paperless_dirs.consumption_dir.chmod(0o000)
 
         try:
             msgs = paths_check(None)
         finally:
-            directories.data_dir.chmod(0o777)
-            directories.media_dir.chmod(0o777)
-            directories.consumption_dir.chmod(0o777)
+            paperless_dirs.data_dir.chmod(0o777)
+            paperless_dirs.media_dir.chmod(0o777)
+            paperless_dirs.consumption_dir.chmod(0o777)
 
         assert len(msgs) == 3
         for msg in msgs:
@@ -240,14 +211,14 @@ class TestAuditLogChecks:
         assert "auditlog table was found but audit log is disabled." in msgs[0].msg
 
 
-DEPRECATED_VARS: dict[str, str] = {
-    "PAPERLESS_DB_TIMEOUT": "timeout",
-    "PAPERLESS_DB_POOLSIZE": "pool.min_size / pool.max_size",
-    "PAPERLESS_DBSSLMODE": "sslmode",
-    "PAPERLESS_DBSSLROOTCERT": "sslrootcert",
-    "PAPERLESS_DBSSLCERT": "sslcert",
-    "PAPERLESS_DBSSLKEY": "sslkey",
-}
+DEPRECATED_VARS = (
+    "PAPERLESS_DB_TIMEOUT",
+    "PAPERLESS_DB_POOLSIZE",
+    "PAPERLESS_DBSSLMODE",
+    "PAPERLESS_DBSSLROOTCERT",
+    "PAPERLESS_DBSSLCERT",
+    "PAPERLESS_DBSSLKEY",
+)
 
 
 class TestDeprecatedDbSettings:
@@ -263,26 +234,11 @@ class TestDeprecatedDbSettings:
         result = check_deprecated_db_settings(None)
         assert result == []
 
-    @pytest.mark.parametrize(
-        ("env_var", "db_option_key"),
-        [
-            pytest.param("PAPERLESS_DB_TIMEOUT", "timeout", id="db-timeout"),
-            pytest.param(
-                "PAPERLESS_DB_POOLSIZE",
-                "pool.min_size / pool.max_size",
-                id="db-poolsize",
-            ),
-            pytest.param("PAPERLESS_DBSSLMODE", "sslmode", id="ssl-mode"),
-            pytest.param("PAPERLESS_DBSSLROOTCERT", "sslrootcert", id="ssl-rootcert"),
-            pytest.param("PAPERLESS_DBSSLCERT", "sslcert", id="ssl-cert"),
-            pytest.param("PAPERLESS_DBSSLKEY", "sslkey", id="ssl-key"),
-        ],
-    )
+    @pytest.mark.parametrize("env_var", DEPRECATED_VARS)
     def test_single_deprecated_var_produces_one_warning(
         self,
         mocker: MockerFixture,
         env_var: str,
-        db_option_key: str,
     ) -> None:
         """Each deprecated var in isolation produces exactly one warning."""
         mocker.patch.dict(os.environ, {env_var: "some_value"}, clear=True)
@@ -293,7 +249,8 @@ class TestDeprecatedDbSettings:
         assert isinstance(warning, Warning)
         assert warning.id == "paperless.W001"
         assert env_var in warning.hint
-        assert db_option_key in warning.hint
+        assert "PAPERLESS_DB_OPTIONS" in warning.hint
+        assert "https://docs.paperless-ngx.com/migration-v3/" in warning.hint
 
     def test_multiple_deprecated_vars_produce_one_warning_each(
         self,

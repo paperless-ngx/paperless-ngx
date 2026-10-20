@@ -1,13 +1,17 @@
-import { Component, inject } from '@angular/core'
-import { toSignal } from '@angular/core/rxjs-interop'
+import { Component, inject, signal } from '@angular/core'
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import {
   NgbAccordionModule,
   NgbProgressbarModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { map, merge, Subject } from 'rxjs'
 import { Toast, ToastService } from 'src/app/services/toast.service'
 import { ToastComponent } from '../toast/toast.component'
+
+/**
+ * Maximum number of popup toasts shown at once
+ */
+export const MAX_VISIBLE_TOASTS = 3
 
 @Component({
   selector: 'pngx-toasts',
@@ -23,18 +27,31 @@ import { ToastComponent } from '../toast/toast.component'
 export class ToastsComponent {
   toastService = inject(ToastService)
 
-  private readonly closedToast = new Subject<void>()
+  readonly toasts = signal<Toast[]>([])
 
-  readonly toasts = toSignal(
-    merge(
-      this.toastService.showToast.pipe(map((toast) => (toast ? [toast] : []))),
-      this.closedToast.pipe(map(() => [] as Toast[]))
-    ),
-    { initialValue: [] as Toast[] }
-  )
+  constructor() {
+    this.toastService.showToast
+      .pipe(takeUntilDestroyed())
+      .subscribe((toast) => {
+        if (!toast) {
+          this.toasts.set([])
+          return
+        }
+        this.toasts.update((toasts) =>
+          [toast, ...toasts.filter((t) => t.id !== toast.id)].slice(
+            0,
+            MAX_VISIBLE_TOASTS
+          )
+        )
+      })
+  }
 
-  closeToast() {
-    this.toastService.closeToast(this.toasts()[0])
-    this.closedToast.next()
+  closeToast(toast: Toast) {
+    this.toastService.closeToast(toast)
+    this.removePopup(toast)
+  }
+
+  removePopup(toast: Toast) {
+    this.toasts.update((toasts) => toasts.filter((t) => t.id !== toast.id))
   }
 }

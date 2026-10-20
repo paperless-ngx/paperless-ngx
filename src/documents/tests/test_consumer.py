@@ -30,11 +30,14 @@ from documents.models import Tag
 from documents.parsers import ParseError
 from documents.plugins.helpers import ProgressStatusOptions
 from documents.tasks import sanity_check
-from documents.tests.utils import DirectoriesMixin
-from documents.tests.utils import DummyProgressManager
-from documents.tests.utils import FileSystemAssertsMixin
 from documents.tests.utils import GetConsumerMixin
 from paperless_mail.models import MailRule
+from paperless_testing.assertions import FileSystemAssertsMixin
+from paperless_testing.dirs import DirectoriesMixin
+from paperless_testing.factories import DocumentFactory
+from paperless_testing.factories import UserFactory
+from paperless_testing.fakes.progress import FakeProgressManager
+from paperless_testing.permissions import grant_object
 
 
 class _BaseNewStyleParser:
@@ -769,14 +772,14 @@ class TestConsumer(
 
         original_modified = timezone.now() - datetime.timedelta(days=1)
         Document.objects.filter(pk=root_doc.pk).update(modified=original_modified)
-        actor = User.objects.create_user(
+        actor = UserFactory(
             username="actor",
             email="actor@example.com",
             password="password",
         )
 
         version_file = self.get_test_file2()
-        status = DummyProgressManager(version_file.name, None)
+        status = FakeProgressManager(version_file.name, None)
         overrides = DocumentMetadataOverrides(
             version_label="v2",
             actor_id=actor.pk,
@@ -839,7 +842,7 @@ class TestConsumer(
         assert root_doc is not None
 
         version_file = self.get_test_file2()
-        status = DummyProgressManager(version_file.name, None)
+        status = FakeProgressManager(version_file.name, None)
         overrides = DocumentMetadataOverrides(
             filename="valid_pdf_version-upload",
             actor_id=999999,
@@ -896,7 +899,7 @@ class TestConsumer(
         assert root_doc is not None
 
         def consume_version(version_file: Path) -> Document:
-            status = DummyProgressManager(version_file.name, None)
+            status = FakeProgressManager(version_file.name, None)
             overrides = DocumentMetadataOverrides()
             doc = ConsumableDocument(
                 DocumentSource.ApiUpload,
@@ -1681,6 +1684,32 @@ class TestMetadataOverrides(TestCase):
         base.update(incoming)
         self.assertEqual(base.actor_id, 2)
         self.assertEqual(base.version_label, "v2")
+
+    def test_from_document_copies_user_and_group_grants_separately(self) -> None:
+        """
+        GIVEN:
+            - A document with view and change granted directly to one user and
+              to a group with another user as a member
+        WHEN:
+            - Overrides are built from the document
+        THEN:
+            - The user lists hold only the directly granted user
+            - The group lists hold the group
+        """
+        direct_user = UserFactory()
+        group_member = UserFactory()
+        group = Group.objects.create(name="group")
+        group_member.groups.add(group)
+        document = DocumentFactory()
+        grant_object(direct_user, document, "view_document", "change_document")
+        grant_object(group, document, "view_document", "change_document")
+
+        overrides = DocumentMetadataOverrides.from_document(document)
+
+        self.assertEqual(overrides.view_users, [direct_user.pk])
+        self.assertEqual(overrides.change_users, [direct_user.pk])
+        self.assertEqual(overrides.view_groups, [group.pk])
+        self.assertEqual(overrides.change_groups, [group.pk])
 
 
 class TestBarcodeApplyDetectedASN(TestCase):

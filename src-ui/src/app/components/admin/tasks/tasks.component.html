@@ -102,25 +102,34 @@
     </button>
   }
 
-  <ngb-pagination
-    [pageSize]="pageSize"
-    [collectionSize]="totalTasks()"
-    [page]="page"
-    [maxSize]="5"
-    [rotate]="true"
-    size="sm"
-    aria-label="Tasks pagination"
-    (pageChange)="setPage($event)">
-  </ngb-pagination>
+  @if (selectedSection !== TaskSection.All && totalTasks() > pageSize) {
+    <ngb-pagination
+      [pageSize]="pageSize"
+      [collectionSize]="totalTasks()"
+      [page]="page"
+      [maxSize]="5"
+      [rotate]="true"
+      size="sm"
+      aria-label="Tasks pagination"
+      (pageChange)="setPage($event)">
+    </ngb-pagination>
+  }
 </div>
 
 <ng-template let-tasks="tasks" let-section="section" #tasksTemplate>
-  <div class="section-header d-flex align-items-center justify-content-between mb-2">
-    <div>
-      <h5 class="mb-0">{{ sectionLabel(section) }}</h5>
-      <div class="small text-muted">
-        <ng-container i18n>{tasks.length, plural, =1 {1 task} other {{{tasks.length}} tasks}}</ng-container>
-      </div>
+  <div class="section-header mb-2">
+    <h5 class="mb-0">{{ sectionLabel(section) }}</h5>
+    @let count = sectionCount(section);
+    @let hasMore = selectedSection === TaskSection.All && count > tasks.length;
+    <div class="small text-muted">
+      @if (hasMore) {
+        <ng-container i18n>{{tasks.length}} of {{count}} tasks</ng-container>
+        <button class="btn btn-link show-all p-0 ms-2 align-baseline" type="button" (click)="setSection(section)">
+          <ng-container i18n>Show all</ng-container><i-bs class="ms-1" width="1em" height="1em" name="arrow-right"></i-bs>
+        </button>
+      } @else {
+        <ng-container i18n>{count, plural, =1 {1 task} other {{{count}} tasks}}</ng-container>
+      }
     </div>
   </div>
 
@@ -169,10 +178,9 @@
               <div>{{ taskDisplayName(task) }}</div>
               <div class="small text-muted">
                 @if (taskShowsSeparateTypeLabel(task)) {
-                  <span>{{ task.task_type_display }}</span>
-                  <span class="mx-1">&bull;</span>
+                  <span class="me-2">{{ task.task_type_display }}</span>
                 }
-                <span>{{ task.trigger_source_display }}</span>
+                <span class="text-nowrap"><i-bs class="me-1" width="1em" height="1em" name="box-arrow-in-right"></i-bs>{{ task.trigger_source_display }}</span>
               </div>
             </td>
             <td class="d-none d-lg-table-cell created-col">{{ task.date_created | customDate:'short' }}</td>

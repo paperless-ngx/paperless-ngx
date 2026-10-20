@@ -17,7 +17,8 @@ from documents.signals.handlers import task_failure_handler
 from documents.signals.handlers import task_postrun_handler
 from documents.signals.handlers import task_prerun_handler
 from documents.signals.handlers import task_revoked_handler
-from documents.tests.factories import PaperlessTaskFactory
+from paperless_testing.factories import PaperlessTaskFactory
+from paperless_testing.factories import UserFactory
 
 
 @pytest.fixture
@@ -34,8 +35,8 @@ def consume_input_doc():
 
 
 @pytest.fixture
-def consume_overrides(django_user_model):
-    user = django_user_model.objects.create_user(username="testuser")
+def consume_overrides():
+    user = UserFactory(username="testuser")
     overrides = mock.MagicMock(spec=DocumentMetadataOverrides)
     overrides.owner_id = user.id
     return overrides
@@ -105,6 +106,17 @@ class TestBeforeTaskPublishHandler:
         task = PaperlessTask.objects.get(task_id=task_id)
         assert task.task_type == PaperlessTask.TaskType.TRAIN_CLASSIFIER
         assert task.trigger_source == PaperlessTask.TriggerSource.MANUAL
+
+        # A Celery retry republishes with the same task_id; this must not
+        # raise a duplicate-key IntegrityError, and must leave the original
+        # PENDING record alone.
+        send_publish(
+            "documents.tasks.train_classifier",
+            (),
+            {},
+            headers={"id": task_id},
+        )
+        assert PaperlessTask.objects.filter(task_id=task_id).count() == 1
 
     def test_creates_task_for_sanity_check(self) -> None:
         task_id = send_publish("documents.tasks.sanity_check", (), {})

@@ -4,12 +4,16 @@ from pathlib import Path
 from unittest import mock
 
 import pikepdf
+import pytest
 from django.contrib.auth.models import Group
+from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
+from django.db import connection
 from django.test import TestCase
-from guardian.shortcuts import assign_perm
+from django.test.utils import CaptureQueriesContext
 from guardian.shortcuts import get_groups_with_perms
 from guardian.shortcuts import get_users_with_perms
+from pytest_mock import MockerFixture
 
 from documents import bulk_edit
 from documents.models import Correspondent
@@ -19,7 +23,10 @@ from documents.models import Document
 from documents.models import DocumentType
 from documents.models import StoragePath
 from documents.models import Tag
-from documents.tests.utils import DirectoriesMixin
+from documents.permissions import set_permissions_for_objects
+from paperless_testing.dirs import DirectoriesMixin
+from paperless_testing.factories import DocumentFactory
+from paperless_testing.permissions import grant_object
 
 
 class TestBulkEdit(DirectoriesMixin, TestCase):
@@ -436,7 +443,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
     def test_set_permissions(self, m) -> None:
         doc_ids = [self.doc1.id, self.doc2.id, self.doc3.id]
 
-        assign_perm("view_document", self.group1, self.doc1)
+        grant_object(self.group1, self.doc1, "view_document")
 
         permissions = {
             "view": {
@@ -478,8 +485,8 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         self.doc1.owner = self.user1
         self.doc1.save()
 
-        assign_perm("view_document", self.user1, self.doc1)
-        assign_perm("view_document", self.group1, self.doc1)
+        grant_object(self.user1, self.doc1, "view_document")
+        grant_object(self.group1, self.doc1, "view_document")
 
         permissions = {
             "view": {
@@ -514,6 +521,173 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
             self.doc1,
         )
         self.assertEqual(groups_with_perms.count(), 2)
+
+    @mock.patch("documents.tasks.bulk_update_documents.apply_async")
+    def test_set_permissions_batched_across_document_count(
+        self,
+        m,
+    ) -> None:
+        """
+        GIVEN:
+            - Many documents are being bulk-edited to set permissions at once
+        WHEN:
+            - set_permissions runs over a small batch vs. a much larger one
+        THEN:
+            - Permissions are applied correctly at both scales
+            - Query count does not grow with the number of documents, i.e.
+              each user/group is applied across all documents with one
+              batched call rather than one call per (document, identity)
+              pair
+        """
+        permissions = {
+            "view": {
+                "users": [self.user1.id, self.user2.id],
+                "groups": [self.group2.id],
+            },
+            "change": {
+                "users": [self.user1.id],
+                "groups": [self.group2.id],
+            },
+        }
+
+        def run_with_n_documents(n: int) -> int:
+            docs = [
+                Document.objects.create(checksum=f"perm-{n}-{i}", title=f"perm-{n}-{i}")
+                for i in range(n)
+            ]
+            with CaptureQueriesContext(connection) as ctx:
+                bulk_edit.set_permissions(
+                    [doc.id for doc in docs],
+                    set_permissions=permissions,
+                    owner=self.owner,
+                    merge=False,
+                )
+            for doc in docs:
+                self.assertEqual(get_users_with_perms(doc).count(), 2)
+                self.assertEqual(get_groups_with_perms(doc).count(), 1)
+            return len(ctx.captured_queries)
+
+        small_batch_queries = run_with_n_documents(5)
+        large_batch_queries = run_with_n_documents(50)
+
+        # A tolerance rather than equality, matching the N+1 check in
+        # test_views.py: bulk_create's batch_size caps rows per INSERT, so a
+        # large enough selection does legitimately add statements, and the
+        # per-process ContentType cache makes the first run carry an extra
+        # query. Neither can hide a regression to per-document assignment,
+        # which would be ~10x the small-batch count here.
+        self.assertLessEqual(
+            large_batch_queries,
+            small_batch_queries + 5,
+            "Permission assignment appears to scale with document count: "
+            f"{small_batch_queries} queries for 5 documents vs. "
+            f"{large_batch_queries} for 50",
+        )
+
+    @mock.patch("documents.tasks.bulk_update_documents.apply_async")
+    def test_set_permissions_grants_direct_perm_even_if_already_granted_via_group(
+        self,
+        m,
+    ) -> None:
+        """
+        GIVEN:
+            - A user already has view access to a document via group
+              membership, with no direct grant of their own
+        WHEN:
+            - set_permissions explicitly grants that same user direct view
+              access via bulk_edit
+        THEN:
+            - A direct permission grant is created for the user, not skipped
+              because they already have equivalent access via the group
+
+        Regression test: guardian's queryset-aware assign_perm() (routed to
+        when the target is a list/queryset) skips creating a direct row for
+        anyone whose ObjectPermissionChecker.has_perm() already returns True
+        -- which includes group-derived access. The single-object assign_perm
+        this bulk path replaces has no such check; it always ensures a
+        direct row via get_or_create. Losing that guarantee would mean
+        revoking the group's grant later silently strips access that was
+        supposed to be explicit.
+        """
+        self.doc1.owner = self.user1
+        self.doc1.save()
+        self.user1.groups.add(self.group1)
+        grant_object(self.group1, self.doc1, "view_document")
+
+        bulk_edit.set_permissions(
+            [self.doc1.id],
+            set_permissions={
+                "view": {"users": [self.user1.id], "groups": []},
+            },
+            merge=True,
+        )
+
+        direct_users = get_users_with_perms(
+            self.doc1,
+            only_with_perms_in=["view_document"],
+            with_group_users=False,
+        )
+        self.assertIn(self.user1, direct_users)
+
+    def test_set_permissions_for_objects_raises_for_unknown_action(self) -> None:
+        """
+        GIVEN:
+            - An unrecognized permission action name with users to grant it
+              to
+        WHEN:
+            - set_permissions_for_objects is called
+        THEN:
+            - Permission.DoesNotExist is raised, not a silent no-op
+
+        The API rejects unknown action names before they get here, but a
+        direct caller could still pass one. Resolving the Permission via a
+        bare `.filter()` (which returns empty instead of raising) would
+        silently drop the grant and report success.
+        """
+        with self.assertRaises(Permission.DoesNotExist):
+            set_permissions_for_objects(
+                {"not_a_real_action": {"users": [self.user1.id], "groups": []}},
+                Document,
+                [self.doc1.pk],
+            )
+
+    def test_set_permissions_for_objects_unknown_action_applies_nothing(
+        self,
+    ) -> None:
+        """
+        GIVEN:
+            - A permissions dict with a valid action ordered ahead of an
+              unrecognized one
+        WHEN:
+            - set_permissions_for_objects is called
+        THEN:
+            - Permission.DoesNotExist is raised
+            - The valid action ahead of it is not applied either
+
+        Every action is resolved before any row is written, so a bad action
+        name cannot leave a half-applied change behind. That matters because
+        BulkEditObjectsView turns this exception into a 400: without the
+        up-front resolution the client would be told the request failed
+        while the leading action had already been committed.
+        """
+        with self.assertRaises(Permission.DoesNotExist):
+            set_permissions_for_objects(
+                {
+                    "view": {"users": [self.user1.id], "groups": []},
+                    "not_a_real_action": {"users": [self.user1.id], "groups": []},
+                },
+                Document,
+                [self.doc1.pk],
+            )
+
+        self.assertNotIn(
+            self.user1,
+            get_users_with_perms(
+                self.doc1,
+                only_with_perms_in=["view_document"],
+                with_group_users=False,
+            ),
+        )
 
     @mock.patch("documents.models.Document.delete")
     def test_delete_documents_old_uuid_field(self, m) -> None:
@@ -1466,6 +1640,16 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         mock_group.assert_not_called()
         mock_consume_file.assert_not_called()
 
+    @mock.patch("pikepdf.open")
+    def test_edit_pdf_rejects_invalid_operations(self, mock_open) -> None:
+        for operations in ([], [{"page": 1, "doc": 2**32}]):
+            with self.subTest(operations=operations):
+                with self.assertLogs("paperless.bulk_edit", level="ERROR"):
+                    with self.assertRaisesRegex(ValueError, "index is out of bounds"):
+                        bulk_edit.edit_pdf([self.doc2.id], operations)
+
+        mock_open.assert_not_called()
+
     @mock.patch("documents.bulk_edit.update_document_content_maybe_archive_file.delay")
     @mock.patch("documents.tasks.consume_file.apply_async")
     @mock.patch("documents.bulk_edit.tempfile.mkdtemp")
@@ -1789,18 +1973,22 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         self.assertIn("Error removing password from document", cm.output[0])
 
 
-class TestBulkEditReprocess(DirectoriesMixin, TestCase):
-    def setUp(self) -> None:
-        super().setUp()
-
-        self.doc = Document.objects.create(
-            title="test",
-            checksum="A",
-            mime_type="application/pdf",
+@pytest.mark.django_db
+class TestBulkEditReprocess:
+    @pytest.fixture
+    def mock_task(self, mocker: MockerFixture) -> mock.MagicMock:
+        return mocker.patch(
+            "documents.bulk_edit.update_document_content_maybe_archive_file",
         )
 
-    @mock.patch("documents.bulk_edit.update_document_content_maybe_archive_file")
-    def test_reprocess_defaults_to_local(self, mock_task: mock.Mock) -> None:
+    @staticmethod
+    def _queued_ids(mock_task: mock.MagicMock) -> list[int]:
+        return [
+            call.kwargs["kwargs"]["document_id"]
+            for call in mock_task.apply_async.call_args_list
+        ]
+
+    def test_reprocess_defaults_to_local(self, mock_task: mock.MagicMock) -> None:
         """
         GIVEN:
             - A reprocess request that says nothing about remote OCR
@@ -1809,18 +1997,17 @@ class TestBulkEditReprocess(DirectoriesMixin, TestCase):
         THEN:
             - The task is queued without asking for the remote engine
         """
-        result = bulk_edit.reprocess([self.doc.id])
+        doc = DocumentFactory()
 
-        self.assertEqual(result, "OK")
+        assert bulk_edit.reprocess([doc.id]) == "OK"
+
         mock_task.apply_async.assert_called_once()
-        _, kwargs = mock_task.apply_async.call_args
-        self.assertEqual(
-            kwargs["kwargs"],
-            {"document_id": self.doc.id, "remote_ocr": False},
-        )
+        assert mock_task.apply_async.call_args.kwargs["kwargs"] == {
+            "document_id": doc.id,
+            "remote_ocr": False,
+        }
 
-    @mock.patch("documents.bulk_edit.update_document_content_maybe_archive_file")
-    def test_reprocess_passes_remote_ocr(self, mock_task: mock.Mock) -> None:
+    def test_reprocess_passes_remote_ocr(self, mock_task: mock.MagicMock) -> None:
         """
         GIVEN:
             - A reprocess request that explicitly asks for remote OCR
@@ -1829,14 +2016,72 @@ class TestBulkEditReprocess(DirectoriesMixin, TestCase):
         THEN:
             - The request is forwarded to the task for every document
         """
-        other = Document.objects.create(
-            title="test2",
-            checksum="B",
-            mime_type="application/pdf",
+        docs = DocumentFactory.create_batch(2)
+
+        bulk_edit.reprocess([doc.id for doc in docs], remote_ocr=True)
+
+        assert mock_task.apply_async.call_count == 2
+        for call in mock_task.apply_async.call_args_list:
+            assert call.kwargs["kwargs"]["remote_ocr"]
+
+    def test_reprocess_root_uses_latest_version(
+        self,
+        mock_task: mock.MagicMock,
+    ) -> None:
+        """
+        GIVEN:
+            - A root document with two versions
+        WHEN:
+            - reprocess is called with the root document
+        THEN:
+            - The latest version is reprocessed, not the root's original file
+        """
+        root = DocumentFactory()
+        DocumentFactory(root_document=root, version_index=1)
+        latest = DocumentFactory(root_document=root, version_index=2)
+
+        bulk_edit.reprocess([root.id])
+
+        assert self._queued_ids(mock_task) == [latest.id]
+
+    def test_reprocess_explicit_version(self, mock_task: mock.MagicMock) -> None:
+        """
+        GIVEN:
+            - A root document with two versions
+        WHEN:
+            - reprocess is called with the older version
+        THEN:
+            - That version is reprocessed
+        """
+        root = DocumentFactory()
+        older = DocumentFactory(root_document=root, version_index=1)
+        DocumentFactory(root_document=root, version_index=2)
+
+        bulk_edit.reprocess([older.id])
+
+        assert self._queued_ids(mock_task) == [older.id]
+
+    def test_reprocess_root_and_latest_version_dispatches_once(
+        self,
+        mock_task: mock.MagicMock,
+    ) -> None:
+        """
+        GIVEN:
+            - A root document with two versions, the latest created on a
+              different date than the root
+        WHEN:
+            - reprocess is called with both the root and its latest version
+        THEN:
+            - The latest version is reprocessed only once
+        """
+        root = DocumentFactory(created=date(2024, 1, 1))
+        DocumentFactory(root_document=root, version_index=1)
+        latest = DocumentFactory(
+            root_document=root,
+            version_index=2,
+            created=date(2025, 1, 1),
         )
 
-        bulk_edit.reprocess([self.doc.id, other.id], remote_ocr=True)
+        bulk_edit.reprocess([root.id, latest.id])
 
-        self.assertEqual(mock_task.apply_async.call_count, 2)
-        for call in mock_task.apply_async.call_args_list:
-            self.assertTrue(call.kwargs["kwargs"]["remote_ocr"])
+        assert self._queued_ids(mock_task) == [latest.id]

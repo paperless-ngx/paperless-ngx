@@ -14,7 +14,8 @@ from documents.models import Tag
 from documents.models import Workflow
 from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
-from documents.tests.utils import DirectoriesMixin
+from paperless_testing.dirs import DirectoriesMixin
+from paperless_testing.factories import UserFactory
 
 
 class TestApiWorkflows(DirectoriesMixin, APITestCase):
@@ -25,7 +26,7 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
     def setUp(self) -> None:
         super().setUp()
 
-        user = User.objects.create_superuser(username="temp_admin")
+        user = UserFactory(username="temp_admin", superuser=True)
         self.client.force_authenticate(user=user)
         self.user2 = User.objects.create(username="user2")
         self.user3 = User.objects.create(username="user3")
@@ -193,6 +194,48 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Workflow.objects.count(), 2)
+
+    def test_api_create_workflow_ignores_nested_action_id(self) -> None:
+        """
+        GIVEN:
+            - An existing workflow action
+        WHEN:
+            - API request to create a workflow includes that action's ID
+        THEN:
+            - A new action is created without changing the existing action
+        """
+        original_title = self.action.assign_title
+
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Workflow 2",
+                    "order": 1,
+                    "triggers": [
+                        {
+                            "sources": [DocumentSource.ApiUpload],
+                            "type": WorkflowTrigger.WorkflowTriggerType.CONSUMPTION,
+                            "filter_filename": "*",
+                        },
+                    ],
+                    "actions": [
+                        {
+                            "id": self.action.id,
+                            "assign_title": "New Action Title",
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.action.refresh_from_db()
+        self.assertEqual(self.action.assign_title, original_title)
+        new_action = Workflow.objects.get(name="Workflow 2").actions.get()
+        self.assertNotEqual(new_action.id, self.action.id)
+        self.assertEqual(new_action.assign_title, "New Action Title")
 
     def test_api_create_workflow_nested(self) -> None:
         """

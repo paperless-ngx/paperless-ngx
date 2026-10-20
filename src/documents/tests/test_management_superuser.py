@@ -7,14 +7,14 @@ from django.contrib.auth.models import User
 from django.core.management import call_command
 from django.test import TestCase
 
-from documents.tests.utils import DirectoriesMixin
+from paperless_testing.dirs import DirectoriesMixin
 
 
 @pytest.mark.management
 class TestManageSuperUser(DirectoriesMixin, TestCase):
     def call_command(self, environ):
         out = StringIO()
-        with mock.patch.dict(os.environ, environ):
+        with mock.patch.dict(os.environ, environ, clear=True):
             call_command(
                 "manage_superuser",
                 "--no-color",

@@ -15,7 +15,7 @@
 {% endblock form_top_content %}
 
 {% block form_content %}
-		{% if FIRST_INSTALL %}
+		{% if FIRST_INSTALL and not DISABLE_REGULAR_LOGIN %}
 			<script type="text/javascript">
 				// forward to the signup page if no users exist
 				window.location.href = "{{ signup_url }}";

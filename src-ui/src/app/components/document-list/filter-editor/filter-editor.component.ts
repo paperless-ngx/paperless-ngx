@@ -205,11 +205,11 @@ const DEFAULT_TEXT_FILTER_TARGET_OPTIONS = [
   },
   { id: TEXT_FILTER_TARGET_ASN, name: $localize`ASN` },
   { id: TEXT_FILTER_TARGET_MIME_TYPE, name: $localize`File type` },
+  { id: TEXT_FILTER_TARGET_DUPLICATES, name: $localize`Duplicates` },
   {
     id: TEXT_FILTER_TARGET_FULLTEXT_QUERY,
     name: $localize`Advanced search`,
   },
-  { id: TEXT_FILTER_TARGET_DUPLICATES, name: $localize`Duplicates` },
 ]
 
 const DEPRECATED_CUSTOM_FIELDS_TEXT_FILTER_TARGET_OPTION = {
@@ -1082,23 +1082,6 @@ export class FilterEditorComponent
       let existingRule = filterRules.find(
         (fr) => fr.rule_type == FILTER_FULLTEXT_QUERY
       )
-
-      // if had a title / content search and added a relative date we need to carry it over...
-      if (
-        !existingRule &&
-        this._textFilter?.length > 0 &&
-        (this.textFilterTarget == TEXT_FILTER_TARGET_TITLE_CONTENT ||
-          this.textFilterTarget == TEXT_FILTER_TARGET_TITLE)
-      ) {
-        existingRule = filterRules.find(
-          (fr) =>
-            fr.rule_type == FILTER_TITLE_CONTENT ||
-            fr.rule_type == FILTER_SIMPLE_TEXT ||
-            fr.rule_type == FILTER_TITLE ||
-            fr.rule_type == FILTER_SIMPLE_TITLE
-        )
-        existingRule.rule_type = FILTER_FULLTEXT_QUERY
-      }
 
       let queryArgs = existingRule?.value.split(',') ?? []
       if (this.dateCreatedRelativeDate !== null) {

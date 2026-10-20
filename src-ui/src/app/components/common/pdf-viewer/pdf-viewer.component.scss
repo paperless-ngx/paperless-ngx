@@ -154,11 +154,29 @@
   & section {
     position: absolute;
     text-align: initial;
+    pointer-events: auto;
     box-sizing: border-box;
     transform-origin: 0 0;
+  }
+
+  & :is(.linkAnnotation, .buttonWidgetAnnotation.pushButton) > a {
+    position: absolute;
+    inset: 0;
+    font-size: 1em;
+    transition: none;
+  }
+
+  & :is(.linkAnnotation, .buttonWidgetAnnotation.pushButton):not(.hasBorder)
+    > a:hover {
+    opacity: 0.2;
+    background-color: rgb(255 255 0);
   }
 
   & .annotationTextContent {
     opacity: 0;
   }
+}
+
+:host ::ng-deep .textLayer.selecting ~ .annotationLayer section {
+  pointer-events: none;
 }

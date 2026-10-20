@@ -24,6 +24,7 @@ import { DEFAULT_DISPLAY_FIELDS, DisplayField } from '../data/document'
 import { RemoteOCRModeConfig } from '../data/paperless-config'
 import { SavedView } from '../data/saved-view'
 import {
+  HideableSidebarItemID,
   PAPERLESS_GREEN_HEX,
   SETTINGS,
   SETTINGS_KEYS,
@@ -313,6 +314,18 @@ export class SettingsService {
   readonly globalDropzoneEnabled = signal(true)
   readonly globalDropzoneActive = signal(false)
   readonly organizingSidebarSavedViews = signal(false)
+  readonly sidebarHiddenItemsEditing = signal<HideableSidebarItemID[] | null>(
+    null
+  )
+  readonly organizingSidebarItems = computed(
+    () => this.sidebarHiddenItemsEditing() !== null
+  )
+  readonly sidebarHiddenItemsEditingChanged = new EventEmitter<
+    HideableSidebarItemID[]
+  >()
+  readonly hiddenSidebarItems = this.getSignal<HideableSidebarItemID[]>(
+    SETTINGS_KEYS.SIDEBAR_HIDDEN_ITEMS
+  )
 
   readonly allDisplayFields = signal<Array<{ id: DisplayField; name: string }>>(
     DEFAULT_DISPLAY_FIELDS
@@ -666,7 +679,7 @@ export class SettingsService {
         .subscribe({
           next: () => {
             this.updateAppearanceSettings()
-            this.toastService.showInfo(successMessage)
+            this.toastService.showSuccess(successMessage)
           },
           error: (e) => {
             this.toastService.showError(errorMessage)
@@ -728,9 +741,10 @@ export class SettingsService {
       this.storeSettings()
         .pipe(first())
         .subscribe(() => {
-          this.toastService.showInfo(
-            $localize`You can restart the tour from the settings page.`
-          )
+          this.toastService.show({
+            content: $localize`You can restart the tour from the settings page.`,
+            delay: 5000,
+          })
         })
     }
   }
@@ -747,6 +761,29 @@ export class SettingsService {
       ...new Set(sidebarViews.map((v) => v.id)),
     ])
     return this.storeSettings()
+  }
+
+  sidebarItemIsHidden(item: HideableSidebarItemID): boolean {
+    return (
+      this.sidebarHiddenItemsEditing() ?? this.hiddenSidebarItems()
+    ).includes(item)
+  }
+
+  updateSidebarItemVisibility(
+    item: HideableSidebarItemID,
+    visible: boolean
+  ): void {
+    const hiddenItems = new Set(
+      this.sidebarHiddenItemsEditing() ?? this.hiddenSidebarItems()
+    )
+    if (visible) {
+      hiddenItems.delete(item)
+    } else {
+      hiddenItems.add(item)
+    }
+    const updatedHiddenItems = [...hiddenItems]
+    this.sidebarHiddenItemsEditing.set(updatedHiddenItems)
+    this.sidebarHiddenItemsEditingChanged.emit(updatedHiddenItems)
   }
 
   updateSavedViewsVisibility(

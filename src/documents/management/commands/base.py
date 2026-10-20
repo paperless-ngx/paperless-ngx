@@ -21,6 +21,7 @@ from typing import ClassVar
 from typing import Generic
 from typing import TypeVar
 
+import django
 from django import db
 from django.core.management import CommandError
 from django.db.models import QuerySet
@@ -534,7 +535,10 @@ class PaperlessCommand(RichCommand):
         with self._create_progress(description) as progress:
             task_id = progress.add_task(description, total=total)
 
-            with ProcessPoolExecutor(max_workers=self.process_count) as executor:
+            with ProcessPoolExecutor(
+                max_workers=self.process_count,
+                initializer=django.setup,
+            ) as executor:
                 # Submit all tasks and map futures back to items
                 future_to_item = {executor.submit(fn, item): item for item in items}
 

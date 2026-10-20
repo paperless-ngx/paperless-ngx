@@ -1,3 +1,5 @@
+import { DocumentBarcode } from './document-barcode'
+
 export interface DocumentMetadata {
   original_checksum?: string
 
@@ -12,4 +14,6 @@ export interface DocumentMetadata {
   has_archive_version?: boolean
 
   lang?: string
+
+  barcodes?: DocumentBarcode[]
 }

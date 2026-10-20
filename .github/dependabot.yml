@@ -59,7 +59,6 @@ updates:
           - "drf-*"
           - "djangorestframework"
           - "whitenoise"
-          - "bleach"
           - "jinja2"
       # Async, Task Queuing & Caching
       async-tasks:
@@ -81,7 +80,6 @@ updates:
       # Data, NLP, and Search
       data-nlp-search:
         patterns:
-          - "nltk"
           - "scikit-learn"
           - "langdetect"
           - "rapidfuzz"

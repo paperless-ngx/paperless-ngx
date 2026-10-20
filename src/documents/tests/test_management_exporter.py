@@ -2,6 +2,7 @@ import hashlib
 import json
 import shutil
 import tempfile
+from datetime import date
 from datetime import timedelta
 from io import StringIO
 from pathlib import Path
@@ -26,13 +27,13 @@ from django.test import override_settings
 from django.utils import timezone
 from guardian.models import GroupObjectPermission
 from guardian.models import UserObjectPermission
-from guardian.shortcuts import assign_perm
 
 from documents.management.commands import document_exporter
 from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
+from documents.models import DocumentBarcode
 from documents.models import DocumentType
 from documents.models import Note
 from documents.models import ShareLink
@@ -44,13 +45,20 @@ from documents.models import Workflow
 from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
 from documents.sanity_checker import check_sanity
+from documents.settings import EXPORTER_ARCHIVE_NAME
 from documents.settings import EXPORTER_FILE_NAME
 from documents.settings import EXPORTER_SHARE_LINK_BUNDLE_NAME
-from documents.tests.utils import DirectoriesMixin
-from documents.tests.utils import FileSystemAssertsMixin
+from documents.settings import EXPORTER_THUMBNAIL_NAME
 from documents.tests.utils import SampleDirMixin
-from documents.tests.utils import paperless_environment
+from paperless.models import ApplicationConfiguration
 from paperless_mail.models import MailAccount
+from paperless_testing.assertions import FileSystemAssertsMixin
+from paperless_testing.dirs import DirectoriesMixin
+from paperless_testing.dirs import PaperlessDirs
+from paperless_testing.dirs import paperless_environment
+from paperless_testing.factories import DocumentBarcodeFactory
+from paperless_testing.factories import DocumentFactory
+from paperless_testing.permissions import grant_object
 
 
 @pytest.mark.management
@@ -105,8 +113,8 @@ class TestExportImport(
             user=self.user,
         )
 
-        assign_perm("view_document", self.user2, self.d2)
-        assign_perm("view_document", self.group1, self.d3)
+        grant_object(self.user2, self.d2, "view_document")
+        grant_object(self.group1, self.d3, "view_document")
 
         self.t1 = Tag.objects.create(name="t")
         self.dt1 = DocumentType.objects.create(name="dt")
@@ -677,12 +685,13 @@ class TestExportImport(
         THEN:
             - Error is raised
         """
-        args = ["document_exporter", "/tmp/foo/bar"]
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            args = ["document_exporter", str(Path(tmp_dir) / "does-not-exist")]
 
-        with self.assertRaises(CommandError) as e:
-            call_command(*args, skip_checks=True)
+            with self.assertRaises(CommandError) as e:
+                call_command(*args, skip_checks=True)
 
-        self.assertEqual("That path doesn't exist", str(e.exception))
+            self.assertEqual("That path doesn't exist", str(e.exception))
 
     def test_export_target_exists_but_is_file(self) -> None:
         """
@@ -854,6 +863,37 @@ class TestExportImport(
             )
             self.assertEqual(Document.objects.count(), 4)
             self.assertEqual(CustomFieldInstance.objects.count(), 1)
+
+    def _export_import_barcodes(self, *, split_manifest: bool) -> None:
+        shutil.rmtree(Path(self.dirs.media_dir) / "documents")
+        shutil.copytree(
+            Path(__file__).parent / "samples" / "documents",
+            Path(self.dirs.media_dir) / "documents",
+        )
+        DocumentBarcodeFactory(document=self.d1, value="https://example.com")
+        DocumentBarcodeFactory(document=self.d2, page=2, value="DE8937")
+
+        self._do_export(split_manifest=split_manifest)
+
+        with paperless_environment():
+            Document.objects.all().delete()
+            self.assertEqual(DocumentBarcode.objects.count(), 0)
+            call_command(
+                "document_importer",
+                "--no-progress-bar",
+                self.target,
+                skip_checks=True,
+            )
+            self.assertEqual(
+                set(DocumentBarcode.objects.values_list("document", "page", "value")),
+                {(self.d1.pk, 1, "https://example.com"), (self.d2.pk, 2, "DE8937")},
+            )
+
+    def test_export_import_barcodes(self) -> None:
+        self._export_import_barcodes(split_manifest=False)
+
+    def test_export_import_barcodes_split_manifest(self) -> None:
+        self._export_import_barcodes(split_manifest=True)
 
     def test_folder_prefix(self) -> None:
         """
@@ -1363,6 +1403,45 @@ class TestCryptExportImport(
         social_token = SocialToken.objects.first()
         self.assertIsNotNone(social_token)
 
+    def test_import_passphrase_with_float_field(self) -> None:
+        """
+        GIVEN:
+            - An application configuration with a float field set
+        WHEN:
+            - Export and import are run with a passphrase
+        THEN:
+            - The import succeeds and the float value is preserved
+        """
+        ApplicationConfiguration.objects.update_or_create(
+            pk=1,
+            defaults={"rotate_pages_threshold": 12.5},
+        )
+
+        call_command(
+            "document_exporter",
+            "--no-progress-bar",
+            "--passphrase",
+            "securepassword",
+            self.target,
+            skip_checks=True,
+        )
+
+        ApplicationConfiguration.objects.all().delete()
+
+        call_command(
+            "document_importer",
+            "--no-progress-bar",
+            "--passphrase",
+            "securepassword",
+            self.target,
+            skip_checks=True,
+        )
+
+        self.assertEqual(
+            ApplicationConfiguration.objects.get().rotate_pages_threshold,
+            12.5,
+        )
+
     def test_import_crypt_no_passphrase(self) -> None:
         """
         GIVEN:
@@ -1428,3 +1507,140 @@ class TestCryptExportImport(
             ("No passphrase was given, sensitive fields will be in plaintext"),
             stdout.read(),
         )
+
+
+@pytest.mark.management
+@pytest.mark.django_db
+class TestExportDerivedFileNameCollisions:
+    def test_same_stem_different_extension_get_distinct_derived_files(
+        self,
+        paperless_dirs: PaperlessDirs,
+        tmp_path: Path,
+    ) -> None:
+        """
+        GIVEN:
+            - Two documents with the same title and created date
+            - One original is a PDF, the other a PNG, both with archive and thumbnail
+        WHEN:
+            - The exporter runs
+        THEN:
+            - Each document is exported under a distinct original, thumbnail and archive name
+            - Each exported file holds its own document's content
+        """
+        for pk, (filename, mime_type) in enumerate(
+            [("collide.pdf", "application/pdf"), ("collide.png", "image/png")],
+            start=1,
+        ):
+            (paperless_dirs.originals_dir / filename).write_bytes(
+                f"original {pk}".encode(),
+            )
+            (paperless_dirs.archive_dir / f"{pk:07}.pdf").write_bytes(
+                f"archive {pk}".encode(),
+            )
+            (paperless_dirs.thumbnail_dir / f"{pk:07}.webp").write_bytes(
+                f"thumbnail {pk}".encode(),
+            )
+            DocumentFactory(
+                pk=pk,
+                title="collide",
+                created=date(2026, 10, 7),
+                filename=filename,
+                archive_filename=f"{pk:07}.pdf",
+                mime_type=mime_type,
+            )
+
+        target = tmp_path / "export"
+        target.mkdir()
+        call_command(
+            "document_exporter",
+            str(target),
+            "--no-progress-bar",
+            skip_checks=True,
+        )
+
+        manifest = json.loads((target / "manifest.json").read_text())
+        records = {r["pk"]: r for r in manifest if r["model"] == "documents.document"}
+
+        for key in (
+            EXPORTER_FILE_NAME,
+            EXPORTER_THUMBNAIL_NAME,
+            EXPORTER_ARCHIVE_NAME,
+        ):
+            assert records[1][key] != records[2][key]
+
+        for pk in (1, 2):
+            record = records[pk]
+            assert (target / record[EXPORTER_FILE_NAME]).read_text() == f"original {pk}"
+            assert (
+                target / record[EXPORTER_THUMBNAIL_NAME]
+            ).read_text() == f"thumbnail {pk}"
+            assert (
+                target / record[EXPORTER_ARCHIVE_NAME]
+            ).read_text() == f"archive {pk}"
+
+    def test_long_titles_export_within_file_name_limit(
+        self,
+        paperless_dirs: PaperlessDirs,
+        tmp_path: Path,
+    ) -> None:
+        """
+        GIVEN:
+            - Two documents with the same created date and the same title
+            - The title alone is longer than 255 bytes and contains umlauts
+        WHEN:
+            - The exporter runs
+        THEN:
+            - The export finishes with distinct original, thumbnail and archive names
+            - Every exported file name fits in the byte limit
+            - Each exported file holds its own document's content
+        """
+        for pk in (1, 2):
+            (paperless_dirs.originals_dir / f"{pk:07}.pdf").write_bytes(
+                f"original {pk}".encode(),
+            )
+            (paperless_dirs.archive_dir / f"{pk:07}.pdf").write_bytes(
+                f"archive {pk}".encode(),
+            )
+            (paperless_dirs.thumbnail_dir / f"{pk:07}.webp").write_bytes(
+                f"thumbnail {pk}".encode(),
+            )
+            DocumentFactory(
+                pk=pk,
+                title="Bestellbestätigung " * 15,
+                created=date(2026, 10, 15),
+                filename=f"{pk:07}.pdf",
+                archive_filename=f"{pk:07}.pdf",
+                mime_type="application/pdf",
+            )
+
+        target = tmp_path / "export"
+        target.mkdir()
+        call_command(
+            "document_exporter",
+            str(target),
+            "--no-progress-bar",
+            skip_checks=True,
+        )
+
+        manifest = json.loads((target / "manifest.json").read_text())
+        records = {r["pk"]: r for r in manifest if r["model"] == "documents.document"}
+
+        for key in (
+            EXPORTER_FILE_NAME,
+            EXPORTER_THUMBNAIL_NAME,
+            EXPORTER_ARCHIVE_NAME,
+        ):
+            assert records[1][key] != records[2][key]
+
+        for pk in (1, 2):
+            record = records[pk]
+            for key, content in (
+                (EXPORTER_FILE_NAME, f"original {pk}"),
+                (EXPORTER_THUMBNAIL_NAME, f"thumbnail {pk}"),
+                (EXPORTER_ARCHIVE_NAME, f"archive {pk}"),
+            ):
+                assert (
+                    len(Path(record[key]).name.encode())
+                    <= Document.MAX_PUBLIC_FILENAME_BYTES
+                )
+                assert (target / record[key]).read_text() == content

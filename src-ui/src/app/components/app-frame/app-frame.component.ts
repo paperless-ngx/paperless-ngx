@@ -6,7 +6,15 @@ import {
   moveItemInArray,
 } from '@angular/cdk/drag-drop'
 import { NgClass } from '@angular/common'
-import { Component, HostListener, inject, OnInit, signal } from '@angular/core'
+import {
+  Component,
+  HostListener,
+  inject,
+  OnInit,
+  signal,
+  viewChild,
+} from '@angular/core'
+import { FormsModule } from '@angular/forms'
 import { ActivatedRoute, Router, RouterModule } from '@angular/router'
 import {
   NgbCollapseModule,
@@ -21,7 +29,11 @@ import { Observable } from 'rxjs'
 import { first } from 'rxjs/operators'
 import { Document } from 'src/app/data/document'
 import { SavedView } from 'src/app/data/saved-view'
-import { CollapsibleSection, SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import {
+  CollapsibleSection,
+  HideableSidebarItemID,
+  SETTINGS_KEYS,
+} from 'src/app/data/ui-settings'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { ComponentCanDeactivate } from 'src/app/guards/dirty-doc.guard'
 import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
@@ -43,11 +55,15 @@ import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { TasksService } from 'src/app/services/tasks.service'
 import { ToastService } from 'src/app/services/toast.service'
+import { UploadDocumentsService } from 'src/app/services/upload-documents.service'
+import { WebsocketStatusService } from 'src/app/services/websocket-status.service'
 import { environment } from 'src/environments/environment'
 import { ChatComponent } from '../chat/chat/chat.component'
+import { SwitchComponent } from '../common/input/switch/switch.component'
 import { BrandMarkComponent } from '../common/logo/brand-mark/brand-mark.component'
 import { LogoComponent } from '../common/logo/logo.component'
 import { ProfileEditDialogComponent } from '../common/profile-edit-dialog/profile-edit-dialog.component'
+import { UploadStatusTrayComponent } from '../common/upload-status-tray/upload-status-tray.component'
 import { DocumentDetailComponent } from '../document-detail/document-detail.component'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
 import { GlobalSearchComponent } from './global-search/global-search.component'
@@ -76,6 +92,9 @@ const SCROLL_THRESHOLD = 16
     NgxBootstrapIconsModule,
     DragDropModule,
     TourNgBootstrap,
+    FormsModule,
+    SwitchComponent,
+    UploadStatusTrayComponent,
   ],
 })
 export class AppFrameComponent
@@ -93,11 +112,16 @@ export class AppFrameComponent
   private modalService = inject(NgbModal)
   permissionsService = inject(PermissionsService)
   private djangoMessagesService = inject(DjangoMessagesService)
+  private uploadDocumentsService = inject(UploadDocumentsService)
+  private websocketStatusService = inject(WebsocketStatusService)
+
+  private readonly uploadStatusTray = viewChild(UploadStatusTrayComponent)
 
   readonly appRemoteVersion = signal<AppRemoteVersion>(null)
   readonly isMenuCollapsed = signal(true)
   readonly slimSidebarAnimating = signal(false)
   readonly mobileSearchHidden = signal(false)
+  readonly HideableSidebarItemID = HideableSidebarItemID
   private readonly versionSetting = this.settingsService.getSignal<string>(
     SETTINGS_KEYS.VERSION
   )
@@ -162,6 +186,8 @@ export class AppFrameComponent
           this.toastService.showError(message.message)
           break
         case DjangoMessageLevel.SUCCESS:
+          this.toastService.showSuccess(message.message)
+          break
         case DjangoMessageLevel.INFO:
         case DjangoMessageLevel.DEBUG:
           this.toastService.showInfo(message.message)
@@ -195,6 +221,10 @@ export class AppFrameComponent
     }, 200) // slightly longer than css animation for slim sidebar
   }
 
+  toggleSidebarItem(item: HideableSidebarItemID, visible: boolean): void {
+    this.settingsService.updateSidebarItemVisibility(item, visible)
+  }
+
   toggleAttributesSections(event?: Event): void {
     event?.preventDefault()
     event?.stopPropagation()
@@ -219,6 +249,19 @@ export class AppFrameComponent
 
   get appTitle(): string {
     return this.appTitleSetting() || environment.appTitle
+  }
+
+  get canManageShareLinks(): boolean {
+    return (
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.ShareLink
+      ) ||
+      this.permissionsService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.ShareLinkBundle
+      )
+    )
   }
 
   get customAppTitle(): string {
@@ -451,7 +494,7 @@ export class AppFrameComponent
 
     this.settingsService.updateSidebarViewsSort(sidebarViews).subscribe({
       next: () => {
-        this.toastService.showInfo($localize`Sidebar views updated`)
+        this.toastService.showSuccess($localize`Sidebar views updated`)
       },
       error: (e) => {
         this.toastService.showError($localize`Error updating sidebar views`, e)
@@ -483,6 +526,22 @@ export class AppFrameComponent
     if (enable) {
       this.checkForUpdates()
     }
+  }
+
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement
+    const files = Array.from(input.files ?? [])
+    input.value = ''
+    if (!files.length) return
+    this.uploadDocumentsService.uploadFiles(files)
+  }
+
+  get uploadsInProgress(): number {
+    return this.websocketStatusService.getConsumerStatusNotCompleted().length
+  }
+
+  showUploadStatus() {
+    this.uploadStatusTray()?.expand()
   }
 
   onLogout() {

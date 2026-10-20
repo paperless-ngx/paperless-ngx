@@ -12,11 +12,13 @@ from paperless_ai.embedding import _normalize_llm_index_text
 from paperless_ai.embedding import build_llm_index_text
 from paperless_ai.embedding import get_configured_model_name
 from paperless_ai.embedding import get_embedding_model
+from paperless_testing.factories import DocumentFactory
 
 
 @pytest.fixture
 def mock_ai_config():
     with patch("paperless_ai.embedding.AIConfig") as MockAIConfig:
+        MockAIConfig.return_value.llm_embedding_api_key = None
         MockAIConfig.return_value.llm_embedding_endpoint = None
         MockAIConfig.return_value.llm_allow_internal_endpoints = True
         MockAIConfig.return_value.llm_context_size = 8192
@@ -45,6 +47,7 @@ def mock_document():
     doc.correspondent.name = "Test Correspondent"
     doc.archive_serial_number = "12345"
     doc.content = "This is the document content."
+    doc.get_effective_content.return_value = "This is the document content."
 
     cf1 = MagicMock(__str__=lambda x: "Value1")
     cf1.field = MagicMock()
@@ -63,6 +66,7 @@ def mock_document():
 def test_get_embedding_model_openai(mock_ai_config):
     mock_ai_config.return_value.llm_embedding_backend = LLMEmbeddingBackend.OPENAI_LIKE
     mock_ai_config.return_value.llm_embedding_model = "text-embedding-3-small"
+    mock_ai_config.return_value.llm_embedding_api_key = "test_embedding_api_key"
     mock_ai_config.return_value.llm_api_key = "test_api_key"
     mock_ai_config.return_value.llm_endpoint = "http://test-url"
 
@@ -72,13 +76,27 @@ def test_get_embedding_model_openai(mock_ai_config):
         model = get_embedding_model(mock_ai_config.return_value)
         MockOpenAIEmbedding.assert_called_once_with(
             model_name="text-embedding-3-small",
-            api_key="test_api_key",
+            api_key="test_embedding_api_key",
             api_base="http://test-url",
             timeout=120,
             http_client=ANY,
             async_http_client=ANY,
         )
         assert model == MockOpenAIEmbedding.return_value
+
+
+def test_get_embedding_model_openai_falls_back_to_llm_api_key(mock_ai_config):
+    mock_ai_config.return_value.llm_embedding_backend = LLMEmbeddingBackend.OPENAI_LIKE
+    mock_ai_config.return_value.llm_embedding_model = "text-embedding-3-small"
+    mock_ai_config.return_value.llm_api_key = "test_api_key"
+    mock_ai_config.return_value.llm_endpoint = "http://test-url"
+
+    with patch(
+        "llama_index.embeddings.openai_like.OpenAILikeEmbedding",
+    ) as MockOpenAIEmbedding:
+        get_embedding_model(mock_ai_config.return_value)
+
+    assert MockOpenAIEmbedding.call_args.kwargs["api_key"] == "test_api_key"
 
 
 @pytest.mark.parametrize("configured_key", [None, ""])
@@ -89,6 +107,7 @@ def test_get_embedding_model_openai_without_api_key_sends_placeholder(
     """Same required key handling as the LLM client, see #13831."""
     mock_ai_config.return_value.llm_embedding_backend = LLMEmbeddingBackend.OPENAI_LIKE
     mock_ai_config.return_value.llm_embedding_model = "text-embedding-3-small"
+    mock_ai_config.return_value.llm_embedding_api_key = configured_key
     mock_ai_config.return_value.llm_api_key = configured_key
     mock_ai_config.return_value.llm_endpoint = "http://test-url"
 
@@ -263,7 +282,7 @@ def test_build_llm_index_text(mock_document):
 
 
 def test_build_llm_index_text_normalizes_ocr_punctuation_runs(mock_document):
-    mock_document.content = (
+    mock_document.get_effective_content.return_value = (
         "Introduction ................................................ 7\n"
         "Hardware Limitation ________________________________________ 9\n"
         "Keep short punctuation like INV-100 and ellipses..."
@@ -275,6 +294,43 @@ def test_build_llm_index_text_normalizes_ocr_punctuation_runs(mock_document):
     assert "Hardware Limitation 9" in result
     assert "INV-100" in result
     assert "ellipses..." in result
+
+
+@pytest.mark.django_db
+class TestBuildLlmIndexTextVersions:
+    """A root document is indexed with its effective content, like in the search index."""
+
+    def test_root_uses_the_newest_versions_content(self) -> None:
+        """
+        GIVEN:
+            - A root document with two versions
+        WHEN:
+            - The LLM index text is built for the root
+        THEN:
+            - It contains the newest version's content and not the others'
+        """
+        root = DocumentFactory(content="stale text")
+        DocumentFactory(root_document=root, version_index=1, content="older text")
+        DocumentFactory(root_document=root, version_index=2, content="latest text")
+
+        text = build_llm_index_text(root)
+
+        assert "latest text" in text
+        assert "stale text" not in text
+        assert "older text" not in text
+
+    def test_root_without_versions_uses_its_own_content(self) -> None:
+        """
+        GIVEN:
+            - A root document without versions
+        WHEN:
+            - The LLM index text is built for it
+        THEN:
+            - It contains the document's own content
+        """
+        root = DocumentFactory(content="own text")
+
+        assert "own text" in build_llm_index_text(root)
 
 
 def test_normalize_llm_index_text_collapses_ocr_leaders_without_joining_lines():

@@ -102,42 +102,42 @@ def execute_email_action(
         )
         return
 
-    subject = (
-        parse_w_workflow_placeholders(
-            action.email.subject,
-            context["correspondent"],
-            context["document_type"],
-            context["owner_username"],
-            context["added"],
-            context["filename"],
-            context["current_filename"],
-            context["created"],
-            context["title"],
-            context["doc_url"],
-            context["id"],
-        )
-        if action.email.subject
-        else ""
-    )
-    body = (
-        parse_w_workflow_placeholders(
-            action.email.body,
-            context["correspondent"],
-            context["document_type"],
-            context["owner_username"],
-            context["added"],
-            context["filename"],
-            context["current_filename"],
-            context["created"],
-            context["title"],
-            context["doc_url"],
-            context["id"],
-        )
-        if action.email.body
-        else ""
-    )
-
     try:
+        subject = (
+            parse_w_workflow_placeholders(
+                action.email.subject,
+                context["correspondent"],
+                context["document_type"],
+                context["owner_username"],
+                context["added"],
+                context["filename"],
+                context["current_filename"],
+                context["created"],
+                context["title"],
+                context["doc_url"],
+                context["id"],
+            )
+            if action.email.subject
+            else ""
+        )
+        body = (
+            parse_w_workflow_placeholders(
+                action.email.body,
+                context["correspondent"],
+                context["document_type"],
+                context["owner_username"],
+                context["added"],
+                context["filename"],
+                context["current_filename"],
+                context["created"],
+                context["title"],
+                context["doc_url"],
+                context["id"],
+            )
+            if action.email.body
+            else ""
+        )
+
         attachments: list[EmailAttachment] = []
         if action.email.include_document:
             attachment: EmailAttachment | None = None

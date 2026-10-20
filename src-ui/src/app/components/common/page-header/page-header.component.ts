@@ -27,7 +27,10 @@ export class PageHeaderComponent {
 
   constructor() {
     effect(() => {
-      this.titleService.setTitle(`${this.title()} - ${environment.appTitle}`)
+      const title = this.title()
+      this.titleService.setTitle(
+        title ? `${title} - ${environment.appTitle}` : environment.appTitle
+      )
     })
   }
 

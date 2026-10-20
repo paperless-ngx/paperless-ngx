@@ -16,8 +16,8 @@ from paperless_mail.mail import MailAccountHandler
 from paperless_mail.models import MailRule
 from paperless_mail.preprocessor import MailMessageDecryptor
 from paperless_mail.tests.factories import MailAccountFactory
+from paperless_mail.tests.helpers import _AttachmentDef
 from paperless_mail.tests.test_mail import TestMail
-from paperless_mail.tests.test_mail import _AttachmentDef
 
 
 class MessageEncryptor:

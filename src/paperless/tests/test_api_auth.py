@@ -1,11 +1,12 @@
 import uuid
 
-from django.contrib.auth.models import User
 from django.test import TestCase
 from django.test import override_settings
 from django.urls import resolve
 from django.urls import reverse
 from rest_framework import status
+
+from paperless_testing.factories import UserFactory
 
 
 class TestApiAuthViews(TestCase):
@@ -24,10 +25,7 @@ class TestApiAuthViews(TestCase):
     @override_settings(DISABLE_REGULAR_LOGIN=True)
     def test_api_auth_login_respects_disable_regular_login(self):
         username = f"testuser-{uuid.uuid4().hex}"
-        User.objects.create_user(
-            username=username,
-            password="testpassword",
-        )
+        UserFactory(username=username, password="testpassword")
 
         response = self.client.post(
             reverse("rest_framework:login"),

@@ -1,5 +1,4 @@
 import datetime
-import json
 import logging
 import logging.config
 import math
@@ -10,7 +9,6 @@ from pathlib import Path
 from typing import Final
 from urllib.parse import urlparse
 
-from compression_middleware.middleware import CompressionMiddleware
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import gettext_lazy as _
 from dotenv import load_dotenv
@@ -25,6 +23,7 @@ from paperless.settings.parsers import get_bool_from_env
 from paperless.settings.parsers import get_choice_from_env
 from paperless.settings.parsers import get_float_from_env
 from paperless.settings.parsers import get_int_from_env
+from paperless.settings.parsers import get_json_from_env
 from paperless.settings.parsers import get_list_from_env
 from paperless.settings.parsers import get_path_from_env
 
@@ -74,8 +73,6 @@ SHARE_LINK_BUNDLE_DIR = MEDIA_ROOT / "documents" / "share_link_bundles"
 
 DATA_DIR = get_path_from_env("PAPERLESS_DATA_DIR", BASE_DIR.parent / "data")
 
-NLTK_DIR = get_path_from_env("PAPERLESS_NLTK_DIR", "/usr/share/nltk_data")
-
 # Check deprecated setting first
 EMPTY_TRASH_DIR = (
     get_path_from_env("PAPERLESS_TRASH_DIR", os.getenv("PAPERLESS_EMPTY_TRASH_DIR"))
@@ -95,6 +92,17 @@ ADVANCED_FUZZY_SEARCH_THRESHOLD: float | None = get_float_from_env(
 MODEL_FILE = get_path_from_env(
     "PAPERLESS_MODEL_FILE",
     DATA_DIR / "classification_model.pickle",
+)
+
+# Minimum confidence (0.0-1.0) for the ML classifier to assign a correspondent,
+# document type, or storage path. 0.0 disables the threshold.
+CLASSIFIER_MATCH_THRESHOLD: Final[float] = get_float_from_env(
+    "PAPERLESS_CLASSIFIER_MATCH_THRESHOLD",
+    0.3,
+)
+MATCH_REGEX_TIMEOUT_SECONDS: Final[float] = get_float_from_env(
+    "PAPERLESS_MATCH_REGEX_TIMEOUT_SECONDS",
+    0.1,
 )
 LLM_INDEX_DIR = DATA_DIR / "llm_index"
 LLM_INDEX_LOCK = LLM_INDEX_DIR / "index.lock"
@@ -194,22 +202,10 @@ MIDDLEWARE = [
     "allauth.account.middleware.AccountMiddleware",
 ]
 
-# Optional to enable compression
+# Optional to enable compression. The subclass leaves server-sent events
+# uncompressed; see paperless.middleware.StreamAwareCompressionMiddleware.
 if get_bool_from_env("PAPERLESS_ENABLE_COMPRESSION", "yes"):  # pragma: no cover
-    MIDDLEWARE.insert(0, "compression_middleware.middleware.CompressionMiddleware")
-
-# Workaround to not compress streaming responses (e.g. chat).
-# See https://github.com/friedelwolff/django-compression-middleware/pull/7
-original_process_response = CompressionMiddleware.process_response
-
-
-def patched_process_response(self, request, response):
-    if getattr(request, "compress_exempt", False):
-        return response
-    return original_process_response(self, request, response)
-
-
-CompressionMiddleware.process_response = patched_process_response
+    MIDDLEWARE.insert(0, "paperless.middleware.StreamAwareCompressionMiddleware")
 
 ROOT_URLCONF = "paperless.urls"
 
@@ -232,6 +228,7 @@ SPECTACULAR_SETTINGS = {
     },
     "ENUM_NAME_OVERRIDES": {
         "MatchingAlgorithm": "documents.models.MatchingModel.MATCHING_ALGORITHMS",
+        "BarcodeFormatEnum": "documents.models.DocumentBarcode.Format",
     },
     "SCHEMA_PATH_PREFIX_INSERT": FORCE_SCRIPT_NAME or "",
 }
@@ -294,7 +291,7 @@ if _CHANNELS_BACKEND.startswith("channels_redis."):
 ###############################################################################
 
 EMAIL_HOST: Final[str] = os.getenv("PAPERLESS_EMAIL_HOST", "localhost")
-EMAIL_PORT: Final[int] = int(os.getenv("PAPERLESS_EMAIL_PORT", 25))
+EMAIL_PORT: Final[int] = get_int_from_env("PAPERLESS_EMAIL_PORT", 25)
 EMAIL_HOST_USER: Final[str] = os.getenv("PAPERLESS_EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD: Final[str] = os.getenv("PAPERLESS_EMAIL_HOST_PASSWORD", "")
 DEFAULT_FROM_EMAIL: Final[str] = os.getenv("PAPERLESS_EMAIL_FROM", EMAIL_HOST_USER)
@@ -333,8 +330,10 @@ SOCIALACCOUNT_ALLOW_SIGNUPS = get_bool_from_env(
     "yes",
 )
 SOCIALACCOUNT_AUTO_SIGNUP = get_bool_from_env("PAPERLESS_SOCIAL_AUTO_SIGNUP")
-SOCIALACCOUNT_PROVIDERS = json.loads(
-    os.getenv("PAPERLESS_SOCIALACCOUNT_PROVIDERS", "{}"),
+SOCIALACCOUNT_PROVIDERS = get_json_from_env(
+    "PAPERLESS_SOCIALACCOUNT_PROVIDERS",
+    {},
+    dict,
 )
 SOCIAL_ACCOUNT_DEFAULT_GROUPS = get_list_from_env(
     "PAPERLESS_SOCIAL_ACCOUNT_DEFAULT_GROUPS",
@@ -381,8 +380,9 @@ ACCOUNT_SESSION_REMEMBER = get_bool_from_env(
     "True",
 )
 SESSION_EXPIRE_AT_BROWSER_CLOSE = not ACCOUNT_SESSION_REMEMBER
-SESSION_COOKIE_AGE = int(
-    os.getenv("PAPERLESS_SESSION_COOKIE_AGE", 60 * 60 * 24 * 7 * 3),
+SESSION_COOKIE_AGE = get_int_from_env(
+    "PAPERLESS_SESSION_COOKIE_AGE",
+    60 * 60 * 24 * 7 * 3,
 )
 # https://docs.djangoproject.com/en/5.1/ref/settings/#std-setting-SESSION_ENGINE
 SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
@@ -489,7 +489,7 @@ ALLAUTH_TRUSTED_CLIENT_IP_HEADER = os.getenv(
 USE_X_FORWARDED_HOST = get_bool_from_env("PAPERLESS_USE_X_FORWARD_HOST", "false")
 USE_X_FORWARDED_PORT = get_bool_from_env("PAPERLESS_USE_X_FORWARD_PORT", "false")
 SECURE_PROXY_SSL_HEADER = (
-    tuple(json.loads(os.environ["PAPERLESS_PROXY_SSL_HEADER"]))
+    tuple(get_json_from_env("PAPERLESS_PROXY_SSL_HEADER", [], list))
     if "PAPERLESS_PROXY_SSL_HEADER" in os.environ
     else None
 )
@@ -614,8 +614,8 @@ USE_TZ = True
 
 LOGGING_DIR.mkdir(parents=True, exist_ok=True)
 
-LOGROTATE_MAX_SIZE = os.getenv("PAPERLESS_LOGROTATE_MAX_SIZE", 1024 * 1024)
-LOGROTATE_MAX_BACKUPS = os.getenv("PAPERLESS_LOGROTATE_MAX_BACKUPS", 20)
+LOGROTATE_MAX_SIZE = get_int_from_env("PAPERLESS_LOGROTATE_MAX_SIZE", 1024 * 1024)
+LOGROTATE_MAX_BACKUPS = get_int_from_env("PAPERLESS_LOGROTATE_MAX_BACKUPS", 20)
 
 LOGGING = {
     "version": 1,
@@ -799,7 +799,7 @@ def default_threads_per_worker(task_workers) -> int:
         return 1
 
 
-THREADS_PER_WORKER = os.getenv(
+THREADS_PER_WORKER = get_int_from_env(
     "PAPERLESS_THREADS_PER_WORKER",
     default_threads_per_worker(CELERY_WORKER_CONCURRENCY),
 )
@@ -820,32 +820,26 @@ IGNORABLE_FILES: Final[list[str]] = [
     "Thumbs.db",
 ]
 
-CONSUMER_POLLING_INTERVAL = float(os.getenv("PAPERLESS_CONSUMER_POLLING_INTERVAL", 0))
+CONSUMER_POLLING_INTERVAL = get_float_from_env("PAPERLESS_CONSUMER_POLLING_INTERVAL", 0)
 
-CONSUMER_STABILITY_DELAY = float(os.getenv("PAPERLESS_CONSUMER_STABILITY_DELAY", 5))
+CONSUMER_STABILITY_DELAY = get_float_from_env("PAPERLESS_CONSUMER_STABILITY_DELAY", 5)
 
 CONSUMER_DELETE_DUPLICATES = get_bool_from_env("PAPERLESS_CONSUMER_DELETE_DUPLICATES")
 
 CONSUMER_RECURSIVE = get_bool_from_env("PAPERLESS_CONSUMER_RECURSIVE")
 
 # Ignore regex patterns, matched against filename only
-CONSUMER_IGNORE_PATTERNS = list(
-    json.loads(
-        os.getenv(
-            "PAPERLESS_CONSUMER_IGNORE_PATTERNS",
-            json.dumps([]),
-        ),
-    ),
+CONSUMER_IGNORE_PATTERNS = get_json_from_env(
+    "PAPERLESS_CONSUMER_IGNORE_PATTERNS",
+    [],
+    list,
 )
 
 # Directories to always ignore.  These are matched by directory name, not full path
-CONSUMER_IGNORE_DIRS = list(
-    json.loads(
-        os.getenv(
-            "PAPERLESS_CONSUMER_IGNORE_DIRS",
-            json.dumps([]),
-        ),
-    ),
+CONSUMER_IGNORE_DIRS = get_json_from_env(
+    "PAPERLESS_CONSUMER_IGNORE_DIRS",
+    [],
+    list,
 )
 
 CONSUMER_SUBDIRS_AS_TAGS = get_bool_from_env("PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS")
@@ -895,17 +889,18 @@ CONSUMER_ENABLE_TAG_BARCODE: Final[bool] = get_bool_from_env(
     "PAPERLESS_CONSUMER_ENABLE_TAG_BARCODE",
 )
 
-CONSUMER_TAG_BARCODE_MAPPING = dict(
-    json.loads(
-        os.getenv(
-            "PAPERLESS_CONSUMER_TAG_BARCODE_MAPPING",
-            '{"TAG:(.*)": "\\\\g<1>"}',
-        ),
-    ),
+CONSUMER_TAG_BARCODE_MAPPING = get_json_from_env(
+    "PAPERLESS_CONSUMER_TAG_BARCODE_MAPPING",
+    {"TAG:(.*)": "\\g<1>"},
+    dict,
 )
 
 CONSUMER_TAG_BARCODE_SPLIT: Final[bool] = get_bool_from_env(
     "PAPERLESS_CONSUMER_TAG_BARCODE_SPLIT",
+)
+
+CONSUMER_STORE_BARCODE_VALUES: Final[bool] = get_bool_from_env(
+    "PAPERLESS_CONSUMER_STORE_BARCODE_VALUES",
 )
 
 CONSUMER_ENABLE_COLLATE_DOUBLE_SIDED: Final[bool] = get_bool_from_env(
@@ -1069,39 +1064,30 @@ APP_LOGO = os.getenv("PAPERLESS_APP_LOGO", None)
 ###############################################################################
 
 
-def _get_nltk_language_setting(ocr_lang: str) -> str | None:
+CLASSIFIER_LANGUAGES: Final[dict[str, str]] = {
+    "dan": "danish",
+    "nld": "dutch",
+    "eng": "english",
+    "fin": "finnish",
+    "fra": "french",
+    "deu": "german",
+    "ita": "italian",
+    "nor": "norwegian",
+    "por": "portuguese",
+    "rus": "russian",
+    "spa": "spanish",
+    "swe": "swedish",
+}
+
+
+def _get_classifier_language_setting(ocr_lang: str) -> str | None:
     """
-    Maps an ISO-639-1 language code supported by Tesseract into
-    an optional NLTK language name.  This is the set of common supported
-    languages for all the NLTK data used.
+    Maps the primary Tesseract language to the classifier's stemming
+    language, or None if unsupported.
 
     Assumption: The primary language is first
-
-    NLTK Languages:
-      - https://www.nltk.org/api/nltk.stem.snowball.html#nltk.stem.snowball.SnowballStemmer
-      - https://raw.githubusercontent.com/nltk/nltk_data/gh-pages/packages/tokenizers/punkt.zip
-      - https://raw.githubusercontent.com/nltk/nltk_data/gh-pages/packages/corpora/stopwords.zip
-
-    The common intersection between all languages in those 3 is handled here
-
     """
-    ocr_lang = ocr_lang.split("+", maxsplit=1)[0]
-    iso_code_to_nltk = {
-        "dan": "danish",
-        "nld": "dutch",
-        "eng": "english",
-        "fin": "finnish",
-        "fra": "french",
-        "deu": "german",
-        "ita": "italian",
-        "nor": "norwegian",
-        "por": "portuguese",
-        "rus": "russian",
-        "spa": "spanish",
-        "swe": "swedish",
-    }
-
-    return iso_code_to_nltk.get(ocr_lang)
+    return CLASSIFIER_LANGUAGES.get(ocr_lang.split("+", maxsplit=1)[0])
 
 
 def _get_search_language_setting(ocr_lang: str) -> str | None:
@@ -1147,9 +1133,7 @@ def _get_search_language_setting(ocr_lang: str) -> str | None:
     return _ocr_to_search.get(primary)
 
 
-NLTK_ENABLED: Final[bool] = get_bool_from_env("PAPERLESS_ENABLE_NLTK", "yes")
-
-NLTK_LANGUAGE: str | None = _get_nltk_language_setting(OCR_LANGUAGE)
+CLASSIFIER_LANGUAGE: str | None = _get_classifier_language_setting(OCR_LANGUAGE)
 
 SEARCH_LANGUAGE: str | None = _get_search_language_setting(OCR_LANGUAGE)
 
@@ -1231,6 +1215,7 @@ LLM_EMBEDDING_BACKEND = get_choice_from_env(
     {"huggingface", "openai-like", "ollama"},
 )
 LLM_EMBEDDING_MODEL = os.getenv("PAPERLESS_AI_LLM_EMBEDDING_MODEL")
+LLM_EMBEDDING_API_KEY = os.getenv("PAPERLESS_AI_LLM_EMBEDDING_API_KEY")
 LLM_EMBEDDING_ENDPOINT = os.getenv("PAPERLESS_AI_LLM_EMBEDDING_ENDPOINT")
 LLM_EMBEDDING_CHUNK_SIZE = get_int_from_env(
     "PAPERLESS_AI_LLM_EMBEDDING_CHUNK_SIZE",
@@ -1256,3 +1241,5 @@ LLM_ALLOW_INTERNAL_ENDPOINTS = get_bool_from_env(
     "PAPERLESS_AI_LLM_ALLOW_INTERNAL_ENDPOINTS",
     "true",
 )
+# JSON object passed straight through to the LLM backend's request body
+LLM_EXTRA_PARAMS = get_json_from_env("PAPERLESS_AI_LLM_EXTRA_PARAMS", {}, dict)

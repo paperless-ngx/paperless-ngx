@@ -73,6 +73,7 @@ export interface DocumentSelectionQuery {
   documents?: number[]
   all?: boolean
   filters?: { [key: string]: any }
+  excluded_documents?: number[]
 }
 
 @Injectable({
@@ -415,10 +416,12 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     })
   }
 
-  getSelectionData(ids: number[]): Observable<SelectionData> {
+  getSelectionData(
+    selection: DocumentSelectionQuery
+  ): Observable<SelectionData> {
     return this.http.post<SelectionData>(
       this.getResourceUrl(null, 'selection_data'),
-      { documents: ids }
+      selection
     )
   }
 

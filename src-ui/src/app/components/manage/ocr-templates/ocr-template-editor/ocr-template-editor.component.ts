@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common'
 import {
+  ChangeDetectorRef,
   Component,
   ElementRef,
   HostListener,
@@ -141,6 +142,7 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
   private readonly correspondentService = inject(CorrespondentService)
   private readonly documentService = inject(DocumentService)
   private readonly toastService = inject(ToastService)
+  private readonly changeDetector = inject(ChangeDetectorRef)
   private readonly destroy$ = new Subject<void>()
   private readonly customDateFormatZones = new WeakSet<OcrTemplateZone>()
 
@@ -228,18 +230,25 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     this.customFieldsService
       .listAll()
       .pipe(takeUntil(this.destroy$))
-      .subscribe((r) => (this.customFields = r.results))
+      .subscribe((r) => {
+        this.customFields = r.results
+        this.changeDetector.markForCheck()
+      })
 
     this.documentTypeService
       .listAll()
       .pipe(takeUntil(this.destroy$))
-      .subscribe((r) => (this.documentTypes = r.results))
+      .subscribe((r) => {
+        this.documentTypes = r.results
+        this.changeDetector.markForCheck()
+      })
 
     this.correspondentService
       .listAll()
       .pipe(takeUntil(this.destroy$))
       .subscribe((r) => {
         this.correspondentNames = new Map(r.results.map((c) => [c.id, c.name]))
+        this.changeDetector.markForCheck()
       })
 
     const id = this.route.snapshot.paramMap.get('id')
@@ -251,6 +260,7 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
         .subscribe((t) => {
           this.template = t
           this.template.combine_formats ??= {}
+          this.changeDetector.markForCheck()
           if (t.sample_document) {
             this.previewDocId = t.sample_document
             this.loadPreview()
@@ -332,8 +342,12 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
           next: (doc) => {
             this.previewPageCount = doc?.page_count ?? null
             if (doc && !this.previewDocModel) this.previewDocModel = doc
+            this.changeDetector.markForCheck()
           },
-          error: () => (this.previewPageCount = null),
+          error: () => {
+            this.previewPageCount = null
+            this.changeDetector.markForCheck()
+          },
         })
     }
     this.pageImageUrl = this.templateService.getPageImageUrl(
@@ -706,12 +720,14 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
         next: (res) => {
           this.zoneTestResult = res
           this.zoneTesting = false
+          this.changeDetector.markForCheck()
         },
         error: (err) => {
           this.zoneTestResult = {
             error: err.error?.error || $localize`Test failed`,
           }
           this.zoneTesting = false
+          this.changeDetector.markForCheck()
         },
       })
   }
@@ -755,10 +771,12 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
         this.selectedZoneIndex = idx
         this.saving = false
         this.toastService.showInfo($localize`OCR template saved.`)
+        this.changeDetector.markForCheck()
       },
       error: (e) => {
         this.saving = false
         this.toastService.showError($localize`Error saving OCR template.`, e)
+        this.changeDetector.markForCheck()
       },
     })
   }
@@ -944,6 +962,7 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
               }
               this.showQuickCreate = false
               this.quickCreateForZoneIndex = null
+              this.changeDetector.markForCheck()
             })
         },
         error: (err) => {

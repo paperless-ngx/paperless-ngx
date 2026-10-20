@@ -72,7 +72,7 @@ jobs:
     needs: changes
     if: needs.changes.outputs.frontend_changed == 'true'
     name: Install Dependencies
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
     steps:
@@ -81,7 +81,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Install pnpm
-        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
+        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
         with:
           package_json_file: src-ui/package.json
       - name: Use Node.js 24
@@ -104,7 +104,7 @@ jobs:
     name: Lint
     needs: [changes, install-dependencies]
     if: needs.changes.outputs.frontend_changed == 'true'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
     steps:
@@ -113,7 +113,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Install pnpm
-        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
+        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
         with:
           package_json_file: src-ui/package.json
       - name: Use Node.js 24
@@ -137,7 +137,7 @@ jobs:
     name: "Unit Tests (${{ matrix.shard-index }}/${{ matrix.shard-count }})"
     needs: [changes, install-dependencies]
     if: needs.changes.outputs.frontend_changed == 'true'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
     strategy:
@@ -152,7 +152,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Install pnpm
-        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
+        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
         with:
           package_json_file: src-ui/package.json
       - name: Use Node.js 24
@@ -174,13 +174,13 @@ jobs:
         run: cd src-ui && pnpm run test --max-workers=2 --shard=${{ matrix.shard-index }}/${{ matrix.shard-count }}
       - name: Upload test results to Codecov
         if: always()
-        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
         with:
           flags: frontend-node-${{ matrix.node-version }}
           directory: src-ui/
           report_type: test_results
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
         with:
           flags: frontend-node-${{ matrix.node-version }}
           directory: src-ui/coverage/
@@ -188,10 +188,10 @@ jobs:
     name: E2E Tests
     needs: [changes, install-dependencies]
     if: needs.changes.outputs.frontend_changed == 'true'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
-    container: mcr.microsoft.com/playwright:v1.62.1-noble
+    container: mcr.microsoft.com/playwright:v1.62.1-resolute
     env:
       PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
       PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
@@ -201,7 +201,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Install pnpm
-        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
+        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
         with:
           package_json_file: src-ui/package.json
       - name: Use Node.js 24
@@ -216,7 +216,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install uv
-        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
           version: '0.12.x'
           enable-cache: false
@@ -231,9 +231,10 @@ jobs:
       - name: Install dependencies
         run: cd src-ui && pnpm install --frozen-lockfile
       - name: Install backend system dependencies
-        run: |
-          apt-get update
-          apt-get install --yes --quiet --no-install-recommends libmagic1
+        timeout-minutes: 12
+        uses: $/.github/actions/apt-install
+        with:
+          packages: libmagic1
       - name: Install backend dependencies
         env:
           PYTHON_VERSION: ${{ steps.setup-python.outputs.python-version }}
@@ -245,7 +246,7 @@ jobs:
     name: Frontend Build
     needs: [changes, unit-tests, e2e-tests]
     if: needs.changes.outputs.frontend_changed == 'true'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
     steps:
@@ -255,7 +256,7 @@ jobs:
           fetch-depth: 2
           persist-credentials: false
       - name: Install pnpm
-        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
+        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
         with:
           package_json_file: src-ui/package.json
       - name: Use Node.js 24
