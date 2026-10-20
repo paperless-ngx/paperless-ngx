@@ -980,7 +980,7 @@ export class BulkEditorComponent
     modal.componentInstance.confirmClicked
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
-        modal.componentInstance.buttonsEnabled = false
+        modal.componentInstance.buttonsEnabled.set(false)
         this.executeDocumentAction(
           modal,
           forkJoin(ids.map((id) => this.documentService.runZoneOcr(id)))
