@@ -188,7 +188,7 @@ class Migration(migrations.Migration):
                 (
                     "ocr_language",
                     models.CharField(
-                        default="deu+eng",
+                        default="eng",
                         help_text="Tesseract language code(s), e.g. 'deu+eng'",
                         max_length=20,
                         verbose_name="OCR language",

@@ -19,7 +19,7 @@ export enum OcrZoneTransform {
   QrCode = 'qr_code',
 }
 
-export const DEFAULT_OCR_ZONE_LANGUAGE = 'deu+eng'
+export const DEFAULT_OCR_ZONE_LANGUAGE = 'eng'
 
 /** The field a zone writes to, keyed by OcrTemplate.combine_formats. */
 export function getZoneFieldKey(zone: OcrTemplateZone): string | null {

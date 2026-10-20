@@ -2323,7 +2323,7 @@ class OcrTemplateZone(models.Model):
     ocr_language = models.CharField(
         _("OCR language"),
         max_length=20,
-        default="deu+eng",
+        default="eng",
         help_text=_("Tesseract language code(s), e.g. 'deu+eng'"),
     )
 
