@@ -2152,13 +2152,7 @@ class WorkflowRun(SoftDeleteModel):
 
 
 class OcrTemplate(MatchingModel):
-    """
-    Defines a set of OCR extraction zones for documents with a common layout.
-
-    When a consumed document matches the template, each zone is cropped from
-    the document image and OCR'd separately. The extracted text is written to
-    the configured custom field or built-in document field.
-    """
+    """Matching rules and extraction zones for documents with a common layout."""
 
     source_width = models.PositiveIntegerField(
         _("source width"),
@@ -2213,11 +2207,7 @@ class OcrTemplate(MatchingModel):
 
 
 class OcrTemplateZone(models.Model):
-    """
-    A rectangular region within a document page to OCR and extract into a custom
-    field or built-in document field. Coordinates are relative to the source
-    image dimensions stored on the template.
-    """
+    """A page region and the field its extracted value is written to."""
 
     template = models.ForeignKey(
         OcrTemplate,
@@ -2279,11 +2269,7 @@ class OcrTemplateZone(models.Model):
         help_text=_("Zone height (px)"),
     )
 
-    # Per-zone source dimensions for coordinate scaling.
-    # Stored from the page image the zone was drawn on.
-    # If null, falls back to the template's source_width/source_height.
-    # This handles PDFs with mixed page sizes (e.g. landscape + portrait,
-    # or different paper formats across pages).
+    # Mixed-size PDFs need each zone's original page dimensions for scaling.
     zone_source_width = models.PositiveIntegerField(
         _("zone source width"),
         null=True,
@@ -2362,9 +2348,7 @@ class OcrTemplateZone(models.Model):
         return f"{self.template.name} -> {self.name}"
 
 
-# Custom field data types that zone OCR can extract into. DOCUMENTLINK and
-# SELECT are excluded (they reference other objects, not free text). Single
-# source of truth for the serializer and the engine.
+# Document links and select fields require object references, not OCR text.
 OCR_SUPPORTED_FIELD_TYPES = frozenset(
     {
         CustomField.FieldDataType.STRING,

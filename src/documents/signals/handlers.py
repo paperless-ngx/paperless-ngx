@@ -1409,9 +1409,7 @@ def close_connection_pool_on_worker_init(**kwargs) -> None:
 
 
 def run_zone_ocr_extraction(sender, document, original_file=None, **kwargs):
-    """
-    Run zone-based OCR extraction with the OCR templates that match the document.
-    """
+    """Apply matching templates without failing consumption if extraction fails."""
     try:
         from documents.zone_ocr import run_zone_extraction
 
