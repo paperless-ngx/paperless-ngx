@@ -12,7 +12,7 @@
           }
         </div>
         <div class="me-1">
-          <small i18n>All</small>
+          <span i18n>All</span>
         </div>
       </button>
       <button class="list-group-item list-group-item-action d-flex align-items-center p-2 border-top-0 border-start-0 border-end-0 border-bottom" role="menuitem" (click)="setFilter(OwnerFilterType.SELF)" [disabled]="disabled">
@@ -22,7 +22,7 @@
           }
         </div>
         <div class="me-1">
-          <small>{{ownerFilterLabel}}</small>
+          {{ownerFilterLabel}}
         </div>
       </button>
       <button class="list-group-item list-group-item-action d-flex align-items-center p-2 border-top-0 border-start-0 border-end-0 border-bottom" role="menuitem" (click)="setFilter(OwnerFilterType.NOT_SELF)" [disabled]="disabled">
@@ -32,7 +32,7 @@
           }
         </div>
         <div class="me-1">
-          <small>{{ownerExclusionFilterLabel}}</small>
+          {{ownerExclusionFilterLabel}}
         </div>
       </button>
       <button class="list-group-item list-group-item-action d-flex align-items-center p-2 border-top-0 border-start-0 border-end-0 border-bottom" role="menuitem" (click)="setFilter(OwnerFilterType.SHARED_BY_ME)" [disabled]="disabled">
@@ -42,7 +42,7 @@
           }
         </div>
         <div class="me-1">
-          <small>{{sharedByFilterLabel}}</small>
+          {{sharedByFilterLabel}}
         </div>
       </button>
       <button class="list-group-item list-group-item-action d-flex align-items-center p-2 border-top-0 border-start-0 border-end-0 border-bottom" role="menuitem" (click)="setFilter(OwnerFilterType.UNOWNED)" [disabled]="disabled">
@@ -52,7 +52,7 @@
           }
         </div>
         <div class="me-1">
-          <small i18n>Unowned</small>
+          <span i18n>Unowned</span>
         </div>
       </button>
       <button *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.User }" class="list-group-item list-group-item-action d-flex align-items-center p-2 border-top-0 border-start-0 border-end-0 border-bottom" role="menuitem" [disabled]="disabled">
@@ -67,7 +67,7 @@
         <div class="me-1 w-100">
           <ng-select
             name="user"
-            class="user-select small"
+            class="user-select"
             [ngModel]="selectionModel.includeUsers()"
             (ngModelChange)="selectionModel.includeUsers.set($event)"
             [disabled]="disabled"
@@ -87,7 +87,7 @@
         <div class="list-group-item list-group-item-action d-flex align-items-center p-2 ps-3 border-bottom-0 border-start-0 border-end-0">
           <div class="form-check form-switch w-100">
             <input type="checkbox" class="form-check-input" id="hideUnowned" [ngModel]="selectionModel.hideUnowned()" (ngModelChange)="selectionModel.hideUnowned.set($event)" (change)="onChange()" [disabled]="disabled">
-            <label class="form-check-label w-100" for="hideUnowned"><small i18n>Hide unowned</small></label>
+            <label class="form-check-label w-100" for="hideUnowned"><ng-container i18n>Hide unowned</ng-container></label>
           </div>
         </div>
       }

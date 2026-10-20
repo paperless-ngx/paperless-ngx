@@ -6,7 +6,7 @@
   <div ngbDropdownMenu class="dropdown-menu-end shadow p-0 overflow-hidden" aria-labelledby="chatDropdown">
     <div class="d-flex align-items-center border-bottom px-3 py-2">
       <i-bs width="1em" height="1em" name="stars" class="text-primary me-2"></i-bs>
-      <span class="fw-semibold small">
+      <span class="fw-semibold">
         @if (documentId()) {
           <ng-container i18n>Ask about this document</ng-container>
         } @else {
@@ -20,7 +20,7 @@
       }
     </div>
 
-    <div class="chat-messages small px-2">
+    <div class="chat-messages px-2">
       @if (!messages().length) {
         <p class="text-muted text-center py-4 px-3 mb-0" i18n>Answers come from your documents, with links to their sources.</p>
       }
