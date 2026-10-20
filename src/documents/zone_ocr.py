@@ -41,10 +41,14 @@ def get_templates_for_document(document: Document) -> list[OcrTemplate]:
     document.
     """
     owner = get_root_document(document).owner
-    templates = OcrTemplate.objects.filter(
-        enabled=True,
-        id__in=permitted_object_ids(owner, OcrTemplate, "view_ocrtemplate"),
-    ).prefetch_related("zones", "zones__custom_field")
+    templates = (
+        OcrTemplate.objects.filter(
+            enabled=True,
+            id__in=permitted_object_ids(owner, OcrTemplate, "view_ocrtemplate"),
+        )
+        .order_by("name", "pk")
+        .prefetch_related("zones", "zones__custom_field")
+    )
     return [template for template in templates if matches(template, document)]
 
 
