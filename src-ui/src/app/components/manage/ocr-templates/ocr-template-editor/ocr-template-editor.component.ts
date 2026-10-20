@@ -7,10 +7,11 @@ import {
   inject,
   OnDestroy,
   OnInit,
+  signal,
   ViewChild,
 } from '@angular/core'
 import { FormsModule } from '@angular/forms'
-import { ActivatedRoute, Router, RouterModule } from '@angular/router'
+import { ActivatedRoute, RouterModule } from '@angular/router'
 import {
   NgbNavModule,
   NgbPopoverModule,
@@ -29,6 +30,7 @@ import {
   Subject,
   switchMap,
   takeUntil,
+  tap,
 } from 'rxjs'
 import { SelectComponent } from 'src/app/components/common/input/select/select.component'
 import { SwitchComponent } from 'src/app/components/common/input/switch/switch.component'
@@ -70,6 +72,7 @@ import {
   getZonePage,
   HANDLE_SIZE,
   isZoneOnPage,
+  MIN_ZONE_SIZE,
   MoveStart,
   moveZone,
   Point,
@@ -79,17 +82,28 @@ import {
 
 type ActiveTab = 'settings' | 'zones' | 'zone'
 type ZoneFieldSelection = OcrBuiltinTarget | number | null
+type OverlayMode = 'select' | 'draw'
 type OverlayInteraction =
   | { kind: 'idle' }
-  | { kind: 'drawing'; rect: DrawingRect }
-  | { kind: 'moving'; zoneIndex: number; start: MoveStart }
-  | { kind: 'resizing'; zoneIndex: number; handle: ResizeHandle }
+  | { kind: 'drawing'; pointerId: number; rect: DrawingRect }
+  | { kind: 'moving'; pointerId: number; zoneIndex: number; start: MoveStart }
+  | {
+      kind: 'resizing'
+      pointerId: number
+      zoneIndex: number
+      handle: ResizeHandle
+    }
+interface ZoneTest {
+  zone: OcrTemplateZone
+  documentId: number
+  request: ZoneTestRequest
+  result: OcrZoneTestResult | null
+}
 interface ResizeHandleMarker extends Point {
   handle: ResizeHandle
 }
 
 const CUSTOM_DATE_FORMAT_CHOICE = 'custom'
-const MIN_DRAWN_ZONE_SIZE = 10
 const NO_OVERLAY_INTERACTION: OverlayInteraction = { kind: 'idle' }
 const ZONE_COLORS = [
   '#4f8ff7',
@@ -135,7 +149,6 @@ const RESIZE_CURSOR: Record<ResizeHandle, string> = {
 })
 export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute)
-  private readonly router = inject(Router)
   private readonly templateService = inject(OcrTemplateService)
   private readonly customFieldsService = inject(CustomFieldsService)
   private readonly documentTypeService = inject(DocumentTypeService)
@@ -144,10 +157,27 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
   private readonly toastService = inject(ToastService)
   private readonly changeDetector = inject(ChangeDetectorRef)
   private readonly destroy$ = new Subject<void>()
+  private readonly cancelZoneTest$ = new Subject<void>()
   private readonly customDateFormatZones = new WeakSet<OcrTemplateZone>()
 
   @ViewChild('zoneOverlay') overlayRef: ElementRef<SVGSVGElement>
-  @ViewChild('pageImage') imageRef: ElementRef<HTMLImageElement>
+  imageRef: ElementRef<HTMLImageElement>
+  private previewResizeObserver: ResizeObserver | null = null
+  private readonly overlayScale = signal(1)
+
+  @ViewChild('pageImage')
+  set pageImage(ref: ElementRef<HTMLImageElement> | undefined) {
+    this.previewResizeObserver?.disconnect()
+    this.imageRef = ref
+    if (!ref) return
+    this.previewResizeObserver = new ResizeObserver(() => {
+      const image = ref.nativeElement
+      if (image.naturalWidth && image.clientWidth) {
+        this.overlayScale.set(image.naturalWidth / image.clientWidth)
+      }
+    })
+    this.previewResizeObserver.observe(ref.nativeElement)
+  }
 
   template: OcrTemplate = {
     id: null,
@@ -177,7 +207,11 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
   previewPageCount: number | null = null
   private pageCountForDoc: number | null = null
   pageImageUrl: string | null = null
-  imageLoaded = false
+  previewStatus: 'empty' | 'loading' | 'ready' | 'error' = 'empty'
+  previewError = ''
+  readonly searchStatus = signal<
+    'idle' | 'loading' | 'ready' | 'empty' | 'error'
+  >('idle')
   zoom = 1
   previewDocModel: Document | string = ''
   private correspondentNames = new Map<number, string>()
@@ -194,10 +228,22 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
 
   selectedZoneIndex: number | null = null
   private overlayInteraction: OverlayInteraction = NO_OVERLAY_INTERACTION
-  overlayCursor = 'crosshair'
+  overlayMode: OverlayMode = 'select'
+  overlayCursor = 'default'
 
-  zoneTestResult: OcrZoneTestResult | null = null
-  zoneTesting = false
+  private zoneTest: ZoneTest | null = null
+
+  get imageLoaded(): boolean {
+    return this.previewStatus === 'ready'
+  }
+
+  get zoneTestResult(): OcrZoneTestResult | null {
+    return this.isCurrentZoneTest() ? this.zoneTest.result : null
+  }
+
+  get zoneTesting(): boolean {
+    return this.isCurrentZoneTest() && this.zoneTest.result === null
+  }
 
   showQuickCreate = false
   quickCreateName = ''
@@ -282,23 +328,35 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
 
   searchDocuments = (text$: Observable<string>): Observable<Document[]> =>
     text$.pipe(
+      map((term) => term.trim()),
       debounceTime(250),
       distinctUntilChanged(),
       switchMap((term) => {
-        if (!term || term.trim().length < 2) return of([])
-        const params: { title__icontains: string; document_type__id?: number } =
-          { title__icontains: term.trim() }
-        if (this.template.document_type) {
-          params['document_type__id'] = this.template.document_type
+        if (term.length < 2) {
+          this.searchStatus.set('idle')
+          return of([])
         }
-        return this.documentService.list(1, 10, 'created', true, params).pipe(
-          map((r) => r.results),
-          catchError(() => of([]))
-        )
+        this.searchStatus.set('loading')
+        return this.documentService
+          .list(1, 10, 'created', true, {
+            search: term,
+            truncate_content: true,
+          })
+          .pipe(
+            map((r) => r.results),
+            tap((documents) => {
+              this.searchStatus.set(documents.length ? 'ready' : 'empty')
+            }),
+            catchError(() => {
+              this.searchStatus.set('error')
+              return of([])
+            })
+          )
       })
     )
 
-  documentFormatter = (doc: Document | string): string => {
+  documentFormatter = (doc: Document | string | null): string => {
+    if (!doc) return ''
     if (typeof doc === 'string') return doc
     const corr = doc.correspondent
       ? this.correspondentNames.get(doc.correspondent)
@@ -312,6 +370,7 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     event.preventDefault()
     const doc: Document = event.item
     this.previewDocModel = doc
+    this.searchStatus.set('idle')
     this.previewDocId = doc.id
     if (!this.template.document_type && doc.document_type) {
       this.template.document_type = doc.document_type
@@ -321,31 +380,45 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
   }
 
   clearPreviewDoc() {
+    this.stopOverlayInteraction()
+    this.clearZoneTest()
     this.previewDocModel = ''
     this.previewDocId = null
     this.previewPageCount = null
     this.pageCountForDoc = null
     this.previewPage = 0
     this.pageImageUrl = null
-    this.imageLoaded = false
+    this.previewStatus = 'empty'
+    this.previewError = ''
+    this.searchStatus.set('idle')
   }
 
   loadPreview() {
     if (!this.previewDocId) return
-    if (this.pageCountForDoc !== this.previewDocId) {
-      this.pageCountForDoc = this.previewDocId
+    this.stopOverlayInteraction()
+    this.clearZoneTest()
+    this.previewStatus = 'loading'
+    this.previewError = ''
+    const documentId = this.previewDocId
+    if (this.pageCountForDoc !== documentId) {
+      this.pageCountForDoc = documentId
       this.previewPageCount = null
       this.documentService
-        .get(this.previewDocId)
+        .get(documentId)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: (doc) => {
+            if (this.previewDocId !== documentId) return
             this.previewPageCount = doc?.page_count ?? null
             if (doc && !this.previewDocModel) this.previewDocModel = doc
             this.changeDetector.markForCheck()
           },
           error: () => {
+            if (this.previewDocId !== documentId) return
             this.previewPageCount = null
+            this.pageCountForDoc = null
+            this.previewStatus = 'error'
+            this.previewError = $localize`Could not load the selected document.`
             this.changeDetector.markForCheck()
           },
         })
@@ -354,13 +427,12 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
       this.previewDocId,
       this.previewPage
     )
-    this.imageLoaded = false
   }
 
   goToPage(page: number) {
     if (!Number.isFinite(page)) return
     const max = this.previewPageCount ? this.previewPageCount - 1 : page
-    const clamped = Math.max(0, Math.min(page, max))
+    const clamped = Math.max(0, Math.min(Math.trunc(page), max))
     if (clamped === this.previewPage) return
     this.previewPage = clamped
     this.loadPreview()
@@ -395,35 +467,74 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
   }
 
   onImageLoad() {
-    this.imageLoaded = true
+    if (this.previewStatus !== 'loading') return
+    this.previewStatus = 'ready'
     const img = this.imageRef.nativeElement
     this.template.source_width = img.naturalWidth
     this.template.source_height = img.naturalHeight
   }
 
-  onOverlayMouseDown(event: MouseEvent) {
+  onImageError() {
+    this.stopOverlayInteraction()
+    this.previewStatus = 'error'
+    this.previewError = $localize`Could not load this page.`
+  }
+
+  setOverlayMode(mode: OverlayMode) {
+    this.stopOverlayInteraction()
+    this.overlayMode = mode
+    this.overlayCursor = mode === 'draw' ? 'crosshair' : 'default'
+  }
+
+  @HostListener('document:keydown.escape')
+  cancelDrawing() {
+    this.setOverlayMode('select')
+  }
+
+  onOverlayPointerDown(event: PointerEvent) {
+    if (event.button !== 0 || this.overlayInteraction.kind !== 'idle') return
     const point = this.svgPointFromEvent(event)
-    if (!point) return
+    if (!this.imageLoaded || !point) return
     event.preventDefault()
+
+    if (this.overlayMode === 'draw') {
+      this.clearZoneTest()
+      this.overlayInteraction = {
+        kind: 'drawing',
+        pointerId: event.pointerId,
+        rect: {
+          startX: point.x,
+          startY: point.y,
+          endX: point.x,
+          endY: point.y,
+        },
+      }
+      this.selectedZoneIndex = null
+      this.overlayRef.nativeElement.setPointerCapture(event.pointerId)
+      return
+    }
 
     if (this.selectedZoneIndex !== null) {
       const handle = this.findHandleAt(point, this.selectedZoneIndex)
       if (handle) {
         this.overlayInteraction = {
           kind: 'resizing',
+          pointerId: event.pointerId,
           zoneIndex: this.selectedZoneIndex,
           handle,
         }
+        this.overlayRef.nativeElement.setPointerCapture(event.pointerId)
         return
       }
     }
 
     const clickedIdx = this.findZoneAt(point)
-    if (clickedIdx !== null && !event.shiftKey) {
+    if (clickedIdx !== null) {
       this.selectZone(clickedIdx)
       const zone = this.template.zones[clickedIdx]
       this.overlayInteraction = {
         kind: 'moving',
+        pointerId: event.pointerId,
         zoneIndex: clickedIdx,
         start: {
           mouseX: point.x,
@@ -432,23 +543,20 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
           zoneY: zone.y,
         },
       }
+      this.overlayRef.nativeElement.setPointerCapture(event.pointerId)
       return
     }
 
-    // Shift+click or click on empty area starts a new zone.
-    this.overlayInteraction = {
-      kind: 'drawing',
-      rect: {
-        startX: point.x,
-        startY: point.y,
-        endX: point.x,
-        endY: point.y,
-      },
-    }
+    this.clearZoneTest()
     this.selectedZoneIndex = null
   }
 
-  onOverlayMouseMove(event: MouseEvent) {
+  onOverlayPointerMove(event: PointerEvent) {
+    if (
+      this.overlayInteraction.kind !== 'idle' &&
+      this.overlayInteraction.pointerId !== event.pointerId
+    )
+      return
     const point = this.svgPointFromEvent(event)
     if (!point) return
 
@@ -482,6 +590,10 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
   }
 
   private updateOverlayCursor(point: Point) {
+    if (this.overlayMode === 'draw') {
+      this.overlayCursor = 'crosshair'
+      return
+    }
     if (this.selectedZoneIndex !== null) {
       const handle = this.findHandleAt(point, this.selectedZoneIndex)
       if (handle) {
@@ -489,30 +601,26 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
         return
       }
     }
-    this.overlayCursor = this.findZoneAt(point) !== null ? 'move' : 'crosshair'
+    this.overlayCursor = this.findZoneAt(point) !== null ? 'move' : 'default'
   }
 
-  onOverlayMouseUp(_event: MouseEvent) {
-    if (
-      this.overlayInteraction.kind === 'moving' ||
-      this.overlayInteraction.kind === 'resizing'
-    ) {
-      this.stopOverlayInteraction()
-      return
-    }
-
-    if (this.overlayInteraction.kind !== 'drawing') return
-    const drawingRect = this.overlayInteraction.rect
+  onOverlayPointerUp(event: PointerEvent) {
+    if (this.overlayInteraction.kind === 'idle') return
+    if (this.overlayInteraction.pointerId !== event.pointerId) return
+    this.onOverlayPointerMove(event)
+    const interaction = this.overlayInteraction
     this.stopOverlayInteraction()
+    if (interaction.kind !== 'drawing') return
 
-    const rect = this.sourceRectFromDrawing(drawingRect)
+    const rect = this.sourceRectFromDrawing(interaction.rect)
 
     // Ignore tiny accidental clicks.
-    if (rect.w < MIN_DRAWN_ZONE_SIZE || rect.h < MIN_DRAWN_ZONE_SIZE) {
+    if (rect.w < MIN_ZONE_SIZE || rect.h < MIN_ZONE_SIZE) {
       return
     }
 
     this.template.zones.push(this.createZoneFromRect(rect))
+    this.setOverlayMode('select')
     this.selectZone(this.template.zones.length - 1)
   }
 
@@ -541,15 +649,23 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     return this.customFields[0]?.id ?? null
   }
 
-  @HostListener('document:mouseup')
-  onDocumentMouseUp() {
+  onOverlayPointerCancel(event: PointerEvent) {
     if (this.overlayInteraction.kind === 'idle') return
+    if (this.overlayInteraction.pointerId !== event.pointerId) return
     this.stopOverlayInteraction()
   }
 
   private stopOverlayInteraction() {
+    const interaction = this.overlayInteraction
     this.overlayInteraction = NO_OVERLAY_INTERACTION
-    this.overlayCursor = 'crosshair'
+    this.overlayCursor = this.overlayMode === 'draw' ? 'crosshair' : 'default'
+    const overlay = this.overlayRef?.nativeElement
+    if (
+      interaction.kind !== 'idle' &&
+      overlay?.hasPointerCapture(interaction.pointerId)
+    ) {
+      overlay.releasePointerCapture(interaction.pointerId)
+    }
   }
 
   drawingRect(): DisplayRect | null {
@@ -646,9 +762,7 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
   }
 
   overlayUnitSize(screenPixels: number): number {
-    const img = this.imageRef?.nativeElement
-    if (!img?.naturalWidth || !img.clientWidth) return screenPixels
-    return (screenPixels * img.naturalWidth) / img.clientWidth
+    return screenPixels * this.overlayScale()
   }
 
   private svgPointFromEvent(event: MouseEvent): Point | null {
@@ -661,7 +775,11 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     point.y = event.clientY
 
     const svgPoint = point.matrixTransform(matrix.inverse())
-    return { x: svgPoint.x, y: svgPoint.y }
+    const size = this.imageNaturalSize()
+    return {
+      x: Math.max(0, Math.min(svgPoint.x, size.width)),
+      y: Math.max(0, Math.min(svgPoint.y, size.height)),
+    }
   }
 
   private displayRectFromDrawing(rect: DrawingRect): DisplayRect {
@@ -689,6 +807,8 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
   }
 
   removeZone(index: number) {
+    this.stopOverlayInteraction()
+    this.clearZoneTest()
     this.template.zones.splice(index, 1)
     if (this.selectedZoneIndex === index) {
       this.selectedZoneIndex = null
@@ -700,7 +820,7 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
   selectZone(index: number) {
     this.selectedZoneIndex = index
     this.activeTab = 'zone'
-    this.zoneTestResult = null
+    this.clearZoneTest()
     const zone = this.template.zones[index]
     if (zone) {
       this.seedCombineDefault(zone)
@@ -711,25 +831,49 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
   testZone() {
     const zone = this.selectedZone
     if (!zone || !this.previewDocId) return
-    this.zoneTesting = true
-    this.zoneTestResult = null
+    this.clearZoneTest()
+    const test: ZoneTest = {
+      zone,
+      documentId: this.previewDocId,
+      request: this.zoneTestRequest(zone),
+      result: null,
+    }
+    this.zoneTest = test
     this.templateService
-      .testZone(this.previewDocId, this.zoneTestRequest(zone))
-      .pipe(takeUntil(this.destroy$))
+      .testZone(test.documentId, test.request)
+      .pipe(takeUntil(this.destroy$), takeUntil(this.cancelZoneTest$))
       .subscribe({
         next: (res) => {
-          this.zoneTestResult = res
-          this.zoneTesting = false
+          test.result = res
           this.changeDetector.markForCheck()
         },
         error: (err) => {
-          this.zoneTestResult = {
+          test.result = {
             error: err.error?.error || $localize`Test failed`,
           }
-          this.zoneTesting = false
           this.changeDetector.markForCheck()
         },
       })
+  }
+
+  private clearZoneTest() {
+    this.cancelZoneTest$.next()
+    this.zoneTest = null
+  }
+
+  private isCurrentZoneTest(): boolean {
+    const test = this.zoneTest
+    if (
+      !test ||
+      test.zone !== this.selectedZone ||
+      test.documentId !== this.previewDocId
+    ) {
+      return false
+    }
+    const request = this.zoneTestRequest(test.zone)
+    return (Object.keys(request) as (keyof ZoneTestRequest)[]).every(
+      (key) => request[key] === test.request[key]
+    )
   }
 
   private zoneTestRequest(zone: OcrTemplateZone): ZoneTestRequest {
@@ -975,6 +1119,9 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.previewResizeObserver?.disconnect()
+    this.clearZoneTest()
+    this.cancelZoneTest$.complete()
     this.destroy$.next()
     this.destroy$.complete()
   }

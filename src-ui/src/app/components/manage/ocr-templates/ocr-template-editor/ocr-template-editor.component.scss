@@ -4,25 +4,33 @@
 
 .zone-preview-scroll {
   max-height: 78vh;
-  overflow: auto;
 }
 
-.zone-preview-stage {
-  display: inline-block;
-  position: relative;
+.preview-search-status {
+  min-height: 1.5rem;
 }
 
-.zone-preview-image {
-  display: block;
-  width: 100%;
+.preview-page-input {
+  width: 3.5rem;
+}
+
+.preview-zoom {
+  min-width: 4rem;
+}
+
+// The typeahead popup is appended to body.
+::ng-deep .ocr-template-document-results {
+  max-height: min(24rem, 60vh);
 }
 
 .zone-overlay {
-  height: 100%;
-  inset: 0;
-  position: absolute;
+  touch-action: pan-x pan-y;
+}
+
+.zone-overlay-drawing,
+.zone-rect,
+.zone-resize-handle {
   touch-action: none;
-  width: 100%;
 }
 
 .zone-rect,
@@ -40,9 +48,7 @@
 
 .zone-label {
   font-family: var(--bs-font-sans-serif);
-  font-weight: 600;
   paint-order: stroke;
-  pointer-events: none;
   stroke: #fff;
   stroke-linejoin: round;
   stroke-width: 4px;
