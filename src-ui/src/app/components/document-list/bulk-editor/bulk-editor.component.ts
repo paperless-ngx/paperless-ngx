@@ -64,6 +64,7 @@ import { MergeAsVersionsConfirmDialogComponent } from '../../common/confirm-dial
 import { MergeConfirmDialogComponent } from '../../common/confirm-dialog/merge-confirm-dialog/merge-confirm-dialog.component'
 import { ReprocessConfirmDialogComponent } from '../../common/confirm-dialog/reprocess-confirm-dialog/reprocess-confirm-dialog.component'
 import { RotateConfirmDialogComponent } from '../../common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
+import { ZoneOcrConfirmDialogComponent } from '../../common/confirm-dialog/zone-ocr-confirm-dialog/zone-ocr-confirm-dialog.component'
 import { CorrespondentEditDialogComponent } from '../../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
 import { CustomFieldEditDialogComponent } from '../../common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
 import { DocumentTypeEditDialogComponent } from '../../common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
@@ -967,20 +968,25 @@ export class BulkEditorComponent
   }
 
   runZoneOcrSelected() {
-    const modal = this.modalService.open(ConfirmDialogComponent, {
+    const modal = this.modalService.open(ZoneOcrConfirmDialogComponent, {
       backdrop: 'static',
     })
-    modal.componentInstance.title = $localize`Run zone OCR confirm`
-    modal.componentInstance.messageBold = $localize`This operation will run zone OCR on ${this.getSelectionSize()} selected document(s).`
-    modal.componentInstance.message = $localize`Fields mapped by each document type's OCR template will be overwritten.`
-    modal.componentInstance.btnClass = 'btn-warning'
-    modal.componentInstance.btnCaption = $localize`Proceed`
-    modal.componentInstance.confirmClicked
+    const dialog = modal.componentInstance as ZoneOcrConfirmDialogComponent
+    dialog.title = $localize`Run zone OCR confirm`
+    dialog.messageBold = $localize`This operation will run zone OCR on ${this.getSelectionSize()} selected document(s).`
+    dialog.message = $localize`Fields filled by the template will be overwritten.`
+    dialog.btnClass = 'btn-warning'
+    dialog.btnCaption = $localize`Proceed`
+    dialog.confirmClicked
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
+        dialog.buttonsEnabled.set(false)
         this.executeDocumentAction(
           modal,
-          this.documentService.runZoneOcrDocuments(this.getSelectionQuery())
+          this.documentService.runZoneOcrDocuments(
+            this.getSelectionQuery(),
+            dialog.template
+          )
         )
       })
   }

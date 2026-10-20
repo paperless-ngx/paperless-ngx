@@ -1310,6 +1310,21 @@ describe('BulkEditorComponent', () => {
     expect(req.request.body).toEqual({
       documents: [3, 4],
     })
+
+    component.runZoneOcrSelected()
+    modal.componentInstance.template = 3
+    modal.componentInstance.confirm()
+    req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/run_zone_ocr/`
+    )
+    req.flush(true)
+    expect(req.request.body).toEqual({
+      documents: [3, 4],
+      template: 3,
+    })
+    httpTestingController.match(
+      `${environment.apiBaseUrl}ocr_templates/?page=1&page_size=100000`
+    ) // template list
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
     ) // list reload
