@@ -455,6 +455,27 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
         # Past the permission check; the factory document has no file on disk.
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+    @patch("documents.zone_ocr.extract_zone_preview")
+    def test_test_zone_requires_view_permission_on_the_document(self, preview):
+        owner = User.objects.create_user(username="owner")
+        user = User.objects.create_user(username="template_editor")
+        user.user_permissions.add(Permission.objects.get(codename="add_ocrtemplate"))
+        document = DocumentFactory(owner=owner)
+        self.client.force_authenticate(user=user)
+        data = {
+            "document": document.pk,
+            "zone": {"x": 0, "y": 0, "width": 100, "height": 100, "page": 1},
+        }
+
+        response = self.client.post(f"{self.ENDPOINT}test-zone/", data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+        grant_object(user, document, "view_document")
+        response = self.client.post(f"{self.ENDPOINT}test-zone/", data, format="json")
+        # Past the permission check; the factory document has no file on disk.
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        preview.assert_not_called()
+
     @patch("documents.zone_ocr.run_zone_extraction")
     def test_run_zone_ocr_requires_change_permission_on_the_document(
         self,

@@ -5937,12 +5937,17 @@ class OcrTemplateViewSet(ModelViewSet):
         zone_data = request.data.get("zone") or {}
 
         try:
-            document = Document.objects.get(pk=request.data.get("document"))
+            document = Document.objects.select_related(
+                "root_document__owner",
+            ).get(pk=request.data.get("document"))
         except (Document.DoesNotExist, ValueError, TypeError):
             return Response(
                 {"error": "Document not found"},
                 status=status.HTTP_404_NOT_FOUND,
             )
+
+        if not has_perms_owner_aware(request.user, "view_document", document):
+            return HttpResponseForbidden("Insufficient permissions")
 
         doc_path = document.archive_path or document.source_path
         if not doc_path or not Path(doc_path).is_file():
