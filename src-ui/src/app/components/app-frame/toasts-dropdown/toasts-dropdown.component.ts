@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core'
+import { Component, computed, inject } from '@angular/core'
 import { toSignal } from '@angular/core/rxjs-interop'
 import {
   NgbDropdownModule,
@@ -6,7 +6,7 @@ import {
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { map } from 'rxjs'
-import { Toast, ToastService } from 'src/app/services/toast.service'
+import { Toast, ToastLevel, ToastService } from 'src/app/services/toast.service'
 import { ToastComponent } from '../../common/toast/toast.component'
 
 @Component({
@@ -28,7 +28,14 @@ export class ToastsDropdownComponent {
     { initialValue: [] as Toast[] }
   )
 
+  readonly unread = computed(() => this.toasts().filter((t) => !t.read))
+
+  readonly hasUnreadError = computed(() =>
+    this.unread().some((t) => t.level === ToastLevel.Error)
+  )
+
   onOpenChange(open: boolean): void {
     this.toastService.suppressPopupToasts = open
+    if (open) this.toastService.markAllRead()
   }
 }

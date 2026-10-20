@@ -178,4 +178,21 @@ describe('ToastService', () => {
     expect(toasts.map((t) => t.content)).toEqual(['Recorded'])
     expect(popups).toHaveLength(0)
   })
+
+  it('timestamps toasts and tracks read state', () => {
+    let toasts: Toast[] = []
+    toastService.getToasts().subscribe((t) => (toasts = [...t]))
+
+    toastService.showError('Failed')
+    expect(toasts[0].timestamp).toBeInstanceOf(Date)
+    expect(toasts[0].read).toBe(false)
+
+    toastService.markAllRead()
+    expect(toasts[0].read).toBe(true)
+
+    // arriving while the dropdown is open counts as seen
+    toastService.suppressPopupToasts = true
+    toastService.showError('Failed again')
+    expect(toasts[0].read).toBe(true)
+  })
 })

@@ -1,3 +1,6 @@
+import { DatePipe } from '@angular/common'
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 
 import { Clipboard } from '@angular/cdk/clipboard'
@@ -31,6 +34,11 @@ describe('ToastComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [ToastComponent, NgxBootstrapIconsModule.pick(allIcons)],
+      providers: [
+        DatePipe,
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+      ],
     }).compileComponents()
 
     fixture = TestBed.createComponent(ToastComponent)
@@ -194,5 +202,32 @@ describe('ToastComponent', () => {
     expect(
       component.getErrorText({ error: new Array(205).join('a') })
     ).toContain('...')
+  })
+
+  it('should emit actioned, not closed, when the action is clicked', () => {
+    const action = jest.fn()
+    component.toast = {
+      content: 'Moved',
+      delay: 5000,
+      action,
+      actionName: 'Undo',
+    }
+    fixture.detectChanges()
+    const closedSpy = jest.spyOn(component.closed, 'emit')
+    const actionedSpy = jest.spyOn(component.actioned, 'emit')
+    const button: HTMLButtonElement = [
+      ...fixture.nativeElement.querySelectorAll('button'),
+    ].find((b) => b.textContent.includes('Undo'))
+    button.click()
+    expect(actionedSpy).toHaveBeenCalled()
+    expect(closedSpy).not.toHaveBeenCalled()
+    expect(action).toHaveBeenCalled()
+  })
+
+  it('should show a relative timestamp in the notifications list', () => {
+    component.toast = { content: 'Saved', delay: 5000, timestamp: new Date() }
+    component.autohide = false
+    fixture.detectChanges()
+    expect(fixture.nativeElement.textContent).toContain('Just now')
   })
 })

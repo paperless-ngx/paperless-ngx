@@ -1,6 +1,7 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
+import { By } from '@angular/platform-browser'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { Subject } from 'rxjs'
 import { Toast, ToastService } from 'src/app/services/toast.service'
@@ -95,5 +96,23 @@ describe('ToastsComponent', () => {
     toastSubject.next({ id: 'b', content: 'B', delay: 5000 })
     fixture.detectChanges()
     expect(fixture.nativeElement.querySelectorAll('pngx-toast')).toHaveLength(2)
+  })
+
+  it('should only hide the popup on close, but clear it on action', () => {
+    const closeToastSpy = jest.spyOn(toastService, 'closeToast')
+    const first = { id: 'a', content: 'A', delay: 5000 }
+    const second = { id: 'b', content: 'B', delay: 5000 }
+    toastSubject.next(first)
+    toastSubject.next(second)
+    fixture.detectChanges()
+    const popups = fixture.debugElement.queryAll(By.css('pngx-toast'))
+
+    popups[1].triggerEventHandler('closed', first)
+    expect(closeToastSpy).not.toHaveBeenCalled()
+    expect(component.toasts()).toEqual([second])
+
+    popups[0].triggerEventHandler('actioned', second)
+    expect(closeToastSpy).toHaveBeenCalledWith(second)
+    expect(component.toasts()).toEqual([])
   })
 })

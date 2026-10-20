@@ -35,6 +35,12 @@ export interface Toast {
    * the same information is already on screen. Defaults to false.
    */
   silent?: boolean
+
+  /** When the toast was shown, set automatically */
+  timestamp?: Date
+
+  /** Whether the toast has been seen in the notifications dropdown */
+  read?: boolean
 }
 
 @Injectable({
@@ -59,6 +65,7 @@ export class ToastService {
     if (!toast.id) {
       toast.id = uuidv4()
     }
+    toast.timestamp ??= new Date()
     if (typeof toast.error === 'string') {
       try {
         toast.error = JSON.parse(toast.error)
@@ -66,6 +73,8 @@ export class ToastService {
     }
     const persistent = toast.persistent !== false
     if (persistent) {
+      // the dropdown is open, so it's seen as it arrives
+      toast.read = !!this._suppressPopupToasts
       this.toasts.unshift(toast)
       this.toastsSubject.next(this.toasts)
     }
@@ -96,6 +105,11 @@ export class ToastService {
       level: ToastLevel.Success,
       persistent: false,
     })
+  }
+
+  markAllRead() {
+    this.toasts.forEach((toast) => (toast.read = true))
+    this.toastsSubject.next(this.toasts)
   }
 
   closeToast(toast: Toast) {

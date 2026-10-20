@@ -19,11 +19,13 @@ import {
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Subscription, interval, takeWhile } from 'rxjs'
+import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { Toast, ToastLevel } from 'src/app/services/toast.service'
 
 @Component({
   selector: 'pngx-toast',
   imports: [
+    CustomDatePipe,
     DecimalPipe,
     NgbToastModule,
     NgbProgressbarModule,
@@ -52,6 +54,9 @@ export class ToastComponent implements OnInit {
   @Output() hidden: EventEmitter<Toast> = new EventEmitter<Toast>()
 
   @Output() closed: EventEmitter<Toast> = new EventEmitter<Toast>()
+
+  /** The toast's action button was clicked */
+  @Output() actioned: EventEmitter<Toast> = new EventEmitter<Toast>()
 
   ngOnInit(): void {
     if (this.autohide) this.delayRemaining.set(this.toast.delay)
