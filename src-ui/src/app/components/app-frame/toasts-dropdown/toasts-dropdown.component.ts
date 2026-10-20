@@ -1,6 +1,14 @@
-import { Component, DestroyRef, computed, inject, signal } from '@angular/core'
+import {
+  Component,
+  DestroyRef,
+  ViewChild,
+  computed,
+  inject,
+  signal,
+} from '@angular/core'
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop'
 import {
+  NgbDropdown,
   NgbDropdownModule,
   NgbProgressbarModule,
 } from '@ng-bootstrap/ng-bootstrap'
@@ -24,6 +32,8 @@ export class ToastsDropdownComponent {
   toastService = inject(ToastService)
   private destroyRef = inject(DestroyRef)
   private clock: Subscription
+
+  @ViewChild(NgbDropdown) dropdown: NgbDropdown
 
   /** Drives the relative timestamps, ticks only while the dropdown is open */
   readonly now = signal(new Date())
@@ -53,5 +63,11 @@ export class ToastsDropdownComponent {
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe(() => this.now.set(new Date()))
     }
+  }
+
+  /** Using an action (Undo, Open document...) clears it and closes the menu */
+  onActioned(toast: Toast): void {
+    this.toastService.closeToast(toast)
+    this.dropdown?.close()
   }
 }

@@ -150,4 +150,13 @@ describe('ToastsDropdownComponent', () => {
     component.onOpenChange(false)
     expect(component.newIds().size).toEqual(0)
   })
+
+  it('should clear the toast and close the menu when an action is used', () => {
+    const toast = { id: 'a', content: 'Moved', delay: 5000 }
+    const closeToastSpy = jest.spyOn(toastService, 'closeToast')
+    const closeSpy = jest.spyOn(component.dropdown, 'close')
+    component.onActioned(toast)
+    expect(closeToastSpy).toHaveBeenCalledWith(toast)
+    expect(closeSpy).toHaveBeenCalled()
+  })
 })

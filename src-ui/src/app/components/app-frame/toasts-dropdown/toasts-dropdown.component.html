@@ -24,7 +24,7 @@
     }
     <div class="scroll-list d-flex flex-column gap-2">
       @for (toast of toasts(); track toast.id) {
-        <pngx-toast [autohide]="false" [toast]="toast" [now]="now()" [isNew]="newIds().has(toast.id)" (closed)="toastService.closeToast(toast)" (actioned)="toastService.closeToast(toast)"></pngx-toast>
+        <pngx-toast [autohide]="false" [toast]="toast" [now]="now()" [isNew]="newIds().has(toast.id)" (closed)="toastService.closeToast(toast)" (actioned)="onActioned(toast)"></pngx-toast>
       }
     </div>
   </div>
