@@ -25,6 +25,22 @@
     color: var(--pngx-toast-accent);
 }
 
+.toast-content {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.toast .btn-close {
+    font-size: .6rem;
+    margin-top: .3rem;
+    margin-left: .75rem !important;
+    opacity: .45;
+}
+
+.toast:hover .btn-close {
+    opacity: .85;
+}
+
 // compact rows in the notifications dropdown
 .toast.toast-list-item {
     width: 100%;
@@ -45,24 +61,8 @@
         padding: .625rem .75rem;
     }
 
-    .toast-content {
-        flex: 1 1 auto;
-        min-width: 0;
-    }
-
     .toast-time {
         margin-top: .1rem;
-    }
-
-    .btn-close {
-        font-size: .6rem;
-        margin-top: .3rem;
-        margin-left: .75rem !important;
-        opacity: .4;
-    }
-
-    &:hover .btn-close {
-        opacity: .8;
     }
 
     // marks notifications that arrived since the dropdown was last opened

@@ -58,10 +58,7 @@
                 </div>
             </details>
             }
-            @if (autohide && toast.action) {
-            <p class="mb-0 mt-2"><button class="btn btn-sm btn-outline-secondary" (click)="actioned.emit(toast); toast.action()">{{toast.actionName}}</button></p>
-            }
-            @if (!autohide && toast.action) {
+            @if (toast.action) {
             <button class="btn btn-sm toast-action ms-2 mt-2" (click)="actioned.emit(toast); toast.action()">{{toast.actionName}}</button>
             }
         </div>
