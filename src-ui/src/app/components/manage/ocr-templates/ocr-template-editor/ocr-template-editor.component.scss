@@ -20,12 +20,6 @@
 }
 
 .zone-overlay {
-  touch-action: pan-x pan-y;
-}
-
-.zone-overlay-drawing,
-.zone-rect,
-.zone-resize-handle {
   touch-action: none;
 }
 

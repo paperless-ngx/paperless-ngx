@@ -171,18 +171,30 @@ describe('OcrTemplateEditorComponent', () => {
     expect(fixture.nativeElement.textContent).toBe('empty')
   })
 
-  it('does not create zones by dragging empty space in Select mode', () => {
+  it('clears the selection on a click in empty space without adding a zone', () => {
     prepareOverlay()
-    component.onOverlayPointerDown(pointer(100, 100))
-    component.onOverlayPointerMove(pointer(300, 200))
-    component.onOverlayPointerUp(pointer(300, 200))
+    component.template.zones = [zone()]
+    component.selectZone(0)
+    component.onOverlayPointerDown(pointer(600, 600))
+    component.onOverlayPointerUp(pointer(602, 601))
 
-    expect(component.template.zones).toEqual([])
+    expect(component.template.zones.length).toBe(1)
+    expect(component.selectedZoneIndex).toBeNull()
   })
 
-  it('draws within the page bounds, uses the release position and returns to Select', () => {
+  it('moves a zone when dragging on it instead of drawing', () => {
     prepareOverlay()
-    component.setOverlayMode('draw')
+    component.template.zones = [zone()]
+    component.onOverlayPointerDown(pointer(150, 150))
+    component.onOverlayPointerUp(pointer(250, 200))
+
+    expect(component.template.zones.length).toBe(1)
+    expect(component.template.zones[0]).toMatchObject({ x: 200, y: 150 })
+    expect(component.selectedZoneIndex).toBe(0)
+  })
+
+  it('draws in empty space within the page bounds, using the release position', () => {
+    prepareOverlay()
     component.onOverlayPointerDown(pointer(100, 100))
     component.onOverlayPointerUp(pointer(1200, 250))
 
@@ -193,12 +205,10 @@ describe('OcrTemplateEditorComponent', () => {
       height: 150,
     })
     expect(component.selectedZoneIndex).toBe(0)
-    expect(component.overlayMode).toBe('select')
   })
 
   it('discards a drawing on Escape and ignores other pointers', () => {
     prepareOverlay()
-    component.setOverlayMode('draw')
     component.onOverlayPointerDown(pointer(100, 100))
     component.onOverlayPointerUp(pointer(300, 200, 2))
     expect(component.drawingRect()).not.toBeNull()
@@ -206,7 +216,6 @@ describe('OcrTemplateEditorComponent', () => {
     component.cancelDrawing()
     component.onOverlayPointerUp(pointer(300, 200))
     expect(component.template.zones).toEqual([])
-    expect(component.overlayMode).toBe('select')
   })
 
   it('opens the zone in the Zones tab and returns to the list', () => {

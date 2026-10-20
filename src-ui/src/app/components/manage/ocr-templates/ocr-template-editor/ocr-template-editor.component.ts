@@ -88,7 +88,6 @@ import {
 
 type ActiveTab = 'settings' | 'zones'
 type ZoneFieldSelection = OcrBuiltinTarget | number | null
-type OverlayMode = 'select' | 'draw'
 type OverlayInteraction =
   | { kind: 'idle' }
   | { kind: 'drawing'; pointerId: number; rect: DrawingRect }
@@ -248,8 +247,7 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
 
   selectedZoneIndex: number | null = null
   private overlayInteraction: OverlayInteraction = NO_OVERLAY_INTERACTION
-  overlayMode: OverlayMode = 'select'
-  overlayCursor = 'default'
+  overlayCursor = 'crosshair'
 
   private readonly zoneTest = signal<ZoneTest | null>(null)
 
@@ -484,15 +482,9 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     this.previewError = $localize`Could not load this page.`
   }
 
-  setOverlayMode(mode: OverlayMode) {
-    this.stopOverlayInteraction()
-    this.overlayMode = mode
-    this.overlayCursor = mode === 'draw' ? 'crosshair' : 'default'
-  }
-
   @HostListener('document:keydown.escape')
   cancelDrawing() {
-    this.setOverlayMode('select')
+    this.stopOverlayInteraction()
   }
 
   onOverlayPointerDown(event: PointerEvent) {
@@ -500,23 +492,6 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     const point = this.svgPointFromEvent(event)
     if (!this.imageLoaded || !point) return
     event.preventDefault()
-
-    if (this.overlayMode === 'draw') {
-      this.clearZoneTest()
-      this.overlayInteraction = {
-        kind: 'drawing',
-        pointerId: event.pointerId,
-        rect: {
-          startX: point.x,
-          startY: point.y,
-          endX: point.x,
-          endY: point.y,
-        },
-      }
-      this.selectedZoneIndex = null
-      this.overlayRef.nativeElement.setPointerCapture(event.pointerId)
-      return
-    }
 
     if (this.selectedZoneIndex !== null) {
       const handle = this.findHandleAt(point, this.selectedZoneIndex)
@@ -551,8 +526,21 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
       return
     }
 
+    // Empty space: start drawing a new zone. A click without a drag just clears
+    // the selection (see onOverlayPointerUp).
     this.clearZoneTest()
     this.selectedZoneIndex = null
+    this.overlayInteraction = {
+      kind: 'drawing',
+      pointerId: event.pointerId,
+      rect: {
+        startX: point.x,
+        startY: point.y,
+        endX: point.x,
+        endY: point.y,
+      },
+    }
+    this.overlayRef.nativeElement.setPointerCapture(event.pointerId)
   }
 
   onOverlayPointerMove(event: PointerEvent) {
@@ -594,10 +582,6 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
   }
 
   private updateOverlayCursor(point: Point) {
-    if (this.overlayMode === 'draw') {
-      this.overlayCursor = 'crosshair'
-      return
-    }
     if (this.selectedZoneIndex !== null) {
       const handle = this.findHandleAt(point, this.selectedZoneIndex)
       if (handle) {
@@ -605,7 +589,7 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
         return
       }
     }
-    this.overlayCursor = this.findZoneAt(point) !== null ? 'move' : 'default'
+    this.overlayCursor = this.findZoneAt(point) !== null ? 'move' : 'crosshair'
   }
 
   onOverlayPointerUp(event: PointerEvent) {
@@ -624,7 +608,6 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     }
 
     this.template.zones.push(this.createZoneFromRect(rect))
-    this.setOverlayMode('select')
     this.selectZone(this.template.zones.length - 1)
   }
 
@@ -662,7 +645,7 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
   private stopOverlayInteraction() {
     const interaction = this.overlayInteraction
     this.overlayInteraction = NO_OVERLAY_INTERACTION
-    this.overlayCursor = this.overlayMode === 'draw' ? 'crosshair' : 'default'
+    this.overlayCursor = 'crosshair'
     const overlay = this.overlayRef?.nativeElement
     if (
       interaction.kind !== 'idle' &&

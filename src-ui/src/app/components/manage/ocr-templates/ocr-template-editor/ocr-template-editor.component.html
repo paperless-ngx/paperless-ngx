@@ -176,53 +176,43 @@
     </div>
 
     <div class="col-lg-8">
-      <div class="d-flex flex-wrap align-items-center gap-2 mb-2" role="toolbar" aria-label="Document preview" i18n-aria-label>
-        <div class="flex-grow-1">
-          <label class="visually-hidden" for="preview-document" i18n>Sample document</label>
-          <div class="input-group input-group-sm">
-            <span class="input-group-text">
-              @if (searchStatus() === 'loading') {
-                <span class="spinner-border spinner-border-sm" role="status"><span class="visually-hidden" i18n>Searching...</span></span>
-              } @else {
-                <i-bs name="file-text"></i-bs>
-              }
-            </span>
-            <input
-              id="preview-document"
-              type="text"
-              class="form-control"
-              [(ngModel)]="previewDocModel"
-              [ngbTypeahead]="searchDocuments"
-              #documentSearch="ngbTypeahead"
-              [inputFormatter]="documentFormatter"
-              [resultFormatter]="documentFormatter"
-              [resultTemplate]="documentResult"
-              (input)="searchStatus.set('idle')"
-              (selectItem)="onPreviewDocSelected($event)"
-              [editable]="false"
-              container="body"
-              popupClass="ocr-template-document-results col-11 col-md-6 overflow-y-auto"
-              placeholder="Search for a sample document..."
-              i18n-placeholder
-            />
-            @if (previewDocId) {
-              <button type="button" class="btn btn-outline-secondary" (click)="clearPreviewDoc(); documentSearch.dismissPopup()" title="Clear sample document" i18n-title aria-label="Clear sample document" i18n-aria-label>
-                <i-bs name="x"></i-bs>
-              </button>
+      <div class="mb-2">
+        <label class="visually-hidden" for="preview-document" i18n>Sample document</label>
+        <div class="input-group input-group-sm">
+          <span class="input-group-text">
+            @if (searchStatus() === 'loading') {
+              <span class="spinner-border spinner-border-sm" role="status"><span class="visually-hidden" i18n>Searching...</span></span>
+            } @else {
+              <i-bs name="file-text"></i-bs>
             }
-          </div>
-          <ng-template #documentResult let-document="result">
-            <span class="d-block text-wrap text-break">{{ documentFormatter(document) }}</span>
-          </ng-template>
+          </span>
+          <input
+            id="preview-document"
+            type="text"
+            class="form-control"
+            [(ngModel)]="previewDocModel"
+            [ngbTypeahead]="searchDocuments"
+            #documentSearch="ngbTypeahead"
+            [inputFormatter]="documentFormatter"
+            [resultFormatter]="documentFormatter"
+            [resultTemplate]="documentResult"
+            (input)="searchStatus.set('idle')"
+            (selectItem)="onPreviewDocSelected($event)"
+            [editable]="false"
+            container="body"
+            popupClass="ocr-template-document-results col-11 col-md-6 overflow-y-auto"
+            placeholder="Search for a sample document..."
+            i18n-placeholder
+          />
+          @if (previewDocId) {
+            <button type="button" class="btn btn-outline-secondary" (click)="clearPreviewDoc(); documentSearch.dismissPopup()" title="Clear sample document" i18n-title aria-label="Clear sample document" i18n-aria-label>
+              <i-bs name="x"></i-bs>
+            </button>
+          }
         </div>
-        <div class="btn-group btn-group-sm text-nowrap" role="group" aria-label="Editing mode" i18n-aria-label>
-          <button type="button" class="btn btn-outline-primary" [class.active]="overlayMode === 'select'" [attr.aria-pressed]="overlayMode === 'select'" [disabled]="!imageLoaded" (click)="setOverlayMode('select')" title="Select and move zones" i18n-title>
-            <i-bs name="cursor" class="me-1"></i-bs><span i18n>Select</span>
-          </button>
-          <button type="button" class="btn btn-outline-primary" [class.active]="overlayMode === 'draw'" [attr.aria-pressed]="overlayMode === 'draw'" [disabled]="!imageLoaded" (click)="setOverlayMode('draw')" title="Draw a zone" i18n-title>
-            <i-bs name="pencil" class="me-1"></i-bs><span i18n>Draw</span>
-          </button>
-        </div>
+        <ng-template #documentResult let-document="result">
+          <span class="d-block text-wrap text-break">{{ documentFormatter(document) }}</span>
+        </ng-template>
       </div>
       @if (searchStatus() === 'empty' || searchStatus() === 'error') {
         <div class="small mb-2" role="status" [class.text-danger]="searchStatus() === 'error'" [class.text-muted]="searchStatus() === 'empty'">
@@ -258,7 +248,6 @@
                 <svg
                   #zoneOverlay
                   class="zone-overlay position-absolute top-0 start-0 w-100 h-100"
-                  [class.zone-overlay-drawing]="overlayMode === 'draw'"
                   [attr.viewBox]="overlayViewBox()"
                   preserveAspectRatio="none"
                   [style.cursor]="overlayCursor"
@@ -289,7 +278,7 @@
                           [attr.fill]="zoneColor(i)"
                         >{{ zoneLabel(zone, i) }}</text>
 
-                        @if (selectedZoneIndex === i && overlayMode === 'select') {
+                        @if (selectedZoneIndex === i) {
                           @for (handle of resizeHandles(rect); track handle.handle) {
                             <rect
                               class="zone-resize-handle"
