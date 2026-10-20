@@ -616,7 +616,7 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     return {
       name: `Zone ${this.template.zones.length + 1}`,
       target: DEFAULT_OCR_ZONE_TARGET,
-      custom_field: this.defaultCustomFieldId(),
+      custom_field: null,
       x: rect.x,
       y: rect.y,
       width: rect.w,
@@ -630,10 +630,6 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
       zone_source_width: imageSize.width,
       zone_source_height: imageSize.height,
     }
-  }
-
-  private defaultCustomFieldId(): number | null {
-    return this.customFields[0]?.id ?? null
   }
 
   onOverlayPointerCancel(event: PointerEvent) {

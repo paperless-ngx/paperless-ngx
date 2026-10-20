@@ -203,6 +203,7 @@ describe('OcrTemplateEditorComponent', () => {
       y: 100,
       width: 900,
       height: 150,
+      custom_field: null,
     })
     expect(component.selectedZoneIndex).toBe(0)
   })
