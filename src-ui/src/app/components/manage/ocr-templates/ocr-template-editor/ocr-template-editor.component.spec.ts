@@ -10,6 +10,12 @@ import { PermissionsFormComponent } from 'src/app/components/common/input/permis
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import { Document } from 'src/app/data/document'
 import {
+  MATCH_ANY,
+  MATCH_AUTO,
+  MATCH_LITERAL,
+  MATCH_NONE,
+} from 'src/app/data/matching-model'
+import {
   OcrTemplate,
   OcrTemplateZone,
   OcrZoneTarget,
@@ -20,7 +26,6 @@ import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { User } from 'src/app/data/user'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
-import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { OcrTemplateService } from 'src/app/services/rest/ocr-template.service'
 import { UserService } from 'src/app/services/rest/user.service'
@@ -81,16 +86,13 @@ describe('OcrTemplateEditorComponent', () => {
       .spyOn(TestBed.inject(CustomFieldsService), 'listAll')
       .mockReturnValue(of({ count: 2, all: [1, 2], results: customFields }))
     jest
-      .spyOn(TestBed.inject(DocumentTypeService), 'listAll')
-      .mockReturnValue(of({ count: 0, all: [], results: [] }))
-    jest
       .spyOn(TestBed.inject(UserService), 'listAll')
       .mockReturnValue(of({ count: 0, all: [], results: [] }))
     TestBed.inject(PermissionsService).initialize([], { id: 1 } as User)
     documentService = TestBed.inject(DocumentService)
     jest
       .spyOn(documentService, 'get')
-      .mockReturnValue(of({ id: 5, page_count: 3, document_type: 2 }))
+      .mockReturnValue(of({ id: 5, page_count: 3 }))
     templateService = TestBed.inject(OcrTemplateService)
     modalService = TestBed.inject(NgbModal)
     activeModal.close.mockReset()
@@ -132,7 +134,8 @@ describe('OcrTemplateEditorComponent', () => {
       ...component.template,
       id: 3,
       name: 'Invoices',
-      document_type: 1,
+      match: 'Northwind',
+      matching_algorithm: MATCH_LITERAL,
       sample_document: 5,
       zones: [zone()],
       combine_formats: { '1': '{Invoice number}' },
@@ -144,7 +147,7 @@ describe('OcrTemplateEditorComponent', () => {
     expect(component.previewDocId).toEqual(5)
     expect(component.previewPageCount()).toEqual(3)
     expect(component.pageImageUrl).toContain('document-page-image/5/0/')
-    expect(component.template.document_type).toEqual(1)
+    expect(component.template.match).toEqual('Northwind')
     expect(component.isDirty).toBeFalsy()
 
     component.template.zones[0].x = 500
@@ -153,9 +156,15 @@ describe('OcrTemplateEditorComponent', () => {
     expect(original.combine_formats['1']).toEqual('{Invoice number}')
   })
 
-  it('should fill the document type from a new sample document', () => {
-    component.setSampleDocument([5])
-    expect(component.template.document_type).toEqual(2)
+  it('should offer every matching algorithm except automatic', () => {
+    expect(component.matchingAlgorithms.map((a) => a.id)).not.toContain(
+      MATCH_AUTO
+    )
+    expect(component.template.matching_algorithm).toEqual(MATCH_ANY)
+    expect(component.patternRequired).toBeTruthy()
+
+    component.template.matching_algorithm = MATCH_NONE
+    expect(component.patternRequired).toBeFalsy()
   })
 
   it('should initialize new template permissions from saved defaults', () => {

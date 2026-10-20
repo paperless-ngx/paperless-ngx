@@ -14,7 +14,7 @@
   <li class="list-group-item">
     <div class="row">
       <div class="col" i18n>Name</div>
-      <div class="col d-none d-sm-flex" i18n>Document Type</div>
+      <div class="col d-none d-sm-flex" i18n>Matching</div>
       <div class="col d-none d-sm-flex" i18n>Zones</div>
       <div class="col" i18n>Status</div>
       <div class="col" i18n>Actions</div>
@@ -32,7 +32,7 @@
     <li class="list-group-item">
       <div class="row fade" [class.show]="show()">
         <div class="col d-flex align-items-center"><button class="btn btn-link p-0 text-start" type="button" (click)="editTemplate(template)" [disabled]="!userCanEdit(template)">{{template.name}}</button></div>
-        <div class="col d-flex align-items-center d-none d-sm-flex">{{getDocumentTypeName(template)}}</div>
+        <div class="col d-flex align-items-center d-none d-sm-flex">{{getMatching(template)}}</div>
         <div class="col d-flex align-items-center d-none d-sm-flex"><code>{{template.zones.length}}</code></div>
         <div class="col d-flex align-items-center">
           <div class="form-check form-switch mb-0">

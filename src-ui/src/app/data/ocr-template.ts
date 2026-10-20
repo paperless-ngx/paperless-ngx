@@ -1,4 +1,5 @@
 import { CustomFieldDataType } from './custom-field'
+import { MatchingModel } from './matching-model'
 import { ObjectWithPermissions } from './object-with-permissions'
 
 export enum OcrZoneTarget {
@@ -64,9 +65,8 @@ export interface OcrTemplateZone {
   zone_source_height?: number
 }
 
-export interface OcrTemplate extends ObjectWithPermissions {
+export interface OcrTemplate extends MatchingModel, ObjectWithPermissions {
   name: string
-  document_type: number
   sample_document: number | null
   source_width: number
   source_height: number
@@ -109,6 +109,6 @@ export interface OcrZoneRunResult {
 
 export interface OcrZoneRunResponse {
   status: 'completed' | 'skipped'
-  reason?: 'no_document_type' | 'no_template'
+  reason?: 'no_template'
   results: OcrZoneRunResult[]
 }

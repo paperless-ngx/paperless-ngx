@@ -24,6 +24,7 @@ import { Subject, takeUntil } from 'rxjs'
 import { CustomFieldEditDialogComponent } from 'src/app/components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
 import { EditDialogMode } from 'src/app/components/common/edit-dialog/edit-dialog.component'
 import { DocumentLinkComponent } from 'src/app/components/common/input/document-link/document-link.component'
+import { CheckComponent } from 'src/app/components/common/input/check/check.component'
 import { NumberComponent } from 'src/app/components/common/input/number/number.component'
 import {
   PermissionsFormComponent,
@@ -33,7 +34,12 @@ import { SelectComponent } from 'src/app/components/common/input/select/select.c
 import { SwitchComponent } from 'src/app/components/common/input/switch/switch.component'
 import { TextComponent } from 'src/app/components/common/input/text/text.component'
 import { CustomField } from 'src/app/data/custom-field'
-import { DocumentType } from 'src/app/data/document-type'
+import {
+  MATCH_ANY,
+  MATCH_AUTO,
+  MATCH_NONE,
+  MATCHING_ALGORITHMS,
+} from 'src/app/data/matching-model'
 import {
   DEFAULT_OCR_ZONE_LANGUAGE,
   getZoneFieldKey,
@@ -51,7 +57,6 @@ import { User } from 'src/app/data/user'
 import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
 import { PermissionsService } from 'src/app/services/permissions.service'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
-import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { OcrTemplateService } from 'src/app/services/rest/ocr-template.service'
 import { UserService } from 'src/app/services/rest/user.service'
@@ -120,6 +125,10 @@ export const ZONE_LANGUAGE_OPTIONS = [
   { id: 'nld', name: $localize`Dutch` },
 ]
 
+const TEMPLATE_MATCHING_ALGORITHMS = MATCHING_ALGORITHMS.filter(
+  (algorithm) => algorithm.id !== MATCH_AUTO
+)
+
 const NO_OVERLAY_INTERACTION: OverlayInteraction = { kind: 'idle' }
 const RESIZE_CURSOR: Record<ResizeHandle, string> = {
   nw: 'nw-resize',
@@ -138,6 +147,7 @@ const RESIZE_CURSOR: Record<ResizeHandle, string> = {
     DocumentLinkComponent,
     NumberComponent,
     TextComponent,
+    CheckComponent,
     SelectComponent,
     SwitchComponent,
     CommonModule,
@@ -155,7 +165,6 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
   public readonly activeModal = inject(NgbActiveModal)
   private readonly templateService = inject(OcrTemplateService)
   private readonly customFieldsService = inject(CustomFieldsService)
-  private readonly documentTypeService = inject(DocumentTypeService)
   private readonly documentService = inject(DocumentService)
   private readonly toastService = inject(ToastService)
   private readonly modalService = inject(NgbModal)
@@ -191,7 +200,9 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
   template: OcrTemplate = {
     id: null,
     name: '',
-    document_type: null,
+    match: '',
+    matching_algorithm: MATCH_ANY,
+    is_insensitive: true,
     sample_document: null,
     source_width: 0,
     source_height: 0,
@@ -209,7 +220,6 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
       .filter((field) => OCR_SUPPORTED_FIELD_TYPES.includes(field.data_type))
       .map((field) => ({ id: field.id, name: field.name })),
   ])
-  public readonly documentTypes = signal<DocumentType[]>([])
   public readonly users = signal<User[]>([])
   permissionsForm: PermissionsFormObject = {}
   public readonly OcrZoneTransform = OcrZoneTransform
@@ -242,6 +252,17 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
 
   get languageOptions() {
     return ZONE_LANGUAGE_OPTIONS
+  }
+
+  get matchingAlgorithms() {
+    return TEMPLATE_MATCHING_ALGORITHMS
+  }
+
+  get patternRequired(): boolean {
+    return (
+      this.template.matching_algorithm !== MATCH_AUTO &&
+      this.template.matching_algorithm !== MATCH_NONE
+    )
   }
 
   public get previewPageDisplay(): number {
@@ -310,13 +331,6 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
         this.customFields.set(r.results)
       })
 
-    this.documentTypeService
-      .listAll()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((r) => {
-        this.documentTypes.set(r.results)
-      })
-
     if (this.object) {
       this.template = {
         ...this.object,
@@ -380,7 +394,6 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
         next: (doc) => {
           if (this.previewDocId !== id) return
           this.previewPageCount.set(doc.page_count ?? null)
-          this.template.document_type ??= doc.document_type
         },
         error: () => {
           if (this.previewDocId === id) this.pageFailed.set(true)

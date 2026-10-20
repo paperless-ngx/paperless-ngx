@@ -5,11 +5,11 @@ import { By } from '@angular/platform-browser'
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of, throwError } from 'rxjs'
+import { MATCH_LITERAL, MATCH_NONE } from 'src/app/data/matching-model'
 import { OcrTemplate } from 'src/app/data/ocr-template'
 import { User } from 'src/app/data/user'
 import { DirtyFormGuard } from 'src/app/guards/dirty-form.guard'
 import { PermissionsService } from 'src/app/services/permissions.service'
-import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { OcrTemplateService } from 'src/app/services/rest/ocr-template.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { ToastService } from 'src/app/services/toast.service'
@@ -21,7 +21,8 @@ const templates: OcrTemplate[] = [
   {
     id: 1,
     name: 'Invoices',
-    document_type: 2,
+    match: 'Northwind',
+    matching_algorithm: MATCH_LITERAL,
     sample_document: null,
     source_width: 0,
     source_height: 0,
@@ -64,11 +65,6 @@ describe('OcrTemplatesComponent', () => {
     jest
       .spyOn(ocrTemplateService, 'listAll')
       .mockReturnValue(of({ count: 1, all: [1], results: templates }))
-    jest
-      .spyOn(TestBed.inject(DocumentTypeService), 'listAll')
-      .mockReturnValue(
-        of({ count: 1, all: [2], results: [{ id: 2, name: 'Invoice' }] })
-      )
     modalService = TestBed.inject(NgbModal)
     modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
     toastService = TestBed.inject(ToastService)
@@ -79,10 +75,15 @@ describe('OcrTemplatesComponent', () => {
 
   afterEach(() => modalService.dismissAll())
 
-  it('should show templates with their document type', () => {
+  it('should show templates with their matching', () => {
     const text = fixture.nativeElement.textContent
     expect(text).toContain('Invoices')
-    expect(text).toContain('Invoice')
+    expect(text).toContain('Exact match: Northwind')
+
+    expect(
+      component.getMatching({ ...templates[0], matching_algorithm: MATCH_NONE })
+    ).toEqual('None')
+    expect(component.getMatching({ ...templates[0], match: '' })).toEqual('-')
   })
 
   it.each([

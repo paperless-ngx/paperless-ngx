@@ -22,7 +22,11 @@
               </div>
             </div>
 
-            <pngx-input-select [(ngModel)]="template.document_type" [items]="documentTypes()" bindLabel="name" bindValue="id" title="Document type" i18n-title></pngx-input-select>
+            <pngx-input-select [(ngModel)]="template.matching_algorithm" [items]="matchingAlgorithms" title="Matching algorithm" i18n-title></pngx-input-select>
+            @if (patternRequired) {
+              <pngx-input-text [(ngModel)]="template.match" title="Matching pattern" i18n-title></pngx-input-text>
+              <pngx-input-check [(ngModel)]="template.is_insensitive" title="Case insensitive" i18n-title></pngx-input-check>
+            }
 
             <div *pngxIfOwner="object">
               <hr />

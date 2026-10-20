@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms'
 import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { firstValueFrom, takeUntil, tap } from 'rxjs'
-import { DocumentType } from 'src/app/data/document-type'
+import { MATCH_NONE, MATCHING_ALGORITHMS } from 'src/app/data/matching-model'
 import { OcrTemplate } from 'src/app/data/ocr-template'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { DirtyFormGuard } from 'src/app/guards/dirty-form.guard'
@@ -12,7 +12,6 @@ import {
   PermissionType,
   PermissionsService,
 } from 'src/app/services/permissions.service'
-import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { OcrTemplateService } from 'src/app/services/rest/ocr-template.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
@@ -36,20 +35,14 @@ export class OcrTemplatesComponent
   implements OnInit
 {
   private readonly ocrTemplateService = inject(OcrTemplateService)
-  private readonly documentTypeService = inject(DocumentTypeService)
   public readonly permissionsService = inject(PermissionsService)
   private readonly modalService = inject(NgbModal)
   private readonly dirtyFormGuard = inject(DirtyFormGuard)
   private readonly toastService = inject(ToastService)
 
   public readonly templates = signal<OcrTemplate[]>([])
-  private readonly documentTypes = signal<DocumentType[]>([])
 
   ngOnInit() {
-    this.documentTypeService
-      .listAll()
-      .pipe(takeUntil(this.unsubscribeNotifier))
-      .subscribe((r) => this.documentTypes.set(r.results))
     this.reload()
   }
 
@@ -67,11 +60,17 @@ export class OcrTemplatesComponent
       })
   }
 
-  getDocumentTypeName(template: OcrTemplate): string {
-    return (
-      this.documentTypes().find((dt) => dt.id === template.document_type)
-        ?.name ?? ''
+  getMatching(template: OcrTemplate): string {
+    if (template.matching_algorithm === MATCH_NONE) {
+      return $localize`None`
+    }
+    if (!template.match) {
+      return '-'
+    }
+    const algorithm = MATCHING_ALGORITHMS.find(
+      (a) => a.id === template.matching_algorithm
     )
+    return `${algorithm?.shortName}: ${template.match}`
   }
 
   editTemplate(template?: OcrTemplate) {
