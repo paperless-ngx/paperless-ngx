@@ -3781,15 +3781,21 @@ class OcrTemplateZoneSerializer(serializers.ModelSerializer):
         return value
 
 
-class OcrTemplateSerializer(OwnedObjectSerializer):
+class OcrTemplateSerializer(MatchingModelSerializer, OwnedObjectSerializer):
     zones = OcrTemplateZoneSerializer(many=True, required=False)
+
+    # Templates are never assigned to documents
+    slug = None
+    document_count = None
 
     class Meta:
         model = OcrTemplate
         fields = [
             "id",
             "name",
-            "document_type",
+            "match",
+            "matching_algorithm",
+            "is_insensitive",
             "source_width",
             "source_height",
             "sample_document",
@@ -3804,6 +3810,13 @@ class OcrTemplateSerializer(OwnedObjectSerializer):
             "set_permissions",
         ]
         read_only_fields = ["created", "updated"]
+
+    def validate_matching_algorithm(self, value):
+        if value == MatchingModel.MATCH_AUTO:
+            raise serializers.ValidationError(
+                "Automatic matching is not supported for OCR templates.",
+            )
+        return value
 
     def validate_source_width(self, value):
         if value < 1:
