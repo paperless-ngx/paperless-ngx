@@ -1,5 +1,6 @@
 import { NgClass, NgTemplateOutlet } from '@angular/common'
 import { Component, effect, inject, signal } from '@angular/core'
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { RouterModule } from '@angular/router'
 import {
   NgbAlertModule,
@@ -15,6 +16,7 @@ import {
   PermissionType,
 } from 'src/app/services/permissions.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { UploadDocumentsService } from 'src/app/services/upload-documents.service'
 import {
   FileStatus,
   FileStatusPhase,
@@ -40,6 +42,7 @@ export class UploadStatusTrayComponent extends ComponentWithPermissions {
   private websocketStatusService = inject(WebsocketStatusService)
   private settingsService = inject(SettingsService)
   private permissionsService = inject(PermissionsService)
+  private uploadDocumentsService = inject(UploadDocumentsService)
 
   readonly collapsed = signal(false)
 
@@ -49,6 +52,10 @@ export class UploadStatusTrayComponent extends ComponentWithPermissions {
     effect(() => {
       if (this.getStatus().length === 0) this.collapsed.set(false)
     })
+    this.uploadDocumentsService
+      .onUploadsStarted()
+      .pipe(takeUntilDestroyed())
+      .subscribe(() => this.collapsed.set(false))
   }
 
   get canAddDocuments(): boolean {

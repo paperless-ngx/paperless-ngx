@@ -1,12 +1,12 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { By } from '@angular/platform-browser'
 import { RouterTestingModule } from '@angular/router/testing'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { routes } from 'src/app/app-routing.module'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { PermissionsService } from 'src/app/services/permissions.service'
+import { UploadDocumentsService } from 'src/app/services/upload-documents.service'
 import {
   FileStatus,
   FileStatusPhase,
@@ -102,6 +102,19 @@ describe('UploadStatusTrayComponent', () => {
     expect(component.collapsed()).toBe(true)
     websocketStatusService.dismiss(status)
     fixture.detectChanges()
+    expect(component.collapsed()).toBe(false)
+  })
+
+  it('should expand when new uploads start', () => {
+    const uploadDocumentsService = TestBed.inject(UploadDocumentsService)
+    jest
+      .spyOn(uploadDocumentsService, 'uploadFile')
+      .mockImplementation(() => {})
+    websocketStatusService.newFileUpload('invoice.pdf')
+    fixture.detectChanges()
+    component.toggleCollapsed()
+    expect(component.collapsed()).toBe(true)
+    uploadDocumentsService.uploadFiles([new File(['one'], 'one.pdf')])
     expect(component.collapsed()).toBe(false)
   })
 
