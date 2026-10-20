@@ -16,6 +16,12 @@ export class UploadDocumentsService {
 
   private uploadSubscriptions: Array<Subscription> = []
 
+  public uploadFiles(files: Iterable<File>) {
+    for (const file of files) {
+      this.uploadFile(file)
+    }
+  }
+
   public uploadFile(file: File) {
     let formData = new FormData()
     formData.append('document', file, file.name)
