@@ -14,6 +14,7 @@ import re
 import string
 import subprocess
 import tempfile
+from dataclasses import dataclass
 from datetime import date
 from datetime import datetime
 from pathlib import Path
@@ -32,6 +33,12 @@ from documents.regex import safe_regex_fullmatch
 from documents.versioning import get_root_document
 
 logger = logging.getLogger("paperless.zone_ocr")
+
+
+@dataclass(frozen=True)
+class ZoneExtraction:
+    raw_text: str | None = None
+    value: str | None = None
 
 
 def get_templates_for_document(document: Document) -> list[OcrTemplate]:
@@ -171,13 +178,14 @@ def _process_template(
             src_w = zone.zone_source_width or template.source_width
             src_h = zone.zone_source_height or template.source_height
 
-            extracted = _extract_zone(
+            result = _extract_zone(
                 page_images[page_idx],
                 zone,
                 src_w,
                 src_h,
                 tmp_path,
             )
+            extracted = result.value
 
             if (
                 extracted is not None
@@ -323,12 +331,13 @@ def _crop_zone(
     zone: OcrTemplateZone,
     source_width: int,
     source_height: int,
-    tmp_dir: Path,
 ) -> Image.Image | None:
     """Crop a zone from the page image and return the PIL Image."""
     try:
         with Image.open(page_img) as img:
             img_width, img_height = img.size
+            if not source_width or not source_height:
+                source_width, source_height = img.size
 
             scale_x = img_width / source_width
             scale_y = img_height / source_height
@@ -348,7 +357,7 @@ def _crop_zone(
                 logger.warning("Zone OCR: crop too small for zone '%s'", zone.name)
                 return None
 
-            return img.crop((crop_left, crop_top, crop_right, crop_bottom)).copy()
+            return img.crop((crop_left, crop_top, crop_right, crop_bottom))
     except Exception:
         logger.exception("Zone OCR: crop failed for zone '%s'", zone.name)
         return None
@@ -421,31 +430,25 @@ def _extract_zone(
     source_width: int,
     source_height: int,
     tmp_dir: Path,
-) -> str | None:
-    """Crop a zone from the page image and extract text via OCR or barcode reader."""
-    cropped = _crop_zone(page_img, zone, source_width, source_height, tmp_dir)
+) -> ZoneExtraction:
+    """Read and transform a zone, retaining the text for the editor's preview."""
+    cropped = _crop_zone(page_img, zone, source_width, source_height)
     if cropped is None:
-        return None
+        return ZoneExtraction()
 
-    # QR/barcode zones skip Tesseract entirely
-    if zone.transform == "qr_code":
-        text = _read_barcode(cropped, zone.name)
-        if not text:
-            return None
-        return _apply_transform(
-            text,
-            zone.transform,
-            getattr(zone, "date_format", "") or "",
+    try:
+        raw_text = (
+            _read_barcode(cropped, zone.name)
+            if zone.transform == OcrTemplateZone.TransformType.QR_CODE
+            else _ocr_text(cropped, zone, tmp_dir)
         )
-
-    text = _ocr_text(cropped, zone, tmp_dir)
-    if not text:
-        return None
-
-    return _apply_transform(
-        text,
-        zone.transform,
-        getattr(zone, "date_format", "") or "",
+    finally:
+        cropped.close()
+    return ZoneExtraction(
+        raw_text=raw_text,
+        value=_apply_transform(raw_text, zone.transform, zone.date_format)
+        if raw_text
+        else None,
     )
 
 
@@ -456,15 +459,7 @@ def extract_zone_preview(
     source_height: int,
     page_count: int | None,
 ) -> dict:
-    """Non-destructive single-zone extraction for the editor's per-zone test.
-
-    Renders the zone's page, crops it, runs OCR (or the barcode reader) and
-    applies the transform — WITHOUT writing any custom field. Returns the raw
-    OCR text and the transformed value so the user can see what the zone yields
-    (and tune the validation regex) before saving.
-    """
-    # zone.page is 1-indexed (1 = first, -1 = last); resolve to a 0-indexed
-    # image index exactly like the production extraction path does.
+    """Extract a zone without writing its value to the document."""
     page_idx = _resolve_page_idx(zone.page, page_count)
     with tempfile.TemporaryDirectory(dir=settings.SCRATCH_DIR) as tmp_dir:
         tmp_path = Path(tmp_dir)
@@ -472,35 +467,14 @@ def extract_zone_preview(
         if page_idx not in page_images:
             return {"raw_text": None, "value": None}
 
-        if not source_width or not source_height:
-            with Image.open(page_images[page_idx]) as im:
-                source_width, source_height = im.size
-
-        cropped = _crop_zone(
+        result = _extract_zone(
             page_images[page_idx],
             zone,
             source_width,
             source_height,
             tmp_path,
         )
-        if cropped is None:
-            return {"raw_text": None, "value": None}
-
-        if zone.transform == "qr_code":
-            raw_text = _read_barcode(cropped, zone.name)
-        else:
-            raw_text = _ocr_text(cropped, zone, tmp_path)
-
-        value = (
-            _apply_transform(
-                raw_text,
-                zone.transform,
-                getattr(zone, "date_format", "") or "",
-            )
-            if raw_text
-            else None
-        )
-        return {"raw_text": raw_text, "value": value}
+        return {"raw_text": result.raw_text, "value": result.value}
 
 
 def _parse_date(text: str, fmt: str) -> str:

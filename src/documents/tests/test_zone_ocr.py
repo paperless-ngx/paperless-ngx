@@ -7,7 +7,9 @@ from unittest.mock import patch
 
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
+from django.test import SimpleTestCase
 from django.test import TestCase
+from PIL import Image
 
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
@@ -17,13 +19,182 @@ from documents.models import OcrTemplate
 from documents.models import OcrTemplateZone
 from documents.zone_ocr import _apply_transform
 from documents.zone_ocr import _convert_value
+from documents.zone_ocr import _crop_zone
 from documents.zone_ocr import _detect_mime
+from documents.zone_ocr import _extract_zone
+from documents.zone_ocr import _process_template
 from documents.zone_ocr import _resolve_doc_path
+from documents.zone_ocr import extract_zone_preview
 from documents.zone_ocr import get_templates_for_document
 from documents.zone_ocr import run_zone_extraction
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import DocumentFactory
 from paperless_testing.permissions import grant_object
+
+
+class TestZoneExtraction(SimpleTestCase):
+    def setUp(self):
+        directory = tempfile.TemporaryDirectory()
+        self.addCleanup(directory.cleanup)
+        self.tmp_path = Path(directory.name)
+        self.page = self.tmp_path / "page.png"
+        with Image.new("RGB", (200, 100), "white") as image:
+            image.paste("black", (20, 10, 60, 30))
+            image.save(self.page)
+        self.zone = OcrTemplateZone(
+            name="Account",
+            x=10,
+            y=5,
+            width=20,
+            height=10,
+            transform="uppercase",
+            ocr_language="eng",
+        )
+        settings = self.settings(SCRATCH_DIR=self.tmp_path)
+        settings.enable()
+        self.addCleanup(settings.disable)
+
+    def test_crop_scales_coordinates(self):
+        with _crop_zone(self.page, self.zone, 100, 50) as cropped:
+            self.assertEqual(cropped.size, (40, 20))
+            self.assertEqual(cropped.getextrema(), ((0, 0), (0, 0), (0, 0)))
+
+    def test_crop_defaults_to_image_dimensions(self):
+        with _crop_zone(self.page, self.zone, 0, 0) as cropped:
+            self.assertEqual(cropped.size, (20, 10))
+            self.assertEqual(cropped.getpixel((0, 0)), (255, 255, 255))
+            self.assertEqual(cropped.getpixel((19, 9)), (0, 0, 0))
+
+    def test_crop_clamps_to_image(self):
+        self.zone.x, self.zone.y = 90, 40
+        with _crop_zone(self.page, self.zone, 100, 50) as cropped:
+            self.assertEqual(cropped.size, (20, 20))
+
+    @patch("documents.zone_ocr.subprocess.run")
+    def test_tiny_crop_skips_reader(self, run):
+        self.zone.width = 0
+        result = _extract_zone(self.page, self.zone, 100, 50, self.tmp_path)
+        self.assertIsNone(result.raw_text)
+        self.assertIsNone(result.value)
+        run.assert_not_called()
+
+    @patch("documents.zone_ocr.subprocess.run")
+    def test_unreadable_image_skips_reader(self, run):
+        self.page.write_bytes(b"not an image")
+        result = _extract_zone(self.page, self.zone, 100, 50, self.tmp_path)
+        self.assertIsNone(result.raw_text)
+        self.assertIsNone(result.value)
+        run.assert_not_called()
+
+    @patch("documents.zone_ocr.subprocess.run")
+    def test_text_extraction_retains_raw_text_and_transforms(self, run):
+        def read_crop(args, **kwargs):
+            with Image.open(args[1]) as crop:
+                self.assertEqual(crop.size, (40, 20))
+                self.assertEqual(crop.getpixel((0, 0)), (0, 0, 0))
+            return MagicMock(stdout="  account abc\n")
+
+        run.side_effect = read_crop
+        result = _extract_zone(self.page, self.zone, 100, 50, self.tmp_path)
+        self.assertEqual(result.raw_text, "account abc")
+        self.assertEqual(result.value, "ACCOUNT ABC")
+        self.assertEqual(run.call_args.args[0][-4:], ["-l", "eng", "--psm", "6"])
+        self.assertEqual(run.call_args.kwargs["timeout"], 30)
+
+    @patch("documents.zone_ocr.subprocess.run")
+    def test_no_text_returns_no_value(self, run):
+        run.return_value.stdout = " \n"
+        result = _extract_zone(self.page, self.zone, 100, 50, self.tmp_path)
+        self.assertIsNone(result.raw_text)
+        self.assertIsNone(result.value)
+
+    @patch("documents.zone_ocr.subprocess.run")
+    def test_date_transform_uses_zone_format(self, run):
+        self.zone.transform = "date"
+        self.zone.date_format = "%d/%m/%Y"
+        run.return_value.stdout = "25/12/2025"
+        result = _extract_zone(self.page, self.zone, 100, 50, self.tmp_path)
+        self.assertEqual(result.raw_text, "25/12/2025")
+        self.assertEqual(result.value, "2025-12-25")
+
+    @patch("documents.zone_ocr.subprocess.run")
+    @patch("zxingcpp.read_barcodes")
+    def test_barcode_extraction_bypasses_tesseract(self, read_barcodes, run):
+        self.zone.transform = "qr_code"
+
+        def read_crop(image):
+            self.assertEqual(image.size, (40, 20))
+            self.assertEqual(image.getpixel((0, 0)), (0, 0, 0))
+            return [MagicMock(text="  https://example.com  ")]
+
+        read_barcodes.side_effect = read_crop
+        result = _extract_zone(self.page, self.zone, 100, 50, self.tmp_path)
+        self.assertEqual(result.raw_text, "  https://example.com  ")
+        self.assertEqual(result.value, "https://example.com")
+        run.assert_not_called()
+        with self.assertRaises(ValueError):
+            read_barcodes.call_args.args[0].getpixel((0, 0))
+
+    @patch("zxingcpp.read_barcodes", return_value=[])
+    def test_missing_barcode_returns_no_value(self, read_barcodes):
+        self.zone.transform = "qr_code"
+        result = _extract_zone(self.page, self.zone, 100, 50, self.tmp_path)
+        self.assertIsNone(result.raw_text)
+        self.assertIsNone(result.value)
+
+    @patch("documents.zone_ocr.subprocess.run")
+    def test_preview_uses_image_dimensions_without_writing(self, run):
+        run.return_value.stdout = "account abc"
+        self.assertEqual(
+            extract_zone_preview(self.page, self.zone, 0, 0, 1),
+            {"raw_text": "account abc", "value": "ACCOUNT ABC"},
+        )
+
+    @patch("documents.zone_ocr.subprocess.run")
+    def test_preview_unavailable_page_skips_reader(self, run):
+        self.zone.page = 2
+        self.assertEqual(
+            extract_zone_preview(self.page, self.zone, 100, 50, 1),
+            {"raw_text": None, "value": None},
+        )
+        run.assert_not_called()
+
+
+class TestSavedZoneExtraction(DirectoriesMixin, TestCase):
+    @patch("documents.zone_ocr.subprocess.run")
+    def test_saved_extraction_matches_preview_and_rejects_invalid_value(self, run):
+        page = Path(self.dirs.scratch_dir) / "page.png"
+        with Image.new("RGB", (200, 100), "white") as image:
+            image.save(page)
+        document = DocumentFactory(title="Original")
+        template = OcrTemplate.objects.create(
+            name="Account",
+            source_width=100,
+            source_height=50,
+        )
+        zone = OcrTemplateZone.objects.create(
+            template=template,
+            name="Title",
+            target="title",
+            x=0,
+            y=0,
+            width=20,
+            height=10,
+            transform="uppercase",
+            validation_regex="ACCOUNT [A-Z]+",
+        )
+        for raw_text, expected_title in [
+            ("account abc", "ACCOUNT ABC"),
+            ("invalid", "ACCOUNT ABC"),
+        ]:
+            with self.subTest(raw_text=raw_text):
+                run.return_value.stdout = raw_text
+                preview = extract_zone_preview(page, zone, 100, 50, 1)
+                self.assertEqual(preview["raw_text"], raw_text)
+                self.assertEqual(preview["value"], raw_text.upper())
+                _process_template(document, page, template, [zone])
+                document.refresh_from_db()
+                self.assertEqual(document.title, expected_title)
 
 
 class TestTemplateVisibility(DirectoriesMixin, TestCase):
