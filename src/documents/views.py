@@ -2302,7 +2302,12 @@ class DocumentViewSet(
             },
         ),
     )
-    @action(methods=["post"], detail=True, url_path="run-zone-ocr")
+    @action(
+        methods=["post"],
+        detail=True,
+        url_path="run-zone-ocr",
+        permission_classes=[IsAuthenticated],
+    )
     def run_zone_ocr(self, request, pk=None):
         """
         Run zone-based OCR extraction on this document, with the given template
