@@ -2048,7 +2048,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
-          <context context-type="linenumber">167,168</context>
+          <context context-type="linenumber">174,175</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.html</context>
@@ -4099,6 +4099,10 @@
           <context context-type="linenumber">2</context>
         </context-group>
         <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
+          <context context-type="linenumber">38</context>
+        </context-group>
+        <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/processed-mail-dialog/processed-mail-dialog.component.html</context>
           <context context-type="linenumber">85,86</context>
         </context-group>
@@ -4414,22 +4418,15 @@
           <context context-type="linenumber">96</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="9138811584797805840" datatype="html">
-        <source>Open date picker</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
-          <context context-type="linenumber">42</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/common/input/date/date.component.html</context>
-          <context context-type="linenumber">16</context>
-        </context-group>
-      </trans-unit>
       <trans-unit id="6048892649018070225" datatype="html">
         <source>Today</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
-          <context context-type="linenumber">47,48</context>
+          <context context-type="linenumber">37</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
+          <context context-type="linenumber">53,54</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/dates-dropdown/dates-dropdown.component.html</context>
@@ -4456,11 +4453,22 @@
           <context context-type="linenumber">21,22</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="9138811584797805840" datatype="html">
+        <source>Open date picker</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
+          <context context-type="linenumber">48</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/input/date/date.component.html</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="7819314041543176992" datatype="html">
         <source>Close</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
-          <context context-type="linenumber">48,49</context>
+          <context context-type="linenumber">54,55</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/dates-dropdown/dates-dropdown.component.html</context>
@@ -4499,55 +4507,55 @@
         <source>True</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
-          <context context-type="linenumber">55,56</context>
+          <context context-type="linenumber">62,63</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
-          <context context-type="linenumber">107,108</context>
+          <context context-type="linenumber">114,115</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
-          <context context-type="linenumber">113,114</context>
+          <context context-type="linenumber">120,121</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3800326155195149498" datatype="html">
         <source>False</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
-          <context context-type="linenumber">56,57</context>
+          <context context-type="linenumber">63,64</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
-          <context context-type="linenumber">108,109</context>
+          <context context-type="linenumber">115,116</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
-          <context context-type="linenumber">114,115</context>
+          <context context-type="linenumber">121,122</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7551700625201096185" datatype="html">
         <source>Search docs...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
-          <context context-type="linenumber">73</context>
+          <context context-type="linenumber">80</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
-          <context context-type="linenumber">130</context>
+          <context context-type="linenumber">137</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2328549728463836983" datatype="html">
         <source>Remove query</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
-          <context context-type="linenumber">154</context>
+          <context context-type="linenumber">161</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3184700926171002527" datatype="html">
         <source>Any</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
-          <context context-type="linenumber">165,166</context>
+          <context context-type="linenumber">172,173</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/filterable-dropdown/filterable-dropdown.component.html</context>
@@ -4558,28 +4566,28 @@
         <source>Not</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
-          <context context-type="linenumber">170,171</context>
+          <context context-type="linenumber">177,178</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6548676277933116532" datatype="html">
         <source>Add query</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
-          <context context-type="linenumber">189</context>
+          <context context-type="linenumber">196</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5599577087865387184" datatype="html">
         <source>Add expression</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
-          <context context-type="linenumber">192</context>
+          <context context-type="linenumber">199</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7394978038852129121" datatype="html">
         <source>Remove expression</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
-          <context context-type="linenumber">196</context>
+          <context context-type="linenumber">203</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6630533861307510614" datatype="html">
