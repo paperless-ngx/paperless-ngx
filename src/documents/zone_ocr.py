@@ -20,6 +20,8 @@ from datetime import datetime
 from pathlib import Path
 
 from django.conf import settings
+from django.core.exceptions import ValidationError
+from django.db import transaction
 from PIL import Image
 
 from documents.matching import matches
@@ -39,6 +41,13 @@ logger = logging.getLogger("paperless.zone_ocr")
 class ZoneExtraction:
     raw_text: str | None = None
     value: str | None = None
+
+
+@dataclass(frozen=True)
+class FieldUpdate:
+    field_name: str
+    value: object
+    custom_field: CustomField | None = None
 
 
 def get_templates_for_document(document: Document) -> list[OcrTemplate]:
@@ -140,14 +149,7 @@ def _process_template(
     template: OcrTemplate,
     zones: list[OcrTemplateZone],
 ) -> None:
-    """Process all zones in a template against a document.
-
-    Each zone is OCR'd independently, then zones are grouped by their target
-    field and each field is written exactly once. When several zones share a
-    field, their values are combined via the template's per-field format string
-    (or joined in order if none is set) — this avoids the zones overwriting each
-    other's value.
-    """
+    """Extract and combine zone values before applying a template's updates."""
     pages_needed: set[int] = {
         _resolve_page_idx(zone.page, document.page_count) for zone in zones
     }
@@ -162,30 +164,19 @@ def _process_template(
             document.page_count,
         )
 
-        # Pass 1: OCR every zone into a value (or None if it failed/was rejected).
-        zone_values: dict[int, str | None] = {}
+        grouped: dict[str, list[tuple[OcrTemplateZone, str | None]]] = {}
         for zone in zones:
             page_idx = _resolve_page_idx(zone.page, document.page_count)
-
-            if page_idx not in page_images:
-                logger.warning(
-                    "Zone OCR: page %d not available for zone '%s'",
-                    page_idx,
-                    zone.name,
+            extracted = None
+            if page_idx in page_images:
+                result = _extract_zone(
+                    page_images[page_idx],
+                    zone,
+                    zone.zone_source_width or template.source_width,
+                    zone.zone_source_height or template.source_height,
+                    tmp_path,
                 )
-                continue
-
-            src_w = zone.zone_source_width or template.source_width
-            src_h = zone.zone_source_height or template.source_height
-
-            result = _extract_zone(
-                page_images[page_idx],
-                zone,
-                src_w,
-                src_h,
-                tmp_path,
-            )
-            extracted = result.value
+                extracted = result.value
 
             if (
                 extracted is not None
@@ -200,38 +191,28 @@ def _process_template(
                 )
                 extracted = None
 
-            zone_values[id(zone)] = extracted
+            grouped.setdefault(_field_key(zone), []).append((zone, extracted))
 
-    # Pass 2: group zones by target field and write each field once.
-    grouped: dict[str, list[OcrTemplateZone]] = {}
-    for zone in zones:
-        grouped.setdefault(_field_key(zone), []).append(zone)
-
+    updates = []
     combine_formats = template.combine_formats or {}
     for key, field_zones in grouped.items():
         value = _combine_field_value(
             combine_formats.get(key, ""),
             field_zones,
-            zone_values,
         )
         if not value:
             continue
-
-        target_zone = field_zones[0]
-        _write_zone_value(document, target_zone, value)
-        logger.info(
-            "Zone OCR: %s = %r (from %d zone(s))",
-            _zone_target_label(target_zone),
-            value[:100] if len(value) > 100 else value,
-            len(field_zones),
-        )
+        update = _prepare_field_update(field_zones[0][0], value)
+        if update is not None:
+            updates.append(update)
+    _apply_field_updates(document, updates)
 
 
 def _field_key(zone: OcrTemplateZone) -> str:
     """Identify a zone's target field. Custom fields key by id, built-in targets
     by their name. Matches the key used in OcrTemplate.combine_formats and on the
     frontend field select."""
-    target = getattr(zone, "target", None) or "custom_field"
+    target = zone.target
     if target == "custom_field" and zone.custom_field_id:
         return str(zone.custom_field_id)
     return target
@@ -239,8 +220,7 @@ def _field_key(zone: OcrTemplateZone) -> str:
 
 def _combine_field_value(
     fmt: str,
-    field_zones: list[OcrTemplateZone],
-    zone_values: dict[int, str | None],
+    field_zones: list[tuple[OcrTemplateZone, str | None]],
 ) -> str:
     """Combine the OCR values of all zones targeting one field.
 
@@ -248,11 +228,10 @@ def _combine_field_value(
     and literal text is kept; separators left dangling by an empty token are
     cleaned up. Without a format, the zone values are joined in order by a space.
     """
-    values = {z.name: (zone_values.get(id(z)) or "") for z in field_zones}
+    values = {zone.name: value or "" for zone, value in field_zones}
 
     if not fmt:
-        parts = [zone_values.get(id(z)) or "" for z in field_zones]
-        return " ".join(p for p in parts if p).strip()
+        return " ".join(value for _, value in field_zones if value).strip()
 
     def _replace(match: re.Match) -> str:
         return values.get(match.group(1).strip(), "")
@@ -531,14 +510,6 @@ def _apply_transform(text: str, transform: str, date_format: str = "") -> str:
     return text
 
 
-def _zone_target_label(zone: OcrTemplateZone) -> str:
-    """Human label of a zone's write target (for logging)."""
-    target = getattr(zone, "target", None) or "custom_field"
-    if target == "custom_field":
-        return zone.custom_field.name if zone.custom_field_id else "(no field)"
-    return {"title": "Title", "asn": "ASN", "created": "Created"}.get(target, target)
-
-
 def _parse_created_datetime(value: str):
     """Parse an extracted value into a tz-aware datetime for document.created.
 
@@ -568,70 +539,68 @@ def _parse_created_datetime(value: str):
     return None
 
 
-def _write_zone_value(
-    document: Document,
+def _prepare_field_update(
     zone: OcrTemplateZone,
     value: str,
-) -> None:
-    """Write an extracted value to the zone's target — a custom field, or a
-    built-in document field (title / archive_serial_number / created)."""
-    target = getattr(zone, "target", None) or "custom_field"
-
-    if target == "custom_field":
-        if zone.custom_field_id:
-            _write_custom_field(document, zone.custom_field, value)
-        else:
-            logger.debug("Zone OCR: zone '%s' has no custom field set", zone.name)
-        return
-
-    if target == "title":
-        document.title = value[:128]
-        document.save(update_fields=["title"])
-    elif target == "asn":
+) -> FieldUpdate | None:
+    """Convert extracted text and enforce the destination field's constraints."""
+    custom_field = None
+    if zone.target == OcrTemplateZone.TargetType.CUSTOM_FIELD:
+        if not zone.custom_field_id:
+            return None
+        custom_field = zone.custom_field
+        field_name = CustomFieldInstance.get_value_field_name(custom_field.data_type)
+        typed_value = _convert_value(value, custom_field.data_type)
+        model = CustomFieldInstance
+    elif zone.target == OcrTemplateZone.TargetType.TITLE:
+        field_name, typed_value = "title", value[:128]
+        model = Document
+    elif zone.target == OcrTemplateZone.TargetType.ASN:
         digits = re.sub(r"[^\d]", "", value)
-        if not digits:
-            logger.debug(
-                "Zone OCR: ASN zone '%s' produced no digits (%r)",
-                zone.name,
-                value[:50],
-            )
-            return
-        document.archive_serial_number = int(digits)
-        document.save(update_fields=["archive_serial_number"])
-    elif target == "created":
+        field_name = "archive_serial_number"
+        typed_value = int(digits) if digits else None
+        model = Document
+    elif zone.target == OcrTemplateZone.TargetType.CREATED:
         parsed = _parse_created_datetime(value)
-        if parsed is None:
-            logger.debug(
-                "Zone OCR: created zone '%s' could not parse a date (%r)",
-                zone.name,
-                value[:50],
-            )
-            return
-        document.created = parsed
-        document.save(update_fields=["created"])
-
-
-def _write_custom_field(
-    document: Document,
-    custom_field: CustomField,
-    value: str,
-) -> None:
-    """Write an extracted value to a document's custom field."""
-    typed_value = _convert_value(value, custom_field.data_type)
+        field_name, typed_value = "created", parsed.date() if parsed else None
+        model = Document
+    else:
+        return None
     if typed_value is None:
-        logger.debug(
-            "Zone OCR: skipping custom field '%s' — value conversion returned None",
-            custom_field.name,
-        )
-        return
+        return None
+    try:
+        typed_value = model._meta.get_field(field_name).clean(typed_value, None)
+    except ValidationError:
+        logger.info("Zone OCR: invalid value for zone '%s'", zone.name)
+        return None
+    return FieldUpdate(field_name, typed_value, custom_field)
 
-    value_field_name = CustomFieldInstance.get_value_field_name(custom_field.data_type)
 
-    CustomFieldInstance.objects.update_or_create(
-        document=document,
-        field=custom_field,
-        defaults={value_field_name: typed_value},
-    )
+def _apply_field_updates(document: Document, updates: list[FieldUpdate]) -> None:
+    builtin_values = {
+        update.field_name: update.value
+        for update in updates
+        if update.custom_field is None
+    }
+    original_values = {name: getattr(document, name) for name in builtin_values}
+    try:
+        with transaction.atomic():
+            for update in updates:
+                if update.custom_field is not None:
+                    CustomFieldInstance.objects.update_or_create(
+                        document=document,
+                        field=update.custom_field,
+                        defaults={update.field_name: update.value},
+                    )
+            if builtin_values:
+                for name, value in builtin_values.items():
+                    setattr(document, name, value)
+                document.save(update_fields=list(builtin_values))
+    except Exception:
+        # Database rollback does not restore attributes on the model instance.
+        for name, value in original_values.items():
+            setattr(document, name, value)
+        raise
 
 
 def _convert_value(value: str, data_type: str) -> object | None:

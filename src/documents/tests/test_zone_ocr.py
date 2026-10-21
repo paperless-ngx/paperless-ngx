@@ -1,6 +1,7 @@
 """Tests for the zone-based OCR extraction engine."""
 
 import tempfile
+from datetime import date
 from pathlib import Path
 from unittest.mock import MagicMock
 from unittest.mock import patch
@@ -18,6 +19,7 @@ from documents.models import MatchingModel
 from documents.models import OcrTemplate
 from documents.models import OcrTemplateZone
 from documents.zone_ocr import _apply_transform
+from documents.zone_ocr import _combine_field_value
 from documents.zone_ocr import _convert_value
 from documents.zone_ocr import _crop_zone
 from documents.zone_ocr import _detect_mime
@@ -161,25 +163,150 @@ class TestZoneExtraction(SimpleTestCase):
 
 
 class TestSavedZoneExtraction(DirectoriesMixin, TestCase):
-    @patch("documents.zone_ocr.subprocess.run")
-    def test_saved_extraction_matches_preview_and_rejects_invalid_value(self, run):
-        page = Path(self.dirs.scratch_dir) / "page.png"
+    def setUp(self):
+        super().setUp()
+        self.page = self.dirs.scratch_dir / "page.png"
         with Image.new("RGB", (200, 100), "white") as image:
-            image.save(page)
-        document = DocumentFactory(title="Original")
-        template = OcrTemplate.objects.create(
+            image.save(self.page)
+        self.document = DocumentFactory(title="Original")
+        self.template = OcrTemplate.objects.create(
             name="Account",
             source_width=100,
             source_height=50,
         )
-        zone = OcrTemplateZone.objects.create(
-            template=template,
-            name="Title",
-            target="title",
+
+    def zone(self, name, target="title", **kwargs):
+        return OcrTemplateZone.objects.create(
+            template=self.template,
+            name=name,
+            target=target,
             x=0,
             y=0,
             width=20,
             height=10,
+            **kwargs,
+        )
+
+    @patch("documents.zone_ocr.subprocess.run")
+    def test_combines_zones_and_writes_each_field_once(self, run):
+        zones = [self.zone("First"), self.zone("Second")]
+        self.template.combine_formats = {"title": "{Second} / {First}"}
+        run.side_effect = [MagicMock(stdout="one"), MagicMock(stdout="two")]
+        with patch.object(self.document, "save", wraps=self.document.save) as save:
+            _process_template(self.document, self.page, self.template, zones)
+        self.document.refresh_from_db()
+        self.assertEqual(self.document.title, "two / one")
+        save.assert_called_once_with(update_fields=["title"])
+
+    @patch("documents.zone_ocr.subprocess.run")
+    def test_converts_custom_and_builtin_fields_before_saving(self, run):
+        field = CustomField.objects.create(name="Paid", data_type="boolean")
+        zones = [
+            self.zone("Title"),
+            self.zone("ASN", "asn"),
+            self.zone("Created", "created"),
+            self.zone("Paid", "custom_field", custom_field=field),
+        ]
+        run.side_effect = [
+            MagicMock(stdout=value)
+            for value in [
+                "New title",
+                "ASN 42",
+                "2026-04-13",
+                "no",
+            ]
+        ]
+        _process_template(self.document, self.page, self.template, zones)
+        self.document.refresh_from_db()
+        self.assertEqual(self.document.title, "New title")
+        self.assertEqual(self.document.archive_serial_number, 42)
+        self.assertEqual(self.document.created, date(2026, 4, 13))
+        self.assertFalse(self.document.custom_fields.get(field=field).value)
+
+    @patch("documents.zone_ocr.subprocess.run")
+    def test_invalid_field_values_preserve_existing_values(self, run):
+        field = CustomField.objects.create(name="Number", data_type="integer")
+        CustomFieldInstance.objects.create(
+            document=self.document,
+            field=field,
+            value_int=12,
+        )
+        zones = [
+            self.zone("Title"),
+            self.zone("ASN", "asn"),
+            self.zone("Created", "created"),
+            self.zone("Number", "custom_field", custom_field=field),
+            self.zone("Unassigned", "custom_field"),
+        ]
+        original_created = self.document.created
+        run.side_effect = [
+            MagicMock(stdout=value)
+            for value in [
+                "Valid",
+                "9999999999999999999999999999999",
+                "invalid",
+                "abc",
+                "text",
+            ]
+        ]
+        _process_template(self.document, self.page, self.template, zones)
+        self.document.refresh_from_db()
+        self.assertEqual(self.document.title, "Valid")
+        self.assertIsNone(self.document.archive_serial_number)
+        self.assertEqual(self.document.created, original_created)
+        self.assertEqual(self.document.custom_fields.get(field=field).value, 12)
+
+    @patch("documents.zone_ocr.subprocess.run")
+    def test_write_failure_rolls_back_template_and_restores_document(self, run):
+        field = CustomField.objects.create(name="Number", data_type="integer")
+        zones = [
+            self.zone("Title"),
+            self.zone("Number", "custom_field", custom_field=field),
+        ]
+        run.side_effect = [MagicMock(stdout="New title"), MagicMock(stdout="42")]
+        save = self.document.save
+
+        def fail_after_save(**kwargs):
+            save(**kwargs)
+            raise RuntimeError("save failed")
+
+        with patch.object(self.document, "save", side_effect=fail_after_save):
+            with self.assertRaisesMessage(RuntimeError, "save failed"):
+                _process_template(self.document, self.page, self.template, zones)
+        self.assertEqual(self.document.title, "Original")
+        self.document.refresh_from_db()
+        self.assertEqual(self.document.title, "Original")
+        self.assertFalse(self.document.custom_fields.exists())
+
+    @patch("documents.zone_ocr.subprocess.run")
+    def test_last_successful_template_wins(self, run):
+        self.zone("First")
+        second = OcrTemplate.objects.create(
+            name="Second",
+            source_width=100,
+            source_height=50,
+        )
+        self.template = second
+        self.zone("Second")
+        third = OcrTemplate.objects.create(
+            name="Third",
+            source_width=100,
+            source_height=50,
+        )
+        self.template = third
+        self.zone("Third", validation_regex="accepted")
+        templates = list(OcrTemplate.objects.order_by("pk"))
+        run.side_effect = [
+            MagicMock(stdout=value) for value in ["First", "Second", "rejected"]
+        ]
+        run_zone_extraction(self.document, self.page, templates=templates)
+        self.document.refresh_from_db()
+        self.assertEqual(self.document.title, "Second")
+
+    @patch("documents.zone_ocr.subprocess.run")
+    def test_saved_extraction_matches_preview_and_rejects_invalid_value(self, run):
+        zone = self.zone(
+            "Title",
             transform="uppercase",
             validation_regex="ACCOUNT [A-Z]+",
         )
@@ -189,12 +316,30 @@ class TestSavedZoneExtraction(DirectoriesMixin, TestCase):
         ]:
             with self.subTest(raw_text=raw_text):
                 run.return_value.stdout = raw_text
-                preview = extract_zone_preview(page, zone, 100, 50, 1)
+                preview = extract_zone_preview(self.page, zone, 100, 50, 1)
                 self.assertEqual(preview["raw_text"], raw_text)
                 self.assertEqual(preview["value"], raw_text.upper())
-                _process_template(document, page, template, [zone])
-                document.refresh_from_db()
-                self.assertEqual(document.title, expected_title)
+                _process_template(self.document, self.page, self.template, [zone])
+                self.document.refresh_from_db()
+                self.assertEqual(self.document.title, expected_title)
+
+
+class TestCombineFieldValue(SimpleTestCase):
+    def test_default_format_preserves_zone_order_and_duplicate_names(self):
+        zones = [
+            (OcrTemplateZone(name="Same"), value) for value in ["one", None, "two"]
+        ]
+        self.assertEqual(_combine_field_value("", zones), "one two")
+
+    def test_format_preserves_existing_missing_token_cleanup(self):
+        zones = [
+            (OcrTemplateZone(name="First"), "one"),
+            (OcrTemplateZone(name="Second"), None),
+        ]
+        self.assertEqual(
+            _combine_field_value("{ First } / {Second} / {Unknown}", zones),
+            "one",
+        )
 
 
 class TestTemplateVisibility(DirectoriesMixin, TestCase):
