@@ -139,7 +139,7 @@ class TestCustomAccountAdapter:
 @pytest.mark.django_db
 class TestSocialAccountAuthenticateStage:
     @staticmethod
-    def _should_handle(user: User, extra_data: dict | None) -> bool:
+    def _requires_mfa(user: User, extra_data: dict | None) -> bool:
         signal_kwargs = None
         if extra_data is not None:
             account = SocialAccount(
@@ -155,7 +155,14 @@ class TestSocialAccountAuthenticateStage:
             request,
             Login(user=user, signal_kwargs=signal_kwargs),
         )
-        return stage._should_handle(request)
+        response, cont = stage.handle()
+        assert cont is True
+        requires_mfa = response is not None
+        assert stage.state.get("authentication_required", False) is requires_mfa
+        if requires_mfa:
+            assert response.status_code == 302
+            assert response.url == reverse("mfa_authenticate")
+        return requires_mfa
 
     def test_stage_replaces_allauth_stage(self) -> None:
         stages = get_adapter().get_login_stages()
@@ -186,6 +193,30 @@ class TestSocialAccountAuthenticateStage:
                 True,
                 id="userinfo-only",
             ),
+            pytest.param(["m"], {"id_token": {"amr": "mfa"}}, True, id="string-amr"),
+            pytest.param(
+                ["mfa"],
+                {"id_token": {"amr": {"mfa": 1}}},
+                True,
+                id="dict-amr",
+            ),
+            pytest.param(
+                ["mfa"],
+                {"id_token": {"amr": [["mfa"]]}},
+                True,
+                id="nested-amr",
+            ),
+            pytest.param(
+                ["mfa"],
+                {"id_token": {"amr": ["mfa", 1]}},
+                True,
+                id="mixed-amr",
+            ),
+            pytest.param(["mfa"], {"id_token": {"amr": None}}, True, id="null-amr"),
+            pytest.param(["mfa"], {"id_token": {"amr": []}}, True, id="empty-amr"),
+            pytest.param(["mfa"], {"id_token": "mfa"}, True, id="string-id-token"),
+            pytest.param(["mfa"], {"id_token": ["mfa"]}, True, id="list-id-token"),
+            pytest.param(["mfa"], {"id_token": None}, True, id="null-id-token"),
             pytest.param(["mfa"], None, True, id="regular-login"),
         ],
     )
@@ -210,13 +241,13 @@ class TestSocialAccountAuthenticateStage:
         user = UserFactory(username="testuser")
         TOTP.activate(user, generate_totp_secret())
 
-        assert self._should_handle(user, extra_data) is expected
+        assert self._requires_mfa(user, extra_data) is expected
 
     def test_no_mfa_for_user_without_authenticator(self, settings: Settings) -> None:
         settings.SOCIAL_ACCOUNT_MFA_TRUSTED_AMR = ["mfa"]
         user = UserFactory(username="testuser")
 
-        assert not self._should_handle(user, {"id_token": {"amr": ["pwd"]}})
+        assert not self._requires_mfa(user, {"id_token": {"amr": ["pwd"]}})
 
 
 class TestCustomSocialAccountAdapter:
