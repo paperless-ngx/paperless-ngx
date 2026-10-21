@@ -25,6 +25,7 @@ from django.db.models import Value
 from django.db.models import When
 from django.db.models.functions import Cast
 from django.db.models.functions import NullIf
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django_filters import DateFilter
 from django_filters.rest_framework import BooleanFilter
@@ -320,6 +321,21 @@ class MonetaryAmountField(serializers.Field):
 
     def to_representation(self, value):
         return str(value)
+
+
+class DateOrTodayField(serializers.DateField):
+    """
+    A DateField that also accepts "today", resolved to the current local date
+    each time the query is parsed. This lets saved views and workflow triggers
+    compare a custom date field against a date that moves with time.
+    """
+
+    TODAY = "today"
+
+    def to_internal_value(self, value):
+        if value == self.TODAY:
+            return timezone.localdate()
+        return super().to_internal_value(value)
 
 
 class SelectField(serializers.CharField):
@@ -649,6 +665,8 @@ class CustomFieldQueryParser:
         ):
             # DateField admits queries in the form of `year__exact`, etc. These take integers.
             field = serializers.IntegerField()
+        elif custom_field.data_type == CustomField.FieldDataType.DATE:
+            field = DateOrTodayField()
         elif custom_field.data_type == CustomField.FieldDataType.DOCUMENTLINK:
             # We can be more specific here and make sure the value is a list.
             field = serializers.ListField(child=serializers.IntegerField())

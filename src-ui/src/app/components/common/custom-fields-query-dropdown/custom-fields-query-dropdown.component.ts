@@ -28,6 +28,7 @@ import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { first, Subject, Subscription, takeUntil } from 'rxjs'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import {
+  CUSTOM_FIELD_QUERY_DYNAMIC_TODAY,
   CUSTOM_FIELD_QUERY_MAX_ATOMS,
   CUSTOM_FIELD_QUERY_MAX_DEPTH,
   CUSTOM_FIELD_QUERY_OPERATOR_GROUPS_BY_TYPE,
@@ -228,6 +229,7 @@ export class CustomFieldsQueryDropdownComponent extends LoadingComponentWithPerm
   public CustomFieldDataType = CustomFieldDataType
   public CUSTOM_FIELD_QUERY_MAX_DEPTH = CUSTOM_FIELD_QUERY_MAX_DEPTH
   public CUSTOM_FIELD_QUERY_MAX_ATOMS = CUSTOM_FIELD_QUERY_MAX_ATOMS
+  public CUSTOM_FIELD_QUERY_DYNAMIC_TODAY = CUSTOM_FIELD_QUERY_DYNAMIC_TODAY
   public popperOptions = pngxPopperOptions
 
   @Input()
@@ -302,8 +304,6 @@ export class CustomFieldsQueryDropdownComponent extends LoadingComponentWithPerm
   selectionModelChange = new EventEmitter<CustomFieldQueriesModel>()
 
   readonly customFields = signal<CustomField[]>([])
-
-  public readonly today: string = new Date().toLocaleDateString('en-CA')
 
   public customFieldSearchFn = (term: string, field: CustomField): boolean =>
     matchesSearchText(field?.name, term)

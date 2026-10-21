@@ -133,6 +133,9 @@ export const CUSTOM_FIELD_QUERY_VALUE_TYPES_BY_OPERATOR = {
   [CustomFieldQueryOperator.In]: 'array',
 }
 
+// filters.py > DateOrTodayField
+export const CUSTOM_FIELD_QUERY_DYNAMIC_TODAY = 'today'
+
 export const CUSTOM_FIELD_QUERY_MAX_DEPTH = 4
 export const CUSTOM_FIELD_QUERY_MAX_ATOMS = 5
 

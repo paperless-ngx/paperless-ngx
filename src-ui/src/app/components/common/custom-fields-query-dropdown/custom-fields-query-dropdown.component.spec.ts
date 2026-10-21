@@ -3,14 +3,17 @@ import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { LOCALE_ID } from '@angular/core'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { By } from '@angular/platform-browser'
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
 import { allIcons, NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { of } from 'rxjs'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import {
+  CUSTOM_FIELD_QUERY_DYNAMIC_TODAY,
   CUSTOM_FIELD_QUERY_OPERATORS_BY_GROUP,
   CustomFieldQueryLogicalOperator,
+  CustomFieldQueryOperator,
   CustomFieldQueryOperatorGroups,
 } from 'src/app/data/custom-field-query'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
@@ -47,6 +50,12 @@ const customFields = [
     name: 'Test Monetary Field',
     data_type: CustomFieldDataType.Monetary,
     extra_data: { default_currency: 'EUR' },
+  },
+  {
+    id: 4,
+    name: 'Test Date Field',
+    data_type: CustomFieldDataType.Date,
+    extra_data: {},
   },
 ]
 
@@ -227,6 +236,42 @@ describe('CustomFieldsQueryDropdownComponent', () => {
   it('should sanitize name from title', () => {
     component.title = 'Test Title'
     expect(component.name).toBe('test_title')
+  })
+
+  it('should support a dynamic today value for date fields', () => {
+    component.useDropdown = false
+    const atom = new CustomFieldQueryAtom([
+      4,
+      CustomFieldQueryOperator.GreaterThanOrEqual,
+      null,
+    ])
+    component.selectionModel.addAtom(atom)
+    fixture.detectChanges()
+
+    fixture.debugElement
+      .query(By.css('button[aria-label="Open date picker"]'))
+      .nativeElement.click()
+    fixture.detectChanges()
+    const todayButton = Array.from(
+      document.querySelectorAll('ngb-datepicker button')
+    ).find((button: HTMLButtonElement) => button.textContent.trim() === 'Today')
+    ;(todayButton as HTMLButtonElement).click()
+    fixture.detectChanges()
+
+    expect(atom.value).toEqual(CUSTOM_FIELD_QUERY_DYNAMIC_TODAY)
+    expect(
+      fixture.debugElement
+        .query(By.css('.input-group-text'))
+        .nativeElement.textContent.trim()
+    ).toEqual('Today')
+
+    fixture.debugElement
+      .query(By.css('button[aria-label="Clear"]'))
+      .nativeElement.click()
+    fixture.detectChanges()
+
+    expect(atom.value).toBeNull()
+    expect(fixture.debugElement.query(By.css('.input-group-text'))).toBeNull()
   })
 
   it('should add a default atom on open', async () => {

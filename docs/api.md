@@ -154,6 +154,10 @@ use cases:
 
    `?custom_field_query=["references", "contains", [3, 7]]`
 
+8. Documents with a custom field "event date" (date) that is today or later:
+
+   `?custom_field_query=["event date", "gte", "today"]`
+
 All field types support basic operations including `exact`, `in`, `isnull`,
 and `exists`. String, URL, and monetary fields support case-insensitive
 substring matching operations including `icontains`, `istartswith`, and
@@ -161,6 +165,10 @@ substring matching operations including `icontains`, `istartswith`, and
 including `gt` (>), `gte` (>=), `lt` (<), `lte` (<=), and `range`.
 Lastly, document link fields support a `contains` operator that behaves
 like a "is superset of" check.
+
+Date fields also accept the value `"today"` in place of a date. It is
+resolved to the current date (in `PAPERLESS_TIME_ZONE`) each time the query
+runs, so saved views and workflow triggers using it stay up to date.
 
 ### `/api/search/autocomplete/`
 

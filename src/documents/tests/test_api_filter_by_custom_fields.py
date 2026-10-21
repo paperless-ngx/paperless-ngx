@@ -1,9 +1,13 @@
 import json
 import types
 from collections.abc import Callable
+from datetime import UTC
 from datetime import date
+from datetime import datetime
 from urllib.parse import quote
 
+import time_machine
+from django.test import override_settings
 from rest_framework.test import APITestCase
 
 from documents.models import CustomField
@@ -442,6 +446,32 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
                 and document["date_field"].year >= 2024
             ),
         )
+
+    @override_settings(TIME_ZONE="UTC")
+    def test_date_today(self) -> None:
+        # "today" is resolved whenever the query runs, so the same saved query
+        # keeps matching the documents whose date is still upcoming.
+        for today in (date(2024, 8, 22), date(2024, 9, 1)):
+            with time_machine.travel(
+                datetime(today.year, today.month, today.day, 12, tzinfo=UTC),
+                tick=False,
+            ):
+                self._assert_query_match_predicate(
+                    ["date_field", "gte", "today"],
+                    lambda document, today=today: (
+                        "date_field" in document
+                        and document["date_field"] is not None
+                        and document["date_field"] >= today
+                    ),
+                )
+                self._assert_query_match_predicate(
+                    ["date_field", "lt", "today"],
+                    lambda document, today=today: (
+                        "date_field" in document
+                        and document["date_field"] is not None
+                        and document["date_field"] < today
+                    ),
+                )
 
     def test_gt_monetary(self) -> None:
         self._assert_query_match_predicate(
