@@ -26,17 +26,21 @@ class SocialAccountAuthenticateStage(AuthenticateStage):
     identity provider already used one of the SOCIAL_ACCOUNT_MFA_TRUSTED_AMR methods.
     """
 
-    def _should_handle(self, request: HttpRequest) -> bool:
+    def handle(self) -> tuple:
         sociallogin = (self.login.signal_kwargs or {}).get("sociallogin")
         if sociallogin is not None and settings.SOCIAL_ACCOUNT_MFA_TRUSTED_AMR:
-            id_token = (sociallogin.account.extra_data or {}).get("id_token") or {}
-            amr = id_token.get("amr") or []
-            if set(amr) & set(settings.SOCIAL_ACCOUNT_MFA_TRUSTED_AMR):
+            id_token = (sociallogin.account.extra_data or {}).get("id_token")
+            amr = id_token.get("amr") if isinstance(id_token, dict) else None
+            if (
+                isinstance(amr, list)
+                and all(isinstance(value, str) for value in amr)
+                and set(amr) & set(settings.SOCIAL_ACCOUNT_MFA_TRUSTED_AMR)
+            ):
                 logger.debug(
                     f"Skipping 2FA for `{self.login.user}`, provider `{sociallogin.account.provider}` reported amr {amr}",
                 )
-                return False
-        return super()._should_handle(request)
+                return None, True
+        return super().handle()
 
 
 class CustomAccountAdapter(DefaultAccountAdapter):
