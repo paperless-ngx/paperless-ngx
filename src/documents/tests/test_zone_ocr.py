@@ -304,6 +304,70 @@ class TestSavedZoneExtraction(DirectoriesMixin, TestCase):
         self.assertEqual(self.document.title, "Second")
 
     @patch("documents.zone_ocr.subprocess.run")
+    def test_skipped_results_never_report_existing_document_values(self, run):
+        zones = [
+            self.zone("Empty"),
+            self.zone("Rejected", validation_regex="accepted"),
+            self.zone("Invalid", "asn"),
+            self.zone("Unassigned", "custom_field"),
+        ]
+        run.side_effect = [
+            MagicMock(stdout=value) for value in ["", "rejected", "abc", "orphan"]
+        ]
+        results = _process_template(self.document, self.page, self.template, zones)
+        self.assertEqual(
+            [result.reason for result in results],
+            [
+                "no_value",
+                "regex_mismatch",
+                "invalid_value",
+                "unassigned",
+            ],
+        )
+        self.assertEqual([result.value for result in results], [None] * 4)
+        self.assertEqual(self.document.title, "Original")
+
+    @patch("documents.zone_ocr.subprocess.run")
+    def test_failed_template_reports_rollback_and_next_template_still_runs(self, run):
+        DocumentFactory(archive_serial_number=42)
+        self.zone("Title")
+        self.zone("Conflict", "asn")
+        second = OcrTemplate.objects.create(
+            name="Second",
+            source_width=100,
+            source_height=50,
+        )
+        first = self.template
+        self.template = second
+        self.zone("Second")
+        run.side_effect = [
+            MagicMock(stdout=value) for value in ["Rolled back", "42", "Applied"]
+        ]
+        results = run_zone_extraction(
+            self.document,
+            self.page,
+            templates=[first, second],
+        )
+        self.assertEqual(
+            [result.reason for result in results],
+            ["template_failed", "template_failed", None],
+        )
+        self.assertEqual([result.value for result in results], [None, None, "Applied"])
+        self.document.refresh_from_db()
+        self.assertEqual(self.document.title, "Applied")
+        self.assertIsNone(self.document.archive_serial_number)
+
+    @patch("documents.zone_ocr.subprocess.run")
+    def test_literal_format_does_not_write_when_every_zone_failed(self, run):
+        zone = self.zone("Title")
+        self.template.combine_formats = {"title": "Invoice {Title}"}
+        run.return_value.stdout = ""
+        results = _process_template(self.document, self.page, self.template, [zone])
+        self.assertEqual(results[0].reason, "no_value")
+        self.assertIsNone(results[0].value)
+        self.assertEqual(self.document.title, "Original")
+
+    @patch("documents.zone_ocr.subprocess.run")
     def test_saved_extraction_matches_preview_and_rejects_invalid_value(self, run):
         zone = self.zone(
             "Title",
@@ -326,15 +390,13 @@ class TestSavedZoneExtraction(DirectoriesMixin, TestCase):
 
 class TestCombineFieldValue(SimpleTestCase):
     def test_default_format_preserves_zone_order_and_duplicate_names(self):
-        zones = [
-            (OcrTemplateZone(name="Same"), value) for value in ["one", None, "two"]
-        ]
+        zones = [("Same", value) for value in ["one", None, "two"]]
         self.assertEqual(_combine_field_value("", zones), "one two")
 
     def test_format_preserves_existing_missing_token_cleanup(self):
         zones = [
-            (OcrTemplateZone(name="First"), "one"),
-            (OcrTemplateZone(name="Second"), None),
+            ("First", "one"),
+            ("Second", None),
         ]
         self.assertEqual(
             _combine_field_value("{ First } / {Second} / {Unknown}", zones),

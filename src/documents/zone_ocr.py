@@ -50,6 +50,29 @@ class FieldUpdate:
     custom_field: CustomField | None = None
 
 
+@dataclass
+class ZoneOcrResult:
+    template: str
+    zone: str
+    custom_field: str
+    value: object = None
+    reason: str | None = None
+
+
+def _zone_result(
+    template: OcrTemplate,
+    zone: OcrTemplateZone,
+    *,
+    value: object = None,
+    reason: str | None = None,
+) -> ZoneOcrResult:
+    if zone.target == OcrTemplateZone.TargetType.CUSTOM_FIELD:
+        label = zone.custom_field.name if zone.custom_field_id else "(no field)"
+    else:
+        label = {"title": "Title", "asn": "ASN", "created": "Created"}[zone.target]
+    return ZoneOcrResult(template.name, zone.name, label, value, reason)
+
+
 def get_templates_for_document(document: Document) -> list[OcrTemplate]:
     """
     The enabled templates that match the document's content and that its owner
@@ -72,7 +95,7 @@ def run_zone_extraction(
     document: Document,
     original_file: Path | None,
     templates: list[OcrTemplate] | None = None,
-) -> None:
+) -> list[ZoneOcrResult]:
     """
     Run zone-based OCR extraction for the given templates, or for every
     template that matches the document when none are given.
@@ -80,7 +103,7 @@ def run_zone_extraction(
     if templates is None:
         templates = get_templates_for_document(document)
     if not templates:
-        return
+        return []
 
     # Resolve the document file: prefer archive (PDF/A), then source, then signal arg
     doc_path = _resolve_doc_path(document, original_file)
@@ -89,8 +112,13 @@ def run_zone_extraction(
             "Zone OCR: no accessible file for document %d",
             document.pk,
         )
-        return
+        return [
+            _zone_result(template, zone, reason="missing_file")
+            for template in templates
+            for zone in template.zones.all()
+        ]
 
+    results = []
     for template in templates:
         zones = list(template.zones.all())
         if not zones:
@@ -104,13 +132,17 @@ def run_zone_extraction(
         )
 
         try:
-            _process_template(document, doc_path, template, zones)
+            results.extend(_process_template(document, doc_path, template, zones))
         except Exception:
             logger.exception(
                 "Zone OCR: error processing template '%s' for document %d",
                 template.name,
                 document.pk,
             )
+            results.extend(
+                _zone_result(template, zone, reason="template_failed") for zone in zones
+            )
+    return results
 
 
 def _resolve_doc_path(
@@ -148,7 +180,7 @@ def _process_template(
     doc_path: Path,
     template: OcrTemplate,
     zones: list[OcrTemplateZone],
-) -> None:
+) -> list[ZoneOcrResult]:
     """Extract and combine zone values before applying a template's updates."""
     pages_needed: set[int] = {
         _resolve_page_idx(zone.page, document.page_count) for zone in zones
@@ -164,19 +196,22 @@ def _process_template(
             document.page_count,
         )
 
-        grouped: dict[str, list[tuple[OcrTemplateZone, str | None]]] = {}
+        grouped: dict[str, list[tuple[OcrTemplateZone, ZoneOcrResult]]] = {}
+        results = []
         for zone in zones:
             page_idx = _resolve_page_idx(zone.page, document.page_count)
             extracted = None
+            reason = "missing_page"
             if page_idx in page_images:
-                result = _extract_zone(
+                extraction = _extract_zone(
                     page_images[page_idx],
                     zone,
                     zone.zone_source_width or template.source_width,
                     zone.zone_source_height or template.source_height,
                     tmp_path,
                 )
-                extracted = result.value
+                extracted = extraction.value
+                reason = None if extracted else "no_value"
 
             if (
                 extracted is not None
@@ -190,22 +225,39 @@ def _process_template(
                     zone.validation_regex,
                 )
                 extracted = None
+                reason = "regex_mismatch"
 
-            grouped.setdefault(_field_key(zone), []).append((zone, extracted))
+            result = _zone_result(
+                template,
+                zone,
+                value=extracted if reason is None else None,
+                reason=reason,
+            )
+            results.append(result)
+            grouped.setdefault(_field_key(zone), []).append((zone, result))
 
     updates = []
     combine_formats = template.combine_formats or {}
     for key, field_zones in grouped.items():
+        accepted = [result for _, result in field_zones if result.reason is None]
+        if not accepted:
+            continue
         value = _combine_field_value(
             combine_formats.get(key, ""),
-            field_zones,
+            [(zone.name, result.value) for zone, result in field_zones],
         )
-        if not value:
-            continue
-        update = _prepare_field_update(field_zones[0][0], value)
+        target_zone = field_zones[0][0]
+        update = _prepare_field_update(target_zone, value) if value else None
         if update is not None:
             updates.append(update)
+        for result in accepted:
+            result.value = update.value if update else None
+            if update is None:
+                result.reason = (
+                    "unassigned" if key == "custom_field" else "invalid_value"
+                )
     _apply_field_updates(document, updates)
+    return results
 
 
 def _field_key(zone: OcrTemplateZone) -> str:
@@ -220,7 +272,7 @@ def _field_key(zone: OcrTemplateZone) -> str:
 
 def _combine_field_value(
     fmt: str,
-    field_zones: list[tuple[OcrTemplateZone, str | None]],
+    field_zones: list[tuple[str, str | None]],
 ) -> str:
     """Combine the OCR values of all zones targeting one field.
 
@@ -228,7 +280,7 @@ def _combine_field_value(
     and literal text is kept; separators left dangling by an empty token are
     cleaned up. Without a format, the zone values are joined in order by a space.
     """
-    values = {zone.name: value or "" for zone, value in field_zones}
+    values = {name: value or "" for name, value in field_zones}
 
     if not fmt:
         return " ".join(value for _, value in field_zones if value).strip()

@@ -104,7 +104,8 @@ export interface OcrZoneRunResult {
   template: string
   zone: string
   custom_field: string
-  value: string | number | null
+  value: string | number | boolean | null
+  reason?: string | null
 }
 
 export interface OcrZoneRunResponse {

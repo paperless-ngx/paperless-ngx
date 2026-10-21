@@ -9,6 +9,7 @@ import zipfile
 from collections import defaultdict
 from collections import deque
 from collections.abc import Callable
+from dataclasses import asdict
 from datetime import datetime
 from datetime import timedelta
 from http import HTTPStatus
@@ -2352,40 +2353,10 @@ class DocumentViewSet(
 
         from documents.zone_ocr import run_zone_extraction
 
-        run_zone_extraction(document, None, templates=templates)
-
-        results = []
-        builtin_labels = {"title": "Title", "asn": "ASN", "created": "Created"}
-        builtin_values = {
-            "title": document.title,
-            "asn": document.archive_serial_number,
-            "created": document.created.isoformat(),
-        }
-        field_values = {
-            instance.field_id: instance.value
-            for instance in document.custom_fields.select_related("field")
-        }
-        for template in templates:
-            for zone in template.zones.all():
-                if (
-                    zone.target == OcrTemplateZone.TargetType.CUSTOM_FIELD
-                    and zone.custom_field_id
-                ):
-                    field_name = zone.custom_field.name
-                    value = field_values.get(zone.custom_field_id)
-                else:
-                    field_name = builtin_labels.get(zone.target, zone.target)
-                    value = builtin_values.get(zone.target)
-                results.append(
-                    {
-                        "template": template.name,
-                        "zone": zone.name,
-                        "custom_field": field_name,
-                        "value": value,
-                    },
-                )
-
-        return Response({"status": "completed", "results": results})
+        results = run_zone_extraction(document, None, templates=templates)
+        return Response(
+            {"status": "completed", "results": [asdict(result) for result in results]},
+        )
 
     @extend_schema(
         operation_id="documents_delete_version",

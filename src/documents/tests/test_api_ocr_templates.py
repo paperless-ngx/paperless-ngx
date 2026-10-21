@@ -8,6 +8,7 @@ from unittest.mock import patch
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.db import IntegrityError
+from PIL import Image
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -947,14 +948,16 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
         )
         extract.assert_not_called()
 
-    @patch("documents.zone_ocr.run_zone_extraction")
+    @patch("documents.zone_ocr.subprocess.run")
     def test_run_zone_ocr_reports_only_templates_visible_to_the_document_owner(
         self,
-        extract,
+        run,
     ):
         owner = User.objects.create_user(username="document_owner")
         document = DocumentFactory(content=CONTENT, owner=owner)
-        document.source_path.write_bytes(b"test PDF")
+        with Image.new("RGB", (100, 100), "white") as image:
+            image.save(document.source_path, format="PNG")
+        run.return_value.stdout = "extracted"
         for name, template_owner in [
             ("Owned", owner),
             ("Unowned", None),
@@ -987,7 +990,7 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
             [result["template"] for result in response.json()["results"]],
             ["Owned", "Unowned", "Shared"],
         )
-        extract.assert_called_once()
+        self.assertEqual(run.call_count, 3)
 
     def test_shared_editor_cannot_transfer_ownership_or_change_sharing(self):
         editor = User.objects.create_user(username="shared_editor")
@@ -1035,13 +1038,15 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(response.json(), {"error": "Document file not found"})
         extract.assert_not_called()
 
-    @patch("documents.zone_ocr.run_zone_extraction")
-    def test_run_zone_ocr_reports_completed_results(self, extract):
+    @patch("documents.zone_ocr.subprocess.run")
+    def test_run_zone_ocr_reports_completed_results(self, run):
         document = DocumentFactory(
             content=CONTENT,
             mime_type="application/pdf",
         )
-        document.source_path.write_bytes(b"test PDF")
+        with Image.new("RGB", (100, 100), "white") as image:
+            image.save(document.source_path, format="PNG")
+        run.return_value.stdout = "Extracted title"
         template = OcrTemplate.objects.create(
             name="Template",
             match="Northwind",
@@ -1070,17 +1075,61 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
                         "template": template.name,
                         "zone": "Title zone",
                         "custom_field": "Title",
-                        "value": document.title,
+                        "value": "Extracted title",
+                        "reason": None,
                     },
                 ],
             },
         )
-        extract.assert_called_once()
+        run.assert_called_once()
 
-    @patch("documents.zone_ocr.run_zone_extraction")
-    def test_run_zone_ocr_reports_all_target_types_and_missing_values(self, extract):
+    @patch("documents.zone_ocr.subprocess.run")
+    def test_run_zone_ocr_does_not_report_an_old_title_when_extraction_is_empty(
+        self,
+        run,
+    ):
+        document = DocumentFactory(title="Existing title", content=CONTENT)
+        with Image.new("RGB", (100, 100), "white") as image:
+            image.save(document.source_path, format="PNG")
+        template = OcrTemplate.objects.create(
+            name="Template",
+            match="Northwind",
+            source_width=100,
+            source_height=100,
+        )
+        OcrTemplateZone.objects.create(
+            template=template,
+            name="Title",
+            target="title",
+            x=0,
+            y=0,
+            width=20,
+            height=20,
+        )
+        run.return_value.stdout = ""
+        response = self.client.post(f"/api/documents/{document.pk}/run-zone-ocr/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["results"][0]["reason"], "no_value")
+        self.assertIsNone(response.json()["results"][0]["value"])
+        document.refresh_from_db()
+        self.assertEqual(document.title, "Existing title")
+
+    @patch("documents.zone_ocr.subprocess.run")
+    def test_run_zone_ocr_reports_all_target_types_and_missing_values(self, run):
         document = DocumentFactory(content=CONTENT, archive_serial_number=123)
-        document.source_path.write_bytes(b"test PDF")
+        with Image.new("RGB", (100, 100), "white") as image:
+            image.save(document.source_path, format="PNG")
+        run.side_effect = [
+            subprocess.CompletedProcess([], 0, stdout=value)
+            for value in [
+                "New invoice",
+                "",
+                "orphan",
+                "New title",
+                "456",
+                "2026-04-13",
+            ]
+        ]
         template = OcrTemplate.objects.create(
             name="Test",
             source_width=100,
@@ -1121,12 +1170,12 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(
             values,
             {
-                "Present": "INV-123",
+                "Present": "New invoice",
                 "Missing": None,
                 "Unassigned": None,
-                "Title": document.title,
-                "ASN": 123,
-                "Created": document.created.isoformat(),
+                "Title": "New title",
+                "ASN": 456,
+                "Created": "2026-04-13",
             },
         )
 
