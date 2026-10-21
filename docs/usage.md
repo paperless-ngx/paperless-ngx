@@ -867,9 +867,6 @@ processed in the background.
 
     Zone OCR overwrites the fields it fills. A zone that finds no value leaves its field unchanged.
 
-Each template's field updates are saved together. If a database write fails, that template's updates
-are rolled back; the remaining templates can still run.
-
 Managing OCR templates requires the OCR template permissions. Running zone OCR on documents requires
 permission to change them, and choosing a template requires permission to view it.
 
