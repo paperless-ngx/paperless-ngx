@@ -35,6 +35,7 @@ from paperless_mail.models import MailRule
 from paperless_testing.assertions import FileSystemAssertsMixin
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import DocumentFactory
+from paperless_testing.factories import TagFactory
 from paperless_testing.factories import UserFactory
 from paperless_testing.fakes.progress import FakeProgressManager
 from paperless_testing.permissions import grant_object
@@ -514,6 +515,65 @@ class TestConsumer(
         self.assertTrue(user_checker.has_perm("view_document", document))
         group_checker = ObjectPermissionChecker(testgroup)
         self.assertTrue(group_checker.has_perm("view_document", document))
+        self._assert_first_last_send_progress()
+
+    def testInboxTagsScopedToOwner(self) -> None:
+        """
+        GIVEN:
+            - Inbox tags that are owned by the document owner, unowned, owned by
+              another user but shared with the document owner, and owned by
+              another user and not shared
+            - A non-inbox tag owned by the document owner
+        WHEN:
+            - A document is consumed with that owner
+        THEN:
+            - The document gets the owned, unowned and shared inbox tags only
+        """
+        owner = UserFactory()
+        other = UserFactory()
+        owned = TagFactory(is_inbox_tag=True, owner=owner)
+        unowned = TagFactory(is_inbox_tag=True, owner=None)
+        shared = TagFactory(is_inbox_tag=True, owner=other)
+        grant_object(owner, shared, "view_tag")
+        TagFactory(is_inbox_tag=True, owner=other)
+        TagFactory(is_inbox_tag=False, owner=owner)
+
+        with self.get_consumer(
+            self.get_test_file(),
+            DocumentMetadataOverrides(owner_id=owner.pk),
+        ) as consumer:
+            consumer.run()
+
+            document = Document.objects.first()
+            assert document is not None
+
+        self.assertCountEqual(document.tags.all(), [owned, unowned, shared])
+        self._assert_first_last_send_progress()
+
+    def testInboxTagsUnownedDocument(self) -> None:
+        """
+        GIVEN:
+            - Inbox tags owned by two different users, an unowned inbox tag and
+              a non-inbox tag
+        WHEN:
+            - A document is consumed with no owner
+        THEN:
+            - The document gets every inbox tag
+        """
+        inbox_tags = [
+            TagFactory(is_inbox_tag=True, owner=UserFactory()),
+            TagFactory(is_inbox_tag=True, owner=UserFactory()),
+            TagFactory(is_inbox_tag=True, owner=None),
+        ]
+        TagFactory(is_inbox_tag=False)
+
+        with self.get_consumer(self.get_test_file()) as consumer:
+            consumer.run()
+
+            document = Document.objects.first()
+            assert document is not None
+
+        self.assertCountEqual(document.tags.all(), inbox_tags)
         self._assert_first_last_send_progress()
 
     def testNotAFile(self) -> None:
