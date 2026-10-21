@@ -1,5 +1,6 @@
 """Tests for the zone-based OCR extraction engine."""
 
+import subprocess
 import tempfile
 from datetime import date
 from pathlib import Path
@@ -24,7 +25,9 @@ from documents.zone_ocr import _convert_value
 from documents.zone_ocr import _crop_zone
 from documents.zone_ocr import _detect_mime
 from documents.zone_ocr import _extract_zone
+from documents.zone_ocr import _prepare_field_update
 from documents.zone_ocr import _process_template
+from documents.zone_ocr import _render_pages
 from documents.zone_ocr import _resolve_doc_path
 from documents.zone_ocr import extract_zone_preview
 from documents.zone_ocr import get_templates_for_document
@@ -111,6 +114,39 @@ class TestZoneExtraction(SimpleTestCase):
         self.assertIsNone(result.value)
 
     @patch("documents.zone_ocr.subprocess.run")
+    def test_reader_failures_return_no_value(self, run):
+        for error in [
+            subprocess.TimeoutExpired("tesseract", 30),
+            subprocess.CalledProcessError(1, "tesseract", stderr="failure"),
+            subprocess.CalledProcessError(1, "tesseract"),
+            FileNotFoundError("tesseract"),
+        ]:
+            with self.subTest(error=type(error).__name__):
+                run.side_effect = error
+                result = _extract_zone(self.page, self.zone, 100, 50, self.tmp_path)
+                self.assertIsNone(result.raw_text)
+                self.assertIsNone(result.value)
+
+    @patch("zxingcpp.read_barcodes", side_effect=RuntimeError("reader failed"))
+    def test_barcode_failure_returns_no_value(self, read_barcodes):
+        self.zone.transform = "qr_code"
+        result = _extract_zone(self.page, self.zone, 100, 50, self.tmp_path)
+        self.assertIsNone(result.raw_text)
+        self.assertIsNone(result.value)
+
+    @patch("documents.zone_ocr.subprocess.run")
+    def test_preview_tiny_crop_returns_empty_result(self, run):
+        self.zone.width = 0
+        self.assertEqual(
+            extract_zone_preview(self.page, self.zone, 100, 50, 1),
+            {
+                "raw_text": None,
+                "value": None,
+            },
+        )
+        run.assert_not_called()
+
+    @patch("documents.zone_ocr.subprocess.run")
     def test_date_transform_uses_zone_format(self, run):
         self.zone.transform = "date"
         self.zone.date_format = "%d/%m/%Y"
@@ -193,7 +229,13 @@ class TestSavedZoneExtraction(DirectoriesMixin, TestCase):
         self.template.combine_formats = {"title": "{Second} / {First}"}
         run.side_effect = [MagicMock(stdout="one"), MagicMock(stdout="two")]
         with patch.object(self.document, "save", wraps=self.document.save) as save:
-            _process_template(self.document, self.page, self.template, zones)
+            _process_template(
+                self.document,
+                {0: self.page},
+                self.template,
+                zones,
+                self.dirs.scratch_dir,
+            )
         self.document.refresh_from_db()
         self.assertEqual(self.document.title, "two / one")
         save.assert_called_once_with(update_fields=["title"])
@@ -216,7 +258,13 @@ class TestSavedZoneExtraction(DirectoriesMixin, TestCase):
                 "no",
             ]
         ]
-        _process_template(self.document, self.page, self.template, zones)
+        _process_template(
+            self.document,
+            {0: self.page},
+            self.template,
+            zones,
+            self.dirs.scratch_dir,
+        )
         self.document.refresh_from_db()
         self.assertEqual(self.document.title, "New title")
         self.assertEqual(self.document.archive_serial_number, 42)
@@ -249,7 +297,13 @@ class TestSavedZoneExtraction(DirectoriesMixin, TestCase):
                 "text",
             ]
         ]
-        _process_template(self.document, self.page, self.template, zones)
+        _process_template(
+            self.document,
+            {0: self.page},
+            self.template,
+            zones,
+            self.dirs.scratch_dir,
+        )
         self.document.refresh_from_db()
         self.assertEqual(self.document.title, "Valid")
         self.assertIsNone(self.document.archive_serial_number)
@@ -272,7 +326,13 @@ class TestSavedZoneExtraction(DirectoriesMixin, TestCase):
 
         with patch.object(self.document, "save", side_effect=fail_after_save):
             with self.assertRaisesMessage(RuntimeError, "save failed"):
-                _process_template(self.document, self.page, self.template, zones)
+                _process_template(
+                    self.document,
+                    {0: self.page},
+                    self.template,
+                    zones,
+                    self.dirs.scratch_dir,
+                )
         self.assertEqual(self.document.title, "Original")
         self.document.refresh_from_db()
         self.assertEqual(self.document.title, "Original")
@@ -304,6 +364,102 @@ class TestSavedZoneExtraction(DirectoriesMixin, TestCase):
         self.assertEqual(self.document.title, "Second")
 
     @patch("documents.zone_ocr.subprocess.run")
+    def test_document_run_renders_each_page_once_across_templates(self, run):
+        self.document.page_count = 2
+        self.zone("First", page=1)
+        self.zone("Last", page=-1)
+        first = self.template
+        self.template = OcrTemplate.objects.create(
+            name="Second",
+            source_width=100,
+            source_height=50,
+        )
+        self.zone("Last again", page=2)
+        pdf = self.dirs.scratch_dir / "document.pdf"
+        pdf.write_bytes(b"%PDF-1.4")
+        rendered = []
+
+        def execute(args, **kwargs):
+            if args[0] == "pdftoppm":
+                output = Path(args[-1]).with_suffix(".png")
+                with Image.new("RGB", (100, 50), "white") as image:
+                    image.save(output)
+                rendered.append(output)
+                return subprocess.CompletedProcess(args, 0)
+            return subprocess.CompletedProcess(args, 0, stdout="extracted")
+
+        run.side_effect = execute
+        results = run_zone_extraction(
+            self.document,
+            pdf,
+            templates=[first, self.template],
+        )
+        render_calls = [
+            call for call in run.call_args_list if call.args[0][0] == "pdftoppm"
+        ]
+        self.assertEqual(len(render_calls), 2)
+        self.assertEqual(
+            [call.args[0][call.args[0].index("-f") + 1] for call in render_calls],
+            ["1", "2"],
+        )
+        self.assertEqual([result.reason for result in results], [None, None, None])
+        self.assertFalse(any(path.exists() for path in rendered))
+
+    @patch("documents.zone_ocr.subprocess.run")
+    def test_zone_dimensions_override_template_dimensions(self, run):
+        zone = self.zone("Title", zone_source_width=200, zone_source_height=100)
+
+        def read_crop(args, **kwargs):
+            with Image.open(args[1]) as crop:
+                self.assertEqual(crop.size, (20, 10))
+            return subprocess.CompletedProcess(args, 0, stdout="extracted")
+
+        run.side_effect = read_crop
+        _process_template(
+            self.document,
+            {0: self.page},
+            self.template,
+            [zone],
+            self.dirs.scratch_dir,
+        )
+        self.assertEqual(self.document.title, "extracted")
+
+    def test_missing_page_returns_skipped_result(self):
+        zone = self.zone("Last", page=-1)
+        results = _process_template(
+            self.document,
+            {},
+            self.template,
+            [zone],
+            self.dirs.scratch_dir,
+        )
+        self.assertEqual(results[0].reason, "missing_page")
+        self.assertIsNone(results[0].value)
+
+    def test_missing_document_file_returns_skipped_results(self):
+        self.zone("Title")
+        results = run_zone_extraction(self.document, None, templates=[self.template])
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0].reason, "missing_file")
+        self.assertIsNone(results[0].value)
+
+    @patch("documents.zone_ocr.subprocess.run")
+    def test_empty_combination_cannot_clear_a_field(self, run):
+        zone = self.zone("Title")
+        self.template.combine_formats = {"title": "{Unknown}"}
+        run.return_value.stdout = "extracted"
+        results = _process_template(
+            self.document,
+            {0: self.page},
+            self.template,
+            [zone],
+            self.dirs.scratch_dir,
+        )
+        self.assertEqual(results[0].reason, "invalid_value")
+        self.assertIsNone(results[0].value)
+        self.assertEqual(self.document.title, "Original")
+
+    @patch("documents.zone_ocr.subprocess.run")
     def test_skipped_results_never_report_existing_document_values(self, run):
         zones = [
             self.zone("Empty"),
@@ -314,7 +470,13 @@ class TestSavedZoneExtraction(DirectoriesMixin, TestCase):
         run.side_effect = [
             MagicMock(stdout=value) for value in ["", "rejected", "abc", "orphan"]
         ]
-        results = _process_template(self.document, self.page, self.template, zones)
+        results = _process_template(
+            self.document,
+            {0: self.page},
+            self.template,
+            zones,
+            self.dirs.scratch_dir,
+        )
         self.assertEqual(
             [result.reason for result in results],
             [
@@ -362,7 +524,13 @@ class TestSavedZoneExtraction(DirectoriesMixin, TestCase):
         zone = self.zone("Title")
         self.template.combine_formats = {"title": "Invoice {Title}"}
         run.return_value.stdout = ""
-        results = _process_template(self.document, self.page, self.template, [zone])
+        results = _process_template(
+            self.document,
+            {0: self.page},
+            self.template,
+            [zone],
+            self.dirs.scratch_dir,
+        )
         self.assertEqual(results[0].reason, "no_value")
         self.assertIsNone(results[0].value)
         self.assertEqual(self.document.title, "Original")
@@ -383,7 +551,13 @@ class TestSavedZoneExtraction(DirectoriesMixin, TestCase):
                 preview = extract_zone_preview(self.page, zone, 100, 50, 1)
                 self.assertEqual(preview["raw_text"], raw_text)
                 self.assertEqual(preview["value"], raw_text.upper())
-                _process_template(self.document, self.page, self.template, [zone])
+                _process_template(
+                    self.document,
+                    {0: self.page},
+                    self.template,
+                    [zone],
+                    self.dirs.scratch_dir,
+                )
                 self.document.refresh_from_db()
                 self.assertEqual(self.document.title, expected_title)
 
@@ -564,6 +738,24 @@ class TestApplyTransform(TestCase):
     def test_unknown_transform_strips(self):
         self.assertEqual(_apply_transform("  hello  ", "unknown"), "hello")
 
+    def test_strip_punctuation(self):
+        self.assertEqual(
+            _apply_transform(" -- Account #123. -- ", "strip_punctuation"),
+            "Account #123",
+        )
+
+    def test_invalid_iso_date_is_not_transformed(self):
+        self.assertEqual(_apply_transform("2026-13-32", "date"), "2026-13-32")
+
+    @patch("documents.zone_ocr.dateparser.parse", side_effect=OverflowError)
+    def test_unparseable_date_preserves_text(self, parse):
+        self.assertEqual(_apply_transform("unparsable", "date"), "unparsable")
+
+    def test_unknown_target_cannot_produce_a_field_update(self):
+        self.assertIsNone(
+            _prepare_field_update(OcrTemplateZone(target="unknown"), "value"),
+        )
+
 
 class TestConvertValue(TestCase):
     """Tests for the _convert_value function."""
@@ -697,6 +889,95 @@ class TestConvertValue(TestCase):
     def test_empty_string_returns_none(self):
         self.assertIsNone(_convert_value("", CustomField.FieldDataType.STRING))
 
+    def test_numeric_types_reject_malformed_numbers(self):
+        for data_type in [
+            CustomField.FieldDataType.FLOAT,
+            CustomField.FieldDataType.MONETARY,
+        ]:
+            for value in ["1.2.3", "--12", "12-34", "", ".", "-", "not numeric"]:
+                with self.subTest(data_type=data_type, value=value):
+                    self.assertIsNone(_convert_value(value, data_type))
+
+    def test_float_overflow_is_not_stored_as_infinity(self):
+        self.assertIsNone(_convert_value("9" * 400, CustomField.FieldDataType.FLOAT))
+
+    def test_monetary_conversion_preserves_decimal_precision(self):
+        value = "12345678901234567890,12345678901234567890"
+        self.assertEqual(
+            _convert_value(value, CustomField.FieldDataType.MONETARY),
+            value.replace(",", "."),
+        )
+
+
+class TestRenderPages(SimpleTestCase):
+    def setUp(self):
+        directory = tempfile.TemporaryDirectory()
+        self.addCleanup(directory.cleanup)
+        self.tmp_path = Path(directory.name)
+        self.pdf = self.tmp_path / "document.pdf"
+        self.pdf.write_bytes(b"%PDF-1.4")
+
+    @patch("documents.zone_ocr.subprocess.run")
+    def test_renders_requested_pages_in_order_and_skips_out_of_range(self, run):
+        def render(args, **kwargs):
+            Path(args[-1]).with_suffix(".png").write_bytes(b"rendered")
+
+        run.side_effect = render
+        pages = _render_pages(self.pdf, {-1, 0, 2, 3}, self.tmp_path, 3)
+        self.assertEqual(list(pages), [0, 2])
+        self.assertEqual(run.call_count, 2)
+        for page, call in zip([1, 3], run.call_args_list, strict=True):
+            args = call.args[0]
+            self.assertIn("-singlefile", args)
+            self.assertEqual(args[args.index("-f") + 1], str(page))
+            self.assertEqual(args[args.index("-l") + 1], str(page))
+            self.assertEqual(call.kwargs["timeout"], 60)
+            self.assertTrue(call.kwargs["check"])
+
+    @patch("documents.zone_ocr.subprocess.run")
+    def test_missing_render_output_is_not_a_page(self, run):
+        self.assertEqual(_render_pages(self.pdf, {0}, self.tmp_path, None), {})
+
+    @patch("documents.zone_ocr.subprocess.run")
+    def test_render_failure_does_not_prevent_other_pages(self, run):
+        for error in [
+            subprocess.TimeoutExpired("pdftoppm", 60),
+            subprocess.CalledProcessError(1, "pdftoppm", stderr=b"failure"),
+            subprocess.CalledProcessError(1, "pdftoppm"),
+        ]:
+            with self.subTest(error=type(error).__name__):
+
+                def render(args, **kwargs):
+                    if args[args.index("-f") + 1] == "1":
+                        raise error
+                    Path(args[-1]).with_suffix(".png").write_bytes(b"rendered")
+
+                run.side_effect = render
+                self.assertEqual(
+                    list(_render_pages(self.pdf, {0, 1}, self.tmp_path, 2)),
+                    [1],
+                )
+
+    @patch(
+        "documents.zone_ocr.subprocess.run",
+        side_effect=FileNotFoundError("pdftoppm"),
+    )
+    def test_missing_renderer_stops_without_retrying_every_page(self, run):
+        self.assertEqual(_render_pages(self.pdf, {0, 1}, self.tmp_path, 2), {})
+        run.assert_called_once()
+
+    @patch("documents.zone_ocr.subprocess.run")
+    def test_image_is_used_directly_only_for_first_page(self, run):
+        image_path = self.tmp_path / "image.png"
+        with Image.new("RGB", (10, 10)) as image:
+            image.save(image_path)
+        self.assertEqual(
+            _render_pages(image_path, {0}, self.tmp_path, 1),
+            {0: image_path},
+        )
+        self.assertEqual(_render_pages(image_path, {1}, self.tmp_path, 1), {})
+        run.assert_not_called()
+
 
 class TestDetectMime(TestCase):
     """Tests for _detect_mime."""
@@ -726,6 +1007,21 @@ class TestResolveDocPath(TestCase):
         doc.source_path = Path("/nonexistent/source.pdf")
         result = _resolve_doc_path(doc, None)
         self.assertIsNone(result)
+
+    def test_prefers_archive_and_falls_back_to_source(self):
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "source.pdf"
+            archive = Path(directory) / "archive.pdf"
+            source.touch()
+            archive.touch()
+            document = MagicMock(
+                has_archive_version=True,
+                archive_path=archive,
+                source_path=source,
+            )
+            self.assertEqual(_resolve_doc_path(document, None), archive)
+            archive.unlink()
+            self.assertEqual(_resolve_doc_path(document, None), source)
 
     def test_returns_original_file_as_fallback(self):
         doc = MagicMock()
