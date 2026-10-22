@@ -49,6 +49,15 @@ import { LoadingComponentWithPermissions } from '../../loading-component/loading
 import { ClearableBadgeComponent } from '../clearable-badge/clearable-badge.component'
 import { DocumentLinkComponent } from '../input/document-link/document-link.component'
 
+// Matches the English expressions built by updateRelativeDate, e.g. "30 days ago" / "in 2 weeks"
+const RELATIVE_DATE_PATTERN =
+  /^(?:(\d+) (days|weeks|months|years) ago|in (\d+) (days|weeks|months|years))$/
+
+interface RelativeDate {
+  amount: number | null
+  unit: string
+}
+
 export class CustomFieldQueriesModel {
   private readonly _queries = signal<CustomFieldQueryElement[]>([])
   private rootSubscriptions: Subscription[] = []
@@ -305,20 +314,59 @@ export class CustomFieldsQueryDropdownComponent extends LoadingComponentWithPerm
 
   public readonly today: string = new Date().toLocaleDateString('en-CA')
 
-  private readonly relativeDateModes = new Map<string, boolean>()
+  public readonly relativeDateUnits = [
+    { id: 'days ago', label: $localize`days ago` },
+    { id: 'weeks ago', label: $localize`weeks ago` },
+    { id: 'months ago', label: $localize`months ago` },
+    { id: 'years ago', label: $localize`years ago` },
+    { id: 'days from now', label: $localize`days from now` },
+    { id: 'weeks from now', label: $localize`weeks from now` },
+    { id: 'months from now', label: $localize`months from now` },
+    { id: 'years from now', label: $localize`years from now` },
+  ]
 
-  isRelativeDate(atom: CustomFieldQueryAtom): boolean {
-    return (
-      this.relativeDateModes.get(atom.id) ??
-      (typeof atom.value === 'string' &&
-        !!atom.value &&
-        !/^\d{4}-\d{2}-\d{2}$/.test(atom.value))
-    )
+  private readonly relativeDates = new Map<string, RelativeDate>()
+
+  getRelativeDate(atom: CustomFieldQueryAtom): RelativeDate | undefined {
+    if (!this.relativeDates.has(atom.id)) {
+      const match =
+        typeof atom.value === 'string' &&
+        atom.value.match(RELATIVE_DATE_PATTERN)
+      if (match) {
+        this.relativeDates.set(
+          atom.id,
+          match[1]
+            ? { amount: +match[1], unit: `${match[2]} ago` }
+            : { amount: +match[3], unit: `${match[4]} from now` }
+        )
+      }
+    }
+    return this.relativeDates.get(atom.id)
   }
 
-  setDateQueryMode(atom: CustomFieldQueryAtom, relative: boolean) {
-    this.relativeDateModes.set(atom.id, relative)
-    atom.value = null
+  toggleRelativeDate(atom: CustomFieldQueryAtom) {
+    if (this.getRelativeDate(atom)) {
+      this.relativeDates.delete(atom.id)
+      atom.value = null
+    } else {
+      this.relativeDates.set(atom.id, { amount: null, unit: 'days ago' })
+      this.updateRelativeDate(atom, {})
+    }
+  }
+
+  updateRelativeDate(
+    atom: CustomFieldQueryAtom,
+    change: Partial<RelativeDate>
+  ) {
+    const relativeDate = Object.assign(this.relativeDates.get(atom.id), change)
+    const { amount, unit } = relativeDate
+    const [period, direction] = unit.split(' ', 2)
+    atom.value =
+      amount === null
+        ? null
+        : direction === 'ago'
+          ? `${amount} ${unit}`
+          : `in ${amount} ${period}`
   }
 
   public customFieldSearchFn = (term: string, field: CustomField): boolean =>
