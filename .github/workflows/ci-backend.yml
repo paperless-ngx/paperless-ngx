@@ -11,7 +11,7 @@ concurrency:
   group: backend-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 env:
-  DEFAULT_UV_VERSION: "0.12.x"
+  DEFAULT_UV_VERSION: "0.13.x"
   # Match the Docker image: nltk refuses to read hardlinked data files, such as
   # the copy bundled with llama-index when uv links packages from its cache
   UV_LINK_MODE: copy
@@ -102,7 +102,7 @@ jobs:
         with:
           python-version: "${{ matrix.python-version }}"
       - name: Install uv
-        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e # v10.3.2
         with:
           version: ${{ env.DEFAULT_UV_VERSION }}
           enable-cache: true
@@ -172,7 +172,7 @@ jobs:
         with:
           python-version: "${{ env.DEFAULT_PYTHON }}"
       - name: Install uv
-        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e # v10.3.2
         with:
           version: ${{ env.DEFAULT_UV_VERSION }}
           enable-cache: true
