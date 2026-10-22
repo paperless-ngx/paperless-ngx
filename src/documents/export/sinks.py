@@ -193,6 +193,9 @@ class DirectoryExportSink(ExportSink):
             raise RuntimeError("A stream is already open on this sink")
         target = (self._target / arcname).resolve()
         tmp = target.with_suffix(target.suffix + ".tmp")
+        # A stale tmp from an interrupted run is overwritten and consumed here,
+        # so it must not be pruned as a leftover at finalize.
+        self._snapshot.discard(tmp)
         target.parent.mkdir(parents=True, exist_ok=True)
         handle = tmp.open("w", encoding="utf-8")
         self._stream_open = True
