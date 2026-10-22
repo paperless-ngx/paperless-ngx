@@ -353,7 +353,10 @@ class DateQueryField(serializers.DateField):
         try:
             parsed = dateparser.parse(
                 value,
-                locales=settings.DATE_PARSER_LANGUAGES,
+                # The UI always builds English expressions
+                locales=[*settings.DATE_PARSER_LANGUAGES, "en"]
+                if settings.DATE_PARSER_LANGUAGES
+                else None,
                 settings={
                     "PARSERS": ["relative-time"],
                     "RELATIVE_BASE": self.reference_datetime,
