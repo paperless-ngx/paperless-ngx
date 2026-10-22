@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = ">=3.11"
 resolution-markers = [
     "python_full_version >= '3.15' and sys_platform == 'darwin'",
@@ -9,7 +9,7 @@ resolution-markers = [
     "python_full_version >= '3.12' and python_full_version < '3.15' and sys_platform == 'darwin'",
     "python_full_version == '3.12.*' and platform_machine == 'x86_64' and sys_platform == 'linux'",
     "python_full_version == '3.12.*' and platform_machine == 'aarch64' and sys_platform == 'linux'",
-    "(python_full_version >= '3.12' and python_full_version < '3.15' and platform_machine != 'aarch64' and platform_machine != 'x86_64' and sys_platform == 'linux') or (python_full_version == '3.13.*' and platform_machine == 'aarch64' and sys_platform == 'linux') or (python_full_version == '3.13.*' and platform_machine == 'x86_64' and sys_platform == 'linux')",
+    "(python_full_version == '3.12.*' and platform_machine != 'aarch64' and platform_machine != 'x86_64' and sys_platform == 'linux') or (python_full_version == '3.14.*' and platform_machine != 'aarch64' and platform_machine != 'x86_64' and sys_platform == 'linux') or (python_full_version == '3.13.*' and sys_platform == 'linux')",
     "python_full_version < '3.12' and sys_platform == 'darwin'",
     "python_full_version < '3.12' and sys_platform == 'linux'",
 ]
@@ -496,11 +496,11 @@ wheels = [
 
 [[package]]
 name = "certifi"
-version = "2026.1.4"
+version = "2026.10.19"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/e0/2d/a891ca51311197f6ad14a7ef42e2399f36cf2f9bd44752b3dc4eab60fdc5/certifi-2026.1.4.tar.gz", hash = "sha256:ac726dd470482006e014ad384921ed6438c457018f4b3d204aea4281258b2120", size = 154268, upload-time = "2026-01-04T02:42:41.825Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/a6/bd/1436c50cc46699de0230fbaacc1d1de7bfec413176099949e9d5112e88f2/certifi-2026.10.19.tar.gz", hash = "sha256:035c1e85572b141bf1c3a3eff0e33a8eb74917522f2559075ff8d2fea780a1ae", size = 137598, upload-time = "2026-10-20T02:24:16.604Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/e6/ad/3cc14f097111b4de0040c83a525973216457bbeeb63739ef1ed275c1c021/certifi-2026.1.4-py3-none-any.whl", hash = "sha256:9943707519e4add1115f44c2bc244f782c0249876bf51b6599fee1ffbedd685c", size = 152900, upload-time = "2026-01-04T02:42:40.15Z" },
+    { url = "https://files.pythonhosted.org/packages/c4/51/29046e48f693c54e5b7412216d447a1d8362c9653148d98c02cdf65fa733/certifi-2026.10.19-py3-none-any.whl", hash = "sha256:42d35340cc5b9ba78e818ddbff0c5b1c2b779de448a340fd1b989f5fa8670e1b", size = 136464, upload-time = "2026-10-20T02:24:15.072Z" },
 ]
 
 [[package]]
@@ -3080,7 +3080,7 @@ mariadb = [
 ]
 postgres = [
     { name = "psycopg", extra = ["c", "pool"] },
-    { name = "psycopg-c", version = "3.3.4", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.12' and platform_machine == 'aarch64') or (python_full_version == '3.13.*' and platform_machine == 'aarch64') or (python_full_version >= '3.15' and platform_machine == 'aarch64') or (python_full_version < '3.12' and platform_machine == 'x86_64') or (python_full_version == '3.13.*' and platform_machine == 'x86_64') or (python_full_version >= '3.15' and platform_machine == 'x86_64') or (platform_machine != 'aarch64' and platform_machine != 'x86_64') or sys_platform != 'linux'" },
+    { name = "psycopg-c", version = "3.3.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or python_full_version == '3.13.*' or python_full_version >= '3.15' or (platform_machine != 'aarch64' and platform_machine != 'x86_64') or sys_platform != 'linux'" },
     { name = "psycopg-c", version = "3.3.4", source = { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.4/psycopg_c-3.3.4-cp312-cp312-linux_aarch64.whl" }, marker = "python_full_version == '3.12.*' and platform_machine == 'aarch64' and sys_platform == 'linux'" },
     { name = "psycopg-c", version = "3.3.4", source = { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.4/psycopg_c-3.3.4-cp312-cp312-linux_x86_64.whl" }, marker = "python_full_version == '3.12.*' and platform_machine == 'x86_64' and sys_platform == 'linux'" },
     { name = "psycopg-c", version = "3.3.4", source = { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.4/psycopg_c-3.3.4-cp314-cp314-linux_aarch64.whl" }, marker = "python_full_version == '3.14.*' and platform_machine == 'aarch64' and sys_platform == 'linux'" },
@@ -3209,7 +3209,7 @@ requires-dist = [
     { name = "psycopg-c", marker = "python_full_version == '3.14.*' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra == 'postgres'", url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.4/psycopg_c-3.3.4-cp314-cp314-linux_aarch64.whl" },
     { name = "psycopg-c", marker = "python_full_version == '3.12.*' and platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'postgres'", url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.4/psycopg_c-3.3.4-cp312-cp312-linux_x86_64.whl" },
     { name = "psycopg-c", marker = "python_full_version == '3.14.*' and platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'postgres'", url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.4/psycopg_c-3.3.4-cp314-cp314-linux_x86_64.whl" },
-    { name = "psycopg-c", marker = "(python_full_version < '3.12' and platform_machine == 'aarch64' and extra == 'postgres') or (python_full_version == '3.13.*' and platform_machine == 'aarch64' and extra == 'postgres') or (python_full_version >= '3.15' and platform_machine == 'aarch64' and extra == 'postgres') or (python_full_version < '3.12' and platform_machine == 'x86_64' and extra == 'postgres') or (python_full_version == '3.13.*' and platform_machine == 'x86_64' and extra == 'postgres') or (python_full_version >= '3.15' and platform_machine == 'x86_64' and extra == 'postgres') or (platform_machine != 'aarch64' and platform_machine != 'x86_64' and extra == 'postgres') or (sys_platform != 'linux' and extra == 'postgres')", specifier = "==3.3.4" },
+    { name = "psycopg-c", marker = "(python_full_version < '3.12' and extra == 'postgres') or (python_full_version == '3.13.*' and extra == 'postgres') or (python_full_version >= '3.15' and extra == 'postgres') or (platform_machine != 'aarch64' and platform_machine != 'x86_64' and extra == 'postgres') or (sys_platform != 'linux' and extra == 'postgres')", specifier = "==3.3.4" },
     { name = "psycopg-pool", marker = "extra == 'postgres'", specifier = "==3.3.3" },
     { name = "python-dateutil", specifier = "~=2.9.0" },
     { name = "python-dotenv", specifier = "~=1.2.1" },
@@ -3662,7 +3662,7 @@ wheels = [
 
 [package.optional-dependencies]
 c = [
-    { name = "psycopg-c", version = "3.3.4", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.12' and implementation_name != 'pypy' and platform_machine == 'aarch64') or (python_full_version == '3.13.*' and implementation_name != 'pypy' and platform_machine == 'aarch64') or (python_full_version >= '3.15' and implementation_name != 'pypy' and platform_machine == 'aarch64') or (python_full_version < '3.12' and implementation_name != 'pypy' and platform_machine == 'x86_64') or (python_full_version == '3.13.*' and implementation_name != 'pypy' and platform_machine == 'x86_64') or (python_full_version >= '3.15' and implementation_name != 'pypy' and platform_machine == 'x86_64') or (implementation_name != 'pypy' and platform_machine != 'aarch64' and platform_machine != 'x86_64') or (implementation_name != 'pypy' and sys_platform != 'linux')" },
+    { name = "psycopg-c", version = "3.3.4", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.12' and implementation_name != 'pypy') or (python_full_version == '3.13.*' and implementation_name != 'pypy') or (python_full_version >= '3.15' and implementation_name != 'pypy') or (implementation_name != 'pypy' and platform_machine != 'aarch64' and platform_machine != 'x86_64') or (implementation_name != 'pypy' and sys_platform != 'linux')" },
     { name = "psycopg-c", version = "3.3.4", source = { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.4/psycopg_c-3.3.4-cp312-cp312-linux_aarch64.whl" }, marker = "python_full_version == '3.12.*' and implementation_name != 'pypy' and platform_machine == 'aarch64' and sys_platform == 'linux'" },
     { name = "psycopg-c", version = "3.3.4", source = { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.4/psycopg_c-3.3.4-cp312-cp312-linux_x86_64.whl" }, marker = "python_full_version == '3.12.*' and implementation_name != 'pypy' and platform_machine == 'x86_64' and sys_platform == 'linux'" },
     { name = "psycopg-c", version = "3.3.4", source = { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.4/psycopg_c-3.3.4-cp314-cp314-linux_aarch64.whl" }, marker = "python_full_version == '3.14.*' and implementation_name != 'pypy' and platform_machine == 'aarch64' and sys_platform == 'linux'" },
@@ -3680,7 +3680,7 @@ resolution-markers = [
     "python_full_version >= '3.15' and sys_platform == 'darwin'",
     "python_full_version >= '3.15' and sys_platform == 'linux'",
     "python_full_version >= '3.12' and python_full_version < '3.15' and sys_platform == 'darwin'",
-    "(python_full_version >= '3.12' and python_full_version < '3.15' and platform_machine != 'aarch64' and platform_machine != 'x86_64' and sys_platform == 'linux') or (python_full_version == '3.13.*' and platform_machine == 'aarch64' and sys_platform == 'linux') or (python_full_version == '3.13.*' and platform_machine == 'x86_64' and sys_platform == 'linux')",
+    "(python_full_version == '3.12.*' and platform_machine != 'aarch64' and platform_machine != 'x86_64' and sys_platform == 'linux') or (python_full_version == '3.14.*' and platform_machine != 'aarch64' and platform_machine != 'x86_64' and sys_platform == 'linux') or (python_full_version == '3.13.*' and sys_platform == 'linux')",
     "python_full_version < '3.12' and sys_platform == 'darwin'",
     "python_full_version < '3.12' and sys_platform == 'linux'",
 ]
@@ -5222,7 +5222,7 @@ resolution-markers = [
     "python_full_version == '3.14.*' and platform_machine == 'aarch64' and sys_platform == 'linux'",
     "python_full_version == '3.12.*' and platform_machine == 'x86_64' and sys_platform == 'linux'",
     "python_full_version == '3.12.*' and platform_machine == 'aarch64' and sys_platform == 'linux'",
-    "(python_full_version >= '3.12' and python_full_version < '3.15' and platform_machine != 'aarch64' and platform_machine != 'x86_64' and sys_platform == 'linux') or (python_full_version == '3.13.*' and platform_machine == 'aarch64' and sys_platform == 'linux') or (python_full_version == '3.13.*' and platform_machine == 'x86_64' and sys_platform == 'linux')",
+    "(python_full_version == '3.12.*' and platform_machine != 'aarch64' and platform_machine != 'x86_64' and sys_platform == 'linux') or (python_full_version == '3.14.*' and platform_machine != 'aarch64' and platform_machine != 'x86_64' and sys_platform == 'linux') or (python_full_version == '3.13.*' and sys_platform == 'linux')",
     "python_full_version < '3.12' and sys_platform == 'linux'",
 ]
 dependencies = [
