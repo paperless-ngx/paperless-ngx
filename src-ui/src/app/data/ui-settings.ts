@@ -62,14 +62,10 @@ export const SETTINGS_KEYS = {
     'general-settings:document-details:pdf-viewer-zoom-setting',
   DATE_LOCALE: 'general-settings:date-display:date-locale',
   DATE_FORMAT: 'general-settings:date-display:date-format',
-  NOTIFICATIONS_CONSUMER_NEW_DOCUMENT:
-    'general-settings:notifications:consumer-new-documents',
   NOTIFICATIONS_CONSUMER_SUCCESS:
     'general-settings:notifications:consumer-success',
   NOTIFICATIONS_CONSUMER_FAILED:
     'general-settings:notifications:consumer-failed',
-  NOTIFICATIONS_CONSUMER_SUPPRESS_ON_DASHBOARD:
-    'general-settings:notifications:consumer-suppress-on-dashboard',
   NOTES_ENABLED: 'general-settings:notes-enabled',
   AUDITLOG_ENABLED: 'general-settings:auditlog-enabled',
   SLIM_SIDEBAR: 'general-settings:slim-sidebar',
@@ -198,22 +194,12 @@ export const SETTINGS: UiSetting[] = [
     default: 'mediumDate',
   },
   {
-    key: SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_NEW_DOCUMENT,
-    type: 'boolean',
-    default: true,
-  },
-  {
     key: SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_SUCCESS,
     type: 'boolean',
     default: true,
   },
   {
     key: SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_FAILED,
-    type: 'boolean',
-    default: true,
-  },
-  {
-    key: SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_SUPPRESS_ON_DASHBOARD,
     type: 'boolean',
     default: true,
   },

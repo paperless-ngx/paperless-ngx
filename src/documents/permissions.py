@@ -1,5 +1,11 @@
+from collections.abc import Mapping
+from collections.abc import Sequence
 from typing import Any
+from typing import ClassVar
+from typing import Literal
+from typing import TypeGuard
 from typing import TypeVar
+from typing import cast
 
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
@@ -21,7 +27,6 @@ from guardian.core import ObjectPermissionChecker
 from guardian.models import GroupObjectPermission
 from guardian.models import UserObjectPermission
 from guardian.shortcuts import assign_perm
-from guardian.shortcuts import get_objects_for_user
 from guardian.shortcuts import get_users_with_perms
 from guardian.shortcuts import remove_perm
 from rest_framework.permissions import BasePermission
@@ -62,28 +67,23 @@ class PaperlessAdminPermissions(BasePermission):
         return request.user.is_active and request.user.is_staff
 
 
-def has_global_statistics_permission(user: User | None) -> bool:
-    if (
-        user is None
-        or not getattr(user, "is_active", False)
-        or not getattr(user, "is_authenticated", False)
-    ):
-        return False
+def _is_active_and_authenticated(user: User | None) -> TypeGuard[User]:
+    return (
+        user is not None
+        and getattr(user, "is_active", False)
+        and getattr(user, "is_authenticated", False)
+    )
 
-    return getattr(user, "is_superuser", False) or user.has_perm(
-        "paperless.view_global_statistics",
+
+def has_global_statistics_permission(user: User | None) -> bool:
+    return _is_active_and_authenticated(user) and (
+        getattr(user, "is_superuser", False)
+        or user.has_perm("paperless.view_global_statistics")
     )
 
 
 def has_system_status_permission(user: User | None) -> bool:
-    if (
-        user is None
-        or not getattr(user, "is_active", False)
-        or not getattr(user, "is_authenticated", False)
-    ):
-        return False
-
-    return (
+    return _is_active_and_authenticated(user) and (
         getattr(user, "is_superuser", False)
         or getattr(user, "is_staff", False)
         or user.has_perm("paperless.view_system_monitoring")
@@ -671,41 +671,6 @@ def annotate_document_count_for_related_queryset(
     )
 
 
-def get_objects_for_user_owner_aware(
-    user: User | None,
-    perms: str | list[str],
-    Model: Any,
-    *,
-    include_deleted: bool = False,
-) -> QuerySet[Any]:
-    """
-    Returns objects the user owns, are unowned, or has explicit perms.
-    When include_deleted is True, soft-deleted items are also included.
-
-    Legacy slow path (guardian-backed, O(n) style permission resolution).
-    Most queryset-filtering call sites have migrated onto
-    ``PermittedObjectsFilter``/``permitted_object_ids()``, but this function
-    is kept because production callers still remain. Several callers remain
-    across ``documents/``, ``paperless_mail/``, and ``paperless_ai/`` --
-    grep for this function name before removing it.
-    """
-    manager = (
-        Model.global_objects
-        if include_deleted and hasattr(Model, "global_objects")
-        else Model.objects
-    )
-
-    objects_owned = manager.filter(owner=user)
-    objects_unowned = manager.filter(owner__isnull=True)
-    objects_with_perms = get_objects_for_user(
-        user=user,
-        perms=perms,
-        klass=manager.all(),
-        accept_global_perms=False,
-    )
-    return objects_owned | objects_unowned | objects_with_perms
-
-
 def has_perms_owner_aware(user, perms, obj):
     """
     Legacy slow path (guardian-backed) single-object permission check.
@@ -727,7 +692,32 @@ def has_perms_owner_aware(user, perms, obj):
     return obj.owner is None or obj.owner == user or checker.has_perm(perms, obj)
 
 
-class ViewDocumentsPermissions(BasePermission):
+# HEAD is deliberately absent: GlobalPermissionsByMethod checks it against GET.
+MappedMethod = Literal["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
+
+
+class GlobalPermissionsByMethod(BasePermission):
+    """
+    Requires the global (model-level) permissions listed in ``perms_map`` for
+    the request's HTTP method. HEAD is checked against the ``"GET"`` entry,
+    since DRF runs the GET handler for it. A method missing from
+    ``perms_map`` is denied.
+    """
+
+    perms_map: ClassVar[Mapping[MappedMethod, Sequence[str]]]
+
+    def has_permission(self, request: Any, view: Any) -> bool:
+        if not request.user or not request.user.is_authenticated:
+            return False
+
+        method = "GET" if request.method == "HEAD" else request.method
+        # An unknown method is not a MappedMethod, but .get() returns None for
+        # it, so it is still denied.
+        perms = self.perms_map.get(cast("MappedMethod", method))
+        return perms is not None and request.user.has_perms(perms)
+
+
+class ViewDocumentsPermissions(GlobalPermissionsByMethod):
     """
     Permissions class that checks for model permissions for only viewing Documents.
     """
@@ -738,31 +728,18 @@ class ViewDocumentsPermissions(BasePermission):
         "POST": ["documents.view_document"],
     }
 
-    def has_permission(self, request, view):
-        if not request.user or (not request.user.is_authenticated):  # pragma: no cover
-            return False
 
-        return request.user.has_perms(self.perms_map.get(request.method, []))
-
-
-class TrashPermissions(BasePermission):
+class TrashPermissions(GlobalPermissionsByMethod):
     """Check the global document permission for each trash operation."""
 
     perms_map = {
         "OPTIONS": ["documents.view_document"],
-        "HEAD": ["documents.view_document"],
         "GET": ["documents.view_document"],
         "POST": ["documents.delete_document"],
     }
 
-    def has_permission(self, request, view):
-        if not request.user or not request.user.is_authenticated:  # pragma: no cover
-            return False
 
-        return request.user.has_perms(self.perms_map.get(request.method, []))
-
-
-class PaperlessNotePermissions(BasePermission):
+class PaperlessNotePermissions(GlobalPermissionsByMethod):
     """
     Permissions class that checks for model permissions for Notes.
     """
@@ -782,28 +759,13 @@ class PaperlessNotePermissions(BasePermission):
         ],
     }
 
-    def has_permission(self, request, view):
-        if not request.user or (not request.user.is_authenticated):  # pragma: no cover
-            return False
 
-        perms = self.perms_map[request.method]
-
-        return request.user.has_perms(perms)
-
-
-class AcknowledgeTasksPermissions(BasePermission):
+class AcknowledgeTasksPermissions(GlobalPermissionsByMethod):
     """
     Permissions class that checks for model permissions for acknowledging tasks.
     """
 
     perms_map = {
+        "OPTIONS": ["documents.change_paperlesstask"],
         "POST": ["documents.change_paperlesstask"],
     }
-
-    def has_permission(self, request: Any, view: Any) -> bool:
-        if not request.user or not request.user.is_authenticated:  # pragma: no cover
-            return False
-
-        perms = self.perms_map.get(request.method, [])
-
-        return request.user.has_perms(perms)

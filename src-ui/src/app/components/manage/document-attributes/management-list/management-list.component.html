@@ -11,7 +11,7 @@
       <div class="input-group input-group-sm w-auto d-none d-md-flex">
         <label class="input-group-text bg-transparent border-0" for="managementPageSize" i18n>Show:</label>
       </div>
-      <div class="input-group input-group-sm w-auto me-3">
+      <div class="input-group input-group-sm w-auto">
         <select id="managementPageSize" class="form-select form-select-sm small" [(ngModel)]="pageSize">
           <option [ngValue]="25">25</option>
           <option [ngValue]="50">50</option>
@@ -19,7 +19,9 @@
         </select>
         <span class="input-group-text text-muted d-none d-md-flex" i18n>per page</span>
       </div>
-      <ngb-pagination [pageSize]="pageSize" [collectionSize]="collectionSize()" [page]="page()" [maxSize]="5" (pageChange)="page.set($event); reloadData()" size="sm" aria-label="Pagination"></ngb-pagination>
+      @if (collectionSize() > pageSize) {
+        <ngb-pagination [pageSize]="pageSize" [collectionSize]="collectionSize()" [page]="page()" [maxSize]="5" (pageChange)="page.set($event); reloadData()" class="ms-3" size="sm" aria-label="Pagination"></ngb-pagination>
+      }
     </div>
   </div>
 
@@ -70,7 +72,7 @@
         }
       </div>
     }
-    @if (collectionSize() > 20) {
+    @if (collectionSize() > pageSize) {
       <ngb-pagination class="ms-auto" [pageSize]="pageSize" [collectionSize]="collectionSize()" [page]="page()" [maxSize]="5" (pageChange)="page.set($event); reloadData()" size="sm" aria-label="Pagination"></ngb-pagination>
     }
   </div>

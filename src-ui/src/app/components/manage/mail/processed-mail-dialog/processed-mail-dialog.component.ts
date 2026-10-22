@@ -67,7 +67,7 @@ export class ProcessedMailDialogComponent implements OnInit {
     this.processedMailService
       .bulk_delete(Array.from(this.selectedMailIds()))
       .subscribe(() => {
-        this.toastService.showInfo($localize`Processed mail(s) deleted`)
+        this.toastService.showSuccess($localize`Processed mail(s) deleted`)
         this.loadProcessedMails()
       })
   }

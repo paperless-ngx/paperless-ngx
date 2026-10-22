@@ -80,8 +80,16 @@ describe('ChatComponent', () => {
     expect(component.messages()[0].content).toBe('Hello')
     expect(component.loading()).toBe(true)
 
+    fixture.detectChanges()
+    const messagesEl = fixture.nativeElement.querySelector('.chat-messages')
+    expect(messagesEl.querySelector('.spinner-border')).not.toBeNull()
+    expect(messagesEl.textContent).toContain('Thinking...')
+
     mockStream$.next('Hi')
     expect(component.messages()[1].content).toBe('H')
+    fixture.detectChanges()
+    expect(messagesEl.querySelector('.spinner-border')).toBeNull()
+    expect(messagesEl.querySelector('.chat-markdown.streaming')).not.toBeNull()
     mockStream$.next('Hi there')
     // advance time to process the typewriter effect
     await jest.runAllTimersAsync()
@@ -96,6 +104,8 @@ describe('ChatComponent', () => {
     await fixture.whenStable()
     expect(component.loading()).toBe(false)
     expect(component.messages()[1].isStreaming).toBe(false)
+    fixture.detectChanges()
+    expect(messagesEl.querySelector('.chat-markdown.streaming')).toBeNull()
     expect(fixture.nativeElement.querySelector('#chatInput').disabled).toBe(
       false
     )
@@ -123,6 +133,10 @@ describe('ChatComponent', () => {
     mockStream$.next(
       `Hi there${CHAT_METADATA_DELIMITER}{"references":[{"id":42,"title":"Bread Recipe"}]}`
     )
+    fixture.detectChanges()
+    expect(fixture.nativeElement.querySelector('.chat-references')).toBeNull()
+
+    mockStream$.complete()
     jest.advanceTimersByTime(1000)
     fixture.detectChanges()
 
@@ -156,11 +170,94 @@ describe('ChatComponent', () => {
     component.input.set('Hello')
     component.sendMessage()
 
+    mockStream$.next('Partial')
     mockStream$.error('Error')
-    expect(component.messages()[1].content).toContain(
-      '⚠️ Error receiving response.'
+    expect(component.messages()[1].content).toBe(
+      'Partial\n\n⚠️ Error receiving response.'
     )
     expect(component.loading()).toBe(false)
+  })
+
+  it('should keep streaming until the typewriter catches up', () => {
+    component.input.set('Hello')
+    component.sendMessage()
+
+    mockStream$.next('Hi there')
+    mockStream$.complete()
+    expect(component.messages()[1].isStreaming).toBe(true)
+    expect(component.loading()).toBe(true)
+
+    jest.advanceTimersByTime(1000)
+    expect(component.messages()[1].content).toBe('Hi there')
+    expect(component.messages()[1].isStreaming).toBe(false)
+    expect(component.loading()).toBe(false)
+  })
+
+  it('should show a slow response message while waiting', () => {
+    component.input.set('Hello')
+    component.sendMessage()
+    fixture.detectChanges()
+    const messagesEl = fixture.nativeElement.querySelector('.chat-messages')
+    expect(messagesEl.textContent).not.toContain('Still thinking...')
+
+    jest.advanceTimersByTime(8000)
+    fixture.detectChanges()
+    expect(messagesEl.textContent).toContain('Still thinking...')
+
+    mockStream$.next('Hi')
+    expect(component.slowResponse()).toBe(false)
+  })
+
+  it('should stop streaming and keep the partial response', () => {
+    component.input.set('Hello')
+    component.sendMessage()
+    fixture.detectChanges()
+    const stopButton = fixture.nativeElement.querySelector('.chat-input button')
+    expect(stopButton.getAttribute('aria-label')).toBe('Stop')
+
+    mockStream$.next('Hi there')
+    jest.advanceTimersByTime(20)
+    stopButton.click()
+
+    expect(mockStream$.observed).toBe(false)
+    expect(component.messages()[1].content).toBe('Hi there')
+    expect(component.messages()[1].isStreaming).toBe(false)
+    expect(component.loading()).toBe(false)
+
+    jest.advanceTimersByTime(1000)
+    expect(component.messages()[1].content).toBe('Hi there')
+  })
+
+  it('should drop the empty response when stopped before any content', () => {
+    component.input.set('Hello')
+    component.sendMessage()
+    component.stopStreaming()
+
+    expect(component.messages()).toHaveLength(1)
+    expect(component.loading()).toBe(false)
+    component.stopStreaming() // no-op once stopped
+    expect(component.messages()).toHaveLength(1)
+  })
+
+  it('should clear the conversation', () => {
+    component.input.set('Hello')
+    component.sendMessage()
+    mockStream$.next('Hi there')
+    fixture.detectChanges()
+
+    fixture.nativeElement.querySelector('button[title="Clear chat"]').click()
+    expect(component.messages()).toHaveLength(0)
+    expect(component.loading()).toBe(false)
+    expect(mockStream$.observed).toBe(false)
+
+    fixture.detectChanges()
+    jest.advanceTimersByTime(10)
+    expect(document.activeElement).toBe(
+      fixture.nativeElement.querySelector('#chatInput')
+    )
+    expect(fixture.nativeElement.textContent).toContain(
+      'Answers come from your documents'
+    )
   })
 
   it('should enqueue typewriter chunks correctly', () => {
@@ -206,5 +303,34 @@ describe('ChatComponent', () => {
     })
     component.searchInputKeyDown(event)
     expect(component.sendMessage).not.toHaveBeenCalled()
+  })
+
+  it('should render markdown for assistant messages only', () => {
+    component.messages.set([
+      { role: 'user', content: '**user**' },
+      { role: 'assistant', content: '**assistant** <script>x</script>' },
+    ])
+    fixture.detectChanges()
+    const el: HTMLElement = fixture.nativeElement
+    expect(el.querySelector('.chat-markdown strong')?.textContent).toBe(
+      'assistant'
+    )
+    expect(el.querySelector('.chat-markdown script')).toBeNull()
+    expect(el.textContent).toContain('**user**')
+  })
+
+  it('should keep the destination hostname visible after sanitizing chat links', () => {
+    component.messages.set([
+      {
+        role: 'assistant',
+        content:
+          '[View original document](https://otherdomain.example/?data=secret)',
+      },
+    ])
+    fixture.detectChanges()
+    const el: HTMLElement = fixture.nativeElement
+    const link = el.querySelector('.chat-markdown a')
+    expect(link?.textContent).toBe('View original document')
+    expect(link?.nextElementSibling?.textContent).toBe('(otherdomain.example)')
   })
 })

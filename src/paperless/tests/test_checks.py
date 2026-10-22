@@ -1,4 +1,5 @@
 import os
+import shutil
 from collections.abc import Callable
 from pathlib import Path
 from unittest import mock
@@ -25,9 +26,30 @@ class TestChecks:
     def test_binaries(self) -> None:
         assert binaries_check(None) == []
 
-    def test_binaries_fail(self, settings: Settings) -> None:
-        settings.CONVERT_BINARY = "uuuhh"
-        assert len(binaries_check(None)) == 1
+    def test_binaries_fail(self, mocker: MockerFixture) -> None:
+        """
+        GIVEN:
+            - None of tesseract, ghostscript, pdftoppm or pdfinfo can be found
+        WHEN:
+            - The binaries check runs
+        THEN:
+            - One warning is raised per missing binary
+        """
+        mocker.patch("paperless.checks.shutil.which", return_value=None)
+        assert len(binaries_check(None)) == 4
+
+    @pytest.mark.parametrize("binary", ["pdftoppm", "pdfinfo"])
+    def test_binaries_fail_poppler(self, mocker: MockerFixture, binary: str) -> None:
+        real_which = shutil.which
+        mocker.patch(
+            "paperless.checks.shutil.which",
+            side_effect=lambda name: None if name == binary else real_which(name),
+        )
+
+        msgs = binaries_check(None)
+
+        assert len(msgs) == 1
+        assert binary in msgs[0].msg
 
     @pytest.mark.usefixtures("paperless_dirs")
     def test_paths_check(self) -> None:

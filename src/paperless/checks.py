@@ -82,7 +82,7 @@ def binaries_check(app_configs: Any, **kwargs: Any) -> list[Error]:
     error = "Paperless can't find {}. Without it, consumption is impossible."
     hint = "Either it's not in your ${PATH} or it's not installed."
 
-    binaries = (settings.CONVERT_BINARY, "tesseract", "gs")
+    binaries = ("tesseract", "gs", "pdftoppm", "pdfinfo")
 
     check_messages = []
     for binary in binaries:

@@ -99,11 +99,16 @@ describe('TrashComponent', () => {
     modal.componentInstance.confirmClicked.next()
     expect(toastErrorSpy).toHaveBeenCalled()
 
+    let toasts
+    toastService.getToasts().subscribe((allToasts) => {
+      toasts = [...allToasts]
+    })
     trashSpy.mockReturnValue(of('OK'))
     component.delete(documentsInTrash[0])
     expect(modal).toBeDefined()
     modal.componentInstance.confirmClicked.next()
     expect(trashSpy).toHaveBeenCalled()
+    expect(toasts[0].content).toContain('deleted')
   })
 
   it('should support empty trash, show error if needed', () => {

@@ -190,7 +190,7 @@ export class ConfigComponent
           this.initialize(config)
           this.store.next(config)
           this.settingsService.initializeSettings().subscribe()
-          this.toastService.showInfo($localize`Configuration updated`)
+          this.toastService.showSuccess($localize`Configuration updated`)
         },
         error: (e) => {
           this.loading.set(false)
@@ -217,7 +217,7 @@ export class ConfigComponent
           this.initialize(config)
           this.store.next(config)
           this.settingsService.initializeSettings().subscribe()
-          this.toastService.showInfo($localize`File successfully updated`)
+          this.toastService.showSuccess($localize`File successfully updated`)
         },
         error: (e) => {
           this.loading.set(false)

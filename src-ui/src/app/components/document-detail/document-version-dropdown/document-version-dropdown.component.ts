@@ -320,7 +320,7 @@ export class DocumentVersionDropdownComponent
               }
               this.newVersionLabel = ''
               modal.close()
-              this.toastService.showInfo(
+              this.toastService.showSuccess(
                 $localize`Existing document added as a version.`
               )
             },

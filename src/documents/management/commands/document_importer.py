@@ -66,7 +66,7 @@ def iter_manifest_records(path: Path) -> Generator[dict, None, None]:
     """Yield records one at a time from a manifest JSON array via ijson."""
     try:
         with path.open("rb") as f:
-            yield from ijson.items(f, "item")
+            yield from ijson.items(f, "item", use_float=True)
     except ijson.JSONError as e:
         raise CommandError(f"Failed to parse manifest file {path}: {e}") from e
 

@@ -976,13 +976,6 @@ MAX_IMAGE_PIXELS: Final[int | None] = get_int_from_env(
 # GNUPG needs a home directory for some reason
 GNUPG_HOME = os.getenv("HOME", "/tmp")
 
-# Convert is part of the ImageMagick package
-CONVERT_BINARY = os.getenv("PAPERLESS_CONVERT_BINARY", "convert")
-CONVERT_TMPDIR = os.getenv("PAPERLESS_CONVERT_TMPDIR")
-CONVERT_MEMORY_LIMIT = os.getenv("PAPERLESS_CONVERT_MEMORY_LIMIT")
-
-GS_BINARY = os.getenv("PAPERLESS_GS_BINARY", "gs")
-
 # Fallback layout for .eml consumption
 EMAIL_PARSE_DEFAULT_LAYOUT = get_int_from_env(
     "PAPERLESS_EMAIL_PARSE_DEFAULT_LAYOUT",

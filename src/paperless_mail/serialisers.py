@@ -2,8 +2,8 @@ from django.utils.translation import gettext as _
 from rest_framework import serializers
 from rest_framework.exceptions import PermissionDenied
 
-from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import has_perms_owner_aware
+from documents.permissions import restrict_queryset_to_visible
 from documents.serialisers import CorrespondentField
 from documents.serialisers import DocumentTypeField
 from documents.serialisers import OwnedObjectSerializer
@@ -68,10 +68,10 @@ class AccountField(serializers.PrimaryKeyRelatedField[MailAccount]):
         if user is None:
             return MailAccount.objects.none()
 
-        return get_objects_for_user_owner_aware(
+        return restrict_queryset_to_visible(
+            MailAccount.objects.all(),
             user,
             "change_mailaccount",
-            MailAccount,
         ).order_by("-id")
 
 

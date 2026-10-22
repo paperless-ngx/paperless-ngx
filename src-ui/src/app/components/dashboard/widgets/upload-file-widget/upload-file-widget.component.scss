@@ -20,48 +20,6 @@
   font-size: 0.75rem;
 }
 
-.alert-heading {
-  font-size: 80%;
-  font-weight: bold;
-}
-
-.alerts-hidden {
-  .btn {
-    line-height: 1;
-  }
-}
-
-.btn-open {
-  line-height: 1;
-
-  i-bs {
-    margin-top: -1px;
-  }
-}
-
-.progress {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  height: auto;
-  mix-blend-mode: soft-light;
-  pointer-events: none;
-}
-
 ::ng-deep .ngx-file-drop__drop-zone--over {
   background-color: var(--pngx-primary-faded) !important;
-}
-
-.consumer-status-card {
-  background-color: rgba(var(--bs-body-bg-rgb), .95) !important;
-}
-
-.consumer-status-list {
-  max-height: calc(100vh - 312px); // e.g. below the upload button, mobile
-
-  @media screen and (min-width: 768px) {
-    max-height: calc(100vh - 208px); // e.g. below the upload button
-  }
 }

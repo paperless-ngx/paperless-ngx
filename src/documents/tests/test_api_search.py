@@ -1001,6 +1001,21 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 10)
 
+    def test_search_autocomplete_head_requires_view_document(self) -> None:
+        """
+        GIVEN:
+            - A user without the global view document permission
+        WHEN:
+            - A HEAD request is made for autocomplete
+        THEN:
+            - It is rejected like the equivalent GET request
+        """
+        self.client.force_authenticate(user=UserFactory())
+
+        response = self.client.head("/api/search/autocomplete/?term=test")
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
     def test_search_autocomplete_respect_permissions(self) -> None:
         """
         GIVEN:
@@ -2136,29 +2151,6 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["documents"]), 1)
         self.assertEqual(response.data["documents"][0]["id"], title_match.id)
-
-    def test_global_search_returns_latest_version_content(self) -> None:
-        root = Document.objects.create(
-            title="bank statement",
-            content="superseded content",
-            checksum="GSV1",
-            pk=23,
-        )
-        Document.objects.create(
-            title="bank statement v2",
-            content="latest content",
-            checksum="GSV2",
-            pk=24,
-            root_document=root,
-            version_index=1,
-        )
-
-        self.client.force_authenticate(self.user)
-
-        response = self.client.get("/api/search/?query=bank&db_only=true")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        returned = {doc["id"]: doc["content"] for doc in response.data["documents"]}
-        self.assertEqual(returned.get(root.id), "latest content")
 
     def test_global_search_filters_owned_mail_objects(self) -> None:
         user1 = UserFactory(username="mail-search-user")

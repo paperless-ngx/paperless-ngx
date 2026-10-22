@@ -4,6 +4,7 @@ import shutil
 from contextlib import contextmanager
 from pathlib import Path
 from typing import TYPE_CHECKING
+from unittest.mock import patch
 
 import pytest
 import zxingcpp
@@ -13,6 +14,7 @@ from django.test import override_settings
 from rest_framework import status
 
 from documents import tasks
+from documents.barcodes import Barcode
 from documents.barcodes import BarcodePlugin
 from documents.barcodes import read_barcode_values
 from documents.consumer import ConsumerError
@@ -843,6 +845,89 @@ class TestTagBarcode(DirectoriesMixin, SampleDirMixin, GetReaderPluginMixin, Tes
         reader.setup()
         yield reader
         reader.cleanup()
+
+    @override_settings(
+        CONSUMER_ENABLE_BARCODES=True,
+        CONSUMER_ENABLE_ASN_BARCODE=True,
+        CONSUMER_ENABLE_TAG_BARCODE=True,
+        CONSUMER_TAG_BARCODE_SPLIT=True,
+    )
+    def test_first_page_tags_without_split(self) -> None:
+        test_file = self.BARCODE_SAMPLE_DIR / "barcode-39-asn-123.pdf"
+        with self.get_reader(test_file) as reader:
+            reader.barcodes = [
+                Barcode(0, "ASN123,TAG:invoice", reader.settings),
+            ]
+            existing_tag = Tag.objects.create(name="existing")
+            reader.metadata.tag_ids = [existing_tag.pk]
+
+            reader.run()
+
+            self.assertEqual(reader.metadata.asn, 123)
+            self.assertCountEqual(
+                reader.metadata.tag_ids,
+                [existing_tag.pk, Tag.objects.get(name="invoice").pk],
+            )
+
+    @override_settings(
+        CONSUMER_ENABLE_BARCODES=True,
+        CONSUMER_ENABLE_ASN_BARCODE=True,
+        CONSUMER_ENABLE_TAG_BARCODE=True,
+        CONSUMER_TAG_BARCODE_SPLIT=False,
+    )
+    def test_asn_split_preserves_tags_when_tag_split_disabled(self) -> None:
+        source = self.BARCODE_SAMPLE_DIR / "split-by-tag-basic.pdf"
+        test_file = self.dirs.scratch_dir / "asn-split.pdf"
+        shutil.copy(source, test_file)
+        with self.get_reader(test_file) as reader:
+            reader.barcodes = [
+                Barcode(0, "ASN123", reader.settings),
+                Barcode(0, "TAG:invoice", reader.settings),
+                Barcode(1, "ASN456", reader.settings),
+                Barcode(1, "TAG:receipt", reader.settings),
+            ]
+            existing_tag = Tag.objects.create(name="existing")
+            reader.metadata.tag_ids = [existing_tag.pk]
+
+            with patch("documents.tasks.consume_file.apply_async") as consume:
+                with self.assertRaises(StopConsumeTaskError):
+                    reader.run()
+
+            self.assertEqual(consume.call_count, 2)
+            for call in consume.call_args_list:
+                self.assertCountEqual(
+                    call.kwargs["kwargs"]["overrides"].tag_ids,
+                    [
+                        existing_tag.pk,
+                        Tag.objects.get(name="invoice").pk,
+                        Tag.objects.get(name="receipt").pk,
+                    ],
+                )
+
+    @override_settings(
+        CONSUMER_ENABLE_BARCODES=True,
+        CONSUMER_ENABLE_TAG_BARCODE=True,
+        CONSUMER_TAG_BARCODE_SPLIT=False,
+        CONSUMER_BARCODE_RETAIN_SPLIT_PAGES=False,
+    )
+    def test_discarded_separator_page_preserves_tags(self) -> None:
+        source = self.BARCODE_SAMPLE_DIR / "split-by-tag-basic.pdf"
+        test_file = self.dirs.scratch_dir / "separator-split.pdf"
+        shutil.copy(source, test_file)
+        with self.get_reader(test_file) as reader:
+            reader.barcodes = [
+                Barcode(0, reader.settings.barcode_string, reader.settings),
+                Barcode(0, "TAG:invoice", reader.settings),
+            ]
+            with patch("documents.tasks.consume_file.apply_async") as consume:
+                with self.assertRaises(StopConsumeTaskError):
+                    reader.run()
+
+            consume.assert_called_once()
+            self.assertEqual(
+                consume.call_args.kwargs["kwargs"]["overrides"].tag_ids,
+                [Tag.objects.get(name="invoice").pk],
+            )
 
     @override_settings(
         CONSUMER_ENABLE_TAG_BARCODE=True,

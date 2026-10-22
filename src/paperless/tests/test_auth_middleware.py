@@ -51,3 +51,21 @@ class TestAutoLoginMiddleware(TestCase):
         self._process(request)
 
         self.assertFalse(request.user.is_authenticated)
+
+    @override_settings(FORCE_SCRIPT_NAME="/paperless")
+    def test_token_request_is_not_logged_in_under_subpath(self) -> None:
+        """
+        GIVEN:
+            - Paperless is served under a subpath
+        WHEN:
+            - A token is requested via POST
+        THEN:
+            - The request is left anonymous so the posted credentials are used
+        """
+        UserFactory(username="autologin")
+
+        request = self.factory.post("/api/token/")
+        request.user = AnonymousUser()
+        self._process(request)
+
+        self.assertFalse(request.user.is_authenticated)

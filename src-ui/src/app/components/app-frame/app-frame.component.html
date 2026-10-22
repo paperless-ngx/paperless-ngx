@@ -29,8 +29,20 @@
   </div>
   <div class="search-container flex-grow-1 py-2 pb-3 pb-sm-2 me-sm-auto order-3 order-sm-1"
     [class.mobile-hidden]="mobileSearchHidden()">
-    <div class="col-12 header-search mx-auto">
-      <pngx-global-search></pngx-global-search>
+    <div class="col-12 header-search mx-auto d-flex align-items-stretch gap-3">
+      <pngx-global-search class="flex-grow-1"></pngx-global-search>
+      <div *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.Document }" class="btn-group header-upload-group flex-shrink-0">
+        <button class="btn btn-sm header-upload border-0 d-flex align-items-center justify-content-center py-0 px-2" type="button"
+          (click)="fileUpload.click()" aria-label="Upload documents" i18n-aria-label>
+          <i-bs class="d-flex" width="1.1em" height="1.1em" name="file-earmark-arrow-up"></i-bs><span class="ms-2 d-sm-none d-md-inline" i18n>Upload</span>
+        </button>
+        @if (uploadsInProgress > 0) {
+          <button class="btn btn-sm header-upload border-0 d-flex align-items-center py-0 px-2" type="button"
+            (click)="showUploadStatus()" aria-label="Show document processing status" i18n-aria-label>
+            <span class="spinner-border spinner-border-sm" aria-hidden="true"></span><span class="ms-2 small">{{ uploadsInProgress }}</span>
+          </button>
+        }
+      </div>
     </div>
   </div>
   <ul ngbNav class="order-sm-3">
@@ -69,6 +81,9 @@
     </li>
   </ul>
 </nav>
+
+<input type="file" class="visually-hidden" id="navbar-file-upload" (change)="onFileSelected($event)" multiple #fileUpload tabindex="-1" aria-hidden="true">
+<label for="navbar-file-upload" class="visually-hidden" i18n>Upload Files</label>
 
 <div class="container-fluid">
   <div class="row">
@@ -419,5 +434,6 @@
       [ngClass]="slimSidebarEnabled ? 'col-slim' : 'col-sidebar-expanded'">
       <router-outlet></router-outlet>
     </main>
+    <pngx-upload-status-tray></pngx-upload-status-tray>
   </div>
 </div>

@@ -86,7 +86,7 @@ export class WorkflowsComponent
     modal.componentInstance.succeeded
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((newWorkflow) => {
-        this.toastService.showInfo(
+        this.toastService.showSuccess(
           $localize`Saved workflow "${newWorkflow.name}".`
         )
         this.workflowService.clearCache()
@@ -138,7 +138,7 @@ export class WorkflowsComponent
       this.workflowService.delete(workflow).subscribe({
         next: () => {
           modal.close()
-          this.toastService.showInfo(
+          this.toastService.showSuccess(
             $localize`Deleted workflow "${workflow.name}".`
           )
           this.workflowService.clearCache()
@@ -157,7 +157,7 @@ export class WorkflowsComponent
   toggleWorkflowEnabled(workflow: Workflow) {
     this.workflowService.patch(workflow).subscribe({
       next: () => {
-        this.toastService.showInfo(
+        this.toastService.showSuccess(
           workflow.enabled
             ? $localize`Enabled workflow "${workflow.name}"`
             : $localize`Disabled workflow "${workflow.name}"`

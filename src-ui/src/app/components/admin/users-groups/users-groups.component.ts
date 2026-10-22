@@ -116,12 +116,13 @@ export class UsersAndGroupsComponent
             $localize`Password has been changed, you will be logged out momentarily.`
           )
           setTimeout(() => {
+            const basePath = new URL(document.baseURI).pathname
             setLocationHref(
-              `${window.location.origin}/accounts/logout/?next=/accounts/login/?next=/`
+              `${window.location.origin}${basePath}accounts/logout/?next=${basePath}accounts/login/?next=${basePath}`
             )
           }, 2500)
         } else {
-          this.toastService.showInfo(
+          this.toastService.showSuccess(
             $localize`Saved user "${newUser.username}".`
           )
           this.usersService.listAll().subscribe((r) => {
@@ -150,7 +151,9 @@ export class UsersAndGroupsComponent
       this.usersService.delete(user).subscribe({
         next: () => {
           modal.close()
-          this.toastService.showInfo($localize`Deleted user "${user.username}"`)
+          this.toastService.showSuccess(
+            $localize`Deleted user "${user.username}"`
+          )
           this.usersService.listAll().subscribe((r) => {
             this.users.set(r.results)
           })
@@ -177,7 +180,9 @@ export class UsersAndGroupsComponent
     modal.componentInstance.succeeded
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe((newGroup) => {
-        this.toastService.showInfo($localize`Saved group "${newGroup.name}".`)
+        this.toastService.showSuccess(
+          $localize`Saved group "${newGroup.name}".`
+        )
         this.groupsService.listAll().subscribe((r) => {
           this.groups.set(r.results)
         })
@@ -203,7 +208,9 @@ export class UsersAndGroupsComponent
       this.groupsService.delete(group).subscribe({
         next: () => {
           modal.close()
-          this.toastService.showInfo($localize`Deleted group "${group.name}"`)
+          this.toastService.showSuccess(
+            $localize`Deleted group "${group.name}"`
+          )
           this.groupsService.listAll().subscribe((r) => {
             this.groups.set(r.results)
           })

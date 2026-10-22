@@ -167,7 +167,7 @@ describe('SettingsService', () => {
     expect(settingsService.getLanguage()).toEqual('')
     expect(settingsService.get(SETTINGS_KEYS.DARK_MODE_ENABLED)).toBeFalsy()
     expect(
-      settingsService.get(SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_NEW_DOCUMENT)
+      settingsService.get(SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_SUCCESS)
     ).toBeTruthy()
     expect(settingsService.get(SETTINGS_KEYS.DOCUMENT_LIST_SIZE)).toEqual(50)
     expect(settingsService.get(SETTINGS_KEYS.THEME_COLOR)).toEqual('#9fbf2f')
@@ -198,17 +198,14 @@ describe('SettingsService', () => {
 
     settingsService.setLanguage('de-de')
     settingsService.set(SETTINGS_KEYS.DARK_MODE_ENABLED, true)
-    settingsService.set(
-      SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_NEW_DOCUMENT,
-      false
-    )
+    settingsService.set(SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_SUCCESS, false)
     settingsService.set(SETTINGS_KEYS.DOCUMENT_LIST_SIZE, 25)
     settingsService.set(SETTINGS_KEYS.THEME_COLOR, '#000000')
 
     expect(settingsService.getLanguage()).toEqual('de-de')
     expect(settingsService.get(SETTINGS_KEYS.DARK_MODE_ENABLED)).toBeTruthy()
     expect(
-      settingsService.get(SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_NEW_DOCUMENT)
+      settingsService.get(SETTINGS_KEYS.NOTIFICATIONS_CONSUMER_SUCCESS)
     ).toBeFalsy()
     expect(settingsService.get(SETTINGS_KEYS.DOCUMENT_LIST_SIZE)).toEqual(25)
     expect(settingsService.get(SETTINGS_KEYS.THEME_COLOR)).toEqual('#000000')

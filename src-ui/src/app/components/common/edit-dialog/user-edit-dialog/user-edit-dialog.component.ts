@@ -132,7 +132,7 @@ export class UserEditDialogComponent
         next: (result) => {
           this.totpLoading.set(false)
           if (result) {
-            this.toastService.showInfo($localize`Totp deactivated`)
+            this.toastService.showSuccess($localize`Totp deactivated`)
             this.object.is_mfa_enabled = false
           } else {
             this.toastService.showError($localize`Totp deactivation failed`)

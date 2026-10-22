@@ -66,6 +66,7 @@
 }
 
 .search-container {
+  min-width: 0;
   padding-left: 1rem;
   padding-right: 1rem;
 }
@@ -499,6 +500,11 @@ main {
 
 // true center the search with equal flex widths
 @media (min-width: 768px) {
+  .search-container {
+    // Prevent input padding and the conditional search button from resizing
+    flex-basis: 55rem;
+  }
+
   .navbar-brand-container,
   .navbar > ul {
     display: flex; // so the brand link stays as wide as its contents
@@ -532,7 +538,36 @@ main {
 
 .header-search {
   width: 100%;
-  max-width: 55rem;
+  max-width: 50rem;
+}
+
+.header-search pngx-global-search {
+  min-width: 0;
+}
+
+// light w shadow to stand out against search
+.header-upload {
+  --bs-btn-bg: rgba(255, 255, 255, .15);
+  --bs-btn-hover-bg: rgba(255, 255, 255, .22);
+  --bs-btn-active-bg: rgba(255, 255, 255, .3);
+  color: var(--pngx-primary-text-contrast) !important; // .navbar .dropdown > .btn in styles.scss
+
+  & + & {
+    border-left: 1px solid rgba(255, 255, 255, .2) !important;
+  }
+
+  &:focus {
+    box-shadow: none;
+  }
+
+  &:focus-visible {
+    box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .5);
+  }
+}
+
+.header-upload-group {
+  border-radius: var(--bs-border-radius-sm);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .35), 0 1px 1px rgba(0, 0, 0, .2);
 }
 
 @media screen and (max-width: 575.98px) {
@@ -624,8 +659,7 @@ main {
 }
 
 .dropdown-toggle::after {
-  margin-left: 0.4em;
-  vertical-align: 0.155em;
+  display: none;
 }
 
 .navbar .dropdown-menu {
@@ -661,4 +695,8 @@ main {
 
 ::ng-deep .navItemDrag .position-absolute i-bs {
   display: none;
+}
+
+.smaller {
+  font-size: 0.75rem;
 }

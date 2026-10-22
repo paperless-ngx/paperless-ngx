@@ -679,7 +679,7 @@ export class SettingsService {
         .subscribe({
           next: () => {
             this.updateAppearanceSettings()
-            this.toastService.showInfo(successMessage)
+            this.toastService.showSuccess(successMessage)
           },
           error: (e) => {
             this.toastService.showError(errorMessage)
@@ -741,9 +741,10 @@ export class SettingsService {
       this.storeSettings()
         .pipe(first())
         .subscribe(() => {
-          this.toastService.showInfo(
-            $localize`You can restart the tour from the settings page.`
-          )
+          this.toastService.show({
+            content: $localize`You can restart the tour from the settings page.`,
+            delay: 5000,
+          })
         })
     }
   }

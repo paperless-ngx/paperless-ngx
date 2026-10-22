@@ -52,7 +52,7 @@ describe('EmailDocumentDialogComponent', () => {
 
   it('should support sending single document via email, showing error if needed', () => {
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const toastSuccessSpy = jest.spyOn(toastService, 'showInfo')
+    const toastSuccessSpy = jest.spyOn(toastService, 'showSuccess')
     component.documentIds.set([1])
     component.emailAddress = 'hello@paperless-ngx.com'
     component.emailSubject = 'Hello'
@@ -73,7 +73,7 @@ describe('EmailDocumentDialogComponent', () => {
 
   it('should support sending multiple documents via email, showing appropriate messages', () => {
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const toastSuccessSpy = jest.spyOn(toastService, 'showInfo')
+    const toastSuccessSpy = jest.spyOn(toastService, 'showSuccess')
     component.documentIds.set([1, 2, 3])
     component.emailAddress = 'hello@paperless-ngx.com'
     component.emailSubject = 'Hello'

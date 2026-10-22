@@ -409,7 +409,7 @@ describe('GlobalSearchComponent', () => {
 
     const editDialog = modal.componentInstance as CustomFieldEditDialogComponent
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    const toastInfoSpy = jest.spyOn(toastService, 'showSuccess')
 
     // fail first
     editDialog.failed.emit({ error: 'error creating item' })
@@ -460,7 +460,7 @@ describe('GlobalSearchComponent', () => {
 
     const editDialog = modal.componentInstance as CustomFieldEditDialogComponent
     const toastErrorSpy = jest.spyOn(toastService, 'showError')
-    const toastInfoSpy = jest.spyOn(toastService, 'showInfo')
+    const toastInfoSpy = jest.spyOn(toastService, 'showSuccess')
 
     // fail first
     editDialog.failed.emit({ error: 'error creating item' })

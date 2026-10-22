@@ -1,25 +1,4 @@
 <pngx-page-header [title]="title()" [id]="documentId()">
-  @if (archiveContentRenderType === ContentRenderType.PDF && !useNativePdfViewer) {
-    @if (previewNumPages()) {
-      <div class="input-group input-group-sm ms-2 d-none d-md-flex">
-        <div class="input-group-text" i18n>Page</div>
-          <input class="form-control flex-grow-0 w-auto" type="number" min="1" [max]="previewNumPages()" [ngModel]="previewCurrentPage()" (ngModelChange)="previewCurrentPage.set($event)" />
-        <div class="input-group-text" i18n>of {{previewNumPages()}}</div>
-      </div>
-    }
-    <div class="input-group input-group-sm me-md-5 d-none d-md-flex">
-      <button class="btn btn-outline-secondary" (click)="decreaseZoom()" i18n>-</button>
-      <select class="form-select" (change)="setZoom($event.target.value)" [ngModel]="currentZoom">
-        @for (setting of zoomSettings; track setting) {
-          <option [value]="setting">
-            {{ getZoomSettingTitle(setting) }}
-          </option>
-        }
-      </select>
-      <button class="btn btn-outline-secondary" (click)="increaseZoom()" i18n>+</button>
-    </div>
-  }
-
   <button type="button" class="btn btn-sm btn-outline-danger me-md-4" (click)="delete()" [disabled]="!userIsOwner" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Document }" aria-label="Delete" i18n-aria-label>
     <i-bs width="1.2em" height="1.2em" name="trash"></i-bs><span class="d-none d-lg-inline ps-1" i18n>Delete</span>
   </button>
@@ -34,7 +13,7 @@
     (versionsUpdated)="onVersionsUpdated($event)"
   />
 
-  <div class="btn-group">
+  <div class="btn-group ms-4">
     <button (click)="download()" class="btn btn-sm btn-outline-primary" [disabled]="downloading()" aria-label="Download" i18n-aria-label>
       @if (downloading()) {
         <div class="spinner-border spinner-border-sm" role="status"></div>
@@ -67,24 +46,24 @@
     </button>
     <div ngbDropdownMenu aria-labelledby="actionsDropdown" class="shadow">
       <button ngbDropdownItem (click)="reprocess()" [disabled]="!userCanEdit || !userIsOwner">
-        <i-bs width="1em" height="1em" name="arrow-counterclockwise" class="me-1"></i-bs><span i18n>Reprocess</span>
+        <i-bs width="1em" height="1em" name="arrow-counterclockwise" class="me-2"></i-bs><span i18n>Reprocess</span>
       </button>
 
       <button ngbDropdownItem (click)="printDocument()" [hidden]="useNativePdfViewer || isMobile">
-        <i-bs width="1em" height="1em" name="printer" class="me-1"></i-bs><span i18n>Print</span>
+        <i-bs width="1em" height="1em" name="printer" class="me-2"></i-bs><span i18n>Print</span>
       </button>
 
       <button ngbDropdownItem (click)="moreLike()">
-        <i-bs width="1em" height="1em" name="diagram-3" class="me-1"></i-bs><span i18n>More like this</span>
+        <i-bs width="1em" height="1em" name="diagram-3" class="me-2"></i-bs><span i18n>More like this</span>
       </button>
 
       <button ngbDropdownItem (click)="editPdf()" [disabled]="!userIsOwner || !userCanEdit || originalContentRenderType !== ContentRenderType.PDF">
-        <i-bs name="pencil" class="me-1"></i-bs><ng-container i18n>PDF Editor</ng-container>
+        <i-bs name="pencil" class="me-2"></i-bs><ng-container i18n>PDF Editor</ng-container>
       </button>
 
       @if (userIsOwner && (requiresPassword || password)) {
         <button ngbDropdownItem (click)="removePassword()" [disabled]="!password">
-          <i-bs name="unlock" class="me-1"></i-bs><ng-container i18n>Remove Password</ng-container>
+          <i-bs name="unlock" class="me-2"></i-bs><ng-container i18n>Remove Password</ng-container>
         </button>
       }
     </div>
@@ -94,13 +73,13 @@
     <button class="btn btn-sm btn-outline-primary" id="sendDropdown" ngbDropdownToggle aria-label="Send" i18n-aria-label>
       <i-bs name="send"></i-bs><div class="d-none d-sm-inline ms-1"><ng-container i18n>Send</ng-container></div>
     </button>
-    <div ngbDropdownMenu aria-labelledby="actionsDropdown" class="shadow">
+    <div ngbDropdownMenu aria-labelledby="sendDropdown" class="shadow">
       <button ngbDropdownItem (click)="openShareLinks()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.ShareLink }">
-        <i-bs name="link" class="me-1"></i-bs><span i18n>Share Links</span>
+        <i-bs name="link" class="me-2"></i-bs><span i18n>Share Links</span>
       </button>
       @if (emailEnabled) {
         <button ngbDropdownItem (click)="openEmailDocument()">
-          <i-bs name="envelope" class="me-1"></i-bs><span i18n>Email</span>
+          <i-bs name="envelope" class="me-2"></i-bs><span i18n>Email</span>
         </button>
       }
     </div>
@@ -113,8 +92,8 @@
 
     <form [formGroup]='documentForm' (ngSubmit)="save()">
 
-      <div class="btn-toolbar justify-content-end mb-1 pb-3 gap-2 row-gap-2 border-bottom">
-        <div class="btn-group me-auto">
+      <div class="btn-toolbar mb-1 pb-3 gap-2 row-gap-2 border-bottom">
+        <div class="btn-group">
           <button type="button" class="btn btn-sm btn-outline-secondary" i18n-title title="Close" (click)="close()">
             <i-bs width="1.2em" height="1.2em" name="x"></i-bs>
           </button>
@@ -127,43 +106,30 @@
         </div>
 
         <ng-container *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }">
-          <div class="d-flex gap-2">
-            <div class="btn-group">
-              <pngx-suggestions-dropdown *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }"
-                [disabled]="!userCanEdit || suggestionsLoading()"
-                [loading]="suggestionsLoading()"
-                [suggestions]="suggestions()"
-                [aiEnabled]="aiEnabled"
-                [source]="suggestionSource"
-                [defaultSource]="defaultSuggestionSource"
-                [fetchedSources]="fetchedSuggestionSources()"
-                [appliedTags]="documentForm.value.tags"
-                [appliedCorrespondent]="documentForm.value.correspondent"
-                [appliedDocumentType]="documentForm.value.document_type"
-                [appliedStoragePath]="documentForm.value.storage_path"
-                [appliedTitle]="documentForm.value.title"
-                [appliedCreated]="documentForm.value.created"
-                (getSuggestions)="getSuggestions($event)"
-                (sourceChange)="suggestionSourceOverride.set($event)"
-                (addTag)="createTag($event)"
-                (addDocumentType)="createDocumentType($event)"
-                (addCorrespondent)="createCorrespondent($event)">
-              </pngx-suggestions-dropdown>
-            </div>
-
-            <div class="btn-group">
-              <pngx-custom-fields-dropdown
-                *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.CustomField }"
-                [documentId]="documentId()"
-                [disabled]="!userCanEdit"
-                [existingFields]="document()?.custom_fields"
-                (created)="refreshCustomFields()"
-                (added)="addField($event)">
-              </pngx-custom-fields-dropdown>
-            </div>
+          <div class="btn-group ms-3">
+            <pngx-suggestions-dropdown *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }"
+              [disabled]="!userCanEdit || suggestionsLoading()"
+              [loading]="suggestionsLoading()"
+              [suggestions]="suggestions()"
+              [aiEnabled]="aiEnabled"
+              [source]="suggestionSource"
+              [defaultSource]="defaultSuggestionSource"
+              [fetchedSources]="fetchedSuggestionSources()"
+              [appliedTags]="documentForm.value.tags"
+              [appliedCorrespondent]="documentForm.value.correspondent"
+              [appliedDocumentType]="documentForm.value.document_type"
+              [appliedStoragePath]="documentForm.value.storage_path"
+              [appliedTitle]="documentForm.value.title"
+              [appliedCreated]="documentForm.value.created"
+              (getSuggestions)="getSuggestions($event)"
+              (sourceChange)="suggestionSourceOverride.set($event)"
+              (addTag)="createTag($event)"
+              (addDocumentType)="createDocumentType($event)"
+              (addCorrespondent)="createCorrespondent($event)">
+            </pngx-suggestions-dropdown>
           </div>
 
-          <div class="ps-3">
+          <div class="ms-auto">
             <ng-container *ngTemplateOutlet="saveButtons"></ng-container>
           </div>
         </ng-container>
@@ -290,8 +256,20 @@
               }
             </div>
 
-            <div class="d-flex justify-content-end border-top pt-3">
-              <ng-container *ngTemplateOutlet="saveButtons"></ng-container>
+            <div class="d-flex border-top pt-3">
+              <ng-container *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }">
+                <pngx-custom-fields-dropdown
+                  *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.CustomField }"
+                  [documentId]="documentId()"
+                  [disabled]="!userCanEdit"
+                  [existingFields]="document()?.custom_fields"
+                  (created)="refreshCustomFields()"
+                  (added)="addField($event)">
+                </pngx-custom-fields-dropdown>
+              </ng-container>
+              <div class="ms-auto">
+                <ng-container *ngTemplateOutlet="saveButtons"></ng-container>
+              </div>
             </div>
           </ng-template>
         </li>
@@ -328,9 +306,9 @@
                     <td i18n>Original filename</td>
                     <td>{{metadata()?.original_filename}}</td>
                   </tr>
-                  <tr>
+                  <tr class="align-middle">
                     <td i18n>Original SHA256 checksum</td>
-                    <td>{{metadata()?.original_checksum}}</td>
+                    <td><span class="badge bg-light font-monospace text-wrap text-break text-start">{{metadata()?.original_checksum}}</span></td>
                   </tr>
                   <tr>
                     <td i18n>Original file size</td>
@@ -341,9 +319,9 @@
                     <td>{{metadata()?.original_mime_type}}</td>
                   </tr>
                   @if (metadata()?.has_archive_version) {
-                    <tr>
+                    <tr class="align-middle">
                       <td i18n>Archive SHA256 checksum</td>
-                      <td>{{metadata()?.archive_checksum}}</td>
+                      <td><span class="badge bg-light font-monospace text-wrap text-break text-start">{{metadata()?.archive_checksum}}</span></td>
                     </tr>
                   }
                   @if (metadata()?.has_archive_version) {
@@ -408,7 +386,7 @@
             <a ngbNavLink i18n>Permissions</a>
             <ng-template ngbNavContent>
               <div class="mb-3">
-                <pngx-permissions-form [users]="users()" formControlName="permissions_form"></pngx-permissions-form>
+                <pngx-permissions-form title="" [users]="users()" formControlName="permissions_form"></pngx-permissions-form>
               </div>
             </ng-template>
           </li>
@@ -499,6 +477,29 @@
               (loadError)="onError($event)"
               (afterLoadComplete)="pdfPreviewLoaded($event)">
             </pngx-pdf-viewer>
+            <div class="position-absolute bottom-0 start-50 translate-middle-x z-1 mb-3 d-flex gap-2 p-1 bg-body border rounded shadow">
+              @if (previewNumPages()) {
+                <div class="input-group input-group-sm w-auto flex-nowrap">
+                  <input class="form-control flex-grow-0 w-auto" type="number" min="1" [max]="previewNumPages()" [ngModelOptions]="{standalone: true}" [ngModel]="previewCurrentPage()" (ngModelChange)="previewCurrentPage.set($event)" aria-label="Page" i18n-aria-label />
+                  <div class="input-group-text" i18n>of {{previewNumPages()}}</div>
+                </div>
+              }
+              <div class="input-group input-group-sm w-auto flex-nowrap">
+                <button class="btn btn-outline-secondary" (click)="decreaseZoom()" aria-label="Zoom out" i18n-aria-label>
+                  <i-bs width="1em" height="1em" name="dash"></i-bs>
+                </button>
+                <select class="form-select" (change)="setZoom($event.target.value)" [ngModelOptions]="{standalone: true}" [ngModel]="currentZoom" aria-label="Zoom" i18n-aria-label>
+                  @for (setting of zoomSettings; track setting) {
+                    <option [value]="setting">
+                      {{ getZoomSettingTitle(setting) }}
+                    </option>
+                  }
+                </select>
+                <button class="btn btn-outline-secondary" (click)="increaseZoom()" aria-label="Zoom in" i18n-aria-label>
+                  <i-bs width="1em" height="1em" name="plus"></i-bs>
+                </button>
+              </div>
+            </div>
           </div>
         } @else {
           <object [data]="previewUrl() | safeUrl" class="preview-sticky" width="100%"></object>

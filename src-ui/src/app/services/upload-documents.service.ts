@@ -1,6 +1,6 @@
 import { HttpEventType } from '@angular/common/http'
 import { Injectable, inject } from '@angular/core'
-import { Subscription } from 'rxjs'
+import { Subject, Subscription } from 'rxjs'
 import { DocumentService } from './rest/document.service'
 import {
   FileStatusPhase,
@@ -15,6 +15,21 @@ export class UploadDocumentsService {
   private websocketStatusService = inject(WebsocketStatusService)
 
   private uploadSubscriptions: Array<Subscription> = []
+
+  private readonly uploadsStartedSubject = new Subject<File[]>()
+
+  public uploadFiles(files: Iterable<File>) {
+    const started: File[] = []
+    for (const file of files) {
+      this.uploadFile(file)
+      started.push(file)
+    }
+    if (started.length) this.uploadsStartedSubject.next(started)
+  }
+
+  public onUploadsStarted() {
+    return this.uploadsStartedSubject.asObservable()
+  }
 
   public uploadFile(file: File) {
     let formData = new FormData()

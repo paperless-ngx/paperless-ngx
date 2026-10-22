@@ -165,17 +165,19 @@ class BarcodePlugin(ConsumeTaskPlugin):
         # Locate any barcodes in the files
         self.detect()
 
-        # try reading tags from barcodes
-        # If tag splitting is enabled, skip this on the original document - let each split document extract its own tags
-        # However, if we're processing a split document (original_path is set), extract tags
+        separator_pages = (
+            self.get_separation_pages() if self.settings.barcodes_enabled else {}
+        )
+
+        # Defer tags to split documents only when a split will actually happen.
         if (
             self.settings.barcode_enable_tag
             and (
                 not self.settings.barcode_tag_split
                 or self.input_doc.original_path is not None
+                or not separator_pages
             )
-            and (tags := self.tags) is not None
-            and len(tags) > 0
+            and (tags := self.tags)
         ):
             if self.metadata.tag_ids:
                 self.metadata.tag_ids += tags
@@ -184,9 +186,7 @@ class BarcodePlugin(ConsumeTaskPlugin):
             logger.info(f"Found tags in barcode: {tags}")
 
         # Lastly attempt to split documents
-        if self.settings.barcodes_enabled and (
-            separator_pages := self.get_separation_pages()
-        ):
+        if separator_pages:
             # We have pages to split against
 
             # Note this does NOT use the base_temp_dir, as that will be removed

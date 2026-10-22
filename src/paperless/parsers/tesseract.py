@@ -19,7 +19,7 @@ from documents.parsers import ParseError
 from documents.parsers import make_thumbnail_from_pdf
 from documents.utils import copy_file_with_basic_stats
 from documents.utils import maybe_override_pixel_limit
-from documents.utils import run_subprocess
+from documents.utils import remove_alpha_channel
 from paperless.config import OcrConfig
 from paperless.models import CleanChoices
 from paperless.models import ModeChoices
@@ -197,18 +197,7 @@ class RasterisedDocumentParser:
             return im.mode in ("RGBA", "LA")
 
     def remove_alpha(self, image_path: Path) -> Path:
-        no_alpha_image = Path(self.tempdir) / "image-no-alpha"
-        run_subprocess(
-            [
-                settings.CONVERT_BINARY,
-                "-alpha",
-                "off",
-                str(image_path),
-                str(no_alpha_image),
-            ],
-            logger=self.log,
-        )
-        return no_alpha_image
+        return remove_alpha_channel(image_path, Path(self.tempdir) / "image-no-alpha")
 
     def get_dpi(self, image: Path) -> int | None:
         try:
