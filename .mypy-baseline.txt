@@ -38,7 +38,6 @@ src/documents/bulk_edit.py:0: error: Incompatible types in assignment (expressio
 src/documents/bulk_edit.py:0: error: Invalid index type "str" for "dict[FieldDataType, str]"; expected type "FieldDataType"  [index]
 src/documents/bulk_edit.py:0: error: List comprehension has incompatible type List[tuple[int, Any]]; expected List[int]  [misc]
 src/documents/bulk_edit.py:0: error: List comprehension has incompatible type List[tuple[int, None]]; expected List[int]  [misc]
-src/documents/bulk_edit.py:0: error: Missing named argument "p" for "remove" of "PageList"  [call-arg]
 src/documents/bulk_edit.py:0: error: Missing type arguments for generic type "dict"  [type-arg]
 src/documents/bulk_edit.py:0: error: Missing type arguments for generic type "dict"  [type-arg]
 src/documents/bulk_edit.py:0: error: Need type annotation for "to_create" (hint: "to_create: list[<type>] = ...")  [var-annotated]
