@@ -137,6 +137,7 @@ from documents.filters import DocumentFilterSet
 from documents.filters import DocumentsOrderingFilter
 from documents.filters import DocumentTypeFilterSet
 from documents.filters import EffectiveContentFilter
+from documents.filters import ObjectFilter
 from documents.filters import PaperlessTaskFilterSet
 from documents.filters import PermittedObjectsFilter
 from documents.filters import ShareLinkBundleFilterSet
@@ -761,6 +762,19 @@ class EmailDocumentDetailSchema(EmailSerializer):
 
 
 @extend_schema_view(
+    list=extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name=name,
+                type=OpenApiTypes.INT,
+                many=True,
+                style="form",
+                explode=False,
+            )
+            for name, field in DocumentFilterSet.base_filters.items()
+            if isinstance(field, ObjectFilter)
+        ],
+    ),
     retrieve=extend_schema(
         description="Retrieve a single document",
         responses={
