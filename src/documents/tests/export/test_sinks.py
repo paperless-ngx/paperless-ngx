@@ -157,6 +157,28 @@ class TestDirectoryExportSink:
         assert not stale.exists()
         assert (target / "originals" / "doc.pdf").exists()
 
+    def test_delete_with_stale_stream_tmp_from_interrupted_run(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        # A previous run killed mid-stream leaves manifest.json.tmp behind; the
+        # next run reuses that path, so pruning must not trip over it.
+        target: Path = tmp_path / "out"
+        target.mkdir()
+        (target / "manifest.json.tmp").write_text("[", encoding="utf-8")
+        with DirectoryExportSink(
+            target,
+            compare_checksums=False,
+            compare_json=False,
+            delete=True,
+        ) as sink:
+            with sink.stream("manifest.json") as handle:
+                writer: StreamingManifestWriter = StreamingManifestWriter(handle)
+                writer.write_record({"pk": 1})
+                writer.close()
+        assert json.loads((target / "manifest.json").read_text()) == [{"pk": 1}]
+        assert not (target / "manifest.json.tmp").exists()
+
     def test_no_delete_keeps_unwritten_files(
         self,
         tmp_path: Path,

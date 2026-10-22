@@ -139,6 +139,7 @@ from documents.filters import DocumentFilterSet
 from documents.filters import DocumentsOrderingFilter
 from documents.filters import DocumentTypeFilterSet
 from documents.filters import EffectiveContentFilter
+from documents.filters import ObjectFilter
 from documents.filters import PaperlessTaskFilterSet
 from documents.filters import PermittedObjectsFilter
 from documents.filters import ShareLinkBundleFilterSet
@@ -179,12 +180,12 @@ from documents.permissions import ViewDocumentsPermissions
 from documents.permissions import annotate_document_count_by_ids
 from documents.permissions import annotate_document_count_for_related_queryset
 from documents.permissions import get_document_count_filter_for_user
-from documents.permissions import get_objects_for_user_owner_aware
 from documents.permissions import has_global_statistics_permission
 from documents.permissions import has_perms_owner_aware
 from documents.permissions import has_system_status_permission
 from documents.permissions import permitted_document_ids
 from documents.permissions import permitted_object_ids
+from documents.permissions import restrict_queryset_to_visible
 from documents.permissions import set_permissions_for_objects
 from documents.permissions import user_is_unrestricted
 from documents.plugins.date_parsing import get_date_parser
@@ -770,6 +771,19 @@ class EmailDocumentDetailSchema(EmailSerializer):
 
 
 @extend_schema_view(
+    list=extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name=name,
+                type=OpenApiTypes.INT,
+                many=True,
+                style="form",
+                explode=False,
+            )
+            for name, field in DocumentFilterSet.base_filters.items()
+            if isinstance(field, ObjectFilter)
+        ],
+    ),
     retrieve=extend_schema(
         description="Retrieve a single document",
         responses={
@@ -3954,49 +3968,51 @@ class GlobalSearchView(PassUserMixin):
                     if doc_id in docs_by_id
                 ][:OBJECT_LIMIT]
         saved_views = (
-            get_objects_for_user_owner_aware(
+            restrict_queryset_to_visible(
+                SavedView.objects.filter(name__icontains=query),
                 request.user,
                 "view_savedview",
-                SavedView,
-            ).filter(name__icontains=query)
+            )
             if request.user.has_perm("documents.view_savedview")
             else []
         )
         saved_views = saved_views[:OBJECT_LIMIT]
         tags = (
-            get_objects_for_user_owner_aware(request.user, "view_tag", Tag).filter(
-                name__icontains=query,
+            restrict_queryset_to_visible(
+                Tag.objects.filter(name__icontains=query),
+                request.user,
+                "view_tag",
             )
             if request.user.has_perm("documents.view_tag")
             else []
         )
         tags = tags[:OBJECT_LIMIT]
         correspondents = (
-            get_objects_for_user_owner_aware(
+            restrict_queryset_to_visible(
+                Correspondent.objects.filter(name__icontains=query),
                 request.user,
                 "view_correspondent",
-                Correspondent,
-            ).filter(name__icontains=query)
+            )
             if request.user.has_perm("documents.view_correspondent")
             else []
         )
         correspondents = correspondents[:OBJECT_LIMIT]
         document_types = (
-            get_objects_for_user_owner_aware(
+            restrict_queryset_to_visible(
+                DocumentType.objects.filter(name__icontains=query),
                 request.user,
                 "view_documenttype",
-                DocumentType,
-            ).filter(name__icontains=query)
+            )
             if request.user.has_perm("documents.view_documenttype")
             else []
         )
         document_types = document_types[:OBJECT_LIMIT]
         storage_paths = (
-            get_objects_for_user_owner_aware(
+            restrict_queryset_to_visible(
+                StoragePath.objects.filter(name__icontains=query),
                 request.user,
                 "view_storagepath",
-                StoragePath,
-            ).filter(name__icontains=query)
+            )
             if request.user.has_perm("documents.view_storagepath")
             else []
         )
@@ -4014,21 +4030,21 @@ class GlobalSearchView(PassUserMixin):
         )
         groups = groups[:OBJECT_LIMIT]
         mail_rules = (
-            get_objects_for_user_owner_aware(
+            restrict_queryset_to_visible(
+                MailRule.objects.filter(name__icontains=query),
                 request.user,
                 "view_mailrule",
-                MailRule,
-            ).filter(name__icontains=query)
+            )
             if request.user.has_perm("paperless_mail.view_mailrule")
             else []
         )
         mail_rules = mail_rules[:OBJECT_LIMIT]
         mail_accounts = (
-            get_objects_for_user_owner_aware(
+            restrict_queryset_to_visible(
+                MailAccount.objects.filter(name__icontains=query),
                 request.user,
                 "view_mailaccount",
-                MailAccount,
-            ).filter(name__icontains=query)
+            )
             if request.user.has_perm("paperless_mail.view_mailaccount")
             else []
         )
@@ -4149,33 +4165,33 @@ class StatisticsView(GenericAPIView[Any]):
         tags = (
             Tag.objects.all()
             if can_view_global_stats
-            else get_objects_for_user_owner_aware(user, "documents.view_tag", Tag)
+            else restrict_queryset_to_visible(Tag.objects.all(), user, "view_tag")
         ).only("id", "is_inbox_tag")
         correspondent_count = (
             Correspondent.objects.count()
             if can_view_global_stats
-            else get_objects_for_user_owner_aware(
+            else restrict_queryset_to_visible(
+                Correspondent.objects.all(),
                 user,
-                "documents.view_correspondent",
-                Correspondent,
+                "view_correspondent",
             ).count()
         )
         document_type_count = (
             DocumentType.objects.count()
             if can_view_global_stats
-            else get_objects_for_user_owner_aware(
+            else restrict_queryset_to_visible(
+                DocumentType.objects.all(),
                 user,
-                "documents.view_documenttype",
-                DocumentType,
+                "view_documenttype",
             ).count()
         )
         storage_path_count = (
             StoragePath.objects.count()
             if can_view_global_stats
-            else get_objects_for_user_owner_aware(
+            else restrict_queryset_to_visible(
+                StoragePath.objects.all(),
                 user,
-                "documents.view_storagepath",
-                StoragePath,
+                "view_storagepath",
             ).count()
         )
 

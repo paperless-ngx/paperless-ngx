@@ -1001,6 +1001,21 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 10)
 
+    def test_search_autocomplete_head_requires_view_document(self) -> None:
+        """
+        GIVEN:
+            - A user without the global view document permission
+        WHEN:
+            - A HEAD request is made for autocomplete
+        THEN:
+            - It is rejected like the equivalent GET request
+        """
+        self.client.force_authenticate(user=UserFactory())
+
+        response = self.client.head("/api/search/autocomplete/?term=test")
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
     def test_search_autocomplete_respect_permissions(self) -> None:
         """
         GIVEN:

@@ -3653,6 +3653,34 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+    def test_notes_head_and_unsupported_methods(self) -> None:
+        """
+        GIVEN:
+            - A user allowed to view notes on their own document
+        WHEN:
+            - The notes endpoint is requested with HEAD, PUT and PATCH
+        THEN:
+            - HEAD is allowed like GET
+            - PUT and PATCH are rejected with 403 rather than a server error
+        """
+        user = UserFactory()
+        grant_global(user, "view_note", "view_document")
+        doc = DocumentFactory(owner=user)
+        self.client.force_authenticate(user)
+
+        self.assertEqual(
+            self.client.head(f"/api/documents/{doc.pk}/notes/").status_code,
+            status.HTTP_200_OK,
+        )
+        self.assertEqual(
+            self.client.put(f"/api/documents/{doc.pk}/notes/").status_code,
+            status.HTTP_403_FORBIDDEN,
+        )
+        self.assertEqual(
+            self.client.patch(f"/api/documents/{doc.pk}/notes/").status_code,
+            status.HTTP_403_FORBIDDEN,
+        )
+
     def test_delete_note(self) -> None:
         """
         GIVEN:
