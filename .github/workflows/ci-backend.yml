@@ -76,6 +76,7 @@ jobs:
               - 'uv.lock'
               - 'docker/compose/docker-compose.ci-test.yml'
               - '.github/workflows/ci-backend.yml'
+              - '.github/actions/apt-install/**'
   test:
     needs: changes
     if: needs.changes.outputs.backend_changed == 'true'

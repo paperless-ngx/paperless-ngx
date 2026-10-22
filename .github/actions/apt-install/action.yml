@@ -1,53 +1,62 @@
 name: Install apt packages
 description: >
-  Installs apt packages with a per-attempt timeout and retries. The hosted runner's Azure apt mirror intermittently serves archives at a crawl, which apt's own timeout does not catch. A stuck attempt is killed and retried, which usually lands on a healthy mirror node.
+  Caches apt packages and their dependencies for an exact hosted runner image. Cache hits install offline; cache misses download from Ubuntu mirrors with bounded retries.
 
 inputs:
   packages:
-    description: Space separated list of packages to install
+    description: Space separated list of package names to install
     required: true
   attempts:
-    description: Maximum number of attempts
+    description: Maximum number of download attempts
     default: "3"
   attempt-timeout:
-    description: Seconds before a single attempt is killed
+    description: Seconds before a single download attempt is killed
     default: "180"
 runs:
   using: composite
   steps:
+    - name: Identify apt cache
+      id: cache-key
+      shell: bash
+      env:
+        PACKAGES: ${{ inputs.packages }}
+      run: |
+        # The bundle contains only dependencies missing from this runner. Never
+        # restore it onto a different image or initial package installation.
+        # Without an image version (e.g. self-hosted), download normally.
+        if [ -n "${ImageVersion:-}" ]; then
+          fingerprint=$({
+            printf '%s\n' "$PACKAGES"
+            dpkg --print-architecture
+            dpkg-query -W -f='${binary:Package}=${Version} ${db:Status-Abbrev}\n'
+            sha256sum "$GITHUB_ACTION_PATH/action.yml" "$GITHUB_ACTION_PATH/install.sh" | cut -d ' ' -f 1
+          } | sha256sum | cut -d ' ' -f 1)
+          echo "key=apt-v1-${ImageOS}-${ImageVersion}-${fingerprint}" >> "$GITHUB_OUTPUT"
+        fi
+    - name: Restore apt packages
+      id: cache
+      if: steps.cache-key.outputs.key != ''
+      uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: |
+          ${{ runner.temp }}/apt-packages/*.deb
+          ${{ runner.temp }}/apt-packages/complete
+        key: ${{ steps.cache-key.outputs.key }}
     - name: Install ${{ inputs.packages }}
       shell: bash
       env:
         PACKAGES: ${{ inputs.packages }}
         ATTEMPTS: ${{ inputs.attempts }}
         ATTEMPT_TIMEOUT: ${{ inputs.attempt-timeout }}
-      run: |
-        SUDO=""
-        if [ "$(id -u)" -ne 0 ]; then
-          SUDO="sudo"
-        fi
-
-        attempt_install() {
-          $SUDO apt-get update -q
-          # Intentionally unquoted, this is a list of package names
-          $SUDO apt-get install -q --yes --no-install-recommends $PACKAGES
-        }
-        export -f attempt_install
-        export SUDO PACKAGES
-
-        for attempt in $(seq 1 "${ATTEMPTS}"); do
-          echo "::group::apt install attempt ${attempt}/${ATTEMPTS}"
-          start=$(date +%s)
-          if timeout --kill-after=10 "${ATTEMPT_TIMEOUT}" bash -c attempt_install; then
-            echo "::endgroup::"
-            echo "Installed in $(( $(date +%s) - start ))s"
-            exit 0
-          fi
-          echo "::endgroup::"
-          echo "::warning::apt install attempt ${attempt}/${ATTEMPTS} failed or exceeded ${ATTEMPT_TIMEOUT}s"
-          # A killed attempt can leave dpkg half configured
-          $SUDO dpkg --configure -a || true
-        done
-
-        echo "::error::apt install failed after ${ATTEMPTS} attempts"
-        exit 1
+        CACHE_DIR: ${{ runner.temp }}/apt-packages
+        CACHE_HIT: ${{ steps.cache.outputs.cache-hit }}
+      run: bash "$GITHUB_ACTION_PATH/install.sh"
+    # Save immediately: a later test failure must not discard a good apt bundle.
+    - name: Save apt packages
+      if: steps.cache-key.outputs.key != '' && steps.cache.outputs.cache-hit != 'true'
+      uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: |
+          ${{ runner.temp }}/apt-packages/*.deb
+          ${{ runner.temp }}/apt-packages/complete
+        key: ${{ steps.cache-key.outputs.key }}
