@@ -172,10 +172,10 @@
         <input class="w-25 form-control rounded-end" type="text" [(ngModel)]="atom.value" [ngModelOptions]="{standalone: true}" [disabled]="disabled">
       }
     }
-    <button class="btn btn-link btn-sm text-danger pe-0" type="button" (click)="removeElement(atom)" [disabled]="disabled" aria-label="Remove query" i18n-aria-label>
-      <i-bs name="x-circle"></i-bs>
-    </button>
   </div>
+  <button class="btn btn-link btn-sm text-danger pe-0 align-self-center" type="button" (click)="removeElement(atom)" [disabled]="disabled" aria-label="Remove query" i18n-aria-label>
+    <i-bs name="x-circle"></i-bs>
+  </button>
 </ng-template>
 
 <ng-template #queryExpression let-expression="expression">
