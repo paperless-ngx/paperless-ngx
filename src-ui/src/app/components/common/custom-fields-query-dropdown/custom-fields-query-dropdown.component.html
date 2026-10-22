@@ -39,10 +39,12 @@
     </button>
     @if (relativeDate) {
       <div class="input-group input-group-sm w-100 order-1 mt-1">
-        <input class="form-control w-25 flex-grow-0" type="number" min="0" aria-label="Amount" i18n-aria-label
-          [ngModel]="relativeDate.amount"
-          (ngModelChange)="updateRelativeDate(atom, { amount: $event })"
-          [ngModelOptions]="{standalone: true}" />
+        @if (relativeDate.unit.includes('{n}')) {
+          <input class="form-control w-25 flex-grow-0" type="number" min="0" aria-label="Amount" i18n-aria-label
+            [ngModel]="relativeDate.amount"
+            (ngModelChange)="updateRelativeDate(atom, { amount: $event })"
+            [ngModelOptions]="{standalone: true}" />
+        }
         <select class="form-select" aria-label="Unit" i18n-aria-label
           [ngModel]="relativeDate.unit"
           (ngModelChange)="updateRelativeDate(atom, { unit: $event })"
