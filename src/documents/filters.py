@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING
 from typing import Any
 
 import dateparser
+from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Case
 from django.db.models import CharField
@@ -352,7 +353,7 @@ class DateQueryField(serializers.DateField):
         try:
             parsed = dateparser.parse(
                 value,
-                languages=["en"],
+                locales=settings.DATE_PARSER_LANGUAGES,
                 settings={
                     "PARSERS": ["relative-time"],
                     "RELATIVE_BASE": self.reference_datetime,
