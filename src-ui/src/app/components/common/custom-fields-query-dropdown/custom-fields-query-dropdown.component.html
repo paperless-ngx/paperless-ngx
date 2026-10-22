@@ -33,21 +33,36 @@
 
 <ng-template #comparisonValueTemplate let-atom="atom">
   @if (getCustomFieldByID(atom.field)?.data_type === CustomFieldDataType.Date) {
-    <input class="form-control" placeholder="yyyy-mm-dd"
-      [(ngModel)]="atom.value"
-      [ngModelOptions]="{standalone: true}"
-      ngbDatepicker
-      #d="ngbDatepicker"
-      [footerTemplate]="datePickerFooterTemplate" />
-    <button class="btn btn-sm btn-outline-secondary rounded-end" (click)="d.toggle()" type="button" aria-label="Open date picker" i18n-aria-label>
-      <i-bs name="calendar-event"></i-bs>
-    </button>
-    <ng-template #datePickerFooterTemplate>
-      <div class="btn-group-xs border-top p-2 d-flex">
-        <button type="button" class="btn btn-primary" (click)="atom.value = today; d.close()" i18n>Today</button>
-        <button type="button" class="btn btn-secondary ms-auto" (click)="d.close()" i18n>Close</button>
-      </div>
-    </ng-template>
+    <div class="input-group input-group-sm w-100 order-1 mt-1">
+      <select class="form-select w-auto flex-grow-0" aria-label="Date value type" i18n-aria-label
+        [ngModel]="isRelativeDate(atom)" (ngModelChange)="setDateQueryMode(atom, $event)"
+        [ngModelOptions]="{standalone: true}" [disabled]="disabled">
+        <option [ngValue]="false" i18n>Fixed</option>
+        <option [ngValue]="true" i18n>Relative</option>
+      </select>
+      @if (isRelativeDate(atom)) {
+        <input class="form-control rounded-end" type="text" aria-label="Relative date" i18n-aria-label
+          placeholder="e.g. in 30 days" i18n-placeholder
+          [(ngModel)]="atom.value" [ngModelOptions]="{standalone: true}" [disabled]="disabled">
+      } @else {
+        <input class="form-control" placeholder="yyyy-mm-dd"
+          [(ngModel)]="atom.value"
+          [ngModelOptions]="{standalone: true}"
+          [disabled]="disabled"
+          ngbDatepicker
+          #d="ngbDatepicker"
+          [footerTemplate]="datePickerFooterTemplate" />
+        <button class="btn btn-sm btn-outline-secondary rounded-end" (click)="d.toggle()" type="button" [disabled]="disabled" aria-label="Open date picker" i18n-aria-label>
+          <i-bs name="calendar-event"></i-bs>
+        </button>
+        <ng-template #datePickerFooterTemplate>
+          <div class="btn-group-xs border-top p-2 d-flex">
+            <button type="button" class="btn btn-primary" (click)="atom.value = today; d.close()" i18n>Today</button>
+            <button type="button" class="btn btn-secondary ms-auto" (click)="d.close()" i18n>Close</button>
+          </div>
+        </ng-template>
+      }
+    </div>
   } @else if (getCustomFieldByID(atom.field)?.data_type === CustomFieldDataType.Float || getCustomFieldByID(atom.field)?.data_type === CustomFieldDataType.Integer) {
     <input class="w-25 form-control rounded-end" type="number" [(ngModel)]="atom.value" [ngModelOptions]="{standalone: true}" [disabled]="disabled">
   } @else if (getCustomFieldByID(atom.field)?.data_type === CustomFieldDataType.Boolean) {

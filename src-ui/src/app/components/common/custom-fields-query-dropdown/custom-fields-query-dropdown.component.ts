@@ -305,6 +305,22 @@ export class CustomFieldsQueryDropdownComponent extends LoadingComponentWithPerm
 
   public readonly today: string = new Date().toLocaleDateString('en-CA')
 
+  private readonly relativeDateModes = new Map<string, boolean>()
+
+  isRelativeDate(atom: CustomFieldQueryAtom): boolean {
+    return (
+      this.relativeDateModes.get(atom.id) ??
+      (typeof atom.value === 'string' &&
+        !!atom.value &&
+        !/^\d{4}-\d{2}-\d{2}$/.test(atom.value))
+    )
+  }
+
+  setDateQueryMode(atom: CustomFieldQueryAtom, relative: boolean) {
+    this.relativeDateModes.set(atom.id, relative)
+    atom.value = null
+  }
+
   public customFieldSearchFn = (term: string, field: CustomField): boolean =>
     matchesSearchText(field?.name, term)
 
