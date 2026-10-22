@@ -1,5 +1,15 @@
 # Changelog
 
+## paperless-ngx 3.3.4
+
+### Documentation
+
+- Documentation: add scratch\_dir setting [@nathanaelhoun](https://github.com/nathanaelhoun) ([#14498](https://github.com/paperless-ngx/paperless-ngx/pull/14498))
+
+### All App Changes
+
+- Chore: Update certifi for eMudhra CA incident [@shamoon](https://github.com/shamoon) ([#14533](https://github.com/paperless-ngx/paperless-ngx/pull/14533))
+
 ## paperless-ngx 3.3.3
 
 ### Bug Fixes
