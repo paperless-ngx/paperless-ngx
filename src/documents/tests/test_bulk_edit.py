@@ -28,6 +28,9 @@ from documents.permissions import set_permissions_for_objects
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import DocumentFactory
 from paperless_testing.permissions import grant_object
+from paperless_testing.samples import MULTI_PAGE_DIGITAL_PDF
+from paperless_testing.samples import SIMPLE_DIGITAL_PDF
+from paperless_testing.samples import WITH_FORM_PDF
 
 
 class TestBulkEdit(DirectoriesMixin, TestCase):
@@ -705,47 +708,27 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         super().setUp()
         sample1 = self.dirs.scratch_dir / "sample.pdf"
         shutil.copy(
-            Path(__file__).parent
-            / "samples"
-            / "documents"
-            / "originals"
-            / "0000001.pdf",
+            SIMPLE_DIGITAL_PDF,
             sample1,
         )
         sample1_archive = self.dirs.archive_dir / "sample_archive.pdf"
         shutil.copy(
-            Path(__file__).parent
-            / "samples"
-            / "documents"
-            / "originals"
-            / "0000001.pdf",
+            SIMPLE_DIGITAL_PDF,
             sample1_archive,
         )
         sample2 = self.dirs.scratch_dir / "sample2.pdf"
         shutil.copy(
-            Path(__file__).parent
-            / "samples"
-            / "documents"
-            / "originals"
-            / "0000002.pdf",
+            MULTI_PAGE_DIGITAL_PDF,
             sample2,
         )
         sample2_archive = self.dirs.archive_dir / "sample2_archive.pdf"
         shutil.copy(
-            Path(__file__).parent
-            / "samples"
-            / "documents"
-            / "originals"
-            / "0000002.pdf",
+            MULTI_PAGE_DIGITAL_PDF,
             sample2_archive,
         )
         sample3 = self.dirs.scratch_dir / "sample3.pdf"
         shutil.copy(
-            Path(__file__).parent
-            / "samples"
-            / "documents"
-            / "originals"
-            / "0000003.pdf",
+            WITH_FORM_PDF,
             sample3,
         )
         self.doc1 = Document.objects.create(
@@ -779,11 +762,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         )
         img_doc_archive = self.dirs.archive_dir / "sample_image.pdf"
         shutil.copy(
-            Path(__file__).parent
-            / "samples"
-            / "documents"
-            / "originals"
-            / "0000001.pdf",
+            SIMPLE_DIGITAL_PDF,
             img_doc_archive,
         )
         self.img_doc = Document.objects.create(
