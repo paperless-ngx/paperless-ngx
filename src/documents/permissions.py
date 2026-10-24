@@ -40,7 +40,17 @@ PermissionAction = Literal["view", "change"]
 PERMISSION_ACTIONS: Final[tuple[PermissionAction, ...]] = ("view", "change")
 
 
-class PermissionGrantees(TypedDict, total=False):
+class PermissionGrantees(TypedDict):
+    """
+    The user and group ids holding one permission action directly on an
+    object. Users who only hold it through a group are not listed.
+    """
+
+    users: list[int]
+    groups: list[int]
+
+
+class PermissionGranteesUpdate(TypedDict, total=False):
     """
     The user and group ids to grant one permission action to. A missing key
     leaves that kind of grant untouched.
@@ -50,7 +60,7 @@ class PermissionGrantees(TypedDict, total=False):
     groups: Iterable[int]
 
 
-PermissionsSpec: TypeAlias = Mapping[PermissionAction, PermissionGrantees]
+PermissionsSpec: TypeAlias = Mapping[PermissionAction, PermissionGranteesUpdate]
 
 
 class PaperlessObjectPermissions(DjangoObjectPermissions):
@@ -245,6 +255,56 @@ def set_permissions_for_objects(
                 object_pks=object_pks,
                 merge=merge,
             )
+
+
+def get_permission_grantees(
+    model: type[Model],
+    pks: Iterable[int],
+    actions: Iterable[PermissionAction] = PERMISSION_ACTIONS,
+) -> dict[int, dict[PermissionAction, PermissionGrantees]]:
+    """
+    Return the users and groups holding each of ``actions`` directly on each
+    object of ``model`` identified by ``pks``, in two queries however many
+    objects are asked about.
+
+    Every requested pk and action has an entry, with empty lists where nothing
+    is granted. Ids are sorted. Group grants stay group ids rather than being
+    expanded to their members, so a caller that copies them keeps access tied
+    to current group membership.
+    """
+    pks = list(pks)
+    actions = list(actions)
+    model_name = model.__name__.lower()
+    action_by_codename: dict[str, PermissionAction] = {
+        f"{action}_{model_name}": action for action in actions
+    }
+    result: dict[int, dict[PermissionAction, PermissionGrantees]] = {
+        pk: {action: {"users": [], "groups": []} for action in actions} for pk in pks
+    }
+    if not pks or not actions:
+        return result
+
+    ctype = ContentType.objects.get_for_model(model)
+    grant_filter = {
+        "content_type": ctype,
+        "permission__content_type": ctype,
+        "permission__codename__in": list(action_by_codename),
+        "object_pk__in": [str(pk) for pk in pks],
+    }
+    for perm_model, identity_field, key in (
+        (UserObjectPermission, "user_id", "users"),
+        (GroupObjectPermission, "group_id", "groups"),
+    ):
+        rows = (
+            perm_model.objects.filter(**grant_filter)
+            .values_list("object_pk", "permission__codename", identity_field)
+            .order_by(identity_field)
+        )
+        for object_pk, codename, identity_id in rows:
+            result[int(object_pk)][action_by_codename[codename]][key].append(
+                identity_id,
+            )
+    return result
 
 
 def permitted_object_ids(
