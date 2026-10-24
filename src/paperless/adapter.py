@@ -4,6 +4,7 @@ from urllib.parse import quote
 from allauth.account.adapter import DefaultAccountAdapter
 from allauth.core import context
 from allauth.headless.tokens.strategies.sessions import SessionTokenStrategy
+from allauth.mfa.stages import AuthenticateStage
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from django.conf import settings
 from django.contrib.auth.models import Group
@@ -19,7 +20,38 @@ from paperless.signals import handle_social_account_updated
 logger = logging.getLogger("paperless.auth")
 
 
+class SocialAccountAuthenticateStage(AuthenticateStage):
+    """
+    Skips the 2FA prompt for a social login if the ID token's `amr` claim shows the
+    identity provider already used one of the SOCIAL_ACCOUNT_MFA_TRUSTED_AMR methods.
+    """
+
+    def handle(self) -> tuple:
+        sociallogin = (self.login.signal_kwargs or {}).get("sociallogin")
+        if sociallogin is not None and settings.SOCIAL_ACCOUNT_MFA_TRUSTED_AMR:
+            id_token = (sociallogin.account.extra_data or {}).get("id_token")
+            amr = id_token.get("amr") if isinstance(id_token, dict) else None
+            if (
+                isinstance(amr, list)
+                and all(isinstance(value, str) for value in amr)
+                and set(amr) & set(settings.SOCIAL_ACCOUNT_MFA_TRUSTED_AMR)
+            ):
+                logger.debug(
+                    f"Skipping 2FA for `{self.login.user}`, provider `{sociallogin.account.provider}` reported amr {amr}",
+                )
+                return None, True
+        return super().handle()
+
+
 class CustomAccountAdapter(DefaultAccountAdapter):
+    def get_login_stages(self) -> list[str]:
+        return [
+            "paperless.adapter.SocialAccountAuthenticateStage"
+            if stage == "allauth.mfa.stages.AuthenticateStage"
+            else stage
+            for stage in super().get_login_stages()
+        ]
+
     def is_open_for_signup(self, request):
         """
         Check whether the site is open for signups, which can be
