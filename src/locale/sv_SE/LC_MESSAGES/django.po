@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-19 15:40+0000\n"
-"PO-Revision-Date: 2026-10-19 15:42\n"
+"POT-Creation-Date: 2026-10-22 19:29+0000\n"
+"PO-Revision-Date: 2026-10-22 19:30\n"
 "Last-Translator: \n"
 "Language-Team: Swedish\n"
 "Language: sv_SE\n"
@@ -1006,23 +1006,23 @@ msgstr "anteckningar"
 
 #: documents/models.py:1007
 msgid "page"
-msgstr ""
+msgstr "sida"
 
 #: documents/models.py:1008
 msgid "Page of the original file, starting at 1"
-msgstr ""
+msgstr "Sida i originalfilen, med början på 1"
 
 #: documents/models.py:1063
 msgid "format"
-msgstr ""
+msgstr "format"
 
 #: documents/models.py:1067
 msgid "document barcode"
-msgstr ""
+msgstr "dokumentstreckkod"
 
 #: documents/models.py:1068
 msgid "document barcodes"
-msgstr ""
+msgstr "dokumentstreckkoder"
 
 #: documents/models.py:1077
 msgid "Original"
@@ -1636,7 +1636,7 @@ msgid "workflow runs"
 msgstr "arbetsflöde körs"
 
 #: documents/serialisers.py:515 documents/serialisers.py:872
-#: documents/serialisers.py:2902 documents/views.py:363 documents/views.py:2768
+#: documents/serialisers.py:2904 documents/views.py:364 documents/views.py:2787
 #: paperless_mail/serialisers.py:156
 msgid "Insufficient permissions."
 msgstr "Otillräckliga behörigheter."
@@ -1645,38 +1645,38 @@ msgstr "Otillräckliga behörigheter."
 msgid "Invalid color."
 msgstr "Ogiltig färg."
 
-#: documents/serialisers.py:2369
+#: documents/serialisers.py:2371
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Filtypen %(type)s stöds inte"
 
-#: documents/serialisers.py:2413
+#: documents/serialisers.py:2415
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
 msgstr "Anpassat fält-id måste vara ett heltal: %(id)s"
 
-#: documents/serialisers.py:2420
+#: documents/serialisers.py:2422
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
 msgstr "Anpassat fält med id %(id)s finns inte"
 
-#: documents/serialisers.py:2437 documents/serialisers.py:2447
+#: documents/serialisers.py:2439 documents/serialisers.py:2449
 msgid "Custom fields must be a list of integers or an object mapping ids to values."
 msgstr "Anpassade fält måste vara en lista med heltal eller ett objekt som mappar ID:n till värden."
 
-#: documents/serialisers.py:2442
+#: documents/serialisers.py:2444
 msgid "Some custom fields don't exist or were specified twice."
 msgstr "Vissa anpassade fält finns inte eller har angetts två gånger."
 
-#: documents/serialisers.py:2589
+#: documents/serialisers.py:2591
 msgid "Invalid variable detected."
 msgstr "Ogiltig variabel upptäckt."
 
-#: documents/serialisers.py:2958
+#: documents/serialisers.py:2960
 msgid "Duplicate document identifiers are not allowed."
 msgstr "Dubbletter av dokumentidentifierare är inte tillåtna."
 
-#: documents/serialisers.py:2988 documents/views.py:4816
+#: documents/serialisers.py:2990 documents/views.py:4837
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr "Dokumenten hittades inte: %(ids)s"
@@ -1915,42 +1915,42 @@ msgstr "Slutför följande formulär som ett sista steg:"
 
 #: documents/validators.py:36
 msgid ", "
-msgstr ""
+msgstr ", "
 
-#: documents/views.py:318
+#: documents/views.py:319
 msgid "Specify only one of text, title_search, query, or more_like_id."
 msgstr "Ange endast ett av text, title_search, query och more_like_id."
 
-#: documents/views.py:356 documents/views.py:2765
+#: documents/views.py:357 documents/views.py:2784
 msgid "Invalid more_like_id"
 msgstr "Ogiltig more_like_id"
 
-#: documents/views.py:1703
+#: documents/views.py:1722
 msgid "Invalid AI configuration."
 msgstr "Ogiltig AI-konfiguration."
 
-#: documents/views.py:1714
+#: documents/views.py:1733
 msgid "AI backend request timed out."
 msgstr "Begäran till AI-serverdelen tog för lång tid."
 
-#: documents/views.py:1726
+#: documents/views.py:1745
 msgid "AI backend rejected the request. Check logs for details."
 msgstr "AI-serverdelen avvisade begäran. Kontrollera loggarna för detaljer."
 
-#: documents/views.py:4832
+#: documents/views.py:4853
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr "Otillräckliga behörigheter för att dela dokument %(id)s."
 
-#: documents/views.py:4879
+#: documents/views.py:4900
 msgid "Bundle is already being processed."
 msgstr "Paketet behandlas redan."
 
-#: documents/views.py:4945
+#: documents/views.py:4966
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr "Delningslänkpaketet förbereds fortfarande. Försök igen senare."
 
-#: documents/views.py:4959
+#: documents/views.py:4980
 msgid "The share link bundle is unavailable."
 msgstr "Delningslänkpaketet är inte tillgängligt."
 
@@ -2168,7 +2168,7 @@ msgstr "Aktiverar delning vid taggstreckkoder"
 
 #: paperless/models.py:308
 msgid "Stores the values of detected barcodes"
-msgstr ""
+msgstr "Lagrar värdena för identifierade streckkoder"
 
 #: paperless/models.py:318
 msgid "Sets the remote OCR engine"

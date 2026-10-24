@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-19 15:40+0000\n"
-"PO-Revision-Date: 2026-10-19 15:42\n"
+"POT-Creation-Date: 2026-10-22 19:29+0000\n"
+"PO-Revision-Date: 2026-10-22 19:30\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
@@ -346,11 +346,11 @@ msgstr ""
 
 #: documents/models.py:590
 msgid "Credit card"
-msgstr ""
+msgstr "Tarjeta de crédito"
 
 #: documents/models.py:591
 msgid "Download"
-msgstr ""
+msgstr "Descarga"
 
 #: documents/models.py:592
 msgid "Envelope"
@@ -362,7 +362,7 @@ msgstr ""
 
 #: documents/models.py:594
 msgid "File"
-msgstr ""
+msgstr "Archivo"
 
 #: documents/models.py:595
 msgid "Checked file"
@@ -374,7 +374,7 @@ msgstr ""
 
 #: documents/models.py:597
 msgid "Medical file"
-msgstr ""
+msgstr "Ficha médica"
 
 #: documents/models.py:598
 msgid "Person file"
@@ -382,7 +382,7 @@ msgstr ""
 
 #: documents/models.py:601
 msgid "Spreadsheet"
-msgstr ""
+msgstr "Hoja de cálculo"
 
 #: documents/models.py:603
 msgid "Text file"
@@ -422,7 +422,7 @@ msgstr ""
 
 #: documents/models.py:612
 msgid "Inbox"
-msgstr ""
+msgstr "Bandeja de entrada"
 
 #: documents/models.py:613
 msgid "Journals"
@@ -462,11 +462,11 @@ msgstr ""
 
 #: documents/models.py:622
 msgid "Search"
-msgstr ""
+msgstr "Búsqueda"
 
 #: documents/models.py:623
 msgid "Send"
-msgstr ""
+msgstr "Enviar"
 
 #: documents/models.py:624
 msgid "Shop"
@@ -1636,7 +1636,7 @@ msgid "workflow runs"
 msgstr "ejecuciones de flujo de trabajo"
 
 #: documents/serialisers.py:515 documents/serialisers.py:872
-#: documents/serialisers.py:2902 documents/views.py:363 documents/views.py:2768
+#: documents/serialisers.py:2904 documents/views.py:364 documents/views.py:2787
 #: paperless_mail/serialisers.py:156
 msgid "Insufficient permissions."
 msgstr "Permisos insuficientes."
@@ -1645,38 +1645,38 @@ msgstr "Permisos insuficientes."
 msgid "Invalid color."
 msgstr "Color inválido."
 
-#: documents/serialisers.py:2369
+#: documents/serialisers.py:2371
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Tipo de fichero %(type)s no suportado"
 
-#: documents/serialisers.py:2413
+#: documents/serialisers.py:2415
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
 msgstr "El id del campo personalizado debe ser un entero: %(id)s"
 
-#: documents/serialisers.py:2420
+#: documents/serialisers.py:2422
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
 msgstr "El campo personalizado con identificador %(id)s no existe"
 
-#: documents/serialisers.py:2437 documents/serialisers.py:2447
+#: documents/serialisers.py:2439 documents/serialisers.py:2449
 msgid "Custom fields must be a list of integers or an object mapping ids to values."
 msgstr "Los campos personalizados deben ser una lista de enteros o un identificador de mapeo de objetos a valores."
 
-#: documents/serialisers.py:2442
+#: documents/serialisers.py:2444
 msgid "Some custom fields don't exist or were specified twice."
 msgstr "Algunos campos personalizados no existen o fueron especificados dos veces."
 
-#: documents/serialisers.py:2589
+#: documents/serialisers.py:2591
 msgid "Invalid variable detected."
 msgstr "Variable inválida."
 
-#: documents/serialisers.py:2958
+#: documents/serialisers.py:2960
 msgid "Duplicate document identifiers are not allowed."
 msgstr "No se permiten identificadores de documento duplicados."
 
-#: documents/serialisers.py:2988 documents/views.py:4816
+#: documents/serialisers.py:2990 documents/views.py:4837
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr "Documentos no encontrados: %(ids)s"
@@ -1917,40 +1917,40 @@ msgstr "Como último paso, por favor complete el siguiente formulario:"
 msgid ", "
 msgstr ""
 
-#: documents/views.py:318
+#: documents/views.py:319
 msgid "Specify only one of text, title_search, query, or more_like_id."
 msgstr "Especifique solo uno entre text, title_search, query, o more_like_id."
 
-#: documents/views.py:356 documents/views.py:2765
+#: documents/views.py:357 documents/views.py:2784
 msgid "Invalid more_like_id"
 msgstr ""
 
-#: documents/views.py:1703
+#: documents/views.py:1722
 msgid "Invalid AI configuration."
 msgstr "Configuración de IA inválida."
 
-#: documents/views.py:1714
+#: documents/views.py:1733
 msgid "AI backend request timed out."
 msgstr ""
 
-#: documents/views.py:1726
+#: documents/views.py:1745
 msgid "AI backend rejected the request. Check logs for details."
 msgstr ""
 
-#: documents/views.py:4832
+#: documents/views.py:4853
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr "Permisos insuficientes para compartir el documento %(id)s."
 
-#: documents/views.py:4879
+#: documents/views.py:4900
 msgid "Bundle is already being processed."
 msgstr "El paquete ya está siendo procesado."
 
-#: documents/views.py:4945
+#: documents/views.py:4966
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr "El paquete de enlace compartido aún está siendo preparado. Por favor, inténtalo de nuevo más tarde."
 
-#: documents/views.py:4959
+#: documents/views.py:4980
 msgid "The share link bundle is unavailable."
 msgstr "El paquete de enlace compartido no está disponible."
 
