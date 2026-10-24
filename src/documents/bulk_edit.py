@@ -33,6 +33,7 @@ from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
+from documents.models import OcrTemplate
 from documents.models import PaperlessTask
 from documents.models import StoragePath
 from documents.models import Tag
@@ -40,6 +41,7 @@ from documents.permissions import set_permissions_for_objects
 from documents.plugins.helpers import DocumentsStatusManager
 from documents.tasks import bulk_update_documents
 from documents.tasks import consume_file
+from documents.tasks import extract_zones
 from documents.tasks import remove_document_from_index
 from documents.tasks import update_document_content_maybe_archive_file
 from documents.versioning import get_latest_version_for_root
@@ -1196,3 +1198,22 @@ def remove_doclink(
         target_doc_field_instance.value.remove(document.id)
         target_doc_field_instance.save()
     Document.objects.filter(id=target_doc_id).update(modified=timezone.now())
+
+
+def run_zone_ocr(
+    doc_ids: list[int],
+    *,
+    template: OcrTemplate | None = None,
+) -> Literal["OK"]:
+    """
+    Queue zone OCR for the given documents, with the given template or with the
+    templates that match each document's content when its task runs.
+    """
+    template_id = template.pk if template is not None else None
+    for document_id in doc_ids:
+        extract_zones.apply_async(
+            kwargs={"document_id": document_id, "template_id": template_id},
+            headers={"trigger_source": PaperlessTask.TriggerSource.MANUAL},
+        )
+
+    return "OK"

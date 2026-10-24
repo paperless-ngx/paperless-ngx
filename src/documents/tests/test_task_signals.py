@@ -13,12 +13,50 @@ from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
 from documents.models import PaperlessTask
 from documents.signals.handlers import before_task_publish_handler
+from documents.signals.handlers import run_zone_ocr_extraction
 from documents.signals.handlers import task_failure_handler
 from documents.signals.handlers import task_postrun_handler
 from documents.signals.handlers import task_prerun_handler
 from documents.signals.handlers import task_revoked_handler
+from paperless_testing.factories import DocumentFactory
 from paperless_testing.factories import PaperlessTaskFactory
 from paperless_testing.factories import UserFactory
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "original_file",
+    [None, "/tmp/original.pdf", Path("/tmp/original.pdf")],
+)
+def test_consumption_runs_zone_extraction(
+    original_file,
+    mocker: pytest_mock.MockerFixture,
+):
+    extract = mocker.patch("documents.zone_ocr.run_zone_extraction")
+    document = DocumentFactory()
+
+    run_zone_ocr_extraction(sender=None, document=document, original_file=original_file)
+
+    extract.assert_called_once_with(
+        document,
+        Path(original_file) if original_file else None,
+    )
+
+
+@pytest.mark.django_db
+def test_zone_extraction_failure_does_not_fail_consumption(
+    mocker: pytest_mock.MockerFixture,
+    caplog,
+):
+    mocker.patch(
+        "documents.zone_ocr.run_zone_extraction",
+        side_effect=RuntimeError("OCR failed"),
+    )
+    document = DocumentFactory()
+
+    run_zone_ocr_extraction(sender=None, document=document)
+
+    assert f"Zone OCR extraction failed for document {document.pk}" in caplog.text
 
 
 @pytest.fixture

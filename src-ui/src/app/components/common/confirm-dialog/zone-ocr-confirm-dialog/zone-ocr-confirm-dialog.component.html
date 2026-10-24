@@ -1,0 +1,30 @@
+<div class="modal-header">
+  <h4 class="modal-title" id="modal-basic-title">{{title}}</h4>
+  <button type="button" class="btn-close" aria-label="Close" (click)="cancel()">
+  </button>
+</div>
+<div class="modal-body">
+  @if (messageBold) {
+    <p class="text-break"><b>{{messageBold}}</b></p>
+  }
+  @if (message) {
+    <p class="text-break" [innerHTML]="message"></p>
+  }
+  <pngx-input-select
+    [items]="templates()"
+    [(ngModel)]="template"
+    [allowNull]="true"
+    title="OCR template"
+    i18n-title
+    placeholder="All matching templates"
+    i18n-placeholder
+  ></pngx-input-select>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn" [class]="cancelBtnClass" (click)="cancel()" [disabled]="!buttonsEnabled()">
+    <span class="d-inline-block" style="padding-bottom: 1px;">{{cancelBtnCaption}}</span>
+  </button>
+  <button type="button" class="btn" [class]="btnClass" (click)="confirm()" [disabled]="!confirmButtonEnabled || !buttonsEnabled()">
+    {{btnCaption}}
+  </button>
+</div>

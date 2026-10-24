@@ -1404,6 +1404,19 @@ def close_connection_pool_on_worker_init(**kwargs) -> None:
             conn.close_pool()
 
 
+def run_zone_ocr_extraction(sender, document, original_file=None, **kwargs):
+    """Apply matching templates without failing consumption if extraction fails."""
+    try:
+        from documents.zone_ocr import run_zone_extraction
+
+        run_zone_extraction(document, Path(original_file) if original_file else None)
+    except Exception:
+        logger.exception(
+            "Zone OCR extraction failed for document %s",
+            document.pk,
+        )
+
+
 @worker_process_shutdown.connect
 def close_connection_pool_on_worker_shutdown(**kwargs) -> None:  # pragma: no cover
     """

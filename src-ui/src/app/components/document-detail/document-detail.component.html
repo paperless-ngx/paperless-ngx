@@ -61,6 +61,22 @@
         <i-bs name="pencil" class="me-2"></i-bs><ng-container i18n>PDF Editor</ng-container>
       </button>
 
+      <div class="d-flex" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.OcrTemplate }">
+        <button ngbDropdownItem (click)="runZoneOcr()" [disabled]="!userCanEdit || networkActive()">
+          <i-bs width="1em" height="1em" name="bounding-box-circles" class="me-2"></i-bs><span i18n>Run Zone OCR</span>
+        </button>
+        <button
+          ngbDropdownItem
+          class="w-auto flex-shrink-0 px-2"
+          (click)="runZoneOcrWithOptions()"
+          [disabled]="!userCanEdit || networkActive()"
+          title="Choose OCR template"
+          i18n-title
+        >
+          <i-bs width="1em" height="1em" name="sliders2"></i-bs>
+        </button>
+      </div>
+
       @if (userIsOwner && (requiresPassword || password)) {
         <button ngbDropdownItem (click)="removePassword()" [disabled]="!password">
           <i-bs name="unlock" class="me-2"></i-bs><ng-container i18n>Remove Password</ng-container>
@@ -90,7 +106,7 @@
 <div class="row">
   <div class="col-md-6 col-xl-5 mb-4">
 
-    <form [formGroup]='documentForm' (ngSubmit)="save()">
+    <form [formGroup]='documentForm' (ngSubmit)="save()" [attr.inert]="zoneOcrRunning() ? '' : null" [attr.aria-busy]="zoneOcrRunning()">
 
       <div class="btn-toolbar mb-1 pb-3 gap-2 row-gap-2 border-bottom">
         <div class="btn-group">
