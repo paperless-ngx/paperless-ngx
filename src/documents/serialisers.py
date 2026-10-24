@@ -8,7 +8,6 @@ from datetime import timedelta
 from decimal import Decimal
 from typing import TYPE_CHECKING
 from typing import Any
-from typing import Literal
 from typing import TypedDict
 
 import magic
@@ -39,8 +38,6 @@ from drf_spectacular.utils import extend_schema_field
 from drf_spectacular.utils import extend_schema_serializer
 from drf_writable_nested.serializers import NestedUpdateMixin
 from guardian.core import ObjectPermissionChecker
-from guardian.shortcuts import get_groups_with_perms
-from guardian.shortcuts import get_users_with_perms
 from guardian.utils import get_group_obj_perms_model
 from guardian.utils import get_user_obj_perms_model
 from rest_framework import fields
@@ -82,8 +79,10 @@ from documents.parsers import is_mime_type_supported
 from documents.permissions import PERMISSION_ACTIONS
 from documents.permissions import PermissionAction
 from documents.permissions import PermissionGrantees
+from documents.permissions import PermissionGranteesUpdate
 from documents.permissions import PermissionsSpec
 from documents.permissions import get_document_count_filter_for_user
+from documents.permissions import get_permission_grantees
 from documents.permissions import has_perms_owner_aware
 from documents.permissions import permitted_document_ids
 from documents.permissions import restrict_queryset_to_visible
@@ -237,7 +236,7 @@ class SetPermissionsMixin:
         return groups
 
     def validate_set_permissions(self, set_permissions=None) -> PermissionsSpec:
-        permissions_dict: dict[PermissionAction, PermissionGrantees] = {
+        permissions_dict: dict[PermissionAction, PermissionGranteesUpdate] = {
             action: {} for action in PERMISSION_ACTIONS
         }
         if set_permissions is not None:
@@ -314,35 +313,6 @@ class OwnedObjectSerializer(
             except KeyError:
                 pass
 
-    def _get_perms(self, obj, codename: str, target: Literal["users", "groups"]):
-        """
-        Get the given permissions from context or from django-guardian.
-
-        :param codename: The permission codename, e.g. 'view' or 'change'
-        :param target: 'users' or 'groups'
-        """
-        key = f"{target}_{codename}_perms"
-        cached = self.context.get(key, {}).get(obj.pk)
-        if cached is not None:
-            return list(cached)
-
-        # Permission not found in the context, get it from guardian
-        if target == "users":
-            return list(
-                get_users_with_perms(
-                    obj,
-                    only_with_perms_in=[f"{codename}_{obj.__class__.__name__.lower()}"],
-                    with_group_users=False,
-                ).values_list("id", flat=True),
-            )
-        else:  # groups
-            return list(
-                get_groups_with_perms(
-                    obj,
-                    only_with_perms_in=[f"{codename}_{obj.__class__.__name__.lower()}"],
-                ).values_list("id", flat=True),
-            )
-
     @extend_schema_field(
         field={
             "type": "object",
@@ -376,17 +346,12 @@ class OwnedObjectSerializer(
             },
         },
     )
-    def get_permissions(self, obj) -> dict:
-        return {
-            "view": {
-                "users": self._get_perms(obj, "view", "users"),
-                "groups": self._get_perms(obj, "view", "groups"),
-            },
-            "change": {
-                "users": self._get_perms(obj, "change", "users"),
-                "groups": self._get_perms(obj, "change", "groups"),
-            },
-        }
+    def get_permissions(self, obj) -> dict[PermissionAction, PermissionGrantees]:
+        # Prefer the page-level batch computed by BulkPermissionMixin.
+        grantees = self.context.get("permission_grantees", {}).get(obj.pk)
+        if grantees is not None:
+            return grantees
+        return get_permission_grantees(type(obj), [obj.pk])[obj.pk]
 
     def get_user_can_change(self, obj) -> bool:
         if obj.owner is None or obj.owner == self.user:
@@ -402,18 +367,18 @@ class OwnedObjectSerializer(
         # Prefer the page-level batch computed by BulkPermissionMixin
         # (get_serializer_context) over a fresh per-object guardian check,
         # which would otherwise query the permission tables once per row.
-        users_change_perms = self.context.get("users_change_perms")
-        groups_change_perms = self.context.get("groups_change_perms")
-        if users_change_perms is not None and groups_change_perms is not None:
-            if self.user.pk in users_change_perms.get(obj.pk, []):
+        grantees_by_pk = self.context.get("permission_grantees")
+        if grantees_by_pk is not None:
+            change = grantees_by_pk.get(obj.pk, {}).get("change")
+            if change is None:
+                return False
+            if self.user.pk in change["users"]:
                 return True
             user_group_ids = getattr(self, "_user_group_ids", None)
             if user_group_ids is None:
                 user_group_ids = set(self.user.groups.values_list("id", flat=True))
                 self._user_group_ids = user_group_ids
-            return bool(
-                user_group_ids.intersection(groups_change_perms.get(obj.pk, [])),
-            )
+            return bool(user_group_ids.intersection(change["groups"]))
 
         checker = ObjectPermissionChecker(self.user)
         return checker.has_perm(f"change_{obj.__class__.__name__.lower()}", obj)
