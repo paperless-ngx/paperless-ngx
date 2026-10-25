@@ -44,3 +44,13 @@
     min-width: 140px;
   }
 }
+
+.date-mode .btn {
+  --bs-btn-color: var(--bs-secondary-color);
+  --bs-btn-hover-bg: transparent;
+  --bs-btn-hover-color: var(--bs-body-color);
+  --bs-btn-hover-border-color: var(--bs-border-color);
+  --bs-btn-active-bg: transparent;
+  --bs-btn-active-color: var(--bs-primary);
+  --bs-btn-active-border-color: var(--bs-border-color);
+}

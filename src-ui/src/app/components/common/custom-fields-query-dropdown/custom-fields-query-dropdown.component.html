@@ -35,7 +35,7 @@
   @if (getCustomFieldByID(atom.field)?.data_type === CustomFieldDataType.Date) {
     @let relativeDate = getRelativeDate(atom);
     <div class="d-flex gap-2 w-100 ms-0 mt-1">
-      <div class="btn-group btn-group-sm" role="group" aria-label="Date mode" i18n-aria-label>
+      <div class="btn-group btn-group-sm date-mode" role="group" aria-label="Date mode" i18n-aria-label>
         <input type="radio" class="btn-check" [id]="atom.id + '_fixed'" [name]="atom.id + '_dateMode'" [checked]="!relativeDate" (change)="toggleRelativeDate(atom)" [disabled]="disabled" aria-label="Fixed date" i18n-aria-label>
         <label class="btn btn-outline-secondary text-nowrap" [for]="atom.id + '_fixed'" title="Fixed date" i18n-title>
           <i-bs name="calendar"></i-bs><span class="d-none d-md-inline ms-2" i18n>Fixed</span>
