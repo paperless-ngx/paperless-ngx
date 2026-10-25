@@ -11,6 +11,7 @@
   border-top-right-radius: 0 !important;
   border-bottom-right-radius: 0 !important;
   height: 100% !important;
+  min-height: calc(1.5em + 0.5rem + calc(var(--bs-border-width) * 2)) !important;
 }
 
 :host ::ng-deep .rounded-end .ng-select-container {

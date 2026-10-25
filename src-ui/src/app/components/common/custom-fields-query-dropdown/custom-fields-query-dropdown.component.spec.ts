@@ -258,10 +258,10 @@ describe('CustomFieldsQueryDropdownComponent', () => {
     await fixture.whenStable()
     const query = (selector: string) =>
       fixture.nativeElement.querySelector(selector)
-    const toggle: HTMLButtonElement = query('button[title="Relative date"]')
     expect(query('[ngbDatepicker]')).not.toBeNull()
+    expect(query('input[id$="_fixed"]').checked).toBe(true)
 
-    toggle.click()
+    query('input[id$="_relative"]').click()
     fixture.detectChanges()
     await fixture.whenStable()
     expect(atom.value).toBeNull()
@@ -279,7 +279,7 @@ describe('CustomFieldsQueryDropdownComponent', () => {
     expect(atom.serialize()).toEqual([4, 'gte', 'today'])
     expect(query('input[aria-label="Amount"]')).toBeNull()
 
-    toggle.click()
+    query('input[id$="_fixed"]').click()
     fixture.detectChanges()
     expect(atom.value).toBeNull()
     expect(query('[ngbDatepicker]')).not.toBeNull()

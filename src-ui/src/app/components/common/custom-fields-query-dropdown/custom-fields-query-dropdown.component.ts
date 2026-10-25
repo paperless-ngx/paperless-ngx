@@ -352,6 +352,15 @@ export class CustomFieldsQueryDropdownComponent extends LoadingComponentWithPerm
     return this.relativeDates.get(atom.id)
   }
 
+  hasDateValueRow(atom: CustomFieldQueryAtom): boolean {
+    return (
+      this.getCustomFieldByID(atom.field)?.data_type ===
+        CustomFieldDataType.Date &&
+      atom.operator !== CustomFieldQueryOperator.Exists &&
+      atom.operator !== CustomFieldQueryOperator.IsNull
+    )
+  }
+
   toggleRelativeDate(atom: CustomFieldQueryAtom) {
     if (this.getRelativeDate(atom)) {
       this.relativeDates.delete(atom.id)

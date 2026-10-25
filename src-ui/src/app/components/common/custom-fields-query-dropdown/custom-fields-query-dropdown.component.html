@@ -34,43 +34,52 @@
 <ng-template #comparisonValueTemplate let-atom="atom">
   @if (getCustomFieldByID(atom.field)?.data_type === CustomFieldDataType.Date) {
     @let relativeDate = getRelativeDate(atom);
-    <button class="btn btn-sm btn-outline-secondary" [class.active]="relativeDate" [class.rounded-end]="relativeDate" [attr.aria-pressed]="!!relativeDate" (click)="toggleRelativeDate(atom)" type="button" title="Relative date" i18n-title>
-      <i-bs name="clock-history"></i-bs>
-    </button>
-    @if (relativeDate) {
-      <div class="input-group input-group-sm w-100 order-1 mt-1">
-        @if (relativeDate.unit.includes('{n}')) {
-          <input class="form-control w-25 flex-grow-0" type="number" min="0" aria-label="Amount" i18n-aria-label
-            [ngModel]="relativeDate.amount"
-            (ngModelChange)="updateRelativeDate(atom, { amount: $event })"
-            [ngModelOptions]="{standalone: true}" />
-        }
-        <select class="form-select" aria-label="Unit" i18n-aria-label
-          [ngModel]="relativeDate.unit"
-          (ngModelChange)="updateRelativeDate(atom, { unit: $event })"
-          [ngModelOptions]="{standalone: true}">
-          @for (unit of relativeDateUnits; track unit.id) {
-            <option [ngValue]="unit.id">{{unit.label}}</option>
-          }
-        </select>
+    <div class="d-flex gap-2 w-100 ms-0 mt-1">
+      <div class="btn-group btn-group-sm" role="group" aria-label="Date mode" i18n-aria-label>
+        <input type="radio" class="btn-check" [id]="atom.id + '_fixed'" [name]="atom.id + '_dateMode'" [checked]="!relativeDate" (change)="toggleRelativeDate(atom)" [disabled]="disabled" aria-label="Fixed date" i18n-aria-label>
+        <label class="btn btn-outline-secondary text-nowrap" [for]="atom.id + '_fixed'" title="Fixed date" i18n-title>
+          <i-bs name="calendar"></i-bs><span class="d-none d-md-inline ms-2" i18n>Fixed</span>
+        </label>
+        <input type="radio" class="btn-check" [id]="atom.id + '_relative'" [name]="atom.id + '_dateMode'" [checked]="!!relativeDate" (change)="toggleRelativeDate(atom)" [disabled]="disabled" aria-label="Relative date" i18n-aria-label>
+        <label class="btn btn-outline-secondary text-nowrap" [for]="atom.id + '_relative'" title="Relative date" i18n-title>
+          <i-bs name="clock-history"></i-bs><span class="d-none d-md-inline ms-2" i18n>Relative</span>
+        </label>
       </div>
-    } @else {
-      <input class="form-control" placeholder="yyyy-mm-dd"
-        [(ngModel)]="atom.value"
-        [ngModelOptions]="{standalone: true}"
-        ngbDatepicker
-        #d="ngbDatepicker"
-        [footerTemplate]="datePickerFooterTemplate" />
-      <button class="btn btn-sm btn-outline-secondary rounded-end" (click)="d.toggle()" type="button" aria-label="Open date picker" i18n-aria-label>
-        <i-bs name="calendar-event"></i-bs>
-      </button>
-      <ng-template #datePickerFooterTemplate>
-        <div class="btn-group-xs border-top p-2 d-flex">
-          <button type="button" class="btn btn-primary" (click)="atom.value = today; d.close()" i18n>Today</button>
-          <button type="button" class="btn btn-secondary ms-auto" (click)="d.close()" i18n>Close</button>
-        </div>
-      </ng-template>
-    }
+      <div class="input-group input-group-sm flex-grow-1">
+        @if (relativeDate) {
+          @if (relativeDate.unit.includes('{n}')) {
+            <input class="form-control w-25 flex-grow-0" type="number" min="0" aria-label="Amount" i18n-aria-label
+              [ngModel]="relativeDate.amount"
+              (ngModelChange)="updateRelativeDate(atom, { amount: $event })"
+              [ngModelOptions]="{standalone: true}" />
+          }
+          <select class="form-select" aria-label="Unit" i18n-aria-label
+            [ngModel]="relativeDate.unit"
+            (ngModelChange)="updateRelativeDate(atom, { unit: $event })"
+            [ngModelOptions]="{standalone: true}">
+            @for (unit of relativeDateUnits; track unit.id) {
+              <option [ngValue]="unit.id">{{unit.label}}</option>
+            }
+          </select>
+        } @else {
+          <input class="form-control" placeholder="yyyy-mm-dd"
+            [(ngModel)]="atom.value"
+            [ngModelOptions]="{standalone: true}"
+            ngbDatepicker
+            #d="ngbDatepicker"
+            [footerTemplate]="datePickerFooterTemplate" />
+          <button class="btn btn-sm btn-outline-secondary" (click)="d.toggle()" type="button" aria-label="Open date picker" i18n-aria-label>
+            <i-bs name="calendar-event"></i-bs>
+          </button>
+          <ng-template #datePickerFooterTemplate>
+            <div class="btn-group-xs border-top p-2 d-flex">
+              <button type="button" class="btn btn-primary" (click)="atom.value = today; d.close()" i18n>Today</button>
+              <button type="button" class="btn btn-secondary ms-auto" (click)="d.close()" i18n>Close</button>
+            </div>
+          </ng-template>
+        }
+      </div>
+    </div>
   } @else if (getCustomFieldByID(atom.field)?.data_type === CustomFieldDataType.Float || getCustomFieldByID(atom.field)?.data_type === CustomFieldDataType.Integer) {
     <input class="w-25 form-control rounded-end" type="number" [(ngModel)]="atom.value" [ngModelOptions]="{standalone: true}" [disabled]="disabled">
   } @else if (getCustomFieldByID(atom.field)?.data_type === CustomFieldDataType.Boolean) {
@@ -119,7 +128,7 @@
       [appendTo]="selectAppendTo"
       (mousedown)="$event.stopImmediatePropagation()"
     ></ng-select>
-    <select class="w-25 form-select" [(ngModel)]="atom.operator" [ngModelOptions]="{standalone: true}" [disabled]="disabled">
+    <select class="w-25 form-select" [class.rounded-end]="hasDateValueRow(atom)" [(ngModel)]="atom.operator" [ngModelOptions]="{standalone: true}" [disabled]="disabled">
       @for (operator of getOperatorsForField(atom.field); track operator.label) {
         <option [ngValue]="operator.value">{{operator.label}}</option>
       }
