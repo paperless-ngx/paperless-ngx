@@ -25,6 +25,7 @@ from documents.models import OcrTemplate
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.pdf_ops import PageSpec
+from documents.permissions import PermissionsSpec
 from documents.permissions import set_permissions_for_objects
 from documents.tasks import extract_zones
 from paperless_testing.dirs import DirectoriesMixin
@@ -448,7 +449,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
 
         grant_object(self.group1, self.doc1, "view_document")
 
-        permissions = {
+        permissions: PermissionsSpec = {
             "view": {
                 "users": [self.user1.id, self.user2.id],
                 "groups": [self.group2.id],
@@ -491,7 +492,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         grant_object(self.user1, self.doc1, "view_document")
         grant_object(self.group1, self.doc1, "view_document")
 
-        permissions = {
+        permissions: PermissionsSpec = {
             "view": {
                 "users": [self.user2.id],
                 "groups": [self.group2.id],
@@ -542,7 +543,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
               batched call rather than one call per (document, identity)
               pair
         """
-        permissions = {
+        permissions: PermissionsSpec = {
             "view": {
                 "users": [self.user1.id, self.user2.id],
                 "groups": [self.group2.id],
@@ -649,7 +650,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         """
         with self.assertRaises(Permission.DoesNotExist):
             set_permissions_for_objects(
-                {"not_a_real_action": {"users": [self.user1.id], "groups": []}},
+                {"not_a_real_action": {"users": [self.user1.id], "groups": []}},  # type: ignore[bad-assignment]
                 Document,
                 [self.doc1.pk],
             )
@@ -677,7 +678,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
             set_permissions_for_objects(
                 {
                     "view": {"users": [self.user1.id], "groups": []},
-                    "not_a_real_action": {"users": [self.user1.id], "groups": []},
+                    "not_a_real_action": {"users": [self.user1.id], "groups": []},  # type: ignore[bad-assignment]
                 },
                 Document,
                 [self.doc1.pk],
