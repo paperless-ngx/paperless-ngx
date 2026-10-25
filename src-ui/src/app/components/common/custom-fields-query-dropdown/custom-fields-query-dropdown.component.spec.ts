@@ -266,7 +266,7 @@ describe('CustomFieldsQueryDropdownComponent', () => {
     await fixture.whenStable()
     expect(atom.value).toBeNull()
     const amount: HTMLInputElement = query('input[aria-label="Amount"]')
-    const unit: HTMLSelectElement = query('select[aria-label="Unit"]')
+    const unit: HTMLSelectElement = query('select[id$="_unit"]')
     amount.value = '30'
     amount.dispatchEvent(new Event('input'))
     expect(atom.serialize()).toEqual([4, 'gte', '30 days ago'])
