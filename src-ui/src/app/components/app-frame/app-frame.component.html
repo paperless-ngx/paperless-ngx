@@ -344,11 +344,11 @@
                 ngbPopover="Tasks" i18n-ngbPopover [disablePopover]="!slimSidebarPopoversEnabled" placement="end"
                 container="body" triggers="mouseenter:mouseleave" popoverClass="popover-slim">
                 <i-bs class="me-2" name="list-task"></i-bs><span class="nav-link-label"><ng-container i18n>Tasks</ng-container></span>
-                @if (tasksService.needsAttentionTasks.length > 0 && !slimSidebarEnabled) {
-                  <span class="badge bg-danger ms-2 d-inline flex-shrink-0">{{tasksService.needsAttentionTasks.length}}</span>
+                @if (tasksService.needsAttentionTasksCount > 0 && !slimSidebarEnabled) {
+                  <span class="badge bg-danger ms-2 d-inline flex-shrink-0">{{tasksService.needsAttentionTasksCount}}</span>
                 }
-                @if (tasksService.needsAttentionTasks.length > 0 && slimSidebarEnabled) {
-                  <span class="badge bg-danger position-absolute top-0 end-0 d-none d-md-block">{{tasksService.needsAttentionTasks.length}}</span>
+                @if (tasksService.needsAttentionTasksCount > 0 && slimSidebarEnabled) {
+                  <span class="badge bg-danger position-absolute top-0 end-0 d-none d-md-block">{{tasksService.needsAttentionTasksCount}}</span>
                 }
               </a>
             </li>

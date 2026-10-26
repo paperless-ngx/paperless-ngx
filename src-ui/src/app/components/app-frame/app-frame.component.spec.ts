@@ -588,8 +588,8 @@ describe('AppFrameComponent', () => {
 
   it('should show tasks badge for needs-attention tasks', () => {
     jest
-      .spyOn(tasksService, 'needsAttentionTasks', 'get')
-      .mockReturnValue([{} as any, {} as any])
+      .spyOn(tasksService, 'needsAttentionTasksCount', 'get')
+      .mockReturnValue(2)
 
     fixture.detectChanges()
 
