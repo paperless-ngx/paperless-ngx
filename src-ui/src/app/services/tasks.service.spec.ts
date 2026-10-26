@@ -42,7 +42,7 @@ describe('TasksService', () => {
         req.params.get('acknowledged') === 'false'
     )
     expect(req.request.method).toEqual('GET')
-    req.flush({ all: 0, needs_attention: 3, in_progress: 0, completed: 0 })
+    req.flush({ all: 5, needs_attention: 3, in_progress: 1, completed: 1 })
     expect(tasksService.needsAttentionTasksCount).toEqual(3)
   })
 
@@ -103,7 +103,7 @@ describe('TasksService', () => {
           req.url === `${environment.apiBaseUrl}tasks/status_counts/` &&
           req.params.get('acknowledged') === 'false'
       )
-      .flush({ all: 0, needs_attention: 42, in_progress: 0, completed: 0 })
+      .flush({ all: 50, needs_attention: 42, in_progress: 3, completed: 5 })
 
     expect(tasksService.needsAttentionTasksCount).toEqual(42)
   })
