@@ -1,62 +1,44 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Run as root in the timed child process. Only downloads may be interrupted.
+if [ "${1:-}" = download ]; then
+	download_archive_dir=$2
+	shift 2
+	apt-get update -q
+	apt-get install -q --yes --no-install-recommends --download-only \
+		-o "Dir::Cache::archives=$download_archive_dir" "$@"
+	exit 0
+fi
+
 SUDO=()
 if [ "$(id -u)" -ne 0 ]; then
 	SUDO=(sudo)
 fi
-
-# Inputs are package names, separated by whitespace (not shell expressions).
 read -r -a requested_packages <<< "$PACKAGES"
 mkdir -p "$CACHE_DIR"
+touch "$CACHE_DIR/.keep"
 
-install_local() {
-	local archives=("$CACHE_DIR"/*.deb)
-	if [ -e "${archives[0]}" ]; then
-		# Local .deb arguments pin the downloaded versions. No package lists or
-		# network access are needed, and apt still runs all package maintainer scripts.
-		"${SUDO[@]}" chmod a+r "${archives[@]}"
-		"${SUDO[@]}" apt-get install -q --yes --no-install-recommends \
-			--no-download -o "Dir::Cache::archives=$CACHE_DIR" "${archives[@]}"
-	fi
-	# An empty bundle is valid when the runner already includes every package.
-	local package
-	for package in "${requested_packages[@]}"; do
-		[ "$(dpkg-query -W -f='${Status}' "$package")" = "install ok installed" ]
-	done
-}
-
-if [ "$CACHE_HIT" = true ]; then
-	echo "Installing cached apt packages without contacting package repositories"
-	install_local
-	exit 0
-fi
-
-# The hosted runner gives Azure priority 1. A slow transfer never triggers its
-# fallback mirrors, so retrying alone keeps selecting the same unhealthy mirror.
+# Hosted runners use a mirror list; job containers can point directly at Azure.
+# Handle both layouts, leaving other repositories and signature checks intact.
 if [ -f /etc/apt/apt-mirrors.txt ]; then
 	"${SUDO[@]}" sed -i '\|azure\.archive\.ubuntu\.com|d' /etc/apt/apt-mirrors.txt
 fi
-
-# Download first so the bundle contains every missing transitive dependency.
-# Keep downloads outside apt's default cache, which Docker cleanup hooks may wipe.
-download_packages() {
-	"${SUDO[@]}" apt-get update -q --error-on=any
-	"${SUDO[@]}" apt-get install -q --yes --no-install-recommends \
-		--download-only -o "Dir::Cache::archives=$CACHE_DIR" "${requested_packages[@]}"
-}
-# Recreate the sudo and package arrays in the timed child process.
-if [ "${1:-}" = download ]; then
-	download_packages
-	exit 0
-fi
+for source in /etc/apt/sources.list /etc/apt/sources.list.d/*.list /etc/apt/sources.list.d/*.sources; do
+	if [ -f "$source" ]; then
+		"${SUDO[@]}" sed -i 's|azure\.archive\.ubuntu\.com|archive.ubuntu.com|g' "$source"
+	fi
+done
 
 for attempt in $(seq 1 "$ATTEMPTS"); do
 	echo "::group::apt download attempt ${attempt}/${ATTEMPTS}"
-	if timeout --kill-after=10 "$ATTEMPT_TIMEOUT" bash "$0" download; then
+	if timeout --kill-after=10 "$ATTEMPT_TIMEOUT" "${SUDO[@]}" bash "$0" download "$CACHE_DIR" "${requested_packages[@]}"; then
 		echo "::endgroup::"
-		install_local
-		touch "$CACHE_DIR/complete"
+		# Apt handles aliases (e.g. libmagic1 -> libmagic1t64) and dependencies.
+		"${SUDO[@]}" apt-get install -q --yes --no-install-recommends --no-download \
+			-o "Dir::Cache::archives=$CACHE_DIR" "${requested_packages[@]}"
+		# Allow the unprivileged cache action to read archives downloaded as root.
+		find "$CACHE_DIR" -maxdepth 1 -name '*.deb' -exec "${SUDO[@]}" chmod a+r {} +
 		exit 0
 	fi
 	echo "::endgroup::"

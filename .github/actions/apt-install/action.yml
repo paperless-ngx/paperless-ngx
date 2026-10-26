@@ -1,6 +1,6 @@
 name: Install apt packages
 description: >
-  Caches apt packages and their dependencies for an exact hosted runner image. Cache hits install offline; cache misses download from Ubuntu mirrors with bounded retries.
+  Installs apt packages using Ubuntu mirrors and bounded download retries. Caches downloaded packages as an optimization; apt resolves dependencies on every run.
 
 inputs:
   packages:
@@ -21,26 +21,18 @@ runs:
       env:
         PACKAGES: ${{ inputs.packages }}
       run: |
-        # The bundle contains only dependencies missing from this runner. Never
-        # restore it onto a different image or initial package installation.
-        # Without an image version (e.g. self-hosted), download normally.
-        if [ -n "${ImageVersion:-}" ]; then
-          fingerprint=$({
-            printf '%s\n' "$PACKAGES"
-            dpkg --print-architecture
-            dpkg-query -W -f='${binary:Package}=${Version} ${db:Status-Abbrev}\n'
-            sha256sum "$GITHUB_ACTION_PATH/action.yml" "$GITHUB_ACTION_PATH/install.sh" | cut -d ' ' -f 1
-          } | sha256sum | cut -d ' ' -f 1)
-          echo "key=apt-v1-${ImageOS}-${ImageVersion}-${fingerprint}" >> "$GITHUB_OUTPUT"
-        fi
+        . /etc/os-release
+        packages_hash=$(printf '%s' "$PACKAGES" | sha256sum | cut -d ' ' -f 1)
+        # Cached downloads are optional: apt fetches any missing/newer packages.
+        # Refresh weekly, including inside job containers without ImageVersion.
+        echo "key=apt-v2-${ID}-${VERSION_ID}-$(dpkg --print-architecture)-$(date -u +%G-%V)-${packages_hash}" >> "$GITHUB_OUTPUT"
     - name: Restore apt packages
       id: cache
-      if: steps.cache-key.outputs.key != ''
       uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         path: |
           ${{ runner.temp }}/apt-packages/*.deb
-          ${{ runner.temp }}/apt-packages/complete
+          ${{ runner.temp }}/apt-packages/.keep
         key: ${{ steps.cache-key.outputs.key }}
     - name: Install ${{ inputs.packages }}
       shell: bash
@@ -49,14 +41,13 @@ runs:
         ATTEMPTS: ${{ inputs.attempts }}
         ATTEMPT_TIMEOUT: ${{ inputs.attempt-timeout }}
         CACHE_DIR: ${{ runner.temp }}/apt-packages
-        CACHE_HIT: ${{ steps.cache.outputs.cache-hit }}
       run: bash "$GITHUB_ACTION_PATH/install.sh"
-    # Save immediately: a later test failure must not discard a good apt bundle.
+    # Save immediately: a later test failure must not discard downloaded packages.
     - name: Save apt packages
-      if: steps.cache-key.outputs.key != '' && steps.cache.outputs.cache-hit != 'true'
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         path: |
           ${{ runner.temp }}/apt-packages/*.deb
-          ${{ runner.temp }}/apt-packages/complete
+          ${{ runner.temp }}/apt-packages/.keep
         key: ${{ steps.cache-key.outputs.key }}
