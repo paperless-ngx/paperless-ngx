@@ -17,6 +17,8 @@ from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
 from documents.plugins.base import StopConsumeTaskError
 from documents.signals import document_consumption_finished
+from documents.templating.workflows import get_document_custom_fields_context
+from documents.templating.workflows import get_override_custom_fields_context
 from documents.templating.workflows import parse_w_workflow_placeholders
 from documents.workflows.webhooks import send_webhook
 
@@ -48,6 +50,7 @@ def build_workflow_action_context(
             "added": timezone.localtime(document.added),
             "created": document.created,
             "id": document.pk,
+            "custom_fields": get_document_custom_fields_context(document),
         }
 
     correspondent_obj = (
@@ -80,6 +83,9 @@ def build_workflow_action_context(
         "added": timezone.localtime(timezone.now()),
         "created": overrides.created if overrides else None,
         "id": "",
+        "custom_fields": get_override_custom_fields_context(
+            overrides.custom_fields if overrides else None,
+        ),
     }
 
 
@@ -116,6 +122,7 @@ def execute_email_action(
                 context["title"],
                 context["doc_url"],
                 context["id"],
+                context["custom_fields"],
             )
             if action.email.subject
             else ""
@@ -133,6 +140,7 @@ def execute_email_action(
                 context["title"],
                 context["doc_url"],
                 context["id"],
+                context["custom_fields"],
             )
             if action.email.body
             else ""
@@ -211,6 +219,7 @@ def execute_webhook_action(
                             context["title"],
                             context["doc_url"],
                             context["id"],
+                            context["custom_fields"],
                         )
                 except Exception as e:
                     logger.error(
@@ -230,6 +239,7 @@ def execute_webhook_action(
                 context["title"],
                 context["doc_url"],
                 context["id"],
+                context["custom_fields"],
             )
         headers = {}
         if action.webhook.headers:

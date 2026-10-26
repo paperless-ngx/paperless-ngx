@@ -51,6 +51,7 @@ from documents.signals import document_consumption_finished
 from documents.signals import document_consumption_started
 from documents.signals import document_updated
 from documents.signals.handlers import run_workflows
+from documents.templating.workflows import get_override_custom_fields_context
 from documents.templating.workflows import parse_w_workflow_placeholders
 from documents.utils import compute_checksum
 from documents.utils import copy_basic_file_stats
@@ -847,6 +848,9 @@ class ConsumerPlugin(
             local_added,
             self.filename,
             self.filename,
+            custom_fields=get_override_custom_fields_context(
+                self.metadata.custom_fields,
+            ),
         )
 
     def _store(
