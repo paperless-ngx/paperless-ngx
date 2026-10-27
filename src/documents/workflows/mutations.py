@@ -9,6 +9,8 @@ from documents.models import Document
 from documents.models import WorkflowAction
 from documents.permissions import PermissionsSpec
 from documents.permissions import set_permissions_for_objects
+from documents.templating.workflows import get_custom_field_context_entry
+from documents.templating.workflows import get_document_custom_fields_context
 from documents.templating.workflows import parse_w_workflow_placeholders
 
 logger = logging.getLogger("paperless.workflows.mutations")
@@ -45,6 +47,16 @@ def apply_assignment_to_document(
 
     if action.assign_title:
         try:
+            custom_fields = get_document_custom_fields_context(document)
+            if action.has_assign_custom_fields:
+                for field in action.assign_custom_fields.all():
+                    value = action.assign_custom_fields_values.get(str(field.pk))
+                    # An empty assignment leaves an existing field value unchanged.
+                    if field.name not in custom_fields or value not in (None, ""):
+                        custom_fields[field.name] = get_custom_field_context_entry(
+                            field,
+                            value,
+                        )
             title = parse_w_workflow_placeholders(
                 action.assign_title,
                 document.correspondent.name if document.correspondent else "",
@@ -57,6 +69,7 @@ def apply_assignment_to_document(
                 "",  # dont pass the title to avoid recursion
                 "",  # no urls in titles
                 document.pk,
+                custom_fields,
             )
             if title:
                 document.title = title

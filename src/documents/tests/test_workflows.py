@@ -146,7 +146,10 @@ class TestWorkflows(
             filter_path=f"*/{self.dirs.scratch_dir.parts[-1]}/*",
         )
         action = WorkflowAction.objects.create(
-            assign_title="Doc from {{correspondent}}",
+            assign_title=(
+                "Doc from {{correspondent}} "
+                "{{ custom_fields | get_cf_value('Custom Field 2') }}"
+            ),
             assign_correspondent=self.c,
             assign_document_type=self.dt,
             assign_storage_path=self.sp,
@@ -234,7 +237,7 @@ class TestWorkflows(
             )
             self.assertEqual(
                 document.title,
-                f"Doc from {self.c.name}",
+                f"Doc from {self.c.name} 42",
             )
             self.assertEqual(
                 list(document.custom_fields.all().values_list("field", flat=True)),
@@ -897,6 +900,61 @@ class TestWorkflows(
 
         expected_str = f"Document matched {trigger} from {w}"
         self.assertIn(expected_str, cm.output[0])
+
+    def test_workflow_assign_title_uses_custom_field_from_same_action(self) -> None:
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+        )
+        action = WorkflowAction.objects.create(
+            assign_title="Invoice {{ custom_fields | get_cf_value('Custom Field 1') }}",
+            assign_custom_fields_values={str(self.cf1.pk): "A/B 2026"},
+        )
+        action.assign_custom_fields.add(self.cf1)
+        workflow = Workflow.objects.create(name="Custom field title", order=0)
+        workflow.triggers.add(trigger)
+        workflow.actions.add(action)
+        document = Document.objects.create(
+            title="Original",
+            checksum="custom-field-title",
+        )
+
+        run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, document)
+
+        document.refresh_from_db()
+        self.assertEqual(document.title, "Invoice A/B 2026")
+        self.assertEqual(document.custom_fields.get(field=self.cf1).value, "A/B 2026")
+
+    def test_workflow_select_field_with_removed_option_uses_fallback(self) -> None:
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+        )
+        action = WorkflowAction.objects.create(
+            assign_title=(
+                "Status {{ custom_fields | get_cf_value('Payment Status', 'unknown') }}"
+            ),
+        )
+        workflow = Workflow.objects.create(name="Removed select option", order=0)
+        workflow.triggers.add(trigger)
+        workflow.actions.add(action)
+        select_field = CustomField.objects.create(
+            name="Payment Status",
+            data_type=CustomField.FieldDataType.SELECT,
+            extra_data={"select_options": [{"id": "paid", "label": "Paid"}]},
+        )
+        document = Document.objects.create(
+            title="Original",
+            checksum="removed-select-option",
+        )
+        CustomFieldInstance.objects.create(
+            document=document,
+            field=select_field,
+            value_select="removed",
+        )
+
+        run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, document)
+
+        document.refresh_from_db()
+        self.assertEqual(document.title, "Status unknown")
 
     def test_workflow_assign_custom_field_keeps_storage_filename_in_sync(self) -> None:
         """
@@ -3577,6 +3635,48 @@ class TestWorkflows(
 
         mock_email_send.assert_called_once()
 
+    @override_settings(EMAIL_ENABLED=True, PAPERLESS_URL="http://localhost:8000")
+    @mock.patch("documents.workflows.actions.send_email")
+    def test_workflow_email_action_custom_field(self, mock_send_email) -> None:
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+        )
+        select_field = CustomField.objects.create(
+            name="Payment Status",
+            data_type=CustomField.FieldDataType.SELECT,
+            extra_data={"select_options": [{"id": "paid", "label": "Paid in full"}]},
+        )
+        email = WorkflowActionEmail.objects.create(
+            subject="Invoice {{ custom_fields | get_cf_value('Payment Status') }}",
+            body="Missing: {{ custom_fields | get_cf_value('Absent', 'none') }}",
+            to="user@example.com",
+        )
+        action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.EMAIL,
+            email=email,
+        )
+        workflow = Workflow.objects.create(name="Custom field email", order=0)
+        workflow.triggers.add(trigger)
+        workflow.actions.add(action)
+        document = Document.objects.create(
+            title="Invoice",
+            checksum="custom-field-email",
+        )
+        CustomFieldInstance.objects.create(
+            document=document,
+            field=select_field,
+            value_select="paid",
+        )
+
+        run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, document)
+
+        mock_send_email.assert_called_once_with(
+            subject="Invoice Paid in full",
+            body="Missing: none",
+            to=["user@example.com"],
+            attachments=[],
+        )
+
     @override_settings(
         PAPERLESS_EMAIL_HOST="localhost",
         EMAIL_ENABLED=True,
@@ -3955,7 +4055,10 @@ class TestWorkflows(
         )
         webhook_action = WorkflowActionWebhook.objects.create(
             use_params=False,
-            body="Test message: {{doc_url}} with id {{doc_id}}",
+            body=(
+                "Test message: {{doc_url}} with id {{doc_id}} for "
+                "{{ custom_fields['Custom Field 1'].value }}"
+            ),
             url="http://paperless-ngx.com",
             include_document=False,
         )
@@ -3980,6 +4083,11 @@ class TestWorkflows(
             correspondent=self.c,
             original_filename="sample.pdf",
         )
+        CustomFieldInstance.objects.create(
+            document=doc,
+            field=self.cf1,
+            value_text="A/B 2026",
+        )
 
         run_workflows(WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED, doc)
 
@@ -3988,7 +4096,7 @@ class TestWorkflows(
                 "url": "http://paperless-ngx.com",
                 "data": (
                     f"Test message: http://localhost:8000/paperless/documents/{doc.id}/"
-                    f" with id {doc.id}"
+                    f" with id {doc.id} for A/B 2026"
                 ),
                 "headers": {},
                 "files": None,

@@ -1,7 +1,9 @@
 import logging
+from collections.abc import Mapping
 from datetime import date
 from datetime import datetime
 from pathlib import Path
+from typing import Any
 
 from django.utils.text import slugify as django_slugify
 from jinja2 import StrictUndefined
@@ -13,8 +15,11 @@ from jinja2 import make_logging_undefined
 from jinja2.meta import find_undeclared_variables
 from jinja2.sandbox import SecurityError
 
+from documents.models import CustomField
+from documents.models import Document
 from documents.templating.environment import _template_environment
 from documents.templating.filters import format_datetime
+from documents.templating.filters import get_cf_value
 from documents.templating.filters import localize_date
 
 logger = logging.getLogger("paperless.templating")
@@ -29,6 +34,8 @@ _template_environment.filters["datetime"] = format_datetime
 _template_environment.filters["slugify"] = django_slugify
 
 _template_environment.filters["localize_date"] = localize_date
+
+_template_environment.filters["get_cf_value"] = get_cf_value
 
 
 _known_placeholder_names = {
@@ -56,7 +63,48 @@ _known_placeholder_names = {
     "doc_title",
     "doc_url",
     "doc_id",
+    "custom_fields",
 }
+
+
+def _custom_field_context_value(field: CustomField, value: Any) -> Any:
+    if field.data_type == CustomField.FieldDataType.SELECT and value is not None:
+        options = (field.extra_data or {}).get("select_options", [])
+        for option in options:
+            if option["id"] == value:
+                return option["label"]
+        return None
+    return value
+
+
+def get_custom_field_context_entry(field: CustomField, value: Any) -> dict[str, Any]:
+    return {
+        "type": field.data_type,
+        "value": _custom_field_context_value(field, value),
+    }
+
+
+def get_document_custom_fields_context(document: Document) -> dict[str, dict[str, Any]]:
+    """Expose document custom fields without passing model instances to Jinja."""
+    return {
+        instance.field.name: get_custom_field_context_entry(
+            instance.field,
+            instance.value,
+        )
+        for instance in document.custom_fields.select_related("field")
+    }
+
+
+def get_override_custom_fields_context(
+    values: Mapping[int, Any] | None,
+) -> dict[str, dict[str, Any]]:
+    """Expose custom fields assigned before a document has been consumed."""
+    if not values:
+        return {}
+    return {
+        field.name: get_custom_field_context_entry(field, values[field.pk])
+        for field in CustomField.objects.filter(pk__in=values)
+    }
 
 
 def validate_workflow_template(text: str) -> None:
@@ -86,6 +134,7 @@ def parse_w_workflow_placeholders(
     doc_title: str | None = None,
     doc_url: str | None = None,
     doc_id: int | None = None,
+    custom_fields: Mapping[str, dict[str, Any]] | None = None,
 ) -> str:
     """
     Available title placeholders for Workflows depend on what has already been assigned,
@@ -107,6 +156,7 @@ def parse_w_workflow_placeholders(
         "owner_username": owner_username,
         "original_filename": Path(original_filename).stem,
         "filename": Path(filename).stem,
+        "custom_fields": custom_fields or {},
     }
     if created is not None:
         formatting.update(

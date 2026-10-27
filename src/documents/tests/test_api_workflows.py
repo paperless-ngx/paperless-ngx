@@ -549,6 +549,32 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
 
         self.assertEqual(Workflow.objects.count(), 1)
 
+    def test_api_create_assign_title_with_custom_field_placeholder(self) -> None:
+        response = self.client.post(
+            self.ENDPOINT,
+            json.dumps(
+                {
+                    "name": "Custom field title",
+                    "order": 1,
+                    "triggers": [
+                        {
+                            "type": WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+                        },
+                    ],
+                    "actions": [
+                        {
+                            "assign_title": (
+                                "{{ custom_fields | get_cf_value('Invoice Number', 'none') }}"
+                            ),
+                        },
+                    ],
+                },
+            ),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
     def test_api_create_remote_ocr_action_requires_consumption_trigger(
         self,
     ) -> None:
