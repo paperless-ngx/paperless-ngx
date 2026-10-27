@@ -726,6 +726,7 @@ applied. You can use the following placeholders in the template with any trigger
 - `{{added_time}}`: added time in HH:MM format
 - `{{original_filename}}`: original file name without extension
 - `{{filename}}`: current file name without extension (for "added" workflows this may not be final yet, you can use `{{original_filename}}`)
+- `{{custom_fields}}` (title assignments only): Custom field names mapped to their type and value, as in [file name templates](advanced_usage.md#additional-variables). For example, `{{ custom_fields.Invoice.value }}` or `{{ custom_fields | get_cf_value("Invoice", "") }}` for a fallback when the field is missing. In title assignments, fields assigned by the same action are available.
 - `{{doc_title}}`: current document title (cannot be used in title assignment)
 
 The following placeholders are only available for "added" or "updated" triggers

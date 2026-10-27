@@ -43,6 +43,33 @@ def apply_assignment_to_document(
     if action.assign_owner:
         document.owner = action.assign_owner
 
+    if action.has_assign_custom_fields:
+        for field in action.assign_custom_fields.all():
+            value_field_name = CustomFieldInstance.get_value_field_name(
+                data_type=field.data_type,
+            )
+            args = {
+                value_field_name: action.assign_custom_fields_values.get(
+                    str(field.pk),
+                    None,
+                ),
+            }
+            # for some reason update_or_create doesn't work here
+            instance = CustomFieldInstance.objects.filter(
+                field=field,
+                document=document,
+            ).first()
+            # empty string is indistinguishable from no value in the UI
+            if instance and args[value_field_name] not in (None, ""):
+                setattr(instance, value_field_name, args[value_field_name])
+                instance.save()
+            elif not instance:
+                CustomFieldInstance.objects.create(
+                    **args,
+                    field=field,
+                    document=document,
+                )
+
     if action.assign_title:
         try:
             title = parse_w_workflow_placeholders(
@@ -57,6 +84,9 @@ def apply_assignment_to_document(
                 "",  # dont pass the title to avoid recursion
                 "",  # no urls in titles
                 document.pk,
+                custom_fields=CustomFieldInstance.global_objects.filter(
+                    document=document,
+                ).select_related("field"),
             )
             if title:
                 document.title = title
@@ -90,33 +120,6 @@ def apply_assignment_to_document(
             [document.pk],
             merge=True,
         )
-
-    if action.has_assign_custom_fields:
-        for field in action.assign_custom_fields.all():
-            value_field_name = CustomFieldInstance.get_value_field_name(
-                data_type=field.data_type,
-            )
-            args = {
-                value_field_name: action.assign_custom_fields_values.get(
-                    str(field.pk),
-                    None,
-                ),
-            }
-            # for some reason update_or_create doesn't work here
-            instance = CustomFieldInstance.objects.filter(
-                field=field,
-                document=document,
-            ).first()
-            # empty string is indistinguishable from no value in the UI
-            if instance and args[value_field_name] not in (None, ""):
-                setattr(instance, value_field_name, args[value_field_name])
-                instance.save()
-            elif not instance:
-                CustomFieldInstance.objects.create(
-                    **args,
-                    field=field,
-                    document=document,
-                )
 
 
 def apply_assignment_to_overrides(

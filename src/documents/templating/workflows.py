@@ -1,4 +1,5 @@
 import logging
+from collections.abc import Iterable
 from datetime import date
 from datetime import datetime
 from pathlib import Path
@@ -13,7 +14,9 @@ from jinja2 import make_logging_undefined
 from jinja2.meta import find_undeclared_variables
 from jinja2.sandbox import SecurityError
 
+from documents.models import CustomFieldInstance
 from documents.templating.environment import _template_environment
+from documents.templating.filepath import get_custom_fields_context
 from documents.templating.filters import format_datetime
 from documents.templating.filters import localize_date
 
@@ -56,6 +59,7 @@ _known_placeholder_names = {
     "doc_title",
     "doc_url",
     "doc_id",
+    "custom_fields",
 }
 
 
@@ -86,6 +90,7 @@ def parse_w_workflow_placeholders(
     doc_title: str | None = None,
     doc_url: str | None = None,
     doc_id: int | None = None,
+    custom_fields: Iterable[CustomFieldInstance] = (),
 ) -> str:
     """
     Available title placeholders for Workflows depend on what has already been assigned,
@@ -108,6 +113,7 @@ def parse_w_workflow_placeholders(
         "original_filename": Path(original_filename).stem,
         "filename": Path(filename).stem,
     }
+    formatting.update(get_custom_fields_context(custom_fields))
     if created is not None:
         formatting.update(
             {

@@ -847,6 +847,19 @@ class ConsumerPlugin(
             local_added,
             self.filename,
             self.filename,
+            custom_fields=[
+                CustomFieldInstance(
+                    field=field,
+                    **{
+                        CustomFieldInstance.get_value_field_name(
+                            field.data_type,
+                        ): self.metadata.custom_fields[field.pk],
+                    },
+                )
+                for field in CustomField.objects.filter(
+                    pk__in=self.metadata.custom_fields or {},
+                )
+            ],
         )
 
     def _store(

@@ -1846,6 +1846,50 @@ class TestWorkflows(
             expected_str = f"Document storage path {doc.storage_path} does not match {trigger.filter_has_storage_path}"
             self.assertIn(expected_str, cm.output[1])
 
+    def test_title_custom_fields(self) -> None:
+        from documents.consumer import ConsumerPlugin
+        from documents.templating.workflows import validate_workflow_template
+
+        field = CustomField.objects.create(
+            name="Invoice",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        template = '{{ custom_fields.Invoice.value }} {{ custom_fields | get_cf_value("Missing", "fallback") }}'
+        validate_workflow_template(template)
+        consumer = mock.Mock(
+            filename="invoice.pdf",
+            metadata=DocumentMetadataOverrides(custom_fields={field.pk: "INV-123"}),
+        )
+        self.assertEqual(
+            ConsumerPlugin._parse_title_placeholders(consumer, template),
+            "INV-123 fallback",
+        )
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+        )
+        action = WorkflowAction.objects.create(assign_title=template)
+        doc = Document.objects.create(title="Original")
+        action.assign_custom_fields.add(field)
+        action.assign_custom_fields_values = {str(field.pk): "INV-123"}
+        action.save()
+        workflow = Workflow.objects.create(name="Custom field title", order=0)
+        workflow.triggers.add(trigger)
+        workflow.actions.add(action)
+
+        document_consumption_finished.send(sender=self.__class__, document=doc)
+
+        doc.refresh_from_db()
+        self.assertEqual(doc.title, "INV-123 fallback")
+
+        # Existing fields remain available when the action assigns no custom fields.
+        action.assign_custom_fields.clear()
+        CustomFieldInstance.objects.filter(document=doc, field=field).update(
+            value_text="INV-456",
+        )
+        document_consumption_finished.send(sender=self.__class__, document=doc)
+        doc.refresh_from_db()
+        self.assertEqual(doc.title, "INV-456 fallback")
+
     def test_document_added_invalid_title_placeholders(self) -> None:
         """
         GIVEN:
