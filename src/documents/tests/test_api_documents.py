@@ -46,6 +46,7 @@ from documents.models import UiSettings
 from documents.models import Workflow
 from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
+from documents.search import get_backend
 from documents.signals.handlers import run_workflows
 from documents.tests.utils import ConsumeTaskMixin
 from paperless_testing.dirs import DirectoriesMixin
@@ -65,6 +66,70 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         self.user = UserFactory(username="temp_admin", superuser=True)
         self.client.force_authenticate(user=self.user)
         cache.clear()
+
+    def test_detail_save_indexes_final_workflow_state(self) -> None:
+        viewer = UserFactory()
+        grant_global(viewer, "view_document")
+        inbox = TagFactory(is_inbox_tag=True)
+        doc = DocumentFactory(owner=self.user, content="distinctiveword")
+        doc.tags.add(inbox)
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+        )
+        action = WorkflowAction.objects.create(assign_title="Workflow title")
+        action.assign_view_users.add(viewer)
+        action.remove_view_users.add(viewer)
+        workflow = Workflow.objects.create(name="Update document")
+        workflow.triggers.add(trigger)
+        workflow.actions.add(action)
+        backend = get_backend()
+        backend.add_or_update(doc)
+
+        for action_type in (
+            WorkflowAction.WorkflowActionType.ASSIGNMENT,
+            WorkflowAction.WorkflowActionType.REMOVAL,
+            WorkflowAction.WorkflowActionType.MOVE_TO_TRASH,
+        ):
+            with self.subTest(action_type=action_type):
+                grant = action_type == WorkflowAction.WorkflowActionType.ASSIGNMENT
+                action.type = action_type
+                action.save()
+                trigger.filter_has_not_tags.set([inbox] if grant else [])
+                trigger.filter_has_tags.set([] if grant else [inbox])
+                self.client.force_authenticate(self.user)
+                response = self.client.patch(
+                    f"/api/documents/{doc.pk}/",
+                    {"tags": [] if grant else [inbox.pk]},
+                    format="json",
+                )
+                self.assertEqual(response.status_code, status.HTTP_200_OK)
+                self.client.force_authenticate(viewer)
+                self.assertEqual(
+                    self.client.get(f"/api/documents/{doc.pk}/").status_code,
+                    status.HTTP_200_OK if grant else status.HTTP_404_NOT_FOUND,
+                )
+                # Check the index directly: the API's DB permission filtering
+                # would otherwise hide stale grants and trashed index entries.
+                self.assertEqual(
+                    list(backend.search_ids("distinctiveword", user=viewer)),
+                    [doc.pk] if grant else [],
+                )
+                if grant:
+                    response = self.client.get(
+                        "/api/documents/",
+                        {"query": "distinctiveword AND title:workflow"},
+                    )
+                    self.assertEqual(response.status_code, status.HTTP_200_OK)
+                    self.assertEqual(
+                        [result["id"] for result in response.data["results"]],
+                        [doc.pk],
+                    )
+                elif action_type == WorkflowAction.WorkflowActionType.MOVE_TO_TRASH:
+                    self.assertFalse(Document.objects.filter(pk=doc.pk).exists())
+                    self.assertEqual(
+                        list(backend.search_ids("distinctiveword", user=None)),
+                        [],
+                    )
 
     def testDocuments(self) -> None:
         response = self.client.get("/api/documents/").data
