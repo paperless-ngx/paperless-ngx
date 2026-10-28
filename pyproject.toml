@@ -38,7 +38,6 @@ dependencies = [
   "django-multiselectfield~=1.0.1",
   "django-rich~=2.2.0",
   "django-soft-delete~=1.0.18",
-  "django-treenode>=0.24",
   "djangorestframework~=3.16",
   "drf-spectacular~=0.30",
   "drf-spectacular-sidecar>=2026.7.1,<2026.10",

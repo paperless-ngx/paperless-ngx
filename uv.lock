@@ -1211,15 +1211,6 @@ wheels = [
 ]
 
 [[package]]
-name = "django-treenode"
-version = "0.25.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/cb/2b/09f04b44b3583a911ae4f5d0e3360a23d529704c9e9115fce2520b7d4420/django_treenode-0.25.0.tar.gz", hash = "sha256:d14d0eb3571c227ce11147210d62a8f87b568bbb30fa76a5be9b9e6d514157c3", size = 29951, upload-time = "2026-08-26T00:20:13.489Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/e1/ac/2140e8c20e2a47457ec23302273527d3430bf5c09edb8940d74c0725c138/django_treenode-0.25.0-py3-none-any.whl", hash = "sha256:f47caab5440420870b6287602b3ee401ca354416d44b24ab97579be5ea658927", size = 22343, upload-time = "2026-08-26T00:20:12.078Z" },
-]
-
-[[package]]
 name = "djangorestframework"
 version = "3.18.3"
 source = { registry = "https://pypi.org/simple" }
@@ -3107,7 +3098,6 @@ dependencies = [
     { name = "django-multiselectfield" },
     { name = "django-rich" },
     { name = "django-soft-delete" },
-    { name = "django-treenode" },
     { name = "djangorestframework" },
     { name = "drf-spectacular" },
     { name = "drf-spectacular-sidecar" },
@@ -3258,7 +3248,6 @@ requires-dist = [
     { name = "django-multiselectfield", specifier = "~=1.0.1" },
     { name = "django-rich", specifier = "~=2.2.0" },
     { name = "django-soft-delete", specifier = "~=1.0.18" },
-    { name = "django-treenode", specifier = ">=0.24" },
     { name = "djangorestframework", specifier = "~=3.16" },
     { name = "drf-spectacular", specifier = "~=0.30" },
     { name = "drf-spectacular-sidecar", specifier = ">=2026.7.1,<2026.10" },

@@ -14,7 +14,6 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from multiselectfield import MultiSelectField
-from treenode.models import TreeNodeModel
 
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.registry import auditlog
@@ -100,7 +99,17 @@ class Correspondent(MatchingModel):
         verbose_name_plural = _("correspondents")
 
 
-class Tag(MatchingModel, TreeNodeModel):
+class Tag(MatchingModel):
+    # Keep the existing column and reverse relation during the transition.
+    tn_parent = models.ForeignKey(
+        "self",
+        blank=True,
+        null=True,
+        on_delete=models.CASCADE,
+        related_name="tn_children",
+        verbose_name=_("Parent"),
+    )
+
     color = models.CharField(_("color"), max_length=7, default="#a6cee3")
     # Maximum allowed nesting depth for tags (root = 1, max depth = 5)
     MAX_NESTING_DEPTH: Final[int] = 5
@@ -114,27 +123,51 @@ class Tag(MatchingModel, TreeNodeModel):
         ),
     )
 
-    class Meta(MatchingModel.Meta, TreeNodeModel.Meta):
+    class Meta(MatchingModel.Meta):
         verbose_name = _("tag")
         verbose_name_plural = _("tags")
 
+    @classmethod
+    def get_hierarchy(cls):
+        from documents.tag_hierarchy import TagHierarchy
+
+        return TagHierarchy(cls.objects.values_list("pk", "tn_parent_id"))
+
+    @property
+    def parent_pk(self):
+        return self.tn_parent_id
+
+    def get_parent(self):
+        return self.tn_parent
+
+    def get_ancestors_pks(self):
+        return self.get_hierarchy().ancestors(self.tn_parent_id)
+
+    def get_ancestors(self):
+        ids = self.get_ancestors_pks()
+        tags = self.__class__.objects.in_bulk(ids)
+        return [tags[pk] for pk in ids]
+
+    def get_descendants_pks(self):
+        return self.get_hierarchy().descendants([self.pk])
+
+    def get_descendants(self):
+        return self.__class__.objects.filter(pk__in=self.get_descendants_pks())
+
+    def get_children_queryset(self):
+        return self.__class__.objects.filter(tn_parent_id=self.pk)
+
     def clean(self) -> None:
-        # Prevent self-parenting and assigning a descendant as parent
-        parent = self.get_parent()
-        if parent == self:
-            raise ValidationError({"parent": _("Cannot set itself as parent.")})
-        if parent and self.pk is not None and self.is_ancestor_of(parent):
-            raise ValidationError({"parent": _("Cannot set parent to a descendant.")})
-
-        # Enforce maximum nesting depth
-        new_parent_depth = 0
-        if parent:
-            new_parent_depth = parent.get_ancestors_count() + 1
-
-        height = 0 if self.pk is None else self.get_depth()
-        deepest_new_depth = (new_parent_depth + 1) + height
-        if deepest_new_depth > self.MAX_NESTING_DEPTH:
-            raise ValidationError({"parent": _("Maximum nesting depth exceeded.")})
+        hierarchy = self.get_hierarchy()
+        if self.pk is not None and self.tn_parent_id == self.pk:
+            raise ValidationError({"tn_parent": _("Cannot set itself as parent.")})
+        ancestors = hierarchy.ancestors(self.tn_parent_id)
+        if self.pk is not None and self.pk in ancestors:
+            raise ValidationError(
+                {"tn_parent": _("Cannot set parent to a descendant.")},
+            )
+        if len(ancestors) + 1 + hierarchy.height(self.pk) > self.MAX_NESTING_DEPTH:
+            raise ValidationError({"tn_parent": _("Maximum nesting depth exceeded.")})
 
         return super().clean()
 
@@ -539,10 +572,7 @@ class Document(SoftDeleteModel, ModelWithOwner):  # type: ignore[django-manager-
         return self.created
 
     def add_nested_tags(self, tags) -> None:
-        tag_ids = set()
-        for tag in tags:
-            tag_ids.add(tag.id)
-            tag_ids.update(tag.get_ancestors_pks())
+        tag_ids = Tag.get_hierarchy().with_ancestors(tag.pk for tag in tags)
 
         tags_to_add = self.tags.model.objects.filter(id__in=tag_ids)
         self.tags.add(*tags_to_add)

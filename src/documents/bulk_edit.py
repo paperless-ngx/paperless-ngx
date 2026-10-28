@@ -255,19 +255,13 @@ def modify_tags(
     affected_docs = list(qs.values_list("pk", flat=True))
     DocumentTagRelationship = Document.tags.through
 
-    # add with all ancestors
-    expanded_add_tags: set[int] = set()
-    add_tag_objects = Tag.objects.filter(pk__in=add_tags)
-    for t in add_tag_objects:
-        expanded_add_tags.add(int(t.id))
-        expanded_add_tags.update(int(pk) for pk in t.get_ancestors_pks())
-
-    # remove with all descendants
-    expanded_remove_tags: set[int] = set()
-    remove_tag_objects = Tag.objects.filter(pk__in=remove_tags)
-    for t in remove_tag_objects:
-        expanded_remove_tags.add(int(t.id))
-        expanded_remove_tags.update(int(pk) for pk in t.get_descendants_pks())
+    hierarchy = Tag.get_hierarchy()
+    expanded_add_tags = hierarchy.with_ancestors(
+        Tag.objects.filter(pk__in=add_tags).values_list("pk", flat=True),
+    )
+    expanded_remove_tags = hierarchy.with_descendants(
+        Tag.objects.filter(pk__in=remove_tags).values_list("pk", flat=True),
+    )
 
     with transaction.atomic():
         if expanded_remove_tags:
