@@ -1384,6 +1384,15 @@ def task_revoked_handler(
         PaperlessTask.objects.filter(task_id=task_id).update(
             status=PaperlessTask.Status.REVOKED,
             date_done=timezone.now(),
+            result_data={
+                "reason": (
+                    "Task expired before execution. Check worker logs for details."
+                    if expired
+                    else "Task terminated during execution. Check worker logs for details."
+                    if terminated
+                    else "Task revoked before completion. Check worker logs for details."
+                ),
+            },
         )
     except Exception:  # pragma: no cover
         logger.exception("Updating PaperlessTask on revocation failed")
