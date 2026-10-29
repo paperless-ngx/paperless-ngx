@@ -23,6 +23,7 @@ from rest_framework.test import APITestCase
 from documents.models import Correspondent
 from documents.models import MatchingModel
 from paperless_mail import tasks
+from paperless_mail.mail import APPLE_MAIL_TAG_COLORS
 from paperless_mail.mail import MailAccountHandler
 from paperless_mail.mail import MailError
 from paperless_mail.mail import TagMailAction
@@ -1871,6 +1872,32 @@ class TestErrorCallback:
         assert processed_mails.count() == 1
         assert processed_mails.get().status == "FAILED"
         assert processed_mails.get().owner == owner
+
+
+class TestTagMailActionColor:
+    @pytest.mark.parametrize(
+        "parameter",
+        ["apple:green", "apple:Green", "APPLE: GREEN "],
+    )
+    def test_color_case_is_ignored(self, parameter: str) -> None:
+        """
+        GIVEN:
+            - An Apple Mail tag parameter in any letter case
+        WHEN:
+            - The action tags a message
+        THEN:
+            - The lowercase color's flag bits are set on the message
+        """
+        action = TagMailAction(parameter, supports_gmail_labels=False)
+        mailbox = mock.Mock()
+
+        action.post_consume(mailbox, "1", parameter)
+
+        assert mailbox.flag.call_args_list[1] == mock.call(
+            "1",
+            APPLE_MAIL_TAG_COLORS["green"],
+            value=True,
+        )
 
 
 class TestManagementCommand(TestCase):
