@@ -24,3 +24,6 @@ onlyBuiltDependencies:
 ignoredBuiltDependencies:
   - normalize-diacritics
   - unrs-resolver
+overrides:
+  "vite@>=8.3.0 <8.3.3": "^8.3.3"
+  "zod@<4.6.6": "^4.6.6"
