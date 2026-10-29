@@ -1846,6 +1846,50 @@ class TestWorkflows(
             expected_str = f"Document storage path {doc.storage_path} does not match {trigger.filter_has_storage_path}"
             self.assertIn(expected_str, cm.output[1])
 
+    def test_title_custom_fields(self) -> None:
+        from documents.consumer import ConsumerPlugin
+        from documents.templating.workflows import validate_workflow_template
+
+        field = CustomField.objects.create(
+            name="Invoice",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        template = '{{ custom_fields.Invoice.value }} {{ custom_fields | get_cf_value("Missing", "fallback") }}'
+        validate_workflow_template(template)
+        consumer = mock.Mock(
+            filename="invoice.pdf",
+            metadata=DocumentMetadataOverrides(custom_fields={field.pk: "INV-123"}),
+        )
+        self.assertEqual(
+            ConsumerPlugin._parse_title_placeholders(consumer, template),
+            "INV-123 fallback",
+        )
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+        )
+        action = WorkflowAction.objects.create(assign_title=template)
+        doc = Document.objects.create(title="Original")
+        action.assign_custom_fields.add(field)
+        action.assign_custom_fields_values = {str(field.pk): "INV-123"}
+        action.save()
+        workflow = Workflow.objects.create(name="Custom field title", order=0)
+        workflow.triggers.add(trigger)
+        workflow.actions.add(action)
+
+        document_consumption_finished.send(sender=self.__class__, document=doc)
+
+        doc.refresh_from_db()
+        self.assertEqual(doc.title, "INV-123 fallback")
+
+        # Existing fields remain available when the action assigns no custom fields.
+        action.assign_custom_fields.clear()
+        CustomFieldInstance.objects.filter(document=doc, field=field).update(
+            value_text="INV-456",
+        )
+        document_consumption_finished.send(sender=self.__class__, document=doc)
+        doc.refresh_from_db()
+        self.assertEqual(doc.title, "INV-456 fallback")
+
     def test_document_added_invalid_title_placeholders(self) -> None:
         """
         GIVEN:
@@ -5118,6 +5162,72 @@ class TestWorkflows(
 
         # No document should be created
         self.assertEqual(Document.objects.count(), 0)
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("use_overrides", [False, True])
+def test_custom_fields_in_email_and_webhook_templates(
+    use_overrides,
+    settings,
+    tmp_path,
+):
+    from documents.workflows.actions import build_workflow_action_context
+    from documents.workflows.actions import execute_email_action
+    from documents.workflows.actions import execute_webhook_action
+
+    settings.EMAIL_ENABLED = True
+    field = CustomField.objects.create(
+        name="Invoice",
+        data_type=CustomField.FieldDataType.STRING,
+    )
+    if use_overrides:
+        invoice = tmp_path / "invoice.pdf"
+        invoice.write_bytes(b"%PDF-1.7")
+        document = ConsumableDocument(
+            source=DocumentSource.ConsumeFolder,
+            original_file=invoice,
+        )
+        overrides = DocumentMetadataOverrides(custom_fields={field.pk: "INV-123"})
+    else:
+        document = Document.objects.create(title="Invoice")
+        CustomFieldInstance.objects.create(
+            document=document,
+            field=field,
+            value_text="INV-123",
+        )
+        overrides = None
+    context = build_workflow_action_context(document, overrides)
+    template = '{{ custom_fields.Invoice.value }} {{ custom_fields | get_cf_value("Missing", "fallback") }}'
+    action = WorkflowAction(
+        email=WorkflowActionEmail(
+            subject=template,
+            body=template,
+            to="test@example.com",
+        ),
+        webhook=WorkflowActionWebhook(
+            url="https://example.com",
+            body=template,
+        ),
+    )
+    with mock.patch("documents.workflows.actions.send_email") as send_email:
+        execute_email_action(
+            action,
+            document,
+            context,
+            None,
+            Path("invoice.pdf"),
+            WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+        )
+    assert send_email.call_args.kwargs["subject"] == "INV-123 fallback"
+    assert send_email.call_args.kwargs["body"] == "INV-123 fallback"
+    with mock.patch("documents.workflows.actions.send_webhook.apply_async") as send:
+        for use_params in (False, True):
+            action.webhook.use_params = use_params
+            action.webhook.params = {"invoice": template}
+            execute_webhook_action(action, document, context, None, Path("invoice.pdf"))
+            assert send.call_args.kwargs["kwargs"]["data"] == (
+                {"invoice": "INV-123 fallback"} if use_params else "INV-123 fallback"
+            )
 
 
 class TestWebhookSend:
