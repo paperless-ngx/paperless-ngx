@@ -4,6 +4,7 @@ from typing import Literal
 
 import pytest
 
+from documents.templating.filters import format_datetime
 from documents.templating.filters import localize_date
 
 
@@ -294,3 +295,23 @@ class TestDateLocalization:
         Tests `localize_date` with `date` string across different locales and formats.
         """
         assert localize_date(value, format_style, locale_str) == expected_output
+
+
+class TestFormatDatetime:
+    @pytest.mark.parametrize(
+        ("value", "expected"),
+        [
+            pytest.param("2026-09-21", "2026-09-21 00:00", id="date"),
+            pytest.param(
+                "2026-09-21T13:45:00+00:00",
+                "2026-09-21 13:45",
+                id="datetime",
+            ),
+        ],
+    )
+    def test_parses_iso_strings(self, value: str, expected: str) -> None:
+        assert format_datetime(value, "%Y-%m-%d %H:%M") == expected
+
+    def test_rejects_unparseable_string(self) -> None:
+        with pytest.raises(ValueError, match="not a date"):
+            format_datetime("not a date", "%Y")
