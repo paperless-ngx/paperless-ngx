@@ -29,10 +29,6 @@
 - Fix: prevent doc permissions queries on schema view [@shamoon](https://github.com/shamoon) ([#14503](https://github.com/paperless-ngx/paperless-ngx/pull/14503))
 - Fix: dont defer tag assignment when barcode will not result in a split [@shamoon](https://github.com/shamoon) ([#14497](https://github.com/paperless-ngx/paperless-ngx/pull/14497))
 
-### Maintenance
-
-- Chore: Update uv to 0.13 for the eMudhra CA fixes [@stumpylog](https://github.com/stumpylog) ([#14532](https://github.com/paperless-ngx/paperless-ngx/pull/14532))
-
 ### Dependencies
 
 <details>
