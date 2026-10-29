@@ -5,14 +5,12 @@ import {
   catchError,
   finalize,
   first,
-  map,
   switchMap,
   takeUntil,
   tap,
 } from 'rxjs/operators'
 import {
   PaperlessTask,
-  PaperlessTaskStatus,
   PaperlessTaskStatusCounts,
   PaperlessTaskType,
 } from 'src/app/data/paperless-task'
@@ -27,48 +25,40 @@ export class TasksService {
 
   private baseUrl: string = environment.apiBaseUrl
   private endpoint: string = 'tasks'
-  private readonly defaultReloadPageSize = 1000
 
   public loading: boolean = false
 
-  private readonly tasks = signal<PaperlessTask[]>([])
+  private readonly tasksStatusCounts = signal<PaperlessTaskStatusCounts>({
+    all: 0,
+    needs_attention: 0,
+    in_progress: 0,
+    completed: 0,
+  })
   private readonly reloadNotifier = new Subject<void>()
 
   private unsubscribeNotifer: Subject<any> = new Subject()
 
   constructor() {
     this.reloadNotifier
-      .pipe(
-        switchMap(() => {
-          this.loading = true
-          return this.http
-            .get<Results<PaperlessTask>>(`${this.baseUrl}${this.endpoint}/`, {
-              params: {
-                acknowledged: 'false',
-                page_size: this.defaultReloadPageSize,
-              },
-            })
-            .pipe(
-              map((response) => response.results),
-              takeUntil(this.unsubscribeNotifer),
-              catchError(() => EMPTY),
-              finalize(() => {
-                this.loading = false
-              })
-            )
-        })
-      )
-      .subscribe((tasks) => {
-        this.tasks.set(tasks)
+      .pipe(switchMap(() => this.fetchUnacknowledgedTasksCounts()))
+      .subscribe((taskStatusCounts) => {
+        this.tasksStatusCounts.set(taskStatusCounts)
       })
   }
 
-  public get needsAttentionTasks(): PaperlessTask[] {
-    return this.tasks().filter((t) =>
-      [PaperlessTaskStatus.Failure, PaperlessTaskStatus.Revoked].includes(
-        t.status
-      )
+  private fetchUnacknowledgedTasksCounts(): Observable<PaperlessTaskStatusCounts> {
+    this.loading = true
+    return this.statusCounts({ acknowledged: false }).pipe(
+      takeUntil(this.unsubscribeNotifer),
+      catchError(() => EMPTY),
+      finalize(() => {
+        this.loading = false
+      })
     )
+  }
+
+  public get needsAttentionTasksCount(): number {
+    return this.tasksStatusCounts().needs_attention
   }
 
   public reload() {
@@ -105,7 +95,7 @@ export class TasksService {
 
   public dismissTasks(task_ids: Set<number>): Observable<any> {
     return this.http
-      .post(`${this.baseUrl}tasks/acknowledge/`, {
+      .post(`${this.baseUrl}${this.endpoint}/acknowledge/`, {
         tasks: [...task_ids],
       })
       .pipe(
@@ -119,7 +109,7 @@ export class TasksService {
 
   public dismissAllTasks(): Observable<any> {
     return this.http
-      .post(`${this.baseUrl}tasks/acknowledge/`, {
+      .post(`${this.baseUrl}${this.endpoint}/acknowledge/`, {
         all: true,
       })
       .pipe(

@@ -19,7 +19,6 @@ import {
   PaperlessTaskTriggerSource,
   PaperlessTaskType,
 } from 'src/app/data/paperless-task'
-import { Results } from 'src/app/data/results'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
@@ -153,11 +152,6 @@ const tasks: PaperlessTask[] = [
   },
 ]
 
-const paginatedTasks: Results<PaperlessTask> = {
-  count: tasks.length,
-  results: tasks,
-}
-
 const sectionCountResponse = {
   all: 7,
   needs_attention: 2,
@@ -204,7 +198,7 @@ describe('TasksComponent', () => {
     }).compileComponents()
 
     tasksService = TestBed.inject(TasksService)
-    reloadSpy = jest.spyOn(tasksService, 'reload')
+    reloadSpy = jest.spyOn(tasksService, 'reload').mockImplementation(() => {})
     httpTestingController = TestBed.inject(HttpTestingController)
     modalService = TestBed.inject(NgbModal)
     router = TestBed.inject(Router)
@@ -213,15 +207,6 @@ describe('TasksComponent', () => {
     component = fixture.componentInstance
     jest.useFakeTimers()
     fixture.detectChanges()
-
-    httpTestingController
-      .expectOne(
-        (req) =>
-          req.url === `${environment.apiBaseUrl}tasks/` &&
-          req.params.get('acknowledged') === 'false' &&
-          req.params.get('page_size') === '1000'
-      )
-      .flush(paginatedTasks)
 
     httpTestingController
       .expectOne(
