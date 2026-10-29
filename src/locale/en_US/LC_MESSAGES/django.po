@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-28 02:55+0000\n"
+"POT-Creation-Date: 2026-10-29 17:25+0000\n"
 "PO-Revision-Date: 2022-02-17 04:17\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -21,39 +21,43 @@ msgstr ""
 msgid "Documents"
 msgstr ""
 
-#: documents/filters.py:464
+#: documents/filters.py:337
+msgid "Expected a date or a relative date such as \"today\" or \"in 30 days\"."
+msgstr ""
+
+#: documents/filters.py:513
 msgid "Value must be valid JSON."
 msgstr ""
 
-#: documents/filters.py:483
+#: documents/filters.py:534
 msgid "Invalid custom field query expression"
 msgstr ""
 
-#: documents/filters.py:493
+#: documents/filters.py:544
 msgid "Invalid expression list. Must be nonempty."
 msgstr ""
 
-#: documents/filters.py:514
+#: documents/filters.py:565
 msgid "Invalid logical operator {op!r}"
 msgstr ""
 
-#: documents/filters.py:528
+#: documents/filters.py:579
 msgid "Maximum number of query conditions exceeded."
 msgstr ""
 
-#: documents/filters.py:592
+#: documents/filters.py:643
 msgid "{name!r} is not a valid custom field."
 msgstr ""
 
-#: documents/filters.py:629
+#: documents/filters.py:680
 msgid "{data_type} does not support query expr {expr!r}."
 msgstr ""
 
-#: documents/filters.py:748 documents/models.py:137
+#: documents/filters.py:801 documents/models.py:137
 msgid "Maximum nesting depth exceeded."
 msgstr ""
 
-#: documents/filters.py:1125
+#: documents/filters.py:1178
 msgid "Custom field not found"
 msgstr ""
 
