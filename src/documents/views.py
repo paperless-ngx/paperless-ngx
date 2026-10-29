@@ -1304,12 +1304,18 @@ class DocumentViewSet(
 
         from documents.search import get_backend
 
-        get_backend().add_or_update(refreshed_doc)
-
         document_updated.send(
             sender=self.__class__,
             document=refreshed_doc,
         )
+
+        # Index the final workflow state, including deletion.
+        backend = get_backend()
+        final_doc = Document.objects.filter(pk=root_doc.pk).first()
+        if final_doc is None:
+            backend.remove(root_doc.pk)
+        else:
+            backend.add_or_update(final_doc)
 
         return response
 

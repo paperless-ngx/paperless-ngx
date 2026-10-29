@@ -2,8 +2,12 @@ import json
 import types
 from collections.abc import Callable
 from datetime import date
+from unittest.mock import patch
 from urllib.parse import quote
 
+import time_machine
+from django.test import override_settings
+from django.utils import timezone
 from rest_framework.test import APITestCase
 
 from documents.models import CustomField
@@ -442,6 +446,65 @@ class TestCustomFieldsSearch(DirectoriesMixin, APITestCase):
                 and document["date_field"].year >= 2024
             ),
         )
+
+    @override_settings(TIME_ZONE="America/Los_Angeles")
+    def test_relative_dates(self) -> None:
+        # Reevaluate the same mixed relative/fixed range on different local dates.
+        for today in (date(2024, 8, 22), date(2024, 11, 15)):
+            with (
+                self.subTest(today=today),
+                time_machine.travel(f"{today}T23:30:00-07:00", tick=False),
+                patch(
+                    "documents.filters.timezone.localtime",
+                    wraps=timezone.localtime,
+                ) as localtime,
+            ):
+                self._assert_query_match_predicate(
+                    ["date_field", "range", ["today", "2024-11-15"]],
+                    lambda document, today=today: (
+                        "date_field" in document
+                        and document["date_field"] is not None
+                        and today <= document["date_field"] <= date(2024, 11, 15)
+                    ),
+                )
+                localtime.assert_called_once_with()
+
+    def test_relative_date_validation(self) -> None:
+        for value, keyword in (
+            ("not a date", "date"),
+            ("January 2024", "date"),
+            ("today + " + "9" * 5000 + " days", "date"),
+            (True, "format"),
+        ):
+            with self.subTest(value=str(value)[:50]):
+                self._assert_validation_error(
+                    json.dumps(["date_field", "exact", value]),
+                    ["custom_field_query", "2"],
+                    keyword,
+                )
+
+    @time_machine.travel("2024-08-22T12:00:00Z", tick=False)
+    def test_relative_date_languages(self) -> None:
+        for locales in (["de"], ["zh-Hans", "de"], None):
+            with (
+                self.subTest(locales=locales),
+                override_settings(
+                    DATE_PARSER_LANGUAGES=locales,
+                ),
+            ):
+                self._assert_query_match_predicate(
+                    ["date_field", "exact", "heute"],
+                    lambda document: (
+                        "date_field" in document
+                        and document["date_field"] == date(2024, 8, 22)
+                    ),
+                )
+        with override_settings(DATE_PARSER_LANGUAGES=["en"]):
+            self._assert_validation_error(
+                json.dumps(["date_field", "exact", "heute"]),
+                ["custom_field_query", "2"],
+                "date",
+            )
 
     def test_gt_monetary(self) -> None:
         self._assert_query_match_predicate(

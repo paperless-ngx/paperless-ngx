@@ -49,6 +49,26 @@ import { LoadingComponentWithPermissions } from '../../loading-component/loading
 import { ClearableBadgeComponent } from '../clearable-badge/clearable-badge.component'
 import { DocumentLinkComponent } from '../input/document-link/document-link.component'
 
+interface RelativeDate {
+  // The expression sent to the API, with {n} standing in for the amount
+  amount: number | null
+  unit: string
+}
+
+function parseRelativeDate(
+  value: string,
+  unit: string
+): RelativeDate | undefined {
+  const [prefix, suffix] = unit.split('{n}')
+  if (suffix === undefined) {
+    return value === unit ? { amount: null, unit } : undefined
+  }
+  if (!value.startsWith(prefix) || !value.endsWith(suffix)) return undefined
+  const amount = value.slice(prefix.length, value.length - suffix.length)
+  if (!amount || !Number.isInteger(+amount) || +amount < 0) return undefined
+  return { amount: +amount, unit }
+}
+
 export class CustomFieldQueriesModel {
   private readonly _queries = signal<CustomFieldQueryElement[]>([])
   private rootSubscriptions: Subscription[] = []
@@ -304,6 +324,67 @@ export class CustomFieldsQueryDropdownComponent extends LoadingComponentWithPerm
   readonly customFields = signal<CustomField[]>([])
 
   public readonly today: string = new Date().toLocaleDateString('en-CA')
+
+  public readonly relativeDateUnits = [
+    { id: 'today', label: $localize`Today` },
+    { id: '{n} days ago', label: $localize`days ago` },
+    { id: '{n} weeks ago', label: $localize`weeks ago` },
+    { id: '{n} months ago', label: $localize`months ago` },
+    { id: '{n} years ago', label: $localize`years ago` },
+    { id: 'in {n} days', label: $localize`days from now` },
+    { id: 'in {n} weeks', label: $localize`weeks from now` },
+    { id: 'in {n} months', label: $localize`months from now` },
+    { id: 'in {n} years', label: $localize`years from now` },
+  ]
+
+  private readonly relativeDates = new Map<string, RelativeDate>()
+
+  getRelativeDate(atom: CustomFieldQueryAtom): RelativeDate | undefined {
+    if (!this.relativeDates.has(atom.id) && typeof atom.value === 'string') {
+      for (const { id } of this.relativeDateUnits) {
+        const relativeDate = parseRelativeDate(atom.value, id)
+        if (relativeDate) {
+          this.relativeDates.set(atom.id, relativeDate)
+          break
+        }
+      }
+    }
+    return this.relativeDates.get(atom.id)
+  }
+
+  hasDateValueRow(atom: CustomFieldQueryAtom): boolean {
+    return (
+      this.getCustomFieldByID(atom.field)?.data_type ===
+        CustomFieldDataType.Date &&
+      atom.operator !== CustomFieldQueryOperator.Exists &&
+      atom.operator !== CustomFieldQueryOperator.IsNull
+    )
+  }
+
+  toggleRelativeDate(atom: CustomFieldQueryAtom) {
+    if (this.getRelativeDate(atom)) {
+      this.relativeDates.delete(atom.id)
+      atom.value = null
+    } else {
+      this.relativeDates.set(atom.id, { amount: null, unit: '{n} days ago' })
+      this.updateRelativeDate(atom, {})
+    }
+  }
+
+  updateRelativeDate(
+    atom: CustomFieldQueryAtom,
+    change: Partial<RelativeDate>
+  ) {
+    const { amount, unit } = Object.assign(
+      this.relativeDates.get(atom.id),
+      change
+    )
+    if (!unit.includes('{n}')) {
+      atom.value = unit
+    } else {
+      atom.value = amount === null ? null : unit.replace('{n}', `${amount}`)
+    }
+  }
 
   public customFieldSearchFn = (term: string, field: CustomField): boolean =>
     matchesSearchText(field?.name, term)
