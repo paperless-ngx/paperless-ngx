@@ -388,3 +388,39 @@ class TestMailOAuth(
                 f"Failed to refresh oauth token for account {mail_account}: test_error",
                 cm.output[0],
             )
+
+    def test_refresh_account_oauth_token_non_oauth_account(self) -> None:
+        """
+        GIVEN:
+            - A mail account which does not use OAuth
+        WHEN:
+            - A token refresh is requested
+        THEN:
+            - False is returned rather than an unbound variable error
+        """
+        account = MailAccountFactory(
+            account_type=MailAccount.MailAccountType.IMAP,
+            refresh_token="token",
+        )
+
+        self.assertFalse(
+            PaperlessMailOAuth2Manager().refresh_account_oauth_token(account),
+        )
+
+    def test_refresh_account_oauth_token_without_refresh_token(self) -> None:
+        """
+        GIVEN:
+            - An OAuth mail account with no refresh token stored
+        WHEN:
+            - A token refresh is requested
+        THEN:
+            - False is returned
+        """
+        account = MailAccountFactory(
+            account_type=MailAccount.MailAccountType.GMAIL_OAUTH,
+            refresh_token=None,
+        )
+
+        self.assertFalse(
+            PaperlessMailOAuth2Manager().refresh_account_oauth_token(account),
+        )

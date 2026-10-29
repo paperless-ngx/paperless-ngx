@@ -89,6 +89,9 @@ class PaperlessMailOAuth2Manager:
         """
         logger = logging.getLogger("paperless_mail")
         logger.debug(f"Attempting to refresh oauth token for account {account}")
+        if account.refresh_token is None:
+            logger.error(f"Account {account} has no refresh token to use")
+            return False
         try:
             result: OAuth2Token
             if account.account_type == MailAccount.MailAccountType.GMAIL_OAUTH:
@@ -103,6 +106,9 @@ class PaperlessMailOAuth2Manager:
                         refresh_token=account.refresh_token,
                     ),
                 )
+            else:
+                logger.error(f"Account {account} does not use OAuth")
+                return False
             if "refresh_token" in result:
                 # Outlook returns a new refresh token on refresh, Gmail does not
                 account.refresh_token = result["refresh_token"]
