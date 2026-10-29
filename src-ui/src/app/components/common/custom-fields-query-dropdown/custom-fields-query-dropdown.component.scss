@@ -5,6 +5,11 @@
   }
 }
 
+:host {
+  --ng-select-border-radius: var(--bs-border-radius);
+  --ng-select-height: calc(1.5em + 0.5rem + calc(var(--bs-border-width) * 2));
+}
+
 :host ::ng-deep .ng-select-container {
   border-top-right-radius: 0 !important;
   border-bottom-right-radius: 0 !important;
@@ -40,4 +45,14 @@
     max-width: 200px;
     min-width: 140px;
   }
+}
+
+.date-mode .btn {
+  --bs-btn-color: var(--bs-secondary-color);
+  --bs-btn-hover-bg: transparent;
+  --bs-btn-hover-color: var(--bs-body-color);
+  --bs-btn-hover-border-color: var(--bs-border-color);
+  --bs-btn-active-bg: transparent;
+  --bs-btn-active-color: var(--bs-primary);
+  --bs-btn-active-border-color: var(--bs-border-color);
 }

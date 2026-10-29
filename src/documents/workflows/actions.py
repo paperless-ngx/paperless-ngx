@@ -11,6 +11,8 @@ from documents.data_models import DocumentMetadataOverrides
 from documents.mail import EmailAttachment
 from documents.mail import send_email
 from documents.models import Correspondent
+from documents.models import CustomField
+from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import WorkflowAction
@@ -48,6 +50,9 @@ def build_workflow_action_context(
             "added": timezone.localtime(document.added),
             "created": document.created,
             "id": document.pk,
+            "custom_fields": CustomFieldInstance.global_objects.filter(
+                document=document,
+            ).select_related("field"),
         }
 
     correspondent_obj = (
@@ -80,6 +85,19 @@ def build_workflow_action_context(
         "added": timezone.localtime(timezone.now()),
         "created": overrides.created if overrides else None,
         "id": "",
+        "custom_fields": [
+            CustomFieldInstance(
+                field=field,
+                **{
+                    CustomFieldInstance.get_value_field_name(
+                        field.data_type,
+                    ): overrides.custom_fields[field.pk],
+                },
+            )
+            for field in CustomField.objects.filter(
+                pk__in=overrides.custom_fields or {},
+            )
+        ],
     }
 
 
@@ -116,6 +134,7 @@ def execute_email_action(
                 context["title"],
                 context["doc_url"],
                 context["id"],
+                custom_fields=context["custom_fields"],
             )
             if action.email.subject
             else ""
@@ -133,6 +152,7 @@ def execute_email_action(
                 context["title"],
                 context["doc_url"],
                 context["id"],
+                custom_fields=context["custom_fields"],
             )
             if action.email.body
             else ""
@@ -211,6 +231,7 @@ def execute_webhook_action(
                             context["title"],
                             context["doc_url"],
                             context["id"],
+                            custom_fields=context["custom_fields"],
                         )
                 except Exception as e:
                     logger.error(
@@ -230,6 +251,7 @@ def execute_webhook_action(
                 context["title"],
                 context["doc_url"],
                 context["id"],
+                custom_fields=context["custom_fields"],
             )
         headers = {}
         if action.webhook.headers:
