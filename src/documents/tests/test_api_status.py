@@ -539,3 +539,28 @@ class TestSystemStatus(APITestCase):
         self.assertEqual(response.data["tasks"]["summary"]["success_count"], 1)
         self.assertEqual(response.data["tasks"]["summary"]["failure_count"], 1)
         self.assertEqual(response.data["tasks"]["summary"]["pending_count"], 1)
+
+    def test_system_status_reports_database_error(self) -> None:
+        """
+        GIVEN:
+            - Reading the migration state fails
+        WHEN:
+            - The system status is requested
+        THEN:
+            - The response reports the database error rather than a server error
+        """
+        self.client.force_login(self.user)
+        with mock.patch(
+            "documents.views.MigrationLoader",
+            side_effect=Exception("database is down"),
+        ):
+            response = self.client.get(self.ENDPOINT)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        database = response.data["database"]
+        self.assertEqual(database["status"], "ERROR")
+        self.assertIsNotNone(database["error"])
+        self.assertEqual(
+            database["migration_status"],
+            {"latest_migration": None, "unapplied_migrations": []},
+        )
