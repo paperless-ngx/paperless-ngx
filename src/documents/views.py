@@ -5357,6 +5357,7 @@ class SystemStatusView(PassUserMixin):
                 for m in MigrationRecorder.Migration.objects.all().order_by("id")
             ]
         except Exception as e:
+            all_migrations = []
             applied_migrations = []
             db_status = "ERROR"
             logger.exception(
