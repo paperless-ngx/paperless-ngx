@@ -1110,7 +1110,7 @@ class TestVersionActionPermissions(DirectoriesMixin, APITestCase):
             self.assertEqual(response.status_code, 403)
             with (
                 mock.patch("documents.views.AIConfig") as ai_config,
-                mock.patch("documents.views.stream_chat_with_documents") as chat,
+                mock.patch("paperless_ai.chat.stream_chat_with_documents") as chat,
             ):
                 ai_config.return_value.ai_enabled = True
                 response = self.client.post(
