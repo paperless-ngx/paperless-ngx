@@ -322,7 +322,7 @@ class TestUpdateContent(DirectoriesMixin, TestCase):
         )
 
     @override_settings(AI_ENABLED=True, LLM_EMBEDDING_BACKEND="huggingface")
-    @mock.patch("documents.tasks.llm_index_add_or_update_document")
+    @mock.patch("paperless_ai.indexing.llm_index_add_or_update_document")
     @mock.patch("documents.search.get_backend")
     def test_update_content_version_updates_llm_index(
         self,
@@ -450,7 +450,7 @@ class TestAIIndex(DirectoriesMixin, TestCase):
             checksum="wow",
         )
         with mock.patch(
-            "documents.tasks.llm_index_add_or_update_document",
+            "paperless_ai.indexing.llm_index_add_or_update_document",
         ) as llm_index_add_or_update_document:
             tasks.update_document_in_llm_index(doc)
             llm_index_add_or_update_document.assert_called_once_with(doc)
@@ -470,7 +470,7 @@ class TestAIIndex(DirectoriesMixin, TestCase):
             checksum="wow",
         )
         with mock.patch(
-            "documents.tasks.llm_index_remove_document",
+            "paperless_ai.indexing.llm_index_remove_document",
         ) as llm_index_remove_document:
             tasks.remove_document_from_llm_index(doc)
             llm_index_remove_document.assert_called_once_with(doc)
@@ -495,7 +495,7 @@ class TestAIIndex(DirectoriesMixin, TestCase):
                 "documents.tasks.update_document_in_llm_index",
             ) as update_document_in_llm_index,
             mock.patch(
-                "documents.tasks.update_llm_index",
+                "paperless_ai.indexing.update_llm_index",
             ) as update_llm_index,
         ):
             doc_ids = [doc.pk for doc in docs]
