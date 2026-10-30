@@ -80,12 +80,21 @@ test('should show a list of notes', async ({ page }) => {
 
 test('should support quick filters', async ({ page }) => {
   await page.goto('/documents/1/details')
+  // filter button is available before tags have loaded
+  const selectedTags = page.locator('pngx-input-tags .ng-value pngx-tag')
+  await expect(selectedTags).toHaveCount(2)
+  await expect(
+    selectedTags.getByText('Another Sample Tag', { exact: true })
+  ).toBeVisible()
+  await expect(selectedTags.getByText('Inbox', { exact: true })).toBeVisible()
   await page
     .getByRole('button', { name: 'Filter documents with these Tags' })
     .click()
-  await expect(page).toHaveURL(
-    /tags__id__all=2,1&sort=created&reverse=1&page=1/
-  )
+  await expect(page).toHaveURL((url) => {
+    const tags = url.searchParams.get('tags__id__all')?.split(',').sort()
+    return url.pathname === '/documents' && tags?.join(',') === '1,2'
+  })
+  await expect(page.locator('pngx-document-list')).toHaveText(/one document/i)
 })
 
 test('should finish reloading the preview after a remote document update', async ({
