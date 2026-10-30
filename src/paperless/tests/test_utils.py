@@ -59,7 +59,10 @@ def test_ocr_to_dateparser_languages_exception(
             raise RuntimeError("Simulated error")
 
     with caplog.at_level(logging.WARNING):
-        monkeypatch.setattr(utils, "LocaleDataLoader", lambda: DummyLoader())
+        monkeypatch.setattr(
+            "dateparser.languages.loader.LocaleDataLoader",
+            lambda: DummyLoader(),
+        )
         result = utils.ocr_to_dateparser_languages("eng+fra")
         assert result == []
         assert (
