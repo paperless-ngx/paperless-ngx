@@ -31,6 +31,7 @@ from documents.serialisers import DocumentSerializer
 from documents.tasks import empty_trash
 from paperless_testing.assertions import FileSystemAssertsMixin
 from paperless_testing.dirs import DirectoriesMixin
+from paperless_testing.dirs import PaperlessDirs
 from paperless_testing.factories import DocumentFactory
 from paperless_testing.factories import UserFactory
 
@@ -2137,7 +2138,9 @@ class TestPathDateLocalization:
 
 
 @pytest.mark.django_db
-def test_refresh_failure_surfaces_database_error(paperless_dirs) -> None:
+def test_refresh_failure_surfaces_database_error(
+    paperless_dirs: PaperlessDirs,
+) -> None:
     """
     GIVEN:
         - A document with a stored filename
