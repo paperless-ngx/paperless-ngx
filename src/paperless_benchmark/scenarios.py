@@ -44,23 +44,16 @@ def all_scenarios() -> tuple[Scenario, ...]:
 
 
 def _guardian_visibility_query_run(user: User) -> list[int]:
-    from documents.models import Document
-    from documents.permissions import get_objects_for_user_owner_aware
-
     return list(
-        get_objects_for_user_owner_aware(
-            user,
-            "documents.view_document",
-            Document,
-        ).values_list("id", flat=True),
+        _guardian_visibility_query_queryset(user).values_list("id", flat=True),
     )
 
 
 def _guardian_visibility_query_queryset(user: User) -> QuerySet:
     from documents.models import Document
-    from documents.permissions import get_objects_for_user_owner_aware
+    from documents.permissions import restrict_queryset_to_visible
 
-    return get_objects_for_user_owner_aware(user, "documents.view_document", Document)
+    return restrict_queryset_to_visible(Document.objects.all(), user, "view_document")
 
 
 register(
@@ -69,7 +62,7 @@ register(
         describe=(
             "Document-visibility queryset for a user with mixed owned/shared "
             "documents -- exercises documents.permissions."
-            "get_objects_for_user_owner_aware's guardian permission join."
+            "restrict_queryset_to_visible's permitted_object_ids subquery."
         ),
         run=_guardian_visibility_query_run,
         queryset_for_explain=_guardian_visibility_query_queryset,
@@ -101,8 +94,8 @@ register(
         name="permitted_document_ids",
         describe=(
             "Document-visibility query built from documents.permissions."
-            "permitted_document_ids -- the resolved-ID-set alternative to "
-            "guardian_visibility_query, for side-by-side comparison."
+            "permitted_document_ids -- like guardian_visibility_query, but a "
+            "version is authorized by its root document."
         ),
         run=_permitted_document_ids_run,
         queryset_for_explain=_permitted_document_ids_queryset,
