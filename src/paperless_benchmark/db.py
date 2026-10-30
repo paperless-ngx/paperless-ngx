@@ -73,17 +73,14 @@ def _reset_mariadb() -> None:
 
 
 def _reset_sqlite() -> None:
-    from documents.models import Correspondent
-    from documents.models import Document
-    from documents.models import DocumentType
-    from documents.models import StoragePath
-    from documents.models import Tag
-
-    Document.global_objects.all().delete()
-    Tag.objects.all().delete()
-    Correspondent.objects.all().delete()
-    DocumentType.objects.all().delete()
-    StoragePath.objects.all().delete()
+    # Plain DELETEs, the SQLite equivalent of the TRUNCATEs above. ORM deletes
+    # fire per-document signals and cascade collection, which is far too slow
+    # at the large tier and needs the cache backend to be reachable.
+    # constraint_checks_disabled() mirrors MariaDB's SET FOREIGN_KEY_CHECKS = 0.
+    tables = _reset_table_names()
+    with connection.constraint_checks_disabled(), connection.cursor() as cursor:
+        for table in tables:
+            cursor.execute(f"DELETE FROM {table};")
     _delete_all_users_and_groups()
 
 
