@@ -47,7 +47,7 @@ def format_datetime(value: str | datetime, format: str) -> str:
         parsed = parse_datetime(value) or parse_date(value)
         if parsed is None:
             raise ValueError(f"Invalid date or datetime string: {value!r}")
-        value = parsed
+        return parsed.strftime(format=format)
     return value.strftime(format=format)
 
 
