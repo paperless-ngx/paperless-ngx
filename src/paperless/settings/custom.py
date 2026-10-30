@@ -6,7 +6,6 @@ from pathlib import Path
 from typing import Any
 
 from celery.schedules import crontab
-from dateparser.languages.loader import LocaleDataLoader
 
 from paperless.settings.parsers import get_choice_from_env
 from paperless.settings.parsers import get_int_from_env
@@ -351,6 +350,8 @@ def parse_dateparser_languages(languages: str | None) -> list[str]:
                 f' some dates with this locale, so Chinese ("zh") will be used as a fallback.',
             )
             language_list.append("zh")
+
+    from dateparser.languages.loader import LocaleDataLoader
 
     return list(LocaleDataLoader().get_locale_map(locales=language_list))
 

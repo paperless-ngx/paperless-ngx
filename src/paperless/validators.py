@@ -3,7 +3,6 @@ from io import BytesIO
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import UploadedFile
-from lxml import etree
 from PIL import Image
 
 ALLOWED_SVG_TAGS: set[str] = {
@@ -186,6 +185,7 @@ def reject_dangerous_svg(file: UploadedFile) -> None:
     Raises ValidationError if unsafe content is found.
     See GHSA-6p53-hqqw-8j62
     """
+    from lxml import etree
 
     try:
         parser = etree.XMLParser(resolve_entities=False)
