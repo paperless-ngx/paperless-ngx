@@ -124,7 +124,6 @@ def _stream_chat_with_documents(
         return
 
     from llama_index.core.prompts import PromptTemplate
-    from llama_index.core.query_engine import RetrieverQueryEngine
     from llama_index.core.response_synthesizers import get_response_synthesizer
     from llama_index.core.retrievers import VectorIndexRetriever
 
@@ -142,9 +141,8 @@ def _stream_chat_with_documents(
             str(pk) for pk in documents.values_list("pk", flat=True)
         )
 
-    # Hold the shared read lock for the whole operation: the query engine
-    # retrieves from the vector store again during synthesis, so the connection
-    # must stay open (and the swap must not run) until the stream finishes.
+    # Hold the shared read lock for the whole operation so the compaction swap
+    # cannot replace the database file while this connection is open.
     with read_store() as store:
         index = load_or_build_index(config, store)
         retriever = VectorIndexRetriever(
@@ -179,19 +177,13 @@ def _stream_chat_with_documents(
             refine_template=refine_template,
             streaming=True,
         )
-        query_engine = RetrieverQueryEngine.from_args(
-            retriever=retriever,
-            llm=client.llm,
-            response_synthesizer=response_synthesizer,
-            streaming=True,
-        )
 
         logger.debug("Document chat query: %s", query_str)
         # Release the pooled DB connection for the slow streaming LLM response
         # so it is not pinned for the whole stream; see paperless_ai.db and
         # #12976.
         with db_connection_released():
-            response_stream = query_engine.query(query_str)
+            response_stream = response_synthesizer.synthesize(query_str, top_nodes)
             for chunk in response_stream.response_gen:
                 yield chunk
                 sys.stdout.flush()
