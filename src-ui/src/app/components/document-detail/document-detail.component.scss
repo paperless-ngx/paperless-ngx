@@ -12,6 +12,22 @@
     width: 100%;
     height: 100%;
   }
+
+  &:focus {
+    outline: none;
+  }
+
+  .preview-controls {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease-in-out;
+  }
+
+  &:hover .preview-controls,
+  &:focus-within .preview-controls {
+    opacity: 1;
+    pointer-events: auto;
+  }
 }
 
 .btn-group .dropdown-toggle-split {
