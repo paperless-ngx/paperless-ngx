@@ -135,12 +135,12 @@ class Command(BaseCommand):
 
         self.stdout.write(f"# label={options['label']} repeat={options['repeat']}")
         self.stdout.write(
-            f"{'user':7s} {'endpoint':20s} {'queries':>8s} "
+            f"{'user':7s} {'endpoint':26s} {'queries':>8s} "
             f"{'min_ms':>9s} {'median_ms':>10s} {'max_ms':>9s}",
         )
         for r in results:
             self.stdout.write(
-                f"{r.user_label:7s} {r.endpoint_name:20s} {r.query_count:8d} "
+                f"{r.user_label:7s} {r.endpoint_name:26s} {r.query_count:8d} "
                 f"{r.min_ms:9.1f} {r.median_ms:10.1f} {r.max_ms:9.1f}",
             )
             append_history(

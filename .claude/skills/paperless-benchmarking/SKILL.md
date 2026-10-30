@@ -34,8 +34,9 @@ manage.py benchmark list-scenarios
   creates two named users, `perf_target` (mixed owned/shared documents,
   realistic guardian permission grants) and `perf_admin` (superuser), plus a
   general user/group pool with realistic permission-row ratios.
-- **`run`** times the 3 built-in API endpoint benchmarks
-  (`/api/documents/`, `/api/documents/?page_size=50`, `/api/tags/?page_size=100000`) for both
+- **`run`** times the 4 built-in API endpoint benchmarks
+  (`/api/documents/`, `/api/documents/?page_size=50`, `/api/tags/?page_size=100000`,
+  and the UI's list request with `include_selection_data=true`) for both
   `perf_target` and `perf_admin`, reporting min/median/max wall-clock and SQL
   query count. Requires `seed` to have already run — it reuses that data, it
   does not seed its own.

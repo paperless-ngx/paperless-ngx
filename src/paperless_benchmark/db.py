@@ -13,6 +13,8 @@ def _reset_table_names() -> list[str]:
     from guardian.models import UserObjectPermission
 
     from documents.models import Correspondent
+    from documents.models import CustomField
+    from documents.models import CustomFieldInstance
     from documents.models import Document
     from documents.models import DocumentType
     from documents.models import StoragePath
@@ -20,6 +22,8 @@ def _reset_table_names() -> list[str]:
 
     return [
         Document.tags.through._meta.db_table,
+        CustomFieldInstance._meta.db_table,
+        CustomField._meta.db_table,
         Document._meta.db_table,
         Tag._meta.db_table,
         Correspondent._meta.db_table,

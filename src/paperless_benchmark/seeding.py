@@ -43,6 +43,8 @@ SHARED_WITH_CHANGE_FRACTION = 0.5
 # realistic permission-join shape for arbitrary users, not only perf_target.
 USER_PERM_ROWS_PER_DOC = 1_414 / 12_000
 GROUP_PERM_ROWS_PER_DOC = 27_232 / 12_000
+# Share of documents that carry any custom field values.
+CUSTOM_FIELD_DOC_FRACTION = 0.4
 
 
 @dataclass(frozen=True, slots=True)
@@ -55,6 +57,7 @@ class _TierCounts:
     other_users: int
     groups: int
     tags_per_doc: tuple[int, int]
+    custom_fields: int = 0
 
 
 TIERS: dict[Tier, _TierCounts] = {
@@ -67,6 +70,7 @@ TIERS: dict[Tier, _TierCounts] = {
         other_users=3,
         groups=2,
         tags_per_doc=(1, 3),
+        custom_fields=3,
     ),
     "medium": _TierCounts(
         documents=20_000,
@@ -77,6 +81,7 @@ TIERS: dict[Tier, _TierCounts] = {
         other_users=10,
         groups=5,
         tags_per_doc=(2, 6),
+        custom_fields=10,
     ),
     "large": _TierCounts(
         documents=360_000,
@@ -87,6 +92,7 @@ TIERS: dict[Tier, _TierCounts] = {
         other_users=25,
         groups=10,
         tags_per_doc=(3, 7),
+        custom_fields=25,
     ),
 }
 
@@ -150,7 +156,7 @@ def _create_users_and_groups(
 ) -> tuple[User, User, tuple[User, ...], tuple[Group, ...]]:
     from django.contrib.auth.models import Group
 
-    from documents.tests.factories import UserFactory
+    from paperless_testing.factories import UserFactory
 
     perf_target = UserFactory.create(username="perf_target")
     _grant_model_level_permissions(perf_target)
@@ -171,10 +177,10 @@ def _create_lookup_tables(counts: _TierCounts):
     from documents.models import DocumentType
     from documents.models import StoragePath
     from documents.models import Tag
-    from documents.tests.factories import CorrespondentFactory
-    from documents.tests.factories import DocumentTypeFactory
-    from documents.tests.factories import StoragePathFactory
-    from documents.tests.factories import TagFactory
+    from paperless_testing.factories import CorrespondentFactory
+    from paperless_testing.factories import DocumentTypeFactory
+    from paperless_testing.factories import StoragePathFactory
+    from paperless_testing.factories import TagFactory
 
     tags = tuple(Tag.objects.bulk_create(TagFactory.build_batch(counts.tags)))
     correspondents = tuple(
@@ -230,8 +236,10 @@ def _seed_documents(
     from django.contrib.contenttypes.models import ContentType
     from guardian.models import UserObjectPermission
 
+    from documents.models import CustomField
+    from documents.models import CustomFieldInstance
     from documents.models import Document
-    from documents.tests.factories import DocumentFactory
+    from paperless_testing.factories import DocumentFactory
 
     tag_ids = [t.pk for t in tags]
     correspondent_ids = [c.pk for c in correspondents]
@@ -248,6 +256,21 @@ def _seed_documents(
         content_type=doc_content_type,
     )
     through_model = Document.tags.through
+
+    # A subset of documents carries 1-3 custom field values, so the
+    # CustomFieldInstance link table is populated for the counts that join it.
+    custom_field_ids = [
+        f.pk
+        for f in CustomField.objects.bulk_create(
+            [
+                CustomField(
+                    name=f"bench field {i}",
+                    data_type=CustomField.FieldDataType.STRING,
+                )
+                for i in range(counts.custom_fields)
+            ],
+        )
+    ]
 
     document_count = 0
     owned_document_pks: list[int] = []
@@ -299,6 +322,27 @@ def _seed_documents(
                 through_rows.append(through_model(document_id=doc.pk, tag_id=tag_id))
         if through_rows:
             through_model.objects.bulk_create(through_rows, batch_size=CHUNK_SIZE)
+
+        if custom_field_ids:
+            custom_field_rows = []
+            for doc in created:
+                if rng.random() >= CUSTOM_FIELD_DOC_FRACTION:
+                    continue
+                for field_id in rng.sample(
+                    custom_field_ids,
+                    min(rng.randint(1, 3), len(custom_field_ids)),
+                ):
+                    custom_field_rows.append(
+                        CustomFieldInstance(
+                            document_id=doc.pk,
+                            field_id=field_id,
+                            value_text=f"value {doc.pk}",
+                        ),
+                    )
+            CustomFieldInstance.objects.bulk_create(
+                custom_field_rows,
+                batch_size=CHUNK_SIZE,
+            )
 
         perm_rows = []
         for doc, bucket in zip(created, owner_buckets, strict=True):

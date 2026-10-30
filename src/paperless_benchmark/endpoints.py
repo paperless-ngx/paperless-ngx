@@ -14,6 +14,13 @@ ENDPOINTS: tuple[tuple[str, str], ...] = (
     ("documents_default", "/api/documents/"),
     ("documents_page50", "/api/documents/?page_size=50"),
     ("tags_all", "/api/tags/?page_size=100000"),
+    (
+        "documents_selection_data",
+        (
+            "/api/documents/?page=1&page_size=50&ordering=-created"
+            "&truncate_content=true&include_selection_data=true"
+        ),
+    ),
 )
 
 
