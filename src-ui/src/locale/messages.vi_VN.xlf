@@ -11459,21 +11459,21 @@
      Sắp xếp theo
     </target>
       </trans-unit>
-      <trans-unit id="2179847500064178686" datatype="html" approved="yes">
-        <source>Edit document</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">328</context>
-        </context-group>
-        <target state="final">Chỉnh sửa tài liệu</target>
-      </trans-unit>
       <trans-unit id="3420321797707163677" datatype="html" approved="yes">
         <source>Preview document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">329</context>
+          <context context-type="linenumber">328</context>
         </context-group>
         <target state="final">Xem trước tài liệu</target>
+      </trans-unit>
+      <trans-unit id="2179847500064178686" datatype="html" approved="yes">
+        <source>Edit document</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
+          <context context-type="linenumber">331</context>
+        </context-group>
+        <target state="final">Chỉnh sửa tài liệu</target>
       </trans-unit>
       <trans-unit id="4512084577073831437" datatype="html" approved="yes">
         <source>Reset filters / selection</source>
