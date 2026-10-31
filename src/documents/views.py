@@ -5,6 +5,7 @@ import platform
 import re
 import tempfile
 import zipfile
+from collections import Counter
 from collections import deque
 from collections.abc import Callable
 from datetime import datetime
@@ -168,7 +169,6 @@ from documents.permissions import PaperlessNotePermissions
 from documents.permissions import PaperlessObjectPermissions
 from documents.permissions import TrashPermissions
 from documents.permissions import ViewDocumentsPermissions
-from documents.permissions import annotate_document_count_by_ids
 from documents.permissions import annotate_document_count_for_related_queryset
 from documents.permissions import get_document_count_filter_for_user
 from documents.permissions import get_permission_grantees
@@ -997,71 +997,83 @@ class DocumentViewSet(
         "custom_field_",
     )
 
-    def _get_selection_data_for_queryset(self, queryset):
-        # Resolve once instead of once per model below. `queryset` can carry an
-        # arbitrarily expensive WHERE clause (user filters plus the permission
-        # filter); re-embedding it as a subquery inside 5 separate Count(...)
-        # calls forces the database to re-evaluate that whole thing 5 times, and
-        # -- for FK relations especially -- can defeat semi-join planning
-        # entirely at scale. A concrete id list is cheap to reuse.
-        # order_by() drops the default/user ordering -- irrelevant for a plain
-        # id list, but left in place it forces a sort over the full filtered
-        # set before the ids can even be collected.
-        document_ids = list(queryset.order_by().values_list("pk", flat=True))
+    # Matching document ids are looked up in the link tables in batches of this
+    # size: one literal IN (...) over every match is a multi-MB statement per
+    # relation and, on SQLite, exceeds the bound-parameter limit.
+    selection_data_link_batch_size = 10_000
 
-        correspondents = Correspondent.objects.annotate(
-            document_count=Count(
-                "documents",
-                filter=Q(documents__id__in=document_ids),
-                distinct=True,
-            ),
+    def _get_selection_data_for_queryset(self, queryset):
+        # The filtered queryset is evaluated once, as the page's own filter is,
+        # and never wrapped in a subquery: re-deriving a join or a HAVING
+        # (shared_by__id) per statement is very slow on some databases, and
+        # regrouping the queryset by another column would miscount.
+        # order_by() drops the default/user ordering, which only costs a sort.
+        correspondents: Counter = Counter()
+        document_types: Counter = Counter()
+        storage_paths: Counter = Counter()
+        document_ids: list[int] = []
+        seen: set[int] = set()
+        rows = queryset.order_by().values_list(
+            "pk",
+            "correspondent_id",
+            "document_type_id",
+            "storage_path_id",
         )
-        document_types = DocumentType.objects.annotate(
-            document_count=Count(
-                "documents",
-                filter=Q(documents__id__in=document_ids),
-                distinct=True,
-            ),
-        )
-        storage_paths = StoragePath.objects.annotate(
-            document_count=Count(
-                "documents",
-                filter=Q(documents__id__in=document_ids),
-                distinct=True,
-            ),
-        )
-        # Tag and CustomField reach Document through an M2M/through-model table;
-        # a plain Count(filter=...) there is a much more expensive plan than the
-        # FK relations above once the bridge table is large -- see
-        # annotate_document_count_by_ids() for why.
-        tags = annotate_document_count_by_ids(
-            Tag.objects.all(),
-            through_model=Document.tags.through,
-            related_object_field="tag_id",
-            document_ids=document_ids,
-        )
-        custom_fields = annotate_document_count_by_ids(
-            CustomField.objects.all(),
-            through_model=CustomFieldInstance,
-            related_object_field="field_id",
-            document_ids=document_ids,
-        )
+        for pk, correspondent, document_type, storage_path in rows:
+            # A filter can join, repeating a document row.
+            if pk in seen:
+                continue
+            seen.add(pk)
+            document_ids.append(pk)
+            # Documents without a value count under None, which selection()
+            # never looks up.
+            correspondents[correspondent] += 1
+            document_types[document_type] += 1
+            storage_paths[storage_path] += 1
+
+        def link_table_counts(link_model, field_name: str) -> Counter:
+            result: Counter = Counter()
+            batch_size = self.selection_data_link_batch_size
+            for start in range(0, len(document_ids), batch_size):
+                result.update(
+                    dict(
+                        link_model.objects.filter(
+                            document_id__in=document_ids[start : start + batch_size],
+                        )
+                        .values_list(field_name)
+                        .annotate(document_count=Count("document_id")),
+                    ),
+                )
+            return result
+
+        def selection(model, counts: Counter) -> list[dict[str, int]]:
+            # Every object is listed, with 0 for those with no matching document.
+            return [
+                {"id": pk, "document_count": counts.get(pk, 0)}
+                for pk in model.objects.values_list("pk", flat=True)
+            ]
+
         return {
-            "selected_correspondents": [
-                {"id": t.id, "document_count": t.document_count} for t in correspondents
-            ],
-            "selected_tags": [
-                {"id": t.id, "document_count": t.document_count} for t in tags
-            ],
-            "selected_document_types": [
-                {"id": t.id, "document_count": t.document_count} for t in document_types
-            ],
-            "selected_storage_paths": [
-                {"id": t.id, "document_count": t.document_count} for t in storage_paths
-            ],
-            "selected_custom_fields": [
-                {"id": t.id, "document_count": t.document_count} for t in custom_fields
-            ],
+            "selected_correspondents": selection(
+                Correspondent,
+                correspondents,
+            ),
+            "selected_tags": selection(
+                Tag,
+                link_table_counts(Document.tags.through, "tag_id"),
+            ),
+            "selected_document_types": selection(
+                DocumentType,
+                document_types,
+            ),
+            "selected_storage_paths": selection(
+                StoragePath,
+                storage_paths,
+            ),
+            "selected_custom_fields": selection(
+                CustomField,
+                link_table_counts(CustomFieldInstance, "field_id"),
+            ),
         }
 
     @classmethod
