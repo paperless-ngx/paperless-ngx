@@ -687,19 +687,6 @@ class EmailDocumentDetailSchema(EmailSerializer):
 
 
 @extend_schema_view(
-    list=extend_schema(
-        parameters=[
-            OpenApiParameter(
-                name=name,
-                type=OpenApiTypes.INT,
-                many=True,
-                style="form",
-                explode=False,
-            )
-            for name, field in DocumentFilterSet.base_filters.items()
-            if isinstance(field, ObjectFilter)
-        ],
-    ),
     retrieve=extend_schema(
         description="Retrieve a single document",
         responses={
@@ -2470,6 +2457,17 @@ class ChatStreamingView(GenericAPIView[Any]):
     list=extend_schema(
         description="Document views including search",
         parameters=[
+            *(
+                OpenApiParameter(
+                    name=name,
+                    type=OpenApiTypes.INT,
+                    many=True,
+                    style="form",
+                    explode=False,
+                )
+                for name, field in DocumentFilterSet.base_filters.items()
+                if isinstance(field, ObjectFilter)
+            ),
             OpenApiParameter(
                 name="text",
                 type=OpenApiTypes.STR,
