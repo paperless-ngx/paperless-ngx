@@ -1480,6 +1480,45 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             [u1_doc1.id],
         )
 
+    def test_shared_by_filter_matches_user_and_group_grants_once(self) -> None:
+        """
+        GIVEN:
+            - Documents owned by a user: one shared with a user, one shared with
+              a group, one shared with several users and a group, one unshared
+            - A shared document owned by someone else
+        WHEN:
+            - Documents are filtered by shared_by__id for the owner
+        THEN:
+            - Only the owner's shared documents are returned, each exactly once
+        """
+        owner = UserFactory(username="owner")
+        other = UserFactory(username="other")
+        reader1 = UserFactory(username="reader1")
+        reader2 = UserFactory(username="reader2")
+        group = Group.objects.create(name="readers")
+        grant_all_global(owner)
+
+        shared_with_user = DocumentFactory.create(owner=owner)
+        shared_with_group = DocumentFactory.create(owner=owner)
+        shared_widely = DocumentFactory.create(owner=owner)
+        DocumentFactory.create(owner=owner)
+        others_shared = DocumentFactory.create(owner=other)
+        grant_object(reader1, shared_with_user, "view_document")
+        grant_object(group, shared_with_group, "view_document")
+        for target in (reader1, reader2, group):
+            grant_object(target, shared_widely, "view_document")
+        grant_object(reader1, others_shared, "view_document")
+
+        self.client.force_authenticate(owner)
+        response = self.client.get(f"/api/documents/?shared_by__id={owner.id}")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["count"], 3)
+        self.assertCountEqual(
+            [result["id"] for result in response.data["results"]],
+            [shared_with_user.id, shared_with_group.id, shared_widely.id],
+        )
+
     def test_document_owned_and_group_shared_not_duplicated_when_filtering_by_tags(
         self,
     ) -> None:

@@ -15,7 +15,6 @@ import dateparser
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Case
-from django.db.models import CharField
 from django.db.models import Count
 from django.db.models import Exists
 from django.db.models import IntegerField
@@ -208,36 +207,30 @@ class EffectiveContentFilter(Filter):
 @extend_schema_field(serializers.BooleanField)
 class SharedByUser(Filter):
     def filter(self, qs, value):
+        if value is None:
+            return qs
+
         ctype = ContentType.objects.get_for_model(self.model)
         UserObjectPermission = get_user_obj_perms_model()
         GroupObjectPermission = get_group_obj_perms_model()
-        # see https://github.com/paperless-ngx/paperless-ngx/issues/5392, we limit subqueries
-        # to 1 because Postgres doesn't like returning > 1 row, but all we care about is > 0
-        return (
-            qs.filter(
-                owner_id=value,
-            )
-            .annotate(
-                num_shared_users=Count(
-                    UserObjectPermission.objects.filter(
-                        content_type=ctype,
-                        object_pk=Cast(OuterRef("pk"), CharField()),
-                    ).values("user_id")[:1],
-                ),
-            )
-            .annotate(
-                num_shared_groups=Count(
-                    GroupObjectPermission.objects.filter(
-                        content_type=ctype,
-                        object_pk=Cast(OuterRef("pk"), CharField()),
-                    ).values("group_id")[:1],
-                ),
-            )
-            .filter(
-                Q(num_shared_users__gt=0) | Q(num_shared_groups__gt=0),
-            )
-            if value is not None
-            else qs
+        # Guardian stores object_pk as a string. Each grant table is read once,
+        # as an uncorrelated set of integer keys, because probing it per
+        # document by string key has no usable index (none leads with
+        # object_pk) and MariaDB re-scans the table for every owned document.
+        # DISTINCT keeps Postgres hashing each set once: without it a large
+        # group grant table exceeds work_mem and is re-scanned for every row.
+        shared_with_users = (
+            UserObjectPermission.objects.filter(content_type=ctype)
+            .values(shared_pk=Cast("object_pk", IntegerField()))
+            .distinct()
+        )
+        shared_with_groups = (
+            GroupObjectPermission.objects.filter(content_type=ctype)
+            .values(shared_pk=Cast("object_pk", IntegerField()))
+            .distinct()
+        )
+        return qs.filter(owner_id=value).filter(
+            Q(pk__in=shared_with_users) | Q(pk__in=shared_with_groups),
         )
 
 
