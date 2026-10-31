@@ -47,6 +47,20 @@ SCHEMA_VERSION = 2
 # a rebuild copies the live rows into a fresh table.
 COMPACT_BLOAT_RATIO = 2.0
 
+# Rows per vec0 vector chunk (vec0's default is 1024, which makes each chunk a
+# multi-megabyte blob). On spinning disks, inserts and re-indexing were dozens
+# of times faster with small chunks, at no cost in query speed or file size.
+# Only applies to tables created from here on; an existing index picks it up
+# the next time it is rebuilt (compact or rebuild).
+VEC0_CHUNK_SIZE = 32
+
+# SQLite page size for the index file, in bytes. With the small vec0 chunks above,
+# 64 KiB pages made cold scans about 35% faster and warm ones about 45% faster,
+# at the cost of a larger write-ahead log (up to about 70 MB). Only takes effect
+# on a newly created file, so like the chunk size it reaches an existing index
+# when it is rebuilt.
+DB_PAGE_SIZE = 65536
+
 # Number of rows fetched/copied per batch whenever this module streams rows
 # instead of materializing them all at once, keeping memory bounded regardless
 # of index size -- used by compact()'s rebuild, m0001_v1_to_v2's migration
@@ -222,6 +236,7 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
         conn.enable_load_extension(True)  # noqa: FBT003
         sqlite_vec.load(conn)
         conn.enable_load_extension(False)  # noqa: FBT003
+        conn.execute(f"PRAGMA page_size={DB_PAGE_SIZE}")
         conn.execute("PRAGMA journal_mode=WAL")
         conn.execute("PRAGMA synchronous=NORMAL")
         IndexMetaTable.create(conn)
@@ -329,7 +344,8 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
             + " +node_content TEXT,"
             + " embedding float["
             + str(int(dim))
-            + "] distance_metric=cosine"
+            + "] distance_metric=cosine, chunk_size="
+            + str(VEC0_CHUNK_SIZE)
             + ")",
         )
 
