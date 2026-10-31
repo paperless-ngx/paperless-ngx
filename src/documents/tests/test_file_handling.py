@@ -31,6 +31,7 @@ from documents.serialisers import DocumentSerializer
 from documents.tasks import empty_trash
 from paperless_testing.assertions import FileSystemAssertsMixin
 from paperless_testing.dirs import DirectoriesMixin
+from paperless_testing.dirs import PaperlessDirs
 from paperless_testing.factories import DocumentFactory
 from paperless_testing.factories import UserFactory
 
@@ -2134,3 +2135,28 @@ class TestPathDateLocalization:
         with override_settings(FILENAME_FORMAT=filename_format):
             filename = generate_filename(document)
             assert filename == Path(expected_filename)
+
+
+@pytest.mark.django_db
+def test_refresh_failure_surfaces_database_error(
+    paperless_dirs: PaperlessDirs,
+) -> None:
+    """
+    GIVEN:
+        - A document with a stored filename
+    WHEN:
+        - Saving it triggers a filename update and refreshing it from the database fails
+    THEN:
+        - The database error is raised, not an unbound variable error from the rollback
+    """
+    document = DocumentFactory(filename="some.pdf")
+
+    with (
+        mock.patch.object(
+            Document,
+            "refresh_from_db",
+            side_effect=DatabaseError("database is locked"),
+        ),
+        pytest.raises(DatabaseError, match="database is locked"),
+    ):
+        document.save()

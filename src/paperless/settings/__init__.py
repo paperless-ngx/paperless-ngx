@@ -461,9 +461,14 @@ def _parse_paperless_url():
     global CSRF_TRUSTED_ORIGINS, CORS_ALLOWED_ORIGINS, ALLOWED_HOSTS
     url = os.getenv("PAPERLESS_URL")
     if url:
+        hostname = urlparse(url).hostname
+        if not hostname:
+            raise ImproperlyConfigured(
+                f"PAPERLESS_URL {url!r} has no hostname, expected a URL like https://example.com",
+            )
         CSRF_TRUSTED_ORIGINS.append(url)
         CORS_ALLOWED_ORIGINS.append(url)
-        ALLOWED_HOSTS.append(urlparse(url).hostname)
+        ALLOWED_HOSTS.append(hostname)
 
     return url
 
