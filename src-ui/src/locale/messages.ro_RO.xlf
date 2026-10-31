@@ -4761,7 +4761,7 @@
         <source>Create new field</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-dropdown/custom-fields-dropdown.component.html</context>
-          <context context-type="linenumber">20</context>
+          <context context-type="linenumber">19</context>
         </context-group>
         <target state="translated">Creare câmp nou</target>
       </trans-unit>

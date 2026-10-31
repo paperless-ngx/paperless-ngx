@@ -2007,7 +2007,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
           <context context-type="linenumber">78,79</context>
         </context-group>
-        <target state="needs-translation">Share Links</target>
+        <target state="translated">Partilhar Links</target>
       </trans-unit>
       <trans-unit id="2889601918256567804" datatype="html">
         <source>Workflows</source>
@@ -2815,7 +2815,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
           <context context-type="linenumber">82</context>
         </context-group>
-        <target state="needs-translation">Mail Fetch</target>
+        <target state="translated">Obter e-mail</target>
       </trans-unit>
       <trans-unit id="228975554646076615" datatype="html">
         <source>LLM Index</source>
@@ -2915,7 +2915,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
           <context context-type="linenumber">78</context>
         </context-group>
-        <target state="needs-translation">API Upload</target>
+        <target state="translated">Carregar via API</target>
       </trans-unit>
       <trans-unit id="6520092939021340973" datatype="html">
         <source>Folder Consume</source>
@@ -3967,7 +3967,7 @@
           <context context-type="sourcefile">src/app/components/manage/document-attributes/document-attributes.component.ts</context>
           <context context-type="linenumber">125</context>
         </context-group>
-        <target state="needs-translation">Custom fields</target>
+        <target state="translated">Campos personalizados</target>
       </trans-unit>
       <trans-unit id="434416984861296627" datatype="html">
         <source>Share links</source>
@@ -4083,7 +4083,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
           <context context-type="linenumber">521</context>
         </context-group>
-        <target state="needs-translation">An error occurred while saving update checking settings.</target>
+        <target state="translated">Ocorreu um erro ao guardar as definições de verificação de atualizações.</target>
       </trans-unit>
       <trans-unit id="4580988005648117665" datatype="html">
         <source>Search</source>
@@ -4761,7 +4761,7 @@
         <source>Create new field</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-dropdown/custom-fields-dropdown.component.html</context>
-          <context context-type="linenumber">20</context>
+          <context context-type="linenumber">19</context>
         </context-group>
         <target state="needs-translation">Create new field</target>
       </trans-unit>
@@ -4775,7 +4775,7 @@
           <context context-type="sourcefile">src/app/components/manage/document-attributes/custom-fields/custom-fields.component.ts</context>
           <context context-type="linenumber">86</context>
         </context-group>
-        <target state="needs-translation">Saved field "<x id="PH" equiv-text="newField.name"/>".</target>
+        <target state="translated">Campo guardado "<x id="PH" equiv-text="newField.name"/>".</target>
       </trans-unit>
       <trans-unit id="1841172489943868696" datatype="html">
         <source>Error saving field.</source>
@@ -4787,7 +4787,7 @@
           <context context-type="sourcefile">src/app/components/manage/document-attributes/custom-fields/custom-fields.component.ts</context>
           <context context-type="linenumber">96</context>
         </context-group>
-        <target state="needs-translation">Error saving field.</target>
+        <target state="translated">Erro ao guardar o campo.</target>
       </trans-unit>
       <trans-unit id="3625677668275605418" datatype="html">
         <source>Date mode</source>
@@ -5443,7 +5443,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component.html</context>
           <context context-type="linenumber">14,15</context>
         </context-group>
-        <target state="needs-translation">Data type cannot be changed after a field is created</target>
+        <target state="translated">O tipo de dados não pode ser alterado após a criação de um campo.</target>
       </trans-unit>
       <trans-unit id="4910631867841099191" datatype="html">
         <source>Add option</source>
@@ -5483,7 +5483,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component.ts</context>
           <context context-type="linenumber">118</context>
         </context-group>
-        <target state="needs-translation">Create new custom field</target>
+        <target state="translated">Criar novo campo personalizado</target>
       </trans-unit>
       <trans-unit id="8751213029607178010" datatype="html">
         <source>Edit custom field</source>
@@ -5491,7 +5491,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component.ts</context>
           <context context-type="linenumber">122</context>
         </context-group>
-        <target state="needs-translation">Edit custom field</target>
+        <target state="translated">Editar campo personalizado</target>
       </trans-unit>
       <trans-unit id="6672809941092516947" datatype="html" approved="yes">
         <source>Create new document type</source>
@@ -6099,7 +6099,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/mail-rule-edit-dialog/mail-rule-edit-dialog.component.ts</context>
           <context context-type="linenumber">120</context>
         </context-group>
-        <target state="needs-translation">Do not assign title from this rule</target>
+        <target state="translated">Não atribua o título a partir desta regra</target>
       </trans-unit>
       <trans-unit id="1568902914205618549" datatype="html">
         <source>Do not assign a correspondent</source>
@@ -6143,7 +6143,7 @@
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
           <context context-type="linenumber">110</context>
         </context-group>
-        <target state="needs-translation">Error retrieving mail accounts</target>
+        <target state="translated">Erro ao recuperar contas de e-mail</target>
       </trans-unit>
       <trans-unit id="8904588217825479681" datatype="html">
         <source>Error retrieving correspondents</source>
@@ -6491,7 +6491,7 @@
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.html</context>
           <context context-type="linenumber">18,19</context>
         </context-group>
-        <target state="needs-translation">Sort order</target>
+        <target state="translated">Ordem de ordenação</target>
       </trans-unit>
       <trans-unit id="1586840222182376783" datatype="html">
         <source>Triggers</source>
@@ -6639,7 +6639,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">161</context>
         </context-group>
-        <target state="needs-translation">Filter filename</target>
+        <target state="translated">Filtrar nome do ficheiro</target>
       </trans-unit>
       <trans-unit id="3694878959415278689" datatype="html">
         <source>Apply to documents that match this filename. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive.</source>
@@ -6647,7 +6647,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">161</context>
         </context-group>
-        <target state="needs-translation">Apply to documents that match this filename. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive.</target>
+        <target state="translated">Aplicar a documentos que correspondam a este nome do ficheiro. São permitidos asteriscos como *.pdf ou *invoice*. Sem distinção de maiúsculas e minúsculas.</target>
       </trans-unit>
       <trans-unit id="1473412958770421458" datatype="html">
         <source>Filter sources</source>
@@ -6655,7 +6655,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">163</context>
         </context-group>
-        <target state="needs-translation">Filter sources</target>
+        <target state="translated">Filtrar fontes</target>
       </trans-unit>
       <trans-unit id="6540860478788535250" datatype="html">
         <source>Filter path</source>
@@ -6663,7 +6663,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">164</context>
         </context-group>
-        <target state="needs-translation">Filter path</target>
+        <target state="translated">Filtrar caminho</target>
       </trans-unit>
       <trans-unit id="4941865803454225171" datatype="html">
         <source>Apply to documents that match this path. Wildcards specified as * are allowed. Case-normalized.</source>
@@ -6687,7 +6687,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">165</context>
         </context-group>
-        <target state="needs-translation">Apply to documents consumed via this mail rule.</target>
+        <target state="translated">Aplicar aos documentos consumidos através desta regra de e-mail.</target>
       </trans-unit>
       <trans-unit id="6840369584127435743" datatype="html">
         <source>Content matching algorithm</source>
@@ -6775,7 +6775,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">268</context>
         </context-group>
-        <target state="needs-translation">Assign storage path</target>
+        <target state="translated">Atribuir caminho de armazenamento</target>
       </trans-unit>
       <trans-unit id="475685412372379925" datatype="html">
         <source>Assign custom fields</source>
@@ -6799,7 +6799,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">275,276</context>
         </context-group>
-        <target state="needs-translation">Assign view permissions</target>
+        <target state="translated">Atribuir permissões de visualização</target>
       </trans-unit>
       <trans-unit id="1744964187586405039" datatype="html">
         <source>Assign edit permissions</source>
@@ -6807,7 +6807,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">294,295</context>
         </context-group>
-        <target state="needs-translation">Assign edit permissions</target>
+        <target state="translated">Atribuir permissões de edição</target>
       </trans-unit>
       <trans-unit id="6236311670364192011" datatype="html">
         <source>Remove tags</source>
@@ -7111,7 +7111,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
           <context context-type="linenumber">74</context>
         </context-group>
-        <target state="needs-translation">Consume Folder</target>
+        <target state="translated">Consumir Pasta</target>
       </trans-unit>
       <trans-unit id="3553216189604488439" datatype="html" approved="yes">
         <source>Modified</source>
@@ -7732,7 +7732,7 @@
           <context context-type="sourcefile">src/app/components/common/input/password/password.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="needs-translation">Show password</target>
+        <target state="translated">Mostrar palavra-passe</target>
       </trans-unit>
       <trans-unit id="594042705136125260" datatype="html">
         <source>Edit Permissions</source>
@@ -7797,7 +7797,7 @@
           <context context-type="sourcefile">src/app/components/common/input/select/select.component.ts</context>
           <context context-type="linenumber">113</context>
         </context-group>
-        <target state="needs-translation">No items found</target>
+        <target state="translated">Nenhum item encontrado</target>
       </trans-unit>
       <trans-unit id="6541407358060244620" datatype="html">
         <source>Note: value has not yet been set and will not apply until explicitly changed</source>
@@ -8009,7 +8009,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-dialog/permissions-dialog.component.ts</context>
           <context context-type="linenumber">51</context>
         </context-group>
-        <target state="needs-translation">Set permissions</target>
+        <target state="translated">Definir permissões</target>
       </trans-unit>
       <trans-unit id="1678966148862835666" datatype="html">
         <source>Edit permissions for </source>
@@ -8017,7 +8017,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-dialog/permissions-dialog.component.ts</context>
           <context context-type="linenumber">62</context>
         </context-group>
-        <target state="needs-translation">Edit permissions for </target>
+        <target state="translated">Editar permissões para</target>
       </trans-unit>
       <trans-unit id="347498040201588614" datatype="html">
         <source>Existing owner, user and group permissions will be merged with these settings.</source>
@@ -8041,7 +8041,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-filter-dropdown/permissions-filter-dropdown.component.html</context>
           <context context-type="linenumber">55,56</context>
         </context-group>
-        <target state="needs-translation">Unowned</target>
+        <target state="translated">Sem dono</target>
       </trans-unit>
       <trans-unit id="7789618798958221204" datatype="html">
         <source>Clear selected users</source>
@@ -8057,7 +8057,7 @@
           <context context-type="sourcefile">src/app/components/common/permissions-filter-dropdown/permissions-filter-dropdown.component.html</context>
           <context context-type="linenumber">90</context>
         </context-group>
-        <target state="needs-translation">Hide unowned</target>
+        <target state="translated">Ocultar sem dono</target>
       </trans-unit>
       <trans-unit id="5947558132119506443" datatype="html">
         <source>My documents</source>
@@ -8209,7 +8209,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
           <context context-type="linenumber">15</context>
         </context-group>
-        <target state="needs-translation">Confirm Email</target>
+        <target state="translated">Confirmar e-mail</target>
       </trans-unit>
       <trans-unit id="3241357959735682038" datatype="html">
         <source>Confirm Password</source>
@@ -8217,7 +8217,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
           <context context-type="linenumber">25</context>
         </context-group>
-        <target state="needs-translation">Confirm Password</target>
+        <target state="translated">Confirmar Senha</target>
       </trans-unit>
       <trans-unit id="7554924397178347823" datatype="html">
         <source>API Auth Token</source>
@@ -8225,7 +8225,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
           <context context-type="linenumber">33,34</context>
         </context-group>
-        <target state="needs-translation">API Auth Token</target>
+        <target state="translated">Token de Autenticação da API</target>
       </trans-unit>
       <trans-unit id="4323470180912194028" datatype="html">
         <source>Copy</source>
@@ -8273,7 +8273,7 @@
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
           <context context-type="linenumber">47,48</context>
         </context-group>
-        <target state="needs-translation">Regenerate auth token</target>
+        <target state="translated">Regenerar token de autenticação</target>
       </trans-unit>
       <trans-unit id="4369881772624105142" datatype="html">
         <source>Warning: changing the token cannot be undone</source>
@@ -8569,7 +8569,7 @@
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.html</context>
           <context context-type="linenumber">19,20</context>
         </context-group>
-        <target state="needs-translation">Status</target>
+        <target state="translated">Estado</target>
       </trans-unit>
       <trans-unit id="2861306361489095884" datatype="html">
         <source>Slug</source>
@@ -8693,7 +8693,7 @@
           <context context-type="sourcefile">src/app/components/common/share-links-dialog/share-links-dialog.component.html</context>
           <context context-type="linenumber">9,10</context>
         </context-group>
-        <target state="needs-translation"> No existing links </target>
+        <target state="translated">Sem links existentes</target>
       </trans-unit>
       <trans-unit id="7419704019640008953" datatype="html">
         <source>Share</source>
@@ -8709,7 +8709,7 @@
           <context context-type="sourcefile">src/app/components/common/share-links-dialog/share-links-dialog.component.html</context>
           <context context-type="linenumber">48,49</context>
         </context-group>
-        <target state="needs-translation">Share archive version</target>
+        <target state="translated">Partilhar versão de arquivo</target>
       </trans-unit>
       <trans-unit id="3429210839568770054" datatype="html">
         <source>Error retrieving links</source>
@@ -8717,7 +8717,7 @@
           <context context-type="sourcefile">src/app/components/common/share-links-dialog/share-links-dialog.component.ts</context>
           <context context-type="linenumber">67</context>
         </context-group>
-        <target state="needs-translation">Error retrieving links</target>
+        <target state="translated">Erro ao recuperar links</target>
       </trans-unit>
       <trans-unit id="4776429682428363094" datatype="html">
         <source>1 day</source>
@@ -8737,7 +8737,7 @@
           <context context-type="sourcefile">src/app/components/common/share-links-dialog/share-links-dialog.component.ts</context>
           <context context-type="linenumber">86</context>
         </context-group>
-        <target state="needs-translation"><x id="PH" equiv-text="days"/> days</target>
+        <target state="translated"><x id="PH" equiv-text="days"/> dias</target>
       </trans-unit>
       <trans-unit id="2897042887615940599" datatype="html">
         <source>Error deleting link</source>
@@ -8745,7 +8745,7 @@
           <context context-type="sourcefile">src/app/components/common/share-links-dialog/share-links-dialog.component.ts</context>
           <context context-type="linenumber">115</context>
         </context-group>
-        <target state="needs-translation">Error deleting link</target>
+        <target state="translated">Erro ao eliminar link</target>
       </trans-unit>
       <trans-unit id="8400747326190565173" datatype="html">
         <source>Error creating link</source>
@@ -8753,7 +8753,7 @@
           <context context-type="sourcefile">src/app/components/common/share-links-dialog/share-links-dialog.component.ts</context>
           <context context-type="linenumber">143</context>
         </context-group>
-        <target state="needs-translation">Error creating link</target>
+        <target state="translated">Erro ao criar o link</target>
       </trans-unit>
       <trans-unit id="8336346011691074629" datatype="html">
         <source>No suggestions</source>
@@ -9137,7 +9137,7 @@
           <context context-type="sourcefile">src/app/components/common/toast/toast.component.html</context>
           <context context-type="linenumber">54</context>
         </context-group>
-        <target state="needs-translation">Copy Raw Error</target>
+        <target state="translated">Copiar Erro Bruto</target>
       </trans-unit>
       <trans-unit id="1749180330008942007" datatype="html" approved="yes">
         <source>Dismiss completed</source>
@@ -9223,7 +9223,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.ts</context>
           <context context-type="linenumber">90</context>
         </context-group>
-        <target state="needs-translation">Dashboard updated</target>
+        <target state="translated">Painel atualizado</target>
       </trans-unit>
       <trans-unit id="3214475953924351473" datatype="html">
         <source>Error updating dashboard</source>
@@ -9231,7 +9231,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/dashboard.component.ts</context>
           <context context-type="linenumber">93</context>
         </context-group>
-        <target state="needs-translation">Error updating dashboard</target>
+        <target state="translated">Erro ao atualizar o dashboard</target>
       </trans-unit>
       <trans-unit id="1559883523769732271" datatype="html">
         <source>Error while loading documents</source>
@@ -9319,7 +9319,7 @@
           <context context-type="sourcefile">src/app/components/dashboard/widgets/saved-view-widget/saved-view-widget.component.html</context>
           <context context-type="linenumber">189,192</context>
         </context-group>
-        <target state="needs-translation">No documents</target>
+        <target state="translated">Nenhum documento</target>
       </trans-unit>
       <trans-unit id="1069523139277190436" datatype="html" approved="yes">
         <source>Statistics</source>
@@ -10079,7 +10079,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">1503</context>
         </context-group>
-        <target state="needs-translation">Error deleting document</target>
+        <target state="translated">Erro ao eliminar documento</target>
       </trans-unit>
       <trans-unit id="619486176823357521" datatype="html">
         <source>Reprocess confirm</source>
@@ -10123,7 +10123,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">1549</context>
         </context-group>
-        <target state="needs-translation">Error executing operation</target>
+        <target state="translated">Erro ao executar a operação</target>
       </trans-unit>
       <trans-unit id="6030453331794586802" datatype="html">
         <source>Error downloading document</source>
@@ -10567,7 +10567,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">349</context>
         </context-group>
-        <target state="needs-translation">Error executing bulk operation</target>
+        <target state="translated">Erro ao executar operação em lote</target>
       </trans-unit>
       <trans-unit id="7894972847287473517" datatype="html">
         <source>&quot;<x id="PH" equiv-text="items[0].name"/>&quot;</source>
@@ -10701,7 +10701,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">681</context>
         </context-group>
-        <target state="needs-translation">Confirm storage path assignment</target>
+        <target state="translated">Confirmar atribuição do caminho de armazenamento</target>
       </trans-unit>
       <trans-unit id="8750527458618415924" datatype="html">
         <source>This operation will assign the storage path &quot;<x id="PH" equiv-text="storagePath.name"/>&quot; to <x id="PH_1" equiv-text="this.getSelectionSize()"/> selected document(s).</source>
@@ -11047,7 +11047,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">24</context>
         </context-group>
-        <target state="needs-translation">Toggle tag filter</target>
+        <target state="translated">Alternar filtro de rótulos</target>
       </trans-unit>
       <trans-unit id="4648526799630820486" datatype="html">
         <source>Toggle correspondent filter</source>
@@ -11055,7 +11055,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">47</context>
         </context-group>
-        <target state="needs-translation">Toggle correspondent filter</target>
+        <target state="translated">Alternar filtro de correspondente</target>
       </trans-unit>
       <trans-unit id="5319701482646590642" datatype="html">
         <source>Toggle document type filter</source>
@@ -11063,7 +11063,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">63</context>
         </context-group>
-        <target state="needs-translation">Toggle document type filter</target>
+        <target state="translated">Alternar filtro de tipo de documento</target>
       </trans-unit>
       <trans-unit id="8950368321707344185" datatype="html">
         <source>Toggle storage path filter</source>
@@ -11071,7 +11071,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">70</context>
         </context-group>
-        <target state="needs-translation">Toggle storage path filter</target>
+        <target state="translated">Alternar filtro de caminho de armazenamento</target>
       </trans-unit>
       <trans-unit id="3797570084942068182" datatype="html" approved="yes">
         <source>Select</source>
@@ -11707,7 +11707,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">364</context>
         </context-group>
-        <target state="needs-translation">Owner not in: <x id="PH" equiv-text="rule.value"/></target>
+        <target state="translated">Proprietário não está em: <x id="PH" equiv-text="rule.value"/></target>
       </trans-unit>
       <trans-unit id="1082034558646673343" datatype="html">
         <source>Without an owner</source>
@@ -11715,7 +11715,7 @@
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
           <context context-type="linenumber">367</context>
         </context-group>
-        <target state="needs-translation">Without an owner</target>
+        <target state="translated">Sem proprietário</target>
       </trans-unit>
       <trans-unit id="7210076240260527720" datatype="html" approved="yes">
         <source>Save current view</source>
@@ -11819,7 +11819,7 @@
           <context context-type="sourcefile">src/app/components/document-notes/document-notes.component.ts</context>
           <context context-type="linenumber">83</context>
         </context-group>
-        <target state="needs-translation">Error saving note</target>
+        <target state="translated">Erro ao guardar nota</target>
       </trans-unit>
       <trans-unit id="4144411010137688084" datatype="html">
         <source>Error deleting note</source>
@@ -11827,7 +11827,7 @@
           <context context-type="sourcefile">src/app/components/document-notes/document-notes.component.ts</context>
           <context context-type="linenumber">97</context>
         </context-group>
-        <target state="needs-translation">Error deleting note</target>
+        <target state="translated">Erro ao eliminar nota</target>
       </trans-unit>
       <trans-unit id="7103632680753685326" datatype="html">
         <source>Drop files to begin upload</source>
@@ -11851,7 +11851,7 @@
           <context context-type="sourcefile">src/app/components/manage/document-attributes/custom-fields/custom-fields.component.html</context>
           <context context-type="linenumber">6,7</context>
         </context-group>
-        <target state="needs-translation">Data Type</target>
+        <target state="translated">Tipo de Dados</target>
       </trans-unit>
       <trans-unit id="6209318295562170730" datatype="html">
         <source>Filter Documents (<x id="INTERPOLATION" equiv-text="{{ field.document_count }}"/>)</source>
@@ -11883,7 +11883,7 @@
           <context context-type="sourcefile">src/app/components/manage/document-attributes/custom-fields/custom-fields.component.html</context>
           <context context-type="linenumber">70,72</context>
         </context-group>
-        <target state="needs-translation">No fields defined.</target>
+        <target state="translated">Sem campos definidos.</target>
       </trans-unit>
       <trans-unit id="3032792139967609806" datatype="html">
         <source>Confirm delete field</source>
@@ -11891,7 +11891,7 @@
           <context context-type="sourcefile">src/app/components/manage/document-attributes/custom-fields/custom-fields.component.ts</context>
           <context context-type="linenumber">104</context>
         </context-group>
-        <target state="needs-translation">Confirm delete field</target>
+        <target state="translated">Confirmar eliminação do campo</target>
       </trans-unit>
       <trans-unit id="2939457975223185057" datatype="html">
         <source>This operation will permanently delete this field.</source>
@@ -11899,7 +11899,7 @@
           <context context-type="sourcefile">src/app/components/manage/document-attributes/custom-fields/custom-fields.component.ts</context>
           <context context-type="linenumber">105</context>
         </context-group>
-        <target state="needs-translation">This operation will permanently delete this field.</target>
+        <target state="translated">Esta operação irá eliminar permanentemente este campo.</target>
       </trans-unit>
       <trans-unit id="4679555638382452936" datatype="html">
         <source>Deleted field &quot;<x id="PH" equiv-text="field.name"/>&quot;</source>
@@ -11931,7 +11931,7 @@
           <context context-type="sourcefile">src/app/components/manage/document-attributes/document-attributes.component.html</context>
           <context context-type="linenumber">57</context>
         </context-group>
-        <target state="needs-translation">Add Field</target>
+        <target state="translated">Adicionar Campo</target>
       </trans-unit>
       <trans-unit id="6316128875819022658" datatype="html">
         <source>correspondent</source>
@@ -12183,7 +12183,7 @@
           <context context-type="sourcefile">src/app/components/manage/document-attributes/management-list/management-list.component.ts</context>
           <context context-type="linenumber">289</context>
         </context-group>
-        <target state="needs-translation">Error while deleting element</target>
+        <target state="translated">Erro ao eliminar elemento</target>
       </trans-unit>
       <trans-unit id="2976110979192587241" datatype="html">
         <source>Error saving settings</source>
@@ -12207,7 +12207,7 @@
           <context context-type="sourcefile">src/app/components/manage/document-attributes/management-list/management-list.component.ts</context>
           <context context-type="linenumber">432</context>
         </context-group>
-        <target state="needs-translation">Permissions updated successfully</target>
+        <target state="translated">Permissões atualizadas com sucesso</target>
       </trans-unit>
       <trans-unit id="4639647950943944112" datatype="html">
         <source>Error updating permissions</source>
@@ -12271,7 +12271,7 @@
           <context context-type="sourcefile">src/app/components/manage/document-attributes/management-list/storage-path-list/storage-path-list.component.ts</context>
           <context context-type="linenumber">59</context>
         </context-group>
-        <target state="needs-translation">Do you really want to delete the storage path "<x id="PH" equiv-text="object.name"/>"?</target>
+        <target state="translated">Tem a certeza que quer eliminar o caminho de armazenamento "<x id="PH" equiv-text="object.name"/>"?</target>
       </trans-unit>
       <trans-unit id="6402703264596649214" datatype="html">
         <source>tag</source>
@@ -12303,7 +12303,7 @@
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
           <context context-type="linenumber">2,3</context>
         </context-group>
-        <target state="needs-translation">Mail Settings</target>
+        <target state="translated">Configurações de Email</target>
       </trans-unit>
       <trans-unit id="8913167930428886792" datatype="html">
         <source>Mail accounts</source>
@@ -12423,7 +12423,7 @@
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.ts</context>
           <context context-type="linenumber">130</context>
         </context-group>
-        <target state="needs-translation">Error retrieving mail rules</target>
+        <target state="translated">Erro ao recuperar as regras de e-mail</target>
       </trans-unit>
       <trans-unit id="763945516325093575" datatype="html">
         <source>OAuth2 authentication success</source>
@@ -13332,7 +13332,7 @@
           <context context-type="sourcefile">src/app/data/matching-model.ts</context>
           <context context-type="linenumber">46</context>
         </context-group>
-        <target state="needs-translation">None: Disable matching</target>
+        <target state="translated">Nenhum: Desativar correspondência</target>
       </trans-unit>
       <trans-unit id="432834967329800065" datatype="html">
         <source>General Settings</source>
@@ -14268,7 +14268,7 @@
           <context context-type="sourcefile">src/app/guards/dirty-saved-view.guard.ts</context>
           <context context-type="linenumber">29</context>
         </context-group>
-        <target state="needs-translation">You have unsaved changes to the saved view</target>
+        <target state="translated">Tem alterações não guardadas na vista guardada</target>
       </trans-unit>
       <trans-unit id="7282050913165342352" datatype="html">
         <source>Are you sure you want to close this saved view?</source>
@@ -14276,7 +14276,7 @@
           <context context-type="sourcefile">src/app/guards/dirty-saved-view.guard.ts</context>
           <context context-type="linenumber">33</context>
         </context-group>
-        <target state="needs-translation">Are you sure you want to close this saved view?</target>
+        <target state="translated">Tem a certeza que quer fechar esta vista guardada?</target>
       </trans-unit>
       <trans-unit id="856284624775342512" datatype="html">
         <source>Save and close</source>
