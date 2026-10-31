@@ -7,8 +7,6 @@ from dataclasses import dataclass
 from types import TracebackType
 from typing import Self
 
-import dateparser
-
 logger = logging.getLogger(__name__)
 
 
@@ -80,6 +78,8 @@ class DateParserPluginBase(ABC):
 
         Uses configuration from `self.config`.
         """
+        import dateparser
+
         try:
             return dateparser.parse(
                 date_string,

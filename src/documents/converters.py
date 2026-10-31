@@ -1,6 +1,5 @@
 from pathlib import Path
 
-import img2pdf
 from PIL import Image
 
 from documents.utils import copy_basic_file_stats
@@ -17,6 +16,8 @@ def convert_from_tiff_to_pdf(tiff_path: Path, target_directory: Path) -> Path:
 
     Returns the path of the PDF created.
     """
+    import img2pdf
+
     # override pixel setting if needed
     maybe_override_pixel_limit()
 

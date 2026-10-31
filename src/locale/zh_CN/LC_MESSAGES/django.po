@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-19 15:40+0000\n"
-"PO-Revision-Date: 2026-10-19 15:42\n"
+"POT-Creation-Date: 2026-10-31 04:47+0000\n"
+"PO-Revision-Date: 2026-10-31 04:48\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -21,39 +21,43 @@ msgstr ""
 msgid "Documents"
 msgstr "文档"
 
-#: documents/filters.py:464
+#: documents/filters.py:336
+msgid "Expected a date or a relative date such as \"today\" or \"in 30 days\"."
+msgstr ""
+
+#: documents/filters.py:514
 msgid "Value must be valid JSON."
 msgstr "值必须是有效的 JSON 格式。"
 
-#: documents/filters.py:483
+#: documents/filters.py:535
 msgid "Invalid custom field query expression"
 msgstr "无效的自定义字段查询表达式"
 
-#: documents/filters.py:493
+#: documents/filters.py:545
 msgid "Invalid expression list. Must be nonempty."
 msgstr "无效的表达式列表。必须不为空。"
 
-#: documents/filters.py:514
+#: documents/filters.py:566
 msgid "Invalid logical operator {op!r}"
 msgstr "无效的逻辑运算符 {op!r}"
 
-#: documents/filters.py:528
+#: documents/filters.py:580
 msgid "Maximum number of query conditions exceeded."
 msgstr "超出查询条件的最大数量。"
 
-#: documents/filters.py:592
+#: documents/filters.py:644
 msgid "{name!r} is not a valid custom field."
 msgstr "{name!r} 不是一个有效的自定义字段。"
 
-#: documents/filters.py:629
+#: documents/filters.py:681
 msgid "{data_type} does not support query expr {expr!r}."
 msgstr "{data_type} 不支持查询表达式 {expr!r}。"
 
-#: documents/filters.py:748 documents/models.py:137
+#: documents/filters.py:802 documents/models.py:137
 msgid "Maximum nesting depth exceeded."
 msgstr "超出最大嵌套深度。"
 
-#: documents/filters.py:1125
+#: documents/filters.py:1179
 msgid "Custom field not found"
 msgstr "Custom field not found"
 
@@ -1635,48 +1639,48 @@ msgstr "工作流运行"
 msgid "workflow runs"
 msgstr "工作流运行"
 
-#: documents/serialisers.py:515 documents/serialisers.py:872
-#: documents/serialisers.py:2902 documents/views.py:363 documents/views.py:2768
+#: documents/serialisers.py:483 documents/serialisers.py:840
+#: documents/serialisers.py:2872 documents/views.py:348 documents/views.py:2731
 #: paperless_mail/serialisers.py:156
 msgid "Insufficient permissions."
 msgstr "权限不足。"
 
-#: documents/serialisers.py:708
+#: documents/serialisers.py:676
 msgid "Invalid color."
 msgstr "无效的颜色"
 
-#: documents/serialisers.py:2369
+#: documents/serialisers.py:2339
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "不支持文件类型 %(type)s"
 
-#: documents/serialisers.py:2413
+#: documents/serialisers.py:2383
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
 msgstr "自定义字段 id 必须是数字：%(id)s"
 
-#: documents/serialisers.py:2420
+#: documents/serialisers.py:2390
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
 msgstr "自定义字段 id %(id)s 不存在"
 
-#: documents/serialisers.py:2437 documents/serialisers.py:2447
+#: documents/serialisers.py:2407 documents/serialisers.py:2417
 msgid "Custom fields must be a list of integers or an object mapping ids to values."
 msgstr "自定义字段必须为整数列表，或是一个将ID映射到值的对象。"
 
-#: documents/serialisers.py:2442
+#: documents/serialisers.py:2412
 msgid "Some custom fields don't exist or were specified twice."
 msgstr "部分自定义字段不存在或重复指定。"
 
-#: documents/serialisers.py:2589
+#: documents/serialisers.py:2559
 msgid "Invalid variable detected."
 msgstr "检测到无效变量。"
 
-#: documents/serialisers.py:2958
+#: documents/serialisers.py:2928
 msgid "Duplicate document identifiers are not allowed."
 msgstr "不允许重复文档标识符。"
 
-#: documents/serialisers.py:2988 documents/views.py:4816
+#: documents/serialisers.py:2958 documents/views.py:4781
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr "未找到文档：%(ids)s"
@@ -1917,40 +1921,40 @@ msgstr "作为最后一步，请填写以下表格："
 msgid ", "
 msgstr "，"
 
-#: documents/views.py:318
+#: documents/views.py:303
 msgid "Specify only one of text, title_search, query, or more_like_id."
 msgstr "只能指定 text、title_search、query 或 more_like_id 中的一项。"
 
-#: documents/views.py:356 documents/views.py:2765
+#: documents/views.py:341 documents/views.py:2728
 msgid "Invalid more_like_id"
 msgstr "无效的more_like_id"
 
-#: documents/views.py:1703
+#: documents/views.py:1652
 msgid "Invalid AI configuration."
 msgstr "无效的 AI 配置。"
 
-#: documents/views.py:1714
+#: documents/views.py:1663
 msgid "AI backend request timed out."
 msgstr "AI 后端请求超时。"
 
-#: documents/views.py:1726
+#: documents/views.py:1675
 msgid "AI backend rejected the request. Check logs for details."
 msgstr "AI 后端拒绝了请求。请检查日志的详细信息。"
 
-#: documents/views.py:4832
+#: documents/views.py:4797
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr "权限不足以分享文件：%(id)s。"
 
-#: documents/views.py:4879
+#: documents/views.py:4844
 msgid "Bundle is already being processed."
 msgstr "捆绑包已在处理中。"
 
-#: documents/views.py:4945
+#: documents/views.py:4910
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr "分享链接包仍在准备中，请稍后再试。"
 
-#: documents/views.py:4959
+#: documents/views.py:4924
 msgid "The share link bundle is unavailable."
 msgstr "分享链接包不可用。"
 
@@ -2242,151 +2246,151 @@ msgstr "设置 LLM 超时时间（秒）"
 msgid "paperless application settings"
 msgstr "paperless 应用设置"
 
-#: paperless/settings/__init__.py:562
+#: paperless/settings/__init__.py:566
 msgid "English (US)"
 msgstr "英语(美国)"
 
-#: paperless/settings/__init__.py:563
+#: paperless/settings/__init__.py:567
 msgid "Arabic"
 msgstr "阿拉伯语"
 
-#: paperless/settings/__init__.py:564
+#: paperless/settings/__init__.py:568
 msgid "Afrikaans"
 msgstr "Afrikaans 荷兰语"
 
-#: paperless/settings/__init__.py:565
+#: paperless/settings/__init__.py:569
 msgid "Belarusian"
 msgstr "白俄罗斯语"
 
-#: paperless/settings/__init__.py:566
+#: paperless/settings/__init__.py:570
 msgid "Bulgarian"
 msgstr "保加利亚语"
 
-#: paperless/settings/__init__.py:567
+#: paperless/settings/__init__.py:571
 msgid "Catalan"
 msgstr "Catalan 加泰罗尼亚语"
 
-#: paperless/settings/__init__.py:568
+#: paperless/settings/__init__.py:572
 msgid "Czech"
 msgstr "捷克语"
 
-#: paperless/settings/__init__.py:569
+#: paperless/settings/__init__.py:573
 msgid "Danish"
 msgstr "丹麦语"
 
-#: paperless/settings/__init__.py:570
+#: paperless/settings/__init__.py:574
 msgid "German"
 msgstr "德语"
 
-#: paperless/settings/__init__.py:571
+#: paperless/settings/__init__.py:575
 msgid "Greek"
 msgstr "Greek 希腊语"
 
-#: paperless/settings/__init__.py:572
+#: paperless/settings/__init__.py:576
 msgid "English (GB)"
 msgstr "英语(英国)"
 
-#: paperless/settings/__init__.py:573
+#: paperless/settings/__init__.py:577
 msgid "Spanish"
 msgstr "西班牙语"
 
-#: paperless/settings/__init__.py:574
+#: paperless/settings/__init__.py:578
 msgid "Persian"
 msgstr "波斯文"
 
-#: paperless/settings/__init__.py:575
+#: paperless/settings/__init__.py:579
 msgid "Finnish"
 msgstr "已完成"
 
-#: paperless/settings/__init__.py:576
+#: paperless/settings/__init__.py:580
 msgid "French"
 msgstr "法语"
 
-#: paperless/settings/__init__.py:577
+#: paperless/settings/__init__.py:581
 msgid "Hungarian"
 msgstr "匈牙利语"
 
-#: paperless/settings/__init__.py:578
+#: paperless/settings/__init__.py:582
 msgid "Indonesian"
 msgstr "印度尼西亚语"
 
-#: paperless/settings/__init__.py:579
+#: paperless/settings/__init__.py:583
 msgid "Italian"
 msgstr "意大利语"
 
-#: paperless/settings/__init__.py:580
+#: paperless/settings/__init__.py:584
 msgid "Japanese"
 msgstr "日语"
 
-#: paperless/settings/__init__.py:581
+#: paperless/settings/__init__.py:585
 msgid "Korean"
 msgstr "韩语"
 
-#: paperless/settings/__init__.py:582
+#: paperless/settings/__init__.py:586
 msgid "Luxembourgish"
 msgstr "卢森堡语"
 
-#: paperless/settings/__init__.py:583
+#: paperless/settings/__init__.py:587
 msgid "Norwegian"
 msgstr "Norwegian 挪威语"
 
-#: paperless/settings/__init__.py:584
+#: paperless/settings/__init__.py:588
 msgid "Dutch"
 msgstr "荷兰语"
 
-#: paperless/settings/__init__.py:585
+#: paperless/settings/__init__.py:589
 msgid "Polish"
 msgstr "波兰语"
 
-#: paperless/settings/__init__.py:586
+#: paperless/settings/__init__.py:590
 msgid "Portuguese (Brazil)"
 msgstr "葡萄牙语 (巴西)"
 
-#: paperless/settings/__init__.py:587
+#: paperless/settings/__init__.py:591
 msgid "Portuguese"
 msgstr "葡萄牙语"
 
-#: paperless/settings/__init__.py:588
+#: paperless/settings/__init__.py:592
 msgid "Romanian"
 msgstr "罗马尼亚语"
 
-#: paperless/settings/__init__.py:589
+#: paperless/settings/__init__.py:593
 msgid "Russian"
 msgstr "俄语"
 
-#: paperless/settings/__init__.py:590
+#: paperless/settings/__init__.py:594
 msgid "Slovak"
 msgstr "斯洛伐克语"
 
-#: paperless/settings/__init__.py:591
+#: paperless/settings/__init__.py:595
 msgid "Slovenian"
 msgstr "斯洛语尼亚语"
 
-#: paperless/settings/__init__.py:592
+#: paperless/settings/__init__.py:596
 msgid "Serbian"
 msgstr "塞尔维亚语"
 
-#: paperless/settings/__init__.py:593
+#: paperless/settings/__init__.py:597
 msgid "Swedish"
 msgstr "瑞典语"
 
-#: paperless/settings/__init__.py:594
+#: paperless/settings/__init__.py:598
 msgid "Turkish"
 msgstr "土耳其语"
 
-#: paperless/settings/__init__.py:595
+#: paperless/settings/__init__.py:599
 msgid "Ukrainian"
 msgstr "乌克兰语"
 
-#: paperless/settings/__init__.py:596
+#: paperless/settings/__init__.py:600
 msgid "Vietnamese"
 msgstr "越南语"
 
-#: paperless/settings/__init__.py:597
+#: paperless/settings/__init__.py:601
 msgid "Chinese Simplified"
 msgstr "简体中文"
 
-#: paperless/settings/__init__.py:598
+#: paperless/settings/__init__.py:602
 msgid "Chinese Traditional"
 msgstr "繁体中文"
 

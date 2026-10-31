@@ -17,7 +17,7 @@ from paperless.urls import websocket_urlpatterns  # noqa: E402
 
 application = ProtocolTypeRouter(
     {
-        "http": get_asgi_application(),
+        "http": django_asgi_app,
         "websocket": AuthMiddlewareStack(URLRouter(websocket_urlpatterns)),
     },
 )

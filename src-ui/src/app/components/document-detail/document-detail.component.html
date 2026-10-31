@@ -308,7 +308,7 @@
                   </tr>
                   <tr class="align-middle">
                     <td i18n>Original SHA256 checksum</td>
-                    <td><span class="badge bg-light font-monospace text-wrap text-break text-start">{{metadata()?.original_checksum}}</span></td>
+                    <td><span class="badge bg-light text-dark font-monospace text-wrap text-break text-start">{{metadata()?.original_checksum}}</span></td>
                   </tr>
                   <tr>
                     <td i18n>Original file size</td>
@@ -465,7 +465,7 @@
     @switch (archiveContentRenderType) {
       @case (ContentRenderType.PDF) {
         @if (!useNativePdfViewer) {
-          <div class="preview-sticky pdf-viewer-container">
+          <div class="preview-sticky pdf-viewer-container" tabindex="-1">
             <pngx-pdf-viewer
               [src]="pdfSource()"
               [sourceRevision]="previewRevision()"
@@ -477,7 +477,7 @@
               (loadError)="onError($event)"
               (afterLoadComplete)="pdfPreviewLoaded($event)">
             </pngx-pdf-viewer>
-            <div class="position-absolute bottom-0 start-50 translate-middle-x z-1 mb-3 d-flex gap-2 p-1 bg-body border rounded shadow">
+            <div class="preview-controls position-absolute bottom-0 start-50 translate-middle-x z-1 mb-3 d-flex gap-2 p-1 bg-body border rounded shadow">
               @if (previewNumPages()) {
                 <div class="input-group input-group-sm w-auto flex-nowrap">
                   <input class="form-control flex-grow-0 w-auto" type="number" min="1" [max]="previewNumPages()" [ngModelOptions]="{standalone: true}" [ngModel]="previewCurrentPage()" (ngModelChange)="previewCurrentPage.set($event)" aria-label="Page" i18n-aria-label />

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-19 15:40+0000\n"
-"PO-Revision-Date: 2026-10-19 15:42\n"
+"POT-Creation-Date: 2026-10-31 04:47+0000\n"
+"PO-Revision-Date: 2026-10-31 04:49\n"
 "Last-Translator: \n"
 "Language-Team: Slovak\n"
 "Language: sk_SK\n"
@@ -21,39 +21,43 @@ msgstr ""
 msgid "Documents"
 msgstr "Dokumenty"
 
-#: documents/filters.py:464
+#: documents/filters.py:336
+msgid "Expected a date or a relative date such as \"today\" or \"in 30 days\"."
+msgstr ""
+
+#: documents/filters.py:514
 msgid "Value must be valid JSON."
 msgstr "Hodnota musí byť v platnom formáte JSON."
 
-#: documents/filters.py:483
+#: documents/filters.py:535
 msgid "Invalid custom field query expression"
 msgstr "Neplatný výraz požiadavky na vlastné pole"
 
-#: documents/filters.py:493
+#: documents/filters.py:545
 msgid "Invalid expression list. Must be nonempty."
 msgstr "Neplatný zoznam výrazov. Nesmie byť prázdny."
 
-#: documents/filters.py:514
+#: documents/filters.py:566
 msgid "Invalid logical operator {op!r}"
 msgstr "Neplatný logický operátor {op!r}"
 
-#: documents/filters.py:528
+#: documents/filters.py:580
 msgid "Maximum number of query conditions exceeded."
 msgstr "Prekročili ste maximálny počet podmienok požiadavky."
 
-#: documents/filters.py:592
+#: documents/filters.py:644
 msgid "{name!r} is not a valid custom field."
 msgstr "{name!r} nie je platné vlastné pole."
 
-#: documents/filters.py:629
+#: documents/filters.py:681
 msgid "{data_type} does not support query expr {expr!r}."
 msgstr "{data_type} nepodporuje výraz požiadavky {expr!r}."
 
-#: documents/filters.py:748 documents/models.py:137
+#: documents/filters.py:802 documents/models.py:137
 msgid "Maximum nesting depth exceeded."
 msgstr "Bola prekročená maximálna hĺbka vetvenia."
 
-#: documents/filters.py:1125
+#: documents/filters.py:1179
 msgid "Custom field not found"
 msgstr "Vlastné pole nebolo nájdené"
 
@@ -1635,48 +1639,48 @@ msgstr "spustenie pracovného postupu"
 msgid "workflow runs"
 msgstr "spustenia pracovných postupov"
 
-#: documents/serialisers.py:515 documents/serialisers.py:872
-#: documents/serialisers.py:2902 documents/views.py:363 documents/views.py:2768
+#: documents/serialisers.py:483 documents/serialisers.py:840
+#: documents/serialisers.py:2872 documents/views.py:348 documents/views.py:2731
 #: paperless_mail/serialisers.py:156
 msgid "Insufficient permissions."
 msgstr "Nedostatočné oprávnenia."
 
-#: documents/serialisers.py:708
+#: documents/serialisers.py:676
 msgid "Invalid color."
 msgstr "Neplatná farba."
 
-#: documents/serialisers.py:2369
+#: documents/serialisers.py:2339
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Typ súboru %(type)s nie je podporovaný"
 
-#: documents/serialisers.py:2413
+#: documents/serialisers.py:2383
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
 msgstr "ID vlastného poľa musí byť celé číslo: %(id)s"
 
-#: documents/serialisers.py:2420
+#: documents/serialisers.py:2390
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
 msgstr "Vlastné pole s ID %(id)s neexistuje."
 
-#: documents/serialisers.py:2437 documents/serialisers.py:2447
+#: documents/serialisers.py:2407 documents/serialisers.py:2417
 msgid "Custom fields must be a list of integers or an object mapping ids to values."
 msgstr "Vlastné polia musia byť zoznamom celých čísel alebo objektom mapujúcim identifikátory na hodnoty."
 
-#: documents/serialisers.py:2442
+#: documents/serialisers.py:2412
 msgid "Some custom fields don't exist or were specified twice."
 msgstr "Niektoré vlastné polia neexistujú alebo boli zadané dvakrát."
 
-#: documents/serialisers.py:2589
+#: documents/serialisers.py:2559
 msgid "Invalid variable detected."
 msgstr "Zistená neplatná premenná."
 
-#: documents/serialisers.py:2958
+#: documents/serialisers.py:2928
 msgid "Duplicate document identifiers are not allowed."
 msgstr "Duplicitné identifikátory dokumentov nie sú povolené."
 
-#: documents/serialisers.py:2988 documents/views.py:4816
+#: documents/serialisers.py:2958 documents/views.py:4781
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr "Dokumenty sa nenašli: %(ids)s"
@@ -1917,40 +1921,40 @@ msgstr "Ako posledný krok vyplňte nasledujúci formulár:"
 msgid ", "
 msgstr ""
 
-#: documents/views.py:318
+#: documents/views.py:303
 msgid "Specify only one of text, title_search, query, or more_like_id."
 msgstr "Zadajte iba jednu z možností: text, title_search, query alebo more_like_id."
 
-#: documents/views.py:356 documents/views.py:2765
+#: documents/views.py:341 documents/views.py:2728
 msgid "Invalid more_like_id"
 msgstr "Neplatné more_like_id"
 
-#: documents/views.py:1703
+#: documents/views.py:1652
 msgid "Invalid AI configuration."
 msgstr "Neplatná konfigurácia umelej inteligencie."
 
-#: documents/views.py:1714
+#: documents/views.py:1663
 msgid "AI backend request timed out."
 msgstr "Vypršal časový limit požiadavky na backend umelej inteligencie."
 
-#: documents/views.py:1726
+#: documents/views.py:1675
 msgid "AI backend rejected the request. Check logs for details."
 msgstr "Backend umelej inteligencie zamietol požiadavku. Podrobnosti nájdete v záznamoch."
 
-#: documents/views.py:4832
+#: documents/views.py:4797
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr "Nedostatočné oprávnenia na zdieľanie dokumentu %(id)s."
 
-#: documents/views.py:4879
+#: documents/views.py:4844
 msgid "Bundle is already being processed."
 msgstr "Balík sa už spracúva."
 
-#: documents/views.py:4945
+#: documents/views.py:4910
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr "Balík odkazov na zdieľanie sa stále pripravuje. Skúste to znova neskôr."
 
-#: documents/views.py:4959
+#: documents/views.py:4924
 msgid "The share link bundle is unavailable."
 msgstr "Balík odkazov na zdieľanie nie je k dispozícii."
 
@@ -2242,151 +2246,151 @@ msgstr "Nastaví časový limit LLM v sekundách"
 msgid "paperless application settings"
 msgstr "nastavenia aplikácie paperless"
 
-#: paperless/settings/__init__.py:562
+#: paperless/settings/__init__.py:566
 msgid "English (US)"
 msgstr "Angličtina (US)"
 
-#: paperless/settings/__init__.py:563
+#: paperless/settings/__init__.py:567
 msgid "Arabic"
 msgstr "Arabčina"
 
-#: paperless/settings/__init__.py:564
+#: paperless/settings/__init__.py:568
 msgid "Afrikaans"
 msgstr "Afrikánčina"
 
-#: paperless/settings/__init__.py:565
+#: paperless/settings/__init__.py:569
 msgid "Belarusian"
 msgstr "Bieloruština"
 
-#: paperless/settings/__init__.py:566
+#: paperless/settings/__init__.py:570
 msgid "Bulgarian"
 msgstr "Bulharčina"
 
-#: paperless/settings/__init__.py:567
+#: paperless/settings/__init__.py:571
 msgid "Catalan"
 msgstr "Catalan"
 
-#: paperless/settings/__init__.py:568
+#: paperless/settings/__init__.py:572
 msgid "Czech"
 msgstr "Čeština"
 
-#: paperless/settings/__init__.py:569
+#: paperless/settings/__init__.py:573
 msgid "Danish"
 msgstr "Dánčina"
 
-#: paperless/settings/__init__.py:570
+#: paperless/settings/__init__.py:574
 msgid "German"
 msgstr "Nemčina"
 
-#: paperless/settings/__init__.py:571
+#: paperless/settings/__init__.py:575
 msgid "Greek"
 msgstr "Gréčtina"
 
-#: paperless/settings/__init__.py:572
+#: paperless/settings/__init__.py:576
 msgid "English (GB)"
 msgstr "Angličtina (GB)"
 
-#: paperless/settings/__init__.py:573
+#: paperless/settings/__init__.py:577
 msgid "Spanish"
 msgstr "Španielčina"
 
-#: paperless/settings/__init__.py:574
+#: paperless/settings/__init__.py:578
 msgid "Persian"
 msgstr "Perzština"
 
-#: paperless/settings/__init__.py:575
+#: paperless/settings/__init__.py:579
 msgid "Finnish"
 msgstr "Finnish"
 
-#: paperless/settings/__init__.py:576
+#: paperless/settings/__init__.py:580
 msgid "French"
 msgstr "Francúzština"
 
-#: paperless/settings/__init__.py:577
+#: paperless/settings/__init__.py:581
 msgid "Hungarian"
 msgstr "Maďarčina"
 
-#: paperless/settings/__init__.py:578
+#: paperless/settings/__init__.py:582
 msgid "Indonesian"
 msgstr "Indonézština"
 
-#: paperless/settings/__init__.py:579
+#: paperless/settings/__init__.py:583
 msgid "Italian"
 msgstr "Taliančina"
 
-#: paperless/settings/__init__.py:580
+#: paperless/settings/__init__.py:584
 msgid "Japanese"
 msgstr "Japončina"
 
-#: paperless/settings/__init__.py:581
+#: paperless/settings/__init__.py:585
 msgid "Korean"
 msgstr "Kórejčina"
 
-#: paperless/settings/__init__.py:582
+#: paperless/settings/__init__.py:586
 msgid "Luxembourgish"
 msgstr "Luxemburčina"
 
-#: paperless/settings/__init__.py:583
+#: paperless/settings/__init__.py:587
 msgid "Norwegian"
 msgstr "Nórčina"
 
-#: paperless/settings/__init__.py:584
+#: paperless/settings/__init__.py:588
 msgid "Dutch"
 msgstr "Holandčina"
 
-#: paperless/settings/__init__.py:585
+#: paperless/settings/__init__.py:589
 msgid "Polish"
 msgstr "Polština"
 
-#: paperless/settings/__init__.py:586
+#: paperless/settings/__init__.py:590
 msgid "Portuguese (Brazil)"
 msgstr "Portugalčina (Brazília)"
 
-#: paperless/settings/__init__.py:587
+#: paperless/settings/__init__.py:591
 msgid "Portuguese"
 msgstr "Portugalčina"
 
-#: paperless/settings/__init__.py:588
+#: paperless/settings/__init__.py:592
 msgid "Romanian"
 msgstr "Rumunčina"
 
-#: paperless/settings/__init__.py:589
+#: paperless/settings/__init__.py:593
 msgid "Russian"
 msgstr "Ruština"
 
-#: paperless/settings/__init__.py:590
+#: paperless/settings/__init__.py:594
 msgid "Slovak"
 msgstr "Slovenčina"
 
-#: paperless/settings/__init__.py:591
+#: paperless/settings/__init__.py:595
 msgid "Slovenian"
 msgstr "Slovinčina"
 
-#: paperless/settings/__init__.py:592
+#: paperless/settings/__init__.py:596
 msgid "Serbian"
 msgstr "Srbčina"
 
-#: paperless/settings/__init__.py:593
+#: paperless/settings/__init__.py:597
 msgid "Swedish"
 msgstr "Švédčina"
 
-#: paperless/settings/__init__.py:594
+#: paperless/settings/__init__.py:598
 msgid "Turkish"
 msgstr "Turečtina"
 
-#: paperless/settings/__init__.py:595
+#: paperless/settings/__init__.py:599
 msgid "Ukrainian"
 msgstr "Ukrainčina"
 
-#: paperless/settings/__init__.py:596
+#: paperless/settings/__init__.py:600
 msgid "Vietnamese"
 msgstr "Vietnamčina"
 
-#: paperless/settings/__init__.py:597
+#: paperless/settings/__init__.py:601
 msgid "Chinese Simplified"
 msgstr "Čínština (zjednodušená)"
 
-#: paperless/settings/__init__.py:598
+#: paperless/settings/__init__.py:602
 msgid "Chinese Traditional"
 msgstr "Čínština (tradičná)"
 

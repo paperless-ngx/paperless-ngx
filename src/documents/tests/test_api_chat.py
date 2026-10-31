@@ -61,7 +61,7 @@ class TestChatStreamingViewInputValidation(APITestCase):
                 return_value=self._mock_ai_enabled(),
             ),
             mock.patch(
-                "documents.views.stream_chat_with_documents",
+                "paperless_ai.chat.stream_chat_with_documents",
                 return_value=iter(chunks),
             ),
         ):
@@ -104,7 +104,7 @@ class TestChatStreamingViewUnrestrictedFlag:
         """
         mocker.patch("documents.views.AIConfig").return_value.ai_enabled = True
         return mocker.patch(
-            "documents.views.stream_chat_with_documents",
+            "paperless_ai.chat.stream_chat_with_documents",
             return_value=iter(()),
         )
 

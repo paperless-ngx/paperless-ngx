@@ -10,7 +10,6 @@ import {
   NgbTooltipModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
-import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
 import { IsNumberPipe } from 'src/app/pipes/is-number.pipe'
@@ -52,7 +51,6 @@ describe('DocumentCardLargeComponent', () => {
         DocumentCardLargeComponent,
         DocumentTitlePipe,
         CustomDatePipe,
-        IfPermissionsDirective,
         SafeUrlPipe,
         IsNumberPipe,
         PreviewPopupComponent,

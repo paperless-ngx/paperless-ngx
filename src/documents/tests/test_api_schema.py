@@ -308,3 +308,32 @@ class TestBulkDownloadSchema:
     def test_bulk_download_response_403(self, api_schema: SchemaGenerator) -> None:
         op = api_schema["paths"]["/api/documents/bulk_download/"]["post"]
         assert "403" in op["responses"]
+
+
+class TestDocumentListObjectFilterSchema:
+    """documents_list: comma-separated ObjectFilter params must be typed as integer arrays."""
+
+    @pytest.mark.parametrize(
+        "param_name",
+        [
+            "tags__id__all",
+            "tags__id__none",
+            "tags__id__in",
+            "correspondent__id__none",
+            "document_type__id__none",
+            "storage_path__id__none",
+            "owner__id__none",
+            "custom_fields__id__all",
+            "custom_fields__id__none",
+            "custom_fields__id__in",
+        ],
+    )
+    def test_object_filter_param_is_integer_array(
+        self,
+        api_schema: SchemaGenerator,
+        param_name: str,
+    ) -> None:
+        params = api_schema["paths"]["/api/documents/"]["get"]["parameters"]
+        param = next(p for p in params if p["name"] == param_name)
+        assert param["schema"] == {"type": "array", "items": {"type": "integer"}}
+        assert param["explode"] is False

@@ -6,8 +6,15 @@ test.use({
   },
 })
 
-test('should not allow user to edit settings', async ({ page }) => {
+test.beforeEach(async ({ page }) => {
+  const settingsLoaded = page.waitForResponse((response) =>
+    response.url().endsWith('/api/ui_settings/')
+  )
   await page.goto('/dashboard')
+  expect((await settingsLoaded).status()).toBe(200)
+})
+
+test('should not allow user to edit settings', async ({ page }) => {
   await expect(page.getByRole('link', { name: 'Settings' })).not.toBeAttached()
   await page.goto('/settings')
   await expect(page.locator('body')).toHaveText(
@@ -16,7 +23,6 @@ test('should not allow user to edit settings', async ({ page }) => {
 })
 
 test('should not allow user to view documents', async ({ page }) => {
-  await page.goto('/dashboard')
   await expect(
     page.locator('nav').getByRole('link', { name: 'Documents' })
   ).not.toBeAttached()
@@ -31,7 +37,6 @@ test('should not allow user to view documents', async ({ page }) => {
 })
 
 test('should not allow user to view correspondents', async ({ page }) => {
-  await page.goto('/dashboard')
   await expect(
     page.getByRole('link', { name: 'Attributes' })
   ).not.toBeAttached()
@@ -42,7 +47,6 @@ test('should not allow user to view correspondents', async ({ page }) => {
 })
 
 test('should not allow user to view tags', async ({ page }) => {
-  await page.goto('/dashboard')
   await expect(
     page.getByRole('link', { name: 'Attributes' })
   ).not.toBeAttached()
@@ -53,7 +57,6 @@ test('should not allow user to view tags', async ({ page }) => {
 })
 
 test('should not allow user to view document types', async ({ page }) => {
-  await page.goto('/dashboard')
   await expect(
     page.getByRole('link', { name: 'Attributes' })
   ).not.toBeAttached()
@@ -64,7 +67,6 @@ test('should not allow user to view document types', async ({ page }) => {
 })
 
 test('should not allow user to view storage paths', async ({ page }) => {
-  await page.goto('/dashboard')
   await expect(
     page.getByRole('link', { name: 'Attributes' })
   ).not.toBeAttached()
@@ -75,7 +77,6 @@ test('should not allow user to view storage paths', async ({ page }) => {
 })
 
 test('should not allow user to view logs', async ({ page }) => {
-  await page.goto('/dashboard')
   await expect(page.getByRole('link', { name: 'Logs' })).not.toBeAttached()
   await page.goto('/logs')
   await expect(page.locator('body')).toHaveText(
@@ -84,7 +85,6 @@ test('should not allow user to view logs', async ({ page }) => {
 })
 
 test('should not allow user to view tasks', async ({ page }) => {
-  await page.goto('/dashboard')
   await expect(page.getByRole('link', { name: 'Tasks' })).not.toBeAttached()
   await page.goto('/tasks')
   await expect(page.locator('body')).toHaveText(

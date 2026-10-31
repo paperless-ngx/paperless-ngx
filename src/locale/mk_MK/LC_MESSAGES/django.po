@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-19 15:40+0000\n"
-"PO-Revision-Date: 2026-10-19 15:42\n"
+"POT-Creation-Date: 2026-10-31 04:47+0000\n"
+"PO-Revision-Date: 2026-10-31 04:49\n"
 "Last-Translator: \n"
 "Language-Team: Macedonian\n"
 "Language: mk_MK\n"
@@ -19,2709 +19,2714 @@ msgstr ""
 
 #: documents/apps.py:8
 msgid "Documents"
-msgstr ""
+msgstr "Документи"
 
-#: documents/filters.py:464
-msgid "Value must be valid JSON."
-msgstr ""
-
-#: documents/filters.py:483
-msgid "Invalid custom field query expression"
-msgstr ""
-
-#: documents/filters.py:493
-msgid "Invalid expression list. Must be nonempty."
-msgstr ""
+#: documents/filters.py:336
+msgid "Expected a date or a relative date such as \"today\" or \"in 30 days\"."
+msgstr "Очекуван е датум или релативен датум како „денес“ или „за 30 дена“."
 
 #: documents/filters.py:514
+msgid "Value must be valid JSON."
+msgstr "Вредноста мора да биде валиден JSON."
+
+#: documents/filters.py:535
+msgid "Invalid custom field query expression"
+msgstr "Невалиден израз за пребарување на сопствено поле"
+
+#: documents/filters.py:545
+msgid "Invalid expression list. Must be nonempty."
+msgstr "Невалидна листа на изрази. Не смее да биде празна."
+
+#: documents/filters.py:566
 msgid "Invalid logical operator {op!r}"
-msgstr ""
+msgstr "Невалиден логички оператор {op!r}"
 
-#: documents/filters.py:528
+#: documents/filters.py:580
 msgid "Maximum number of query conditions exceeded."
-msgstr ""
+msgstr "Надминат е максималниот број на услови за пребарување."
 
-#: documents/filters.py:592
+#: documents/filters.py:644
 msgid "{name!r} is not a valid custom field."
-msgstr ""
+msgstr "{name!r} не е валидно сопствено поле."
 
-#: documents/filters.py:629
+#: documents/filters.py:681
 msgid "{data_type} does not support query expr {expr!r}."
-msgstr ""
+msgstr "{data_type} не поддржува израз за пребарување {expr!r}."
 
-#: documents/filters.py:748 documents/models.py:137
+#: documents/filters.py:802 documents/models.py:137
 msgid "Maximum nesting depth exceeded."
-msgstr ""
+msgstr "Надмината е максималната длабочина на вгнездување."
 
-#: documents/filters.py:1125
+#: documents/filters.py:1179
 msgid "Custom field not found"
-msgstr ""
+msgstr "Сопственото поле не е пронајдено"
 
 #: documents/models.py:40 documents/models.py:1122 documents/models.py:1170
 msgid "owner"
-msgstr ""
+msgstr "сопственик"
 
 #: documents/models.py:57 documents/models.py:1468
 msgid "None"
-msgstr ""
+msgstr "Ништо"
 
 #: documents/models.py:58 documents/models.py:1469
 msgid "Any word"
-msgstr ""
+msgstr "Било кој збор"
 
 #: documents/models.py:59 documents/models.py:1470
 msgid "All words"
-msgstr ""
+msgstr "Сите зборови"
 
 #: documents/models.py:60 documents/models.py:1471
 msgid "Exact match"
-msgstr ""
+msgstr "Точно совпаѓање"
 
 #: documents/models.py:61 documents/models.py:1472
 msgid "Regular expression"
-msgstr ""
+msgstr "Регуларен израз"
 
 #: documents/models.py:62 documents/models.py:1473
 msgid "Fuzzy word"
-msgstr ""
+msgstr "Приближен збор"
 
 #: documents/models.py:63
 msgid "Automatic"
-msgstr ""
+msgstr "Автоматски"
 
 #: documents/models.py:66 documents/models.py:654 documents/models.py:2094
 #: paperless_mail/models.py:23 paperless_mail/models.py:143
 msgid "name"
-msgstr ""
+msgstr "име"
 
 #: documents/models.py:68 documents/models.py:1537
 msgid "match"
-msgstr ""
+msgstr "совпаѓање"
 
 #: documents/models.py:71 documents/models.py:1540
 msgid "matching algorithm"
-msgstr ""
+msgstr "алгоритам за совпаѓање"
 
 #: documents/models.py:76 documents/models.py:1545
 msgid "is insensitive"
-msgstr ""
+msgstr "не разликува големи и мали букви"
 
 #: documents/models.py:99 documents/models.py:169
 msgid "correspondent"
-msgstr ""
+msgstr "кореспондент"
 
 #: documents/models.py:100
 msgid "correspondents"
-msgstr ""
+msgstr "кореспонденти"
 
 #: documents/models.py:104
 msgid "color"
-msgstr ""
+msgstr "боја"
 
 #: documents/models.py:109
 msgid "is inbox tag"
-msgstr ""
+msgstr "е ознака за влезно сандаче"
 
 #: documents/models.py:112
 msgid "Marks this tag as an inbox tag: All newly consumed documents will be tagged with inbox tags."
-msgstr ""
+msgstr "Означува дека оваа ознака е ознака за влезно сандаче: Сите нововнесени документи ќе бидат означени со ознаки за влезно сандаче."
 
 #: documents/models.py:118
 msgid "tag"
-msgstr ""
+msgstr "ознака"
 
 #: documents/models.py:119 documents/models.py:216
 msgid "tags"
-msgstr ""
+msgstr "ознаки"
 
 #: documents/models.py:125
 msgid "Cannot set itself as parent."
-msgstr ""
+msgstr "Не може да се постави себеси како родител."
 
 #: documents/models.py:127
 msgid "Cannot set parent to a descendant."
-msgstr ""
+msgstr "Не може да се постави потомок како родител."
 
 #: documents/models.py:144 documents/models.py:189
 msgid "document type"
-msgstr ""
+msgstr "вид на документ"
 
 #: documents/models.py:145
 msgid "document types"
-msgstr ""
+msgstr "видови на документи"
 
 #: documents/models.py:150
 msgid "path"
-msgstr ""
+msgstr "патека"
 
 #: documents/models.py:154 documents/models.py:178
 msgid "storage path"
-msgstr ""
+msgstr "складишна патека"
 
 #: documents/models.py:155
 msgid "storage paths"
-msgstr ""
+msgstr "складишни патеки"
 
 #: documents/models.py:181
 msgid "title"
-msgstr ""
+msgstr "наслов"
 
 #: documents/models.py:193 documents/models.py:955
 msgid "content"
-msgstr ""
+msgstr "содржина"
 
 #: documents/models.py:196
 msgid "The raw, text-only data of the document. This field is primarily used for searching."
-msgstr ""
+msgstr "Изворните текстуални податоци на документот. Ова поле првенствено се користи за пребарување."
 
 #: documents/models.py:210
 msgid "mime type"
-msgstr ""
+msgstr "MIME тип"
 
 #: documents/models.py:220
 msgid "checksum"
-msgstr ""
+msgstr "контролна сума"
 
 #: documents/models.py:224
 msgid "The checksum of the original document."
-msgstr ""
+msgstr "Контролната сума на оригиналниот документ."
 
 #: documents/models.py:228
 msgid "archive checksum"
-msgstr ""
+msgstr "контролна сума на архивата"
 
 #: documents/models.py:234
 msgid "The checksum of the archived document."
-msgstr ""
+msgstr "Контролната сума на архивираниот документ."
 
 #: documents/models.py:238
 msgid "page count"
-msgstr ""
+msgstr "број на страници"
 
 #: documents/models.py:245
 msgid "The number of pages of the document."
-msgstr ""
+msgstr "Бројот на страници на документот."
 
 #: documents/models.py:250 documents/models.py:961 documents/models.py:1080
 #: documents/models.py:1142 documents/models.py:1270 documents/models.py:1329
 msgid "created"
-msgstr ""
+msgstr "создадено"
 
 #: documents/models.py:256
 msgid "modified"
-msgstr ""
+msgstr "изменето"
 
 #: documents/models.py:263
 msgid "added"
-msgstr ""
+msgstr "додадено"
 
 #: documents/models.py:270
 msgid "filename"
-msgstr ""
+msgstr "име на датотека"
 
 #: documents/models.py:276
 msgid "Current filename in storage"
-msgstr ""
+msgstr "Тековно име на датотеката во складиштето"
 
 #: documents/models.py:280
 msgid "archive filename"
-msgstr ""
+msgstr "име на архивската датотека"
 
 #: documents/models.py:286
 msgid "Current archive filename in storage"
-msgstr ""
+msgstr "Тековно име на архивската датотека во складиштето"
 
 #: documents/models.py:290
 msgid "original filename"
-msgstr ""
+msgstr "оригинално име на датотека"
 
 #: documents/models.py:296
 msgid "The original name of the file when it was uploaded"
-msgstr ""
+msgstr "Оригиналното име на датотеката при прикачувањето"
 
 #: documents/models.py:303
 msgid "archive serial number"
-msgstr ""
+msgstr "архивски сериски број"
 
 #: documents/models.py:313
 msgid "The position of this document in your physical document archive."
-msgstr ""
+msgstr "Позицијата на овој документ во вашата физичка архива на документи."
 
 #: documents/models.py:323
 msgid "root document for this version"
-msgstr ""
+msgstr "коренски документ за оваа верзија"
 
 #: documents/models.py:327
 msgid "version index"
-msgstr ""
+msgstr "индекс на верзијата"
 
 #: documents/models.py:331
 msgid "Index of this version within the root document."
-msgstr ""
+msgstr "Индекс на оваа верзија во коренскиот документ."
 
 #: documents/models.py:335
 msgid "version label"
-msgstr ""
+msgstr "етикета на верзијата"
 
 #: documents/models.py:339
 msgid "Optional short label for a document version."
-msgstr ""
+msgstr "Изборна кратка етикета на верзијата на документот."
 
 #: documents/models.py:344 documents/models.py:972 documents/models.py:1003
 #: documents/models.py:1107 documents/models.py:2137
 msgid "document"
-msgstr ""
+msgstr "документ"
 
 #: documents/models.py:345 documents/models.py:1213
 msgid "documents"
-msgstr ""
+msgstr "документи"
 
 #: documents/models.py:573 documents/models.py:1076
 msgid "Archive"
-msgstr ""
+msgstr "Архива"
 
 #: documents/models.py:574
 msgid "Bank"
-msgstr ""
+msgstr "Банка"
 
 #: documents/models.py:575
 msgid "Basket"
-msgstr ""
+msgstr "Кошница"
 
 #: documents/models.py:576
 msgid "Bell"
-msgstr ""
+msgstr "Звонче"
 
 #: documents/models.py:577
 msgid "Bookmark"
-msgstr ""
+msgstr "Обележувач"
 
 #: documents/models.py:578
 msgid "Boxes"
-msgstr ""
+msgstr "Кутии"
 
 #: documents/models.py:579
 msgid "Briefcase"
-msgstr ""
+msgstr "Актовка"
 
 #: documents/models.py:580
 msgid "Building"
-msgstr ""
+msgstr "Зграда"
 
 #: documents/models.py:581
 msgid "Calculator"
-msgstr ""
+msgstr "Калкулатор"
 
 #: documents/models.py:582
 msgid "Calendar"
-msgstr ""
+msgstr "Календар"
 
 #: documents/models.py:583
 msgid "Camera"
-msgstr ""
+msgstr "Камера"
 
 #: documents/models.py:584
 msgid "Checklist"
-msgstr ""
+msgstr "Контролна листа"
 
 #: documents/models.py:585
 msgid "Cash"
-msgstr ""
+msgstr "Готовина"
 
 #: documents/models.py:586
 msgid "Chat"
-msgstr ""
+msgstr "Разговор"
 
 #: documents/models.py:587
 msgid "Check"
-msgstr ""
+msgstr "Проверка"
 
 #: documents/models.py:588
 msgid "Clipboard"
-msgstr ""
+msgstr "Табла со исечоци"
 
 #: documents/models.py:589
 msgid "Clock"
-msgstr ""
+msgstr "Часовник"
 
 #: documents/models.py:590
 msgid "Credit card"
-msgstr ""
+msgstr "Кредитна картичка"
 
 #: documents/models.py:591
 msgid "Download"
-msgstr ""
+msgstr "Преземи"
 
 #: documents/models.py:592
 msgid "Envelope"
-msgstr ""
+msgstr "Плик"
 
 #: documents/models.py:593
 msgid "Warning"
-msgstr ""
+msgstr "Предупредување"
 
 #: documents/models.py:594
 msgid "File"
-msgstr ""
+msgstr "Датотека"
 
 #: documents/models.py:595
 msgid "Checked file"
-msgstr ""
+msgstr "Проверена датотека"
 
 #: documents/models.py:596
 msgid "Locked file"
-msgstr ""
+msgstr "Заклучена датотека"
 
 #: documents/models.py:597
 msgid "Medical file"
-msgstr ""
+msgstr "Медицинска датотека"
 
 #: documents/models.py:598
 msgid "Person file"
-msgstr ""
+msgstr "Лична датотека"
 
 #: documents/models.py:601
 msgid "Spreadsheet"
-msgstr ""
+msgstr "Табеларна пресметка"
 
 #: documents/models.py:603
 msgid "Text file"
-msgstr ""
+msgstr "Текстуална датотека"
 
 #: documents/models.py:604
 msgid "Files"
-msgstr ""
+msgstr "Датотеки"
 
 #: documents/models.py:605
 msgid "Folder"
-msgstr ""
+msgstr "Папка"
 
 #: documents/models.py:606 paperless_mail/admin.py:58
 msgid "Filter"
-msgstr ""
+msgstr "Филтер"
 
 #: documents/models.py:607
 msgid "Gear"
-msgstr ""
+msgstr "Запчаник"
 
 #: documents/models.py:608
 msgid "Globe"
-msgstr ""
+msgstr "Глобус"
 
 #: documents/models.py:609
 msgid "Hash"
-msgstr ""
+msgstr "Хеш"
 
 #: documents/models.py:610
 msgid "Heart"
-msgstr ""
+msgstr "Срце"
 
 #: documents/models.py:611
 msgid "House"
-msgstr ""
+msgstr "Куќа"
 
 #: documents/models.py:612
 msgid "Inbox"
-msgstr ""
+msgstr "Влезно сандаче"
 
 #: documents/models.py:613
 msgid "Journals"
-msgstr ""
+msgstr "Дневници"
 
 #: documents/models.py:614
 msgid "Task list"
-msgstr ""
+msgstr "Листа на задачи"
 
 #: documents/models.py:615
 msgid "Newspaper"
-msgstr ""
+msgstr "Весник"
 
 #: documents/models.py:616
 msgid "Attachment"
-msgstr ""
+msgstr "Прилог"
 
 #: documents/models.py:617
 msgid "People"
-msgstr ""
+msgstr "Луѓе"
 
 #: documents/models.py:618
 msgid "Person"
-msgstr ""
+msgstr "Личност"
 
 #: documents/models.py:619
 msgid "Printer"
-msgstr ""
+msgstr "Печатач"
 
 #: documents/models.py:620
 msgid "Receipt"
-msgstr ""
+msgstr "Сметка"
 
 #: documents/models.py:621
 msgid "Safe"
-msgstr ""
+msgstr "Сеф"
 
 #: documents/models.py:622
 msgid "Search"
-msgstr ""
+msgstr "Пребарај"
 
 #: documents/models.py:623
 msgid "Send"
-msgstr ""
+msgstr "Прати"
 
 #: documents/models.py:624
 msgid "Shop"
-msgstr ""
+msgstr "Продавница"
 
 #: documents/models.py:625
 msgid "Stack"
-msgstr ""
+msgstr "Куп"
 
 #: documents/models.py:626
 msgid "Stars"
-msgstr ""
+msgstr "Звезди"
 
 #: documents/models.py:627
 msgid "Tag"
-msgstr ""
+msgstr "Ознака"
 
 #: documents/models.py:628 documents/models.py:643 documents/models.py:1815
 msgid "Tags"
-msgstr ""
+msgstr "Ознаки"
 
 #: documents/models.py:629
 msgid "Telephone"
-msgstr ""
+msgstr "Телефон"
 
 #: documents/models.py:630
 msgid "Truck"
-msgstr ""
+msgstr "Камион"
 
 #: documents/models.py:631
 msgid "Barcode"
-msgstr ""
+msgstr "Баркод"
 
 #: documents/models.py:632
 msgid "Wallet"
-msgstr ""
+msgstr "Паричник"
 
 #: documents/models.py:635
 msgid "Table"
-msgstr ""
+msgstr "Табела"
 
 #: documents/models.py:636
 msgid "Small Cards"
-msgstr ""
+msgstr "Мали картици"
 
 #: documents/models.py:637
 msgid "Large Cards"
-msgstr ""
+msgstr "Големи картици"
 
 #: documents/models.py:640 documents/models.py:1814
 msgid "Title"
-msgstr ""
+msgstr "Наслов"
 
 #: documents/models.py:641 documents/models.py:871 documents/models.py:1489
 msgid "Created"
-msgstr ""
+msgstr "Создадено"
 
 #: documents/models.py:642 documents/models.py:1488
 msgid "Added"
-msgstr ""
+msgstr "Додадено"
 
 #: documents/models.py:644 documents/models.py:1816
 msgid "Correspondent"
-msgstr ""
+msgstr "Кореспондент"
 
 #: documents/models.py:645
 msgid "Document Type"
-msgstr ""
+msgstr "Вид на документ"
 
 #: documents/models.py:646
 msgid "Storage Path"
-msgstr ""
+msgstr "Складишна патека"
 
 #: documents/models.py:647
 msgid "Note"
-msgstr ""
+msgstr "Белешка"
 
 #: documents/models.py:648
 msgid "Owner"
-msgstr ""
+msgstr "Сопственик"
 
 #: documents/models.py:649
 msgid "Shared"
-msgstr ""
+msgstr "Споделено"
 
 #: documents/models.py:650
 msgid "ASN"
-msgstr ""
+msgstr "ASN"
 
 #: documents/models.py:651
 msgid "Pages"
-msgstr ""
+msgstr "Страници"
 
 #: documents/models.py:657
 msgid "icon"
-msgstr ""
+msgstr "икона"
 
 #: documents/models.py:664
 msgid "sort field"
-msgstr ""
+msgstr "поле за подредување"
 
 #: documents/models.py:669
 msgid "sort reverse"
-msgstr ""
+msgstr "обратно подредување"
 
 #: documents/models.py:672
 msgid "View page size"
-msgstr ""
+msgstr "Број на ставки по страница во прегледот"
 
 #: documents/models.py:680
 msgid "View display mode"
-msgstr ""
+msgstr "Режим на прикажување на прегледот"
 
 #: documents/models.py:687
 msgid "Document display fields"
-msgstr ""
+msgstr "Полиња за прикажување на документот"
 
 #: documents/models.py:694 documents/models.py:760
 msgid "saved view"
-msgstr ""
+msgstr "зачуван преглед"
 
 #: documents/models.py:695
 msgid "saved views"
-msgstr ""
+msgstr "зачувани прегледи"
 
 #: documents/models.py:703
 msgid "title contains"
-msgstr ""
+msgstr "насловот содржи"
 
 #: documents/models.py:704
 msgid "content contains"
-msgstr ""
+msgstr "содржината содржи"
 
 #: documents/models.py:705
 msgid "ASN is"
-msgstr ""
+msgstr "ASN е"
 
 #: documents/models.py:706
 msgid "correspondent is"
-msgstr ""
+msgstr "кореспондентот е"
 
 #: documents/models.py:707
 msgid "document type is"
-msgstr ""
+msgstr "видот на документ е"
 
 #: documents/models.py:708
 msgid "is in inbox"
-msgstr ""
+msgstr "е во влезното сандаче"
 
 #: documents/models.py:709
 msgid "has tag"
-msgstr ""
+msgstr "има ознака"
 
 #: documents/models.py:710
 msgid "has any tag"
-msgstr ""
+msgstr "има било каква ознака"
 
 #: documents/models.py:711
 msgid "created before"
-msgstr ""
+msgstr "создадено пред"
 
 #: documents/models.py:712
 msgid "created after"
-msgstr ""
+msgstr "создадено по"
 
 #: documents/models.py:713
 msgid "created year is"
-msgstr ""
+msgstr "годината на создавање е"
 
 #: documents/models.py:714
 msgid "created month is"
-msgstr ""
+msgstr "месецот на создавање е"
 
 #: documents/models.py:715
 msgid "created day is"
-msgstr ""
+msgstr "денот на создавање е"
 
 #: documents/models.py:716
 msgid "added before"
-msgstr ""
+msgstr "додадено пред"
 
 #: documents/models.py:717
 msgid "added after"
-msgstr ""
+msgstr "додадено по"
 
 #: documents/models.py:718
 msgid "modified before"
-msgstr ""
+msgstr "изменето пред"
 
 #: documents/models.py:719
 msgid "modified after"
-msgstr ""
+msgstr "изменето по"
 
 #: documents/models.py:720
 msgid "does not have tag"
-msgstr ""
+msgstr "нема ознака"
 
 #: documents/models.py:721
 msgid "does not have ASN"
-msgstr ""
+msgstr "нема ASN"
 
 #: documents/models.py:722
 msgid "title or content contains"
-msgstr ""
+msgstr "насловот или содржината содржи"
 
 #: documents/models.py:723
 msgid "fulltext query"
-msgstr ""
+msgstr "пребарување по цел текст"
 
 #: documents/models.py:724
 msgid "more like this"
-msgstr ""
+msgstr "слично на ова"
 
 #: documents/models.py:725
 msgid "has tags in"
-msgstr ""
+msgstr "има ознаки во"
 
 #: documents/models.py:726
 msgid "ASN greater than"
-msgstr ""
+msgstr "ASN поголем од"
 
 #: documents/models.py:727
 msgid "ASN less than"
-msgstr ""
+msgstr "ASN помал од"
 
 #: documents/models.py:728
 msgid "storage path is"
-msgstr ""
+msgstr "складишната патека е"
 
 #: documents/models.py:729
 msgid "has correspondent in"
-msgstr ""
+msgstr "има кореспондент во"
 
 #: documents/models.py:730
 msgid "does not have correspondent in"
-msgstr ""
+msgstr "нема кореспондент во"
 
 #: documents/models.py:731
 msgid "has document type in"
-msgstr ""
+msgstr "има вид на документ во"
 
 #: documents/models.py:732
 msgid "does not have document type in"
-msgstr ""
+msgstr "нема вид на документ во"
 
 #: documents/models.py:733
 msgid "has storage path in"
-msgstr ""
+msgstr "има складишна патека во"
 
 #: documents/models.py:734
 msgid "does not have storage path in"
-msgstr ""
+msgstr "нема складишна патека во"
 
 #: documents/models.py:735
 msgid "owner is"
-msgstr ""
+msgstr "сопственикот е"
 
 #: documents/models.py:736
 msgid "has owner in"
-msgstr ""
+msgstr "има сопственик во"
 
 #: documents/models.py:737
 msgid "does not have owner"
-msgstr ""
+msgstr "нема сопственик"
 
 #: documents/models.py:738
 msgid "does not have owner in"
-msgstr ""
+msgstr "нема сопственик во"
 
 #: documents/models.py:739
 msgid "has custom field value"
-msgstr ""
+msgstr "има вредност на сопствено поле"
 
 #: documents/models.py:740
 msgid "is shared by me"
-msgstr ""
+msgstr "е споделено од мене"
 
 #: documents/models.py:741
 msgid "has custom fields"
-msgstr ""
+msgstr "има сопствени полиња"
 
 #: documents/models.py:742
 msgid "has custom field in"
-msgstr ""
+msgstr "има сопствено поле во"
 
 #: documents/models.py:743
 msgid "does not have custom field in"
-msgstr ""
+msgstr "нема сопствено поле во"
 
 #: documents/models.py:744
 msgid "does not have custom field"
-msgstr ""
+msgstr "нема сопствено поле"
 
 #: documents/models.py:745
 msgid "custom fields query"
-msgstr ""
+msgstr "пребарување по сопствени полиња"
 
 #: documents/models.py:746
 msgid "created to"
-msgstr ""
+msgstr "создадено до"
 
 #: documents/models.py:747
 msgid "created from"
-msgstr ""
+msgstr "создадено од"
 
 #: documents/models.py:748
 msgid "added to"
-msgstr ""
+msgstr "додадено до"
 
 #: documents/models.py:749
 msgid "added from"
-msgstr ""
+msgstr "додадено од"
 
 #: documents/models.py:750
 msgid "mime type is"
-msgstr ""
+msgstr "MIME типот е"
 
 #: documents/models.py:751
 msgid "simple title search"
-msgstr ""
+msgstr "едноставно пребарување по наслов"
 
 #: documents/models.py:752
 msgid "simple text search"
-msgstr ""
+msgstr "едноставно пребарување по текст"
 
 #: documents/models.py:753
 msgid "has duplicates"
-msgstr ""
+msgstr "има дупликати"
 
 #: documents/models.py:763
 msgid "rule type"
-msgstr ""
+msgstr "вид на правило"
 
 #: documents/models.py:765 documents/models.py:1011
 msgid "value"
-msgstr ""
+msgstr "вредност"
 
 #: documents/models.py:768
 msgid "filter rule"
-msgstr ""
+msgstr "правило за филтрирање"
 
 #: documents/models.py:769
 msgid "filter rules"
-msgstr ""
+msgstr "правила за филтрирање"
 
 #: documents/models.py:799 documents/models.py:1136
 msgid "Pending"
-msgstr ""
+msgstr "Во чекање"
 
 #: documents/models.py:800 documents/models.py:878
 msgid "Started"
-msgstr ""
+msgstr "Започнато"
 
 #: documents/models.py:801
 msgid "Success"
-msgstr ""
+msgstr "Успешно"
 
 #: documents/models.py:802
 msgid "Failure"
-msgstr ""
+msgstr "Неуспешно"
 
 #: documents/models.py:803
 msgid "Revoked"
-msgstr ""
+msgstr "Отповикано"
 
 #: documents/models.py:806
 msgid "Consume File"
-msgstr ""
+msgstr "Внесување датотека"
 
 #: documents/models.py:807
 msgid "Train Classifier"
-msgstr ""
+msgstr "Обука на класификатор"
 
 #: documents/models.py:808
 msgid "Sanity Check"
-msgstr ""
+msgstr "Проверка на исправност"
 
 #: documents/models.py:809
 msgid "Index Optimize"
-msgstr ""
+msgstr "Оптимизација на индексот"
 
 #: documents/models.py:810 documents/models.py:1484
 msgid "Mail Fetch"
-msgstr ""
+msgstr "Преземање пошта"
 
 #: documents/models.py:811
 msgid "LLM Index"
-msgstr ""
+msgstr "LLM индекс"
 
 #: documents/models.py:812
 msgid "Empty Trash"
-msgstr ""
+msgstr "Празнење на канта"
 
 #: documents/models.py:813
 msgid "Check Workflows"
-msgstr ""
+msgstr "Проверка на работни текови"
 
 #: documents/models.py:814
 msgid "Bulk Update"
-msgstr ""
+msgstr "Масовно ажурирање"
 
 #: documents/models.py:815
 msgid "Reprocess Document"
-msgstr ""
+msgstr "Повторна обработка на документ"
 
 #: documents/models.py:816
 msgid "Build Share Link"
-msgstr ""
+msgstr "Создавање врска за споделување"
 
 #: documents/models.py:817
 msgid "Bulk Delete"
-msgstr ""
+msgstr "Масовно бришење"
 
 #: documents/models.py:818
 msgid "Apply AI Suggestions"
-msgstr ""
+msgstr "Примена на AI предлози"
 
 #: documents/models.py:827 documents/models.py:1479
 msgid "Scheduled"
-msgstr ""
+msgstr "Закажано"
 
 #: documents/models.py:828 documents/models.py:1485
 msgid "Web UI"
-msgstr ""
+msgstr "Веб интерфејс"
 
 #: documents/models.py:829
 msgid "API Upload"
-msgstr ""
+msgstr "Прикачување преку API"
 
 #: documents/models.py:830
 msgid "Folder Consume"
-msgstr ""
+msgstr "Внесување од папка"
 
 #: documents/models.py:831
 msgid "Email Consume"
-msgstr ""
+msgstr "Внесување од е-пошта"
 
 #: documents/models.py:832
 msgid "System"
-msgstr ""
+msgstr "Систем"
 
 #: documents/models.py:833
 msgid "Manual"
-msgstr ""
+msgstr "Рачно"
 
 #: documents/models.py:839
 msgid "Task ID"
-msgstr ""
+msgstr "ID на задача"
 
 #: documents/models.py:840
 msgid "Celery task ID"
-msgstr ""
+msgstr "ID на Celery задача"
 
 #: documents/models.py:846
 msgid "Task Type"
-msgstr ""
+msgstr "Вид на задача"
 
 #: documents/models.py:847
 msgid "The kind of work being performed"
-msgstr ""
+msgstr "Видот на работа што се извршува"
 
 #: documents/models.py:854
 msgid "Trigger Source"
-msgstr ""
+msgstr "Извор на активирање"
 
 #: documents/models.py:855
 msgid "What initiated this task"
-msgstr ""
+msgstr "Што ја започна оваа задача"
 
 #: documents/models.py:864
 msgid "Status"
-msgstr ""
+msgstr "Состојба"
 
 #: documents/models.py:884
 msgid "Completed"
-msgstr ""
+msgstr "Завршено"
 
 #: documents/models.py:892
 msgid "Duration (seconds)"
-msgstr ""
+msgstr "Траење (секунди)"
 
 #: documents/models.py:893
 msgid "Elapsed time from start to completion"
-msgstr ""
+msgstr "Изминато време од почеток до завршување"
 
 #: documents/models.py:899
 msgid "Wait Time (seconds)"
-msgstr ""
+msgstr "Време на чекање (секунди)"
 
 #: documents/models.py:900
 msgid "Time from task creation to worker pickup"
-msgstr ""
+msgstr "Време од создавањето на задачата до нејзиното преземање од работникот"
 
 #: documents/models.py:907
 msgid "Input Data"
-msgstr ""
+msgstr "Влезни податоци"
 
 #: documents/models.py:908
 msgid "Structured input parameters for the task"
-msgstr ""
+msgstr "Структурирани влезни параметри за задачата"
 
 #: documents/models.py:914
 msgid "Result Data"
-msgstr ""
+msgstr "Резултатни податоци"
 
 #: documents/models.py:915
 msgid "Structured result data from task execution"
-msgstr ""
+msgstr "Структурирани резултатни податоци од извршувањето на задачата"
 
 #: documents/models.py:921
 msgid "Acknowledged"
-msgstr ""
+msgstr "Потврдено"
 
 #: documents/models.py:926
 msgid "Task"
-msgstr ""
+msgstr "Задача"
 
 #: documents/models.py:927
 msgid "Tasks"
-msgstr ""
+msgstr "Задачи"
 
 #: documents/models.py:957
 msgid "Note for the document"
-msgstr ""
+msgstr "Белешка за документот"
 
 #: documents/models.py:981
 msgid "user"
-msgstr ""
+msgstr "корисник"
 
 #: documents/models.py:986
 msgid "note"
-msgstr ""
+msgstr "белешка"
 
 #: documents/models.py:987
 msgid "notes"
-msgstr ""
+msgstr "белешки"
 
 #: documents/models.py:1007
 msgid "page"
-msgstr ""
+msgstr "страница"
 
 #: documents/models.py:1008
 msgid "Page of the original file, starting at 1"
-msgstr ""
+msgstr "Страница од оригиналната датотека, почнувајќи од 1"
 
 #: documents/models.py:1063
 msgid "format"
-msgstr ""
+msgstr "формат"
 
 #: documents/models.py:1067
 msgid "document barcode"
-msgstr ""
+msgstr "баркод на документот"
 
 #: documents/models.py:1068
 msgid "document barcodes"
-msgstr ""
+msgstr "баркодови на документи"
 
 #: documents/models.py:1077
 msgid "Original"
-msgstr ""
+msgstr "Оригинал"
 
 #: documents/models.py:1088 documents/models.py:1150
 #: paperless_mail/models.py:75
 msgid "expiration"
-msgstr ""
+msgstr "истекување"
 
 #: documents/models.py:1095 documents/models.py:1157
 msgid "slug"
-msgstr ""
+msgstr "слаг"
 
 #: documents/models.py:1127
 msgid "share link"
-msgstr ""
+msgstr "врска за споделување"
 
 #: documents/models.py:1128
 msgid "share links"
-msgstr ""
+msgstr "врски за споделување"
 
 #: documents/models.py:1137
 msgid "Processing"
-msgstr ""
+msgstr "Се обработува"
 
 #: documents/models.py:1138
 msgid "Ready"
-msgstr ""
+msgstr "Готово"
 
 #: documents/models.py:1139
 msgid "Failed"
-msgstr ""
+msgstr "Неуспешно"
 
 #: documents/models.py:1186
 msgid "size (bytes)"
-msgstr ""
+msgstr "големина (бајти)"
 
 #: documents/models.py:1192
 msgid "last error"
-msgstr ""
+msgstr "последна грешка"
 
 #: documents/models.py:1199
 msgid "file path"
-msgstr ""
+msgstr "патека на датотека"
 
 #: documents/models.py:1205
 msgid "built at"
-msgstr ""
+msgstr "создадено на"
 
 #: documents/models.py:1218
 msgid "share link bundle"
-msgstr ""
+msgstr "пакет врски за споделување"
 
 #: documents/models.py:1219
 msgid "share link bundles"
-msgstr ""
+msgstr "пакети врски за споделување"
 
 #: documents/models.py:1222
 #, python-format
 msgid "Share link bundle %(slug)s"
-msgstr ""
+msgstr "Пакет врски за споделување %(slug)s"
 
 #: documents/models.py:1258
 msgid "String"
-msgstr ""
+msgstr "Текст"
 
 #: documents/models.py:1259
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 #: documents/models.py:1260
 msgid "Date"
-msgstr ""
+msgstr "Датум"
 
 #: documents/models.py:1261
 msgid "Boolean"
-msgstr ""
+msgstr "Булова вредност"
 
 #: documents/models.py:1262
 msgid "Integer"
-msgstr ""
+msgstr "Цел број"
 
 #: documents/models.py:1263
 msgid "Float"
-msgstr ""
+msgstr "Децимален број"
 
 #: documents/models.py:1264
 msgid "Monetary"
-msgstr ""
+msgstr "Парична вредност"
 
 #: documents/models.py:1265
 msgid "Document Link"
-msgstr ""
+msgstr "Врска до документ"
 
 #: documents/models.py:1266
 msgid "Select"
-msgstr ""
+msgstr "Избор"
 
 #: documents/models.py:1267
 msgid "Long Text"
-msgstr ""
+msgstr "Долг текст"
 
 #: documents/models.py:1279
 msgid "data type"
-msgstr ""
+msgstr "тип на податоци"
 
 #: documents/models.py:1286
 msgid "extra data"
-msgstr ""
+msgstr "дополнителни податоци"
 
 #: documents/models.py:1290
 msgid "Extra data for the custom field, such as select options"
-msgstr ""
+msgstr "Дополнителни податоци за сопственото поле, како што се опциите за избор"
 
 #: documents/models.py:1296
 msgid "custom field"
-msgstr ""
+msgstr "сопствено поле"
 
 #: documents/models.py:1297
 msgid "custom fields"
-msgstr ""
+msgstr "сопствени полиња"
 
 #: documents/models.py:1397
 msgid "custom field instance"
-msgstr ""
+msgstr "инстанца на сопствено поле"
 
 #: documents/models.py:1398
 msgid "custom field instances"
-msgstr ""
+msgstr "инстанци на сопствени полиња"
 
 #: documents/models.py:1476
 msgid "Consumption Started"
-msgstr ""
+msgstr "Започнато внесување"
 
 #: documents/models.py:1477
 msgid "Document Added"
-msgstr ""
+msgstr "Документот е додаден"
 
 #: documents/models.py:1478
 msgid "Document Updated"
-msgstr ""
+msgstr "Документот е ажуриран"
 
 #: documents/models.py:1482
 msgid "Consume Folder"
-msgstr ""
+msgstr "Папка за внесување"
 
 #: documents/models.py:1483
 msgid "Api Upload"
-msgstr ""
+msgstr "Прикачување преку API"
 
 #: documents/models.py:1490
 msgid "Modified"
-msgstr ""
+msgstr "Изменето"
 
 #: documents/models.py:1491
 msgid "Custom Field"
-msgstr ""
+msgstr "Сопствено поле"
 
 #: documents/models.py:1494
 msgid "Workflow Trigger Type"
-msgstr ""
+msgstr "Вид на активатор на работен тек"
 
 #: documents/models.py:1506
 msgid "filter path"
-msgstr ""
+msgstr "филтрирај по патека"
 
 #: documents/models.py:1511
 msgid "Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
-msgstr ""
+msgstr "Внесувај само документи чиишто патека се совпаѓа со ова, ако е наведено. Дозволени се џокер-знаци наведени како *. Не прави разлика меѓу големи и мали букви."
 
 #: documents/models.py:1518
 msgid "filter filename"
-msgstr ""
+msgstr "филтрирај по име на датотека"
 
 #: documents/models.py:1523 paperless_mail/models.py:200
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
-msgstr ""
+msgstr "Внесувај само документи чие име на датотека во целост се совпаѓа со ова, ако е наведено. Дозволени се џокер-знаци како *.pdf или *invoice*. Не прави разлика меѓу големи и мали букви."
 
 #: documents/models.py:1534
 msgid "filter documents from this mail rule"
-msgstr ""
+msgstr "филтрирај документи од ова правило за пошта"
 
 #: documents/models.py:1550
 msgid "has these tag(s)"
-msgstr ""
+msgstr "има овие ознаки"
 
 #: documents/models.py:1557
 msgid "has all of these tag(s)"
-msgstr ""
+msgstr "има сите од овие ознаки"
 
 #: documents/models.py:1564
 msgid "does not have these tag(s)"
-msgstr ""
+msgstr "нема овие ознаки"
 
 #: documents/models.py:1572
 msgid "has this document type"
-msgstr ""
+msgstr "има овој вид на документ"
 
 #: documents/models.py:1579
 msgid "has one of these document types"
-msgstr ""
+msgstr "има еден од овие видови на документи"
 
 #: documents/models.py:1586
 msgid "does not have these document type(s)"
-msgstr ""
+msgstr "нема овие видови на документи"
 
 #: documents/models.py:1594
 msgid "has this correspondent"
-msgstr ""
+msgstr "има овој кореспондент"
 
 #: documents/models.py:1601
 msgid "does not have these correspondent(s)"
-msgstr ""
+msgstr "нема овие кореспонденти"
 
 #: documents/models.py:1608
 msgid "has one of these correspondents"
-msgstr ""
+msgstr "има еден од овие кореспонденти"
 
 #: documents/models.py:1616
 msgid "has this storage path"
-msgstr ""
+msgstr "има оваа складишна патека"
 
 #: documents/models.py:1623
 msgid "has one of these storage paths"
-msgstr ""
+msgstr "има една од овие складишни патеки"
 
 #: documents/models.py:1630
 msgid "does not have these storage path(s)"
-msgstr ""
+msgstr "нема овие складишни патеки"
 
 #: documents/models.py:1634
 msgid "filter custom field query"
-msgstr ""
+msgstr "филтрирај по пребарување на сопствени полиња"
 
 #: documents/models.py:1637
 msgid "JSON-encoded custom field query expression."
-msgstr ""
+msgstr "Израз за пребарување на сопствени полиња кодиран во JSON."
 
 #: documents/models.py:1641
 msgid "schedule offset days"
-msgstr ""
+msgstr "поместување на распоредот во денови"
 
 #: documents/models.py:1644
 msgid "The number of days to offset the schedule trigger by."
-msgstr ""
+msgstr "Бројот на денови за поместување на активаторот на распоредот."
 
 #: documents/models.py:1649
 msgid "schedule is recurring"
-msgstr ""
+msgstr "распоредот се повторува"
 
 #: documents/models.py:1652
 msgid "If the schedule should be recurring."
-msgstr ""
+msgstr "Дали распоредот треба да се повторува."
 
 #: documents/models.py:1657
 msgid "schedule recurring delay in days"
-msgstr ""
+msgstr "пауза меѓу повторувањата на распоредот во денови"
 
 #: documents/models.py:1661
 msgid "The number of days between recurring schedule triggers."
-msgstr ""
+msgstr "Бројот на денови меѓу повторувачките активатори на распоредот."
 
 #: documents/models.py:1666
 msgid "schedule date field"
-msgstr ""
+msgstr "поле за датум на распоредот"
 
 #: documents/models.py:1671
 msgid "The field to check for a schedule trigger."
-msgstr ""
+msgstr "Полето што се проверува за активатор на распоред."
 
 #: documents/models.py:1680
 msgid "schedule date custom field"
-msgstr ""
+msgstr "сопствено поле за датум на распоредот"
 
 #: documents/models.py:1684
 msgid "workflow trigger"
-msgstr ""
+msgstr "активатор на работен тек"
 
 #: documents/models.py:1685
 msgid "workflow triggers"
-msgstr ""
+msgstr "активатори на работен тек"
 
 #: documents/models.py:1693
 msgid "email subject"
-msgstr ""
+msgstr "тема на е-поштата"
 
 #: documents/models.py:1697
 msgid "The subject of the email, can include some placeholders, see documentation."
-msgstr ""
+msgstr "Темата на е-поштата, може да содржи некои променливи, видете документација."
 
 #: documents/models.py:1703
 msgid "email body"
-msgstr ""
+msgstr "содржина на е-поштата"
 
 #: documents/models.py:1706
 msgid "The body (message) of the email, can include some placeholders, see documentation."
-msgstr ""
+msgstr "Содржината (пораката) на е-поштата, може да содржи некои променливи, видете документација."
 
 #: documents/models.py:1712
 msgid "emails to"
-msgstr ""
+msgstr "примачи на е-пошта"
 
 #: documents/models.py:1715
 msgid "The destination email addresses, comma separated."
-msgstr ""
+msgstr "Адресите на е-пошта на примачите, одделени со запирка."
 
 #: documents/models.py:1721
 msgid "include document in email"
-msgstr ""
+msgstr "вклучи го документот во е-поштата"
 
 #: documents/models.py:1732
 msgid "webhook url"
-msgstr ""
+msgstr "URL на webhook"
 
 #: documents/models.py:1735
 msgid "The destination URL for the notification."
-msgstr ""
+msgstr "Целниот URL за известувањето."
 
 #: documents/models.py:1740
 msgid "use parameters"
-msgstr ""
+msgstr "користи параметри"
 
 #: documents/models.py:1745
 msgid "send as JSON"
-msgstr ""
+msgstr "прати како JSON"
 
 #: documents/models.py:1749
 msgid "webhook parameters"
-msgstr ""
+msgstr "параметри на webhook"
 
 #: documents/models.py:1752
 msgid "The parameters to send with the webhook URL if body not used."
-msgstr ""
+msgstr "Параметрите што се праќаат со URL-то на webhook ако не се користи содржина."
 
 #: documents/models.py:1756
 msgid "webhook body"
-msgstr ""
+msgstr "содржина на webhook"
 
 #: documents/models.py:1759
 msgid "The body to send with the webhook URL if parameters not used."
-msgstr ""
+msgstr "Содржината што се праќа со URL-то на webhook ако не се користат параметри."
 
 #: documents/models.py:1763
 msgid "webhook headers"
-msgstr ""
+msgstr "заглавја на webhook"
 
 #: documents/models.py:1766
 msgid "The headers to send with the webhook URL."
-msgstr ""
+msgstr "Заглавјата што се праќаат со URL-то на webhook."
 
 #: documents/models.py:1771
 msgid "include document in webhook"
-msgstr ""
+msgstr "вклучи го документот во webhook"
 
 #: documents/models.py:1782
 msgid "Assignment"
-msgstr ""
+msgstr "Доделување"
 
 #: documents/models.py:1786
 msgid "Removal"
-msgstr ""
+msgstr "Отстранување"
 
 #: documents/models.py:1790 documents/templates/account/password_reset.html:15
 msgid "Email"
-msgstr ""
+msgstr "Е-пошта"
 
 #: documents/models.py:1794
 msgid "Webhook"
-msgstr ""
+msgstr "Webhook"
 
 #: documents/models.py:1798
 msgid "Password removal"
-msgstr ""
+msgstr "Отстранување на лозинка"
 
 #: documents/models.py:1802
 msgid "Move to trash"
-msgstr ""
+msgstr "Премести во канта"
 
 #: documents/models.py:1806
 msgid "Remote OCR"
-msgstr ""
+msgstr "Оддалечен OCR"
 
 #: documents/models.py:1810
 msgid "Apply AI suggestions"
-msgstr ""
+msgstr "Примена на AI предлози"
 
 #: documents/models.py:1817
 msgid "Document type"
-msgstr ""
+msgstr "Вид на документ"
 
 #: documents/models.py:1818
 msgid "Storage path"
-msgstr ""
+msgstr "Складишна патека"
 
 #: documents/models.py:1819
 msgid "Created date"
-msgstr ""
+msgstr "Датум на создавање"
 
 #: documents/models.py:1822
 msgid "Workflow Action Type"
-msgstr ""
+msgstr "Вид на акција на работен тек"
 
 #: documents/models.py:1827 documents/models.py:2096
 #: paperless_mail/models.py:145
 msgid "order"
-msgstr ""
+msgstr "редослед"
 
 #: documents/models.py:1830
 msgid "assign title"
-msgstr ""
+msgstr "додели наслов"
 
 #: documents/models.py:1834
 msgid "Assign a document title, must  be a Jinja2 template, see documentation."
-msgstr ""
+msgstr "Додели наслов на документот, мора да биде Jinja2 шаблон, видете документација."
 
 #: documents/models.py:1842 paperless_mail/models.py:274
 msgid "assign this tag"
-msgstr ""
+msgstr "додели ја оваа ознака"
 
 #: documents/models.py:1851 paperless_mail/models.py:282
 msgid "assign this document type"
-msgstr ""
+msgstr "додели го овој вид на документ"
 
 #: documents/models.py:1860 paperless_mail/models.py:296
 msgid "assign this correspondent"
-msgstr ""
+msgstr "додели го овој кореспондент"
 
 #: documents/models.py:1869
 msgid "assign this storage path"
-msgstr ""
+msgstr "додели ја оваа складишна патека"
 
 #: documents/models.py:1878
 msgid "assign this owner"
-msgstr ""
+msgstr "додели го овој сопственик"
 
 #: documents/models.py:1885
 msgid "grant view permissions to these users"
-msgstr ""
+msgstr "додели дозволи за преглед на овие корисници"
 
 #: documents/models.py:1892
 msgid "grant view permissions to these groups"
-msgstr ""
+msgstr "додели дозволи за преглед на овие групи"
 
 #: documents/models.py:1899
 msgid "grant change permissions to these users"
-msgstr ""
+msgstr "додели дозволи за промена на овие корисници"
 
 #: documents/models.py:1906
 msgid "grant change permissions to these groups"
-msgstr ""
+msgstr "додели дозволи за промена на овие групи"
 
 #: documents/models.py:1913
 msgid "assign these custom fields"
-msgstr ""
+msgstr "додели овие сопствени полиња"
 
 #: documents/models.py:1917
 msgid "custom field values"
-msgstr ""
+msgstr "вредности на сопствени полиња"
 
 #: documents/models.py:1921
 msgid "Optional values to assign to the custom fields."
-msgstr ""
+msgstr "Изборни вредности за доделување на сопствените полиња."
 
 #: documents/models.py:1930
 msgid "remove these tag(s)"
-msgstr ""
+msgstr "отстрани ги овие ознаки"
 
 #: documents/models.py:1935
 msgid "remove all tags"
-msgstr ""
+msgstr "отстрани ги сите ознаки"
 
 #: documents/models.py:1942
 msgid "remove these document type(s)"
-msgstr ""
+msgstr "отстрани ги овие видови на документи"
 
 #: documents/models.py:1947
 msgid "remove all document types"
-msgstr ""
+msgstr "отстрани ги сите видови на документи"
 
 #: documents/models.py:1954
 msgid "remove these correspondent(s)"
-msgstr ""
+msgstr "отстрани ги овие кореспонденти"
 
 #: documents/models.py:1959
 msgid "remove all correspondents"
-msgstr ""
+msgstr "отстрани ги сите кореспонденти"
 
 #: documents/models.py:1966
 msgid "remove these storage path(s)"
-msgstr ""
+msgstr "отстрани ги овие складишни патеки"
 
 #: documents/models.py:1971
 msgid "remove all storage paths"
-msgstr ""
+msgstr "отстрани ги сите складишни патеки"
 
 #: documents/models.py:1978
 msgid "remove these owner(s)"
-msgstr ""
+msgstr "отстрани ги овие сопственици"
 
 #: documents/models.py:1983
 msgid "remove all owners"
-msgstr ""
+msgstr "отстрани ги сите сопственици"
 
 #: documents/models.py:1990
 msgid "remove view permissions for these users"
-msgstr ""
+msgstr "отстрани дозволи за преглед за овие корисници"
 
 #: documents/models.py:1997
 msgid "remove view permissions for these groups"
-msgstr ""
+msgstr "отстрани дозволи за преглед за овие групи"
 
 #: documents/models.py:2004
 msgid "remove change permissions for these users"
-msgstr ""
+msgstr "отстрани дозволи за промена за овие корисници"
 
 #: documents/models.py:2011
 msgid "remove change permissions for these groups"
-msgstr ""
+msgstr "отстрани дозволи за промена за овие групи"
 
 #: documents/models.py:2016
 msgid "remove all permissions"
-msgstr ""
+msgstr "отстрани ги сите дозволи"
 
 #: documents/models.py:2023
 msgid "remove these custom fields"
-msgstr ""
+msgstr "отстрани ги овие сопствени полиња"
 
 #: documents/models.py:2028
 msgid "remove all custom fields"
-msgstr ""
+msgstr "отстрани ги сите сопствени полиња"
 
 #: documents/models.py:2037
 msgid "email"
-msgstr ""
+msgstr "е-пошта"
 
 #: documents/models.py:2046
 msgid "webhook"
-msgstr ""
+msgstr "webhook"
 
 #: documents/models.py:2050
 msgid "passwords"
-msgstr ""
+msgstr "лозинки"
 
 #: documents/models.py:2054
 msgid "Passwords to try when removing PDF protection. Separate with commas or new lines."
-msgstr ""
+msgstr "Лозинки што ќе се пробаат при отстранување на PDF заштитата. Одделете ги со запирки или нови редови."
 
 #: documents/models.py:2059
 msgid "AI suggestion fields"
-msgstr ""
+msgstr "Полиња за AI предлози"
 
 #: documents/models.py:2063
 msgid "Which of the AI-suggested fields to apply to the document."
-msgstr ""
+msgstr "Кои од полињата предложени од AI да се применат на документот."
 
 #: documents/models.py:2068
 msgid "create missing objects"
-msgstr ""
+msgstr "создавај објекти што недостасуваат"
 
 #: documents/models.py:2071
 msgid "Create suggested tags, correspondents, document types and storage paths that do not already exist instead of skipping them."
-msgstr ""
+msgstr "Создавај предложени ознаки, кореспонденти, видови на документи и складишни патеки што сè уште не постојат, наместо да ги прескокнеш."
 
 #: documents/models.py:2077
 msgid "overwrite existing values"
-msgstr ""
+msgstr "презапишувај постојни вредности"
 
 #: documents/models.py:2080
 msgid "Apply suggestions even if the document already has a value for that field. Tags are always added to, never replaced."
-msgstr ""
+msgstr "Примени предлози дури и ако документот веќе има вредност за тоа поле. Ознаките секогаш се додаваат, никогаш не се заменуваат."
 
 #: documents/models.py:2086
 msgid "workflow action"
-msgstr ""
+msgstr "акција на работен тек"
 
 #: documents/models.py:2087
 msgid "workflow actions"
-msgstr ""
+msgstr "акции на работен тек"
 
 #: documents/models.py:2102
 msgid "triggers"
-msgstr ""
+msgstr "активатори"
 
 #: documents/models.py:2109
 msgid "actions"
-msgstr ""
+msgstr "акции"
 
 #: documents/models.py:2112 paperless_mail/models.py:154
 msgid "enabled"
-msgstr ""
+msgstr "овозможено"
 
 #: documents/models.py:2123
 msgid "workflow"
-msgstr ""
+msgstr "работен тек"
 
 #: documents/models.py:2127
 msgid "workflow trigger type"
-msgstr ""
+msgstr "вид на активатор на работен тек"
 
 #: documents/models.py:2141
 msgid "date run"
-msgstr ""
+msgstr "датум на извршување"
 
 #: documents/models.py:2147
 msgid "workflow run"
-msgstr ""
+msgstr "извршување на работен тек"
 
 #: documents/models.py:2148
 msgid "workflow runs"
-msgstr ""
+msgstr "извршувања на работен тек"
 
-#: documents/serialisers.py:515 documents/serialisers.py:872
-#: documents/serialisers.py:2902 documents/views.py:363 documents/views.py:2768
+#: documents/serialisers.py:483 documents/serialisers.py:840
+#: documents/serialisers.py:2872 documents/views.py:348 documents/views.py:2731
 #: paperless_mail/serialisers.py:156
 msgid "Insufficient permissions."
-msgstr ""
+msgstr "Недоволни дозволи."
 
-#: documents/serialisers.py:708
+#: documents/serialisers.py:676
 msgid "Invalid color."
-msgstr ""
+msgstr "Невалидна боја."
 
-#: documents/serialisers.py:2369
+#: documents/serialisers.py:2339
 #, python-format
 msgid "File type %(type)s not supported"
-msgstr ""
+msgstr "Типот на датотека %(type)s не е поддржан"
 
-#: documents/serialisers.py:2413
+#: documents/serialisers.py:2383
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
-msgstr ""
+msgstr "ID-то на сопственото поле мора да биде цел број: %(id)s"
 
-#: documents/serialisers.py:2420
+#: documents/serialisers.py:2390
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
-msgstr ""
+msgstr "Сопствено поле со ID %(id)s не постои"
 
-#: documents/serialisers.py:2437 documents/serialisers.py:2447
+#: documents/serialisers.py:2407 documents/serialisers.py:2417
 msgid "Custom fields must be a list of integers or an object mapping ids to values."
-msgstr ""
+msgstr "Сопствените полиња мора да бидат листа од цели броеви или објект што ги мапира идентификаторите на вредности."
 
-#: documents/serialisers.py:2442
+#: documents/serialisers.py:2412
 msgid "Some custom fields don't exist or were specified twice."
-msgstr ""
+msgstr "Некои сопствени полиња не постојат или се наведени двапати."
 
-#: documents/serialisers.py:2589
+#: documents/serialisers.py:2559
 msgid "Invalid variable detected."
-msgstr ""
+msgstr "Детектирана е невалидна променлива."
 
-#: documents/serialisers.py:2958
+#: documents/serialisers.py:2928
 msgid "Duplicate document identifiers are not allowed."
-msgstr ""
+msgstr "Не се дозволени дупликат идентификатори на документи."
 
-#: documents/serialisers.py:2988 documents/views.py:4816
+#: documents/serialisers.py:2958 documents/views.py:4781
 #, python-format
 msgid "Documents not found: %(ids)s"
-msgstr ""
+msgstr "Документите не се пронајдени: %(ids)s"
 
 #: documents/templates/account/account_inactive.html:5
 msgid "Paperless-ngx account inactive"
-msgstr ""
+msgstr "Paperless-ngx неактивна сметка"
 
 #: documents/templates/account/account_inactive.html:9
 msgid "Account inactive."
-msgstr ""
+msgstr "Сметката е неактивна."
 
 #: documents/templates/account/account_inactive.html:14
 msgid "This account is inactive."
-msgstr ""
+msgstr "Оваа сметка е неактивна."
 
 #: documents/templates/account/account_inactive.html:16
 msgid "Return to login"
-msgstr ""
+msgstr "Врати се на најавата"
 
 #: documents/templates/account/email/base_message.txt:1
 #, python-format
 msgid "Hello from %(site_name)s!"
-msgstr ""
+msgstr "Здраво од %(site_name)s!"
 
 #: documents/templates/account/email/base_message.txt:5
 #, python-format
 msgid "Thank you for using %(site_name)s!\n"
 "%(site_domain)s"
-msgstr ""
+msgstr "Ви благодариме што користите %(site_name)s!\n"
+"%(site_domain)s"
 
 #: documents/templates/account/login.html:5
 msgid "Paperless-ngx sign in"
-msgstr ""
+msgstr "Paperless-ngx најава"
 
 #: documents/templates/account/login.html:10
 msgid "Please sign in."
-msgstr ""
+msgstr "Најавете се, ве молиме."
 
 #: documents/templates/account/login.html:12
 msgid "Don't have an account yet?"
-msgstr ""
+msgstr "Уште немате сметка?"
 
 #: documents/templates/account/login.html:12
 #: documents/templates/account/signup.html:43
 #: documents/templates/socialaccount/signup.html:29
 msgid "Sign up"
-msgstr ""
+msgstr "Регистрирај се"
 
 #: documents/templates/account/login.html:25
 #: documents/templates/account/signup.html:22
 #: documents/templates/socialaccount/signup.html:15
 msgid "Username"
-msgstr ""
+msgstr "Корисничко име"
 
 #: documents/templates/account/login.html:26
 #: documents/templates/account/signup.html:24
 msgid "Password"
-msgstr ""
+msgstr "Лозинка"
 
 #: documents/templates/account/login.html:36
 #: documents/templates/account/signup.html:11
 #: documents/templates/mfa/authenticate.html:23
 msgid "Sign in"
-msgstr ""
+msgstr "Најави се"
 
 #: documents/templates/account/login.html:40
 msgid "Forgot your password?"
-msgstr ""
+msgstr "Ја заборавивте лозинката?"
 
 #: documents/templates/account/login.html:51
 #: documents/templates/account/signup.html:57
 msgid "or sign in via"
-msgstr ""
+msgstr "или најавете се преку"
 
 #: documents/templates/account/password_reset.html:5
 msgid "Paperless-ngx reset password request"
-msgstr ""
+msgstr "Paperless-ngx барање за ресетирање на лозинка"
 
 #: documents/templates/account/password_reset.html:9
 msgid "Enter your email address below, and we'll email instructions for setting a new one."
-msgstr ""
+msgstr "Внесете ја вашата адреса на е-пошта подолу и ќе ви пратиме инструкции за поставување нова лозинка по е-пошта."
 
 #: documents/templates/account/password_reset.html:12
 msgid "An error occurred. Please try again."
-msgstr ""
+msgstr "Се појави грешка. Обидете се повторно."
 
 #: documents/templates/account/password_reset.html:21
 msgid "Send me instructions!"
-msgstr ""
+msgstr "Пратете ми инструкции!"
 
 #: documents/templates/account/password_reset_done.html:5
 msgid "Paperless-ngx reset password sent"
-msgstr ""
+msgstr "Paperless-ngx пратени инструкции за ресетирање на лозинка"
 
 #: documents/templates/account/password_reset_done.html:9
 msgid "Check your inbox."
-msgstr ""
+msgstr "Проверете го вашето влезно сандаче."
 
 #: documents/templates/account/password_reset_done.html:13
 msgid "We've emailed you instructions for setting your password. You should receive the email shortly!"
-msgstr ""
+msgstr "Ви пративме инструкции по е-пошта за поставување на вашата лозинка. Треба да ја добиете е-поштата наскоро!"
 
 #: documents/templates/account/password_reset_from_key.html:5
 msgid "Paperless-ngx reset password confirmation"
-msgstr ""
+msgstr "Paperless-ngx потврда за ресетирање на лозинка"
 
 #: documents/templates/account/password_reset_from_key.html:9
 msgid "Set a new password."
-msgstr ""
+msgstr "Поставете нова лозинка."
 
 #: documents/templates/account/password_reset_from_key.html:15
 msgid "request a new password reset"
-msgstr ""
+msgstr "побарајте ново ресетирање на лозинка"
 
 #: documents/templates/account/password_reset_from_key.html:17
 msgid "New Password"
-msgstr ""
+msgstr "Нова лозинка"
 
 #: documents/templates/account/password_reset_from_key.html:18
 msgid "Confirm Password"
-msgstr ""
+msgstr "Потврди лозинка"
 
 #: documents/templates/account/password_reset_from_key.html:28
 msgid "Change my password"
-msgstr ""
+msgstr "Промени ја мојата лозинка"
 
 #: documents/templates/account/password_reset_from_key_done.html:5
 msgid "Paperless-ngx reset password complete"
-msgstr ""
+msgstr "Paperless-ngx ресетирањето на лозинката е завршено"
 
 #: documents/templates/account/password_reset_from_key_done.html:9
 msgid "Password reset complete."
-msgstr ""
+msgstr "Ресетирањето на лозинката е завршено."
 
 #: documents/templates/account/password_reset_from_key_done.html:14
 msgid "Your new password has been set. You can now"
-msgstr ""
+msgstr "Вашата нова лозинка е поставена. Сега можете да"
 
 #: documents/templates/account/password_reset_from_key_done.html:14
 msgid "log in"
-msgstr ""
+msgstr "се најавите"
 
 #: documents/templates/account/signup.html:5
 msgid "Paperless-ngx sign up"
-msgstr ""
+msgstr "Paperless-ngx регистрација"
 
 #: documents/templates/account/signup.html:11
 msgid "Already have an account?"
-msgstr ""
+msgstr "Веќе имате сметка?"
 
 #: documents/templates/account/signup.html:19
 msgid "Note: This is the first user account for this installation and will be granted superuser privileges."
-msgstr ""
+msgstr "Забелешка: Ова е првата корисничка сметка за оваа инсталација и ќе добие привилегии на суперкорисник."
 
 #: documents/templates/account/signup.html:23
 #: documents/templates/socialaccount/signup.html:16
 msgid "Email (optional)"
-msgstr ""
+msgstr "Е-пошта (изборно)"
 
 #: documents/templates/account/signup.html:25
 msgid "Password (again)"
-msgstr ""
+msgstr "Лозинка (повторно)"
 
 #: documents/templates/index.html:61
 msgid "Paperless-ngx is loading..."
-msgstr ""
+msgstr "Paperless-ngx се вчитува..."
 
 #: documents/templates/index.html:62
 msgid "Still here?! Hmm, something might be wrong."
-msgstr ""
+msgstr "Уште сте тука?! Хм, можеби нешто не е во ред."
 
 #: documents/templates/index.html:62
 msgid "Here's a link to the docs."
-msgstr ""
+msgstr "Еве врска до документацијата."
 
 #: documents/templates/mfa/authenticate.html:7
 msgid "Paperless-ngx Two-Factor Authentication"
-msgstr ""
+msgstr "Paperless-ngx двофакторска автентикација"
 
 #: documents/templates/mfa/authenticate.html:12
 msgid "Your account is protected by two-factor authentication. Please enter an authenticator code:"
-msgstr ""
+msgstr "Вашата сметка е заштитена со двофакторска автентикација. Внесете код од автентикаторот, ве молиме:"
 
 #: documents/templates/mfa/authenticate.html:17
 msgid "Code"
-msgstr ""
+msgstr "Код"
 
 #: documents/templates/mfa/authenticate.html:24
 msgid "Cancel"
-msgstr ""
+msgstr "Откажи"
 
 #: documents/templates/paperless-ngx/base.html:58
 msgid "Share link was not found."
-msgstr ""
+msgstr "Врската за споделување не е пронајдена."
 
 #: documents/templates/paperless-ngx/base.html:62
 msgid "Share link has expired."
-msgstr ""
+msgstr "Врската за споделување е истечена."
 
 #: documents/templates/socialaccount/authentication_error.html:5
 #: documents/templates/socialaccount/login.html:5
 msgid "Paperless-ngx social account sign in"
-msgstr ""
+msgstr "Paperless-ngx најава со социјална сметка"
 
 #: documents/templates/socialaccount/authentication_error.html:10
 msgid "An error occurred while attempting to login via your social network account. Back to the"
-msgstr ""
+msgstr "Се појави грешка при обидот да се најавите преку вашата сметка на социјална мрежа. Назад до"
 
 #: documents/templates/socialaccount/authentication_error.html:10
 msgid "login page"
-msgstr ""
+msgstr "страницата за најава"
 
 #: documents/templates/socialaccount/login.html:11
 #, python-format
 msgid "You are about to connect a new third-party account from %(provider)s."
-msgstr ""
+msgstr "На пат сте да поврзете нова сметка од трета страна од %(provider)s."
 
 #: documents/templates/socialaccount/login.html:15
 msgid "Continue"
-msgstr ""
+msgstr "Продолжи"
 
 #: documents/templates/socialaccount/signup.html:5
 msgid "Paperless-ngx social account sign up"
-msgstr ""
+msgstr "Paperless-ngx регистрација со социјална сметка"
 
 #: documents/templates/socialaccount/signup.html:11
 #, python-format
 msgid "You are about to use your %(provider_name)s account to login."
-msgstr ""
+msgstr "На пат сте да се најавите со вашата сметка кај %(provider_name)s."
 
 #: documents/templates/socialaccount/signup.html:13
 msgid "As a final step, please complete the following form:"
-msgstr ""
+msgstr "Како последен чекор, пополнете го следниов формулар, ве молиме:"
 
 #: documents/validators.py:36
 msgid ", "
-msgstr ""
+msgstr ", "
 
-#: documents/views.py:318
+#: documents/views.py:303
 msgid "Specify only one of text, title_search, query, or more_like_id."
-msgstr ""
+msgstr "Наведете само едно од text, title_search, query или more_like_id."
 
-#: documents/views.py:356 documents/views.py:2765
+#: documents/views.py:341 documents/views.py:2728
 msgid "Invalid more_like_id"
-msgstr ""
+msgstr "Невалиден more_like_id"
 
-#: documents/views.py:1703
+#: documents/views.py:1652
 msgid "Invalid AI configuration."
-msgstr ""
+msgstr "Невалидна AI конфигурација."
 
-#: documents/views.py:1714
+#: documents/views.py:1663
 msgid "AI backend request timed out."
-msgstr ""
+msgstr "Барањето до AI backend-от истече."
 
-#: documents/views.py:1726
+#: documents/views.py:1675
 msgid "AI backend rejected the request. Check logs for details."
-msgstr ""
+msgstr "AI backend-от го одби барањето. Проверете ги дневниците за детали."
 
-#: documents/views.py:4832
+#: documents/views.py:4797
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
-msgstr ""
+msgstr "Недоволни дозволи за споделување на документот %(id)s."
 
-#: documents/views.py:4879
+#: documents/views.py:4844
 msgid "Bundle is already being processed."
-msgstr ""
+msgstr "Пакетот веќе се обработува."
 
-#: documents/views.py:4945
+#: documents/views.py:4910
 msgid "The share link bundle is still being prepared. Please try again later."
-msgstr ""
+msgstr "Пакетот врски за споделување сè уште се подготвува. Обидете се повторно подоцна."
 
-#: documents/views.py:4959
+#: documents/views.py:4924
 msgid "The share link bundle is unavailable."
-msgstr ""
+msgstr "Пакетот врски за споделување не е достапен."
 
 #: paperless/apps.py:11
 msgid "Paperless"
-msgstr ""
+msgstr "Paperless"
 
 #: paperless/models.py:26
 msgid "pdf"
-msgstr ""
+msgstr "pdf"
 
 #: paperless/models.py:27
 msgid "pdfa"
-msgstr ""
+msgstr "pdfa"
 
 #: paperless/models.py:28
 msgid "pdfa-1"
-msgstr ""
+msgstr "pdfa-1"
 
 #: paperless/models.py:29
 msgid "pdfa-2"
-msgstr ""
+msgstr "pdfa-2"
 
 #: paperless/models.py:30
 msgid "pdfa-3"
-msgstr ""
+msgstr "pdfa-3"
 
 #: paperless/models.py:39 paperless/models.py:50
 msgid "auto"
-msgstr ""
+msgstr "auto"
 
 #: paperless/models.py:40
 msgid "force"
-msgstr ""
+msgstr "force"
 
 #: paperless/models.py:41
 msgid "redo"
-msgstr ""
+msgstr "redo"
 
 #: paperless/models.py:42
 msgid "off"
-msgstr ""
+msgstr "off"
 
 #: paperless/models.py:51
 msgid "always"
-msgstr ""
+msgstr "always"
 
 #: paperless/models.py:52
 msgid "never"
-msgstr ""
+msgstr "never"
 
 #: paperless/models.py:60
 msgid "clean"
-msgstr ""
+msgstr "clean"
 
 #: paperless/models.py:61
 msgid "clean-final"
-msgstr ""
+msgstr "clean-final"
 
 #: paperless/models.py:62
 msgid "none"
-msgstr ""
+msgstr "none"
 
 #: paperless/models.py:70
 msgid "LeaveColorUnchanged"
-msgstr ""
+msgstr "LeaveColorUnchanged"
 
 #: paperless/models.py:71
 msgid "RGB"
-msgstr ""
+msgstr "RGB"
 
 #: paperless/models.py:72
 msgid "UseDeviceIndependentColor"
-msgstr ""
+msgstr "UseDeviceIndependentColor"
 
 #: paperless/models.py:73
 msgid "Gray"
-msgstr ""
+msgstr "Gray"
 
 #: paperless/models.py:74
 msgid "CMYK"
-msgstr ""
+msgstr "CMYK"
 
 #: paperless/models.py:82
 msgid "Azure AI Document Intelligence"
-msgstr ""
+msgstr "Azure AI Document Intelligence"
 
 #: paperless/models.py:90
 msgid "All supported documents"
-msgstr ""
+msgstr "Сите поддржани документи"
 
 #: paperless/models.py:91
 msgid "Only when a workflow enables it"
-msgstr ""
+msgstr "Само кога работен тек го овозможува"
 
 #: paperless/models.py:95 paperless/models.py:105
 msgid "OpenAI-compatible"
-msgstr ""
+msgstr "Компатибилен со OpenAI"
 
 #: paperless/models.py:96
 msgid "Huggingface"
-msgstr ""
+msgstr "Huggingface"
 
 #: paperless/models.py:97 paperless/models.py:106
 msgid "Ollama"
-msgstr ""
+msgstr "Ollama"
 
 #: paperless/models.py:115
 msgid "Sets the output PDF type"
-msgstr ""
+msgstr "Ја поставува излезниот тип на PDF"
 
 #: paperless/models.py:127
 msgid "Do OCR from page 1 to this value"
-msgstr ""
+msgstr "Прави OCR од страница 1 до оваа вредност"
 
 #: paperless/models.py:133
 msgid "Do OCR using these languages"
-msgstr ""
+msgstr "Прави OCR со овие јазици"
 
 #: paperless/models.py:140
 msgid "Sets the OCR mode"
-msgstr ""
+msgstr "Го поставува OCR режимот"
 
 #: paperless/models.py:148
 msgid "Controls archive file generation"
-msgstr ""
+msgstr "Ја контролира генерирањето на архивската датотека"
 
 #: paperless/models.py:156
 msgid "Sets image DPI fallback value"
-msgstr ""
+msgstr "Ја поставува резервната вредност за DPI на слики"
 
 #: paperless/models.py:163
 msgid "Controls the unpaper cleaning"
-msgstr ""
+msgstr "Го контролира чистењето со unpaper"
 
 #: paperless/models.py:170
 msgid "Enables deskew"
-msgstr ""
+msgstr "Овозможува исправување на наклонетост"
 
 #: paperless/models.py:173
 msgid "Enables page rotation"
-msgstr ""
+msgstr "Овозможува ротација на страници"
 
 #: paperless/models.py:178
 msgid "Sets the threshold for rotation of pages"
-msgstr ""
+msgstr "Го поставува прагот за ротација на страници"
 
 #: paperless/models.py:184
 msgid "Sets the maximum image size for decompression"
-msgstr ""
+msgstr "Ја поставува максималната големина на сликата за декомпресија"
 
 #: paperless/models.py:190
 msgid "Sets the Ghostscript color conversion strategy"
-msgstr ""
+msgstr "Ја поставува стратегијата за конверзија на бои на Ghostscript"
 
 #: paperless/models.py:198
 msgid "Adds additional user arguments for OCRMyPDF"
-msgstr ""
+msgstr "Додава дополнителни кориснички аргументи за OCRMyPDF"
 
 #: paperless/models.py:207
 msgid "Application title"
-msgstr ""
+msgstr "Наслов на апликацијата"
 
 #: paperless/models.py:214
 msgid "Application logo"
-msgstr ""
+msgstr "Лого на апликацијата"
 
 #: paperless/models.py:229
 msgid "Enables barcode scanning"
-msgstr ""
+msgstr "Овозможува скенирање баркодови"
 
 #: paperless/models.py:235
 msgid "Enables barcode TIFF support"
-msgstr ""
+msgstr "Овозможува поддршка за TIFF баркодови"
 
 #: paperless/models.py:241
 msgid "Sets the barcode string"
-msgstr ""
+msgstr "Ја поставува низата за баркод"
 
 #: paperless/models.py:249
 msgid "Retains split pages"
-msgstr ""
+msgstr "Ги задржува разделените страници"
 
 #: paperless/models.py:255
 msgid "Enables ASN barcode"
-msgstr ""
+msgstr "Овозможува ASN баркод"
 
 #: paperless/models.py:261
 msgid "Sets the ASN barcode prefix"
-msgstr ""
+msgstr "Го поставува префиксот на ASN баркодот"
 
 #: paperless/models.py:269
 msgid "Sets the barcode upscale factor"
-msgstr ""
+msgstr "Го поставува факторот на зголемување на баркодот"
 
 #: paperless/models.py:276
 msgid "Sets the barcode DPI"
-msgstr ""
+msgstr "Го поставува DPI-то на баркодот"
 
 #: paperless/models.py:283
 msgid "Sets the maximum pages for barcode"
-msgstr ""
+msgstr "Го поставува максималниот број страници за баркод"
 
 #: paperless/models.py:290
 msgid "Enables tag barcode"
-msgstr ""
+msgstr "Овозможува баркод за ознаки"
 
 #: paperless/models.py:296
 msgid "Sets the tag barcode mapping"
-msgstr ""
+msgstr "Го поставува мапирањето на баркодовите за ознаки"
 
 #: paperless/models.py:302
 msgid "Enables splitting on tag barcodes"
-msgstr ""
+msgstr "Овозможува разделување по баркодови на ознаки"
 
 #: paperless/models.py:308
 msgid "Stores the values of detected barcodes"
-msgstr ""
+msgstr "Ги зачувува вредностите на детектираните баркодови"
 
 #: paperless/models.py:318
 msgid "Sets the remote OCR engine"
-msgstr ""
+msgstr "Го поставува оддалечениот OCR мотор"
 
 #: paperless/models.py:327
 msgid "Sets the remote OCR API key"
-msgstr ""
+msgstr "Го поставува API клучот за оддалечениот OCR"
 
 #: paperless/models.py:335
 msgid "Sets the remote OCR endpoint"
-msgstr ""
+msgstr "Го поставува крајната точка на оддалечениот OCR"
 
 #: paperless/models.py:343
 msgid "Sets which documents are sent to the remote OCR engine"
-msgstr ""
+msgstr "Поставува кои документи се праќаат до оддалечениот OCR мотор"
 
 #: paperless/models.py:355
 msgid "Enables AI features"
-msgstr ""
+msgstr "Овозможува AI функции"
 
 #: paperless/models.py:360
 msgid "Sets the LLM embedding backend"
-msgstr ""
+msgstr "Го поставува LLM embedding backend-от"
 
 #: paperless/models.py:368
 msgid "Sets the LLM embedding model"
-msgstr ""
+msgstr "Го поставува LLM embedding моделот"
 
 #: paperless/models.py:375
 msgid "Sets the LLM embedding API key"
-msgstr ""
+msgstr "Го поставува API клучот за LLM embedding"
 
 #: paperless/models.py:382
 msgid "Sets the LLM embedding endpoint, optional"
-msgstr ""
+msgstr "Го поставува LLM embedding endpoint-от, изборно"
 
 #: paperless/models.py:389
 msgid "Sets the LLM embedding chunk size"
-msgstr ""
+msgstr "Ја поставува големината на деловите за LLM embedding"
 
 #: paperless/models.py:395
 msgid "Sets the LLM context size"
-msgstr ""
+msgstr "Го поставува големината на LLM контекстот"
 
 #: paperless/models.py:401
 msgid "Sets the LLM backend"
-msgstr ""
+msgstr "Го поставува LLM backend-от"
 
 #: paperless/models.py:409
 msgid "Sets the LLM model"
-msgstr ""
+msgstr "Го поставува LLM моделот"
 
 #: paperless/models.py:416
 msgid "Sets the LLM API key"
-msgstr ""
+msgstr "Го поставува LLM API клучот"
 
 #: paperless/models.py:423
 msgid "Sets the LLM endpoint, optional"
-msgstr ""
+msgstr "Го поставува LLM endpoint-от, изборно"
 
 #: paperless/models.py:430
 msgid "Sets the LLM output language"
-msgstr ""
+msgstr "Го поставува излезниот јазик на LLM"
 
 #: paperless/models.py:437
 msgid "Sets the LLM timeout in seconds"
-msgstr ""
+msgstr "Го поставува времето на истек на LLM во секунди"
 
 #: paperless/models.py:443
 msgid "paperless application settings"
-msgstr ""
-
-#: paperless/settings/__init__.py:562
-msgid "English (US)"
-msgstr ""
-
-#: paperless/settings/__init__.py:563
-msgid "Arabic"
-msgstr ""
-
-#: paperless/settings/__init__.py:564
-msgid "Afrikaans"
-msgstr ""
-
-#: paperless/settings/__init__.py:565
-msgid "Belarusian"
-msgstr ""
+msgstr "paperless поставки на апликацијата"
 
 #: paperless/settings/__init__.py:566
-msgid "Bulgarian"
-msgstr ""
+msgid "English (US)"
+msgstr "Англиски (САД)"
 
 #: paperless/settings/__init__.py:567
-msgid "Catalan"
-msgstr ""
+msgid "Arabic"
+msgstr "Арапски"
 
 #: paperless/settings/__init__.py:568
-msgid "Czech"
-msgstr ""
+msgid "Afrikaans"
+msgstr "Африканс"
 
 #: paperless/settings/__init__.py:569
-msgid "Danish"
-msgstr ""
+msgid "Belarusian"
+msgstr "Белоруски"
 
 #: paperless/settings/__init__.py:570
-msgid "German"
-msgstr ""
+msgid "Bulgarian"
+msgstr "Бугарски"
 
 #: paperless/settings/__init__.py:571
-msgid "Greek"
-msgstr ""
+msgid "Catalan"
+msgstr "Каталонски"
 
 #: paperless/settings/__init__.py:572
-msgid "English (GB)"
-msgstr ""
+msgid "Czech"
+msgstr "Чешки"
 
 #: paperless/settings/__init__.py:573
-msgid "Spanish"
-msgstr ""
+msgid "Danish"
+msgstr "Дански"
 
 #: paperless/settings/__init__.py:574
-msgid "Persian"
-msgstr ""
+msgid "German"
+msgstr "Германски"
 
 #: paperless/settings/__init__.py:575
-msgid "Finnish"
-msgstr ""
+msgid "Greek"
+msgstr "Грчки"
 
 #: paperless/settings/__init__.py:576
-msgid "French"
-msgstr ""
+msgid "English (GB)"
+msgstr "Англиски (GB)"
 
 #: paperless/settings/__init__.py:577
-msgid "Hungarian"
-msgstr ""
+msgid "Spanish"
+msgstr "Шпански"
 
 #: paperless/settings/__init__.py:578
-msgid "Indonesian"
-msgstr ""
+msgid "Persian"
+msgstr "Персијски"
 
 #: paperless/settings/__init__.py:579
-msgid "Italian"
-msgstr ""
+msgid "Finnish"
+msgstr "Фински"
 
 #: paperless/settings/__init__.py:580
-msgid "Japanese"
-msgstr ""
+msgid "French"
+msgstr "Француски"
 
 #: paperless/settings/__init__.py:581
-msgid "Korean"
-msgstr ""
+msgid "Hungarian"
+msgstr "Унгарски"
 
 #: paperless/settings/__init__.py:582
-msgid "Luxembourgish"
-msgstr ""
+msgid "Indonesian"
+msgstr "Индонезиски"
 
 #: paperless/settings/__init__.py:583
-msgid "Norwegian"
-msgstr ""
+msgid "Italian"
+msgstr "Италијански"
 
 #: paperless/settings/__init__.py:584
-msgid "Dutch"
-msgstr ""
+msgid "Japanese"
+msgstr "Јапонски"
 
 #: paperless/settings/__init__.py:585
-msgid "Polish"
-msgstr ""
+msgid "Korean"
+msgstr "Корејски"
 
 #: paperless/settings/__init__.py:586
-msgid "Portuguese (Brazil)"
-msgstr ""
+msgid "Luxembourgish"
+msgstr "Луксембуршки"
 
 #: paperless/settings/__init__.py:587
-msgid "Portuguese"
-msgstr ""
+msgid "Norwegian"
+msgstr "Норвешки"
 
 #: paperless/settings/__init__.py:588
-msgid "Romanian"
-msgstr ""
+msgid "Dutch"
+msgstr "Холандски"
 
 #: paperless/settings/__init__.py:589
-msgid "Russian"
-msgstr ""
+msgid "Polish"
+msgstr "Полски"
 
 #: paperless/settings/__init__.py:590
-msgid "Slovak"
-msgstr ""
+msgid "Portuguese (Brazil)"
+msgstr "Португалски (Бразил)"
 
 #: paperless/settings/__init__.py:591
-msgid "Slovenian"
-msgstr ""
+msgid "Portuguese"
+msgstr "Португалски"
 
 #: paperless/settings/__init__.py:592
-msgid "Serbian"
-msgstr ""
+msgid "Romanian"
+msgstr "Романски"
 
 #: paperless/settings/__init__.py:593
-msgid "Swedish"
-msgstr ""
+msgid "Russian"
+msgstr "Руски"
 
 #: paperless/settings/__init__.py:594
-msgid "Turkish"
-msgstr ""
+msgid "Slovak"
+msgstr "Словачки"
 
 #: paperless/settings/__init__.py:595
-msgid "Ukrainian"
-msgstr ""
+msgid "Slovenian"
+msgstr "Словенечки"
 
 #: paperless/settings/__init__.py:596
-msgid "Vietnamese"
-msgstr ""
+msgid "Serbian"
+msgstr "Српски"
 
 #: paperless/settings/__init__.py:597
-msgid "Chinese Simplified"
-msgstr ""
+msgid "Swedish"
+msgstr "Шведски"
 
 #: paperless/settings/__init__.py:598
+msgid "Turkish"
+msgstr "Турски"
+
+#: paperless/settings/__init__.py:599
+msgid "Ukrainian"
+msgstr "Украински"
+
+#: paperless/settings/__init__.py:600
+msgid "Vietnamese"
+msgstr "Виетнамски"
+
+#: paperless/settings/__init__.py:601
+msgid "Chinese Simplified"
+msgstr "Кинески поедноставен"
+
+#: paperless/settings/__init__.py:602
 msgid "Chinese Traditional"
-msgstr ""
+msgstr "Кинески традиционален"
 
 #: paperless/urls.py:438
 msgid "Paperless-ngx administration"
-msgstr ""
+msgstr "Paperless-ngx администрација"
 
 #: paperless_mail/admin.py:39
 msgid "Authentication"
-msgstr ""
+msgstr "Автентикација"
 
 #: paperless_mail/admin.py:42
 msgid "Advanced settings"
-msgstr ""
+msgstr "Напредни поставки"
 
 #: paperless_mail/admin.py:61
 msgid "Paperless will only process mails that match ALL of the filters given below."
-msgstr ""
+msgstr "Paperless ќе обработува само пошта што се совпаѓа со СИТЕ филтри наведени подолу."
 
 #: paperless_mail/admin.py:78
 msgid "Actions"
-msgstr ""
+msgstr "Акции"
 
 #: paperless_mail/admin.py:81
 msgid "The action applied to the mail. This action is only performed when the mail body or attachments were consumed from the mail."
-msgstr ""
+msgstr "Акцијата што се применува на поштата. Оваа акција се извршува само кога содржината на поштата или прилозите биле внесени од поштата."
 
 #: paperless_mail/admin.py:89
 msgid "Metadata"
-msgstr ""
+msgstr "Метаподатоци"
 
 #: paperless_mail/admin.py:92
 msgid "Assign metadata to documents consumed from this rule automatically. If you do not assign tags, types or correspondents here, paperless will still process all matching rules that you have defined."
-msgstr ""
+msgstr "Автоматски доделувај метаподатоци на документите внесени од ова правило. Ако не доделите ознаки, видови или кореспонденти тука, paperless сè уште ќе ги обработи сите совпаѓачки правила што сте ги дефинирале."
 
 #: paperless_mail/apps.py:8
 msgid "Paperless mail"
-msgstr ""
+msgstr "Paperless пошта"
 
 #: paperless_mail/models.py:10
 msgid "mail account"
-msgstr ""
+msgstr "сметка за е-пошта"
 
 #: paperless_mail/models.py:11
 msgid "mail accounts"
-msgstr ""
+msgstr "сметки за е-пошта"
 
 #: paperless_mail/models.py:14
 msgid "No encryption"
-msgstr ""
+msgstr "Без шифрирање"
 
 #: paperless_mail/models.py:15
 msgid "Use SSL"
-msgstr ""
+msgstr "Користи SSL"
 
 #: paperless_mail/models.py:16
 msgid "Use STARTTLS"
-msgstr ""
+msgstr "Користи STARTTLS"
 
 #: paperless_mail/models.py:19
 msgid "IMAP"
-msgstr ""
+msgstr "IMAP"
 
 #: paperless_mail/models.py:20
 msgid "Gmail OAuth"
-msgstr ""
+msgstr "Gmail OAuth"
 
 #: paperless_mail/models.py:21
 msgid "Outlook OAuth"
-msgstr ""
+msgstr "Outlook OAuth"
 
 #: paperless_mail/models.py:25
 msgid "IMAP server"
-msgstr ""
+msgstr "IMAP сервер"
 
 #: paperless_mail/models.py:28
 msgid "IMAP port"
-msgstr ""
+msgstr "IMAP порта"
 
 #: paperless_mail/models.py:32
 msgid "This is usually 143 for unencrypted and STARTTLS connections, and 993 for SSL connections."
-msgstr ""
+msgstr "Ова обично е 143 за нешифрирани врски и врски со STARTTLS, а 993 за SSL врски."
 
 #: paperless_mail/models.py:38
 msgid "IMAP security"
-msgstr ""
+msgstr "IMAP безбедност"
 
 #: paperless_mail/models.py:43
 msgid "username"
-msgstr ""
+msgstr "корисничко име"
 
 #: paperless_mail/models.py:45
 msgid "password"
-msgstr ""
+msgstr "лозинка"
 
 #: paperless_mail/models.py:47
 msgid "Is token authentication"
-msgstr ""
+msgstr "Е автентикација со токен"
 
 #: paperless_mail/models.py:50
 msgid "character set"
-msgstr ""
+msgstr "множество знаци"
 
 #: paperless_mail/models.py:54
 msgid "The character set to use when communicating with the mail server, such as 'UTF-8' or 'US-ASCII'."
-msgstr ""
+msgstr "Множеството знаци за комуникација со поштенскиот сервер, како 'UTF-8' или 'US-ASCII'."
 
 #: paperless_mail/models.py:60
 msgid "account type"
-msgstr ""
+msgstr "вид на сметка"
 
 #: paperless_mail/models.py:66
 msgid "refresh token"
-msgstr ""
+msgstr "токен за обновување"
 
 #: paperless_mail/models.py:70
 msgid "The refresh token to use for token authentication e.g. with oauth2."
-msgstr ""
+msgstr "Токенот за обновување што се користи за автентикација со токен, на пр. со oauth2."
 
 #: paperless_mail/models.py:79
 msgid "The expiration date of the refresh token. "
-msgstr ""
+msgstr "Датумот на истекување на токенот за обновување. "
 
 #: paperless_mail/models.py:89
 msgid "mail rule"
-msgstr ""
+msgstr "правило за пошта"
 
 #: paperless_mail/models.py:90
 msgid "mail rules"
-msgstr ""
+msgstr "правила за пошта"
 
 #: paperless_mail/models.py:104 paperless_mail/models.py:115
 msgid "Only process attachments."
-msgstr ""
+msgstr "Обработувај само прилози."
 
 #: paperless_mail/models.py:105
 msgid "Process full Mail (with embedded attachments in file) as .eml"
-msgstr ""
+msgstr "Обработи ја целата пошта (со вградени прилози во датотека) како .eml"
 
 #: paperless_mail/models.py:109
 msgid "Process full Mail (with embedded attachments in file) as .eml + process attachments as separate documents"
-msgstr ""
+msgstr "Обработи ја целата пошта (со вградени прилози во датотека) како .eml + обработи ги прилозите како посебни документи"
 
 #: paperless_mail/models.py:116
 msgid "Process all files, including 'inline' attachments."
-msgstr ""
+msgstr "Обработувај ги сите датотеки, вклучувајќи и 'inline' прилози."
 
 #: paperless_mail/models.py:119
 msgid "System default"
-msgstr ""
+msgstr "Стандардно од системот"
 
 #: paperless_mail/models.py:120
 msgid "Text, then HTML"
-msgstr ""
+msgstr "Текст, па HTML"
 
 #: paperless_mail/models.py:121
 msgid "HTML, then text"
-msgstr ""
+msgstr "HTML, па текст"
 
 #: paperless_mail/models.py:122
 msgid "HTML only"
-msgstr ""
+msgstr "Само HTML"
 
 #: paperless_mail/models.py:123
 msgid "Text only"
-msgstr ""
+msgstr "Само текст"
 
 #: paperless_mail/models.py:126
 msgid "Delete"
-msgstr ""
+msgstr "Избриши"
 
 #: paperless_mail/models.py:127
 msgid "Move to specified folder"
-msgstr ""
+msgstr "Премести во наведена папка"
 
 #: paperless_mail/models.py:128
 msgid "Mark as read, don't process read mails"
-msgstr ""
+msgstr "Означи како прочитано, не обработувај прочитана пошта"
 
 #: paperless_mail/models.py:129
 msgid "Flag the mail, don't process flagged mails"
-msgstr ""
+msgstr "Обележи ја поштата, не обработувај обележана пошта"
 
 #: paperless_mail/models.py:130
 msgid "Tag the mail with specified tag, don't process tagged mails"
-msgstr ""
+msgstr "Означи ја поштата со наведена ознака, не обработувај означена пошта"
 
 #: paperless_mail/models.py:133
 msgid "Use subject as title"
-msgstr ""
+msgstr "Користи тема како наслов"
 
 #: paperless_mail/models.py:134
 msgid "Use attachment filename as title"
-msgstr ""
+msgstr "Користи го името на прилогот како наслов"
 
 #: paperless_mail/models.py:135
 msgid "Do not assign title from rule"
-msgstr ""
+msgstr "Не доделувај наслов од правилото"
 
 #: paperless_mail/models.py:138
 msgid "Do not assign a correspondent"
-msgstr ""
+msgstr "Не доделувај кореспондент"
 
 #: paperless_mail/models.py:139
 msgid "Use mail address"
-msgstr ""
+msgstr "Користи адреса на е-пошта"
 
 #: paperless_mail/models.py:140
 msgid "Use name (or mail address if not available)"
-msgstr ""
+msgstr "Користи име (или адреса на е-пошта ако не е достапна)"
 
 #: paperless_mail/models.py:141
 msgid "Use correspondent selected below"
-msgstr ""
+msgstr "Користи кореспондент избран подолу"
 
 #: paperless_mail/models.py:151
 msgid "account"
-msgstr ""
+msgstr "сметка"
 
 #: paperless_mail/models.py:157 paperless_mail/models.py:326
 msgid "folder"
-msgstr ""
+msgstr "папка"
 
 #: paperless_mail/models.py:161
 msgid "Subfolders must be separated by a delimiter, often a dot ('.') or slash ('/'), but it varies by mail server."
-msgstr ""
+msgstr "Подпапките мора да бидат одделени со одделувач, често точка ('.') или коса црта ('/'), но тоа варира од поштенски сервер."
 
 #: paperless_mail/models.py:167
 msgid "filter from"
-msgstr ""
+msgstr "филтрирај по испраќач"
 
 #: paperless_mail/models.py:174
 msgid "filter to"
-msgstr ""
+msgstr "филтрирај по примач"
 
 #: paperless_mail/models.py:181
 msgid "filter subject"
-msgstr ""
+msgstr "филтрирај по тема"
 
 #: paperless_mail/models.py:188
 msgid "filter body"
-msgstr ""
+msgstr "филтрирај по содржина"
 
 #: paperless_mail/models.py:195
 msgid "filter attachment filename inclusive"
-msgstr ""
+msgstr "филтрирај по име на прилог (вклучително)"
 
 #: paperless_mail/models.py:207
 msgid "filter attachment filename exclusive"
-msgstr ""
+msgstr "филтрирај по име на прилог (исклучително)"
 
 #: paperless_mail/models.py:212
 msgid "Do not consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
-msgstr ""
+msgstr "Не внесувај документи чие име на датотека во целост се совпаѓа со ова, ако е наведено. Дозволени се џокер-знаци како *.pdf или *invoice*. Не прави разлика меѓу големи и мали букви."
 
 #: paperless_mail/models.py:219
 msgid "maximum age"
-msgstr ""
+msgstr "максимална возраст"
 
 #: paperless_mail/models.py:221
 msgid "Specified in days."
-msgstr ""
+msgstr "Наведено во денови."
 
 #: paperless_mail/models.py:225
 msgid "attachment type"
-msgstr ""
+msgstr "вид на прилог"
 
 #: paperless_mail/models.py:229
 msgid "Inline attachments include embedded images, so it's best to combine this option with a filename filter."
-msgstr ""
+msgstr "Прилозите во линија вклучуваат вградени слики, така што е најдобро да ја комбинирате оваа опција со филтер за име на датотека."
 
 #: paperless_mail/models.py:235
 msgid "consumption scope"
-msgstr ""
+msgstr "опфат на внесување"
 
 #: paperless_mail/models.py:241
 msgid "pdf layout"
-msgstr ""
+msgstr "PDF распоред"
 
 #: paperless_mail/models.py:247
 msgid "action"
-msgstr ""
+msgstr "акција"
 
 #: paperless_mail/models.py:253
 msgid "action parameter"
-msgstr ""
+msgstr "параметар на акцијата"
 
 #: paperless_mail/models.py:258
 msgid "Additional parameter for the action selected above, i.e., the target folder of the move to folder action. Subfolders must be separated by dots."
-msgstr ""
+msgstr "Дополнителен параметар за акцијата избрана погоре, т.е. целната папка на акцијата „премести во папка“. Подпапките мора да бидат одделени со точки."
 
 #: paperless_mail/models.py:266
 msgid "assign title from"
-msgstr ""
+msgstr "додели наслов од"
 
 #: paperless_mail/models.py:286
 msgid "assign correspondent from"
-msgstr ""
+msgstr "додели кореспондент од"
 
 #: paperless_mail/models.py:300
 msgid "Assign the rule owner to documents"
-msgstr ""
+msgstr "Додели го сопственикот на правилото на документите"
 
 #: paperless_mail/models.py:305
 msgid "Stop processing further rules"
-msgstr ""
+msgstr "Запри обработка на понатамошни правила"
 
 #: paperless_mail/models.py:308
 msgid "If True, no further rules will be processed after this one if any document is queued."
-msgstr ""
+msgstr "Ако е точно, по ова правило нема да се обработуваат понатамошни правила ако е во чекање било кој документ."
 
 #: paperless_mail/models.py:334
 msgid "uid"
-msgstr ""
+msgstr "uid"
 
 #: paperless_mail/models.py:342
 msgid "uid validity"
-msgstr ""
+msgstr "валидност на uid"
 
 #: paperless_mail/models.py:350
 msgid "subject"
-msgstr ""
+msgstr "тема"
 
 #: paperless_mail/models.py:358
 msgid "received"
-msgstr ""
+msgstr "примена"
 
 #: paperless_mail/models.py:365
 msgid "processed"
-msgstr ""
+msgstr "обработена"
 
 #: paperless_mail/models.py:371
 msgid "status"
-msgstr ""
+msgstr "статус"
 
 #: paperless_mail/models.py:379
 msgid "error"
-msgstr ""
+msgstr "грешка"
 

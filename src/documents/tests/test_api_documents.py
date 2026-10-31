@@ -57,6 +57,8 @@ from paperless_testing.http import read_streaming_response
 from paperless_testing.permissions import grant_all_global
 from paperless_testing.permissions import grant_global
 from paperless_testing.permissions import grant_object
+from paperless_testing.samples import SIMPLE_DIGITAL_PDF
+from paperless_testing.samples import THUMBNAIL_WEBP
 
 
 class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
@@ -1917,7 +1919,11 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             id=str(uuid.uuid4()),
         )
 
-        with (Path(__file__).parent / "samples" / "simple.pdf").open("rb") as f:
+        with SimpleUploadedFile(
+            "simple.pdf",
+            SIMPLE_DIGITAL_PDF.read_bytes(),
+            content_type="application/pdf",
+        ) as f:
             response = self.client.post(
                 "/api/documents/post_document/",
                 {"document": f},
@@ -1945,7 +1951,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
 
         payload = SimpleUploadedFile(
             "../../outside.pdf",
-            (Path(__file__).parent / "samples" / "simple.pdf").read_bytes(),
+            SIMPLE_DIGITAL_PDF.read_bytes(),
             content_type="application/pdf",
         )
 
@@ -1974,7 +1980,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             id=str(uuid.uuid4()),
         )
 
-        pdf_bytes = (Path(__file__).parent / "samples" / "simple.pdf").read_bytes()
+        pdf_bytes = SIMPLE_DIGITAL_PDF.read_bytes()
         boundary = "paperless-boundary"
         payload = (
             (
@@ -2050,7 +2056,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
     def test_upload_insufficient_permissions(self) -> None:
         self.client.force_authenticate(user=UserFactory(username="testuser2"))
 
-        with (Path(__file__).parent / "samples" / "simple.pdf").open("rb") as f:
+        with SIMPLE_DIGITAL_PDF.open("rb") as f:
             response = self.client.post(
                 "/api/documents/post_document/",
                 {"document": f},
@@ -2063,7 +2069,11 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             id=str(uuid.uuid4()),
         )
 
-        with (Path(__file__).parent / "samples" / "simple.pdf").open("rb") as f:
+        with SimpleUploadedFile(
+            "simple.pdf",
+            SIMPLE_DIGITAL_PDF.read_bytes(),
+            content_type="application/pdf",
+        ) as f:
             response = self.client.post(
                 "/api/documents/post_document/",
                 {
@@ -2096,7 +2106,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             id=str(uuid.uuid4()),
         )
 
-        with (Path(__file__).parent / "samples" / "simple.pdf").open("rb") as f:
+        with SIMPLE_DIGITAL_PDF.open("rb") as f:
             response = self.client.post(
                 "/api/documents/post_document/",
                 {"documenst": f},
@@ -2122,7 +2132,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             id=str(uuid.uuid4()),
         )
 
-        with (Path(__file__).parent / "samples" / "simple.pdf").open("rb") as f:
+        with SIMPLE_DIGITAL_PDF.open("rb") as f:
             response = self.client.post(
                 "/api/documents/post_document/",
                 {"document": f, "title": "my custom title"},
@@ -2142,7 +2152,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         )
 
         c = Correspondent.objects.create(name="test-corres")
-        with (Path(__file__).parent / "samples" / "simple.pdf").open("rb") as f:
+        with SIMPLE_DIGITAL_PDF.open("rb") as f:
             response = self.client.post(
                 "/api/documents/post_document/",
                 {"document": f, "correspondent": c.id},
@@ -2161,7 +2171,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             id=str(uuid.uuid4()),
         )
 
-        with (Path(__file__).parent / "samples" / "simple.pdf").open("rb") as f:
+        with SIMPLE_DIGITAL_PDF.open("rb") as f:
             response = self.client.post(
                 "/api/documents/post_document/",
                 {"document": f, "correspondent": 3456},
@@ -2176,7 +2186,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         )
 
         dt = DocumentType.objects.create(name="invoice")
-        with (Path(__file__).parent / "samples" / "simple.pdf").open("rb") as f:
+        with SIMPLE_DIGITAL_PDF.open("rb") as f:
             response = self.client.post(
                 "/api/documents/post_document/",
                 {"document": f, "document_type": dt.id},
@@ -2195,7 +2205,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             id=str(uuid.uuid4()),
         )
 
-        with (Path(__file__).parent / "samples" / "simple.pdf").open("rb") as f:
+        with SIMPLE_DIGITAL_PDF.open("rb") as f:
             response = self.client.post(
                 "/api/documents/post_document/",
                 {"document": f, "document_type": 34578},
@@ -2210,7 +2220,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         )
 
         sp = StoragePath.objects.create(name="invoices")
-        with (Path(__file__).parent / "samples" / "simple.pdf").open("rb") as f:
+        with SIMPLE_DIGITAL_PDF.open("rb") as f:
             response = self.client.post(
                 "/api/documents/post_document/",
                 {"document": f, "storage_path": sp.id},
@@ -2229,7 +2239,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             id=str(uuid.uuid4()),
         )
 
-        with (Path(__file__).parent / "samples" / "simple.pdf").open("rb") as f:
+        with SIMPLE_DIGITAL_PDF.open("rb") as f:
             response = self.client.post(
                 "/api/documents/post_document/",
                 {"document": f, "storage_path": 34578},
@@ -2245,7 +2255,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
 
         t1 = Tag.objects.create(name="tag1")
         t2 = Tag.objects.create(name="tag2")
-        with (Path(__file__).parent / "samples" / "simple.pdf").open("rb") as f:
+        with SIMPLE_DIGITAL_PDF.open("rb") as f:
             response = self.client.post(
                 "/api/documents/post_document/",
                 {"document": f, "tags": [t2.id, t1.id]},
@@ -2266,7 +2276,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
 
         t1 = Tag.objects.create(name="tag1")
         t2 = Tag.objects.create(name="tag2")
-        with (Path(__file__).parent / "samples" / "simple.pdf").open("rb") as f:
+        with SIMPLE_DIGITAL_PDF.open("rb") as f:
             response = self.client.post(
                 "/api/documents/post_document/",
                 {"document": f, "tags": [t2.id, t1.id, 734563]},
@@ -2290,7 +2300,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             0,
             tzinfo=zoneinfo.ZoneInfo("America/Los_Angeles"),
         )
-        with (Path(__file__).parent / "samples" / "simple.pdf").open("rb") as f:
+        with SIMPLE_DIGITAL_PDF.open("rb") as f:
             response = self.client.post(
                 "/api/documents/post_document/",
                 {"document": f, "created": created},
@@ -2306,7 +2316,11 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             id=str(uuid.uuid4()),
         )
 
-        with (Path(__file__).parent / "samples" / "simple.pdf").open("rb") as f:
+        with SimpleUploadedFile(
+            "simple.pdf",
+            SIMPLE_DIGITAL_PDF.read_bytes(),
+            content_type="application/pdf",
+        ) as f:
             response = self.client.post(
                 "/api/documents/post_document/",
                 {"document": f, "archive_serial_number": 500},
@@ -2333,7 +2347,11 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             data_type=CustomField.FieldDataType.STRING,
         )
 
-        with (Path(__file__).parent / "samples" / "simple.pdf").open("rb") as f:
+        with SimpleUploadedFile(
+            "simple.pdf",
+            SIMPLE_DIGITAL_PDF.read_bytes(),
+            content_type="application/pdf",
+        ) as f:
             response = self.client.post(
                 "/api/documents/post_document/",
                 {
@@ -2388,7 +2406,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         w1.actions.add(action1)
         w1.save()
 
-        with (Path(__file__).parent / "samples" / "simple.pdf").open("rb") as f:
+        with SIMPLE_DIGITAL_PDF.open("rb") as f:
             response = self.client.post(
                 "/api/documents/post_document/",
                 {
@@ -2429,7 +2447,11 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             data_type=CustomField.FieldDataType.INT,
         )
 
-        with (Path(__file__).parent / "samples" / "simple.pdf").open("rb") as f:
+        with SimpleUploadedFile(
+            "simple.pdf",
+            SIMPLE_DIGITAL_PDF.read_bytes(),
+            content_type="application/pdf",
+        ) as f:
             response = self.client.post(
                 "/api/documents/post_document/",
                 {
@@ -2478,7 +2500,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         ]
 
         for payload in error_payloads:
-            with (Path(__file__).parent / "samples" / "simple.pdf").open("rb") as f:
+            with SIMPLE_DIGITAL_PDF.open("rb") as f:
                 data = {"document": f, **payload}
                 response = self.client.post(
                     "/api/documents/post_document/",
@@ -2536,7 +2558,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             id=str(uuid.uuid4()),
         )
 
-        with (Path(__file__).parent / "samples" / "simple.pdf").open("rb") as f:
+        with SIMPLE_DIGITAL_PDF.open("rb") as f:
             response = self.client.post(
                 "/api/documents/post_document/",
                 {"document": f, "from_webui": True},
@@ -2575,14 +2597,8 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             archive_filename="archive.pdf",
         )
 
-        source_file: Path = (
-            Path(__file__).parent
-            / "samples"
-            / "documents"
-            / "thumbnails"
-            / "0000001.webp"
-        )
-        archive_file: Path = Path(__file__).parent / "samples" / "simple.pdf"
+        source_file: Path = THUMBNAIL_WEBP
+        archive_file: Path = SIMPLE_DIGITAL_PDF
 
         shutil.copy(source_file, doc.source_path)
         shutil.copy(archive_file, doc.archive_path)
@@ -2615,7 +2631,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             mime_type="application/pdf",
         )
 
-        shutil.copy(Path(__file__).parent / "samples" / "simple.pdf", doc.source_path)
+        shutil.copy(SIMPLE_DIGITAL_PDF, doc.source_path)
 
         response = self.client.get(f"/api/documents/{doc.pk}/metadata/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -2670,7 +2686,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         response = self.client.get("/api/documents/34676/suggestions/")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    @mock.patch("documents.views.get_ai_document_classification")
+    @mock.patch("paperless_ai.ai_classifier.get_ai_document_classification")
     @override_settings(AI_ENABLED=True)
     def test_suggestions_still_uses_classifier_when_ai_enabled(
         self,
@@ -4381,8 +4397,8 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             filename="test2.pdf",
         )
 
-        archive_file = Path(__file__).parent / "samples" / "simple.pdf"
-        source_file = Path(__file__).parent / "samples" / "simple.pdf"
+        archive_file = SIMPLE_DIGITAL_PDF
+        source_file = SIMPLE_DIGITAL_PDF
 
         shutil.copy(archive_file, doc.archive_path)
         shutil.copy(source_file, doc2.source_path)
