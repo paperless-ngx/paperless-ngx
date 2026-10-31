@@ -1,0 +1,313 @@
+<div class="modal-header">
+  <h4 class="modal-title" id="ocr-template-editor-title">{{ dialogTitle }}</h4>
+  @if (template.id) {
+    <span class="badge bg-primary text-primary-text-contrast ms-2">ID: {{ template.id }}</span>
+  }
+  <button type="button" class="btn-close" (click)="activeModal.dismiss()" [disabled]="saving()" aria-label="Close" i18n-aria-label></button>
+</div>
+
+<div class="modal-body d-flex flex-column">
+  <div class="row gx-3 editor-layout flex-grow-1 flex-lg-nowrap" [attr.inert]="saving() ? '' : null" [attr.aria-busy]="saving()">
+    <div class="col-lg-4 mb-3 mb-lg-0 overflow-auto">
+      <ul ngbNav #nav="ngbNav" [(activeId)]="activeTab" class="nav-underline flex-nowrap flex-md-wrap overflow-auto">
+        <li ngbNavItem="template">
+          <a ngbNavLink i18n>Template</a>
+          <ng-template ngbNavContent>
+            <div class="row mb-3">
+              <div class="col-9">
+                <pngx-input-text [(ngModel)]="template.name" title="Template name" i18n-title></pngx-input-text>
+              </div>
+              <div class="col-3">
+                <pngx-input-switch [(ngModel)]="template.enabled" title="Enabled" i18n-title></pngx-input-switch>
+              </div>
+            </div>
+
+            <pngx-input-select [(ngModel)]="template.matching_algorithm" [items]="matchingAlgorithms" title="Matching algorithm" i18n-title></pngx-input-select>
+            @if (patternRequired) {
+              <pngx-input-text [(ngModel)]="template.match" title="Matching pattern" i18n-title></pngx-input-text>
+              <pngx-input-check [(ngModel)]="template.is_insensitive" title="Case insensitive" i18n-title></pngx-input-check>
+            }
+
+            <div *pngxIfOwner="object">
+              <hr />
+              <pngx-permissions-form [users]="users()" [accordion]="true" [(ngModel)]="permissionsForm"></pngx-permissions-form>
+            </div>
+
+          </ng-template>
+        </li>
+
+        <li ngbNavItem="zones">
+          <a ngbNavLink><ng-container i18n>Zones</ng-container> <span class="badge bg-primary ms-2">{{ template.zones.length }}</span></a>
+          <ng-template ngbNavContent>
+            @if (selectedZone; as zone) {
+              <div class="d-flex align-items-center gap-2 mb-3">
+                <button type="button" class="btn btn-sm btn-link px-0 me-auto" (click)="deselectZone()">
+                  <i-bs name="arrow-left" class="me-1"></i-bs><ng-container i18n>All zones</ng-container>
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-primary" (click)="testZone()" [disabled]="!previewDocId || zoneTesting">
+                  @if (zoneTesting) {
+                    <span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
+                  } @else {
+                    <i-bs name="play-fill" class="me-1"></i-bs>
+                  }
+                  <ng-container i18n>Test</ng-container>
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeZone(selectedZoneIndex)" title="Delete zone" i18n-title aria-label="Delete zone" i18n-aria-label>
+                  <i-bs name="trash"></i-bs>
+                </button>
+              </div>
+
+              @if (zoneTestResult; as result) {
+                @if (result.error) {
+                  <div class="alert alert-warning py-2 mb-3 small" role="alert">{{ result.error }}</div>
+                } @else {
+                  <dl class="row small border rounded mx-0 py-2 mb-3">
+                    <dt class="col-4" i18n>OCR text</dt>
+                    <dd class="col-8">
+                      @if (result.raw_text) {
+                        <code>{{ result.raw_text }}</code>
+                      } @else {
+                        <span class="text-muted" i18n>Nothing detected</span>
+                      }
+                    </dd>
+                    <dt class="col-4" i18n>Value</dt>
+                    <dd class="col-8" [class.mb-0]="!result.regex">
+                      @if (result.value) {
+                        <code>{{ result.value }}</code>
+                      } @else {
+                        <span class="text-muted" i18n>Empty</span>
+                      }
+                    </dd>
+                    @if (result.regex) {
+                      <dt class="col-4" i18n>Validation</dt>
+                      <dd class="col-8 mb-0">
+                        @if (result.regex_match) {
+                          <span class="badge bg-success" i18n>Regex matches</span>
+                        } @else {
+                          <span class="badge bg-danger" i18n>Regex does not match</span>
+                        }
+                      </dd>
+                    }
+                  </dl>
+                }
+              }
+
+              <pngx-input-text [ngModel]="zone.name" (ngModelChange)="renameZone(zone, $event)" title="Name" i18n-title></pngx-input-text>
+
+              <pngx-input-select
+                [items]="fieldItems()"
+                [ngModel]="zoneFieldValue(zone)"
+                (ngModelChange)="setZoneField(zone, $event)"
+                (createNew)="createField($event)"
+                title="Field"
+                i18n-title
+                placeholder="Choose a field"
+                i18n-placeholder
+                hint="Where the extracted value is written."
+                i18n-hint
+              ></pngx-input-select>
+
+              @if (isFieldShared(zone)) {
+                <pngx-input-text
+                  [ngModel]="getCombineFormat(zone)"
+                  (ngModelChange)="setCombineFormat(zone, $event)"
+                  [placeholder]="defaultCombineFormat(zone)"
+                  title="Combined value"
+                  i18n-title
+                  hint="Several zones write to this field. Set the format or leave empty to join them with spaces."
+                  i18n-hint
+                ></pngx-input-text>
+                <div class="d-flex flex-wrap gap-1 mt-n2 mb-3">
+                  @for (z of zonesForField(zone); track z) {
+                    <button type="button" class="btn btn-sm btn-outline-secondary font-monospace" (click)="insertCombineToken(zone, z)">{{ '{' + z.name + '}' }}</button>
+                  }
+                </div>
+              }
+
+              <div class="row align-items-end">
+                <div class="col">
+                  @if (!isLastPageZone(zone)) {
+                    <pngx-input-number [(ngModel)]="zone.page" [showAdd]="false" title="Page" i18n-title></pngx-input-number>
+                  }
+                </div>
+                <div class="col-auto">
+                  <pngx-input-switch [ngModel]="isLastPageZone(zone)" (ngModelChange)="setLastPageZone(zone, $event)" [horizontal]="true" title="Last page" i18n-title></pngx-input-switch>
+                </div>
+              </div>
+
+              <h6 class="border-top pt-3 mt-1 mb-3" i18n>Processing</h6>
+
+              <pngx-input-select
+                [items]="languageOptions"
+                [multiple]="true"
+                [ngModel]="ocrLanguageArray(zone)"
+                (ngModelChange)="setOcrLanguages(zone, $event)"
+                title="OCR language"
+                i18n-title
+                placeholder="Select languages"
+                i18n-placeholder
+              ></pngx-input-select>
+
+              <pngx-input-select [items]="transformOptions" [(ngModel)]="zone.transform" title="Transform" i18n-title></pngx-input-select>
+
+              @if (zone.transform === OcrZoneTransform.Date) {
+                <pngx-input-text
+                  [(ngModel)]="zone.date_format"
+                  title="Date format"
+                  i18n-title
+                  placeholder="Auto-detect"
+                  i18n-placeholder
+                  hint="Python date codes, e.g. %d.%m.%Y. Leave empty to detect the format automatically."
+                  i18n-hint
+                ></pngx-input-text>
+              }
+
+              <pngx-input-text [(ngModel)]="zone.validation_regex" title="Validation regex" i18n-title placeholder="\d{2}\.\d{2}\.\d{4}" hint="The value must match this pattern to be applied." i18n-hint></pngx-input-text>
+            } @else {
+              <pngx-ocr-template-zone-list
+                [zones]="template.zones"
+                [customFields]="customFields()"
+                (zoneSelected)="selectZone($event)"
+                (zoneRemoved)="removeZone($event)"
+              ></pngx-ocr-template-zone-list>
+            }
+          </ng-template>
+        </li>
+      </ul>
+
+      <div [ngbNavOutlet]="nav" class="mt-3"></div>
+    </div>
+
+    <div class="col-lg-8 d-flex flex-column">
+      <div class="d-flex flex-wrap gap-2 mb-2 flex-shrink-0">
+        <pngx-input-document-link
+          class="flex-grow-1"
+          [ngModel]="sampleDocumentIds"
+          (ngModelChange)="setSampleDocument($event)"
+          [minimal]="true"
+          [multiple]="false"
+          placeholder="Search for a sample document"
+          i18n-placeholder
+        ></pngx-input-document-link>
+        @if (previewDocId) {
+          <div class="input-group w-auto flex-nowrap">
+            <input class="form-control flex-grow-0 preview-page-input" type="number" min="1" [max]="previewPageCount()" [(ngModel)]="previewPageDisplay" [disabled]="!pageLoaded()" aria-label="Page" i18n-aria-label />
+            <span class="input-group-text" i18n>of {{ previewPageCount() ?? '?' }}</span>
+          </div>
+          <fieldset class="input-group w-auto flex-nowrap" aria-label="Zoom" i18n-aria-label>
+            <button type="button" class="btn btn-outline-secondary" aria-label="Zoom out" i18n-aria-label [disabled]="!pageLoaded() || zoom <= 0.5" (click)="zoomOut()"><i-bs name="dash"></i-bs></button>
+            <button type="button" class="btn btn-outline-secondary preview-zoom" title="Reset zoom" i18n-title [disabled]="!pageLoaded()" (click)="resetZoom()">{{ zoom | percent: '1.0-0' }}</button>
+            <button type="button" class="btn btn-outline-secondary" aria-label="Zoom in" i18n-aria-label [disabled]="!pageLoaded() || zoom >= 4" (click)="zoomIn()"><i-bs name="plus"></i-bs></button>
+          </fieldset>
+        }
+      </div>
+      <div class="flex-grow-1 overflow-hidden">
+        <div class="h-100 overflow-auto border" [attr.aria-busy]="previewDocId && !pageLoaded()">
+          @if (pageFailed()) {
+            <div class="py-5 px-3 text-center" role="alert">
+              <i-bs name="exclamation-triangle" width="32" height="32" class="text-warning"></i-bs>
+              <p class="my-3" i18n>Could not load this page.</p>
+              <button type="button" class="btn btn-sm btn-outline-secondary" (click)="setSampleDocument(sampleDocumentIds)"><i-bs name="arrow-clockwise" class="me-1"></i-bs><span i18n>Retry</span></button>
+            </div>
+          } @else if (previewDocId) {
+            <div class="position-relative" [class.d-none]="!pageLoaded()" [style.width.%]="zoom * 100">
+              <img
+                #pageImage
+                [src]="pageImageUrl"
+                (load)="onImageLoad()"
+                (error)="onImageError()"
+                alt="Sample document page"
+                i18n-alt
+                class="d-block w-100"
+                crossorigin="use-credentials"
+              />
+              @if (pageLoaded()) {
+                <svg
+                  #zoneOverlay
+                  class="zone-overlay position-absolute top-0 start-0 w-100 h-100"
+                  [attr.viewBox]="overlayViewBox()"
+                  preserveAspectRatio="none"
+                  [style.cursor]="overlayCursor"
+                  (pointerdown)="onOverlayPointerDown($event)"
+                  (pointermove)="onOverlayPointerMove($event)"
+                  (pointerup)="onOverlayPointerUp($event)"
+                  (pointercancel)="onOverlayPointerCancel($event)"
+                  (lostpointercapture)="onOverlayPointerCancel($event)"
+                  aria-label="Zone overlay" i18n-aria-label
+                >
+                  @for (zone of template.zones; track $index; let i = $index) {
+                    @if (zoneDisplayRect(i); as rect) {
+                      <g>
+                        <rect
+                          class="zone-rect"
+                          [class.zone-rect-selected]="selectedZoneIndex === i"
+                          [attr.x]="rect.x"
+                          [attr.y]="rect.y"
+                          [attr.width]="rect.w"
+                          [attr.height]="rect.h"
+                          [attr.stroke]="zoneColor(i)"
+                          [attr.fill]="zoneColor(i)"
+                        ></rect>
+                        <text
+                          class="zone-label fw-semibold pe-none"
+                          [attr.x]="rect.x + overlayUnitSize(6)"
+                          [attr.y]="zoneLabelY(rect)"
+                          [attr.font-size]="overlayFontSize()"
+                          [attr.fill]="zoneColor(i)"
+                        >{{ zoneLabel(zone, i) }}</text>
+
+                        @if (selectedZoneIndex === i) {
+                          @for (handle of resizeHandles(rect); track handle.handle) {
+                            <rect
+                              class="zone-resize-handle"
+                              [attr.x]="handle.x - overlayHandleSize() / 2"
+                              [attr.y]="handle.y - overlayHandleSize() / 2"
+                              [attr.width]="overlayHandleSize()"
+                              [attr.height]="overlayHandleSize()"
+                              [attr.fill]="zoneColor(i)"
+                            ></rect>
+                          }
+                        }
+                      </g>
+                    }
+                  }
+
+                  @if (drawingRect(); as rect) {
+                    <rect
+                      class="zone-drawing-rect"
+                      [attr.x]="rect.x"
+                      [attr.y]="rect.y"
+                      [attr.width]="rect.w"
+                      [attr.height]="rect.h"
+                    ></rect>
+                  }
+                </svg>
+              }
+            </div>
+            @if (!pageLoaded()) {
+              <div class="p-5 d-flex justify-content-center align-items-center">
+                <output class="spinner-border">
+                  <span class="visually-hidden" i18n>Loading page...</span>
+                </output>
+              </div>
+            }
+          } @else {
+            <div class="py-5 px-3 text-center text-muted">
+              <i-bs name="file-text" width="32" height="32"></i-bs>
+              <p class="mt-3 mb-0" i18n>No sample document selected.</p>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-outline-secondary" (click)="activeModal.dismiss()" [disabled]="saving()" i18n>Cancel</button>
+  <button type="button" class="btn btn-primary" (click)="save()" [disabled]="saving() || !isDirty">
+    @if (saving()) {
+      <span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
+    }
+    <span i18n>Save</span>
+  </button>
+</div>
