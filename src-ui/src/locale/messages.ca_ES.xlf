@@ -11397,21 +11397,21 @@
         </context-group>
         <target state="translated">Ordena per <x id="INTERPOLATION" equiv-text="{{getDisplayCustomFieldTitle(field_id)}}"/></target>
       </trans-unit>
-      <trans-unit id="2179847500064178686" datatype="html">
-        <source>Edit document</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">328</context>
-        </context-group>
-        <target state="translated">Edita document</target>
-      </trans-unit>
       <trans-unit id="3420321797707163677" datatype="html">
         <source>Preview document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">329</context>
+          <context context-type="linenumber">328</context>
         </context-group>
         <target state="translated">Previsualitza document</target>
+      </trans-unit>
+      <trans-unit id="2179847500064178686" datatype="html">
+        <source>Edit document</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
+          <context context-type="linenumber">331</context>
+        </context-group>
+        <target state="translated">Edita document</target>
       </trans-unit>
       <trans-unit id="4512084577073831437" datatype="html">
         <source>Reset filters / selection</source>
