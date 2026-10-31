@@ -508,6 +508,25 @@
       @case (ContentRenderType.Text) {
         <div class="preview-sticky bg-light p-3 overflow-auto whitespace-preserve" width="100%">{{previewText()}}</div>
       }
+      @case (ContentRenderType.Markdown) {
+        <div class="preview-sticky bg-light p-3 overflow-auto">
+          @if (previewTextError()) {
+            <div class="whitespace-preserve">{{previewText()}}</div>
+          } @else {
+            <div class="markdown-view-toggle d-flex justify-content-end mb-3">
+              <div class="btn-group btn-group-sm bg-light" role="group" aria-label="Markdown preview mode" i18n-aria-label>
+                <button type="button" class="btn btn-outline-secondary" [class.active]="markdownView() === MarkdownViewMode.Source" [attr.aria-pressed]="markdownView() === MarkdownViewMode.Source" (click)="setMarkdownView(MarkdownViewMode.Source)" i18n>Source</button>
+                <button type="button" class="btn btn-outline-secondary" [class.active]="markdownView() === MarkdownViewMode.Rendered" [attr.aria-pressed]="markdownView() === MarkdownViewMode.Rendered" (click)="setMarkdownView(MarkdownViewMode.Rendered)" i18n>Rendered</button>
+              </div>
+            </div>
+            @if (markdownView() === MarkdownViewMode.Source) {
+              <div class="whitespace-preserve">{{previewText()}}</div>
+            } @else {
+              <div class="markdown-preview" [innerHTML]="previewText() | markdown: 'document'"></div>
+            }
+          }
+        </div>
+      }
       @case (ContentRenderType.Image) {
         <div class="preview-sticky">
           <img [src]="previewUrl()" width="100%" height="100%" alt="{{title()}}" />

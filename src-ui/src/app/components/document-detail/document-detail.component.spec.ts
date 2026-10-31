@@ -43,7 +43,11 @@ import {
 } from 'src/app/data/filter-rule-type'
 import { StoragePath } from 'src/app/data/storage-path'
 import { Tag } from 'src/app/data/tag'
-import { SETTINGS_KEYS, SuggestionSource } from 'src/app/data/ui-settings'
+import {
+  MarkdownViewMode,
+  SETTINGS_KEYS,
+  SuggestionSource,
+} from 'src/app/data/ui-settings'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
@@ -1933,7 +1937,7 @@ describe('DocumentDetailComponent', () => {
     }))
     fixture.detectChanges()
     expect(component.archiveContentRenderType).toEqual(
-      component.ContentRenderType.Text
+      component.ContentRenderType.Markdown
     )
 
     component.document.update((document) => ({
@@ -1959,6 +1963,100 @@ describe('DocumentDetailComponent', () => {
     expect(
       fixture.debugElement.query(By.css('object.preview-sticky'))
     ).not.toBeUndefined()
+  })
+
+  it('should render markdown preview and toggle to its source', () => {
+    settingsService.set(
+      SETTINGS_KEYS.MARKDOWN_VIEW_MODE,
+      MarkdownViewMode.Rendered
+    )
+    initNormally()
+    component.document.update((document) => ({
+      ...document,
+      archived_file_name: undefined,
+      mime_type: 'text/markdown',
+    }))
+    component.previewText.set('# Markdown title')
+    fixture.detectChanges()
+    const setMarkdownViewSpy = jest.spyOn(component, 'setMarkdownView')
+
+    expect(
+      fixture.debugElement.query(By.css('.markdown-preview h1'))
+    ).not.toBeNull()
+    expect(
+      fixture.debugElement.query(By.css('.whitespace-preserve'))
+    ).toBeNull()
+
+    fixture.debugElement
+      .query(By.css('.markdown-view-source'))
+      .nativeElement.click()
+    fixture.detectChanges()
+    expect(setMarkdownViewSpy).toHaveBeenCalledWith(MarkdownViewMode.Source)
+    const sourceSettingRequest = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}ui_settings/`
+    )
+    expect(sourceSettingRequest.request.method).toBe('POST')
+    sourceSettingRequest.flush({ success: true })
+
+    expect(fixture.debugElement.query(By.css('.markdown-preview'))).toBeNull()
+    expect(
+      fixture.debugElement.query(By.css('.whitespace-preserve')).nativeElement
+        .textContent
+    ).toContain('# Markdown title')
+
+    fixture.debugElement
+      .query(By.css('.markdown-view-rendered'))
+      .nativeElement.click()
+    fixture.detectChanges()
+    expect(setMarkdownViewSpy).toHaveBeenCalledWith(MarkdownViewMode.Rendered)
+    const renderedSettingRequest = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}ui_settings/`
+    )
+    expect(renderedSettingRequest.request.method).toBe('POST')
+    renderedSettingRequest.flush({ success: true })
+    expect(
+      fixture.debugElement.query(By.css('.markdown-preview h1'))
+    ).not.toBeNull()
+  })
+
+  it('should apply the saved markdown view mode when another document loads', () => {
+    settingsService.set(
+      SETTINGS_KEYS.MARKDOWN_VIEW_MODE,
+      MarkdownViewMode.Rendered
+    )
+    initNormally()
+    expect(component.markdownView()).toBe(MarkdownViewMode.Rendered)
+    httpTestingController.expectOne(component.previewUrl()).flush('preview')
+
+    component.markdownView.set(MarkdownViewMode.Source)
+    jest.spyOn(documentService, 'get').mockReturnValue(of({ ...doc, id: 4 }))
+    jest.spyOn(openDocumentsService, 'openDocument').mockReturnValue(of(true))
+
+    ;(component as any).loadDocument(4)
+
+    expect(component.markdownView()).toBe(MarkdownViewMode.Rendered)
+    httpTestingController.expectOne(component.previewUrl()).flush('preview')
+  })
+
+  it('should show preview loading errors as plain text for markdown', () => {
+    initNormally()
+    component.document.update((document) => ({
+      ...document,
+      archived_file_name: undefined,
+      mime_type: 'text/markdown',
+    }))
+    component.previewText.set('# Preview loading failed')
+    component.previewTextError.set(true)
+    fixture.detectChanges()
+
+    expect(fixture.debugElement.query(By.css('.markdown-preview'))).toBeNull()
+    expect(
+      fixture.debugElement.query(By.css('.whitespace-preserve h1'))
+    ).toBeNull()
+    expect(
+      fixture.debugElement.query(By.css('.whitespace-preserve')).nativeElement
+        .textContent
+    ).toContain('# Preview loading failed')
   })
 
   it('should support pdf editor, handle error', () => {
@@ -2650,8 +2748,46 @@ describe('DocumentDetailComponent', () => {
     ).toEqual([10])
   })
 
+  it('should persist the selected markdown view mode', () => {
+    component.setMarkdownView(MarkdownViewMode.Rendered)
+
+    const request = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}ui_settings/`
+    )
+    expect(request.request.method).toBe('POST')
+    expect(request.request.body.settings.markdown.view_mode).toBe(
+      MarkdownViewMode.Rendered
+    )
+    request.flush({ success: true })
+    expect(component.markdownView()).toBe(MarkdownViewMode.Rendered)
+  })
+
+  it('should not persist an unchanged markdown view mode', () => {
+    component.setMarkdownView(MarkdownViewMode.Source)
+
+    httpTestingController.expectNone(`${environment.apiBaseUrl}ui_settings/`)
+    expect(component.markdownView()).toBe(MarkdownViewMode.Source)
+  })
+
+  it('should keep the selected markdown mode and show an error if saving fails', () => {
+    const toastSpy = jest.spyOn(toastService, 'showError')
+    component.setMarkdownView(MarkdownViewMode.Rendered)
+
+    httpTestingController
+      .expectOne(`${environment.apiBaseUrl}ui_settings/`)
+      .flush('fail', { status: 500, statusText: 'Server Error' })
+
+    expect(component.markdownView()).toBe(MarkdownViewMode.Rendered)
+    expect(toastSpy).toHaveBeenCalledWith(
+      'An error occurred while saving settings.'
+    )
+  })
+
   it('should set previewText', () => {
+    component.previewTextError.set(true)
     initNormally()
+    expect(component.markdownView()).toEqual(MarkdownViewMode.Source)
+    expect(component.previewTextError()).toBe(false)
     const previewText = 'Hello world, this is a test'
     httpTestingController.expectOne(component.previewUrl()).flush(previewText)
     expect(component.previewText()).toEqual(previewText)
@@ -2665,6 +2801,7 @@ describe('DocumentDetailComponent', () => {
     expect(component.previewText()).toContain(
       'An error occurred loading content'
     )
+    expect(component.previewTextError()).toBe(true)
   })
 
   it('should print document successfully', () => {

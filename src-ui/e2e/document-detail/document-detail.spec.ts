@@ -155,3 +155,86 @@ test('should finish reloading the preview after a remote document update', async
     )
     .toBe(true)
 })
+
+test('should toggle markdown preview mode and persist the setting', async ({
+  page,
+}) => {
+  let savedSettings: Record<string, any> | undefined
+
+  await page.route(
+    (url) =>
+      url.pathname.endsWith('/api/documents/1/') ||
+      url.pathname.endsWith('/api/documents/1/metadata/') ||
+      url.pathname.endsWith('/api/documents/1/preview/'),
+    async (route) => {
+      if (route.request().method() !== 'GET') return route.continue()
+
+      const pathname = new URL(route.request().url()).pathname
+      if (pathname.endsWith('/preview/')) {
+        return route.fulfill({
+          contentType: 'text/plain',
+          body: '# heading\n\n**bold**\n\n- item',
+        })
+      }
+
+      const response = await route.fetch()
+      const body = await response.json()
+      if (pathname.endsWith('/metadata/')) {
+        return route.fulfill({
+          response,
+          json: {
+            ...body,
+            has_archive_version: false,
+            original_mime_type: 'text/markdown',
+          },
+        })
+      }
+
+      return route.fulfill({
+        response,
+        json: {
+          ...body,
+          mime_type: 'text/markdown',
+          archived_file_name: null,
+        },
+      })
+    }
+  )
+
+  await page.route('**/api/ui_settings/', async (route) => {
+    if (route.request().method() !== 'POST') return route.continue()
+
+    savedSettings = route.request().postDataJSON()
+    await route.fulfill({ json: { success: true } })
+  })
+
+  await page.goto('/documents/1/details')
+
+  const sourceButton = page.getByRole('button', { name: 'Source', exact: true })
+  const renderedButton = page.getByRole('button', {
+    name: 'Rendered',
+    exact: true,
+  })
+  const markdownSource = page.locator(
+    '.markdown-view-toggle + .whitespace-preserve'
+  )
+  await expect(sourceButton).toHaveAttribute('aria-pressed', 'true')
+  await expect(markdownSource).toContainText('# heading')
+  await expect(markdownSource).toContainText('**bold**')
+
+  await renderedButton.click()
+  const markdownPreview = page.locator('.markdown-preview')
+  await expect(markdownPreview.locator('h1')).toHaveText('heading')
+  await expect(markdownPreview.locator('strong')).toHaveText('bold')
+  await expect(renderedButton).toHaveAttribute('aria-pressed', 'true')
+  await expect
+    .poll(() => savedSettings?.settings?.markdown?.view_mode)
+    .toBe('rendered')
+
+  await expect(markdownSource).toHaveCount(0)
+
+  await sourceButton.click()
+  await expect(markdownSource).toContainText('# heading')
+  await expect(markdownPreview).toHaveCount(0)
+  await expect(sourceButton).toHaveAttribute('aria-pressed', 'true')
+})

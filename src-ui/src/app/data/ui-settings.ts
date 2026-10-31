@@ -26,6 +26,11 @@ export enum SuggestionSource {
   Both = 'both',
 }
 
+export enum MarkdownViewMode {
+  Rendered = 'rendered',
+  Source = 'source',
+}
+
 export enum CollapsibleSection {
   ATTRIBUTES = 'attributes',
 }
@@ -104,6 +109,7 @@ export const SETTINGS_KEYS = {
     'general-settings:document-editing:suggestion-source',
   DOCUMENT_DETAILS_HIDDEN_FIELDS:
     'general-settings:document-details:hidden-fields',
+  MARKDOWN_VIEW_MODE: 'general-settings:markdown:view-mode',
   SEARCH_DB_ONLY: 'general-settings:search:db-only',
   SEARCH_FULL_TYPE: 'general-settings:search:more-link',
   PDF_EDITOR_DEFAULT_EDIT_MODE:
@@ -329,6 +335,11 @@ export const SETTINGS: UiSetting[] = [
     key: SETTINGS_KEYS.DOCUMENT_DETAILS_HIDDEN_FIELDS,
     type: 'array',
     default: [],
+  },
+  {
+    key: SETTINGS_KEYS.MARKDOWN_VIEW_MODE,
+    type: 'string',
+    default: MarkdownViewMode.Source,
   },
   {
     key: SETTINGS_KEYS.SEARCH_DB_ONLY,

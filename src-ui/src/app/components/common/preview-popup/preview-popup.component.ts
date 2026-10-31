@@ -12,8 +12,9 @@ import { Options } from '@popperjs/core'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { first, Subject, takeUntil } from 'rxjs'
 import { Document } from 'src/app/data/document'
-import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { MarkdownViewMode, SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
+import { MarkdownPipe } from 'src/app/pipes/markdown.pipe'
 import { SafeUrlPipe } from 'src/app/pipes/safeurl.pipe'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { SettingsService } from 'src/app/services/settings.service'
@@ -29,6 +30,7 @@ import { PdfRenderMode } from '../pdf-viewer/pdf-viewer.types'
     DocumentTitlePipe,
     PngxPdfViewerComponent,
     SafeUrlPipe,
+    MarkdownPipe,
     NgxBootstrapIconsModule,
   ],
 })
@@ -96,6 +98,21 @@ export class PreviewPopupComponent implements OnDestroy {
     return (
       this.document?.archived_file_name?.length > 0 ||
       this.document?.mime_type?.includes('pdf')
+    )
+  }
+
+  get isMarkdown(): boolean {
+    return (
+      this.document?.mime_type === 'text/markdown' &&
+      !this.document?.archived_file_name
+    )
+  }
+
+  get renderMarkdown(): boolean {
+    return (
+      this.isMarkdown &&
+      this.settingsService.get(SETTINGS_KEYS.MARKDOWN_VIEW_MODE) ===
+        MarkdownViewMode.Rendered
     )
   }
 

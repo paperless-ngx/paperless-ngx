@@ -66,12 +66,17 @@ import {
 import { ObjectWithId } from 'src/app/data/object-with-id'
 import { StoragePath } from 'src/app/data/storage-path'
 import { Tag } from 'src/app/data/tag'
-import { SETTINGS_KEYS, SuggestionSource } from 'src/app/data/ui-settings'
+import {
+  MarkdownViewMode,
+  SETTINGS_KEYS,
+  SuggestionSource,
+} from 'src/app/data/ui-settings'
 import { User } from 'src/app/data/user'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
 import { FileSizePipe } from 'src/app/pipes/file-size.pipe'
+import { MarkdownPipe } from 'src/app/pipes/markdown.pipe'
 import { SafeUrlPipe } from 'src/app/pipes/safeurl.pipe'
 import { ComponentRouterService } from 'src/app/services/component-router.service'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
@@ -155,6 +160,7 @@ enum DocumentDetailNavIDs {
 enum ContentRenderType {
   PDF = 'pdf',
   Image = 'image',
+  Markdown = 'markdown',
   Text = 'text',
   Other = 'other',
   Unknown = 'unknown',
@@ -196,6 +202,7 @@ interface IncomingDocumentUpdate {
     ReactiveFormsModule,
     NgTemplateOutlet,
     SafeUrlPipe,
+    MarkdownPipe,
     NgbNavModule,
     NgbDropdownModule,
     NgxBootstrapIconsModule,
@@ -254,6 +261,8 @@ export class DocumentDetailComponent
   private readonly hiddenFieldsSetting = this.settings.getSignal<
     DocumentDetailFieldID[]
   >(SETTINGS_KEYS.DOCUMENT_DETAILS_HIDDEN_FIELDS)
+  private readonly markdownViewSetting =
+    this.settings.getSignal<MarkdownViewMode>(SETTINGS_KEYS.MARKDOWN_VIEW_MODE)
 
   @ViewChild('inputTitle')
   titleInput: TextComponent
@@ -285,6 +294,8 @@ export class DocumentDetailComponent
   readonly pdfPassword = signal<string>(undefined)
   readonly thumbUrl = signal<string>(undefined)
   readonly previewText = signal<string>(undefined)
+  readonly previewTextError = signal(false)
+  readonly markdownView = signal<MarkdownViewMode>(MarkdownViewMode.Source)
   readonly previewLoaded = signal(false)
   readonly tiffURL = signal<string>(undefined)
   readonly tiffError = signal<string>(undefined)
@@ -338,6 +349,8 @@ export class DocumentDetailComponent
   public readonly CustomFieldDataType = CustomFieldDataType
 
   public readonly ContentRenderType = ContentRenderType
+
+  public readonly MarkdownViewMode = MarkdownViewMode
 
   public readonly DataType = DataType
 
@@ -415,12 +428,11 @@ export class DocumentDetailComponent
 
   private getRenderType(mimeType: string): ContentRenderType {
     if (!mimeType) return ContentRenderType.Unknown
+    if (mimeType === 'text/markdown') return ContentRenderType.Markdown
     if (mimeType === 'application/pdf') {
       return ContentRenderType.PDF
     } else if (
-      ['text/plain', 'text/markdown', 'application/csv', 'text/csv'].includes(
-        mimeType
-      )
+      ['text/plain', 'application/csv', 'text/csv'].includes(mimeType)
     ) {
       return ContentRenderType.Text
     } else if (mimeType.indexOf('tiff') >= 0) {
@@ -550,6 +562,13 @@ export class DocumentDetailComponent
     this.closeIncomingUpdateModal()
     this.pendingIncomingUpdate = null
     this.selectedVersionId.set(documentId)
+    this.previewText.set(null)
+    this.previewTextError.set(false)
+    this.markdownView.set(
+      this.markdownViewSetting() === MarkdownViewMode.Rendered
+        ? MarkdownViewMode.Rendered
+        : MarkdownViewMode.Source
+    )
     this.lastLocalSaveModified = null
     this.previewUrl.set(
       this.documentsService.getPreviewUrl(this.selectedVersionId())
@@ -564,13 +583,18 @@ export class DocumentDetailComponent
         takeUntil(this.versionChangeNotifier)
       )
       .subscribe({
-        next: (res) => this.previewText.set(res.toString()),
-        error: (err) =>
+        next: (res) => {
+          this.previewText.set(res.toString())
+          this.previewTextError.set(false)
+        },
+        error: (err) => {
           this.previewText.set(
             $localize`An error occurred loading content: ${
               err.message ?? err.toString()
             }`
-          ),
+          )
+          this.previewTextError.set(true)
+        },
       })
     this.thumbUrl.set(
       this.documentsService.getThumbUrl(this.selectedVersionId())
@@ -989,6 +1013,13 @@ export class DocumentDetailComponent
   selectVersion(versionId: number, keepContentEdits: boolean = false) {
     this.versionChangeNotifier.next()
     this.selectedVersionId.set(versionId)
+    this.previewText.set(null)
+    this.previewTextError.set(false)
+    this.markdownView.set(
+      this.markdownViewSetting() === MarkdownViewMode.Rendered
+        ? MarkdownViewMode.Rendered
+        : MarkdownViewMode.Source
+    )
     // remember so the version can be restored when returning to the document
     this.document().__selectedVersionId = versionId
     this.openDocumentService.save()
@@ -1045,13 +1076,35 @@ export class DocumentDetailComponent
         takeUntil(this.versionChangeNotifier)
       )
       .subscribe({
-        next: (res) => this.previewText.set(res.toString()),
-        error: (err) =>
+        next: (res) => {
+          this.previewText.set(res.toString())
+          this.previewTextError.set(false)
+        },
+        error: (err) => {
           this.previewText.set(
             $localize`An error occurred loading content: ${
               err.message ?? err.toString()
             }`
-          ),
+          )
+          this.previewTextError.set(true)
+        },
+      })
+  }
+
+  setMarkdownView(mode: MarkdownViewMode): void {
+    this.markdownView.set(mode)
+    if (this.markdownViewSetting() === mode) return
+    this.settings.set(SETTINGS_KEYS.MARKDOWN_VIEW_MODE, mode)
+    this.settings
+      .storeSettings()
+      .pipe(first())
+      .subscribe({
+        error: (error) => {
+          this.toastService.showError(
+            $localize`An error occurred while saving settings.`
+          )
+          console.warn(error)
+        },
       })
   }
 

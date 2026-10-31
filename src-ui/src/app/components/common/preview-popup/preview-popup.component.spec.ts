@@ -9,7 +9,7 @@ import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { By } from '@angular/platform-browser'
 import { allIcons, NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { of, throwError } from 'rxjs'
-import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { MarkdownViewMode, SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { PngxPdfViewerComponent } from '../pdf-viewer/pdf-viewer.component'
@@ -56,8 +56,11 @@ describe('PreviewPopupComponent', () => {
     expect(component.isPdf).toBeTruthy()
     component.document.mime_type = 'application/msword'
     expect(component.isPdf).toBeTruthy() // still has archive file
+    component.document.mime_type = 'text/markdown'
+    expect(component.isMarkdown).toBeFalsy()
     component.document.archived_file_name = undefined
     expect(component.isPdf).toBeFalsy()
+    expect(component.isMarkdown).toBeTruthy()
   })
 
   it('should return settings for native PDF viewer', () => {
@@ -129,6 +132,65 @@ describe('PreviewPopupComponent', () => {
     httpSpy.mockReturnValueOnce(of('Preview text'))
     component.init()
     expect(component.previewText()).toEqual('Preview text')
+  })
+
+  it('should render markdown preview text for markdown documents without archives', () => {
+    settingsService.set(
+      SETTINGS_KEYS.MARKDOWN_VIEW_MODE,
+      MarkdownViewMode.Rendered
+    )
+    jest.spyOn(http, 'get').mockReturnValueOnce(of('# Popup title') as any)
+    component.document = {
+      ...doc,
+      archived_file_name: undefined,
+      mime_type: 'text/markdown',
+    }
+    component.popover.open()
+    fixture.detectChanges()
+
+    expect(component.isMarkdown).toBe(true)
+    expect(
+      fixture.debugElement.query(By.css('.markdown-preview h1'))
+    ).not.toBeNull()
+    expect(
+      fixture.debugElement.query(By.css('.whitespace-preserve'))
+    ).toBeNull()
+  })
+
+  it('should show raw markdown text when the saved mode is source', () => {
+    jest.spyOn(http, 'get').mockReturnValueOnce(of('# Popup title') as any)
+    component.document = {
+      ...doc,
+      archived_file_name: undefined,
+      mime_type: 'text/markdown',
+    }
+    component.popover.open()
+    fixture.detectChanges()
+
+    expect(component.isMarkdown).toBe(true)
+    expect(fixture.debugElement.query(By.css('.markdown-preview'))).toBeNull()
+    expect(
+      fixture.debugElement.query(By.css('.whitespace-preserve')).nativeElement
+        .textContent
+    ).toContain('# Popup title')
+  })
+
+  it('should keep plain text preview content unformatted', () => {
+    jest.spyOn(http, 'get').mockReturnValueOnce(of('# Plain text') as any)
+    component.document = {
+      ...doc,
+      archived_file_name: undefined,
+      mime_type: 'text/plain',
+    }
+    component.popover.open()
+    fixture.detectChanges()
+
+    expect(component.isMarkdown).toBe(false)
+    expect(fixture.debugElement.query(By.css('.markdown-preview'))).toBeNull()
+    expect(
+      fixture.debugElement.query(By.css('.whitespace-preserve')).nativeElement
+        .textContent
+    ).toContain('# Plain text')
   })
 
   it('should show preview on mouseover after delay to preload content', () => {

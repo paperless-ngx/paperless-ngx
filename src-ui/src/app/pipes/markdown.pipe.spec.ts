@@ -87,4 +87,41 @@ describe('MarkdownPipe', () => {
     )
     expect(html).not.toMatch(/"\s*onmouseover=/)
   })
+
+  it('should render document markdown with standard line breaks', () => {
+    const html = pipe.transform('# Title\nline one\nline two', 'document')
+    expect(html).toContain('<h1>Title</h1>')
+    expect(html).toContain('<p>line one\nline two</p>')
+    expect(html).not.toContain('<br')
+  })
+
+  it('should render document tables and links without hostname suffixes', () => {
+    const html = pipe.transform(
+      '| a | b |\n|---|---|\n| 1 | 2 |\n\n[docs](https://docs.paperless-ngx.com)',
+      'document'
+    )
+    expect(html).toContain('<table>')
+    expect(html).toContain(
+      '<a target="_blank" rel="noopener noreferrer nofollow" href="https://docs.paperless-ngx.com">docs</a>'
+    )
+    expect(html).not.toContain('(docs.paperless-ngx.com)')
+  })
+
+  it('should render document task lists as text checkboxes', () => {
+    const html = pipe.transform('- [ ] todo\n- [x] done', 'document')
+    expect(html).toContain('☐ todo')
+    expect(html).toContain('☑ done')
+    expect(html).not.toContain('<input')
+  })
+
+  it('should keep document rendering safe for raw html and images', () => {
+    const html = pipe.transform(
+      '<script>alert(1)</script>\n\n![secret](https://example.com/image.png)',
+      'document'
+    )
+    expect(html).not.toContain('<script')
+    expect(html).not.toContain('<img')
+    expect(html).toContain('&lt;script&gt;')
+    expect(html).toContain('secret')
+  })
 })

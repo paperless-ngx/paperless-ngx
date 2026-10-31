@@ -12,41 +12,69 @@ function allowedUrl(href: string): URL | null {
   }
 }
 
-// Treat chat content as untrusted: no raw HTML, no images, and only
-// absolute links. All escaping is done by marked's default renderer, and
-// Angular's sanitizer runs on top of this as well.
-const renderer: Partial<Renderer> = {
+// Treat markdown content as untrusted: no raw HTML or images. All escaping is
+// done by marked's default renderer, and Angular's sanitizer runs on top.
+const sharedRenderer: Partial<Renderer> = {
   html(this: Renderer, { raw, text }: Tokens.HTML | Tokens.Tag): string {
     return this.text({ type: 'text', raw, text })
   },
   image(this: Renderer, { raw, text }: Tokens.Image): string {
     return this.text({ type: 'text', raw, text })
   },
-  link(this: Renderer, token: Tokens.Link): string {
-    const url = allowedUrl(token.href)
-    if (!url) return this.parser.parseInline(token.tokens)
-    const anchor = Renderer.prototype.link
-      .call(this, token)
-      .replace('<a ', '<a target="_blank" rel="noopener noreferrer nofollow" ')
-    if (!url.hostname) return anchor
-    const hostname = this.text({ type: 'text', raw: '', text: url.hostname })
-    return `${anchor} <span class="text-muted small">(${hostname})</span>`
-  },
 }
 
-const markdown = new Marked({
+function renderLink(
+  this: Renderer,
+  token: Tokens.Link,
+  includeHostname: boolean
+): string {
+  const url = allowedUrl(token.href)
+  if (!url) return this.parser.parseInline(token.tokens)
+  const anchor = Renderer.prototype.link
+    .call(this, token)
+    .replace('<a ', '<a target="_blank" rel="noopener noreferrer nofollow" ')
+  if (!includeHostname || !url.hostname) return anchor
+  const hostname = this.text({ type: 'text', raw: '', text: url.hostname })
+  return `${anchor} <span class="text-muted small">(${hostname})</span>`
+}
+
+const chatMarkdown = new Marked({
   async: false,
   gfm: true,
   breaks: true,
-  renderer,
+  renderer: {
+    ...sharedRenderer,
+    link(this: Renderer, token: Tokens.Link): string {
+      return renderLink.call(this, token, true)
+    },
+  },
+})
+
+const documentMarkdown = new Marked({
+  async: false,
+  gfm: true,
+  breaks: false,
+  renderer: {
+    ...sharedRenderer,
+    link(this: Renderer, token: Tokens.Link): string {
+      return renderLink.call(this, token, false)
+    },
+    checkbox(this: Renderer, { checked }: Tokens.Checkbox): string {
+      return checked ? '☑ ' : '☐ '
+    },
+  },
 })
 
 @Pipe({
   name: 'markdown',
 })
 export class MarkdownPipe implements PipeTransform {
-  transform(value: string | null | undefined): string {
+  transform(
+    value: string | null | undefined,
+    mode: 'chat' | 'document' = 'chat'
+  ): string {
     if (!value) return ''
+    const markdown = mode === 'document' ? documentMarkdown : chatMarkdown
     return markdown.parse(value) as string
   }
 }
