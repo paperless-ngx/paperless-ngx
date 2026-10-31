@@ -141,8 +141,10 @@ def _stream_chat_with_documents(
             str(pk) for pk in documents.values_list("pk", flat=True)
         )
 
-    # Hold the shared read lock for the whole operation so the compaction swap
-    # cannot replace the database file while this connection is open.
+    # Hold the shared read lock only while reading the index, so the compaction
+    # swap cannot replace the database file while this connection is open.
+    # Everything after retrieval works on the nodes already in memory, so a slow
+    # LLM stream never holds the lock.
     with read_store() as store:
         index = load_or_build_index(config, store)
         retriever = VectorIndexRetriever(
@@ -156,37 +158,38 @@ def _stream_chat_with_documents(
         # #12976.
         with db_connection_released():
             top_nodes = retriever.retrieve(query_str)
-        if not top_nodes:
-            logger.warning("No nodes found for the given documents.")
-            yield CHAT_NO_CONTENT_MESSAGE
-            return
 
-        client = AIClient()
+    if not top_nodes:
+        logger.warning("No nodes found for the given documents.")
+        yield CHAT_NO_CONTENT_MESSAGE
+        return
 
-        references = _get_document_references(documents, top_nodes)
+    client = AIClient()
 
-        prompt_template = PromptTemplate(template=_build_chat_prompt(output_language))
-        refine_template = PromptTemplate(template=_build_refine_prompt(output_language))
-        response_synthesizer = get_response_synthesizer(
-            llm=client.llm,
-            prompt_helper=get_rag_prompt_helper(
-                chunk_size=config.llm_embedding_chunk_size,
-                context_size=config.llm_context_size,
-            ),
-            text_qa_template=prompt_template,
-            refine_template=refine_template,
-            streaming=True,
-        )
+    references = _get_document_references(documents, top_nodes)
 
-        logger.debug("Document chat query: %s", query_str)
-        # Release the pooled DB connection for the slow streaming LLM response
-        # so it is not pinned for the whole stream; see paperless_ai.db and
-        # #12976.
-        with db_connection_released():
-            response_stream = response_synthesizer.synthesize(query_str, top_nodes)
-            for chunk in response_stream.response_gen:
-                yield chunk
-                sys.stdout.flush()
+    prompt_template = PromptTemplate(template=_build_chat_prompt(output_language))
+    refine_template = PromptTemplate(template=_build_refine_prompt(output_language))
+    response_synthesizer = get_response_synthesizer(
+        llm=client.llm,
+        prompt_helper=get_rag_prompt_helper(
+            chunk_size=config.llm_embedding_chunk_size,
+            context_size=config.llm_context_size,
+        ),
+        text_qa_template=prompt_template,
+        refine_template=refine_template,
+        streaming=True,
+    )
 
-            if references:
-                yield _format_chat_metadata_trailer(references)
+    logger.debug("Document chat query: %s", query_str)
+    # Release the pooled DB connection for the slow streaming LLM response
+    # so it is not pinned for the whole stream; see paperless_ai.db and
+    # #12976.
+    with db_connection_released():
+        response_stream = response_synthesizer.synthesize(query_str, top_nodes)
+        for chunk in response_stream.response_gen:
+            yield chunk
+            sys.stdout.flush()
+
+        if references:
+            yield _format_chat_metadata_trailer(references)
