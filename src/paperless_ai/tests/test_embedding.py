@@ -167,6 +167,7 @@ def test_get_embedding_model_huggingface(mock_ai_config):
         MockHuggingFaceEmbedding.assert_called_once_with(
             model_name="sentence-transformers/all-MiniLM-L6-v2",
             cache_folder=str(settings.DATA_DIR / "hf_cache"),
+            local_files_only=True,
         )
         assert model == MockHuggingFaceEmbedding.return_value
 

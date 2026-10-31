@@ -470,7 +470,7 @@ def update_llm_index(
         logger.warning("No documents found to index.")
 
     chunk_size = config.llm_embedding_chunk_size
-    embed_model = get_embedding_model(config)
+    embed_model = get_embedding_model(config, refresh=rebuild)
 
     with write_store(embed_model_name=model_name) as store:
         if rebuild or not store.table_exists():

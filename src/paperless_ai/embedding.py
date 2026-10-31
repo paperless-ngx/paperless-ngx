@@ -20,7 +20,18 @@ OCR_LEADER_REGEX = re.compile(r"[._\-\u00b7]{4,}")
 HORIZONTAL_WHITESPACE_REGEX = re.compile(r"[ \t\u00a0]+")
 
 
-def get_embedding_model(config: AIConfig) -> "BaseEmbedding":
+def get_embedding_model(
+    config: AIConfig,
+    *,
+    refresh: bool = False,
+) -> "BaseEmbedding":
+    """Build the configured embedding model.
+
+    For the Hugging Face backend, a model already in the local cache is loaded
+    without contacting the Hub, which saves seconds per call. ``refresh=True``
+    checks the Hub for a newer revision first; index rebuilds use it so a new
+    model release is picked up together with re-embedding every document.
+    """
     match config.llm_embedding_backend:
         case LLMEmbeddingBackend.OPENAI_LIKE:
             from llama_index.embeddings.openai_like import OpenAILikeEmbedding
@@ -52,11 +63,18 @@ def get_embedding_model(config: AIConfig) -> "BaseEmbedding":
         case LLMEmbeddingBackend.HUGGINGFACE:
             from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 
-            return HuggingFaceEmbedding(
-                model_name=config.llm_embedding_model
+            hf_kwargs = {
+                "model_name": config.llm_embedding_model
                 or "sentence-transformers/all-MiniLM-L6-v2",
-                cache_folder=str(settings.DATA_DIR / "hf_cache"),
-            )
+                "cache_folder": str(settings.DATA_DIR / "hf_cache"),
+            }
+            if refresh:
+                return HuggingFaceEmbedding(**hf_kwargs)
+            try:
+                return HuggingFaceEmbedding(**hf_kwargs, local_files_only=True)
+            except OSError:
+                # Not cached yet, download it
+                return HuggingFaceEmbedding(**hf_kwargs)
         case LLMEmbeddingBackend.OLLAMA:
             from llama_index.embeddings.ollama import OllamaEmbedding
             from ollama import AsyncClient
