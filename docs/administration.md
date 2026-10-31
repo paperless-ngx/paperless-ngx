@@ -565,6 +565,8 @@ Specify `rebuild` to build the index from scratch from all documents in the data
 this the first time you enable the feature, or after changing the embedding backend or
 model.
 
+When using the `huggingface` embedding backend, a model that is already downloaded is loaded from the local cache without contacting the Hugging Face Hub. Only `rebuild` checks the Hub for a newer revision of the model, so a model update is picked up together with re-embedding every document. If the model is not cached yet, it is downloaded on first use.
+
 Specify `update` to incrementally index new and changed documents. This is what the
 scheduled task runs.
 

@@ -212,6 +212,10 @@ def test_update_llm_index(
 
         ai_config.assert_called_once()
         build_document_node.assert_called_once_with(real_document, chunk_size=512)
+        indexing.get_embedding_model.assert_called_once_with(
+            mock_config,
+            refresh=True,
+        )
 
 
 @pytest.mark.django_db
@@ -335,6 +339,8 @@ def test_update_llm_index_partial_update(
         mock_all.return_value = mock_queryset
 
         indexing.update_llm_index(rebuild=False)
+
+    assert indexing.get_embedding_model.call_args.kwargs == {"refresh": False}
 
     with indexing.get_vector_store() as store:
         assert store.table_exists(), (

@@ -1,4 +1,5 @@
 import re
+from contextlib import suppress
 from typing import TYPE_CHECKING
 
 from django.conf import settings
@@ -20,7 +21,17 @@ OCR_LEADER_REGEX = re.compile(r"[._\-\u00b7]{4,}")
 HORIZONTAL_WHITESPACE_REGEX = re.compile(r"[ \t\u00a0]+")
 
 
-def get_embedding_model(config: AIConfig) -> "BaseEmbedding":
+def get_embedding_model(
+    config: AIConfig,
+    *,
+    refresh: bool = False,
+) -> "BaseEmbedding":
+    """
+    Build the embedding model for the configured backend.
+
+    For Hugging Face, a cached model loads offline by default, saving seconds per
+    call. Pass ``refresh=True`` to check the Hub for a newer model revision.
+    """
     match config.llm_embedding_backend:
         case LLMEmbeddingBackend.OPENAI_LIKE:
             from llama_index.embeddings.openai_like import OpenAILikeEmbedding
@@ -52,11 +63,15 @@ def get_embedding_model(config: AIConfig) -> "BaseEmbedding":
         case LLMEmbeddingBackend.HUGGINGFACE:
             from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 
-            return HuggingFaceEmbedding(
-                model_name=config.llm_embedding_model
+            hf_kwargs = {
+                "model_name": config.llm_embedding_model
                 or "sentence-transformers/all-MiniLM-L6-v2",
-                cache_folder=str(settings.DATA_DIR / "hf_cache"),
-            )
+                "cache_folder": str(settings.DATA_DIR / "hf_cache"),
+            }
+            if not refresh:
+                with suppress(OSError):
+                    return HuggingFaceEmbedding(**hf_kwargs, local_files_only=True)
+            return HuggingFaceEmbedding(**hf_kwargs)
         case LLMEmbeddingBackend.OLLAMA:
             from llama_index.embeddings.ollama import OllamaEmbedding
             from ollama import AsyncClient
