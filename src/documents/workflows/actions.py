@@ -264,12 +264,17 @@ def execute_webhook_action(
                 )
         files = None
         if action.webhook.include_document:
+            if isinstance(document, Document):
+                filename = document.get_public_filename()
+            elif context["filename"]:
+                filename = str(context["filename"])
+            else:
+                filename = original_file.name
+
             with original_file.open("rb") as f:
                 files = {
                     "file": (
-                        str(context["filename"])
-                        if context["filename"]
-                        else original_file.name,
+                        filename,
                         f.read(),
                         document.mime_type,
                     ),
