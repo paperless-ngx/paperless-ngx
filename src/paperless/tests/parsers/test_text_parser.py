@@ -38,6 +38,7 @@ class TestTextParserProtocol:
         mime_types = TextDocumentParser.supported_mime_types()
         assert isinstance(mime_types, dict)
         assert "text/plain" in mime_types
+        assert "text/markdown" in mime_types
         assert "text/csv" in mime_types
         assert "application/csv" in mime_types
 
@@ -45,6 +46,7 @@ class TestTextParserProtocol:
         ("mime_type", "expected"),
         [
             ("text/plain", 10),
+            ("text/markdown", 10),
             ("text/csv", 10),
             ("application/csv", 10),
             ("application/pdf", None),

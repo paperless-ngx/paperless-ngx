@@ -596,6 +596,38 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
                 )
 
     @override_settings(FILENAME_FORMAT="")
+    def test_serve_markdown_file_declares_utf8_charset(self) -> None:
+        """
+        GIVEN:
+            - A UTF-8 encoded markdown document
+        WHEN:
+            - The file is served for preview or download
+        THEN:
+            - The preview is served as text/plain so browsers display it inline
+            - The download keeps the markdown mime type
+            - Both declare the UTF-8 charset
+        """
+        doc = Document.objects.create(
+            title="none",
+            filename="my_document.md",
+            mime_type="text/markdown",
+        )
+        Path(doc.source_path).write_bytes("# für Grüße München".encode())
+
+        for endpoint, expected_content_type in (
+            ("preview", "text/plain; charset=utf-8"),
+            ("download", "text/markdown; charset=utf-8"),
+        ):
+            with self.subTest(endpoint=endpoint):
+                response = self.client.get(f"/api/documents/{doc.pk}/{endpoint}/")
+                self.assertEqual(response.status_code, status.HTTP_200_OK)
+                self.assertEqual(response["Content-Type"], expected_content_type)
+                self.assertEqual(
+                    read_streaming_response(response).decode("utf-8"),
+                    "# für Grüße München",
+                )
+
+    @override_settings(FILENAME_FORMAT="")
     def test_serve_pdf_file_has_no_charset(self) -> None:
         """
         GIVEN:
@@ -1943,6 +1975,25 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         self.assertIsNone(overrides.correspondent_id)
         self.assertIsNone(overrides.document_type_id)
         self.assertIsNone(overrides.tag_ids)
+
+    def test_upload_markdown_refines_mime_type(self) -> None:
+        self.consume_file_mock.return_value = celery.result.AsyncResult(
+            id=str(uuid.uuid4()),
+        )
+
+        with SimpleUploadedFile(
+            "notes.md",
+            b"# Markdown document\n",
+            content_type="text/plain",
+        ) as f:
+            response = self.client.post(
+                "/api/documents/post_document/",
+                {"document": f},
+            )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        input_doc, _ = self.assert_queue_consumption_task_call_args()
+        self.assertEqual(input_doc.mime_type, "text/markdown")
 
     def test_upload_with_path_traversal_filename_is_reduced_to_basename(self) -> None:
         self.consume_file_mock.return_value = celery.result.AsyncResult(

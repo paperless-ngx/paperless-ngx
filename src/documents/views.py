@@ -4970,11 +4970,14 @@ def serve_file(
         file_handle = doc.source_file
         filename = doc.filename if follow_formatting else doc.get_public_filename()
         mime_type = doc.mime_type
-        # Support browser previewing csv files by using text mime type
-        if mime_type in {"application/csv", "text/csv"} and disposition == "inline":
+        # Support browser previewing csv and markdown files by using text mime type
+        if (
+            mime_type in {"application/csv", "text/csv", "text/markdown"}
+            and disposition == "inline"
+        ):
             mime_type = "text/plain"
         # Tell browsers to use UTF-8 for the text files we parse as UTF-8
-        if mime_type in {"text/plain", "text/csv", "application/csv"}:
+        if mime_type in {"text/plain", "text/csv", "application/csv", "text/markdown"}:
             mime_type = f"{mime_type}; charset=utf-8"
 
     response = FileResponse(file_handle, content_type=mime_type)

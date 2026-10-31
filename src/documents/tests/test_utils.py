@@ -5,7 +5,21 @@ import pytest_mock
 from PIL import Image
 
 from documents.utils import QuerySetStream
+from documents.utils import refine_mime_type
 from documents.utils import remove_alpha_channel
+
+
+@pytest.mark.parametrize(
+    ("mime_type", "filename", "expected"),
+    [
+        ("text/plain", "notes.md", "text/markdown"),
+        ("text/plain", "notes.MARKDOWN", "text/markdown"),
+        ("text/plain", "notes.txt", "text/plain"),
+        ("application/pdf", "notes.md", "application/pdf"),
+    ],
+)
+def test_refine_mime_type(mime_type: str, filename: str, expected: str) -> None:
+    assert refine_mime_type(mime_type, filename) == expected
 
 
 class TestQuerySetStream:

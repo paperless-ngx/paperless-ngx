@@ -28,6 +28,16 @@ _M = TypeVar("_M", bound="Model")
 IterWrapper = Callable[[Iterable[_T]], Iterable[_T]]
 
 
+def refine_mime_type(mime_type: str, filename: str | Path) -> str:
+    """Use the filename extension to identify Markdown detected as plain text."""
+    if mime_type == "text/plain" and Path(filename).suffix.lower() in {
+        ".md",
+        ".markdown",
+    }:
+        return "text/markdown"
+    return mime_type
+
+
 def identity(iterable: Iterable[_T]) -> Iterable[_T]:
     """Return the iterable unchanged; the no-op default for IterWrapper."""
     return iterable

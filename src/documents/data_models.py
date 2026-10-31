@@ -6,6 +6,8 @@ from typing import TypedDict
 
 import magic
 
+from documents.utils import refine_mime_type
+
 
 class StoredBarcode(TypedDict):
     """
@@ -177,7 +179,10 @@ class ConsumableDocument:
 
         # Get the file type once at init
         # Note this function isn't called when the object is unpickled
-        self.mime_type = magic.from_file(self.original_file, mime=True)
+        self.mime_type = refine_mime_type(
+            magic.from_file(self.original_file, mime=True),
+            self.original_file.name,
+        )
 
 
 class ConsumeFileDuplicateResult(TypedDict):

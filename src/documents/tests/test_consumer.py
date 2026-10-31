@@ -160,6 +160,8 @@ def fake_magic_from_file(file, *, mime=False):  # NOSONAR
             return "image/webp"
         elif filepath.suffix == ".eml":
             return "message/rfc822"
+        elif filepath.suffix.lower() in {".md", ".markdown"}:
+            return "text/plain"
         else:
             return "unknown"
     else:
@@ -220,6 +222,16 @@ class TestConsumer(
         dst = self.dirs.scratch_dir / "sample_archive.pdf"
         shutil.copy(src, dst)
         return dst
+
+    def test_markdown_mime_type_is_refined(self) -> None:
+        filename = self.dirs.scratch_dir / "notes.md"
+        filename.write_text("# Markdown document\n")
+
+        with self.get_consumer(filename) as consumer:
+            consumer.run()
+
+        document = Document.objects.get()
+        self.assertEqual(document.mime_type, "text/markdown")
 
     @override_settings(
         FILENAME_FORMAT=None,

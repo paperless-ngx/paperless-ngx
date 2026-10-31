@@ -1929,6 +1929,15 @@ describe('DocumentDetailComponent', () => {
 
     component.document.update((document) => ({
       ...document,
+      mime_type: 'text/markdown',
+    }))
+    fixture.detectChanges()
+    expect(component.archiveContentRenderType).toEqual(
+      component.ContentRenderType.Text
+    )
+
+    component.document.update((document) => ({
+      ...document,
       mime_type: 'image/jpeg',
     }))
     fixture.detectChanges()

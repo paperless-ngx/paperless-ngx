@@ -91,6 +91,7 @@ from documents.regex import validate_regex_pattern
 from documents.templating.filepath import validate_filepath_template_and_render
 from documents.templating.utils import convert_format_str_to_template_format
 from documents.templating.workflows import validate_workflow_template
+from documents.utils import refine_mime_type
 from documents.validators import uri_validator
 from documents.validators import url_validator
 from documents.versioning import has_prefetched_effective_content
@@ -2323,7 +2324,10 @@ class PostDocumentSerializer(serializers.Serializer[dict[str, Any]]):
 
     def validate_document(self, document):
         document_data = document.file.read()
-        mime_type = magic.from_buffer(document_data, mime=True)
+        mime_type = refine_mime_type(
+            magic.from_buffer(document_data, mime=True),
+            document.name,
+        )
 
         if not is_mime_type_supported(mime_type):
             if (

@@ -55,6 +55,7 @@ from documents.templating.workflows import parse_w_workflow_placeholders
 from documents.utils import compute_checksum
 from documents.utils import copy_basic_file_stats
 from documents.utils import copy_file_with_basic_stats
+from documents.utils import refine_mime_type
 from documents.utils import run_subprocess
 from paperless.config import BarcodeConfig
 from paperless.config import OcrConfig
@@ -421,7 +422,10 @@ class ConsumerPlugin(
 
             # Determine the parser class.
 
-            mime_type = magic.from_file(self.working_copy, mime=True)
+            mime_type = refine_mime_type(
+                magic.from_file(self.working_copy, mime=True),
+                self.filename,
+            )
 
             self.log.debug(f"Detected mime type: {mime_type}")
 
@@ -443,7 +447,10 @@ class ConsumerPlugin(
                         ],
                         logger=self.log,
                     )
-                    mime_type = magic.from_file(self.working_copy, mime=True)
+                    mime_type = refine_mime_type(
+                        magic.from_file(self.working_copy, mime=True),
+                        self.filename,
+                    )
                     self.log.debug(f"Detected mime type after qpdf: {mime_type}")
                     # Save the original file for later
                     self.unmodified_original = (

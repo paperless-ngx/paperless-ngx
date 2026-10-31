@@ -418,7 +418,9 @@ export class DocumentDetailComponent
     if (mimeType === 'application/pdf') {
       return ContentRenderType.PDF
     } else if (
-      ['text/plain', 'application/csv', 'text/csv'].includes(mimeType)
+      ['text/plain', 'text/markdown', 'application/csv', 'text/csv'].includes(
+        mimeType
+      )
     ) {
       return ContentRenderType.Text
     } else if (mimeType.indexOf('tiff') >= 0) {

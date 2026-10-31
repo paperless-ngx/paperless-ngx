@@ -45,6 +45,7 @@ from documents.models import Correspondent
 from documents.models import PaperlessTask
 from documents.parsers import is_mime_type_supported
 from documents.tasks import consume_file
+from documents.utils import refine_mime_type
 from paperless.network import is_public_ip
 from paperless.network import resolve_hostname_ips
 from paperless_mail.models import MailAccount
@@ -1047,7 +1048,10 @@ class MailAccountHandler(LoggingMixin):
 
             # don't trust the content type of the attachment. Could be
             # generic application/octet-stream.
-            mime_type = magic.from_buffer(att.payload, mime=True)
+            mime_type = refine_mime_type(
+                magic.from_buffer(att.payload, mime=True),
+                att.filename,
+            )
 
             if is_mime_type_supported(mime_type):
                 self.log.info(
