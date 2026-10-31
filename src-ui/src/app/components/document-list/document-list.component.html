@@ -208,7 +208,8 @@
                   i18n>Correspondent</th>
               }
               @if (activeDisplayFields.includes(DisplayField.TITLE)) {
-                <th class="cursor-pointer ps-5"
+                <th style="width: 2rem"><!-- Preview --></th>
+                <th class="cursor-pointer"
                   pngxSortable="title"
                   title="Sort by title" i18n-title
                   [currentSortField]="list.sortField"
@@ -321,15 +322,17 @@
                     }
                   </td>
                 }
+                @if (activeDisplayFields.includes(DisplayField.TITLE)) {
+                  <td class="pe-0 text-end align-baseline" (mouseleave)="popupPreview.close()">
+                    <pngx-preview-popup [document]="d" linkClasses="btn btn-sm btn-link text-secondary px-1" linkTitle="Preview document" (click)="$event.stopPropagation()" i18n-linkTitle #popupPreview>
+                      <i-bs name="eye"></i-bs>
+                    </pngx-preview-popup>
+                  </td>
+                }
                 @if (activeDisplayFields.includes(DisplayField.TITLE) || activeDisplayFields.includes(DisplayField.TAGS)) {
-                  <td width="30%" class="position-relative" [class.ps-5]="activeDisplayFields.includes(DisplayField.TITLE)">
+                  <td width="30%" class="align-baseline">
                     @if (activeDisplayFields.includes(DisplayField.TITLE)) {
-                      <div class="d-inline-block" (mouseleave)="popupPreview.close()">
-                        <pngx-preview-popup class="position-absolute start-0" [document]="d" linkClasses="btn btn-sm btn-link text-secondary" linkTitle="Preview document" (click)="$event.stopPropagation()" i18n-linkTitle #popupPreview>
-                          <i-bs name="eye"></i-bs>
-                        </pngx-preview-popup>
-                        <a routerLink="/documents/{{d.id}}" title="Edit document" i18n-title style="overflow-wrap: anywhere;">{{d.title | documentTitle}}</a>
-                      </div>
+                      <a routerLink="/documents/{{d.id}}" title="Edit document" i18n-title style="overflow-wrap: anywhere;">{{d.title | documentTitle}}</a>
                     }
                     @if (activeDisplayFields.includes(DisplayField.TAGS)) {
                       @for (tagID of d.tags; track tagID) {
