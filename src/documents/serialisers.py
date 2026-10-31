@@ -397,10 +397,14 @@ class OwnedObjectSerializer(
         object_pks = list(obj.pk for obj in objects)
         pk_type = type(first_obj.pk)
 
-        def get_pks_for_permission_type(model):
+        def get_pks_for_permission_type(model, identity_field, identity_model):
+            # Restricting to existing users/groups changes no result but lets
+            # MariaDB use guardian's (identity, content_type, object_pk) index
+            # instead of scanning every grant of the model.
             return map(
                 pk_type,  # coerce the pk to be the same type of the provided objects
                 model.objects.filter(
+                    **{f"{identity_field}__in": identity_model.objects.values("pk")},
                     content_type=ctype,
                     object_pk__in=object_pks,
                 )
@@ -410,8 +414,16 @@ class OwnedObjectSerializer(
 
         UserObjectPermission = get_user_obj_perms_model()
         GroupObjectPermission = get_group_obj_perms_model()
-        user_permission_pks = get_pks_for_permission_type(UserObjectPermission)
-        group_permission_pks = get_pks_for_permission_type(GroupObjectPermission)
+        user_permission_pks = get_pks_for_permission_type(
+            UserObjectPermission,
+            "user_id",
+            User,
+        )
+        group_permission_pks = get_pks_for_permission_type(
+            GroupObjectPermission,
+            "group_id",
+            Group,
+        )
 
         return set(user_permission_pks) | set(group_permission_pks)
 

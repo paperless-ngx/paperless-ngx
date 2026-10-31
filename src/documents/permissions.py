@@ -291,12 +291,19 @@ def get_permission_grantees(
         "permission__codename__in": list(action_by_codename),
         "object_pk__in": [str(pk) for pk in pks],
     }
-    for perm_model, identity_field, key in (
-        (UserObjectPermission, "user_id", "users"),
-        (GroupObjectPermission, "group_id", "groups"),
+    for perm_model, identity_model, identity_field, key in (
+        (UserObjectPermission, User, "user_id", "users"),
+        (GroupObjectPermission, Group, "group_id", "groups"),
     ):
+        # Every grant belongs to an existing user or group, so restricting to
+        # them changes no result. It lets MariaDB use guardian's
+        # (identity, content_type, object_pk) index; the content type alone
+        # matches every grant of the model and is scanned in full.
         rows = (
-            perm_model.objects.filter(**grant_filter)
+            perm_model.objects.filter(
+                **{f"{identity_field}__in": identity_model.objects.values("pk")},
+                **grant_filter,
+            )
             .values_list("object_pk", "permission__codename", identity_field)
             .order_by(identity_field)
         )
