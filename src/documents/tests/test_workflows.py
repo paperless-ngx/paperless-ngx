@@ -4099,7 +4099,9 @@ class TestWorkflows(
                 "url": "http://paperless-ngx.com",
                 "data": f"Test message: http://localhost:8000/documents/{doc.id}/",
                 "headers": {},
-                "files": {"file": ("simple.pdf", mock.ANY, "application/pdf")},
+                "files": {
+                    "file": (doc.get_public_filename(), mock.ANY, "application/pdf"),
+                },
                 "as_json": False,
             },
         )
