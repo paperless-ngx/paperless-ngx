@@ -5,6 +5,7 @@ import inspect
 import json
 import logging
 import operator
+import unicodedata
 from contextlib import contextmanager
 from decimal import Decimal
 from decimal import InvalidOperation
@@ -93,21 +94,83 @@ CUSTOM_FIELD_QUERY_MAX_ATOMS = 20
 logger = logging.getLogger("paperless.api")
 
 
+def casefold_match(value: str, query: str, lookup: str) -> bool:
+    value = unicodedata.normalize("NFC", value).casefold()
+    query = unicodedata.normalize("NFC", query).casefold()
+    if lookup == "contains":
+        return query in value
+    if lookup == "startswith":
+        return value.startswith(query)
+    if lookup == "endswith":
+        return value.endswith(query)
+    return value == query
+
+
+def filter_name_casefold(queryset, query, *, field="name", lookup="contains"):
+    """
+    Unicode-aware case-insensitive filter for object name searches.
+
+    DB i* lookups only case-fold ASCII (SQLite LIKE; Postgres UPPER on a
+    C-locale database), so "süd" never matched "SÜDSTERN". These object
+    tables are small and already permission-filtered, so match in Python
+    and re-filter by pk.
+    """
+    if not query:
+        return queryset
+    ids = [
+        obj.pk for obj in queryset if casefold_match(getattr(obj, field), query, lookup)
+    ]
+    return queryset.filter(pk__in=ids)
+
+
+class CaseFoldNameFilter(CharFilter):
+    MATCH = {
+        "icontains": "contains",
+        "istartswith": "startswith",
+        "iendswith": "endswith",
+        "iexact": "exact",
+    }
+
+    def filter(self, qs, value):
+        if not value:
+            return qs
+        # Declared as `name__icontains = ...`; django-filter sets field_name
+        # to the attribute name, the helper wants the bare field.
+        field = self.field_name or "name"
+        suffix = "__" + self.lookup_expr
+        if field.endswith(suffix):
+            field = field[: -len(suffix)]
+        return filter_name_casefold(
+            qs,
+            value,
+            field=field,
+            lookup=self.MATCH[self.lookup_expr],
+        )
+
+
 class CorrespondentFilterSet(FilterSet):
+    name__icontains = CaseFoldNameFilter(lookup_expr="icontains")
+    name__istartswith = CaseFoldNameFilter(lookup_expr="istartswith")
+    name__iendswith = CaseFoldNameFilter(lookup_expr="iendswith")
+    name__iexact = CaseFoldNameFilter(lookup_expr="iexact")
+
     class Meta:
         model = Correspondent
         fields = {
             "id": ID_KWARGS,
-            "name": CHAR_KWARGS,
         }
 
 
 class TagFilterSet(FilterSet):
+    name__icontains = CaseFoldNameFilter(lookup_expr="icontains")
+    name__istartswith = CaseFoldNameFilter(lookup_expr="istartswith")
+    name__iendswith = CaseFoldNameFilter(lookup_expr="iendswith")
+    name__iexact = CaseFoldNameFilter(lookup_expr="iexact")
+
     class Meta:
         model = Tag
         fields = {
             "id": ID_KWARGS,
-            "name": CHAR_KWARGS,
         }
 
     is_root = BooleanFilter(
@@ -118,20 +181,28 @@ class TagFilterSet(FilterSet):
 
 
 class DocumentTypeFilterSet(FilterSet):
+    name__icontains = CaseFoldNameFilter(lookup_expr="icontains")
+    name__istartswith = CaseFoldNameFilter(lookup_expr="istartswith")
+    name__iendswith = CaseFoldNameFilter(lookup_expr="iendswith")
+    name__iexact = CaseFoldNameFilter(lookup_expr="iexact")
+
     class Meta:
         model = DocumentType
         fields = {
             "id": ID_KWARGS,
-            "name": CHAR_KWARGS,
         }
 
 
 class StoragePathFilterSet(FilterSet):
+    name__icontains = CaseFoldNameFilter(lookup_expr="icontains")
+    name__istartswith = CaseFoldNameFilter(lookup_expr="istartswith")
+    name__iendswith = CaseFoldNameFilter(lookup_expr="iendswith")
+    name__iexact = CaseFoldNameFilter(lookup_expr="iexact")
+
     class Meta:
         model = StoragePath
         fields = {
             "id": ID_KWARGS,
-            "name": CHAR_KWARGS,
             "path": CHAR_KWARGS,
         }
 
@@ -241,11 +312,15 @@ class SharedByUser(Filter):
 
 
 class CustomFieldFilterSet(FilterSet):
+    name__icontains = CaseFoldNameFilter(lookup_expr="icontains")
+    name__istartswith = CaseFoldNameFilter(lookup_expr="istartswith")
+    name__iendswith = CaseFoldNameFilter(lookup_expr="iendswith")
+    name__iexact = CaseFoldNameFilter(lookup_expr="iexact")
+
     class Meta:
         model = CustomField
         fields = {
             "id": ID_KWARGS,
-            "name": CHAR_KWARGS,
         }
 
 

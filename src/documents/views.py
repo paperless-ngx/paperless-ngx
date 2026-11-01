@@ -140,6 +140,7 @@ from documents.filters import ShareLinkFilterSet
 from documents.filters import StoragePathFilterSet
 from documents.filters import TagFilterSet
 from documents.filters import TitleContentFilter
+from documents.filters import filter_name_casefold
 from documents.mail import EmailAttachment
 from documents.mail import send_email
 from documents.matching import match_correspondents
@@ -3800,7 +3801,7 @@ class GlobalSearchView(PassUserMixin):
                 ][:OBJECT_LIMIT]
         saved_views = (
             restrict_queryset_to_visible(
-                SavedView.objects.filter(name__icontains=query),
+                filter_name_casefold(SavedView.objects.all(), query),
                 request.user,
                 "view_savedview",
             )
@@ -3810,7 +3811,7 @@ class GlobalSearchView(PassUserMixin):
         saved_views = saved_views[:OBJECT_LIMIT]
         tags = (
             restrict_queryset_to_visible(
-                Tag.objects.filter(name__icontains=query),
+                filter_name_casefold(Tag.objects.all(), query),
                 request.user,
                 "view_tag",
             )
@@ -3820,7 +3821,7 @@ class GlobalSearchView(PassUserMixin):
         tags = tags[:OBJECT_LIMIT]
         correspondents = (
             restrict_queryset_to_visible(
-                Correspondent.objects.filter(name__icontains=query),
+                filter_name_casefold(Correspondent.objects.all(), query),
                 request.user,
                 "view_correspondent",
             )
@@ -3830,7 +3831,7 @@ class GlobalSearchView(PassUserMixin):
         correspondents = correspondents[:OBJECT_LIMIT]
         document_types = (
             restrict_queryset_to_visible(
-                DocumentType.objects.filter(name__icontains=query),
+                filter_name_casefold(DocumentType.objects.all(), query),
                 request.user,
                 "view_documenttype",
             )
@@ -3840,7 +3841,7 @@ class GlobalSearchView(PassUserMixin):
         document_types = document_types[:OBJECT_LIMIT]
         storage_paths = (
             restrict_queryset_to_visible(
-                StoragePath.objects.filter(name__icontains=query),
+                filter_name_casefold(StoragePath.objects.all(), query),
                 request.user,
                 "view_storagepath",
             )
@@ -3849,20 +3850,20 @@ class GlobalSearchView(PassUserMixin):
         )
         storage_paths = storage_paths[:OBJECT_LIMIT]
         users = (
-            User.objects.filter(username__icontains=query)
+            filter_name_casefold(User.objects.all(), query, field="username")
             if request.user.has_perm("auth.view_user")
             else []
         )
         users = users[:OBJECT_LIMIT]
         groups = (
-            Group.objects.filter(name__icontains=query)
+            filter_name_casefold(Group.objects.all(), query)
             if request.user.has_perm("auth.view_group")
             else []
         )
         groups = groups[:OBJECT_LIMIT]
         mail_rules = (
             restrict_queryset_to_visible(
-                MailRule.objects.filter(name__icontains=query),
+                filter_name_casefold(MailRule.objects.all(), query),
                 request.user,
                 "view_mailrule",
             )
@@ -3872,7 +3873,7 @@ class GlobalSearchView(PassUserMixin):
         mail_rules = mail_rules[:OBJECT_LIMIT]
         mail_accounts = (
             restrict_queryset_to_visible(
-                MailAccount.objects.filter(name__icontains=query),
+                filter_name_casefold(MailAccount.objects.all(), query),
                 request.user,
                 "view_mailaccount",
             )
@@ -3881,13 +3882,13 @@ class GlobalSearchView(PassUserMixin):
         )
         mail_accounts = mail_accounts[:OBJECT_LIMIT]
         workflows = (
-            Workflow.objects.filter(name__icontains=query)
+            filter_name_casefold(Workflow.objects.all(), query)
             if request.user.has_perm("documents.view_workflow")
             else []
         )
         workflows = workflows[:OBJECT_LIMIT]
         custom_fields = (
-            CustomField.objects.filter(name__icontains=query)
+            filter_name_casefold(CustomField.objects.all(), query)
             if request.user.has_perm("documents.view_customfield")
             else []
         )
