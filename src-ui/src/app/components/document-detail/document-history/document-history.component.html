@@ -47,6 +47,8 @@
                                     <span>{{ change.key | titlecase }}</span>:&nbsp;
                                     @if (change.key === 'content') {
                                         <code class="text-primary">{{ change.value[1]?.substring(0,100) }}...</code>
+                                    } @else if (change.key === 'tags') {
+                                        <code class="text-primary">{{ getTagNames($any(change.value[1])) | async }}</code>
                                     } @else {
                                         <code class="text-primary">{{ getPrettyName(change.key, change.value[1]) | async }}</code>
                                     }

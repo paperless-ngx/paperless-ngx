@@ -12,6 +12,7 @@ import { CorrespondentService } from 'src/app/services/rest/correspondent.servic
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
+import { TagService } from 'src/app/services/rest/tag.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { DocumentHistoryComponent } from './document-history.component'
 
@@ -172,6 +173,39 @@ describe('DocumentHistoryComponent', () => {
     component.getPrettyName('owner', ownerId).subscribe((result) => {
       expect(result).toBe(ownerId)
     })
+  })
+
+  it('should render bulk tag history with names and preserve missing tag IDs', () => {
+    const getCachedSpy = jest
+      .spyOn(TestBed.inject(TagService), 'getCached')
+      .mockImplementation((id) =>
+        of(id === 1 ? { id: 1, name: 'Invoice' } : null)
+      )
+    component.entries.set([
+      {
+        id: 1,
+        action: AuditLogAction.Update,
+        timestamp: '2021-01-01T00:00:00Z',
+        remote_addr: null,
+        changes: JSON.parse('{"tags":[[],[1,2345]]}'),
+      },
+    ])
+    component.loading.set(false)
+    fixture.detectChanges()
+
+    expect(fixture.nativeElement.querySelector('code').textContent).toBe(
+      'Invoice, 2345'
+    )
+    fixture.detectChanges()
+    expect(getCachedSpy).toHaveBeenCalledTimes(2)
+  })
+
+  it('should handle removal of all tags without a lookup', () => {
+    const getCachedSpy = jest.spyOn(TestBed.inject(TagService), 'getCached')
+    component.getTagNames([]).subscribe((result) => {
+      expect(result).toBe('')
+    })
+    expect(getCachedSpy).not.toHaveBeenCalled()
   })
 
   it('getPrettyName should return the value as is for other types', () => {
