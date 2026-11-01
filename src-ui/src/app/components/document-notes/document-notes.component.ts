@@ -18,6 +18,7 @@ import { DocumentNote } from 'src/app/data/document-note'
 import { User } from 'src/app/data/user'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
+import { MarkdownPipe } from 'src/app/pipes/markdown.pipe'
 import { DocumentNotesService } from 'src/app/services/rest/document-notes.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { ToastService } from 'src/app/services/toast.service'
@@ -30,6 +31,7 @@ import { ComponentWithPermissions } from '../with-permissions/with-permissions.c
   imports: [
     IfPermissionsDirective,
     CustomDatePipe,
+    MarkdownPipe,
     FormsModule,
     ReactiveFormsModule,
     NgxBootstrapIconsModule,
@@ -43,6 +45,8 @@ export class DocumentNotesComponent extends ComponentWithPermissions {
   readonly notes = model<DocumentNote[]>([])
   readonly addDisabled = input(false)
   readonly networkActive = signal(false)
+  readonly NoteViewMode = { Edit: 'edit', Preview: 'preview' } as const
+  readonly noteView = signal<'edit' | 'preview'>('edit')
 
   noteForm: FormGroup = new FormGroup({
     newNote: new FormControl(''),
@@ -75,6 +79,7 @@ export class DocumentNotesComponent extends ComponentWithPermissions {
       next: (result) => {
         this.notes.set(result)
         this.noteForm.get('newNote').reset()
+        this.noteView.set('edit')
         this.networkActive.set(false)
         this.updated.emit(this.notes())
       },
@@ -118,5 +123,9 @@ export class DocumentNotesComponent extends ComponentWithPermissions {
     if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
       this.addNote()
     }
+  }
+
+  setNoteView(mode: 'edit' | 'preview') {
+    this.noteView.set(mode)
   }
 }

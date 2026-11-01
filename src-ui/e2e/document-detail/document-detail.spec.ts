@@ -238,3 +238,132 @@ test('should toggle markdown preview mode and persist the setting', async ({
   await expect(markdownPreview).toHaveCount(0)
   await expect(sourceButton).toHaveAttribute('aria-pressed', 'true')
 })
+
+test('should render saved notes as sanitized markdown', async ({ page }) => {
+  const markdown =
+    '**Bold note**\n\n- first item\n- second item\n\n[Paperless](https://example.com)\n\n<script>alert("xss")</script>'
+  await page.route(
+    (url) =>
+      url.pathname.endsWith('/api/documents/1/') &&
+      url.searchParams.get('full_perms') === 'true',
+    async (route) => {
+      const response = await route.fetch()
+      const document = await response.json()
+      await route.fulfill({
+        response,
+        json: {
+          ...document,
+          notes: [
+            { id: 101, note: markdown, created: new Date().toISOString() },
+          ],
+        },
+      })
+    }
+  )
+
+  await page.goto('/documents/1/notes')
+
+  const renderedNote = page.locator('pngx-document-notes .card-text').first()
+  await expect(renderedNote.locator('strong')).toHaveText('Bold note')
+  await expect(renderedNote.locator('li')).toHaveCount(2)
+  await expect(
+    renderedNote.getByRole('link', { name: 'Paperless' })
+  ).toHaveAttribute('href', 'https://example.com')
+  await expect(renderedNote.locator('script')).toHaveCount(0)
+  await page.unrouteAll({ behavior: 'ignoreErrors' })
+})
+
+test('should toggle markdown note preview and retain the draft', async ({
+  page,
+}) => {
+  await page.route(
+    (url) =>
+      url.pathname.endsWith('/api/documents/1/') &&
+      url.searchParams.get('full_perms') === 'true',
+    async (route) => {
+      const response = await route.fetch()
+      const document = await response.json()
+      await route.fulfill({ response, json: { ...document, notes: [] } })
+    }
+  )
+
+  await page.goto('/documents/1/notes')
+
+  const notes = page.locator('pngx-document-notes')
+  const editButton = notes.getByRole('button', { name: 'Edit', exact: true })
+  const previewButton = notes.getByRole('button', {
+    name: 'Preview',
+    exact: true,
+  })
+  await expect(editButton).toHaveAttribute('aria-pressed', 'true')
+  await expect(previewButton).toHaveAttribute('aria-pressed', 'false')
+  await previewButton.click()
+  await expect(notes.locator('.note-preview')).toContainText(
+    'Nothing to preview'
+  )
+
+  await editButton.click()
+  const markdown = '**draft**\n\n- list item'
+  await notes.locator('textarea').fill(markdown)
+  await previewButton.click()
+  const preview = notes.locator('.note-preview .markdown-preview')
+  await expect(preview.locator('strong')).toHaveText('draft')
+  await expect(preview.locator('li')).toHaveText('list item')
+  await expect(previewButton).toHaveAttribute('aria-pressed', 'true')
+
+  await editButton.click()
+  await expect(notes.locator('textarea')).toHaveValue(markdown)
+  await expect(editButton).toHaveAttribute('aria-pressed', 'true')
+  await page.unrouteAll({ behavior: 'ignoreErrors' })
+})
+
+test('should add a markdown note from preview mode', async ({ page }) => {
+  const markdown = '**saved from preview**\n\n- a list item'
+  let documentNotes = []
+  let submittedNote: string | undefined
+
+  await page.route(
+    (url) =>
+      url.pathname.endsWith('/api/documents/1/') &&
+      url.searchParams.get('full_perms') === 'true',
+    async (route) => {
+      const response = await route.fetch()
+      const document = await response.json()
+      await route.fulfill({
+        response,
+        json: { ...document, notes: documentNotes },
+      })
+    }
+  )
+  await page.route('**/api/documents/1/notes/', async (route) => {
+    if (route.request().method() !== 'POST') return route.continue()
+
+    submittedNote = route.request().postDataJSON().note
+    documentNotes = [
+      { id: 102, note: submittedNote, created: new Date().toISOString() },
+    ]
+    await route.fulfill({
+      json: documentNotes,
+    })
+  })
+
+  await page.goto('/documents/1/notes')
+
+  const notes = page.locator('pngx-document-notes')
+  const editButton = notes.getByRole('button', { name: 'Edit', exact: true })
+  const previewButton = notes.getByRole('button', {
+    name: 'Preview',
+    exact: true,
+  })
+  await notes.locator('textarea').fill(markdown)
+  await previewButton.click()
+  await notes.getByRole('button', { name: 'Add note', exact: true }).click()
+
+  await expect.poll(() => submittedNote).toBe(markdown)
+  const renderedNote = notes.locator('.card-text').first()
+  await expect(renderedNote.locator('strong')).toHaveText('saved from preview')
+  await expect(renderedNote.locator('li')).toHaveText('a list item')
+  await expect(editButton).toHaveAttribute('aria-pressed', 'true')
+  await expect(notes.locator('textarea')).toHaveValue('')
+  await page.unrouteAll({ behavior: 'ignoreErrors' })
+})

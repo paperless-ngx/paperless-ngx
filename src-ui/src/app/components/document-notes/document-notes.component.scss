@@ -1,7 +1,8 @@
-.card-body {
-    white-space: pre-wrap;
-}
-
 .card:hover .fade {
     opacity: 1;
+}
+
+.note-preview {
+    min-height: calc(4.5em + 0.75rem + 2px);
+    overflow: auto;
 }

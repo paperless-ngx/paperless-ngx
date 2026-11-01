@@ -2,10 +2,26 @@
   <div>
     <form [formGroup]="noteForm" class="needs-validation mt-3" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.Note }" novalidate>
       <div class="form-group">
-        <textarea class="form-control form-control-sm" [class.is-invalid]="newNoteError" rows="3" formControlName="newNote" placeholder="Enter note" i18n-placeholder (keydown)="noteFormKeydown($event)" required></textarea>
-        <div class="invalid-feedback" i18n>
+        <div class="d-flex justify-content-end mb-2">
+          <div class="btn-group btn-group-sm bg-light" role="group" aria-label="Note input mode" i18n-aria-label>
+            <button type="button" class="btn btn-outline-secondary" [class.active]="noteView() === NoteViewMode.Edit" [attr.aria-pressed]="noteView() === NoteViewMode.Edit" (click)="setNoteView(NoteViewMode.Edit)" i18n>Edit</button>
+            <button type="button" class="btn btn-outline-secondary" [class.active]="noteView() === NoteViewMode.Preview" [attr.aria-pressed]="noteView() === NoteViewMode.Preview" (click)="setNoteView(NoteViewMode.Preview)" i18n>Preview</button>
+          </div>
+        </div>
+        @if (noteView() === NoteViewMode.Edit) {
+          <textarea class="form-control form-control-sm" [class.is-invalid]="newNoteError" rows="3" formControlName="newNote" placeholder="Enter note (Markdown is supported)" i18n-placeholder (keydown)="noteFormKeydown($event)" required></textarea>
+          <div class="invalid-feedback" i18n>
                 Please enter a note.
             </div>
+        } @else {
+          <div class="form-control form-control-sm note-preview">
+            @if (noteForm.get('newNote').value) {
+              <div class="markdown-preview" [innerHTML]="noteForm.get('newNote').value | markdown"></div>
+            } @else {
+              <span class="text-muted" i18n>Nothing to preview</span>
+            }
+          </div>
+        }
       </div>
       <div class="form-group mt-2 d-flex justify-content-end align-items-center">
         @if (networkActive()) {
@@ -18,7 +34,7 @@
       @for (note of notes(); track note) {
         <div class="card border mb-3">
           <div class="card-body text-dark">
-            <p class="card-text">{{note.note}}</p>
+            <div class="card-text markdown-preview" [innerHTML]="note.note | markdown"></div>
           </div>
           <div class="d-flex card-footer small bg-light text-primary justify-content-between align-items-center">
             <span>{{displayName(note)}} - {{ note.created | customDate}}</span>
