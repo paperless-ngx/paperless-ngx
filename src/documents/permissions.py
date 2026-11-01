@@ -576,12 +576,9 @@ def annotate_document_count_by_ids(
                        or CustomFieldInstance)
         related_object_field: field on the relation pointing back to queryset pk
         document_ids: the document ids to count against -- a concrete list/set,
-                       or a simple (already resolved) queryset of ids. Callers
-                       that need this filtered by a complex condition (e.g. a
-                       permission check) should resolve it to a concrete list
-                       first if the same ids will be reused across multiple
-                       calls, rather than passing the complex queryset itself
-                       into each -- see ``_get_selection_data_for_queryset``.
+                       or a simple (already resolved) queryset of ids. Keep
+                       the list small: it is embedded in the statement as
+                       literal parameters.
         target_field: field on the relation pointing to Document id
     """
 

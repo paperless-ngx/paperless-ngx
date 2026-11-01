@@ -49,6 +49,7 @@ from documents.models import WorkflowTrigger
 from documents.search import get_backend
 from documents.signals.handlers import run_workflows
 from documents.tests.utils import ConsumeTaskMixin
+from documents.views import DocumentViewSet
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import DocumentFactory
 from paperless_testing.factories import TagFactory
@@ -1754,6 +1755,106 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             for item in selection_data["selected_custom_fields"]
         }
         self.assertEqual(counts_by_field[custom_field.id], 1)
+
+    def test_selection_data_counts_with_shared_by_filter(self) -> None:
+        """
+        GIVEN:
+            - Several documents owned by one user with the same correspondent
+              and document type, only one of which is shared
+        WHEN:
+            - Requesting the document list filtered by shared_by__id with
+              include_selection_data=true
+        THEN:
+            - Counts reflect only the shared document, not every document the
+              owner has with that correspondent or document type, however the
+              link-table lookups are batched
+        """
+        owner = User.objects.create_user(username="owner")
+        other = User.objects.create_user(username="other")
+        correspondent = Correspondent.objects.create(name="c1")
+        doc_type = DocumentType.objects.create(name="dt1")
+        tag = Tag.objects.create(name="tag")
+        docs = [
+            Document.objects.create(
+                checksum=str(i),
+                owner=owner,
+                correspondent=correspondent,
+                document_type=doc_type,
+            )
+            for i in range(3)
+        ]
+        for doc in docs:
+            doc.tags.add(tag)
+        grant_object(other, docs[0], "view_document")
+
+        for batch_size in (10_000, 1):
+            with (
+                self.subTest(link_batch_size=batch_size),
+                mock.patch.object(
+                    DocumentViewSet,
+                    "selection_data_link_batch_size",
+                    batch_size,
+                ),
+            ):
+                response = self.client.get(
+                    f"/api/documents/?shared_by__id={owner.id}"
+                    "&include_selection_data=true",
+                )
+
+                self.assertEqual(response.status_code, status.HTTP_200_OK)
+                self.assertEqual(response.data["count"], 1)
+                selection_data = response.data["selection_data"]
+                for key, obj in (
+                    ("selected_correspondents", correspondent),
+                    ("selected_document_types", doc_type),
+                    ("selected_tags", tag),
+                ):
+                    counts = {
+                        item["id"]: item["document_count"]
+                        for item in selection_data[key]
+                    }
+                    self.assertEqual(counts[obj.id], 1, key)
+
+    def test_selection_data_counts_documents_once_when_filter_joins(self) -> None:
+        """
+        GIVEN:
+            - A document matching a multi-valued filter through two tags
+        WHEN:
+            - Requesting the document list with include_selection_data=true
+        THEN:
+            - The document is counted once per correspondent, not once per
+              matching tag, however the link-table lookups are batched
+        """
+        correspondent = Correspondent.objects.create(name="c1")
+        tag_a = Tag.objects.create(name="a")
+        tag_b = Tag.objects.create(name="b")
+        both = Document.objects.create(checksum="1", correspondent=correspondent)
+        both.tags.add(tag_a, tag_b)
+        only_a = Document.objects.create(checksum="2", correspondent=correspondent)
+        only_a.tags.add(tag_a)
+
+        for batch_size in (10_000, 1):
+            with (
+                self.subTest(link_batch_size=batch_size),
+                mock.patch.object(
+                    DocumentViewSet,
+                    "selection_data_link_batch_size",
+                    batch_size,
+                ),
+            ):
+                response = self.client.get(
+                    f"/api/documents/?tags__id__in={tag_a.id},{tag_b.id}"
+                    "&include_selection_data=true",
+                )
+
+                self.assertEqual(response.status_code, status.HTTP_200_OK)
+                counts = {
+                    item["id"]: item["document_count"]
+                    for item in response.data["selection_data"][
+                        "selected_correspondents"
+                    ]
+                }
+                self.assertEqual(counts[correspondent.id], 2)
 
     def test_statistics(self) -> None:
         doc1 = Document.objects.create(
