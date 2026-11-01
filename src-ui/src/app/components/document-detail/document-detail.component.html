@@ -485,7 +485,7 @@
                 </div>
               }
               <div class="input-group input-group-sm w-auto flex-nowrap">
-                <button class="btn btn-outline-secondary" (click)="decreaseZoom()" aria-label="Zoom out" i18n-aria-label>
+                <button class="btn btn-outline-secondary" type="button" (click)="decreaseZoom()" aria-label="Zoom out" i18n-aria-label>
                   <i-bs width="1em" height="1em" name="dash"></i-bs>
                 </button>
                 <select class="form-select" (change)="setZoom($event.target.value)" [ngModelOptions]="{standalone: true}" [ngModel]="currentZoom" aria-label="Zoom" i18n-aria-label>
@@ -495,7 +495,7 @@
                     </option>
                   }
                 </select>
-                <button class="btn btn-outline-secondary" (click)="increaseZoom()" aria-label="Zoom in" i18n-aria-label>
+                <button class="btn btn-outline-secondary" type="button" (click)="increaseZoom()" aria-label="Zoom in" i18n-aria-label>
                   <i-bs width="1em" height="1em" name="plus"></i-bs>
                 </button>
               </div>
