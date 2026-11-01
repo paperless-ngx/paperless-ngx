@@ -1273,6 +1273,21 @@ describe('DocumentDetailComponent', () => {
     expect(fixture.debugElement.query(By.css('pngx-pdf-viewer'))).not.toBeNull()
   })
 
+  it('should pass the active search query to the built-in pdf viewer', async () => {
+    initNormally()
+    component.document.update((document) => ({
+      ...document,
+      archived_file_name: 'file.pdf',
+    }))
+    settingsService.set(SETTINGS_KEYS.USE_NATIVE_PDF_VIEWER, false)
+    documentService.searchQuery = 'invoice 12345'
+    await fixture.whenStable()
+    const viewer = fixture.debugElement.query(By.css('pngx-pdf-viewer'))
+    expect(viewer).not.toBeNull()
+    expect(viewer.componentInstance.searchQuery).toBe('invoice 12345')
+    documentService.searchQuery = ''
+  })
+
   it('should display native pdf viewer if enabled', () => {
     initNormally()
     component.document.update((document) => ({
