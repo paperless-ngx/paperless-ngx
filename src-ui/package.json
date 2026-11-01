@@ -30,7 +30,7 @@
     "bootstrap": "^5.3.8",
     "file-saver": "^2.0.5",
     "lodash-es": "^4.18.1",
-    "marked": "~18.0.14",
+    "marked": "~18.1.1",
     "mime-names": "^1.0.0",
     "ngx-bootstrap-icons": "^1.9.3",
     "ngx-color": "^10.1.0",
