@@ -1,7 +1,8 @@
-.card-body {
-    white-space: pre-wrap;
-}
-
 .card:hover .fade {
     opacity: 1;
+}
+
+.note-preview {
+  min-height: calc(calc(1.5em * 3) + 0.5rem + calc(var(--bs-border-width) * 2)); // textfield height with 3 rows
+  overflow: auto;
 }
