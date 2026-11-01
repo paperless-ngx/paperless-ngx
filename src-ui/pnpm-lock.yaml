@@ -94,8 +94,8 @@ importers:
         specifier: ^3.1.0
         version: 3.1.0
       uuid:
-        specifier: ^14.0.2
-        version: 14.0.2
+        specifier: ^14.0.3
+        version: 14.0.3
     devDependencies:
       '@angular-builders/jest':
         specifier: ^22.0.1
@@ -4105,8 +4105,8 @@ packages:
   utif@3.1.0:
     resolution: {integrity: sha512-WEo4D/xOvFW53K5f5QTaTbbiORcm2/pCL9P6qmJnup+17eYfKaEhDeX9PeQkuyEoIxlbGklDuGl8xwuXYMrrXQ==}
 
-  uuid@14.0.2:
-    resolution: {integrity: sha512-xZe/16rV4aa+HGSOCiY2YeLT1OybRLrrkL/Rqaq7p7GMVXjFh+6wN4oMYgjFmnSnhY8t6Xpdl2l9qmnHYuMHwQ==}
+  uuid@14.0.3:
+    resolution: {integrity: sha512-Sc5u1VVln93y1Xnz4R+CunOZc7R9LUcTmhj7Rc7Eg3HVcf7rVn2FOoa812fe0W8p3jD7xeoGSYbfqCGGH2B6xw==}
     hasBin: true
 
   v8-compile-cache-lib@3.0.1:
@@ -7107,7 +7107,7 @@ snapshots:
     dependencies:
       mkdirp: 1.0.4
       strip-ansi: 6.0.1
-      uuid: 14.0.2
+      uuid: 14.0.3
       xml: 1.0.1
 
   jest-leak-detector@30.5.1:
@@ -8302,7 +8302,7 @@ snapshots:
     dependencies:
       pako: 1.0.11
 
-  uuid@14.0.2: {}
+  uuid@14.0.3: {}
 
   v8-compile-cache-lib@3.0.1: {}
 
