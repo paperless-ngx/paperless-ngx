@@ -1,0 +1,36 @@
+@if (zones.length === 0) {
+  <p class="text-muted" i18n>No zones yet. Drag anywhere on the sample document to create one.</p>
+} @else {
+  <div class="list-group">
+    @for (zone of zones; track $index; let i = $index) {
+      <div class="list-group-item list-group-item-action d-flex align-items-center gap-3 position-relative">
+        <span class="p-2 rounded flex-shrink-0" [style.background-color]="zoneColor(i)" aria-hidden="true"></span>
+        <div class="flex-grow-1 text-truncate">
+          <button type="button" class="btn btn-link p-0 fw-semibold text-reset text-decoration-none text-truncate mw-100 stretched-link" (click)="zoneSelected.emit(i)">{{ zone.name }}</button>
+          @if (!hasField(zone)) {
+            <div class="small text-warning text-truncate">
+              <i-bs name="exclamation-triangle" class="me-1" aria-hidden="true"></i-bs><span i18n>No field selected</span>
+            </div>
+          } @else {
+            <div class="small text-muted text-truncate">
+              {{ getZoneTargetName(zone) }}
+              @if (isCombined(zone)) {
+                <i-bs name="braces" class="ms-1" title="Combined with other zones" i18n-title></i-bs>
+              }
+            </div>
+          }
+        </div>
+        <small class="text-muted text-nowrap">
+          @if (zone.page === -1) {
+            <ng-container i18n>Last page</ng-container>
+          } @else {
+            <ng-container i18n>Page {{ zone.page ?? 1 }}</ng-container>
+          }
+        </small>
+        <button type="button" class="btn btn-sm btn-link text-danger position-relative z-2" (click)="zoneRemoved.emit(i)" title="Delete zone" i18n-title aria-label="Delete zone" i18n-aria-label>
+          <i-bs name="trash"></i-bs>
+        </button>
+      </div>
+    }
+  </div>
+}

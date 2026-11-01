@@ -3,12 +3,16 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { DirtyCheckGuard } from '@ngneat/dirty-check-forms'
 import { Observable, Subject } from 'rxjs'
 import { ConfirmDialogComponent } from 'src/app/components/common/confirm-dialog/confirm-dialog.component'
+import { ActivatedRouteSnapshot } from '@angular/router'
 
 @Injectable({ providedIn: 'root' })
 export class DirtyFormGuard extends DirtyCheckGuard {
   private modalService = inject(NgbModal)
 
-  confirmChanges(): Observable<boolean> {
+  confirmChanges(
+    _currentRoute?: ActivatedRouteSnapshot,
+    leaveLabel: string = $localize`Leave page`
+  ): Observable<boolean> {
     let modal = this.modalService.open(ConfirmDialogComponent, {
       backdrop: 'static',
     })
@@ -16,7 +20,7 @@ export class DirtyFormGuard extends DirtyCheckGuard {
     modal.componentInstance.messageBold = $localize`You have unsaved changes.`
     modal.componentInstance.message = $localize`Are you sure you want to leave?`
     modal.componentInstance.btnClass = 'btn-warning'
-    modal.componentInstance.btnCaption = $localize`Leave page`
+    modal.componentInstance.btnCaption = leaveLabel
     modal.componentInstance.confirmClicked.subscribe(() => {
       modal.componentInstance.buttonsEnabled.set(false)
       modal.close()

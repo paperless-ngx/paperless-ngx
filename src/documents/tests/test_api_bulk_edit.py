@@ -12,6 +12,7 @@ from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
+from documents.models import OcrTemplate
 from documents.models import StoragePath
 from documents.models import Tag
 from paperless_testing.dirs import DirectoriesMixin
@@ -582,6 +583,87 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         args, kwargs = m.call_args
         self.assertEqual(args[0], [self.doc1.id])
         self.assertEqual(kwargs, {"remote_ocr": True})
+
+    @mock.patch("documents.views.bulk_edit.run_zone_ocr")
+    def test_run_zone_ocr_documents_endpoint(self, m) -> None:
+        """
+        GIVEN:
+            - API data to run zone OCR on a document
+        WHEN:
+            - API is called
+        THEN:
+            - run_zone_ocr is called with the document
+        """
+        self.setup_mock(m, "run_zone_ocr")
+        response = self.client.post(
+            "/api/documents/run_zone_ocr/",
+            json.dumps({"documents": [self.doc1.id]}),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        m.assert_called_once()
+        args, kwargs = m.call_args
+        self.assertEqual(args[0], [self.doc1.id])
+        self.assertEqual(kwargs, {})
+
+    @mock.patch("documents.views.bulk_edit.run_zone_ocr")
+    def test_run_zone_ocr_documents_endpoint_with_template(self, m) -> None:
+        """
+        GIVEN:
+            - API data to run a chosen OCR template on a document
+        WHEN:
+            - API is called
+        THEN:
+            - run_zone_ocr is called with the template
+        """
+        self.setup_mock(m, "run_zone_ocr")
+        template = OcrTemplate.objects.create(
+            name="Bills",
+            source_width=100,
+            source_height=100,
+        )
+        response = self.client.post(
+            "/api/documents/run_zone_ocr/",
+            json.dumps({"documents": [self.doc1.id], "template": template.pk}),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        m.assert_called_once()
+        args, kwargs = m.call_args
+        self.assertEqual(args[0], [self.doc1.id])
+        self.assertEqual(kwargs, {"template": template})
+
+    @mock.patch("documents.views.bulk_edit.run_zone_ocr")
+    def test_run_zone_ocr_documents_endpoint_rejects_private_template(
+        self,
+        m,
+    ) -> None:
+        """
+        GIVEN:
+            - A user who can change the documents but not view the template
+        WHEN:
+            - API is called with that template
+        THEN:
+            - The whole request is refused
+        """
+        user = UserFactory(username="editor")
+        grant_global(user, "view_document", "change_document")
+        template = OcrTemplate.objects.create(
+            name="Private",
+            owner=UserFactory(username="other"),
+            source_width=100,
+            source_height=100,
+        )
+        self.client.force_authenticate(user=user)
+
+        response = self.client.post(
+            "/api/documents/run_zone_ocr/",
+            json.dumps({"documents": [self.doc1.id], "template": template.pk}),
+            content_type="application/json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        m.assert_not_called()
 
     @mock.patch("documents.serialisers.bulk_edit.set_storage_path")
     def test_api_set_storage_path(self, m) -> None:
