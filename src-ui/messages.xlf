@@ -10,7 +10,7 @@
         </context-group>
       </trans-unit>
       <trans-unit id="ngb.carousel.slide-number" datatype="html">
-        <source> Slide <x id="INTERPOLATION" equiv-text="xt(source?: Ngb"/> of <x id="INTERPOLATION_1" equiv-text="this._cycleToSe"/> </source>
+        <source> Slide <x id="INTERPOLATION" equiv-text="source?: NgbSli"/> of <x id="INTERPOLATION_1" equiv-text="s._cycleToSelec"/> </source>
         <context-group purpose="location">
           <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.2_@angular+core@22.2.2_@angular+_56804c6e9d763769999573a32671b982/node_modules/src/carousel/carousel.ts</context>
           <context context-type="linenumber">386,393</context>
