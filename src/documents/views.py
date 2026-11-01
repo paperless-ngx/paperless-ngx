@@ -615,7 +615,7 @@ class TagViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet[Tag]):
         queryset = queryset.order_by(*ordering)
 
         all_tags = list(queryset)
-        descendant_pks = {pk for tag in all_tags for pk in tag.get_descendants_pks()}
+        descendant_pks = Tag.get_hierarchy().descendants(t.pk for t in all_tags)
 
         if descendant_pks:
             user = getattr(getattr(self, "request", None), "user", None)
@@ -5061,12 +5061,7 @@ class BulkEditObjectsView(PassUserMixin):
             if object_type == "tags":
                 editable_ids = set(user_permitted_objects.values_list("pk", flat=True))
                 all_ids = set(objs.values_list("pk", flat=True))
-                for tag in objs:
-                    all_ids.update(
-                        descendant.pk
-                        for descendant in tag.get_descendants()
-                        if descendant.pk in editable_ids
-                    )
+                all_ids.update(Tag.get_hierarchy().descendants(all_ids) & editable_ids)
                 objs = object_class.objects.filter(pk__in=all_ids)
             objs = objs.select_related("owner")
             object_ids = list(objs.values_list("pk", flat=True))

@@ -589,7 +589,7 @@ class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
 
     text_color = serializers.SerializerMethodField()
 
-    # map to treenode's tn_parent
+    # Preserve the public API parent field.
     parent = serializers.PrimaryKeyRelatedField(
         queryset=Tag.objects.all(),
         allow_null=True,
@@ -692,7 +692,9 @@ class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
                 self.instance.clean()
             except ValidationError as e:
                 logger.debug("Tag parent validation failed: %s", e)
-                raise e
+                raise serializers.ValidationError(
+                    {"parent": e.message_dict["tn_parent"]},
+                ) from e
             finally:
                 self.instance.tn_parent = original_parent
         else:
@@ -702,7 +704,9 @@ class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
                 temp.clean()
             except ValidationError as e:
                 logger.debug("Tag parent validation failed: %s", e)
-                raise e
+                raise serializers.ValidationError(
+                    {"parent": e.message_dict["tn_parent"]},
+                ) from e
 
         return super().validate(attrs)
 
@@ -1198,61 +1202,35 @@ class DocumentSerializer(
                             doc_id,
                         )
         if "tags" in validated_data:
-            # Respect tag hierarchy on updates:
-            # - Adding a child adds its ancestors
-            # - Removing a parent removes all its descendants
-            prev_tags = set(instance.tags.all())
-            requested_tags = set(validated_data["tags"])
+            hierarchy = Tag.get_hierarchy()
+            previous_ids = set(instance.tags.values_list("pk", flat=True))
+            requested_ids = {tag.pk for tag in validated_data["tags"]}
+            required_ids = hierarchy.with_ancestors(requested_ids - previous_ids)
+            blocked_ids = hierarchy.with_descendants(previous_ids - requested_ids)
+            blocked_ids.difference_update(required_ids)
+            final_ids = hierarchy.with_ancestors(requested_ids) - blocked_ids
+            validated_data["tags"] = list(Tag.objects.filter(pk__in=final_ids))
 
-            # Tags newly added in this update and the ancestors they require
-            added_tags = requested_tags - prev_tags
-            required_by_add_tags = set(added_tags)
-            for t in added_tags:
-                required_by_add_tags.update(t.get_ancestors())
-
-            # Tags being removed in this update and all descendants, except
-            # those required by a tag that is being added in this same update
-            removed_tags = prev_tags - requested_tags
-            blocked_tags = set(removed_tags)
-            for t in removed_tags:
-                blocked_tags.update(t.get_descendants())
-            blocked_tags.difference_update(required_by_add_tags)
-
-            # Add all parent tags
-            final_tags = set(requested_tags)
-            for t in requested_tags:
-                final_tags.update(t.get_ancestors())
-
-            # Drop removed parents and their descendants
-            final_tags.difference_update(blocked_tags)
-
-            validated_data["tags"] = list(final_tags)
         if validated_data.get("remove_inbox_tags"):
-            current_tag_ids = {t.pk for t in instance.tags.all()}
+            hierarchy = Tag.get_hierarchy()
             tags = (
                 validated_data["tags"]
                 if "tags" in validated_data
                 else list(instance.tags.all())
             )
-
-            # Tags newly added in this update, plus their ancestors, are kept
-            keep_ids: set[int] = set()
-            for tag in tags:
-                if tag.pk not in current_tag_ids:
-                    keep_ids.add(tag.pk)
-                    keep_ids.update(int(pk) for pk in tag.get_ancestors_pks())
-
-            # Remove inbox tags and their descendants, except those being kept
-            remove_ids: set[int] = set()
-            for inbox_tag in (
+            current_ids = set(instance.tags.values_list("pk", flat=True))
+            keep_ids = hierarchy.with_ancestors(
+                tag.pk for tag in tags if tag.pk not in current_ids
+            )
+            inbox_ids = (
                 Tag.objects.filter(is_inbox_tag=True)
-                .exclude(pk__in=keep_ids)
-                .only("pk", "tn_descendants_pks")
-            ):
-                remove_ids.add(inbox_tag.pk)
-                remove_ids.update(int(pk) for pk in inbox_tag.get_descendants_pks())
-
-            validated_data["tags"] = [t for t in tags if t.pk not in remove_ids]
+                .exclude(
+                    pk__in=keep_ids,
+                )
+                .values_list("pk", flat=True)
+            )
+            remove_ids = hierarchy.with_descendants(inbox_ids) - keep_ids
+            validated_data["tags"] = [tag for tag in tags if tag.pk not in remove_ids]
 
         if settings.AUDIT_LOG_ENABLED:
             with set_actor(self.user):
