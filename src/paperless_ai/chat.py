@@ -22,7 +22,6 @@ logger = logging.getLogger("paperless_ai.chat")
 CHAT_METADATA_DELIMITER = "\n\n__PAPERLESS_CHAT_METADATA__"
 CHAT_ERROR_MESSAGE = "Sorry, something went wrong while generating a response."
 CHAT_NO_CONTENT_MESSAGE = "Sorry, I couldn't find any content to answer your question."
-MAX_CHAT_REFERENCES = 3
 CHAT_RETRIEVER_TOP_K = 5
 
 
@@ -80,9 +79,6 @@ def _get_document_references(
             _build_document_reference(document, node.metadata.get("title")),
         )
 
-        if len(references) >= MAX_CHAT_REFERENCES:  # pragma: no cover
-            break
-
     return references
 
 
@@ -123,10 +119,24 @@ def _stream_chat_with_documents(
         yield CHAT_NO_CONTENT_MESSAGE
         return
 
+    from llama_index.core.postprocessor.types import BaseNodePostprocessor
     from llama_index.core.prompts import PromptTemplate
     from llama_index.core.query_engine import RetrieverQueryEngine
     from llama_index.core.response_synthesizers import get_response_synthesizer
     from llama_index.core.retrievers import VectorIndexRetriever
+
+    class CitationMetadataPostprocessor(BaseNodePostprocessor):
+        def _postprocess_nodes(self, nodes, query_bundle=None):
+            # Stored nodes exclude document_id from LLM context. Expose it
+            # only for chat so citations do not require rebuilding the index
+            # or changing the text used to generate embeddings.
+            for node in nodes:
+                node.node.excluded_llm_metadata_keys = [
+                    key
+                    for key in node.node.excluded_llm_metadata_keys
+                    if key != "document_id"
+                ]
+            return nodes
 
     config = AIConfig()
     if unrestricted:
@@ -184,6 +194,7 @@ def _stream_chat_with_documents(
             llm=client.llm,
             response_synthesizer=response_synthesizer,
             streaming=True,
+            node_postprocessors=[CitationMetadataPostprocessor()],
         )
 
         logger.debug("Document chat query: %s", query_str)

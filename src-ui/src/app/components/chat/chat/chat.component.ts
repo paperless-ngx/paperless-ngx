@@ -8,7 +8,7 @@ import {
 } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NavigationEnd, Router, RouterModule } from '@angular/router'
-import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap'
+import { NgbDropdownModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { filter, map, Subscription } from 'rxjs'
 import { MarkdownPipe } from 'src/app/pipes/markdown.pipe'
@@ -29,6 +29,7 @@ const SLOW_RESPONSE_DELAY_MS = 8000
     RouterModule,
     NgxBootstrapIconsModule,
     NgbDropdownModule,
+    NgbTooltipModule,
     MarkdownPipe,
   ],
   templateUrl: './chat.component.html',
@@ -129,6 +130,14 @@ export class ChatComponent implements OnInit {
           this.finishStreaming(assistantMessage)
         },
         complete: () => {
+          if (assistantMessage.references?.length) {
+            this.chatService
+              .validateReferences(assistantMessage.references)
+              .subscribe((references) => {
+                assistantMessage.references = references
+                this.notifyMessagesChanged()
+              })
+          }
           // let the typewriter catch up before hiding the cursor
           this.streamFinished = true
           if (!this.typewriterActive) this.finishStreaming(assistantMessage)

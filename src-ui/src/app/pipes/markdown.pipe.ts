@@ -1,5 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core'
 import { Marked, Renderer, Tokens } from 'marked'
+import { ChatReference } from 'src/app/services/chat.service'
 
 const ALLOWED_LINK_PROTOCOLS = new Set(['http:', 'https:', 'mailto:'])
 
@@ -45,8 +46,58 @@ const markdown = new Marked({
   name: 'markdown',
 })
 export class MarkdownPipe implements PipeTransform {
-  transform(value: string | null | undefined): string {
+  transform(
+    value: string | null | undefined,
+    references?: ChatReference[]
+  ): string {
     if (!value) return ''
+    if (references !== undefined) {
+      const titles = new Map(
+        references.map((reference) => [reference.id, reference])
+      )
+      const withCitations = new Marked({
+        async: false,
+        gfm: true,
+        breaks: true,
+        renderer,
+        extensions: [
+          {
+            name: 'documentCitation',
+            level: 'inline',
+            start: (source) => source.indexOf('[[document:'),
+            tokenizer(source) {
+              const match = /^\[\[document:(\d+)\]\]/.exec(source)
+              if (match) {
+                return {
+                  type: 'documentCitation',
+                  raw: match[0],
+                  id: +match[1],
+                }
+              }
+            },
+            renderer(token) {
+              const reference = titles.get(token.id)
+              const error =
+                reference?.error ??
+                (!reference
+                  ? $localize`The model cited a document that was not in the retrieved results. This citation cannot be verified.`
+                  : null)
+              const title = (error ?? reference.title)
+                .replace(/&/g, '&amp;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+              if (error) {
+                return `<span class="chat-citation text-danger" title="${title}">[${token.id}] ⚠</span>`
+              }
+              return `<a href="/documents/${token.id}" class="chat-citation" title="${title}">[${token.id}]</a>`
+            },
+          },
+        ],
+      })
+      return withCitations.parse(value) as string
+    }
     return markdown.parse(value) as string
   }
 }

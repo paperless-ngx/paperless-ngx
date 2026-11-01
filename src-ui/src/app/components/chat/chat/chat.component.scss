@@ -12,6 +12,22 @@
   display: none;
 }
 
+.chat-references {
+  white-space: normal;
+
+  summary {
+    cursor: pointer;
+  }
+
+  summary::before {
+    content: '\25b8';
+  }
+
+  &[open] summary::before {
+    content: '\25be';
+  }
+}
+
 .dropdown-item {
   white-space: initial;
 }

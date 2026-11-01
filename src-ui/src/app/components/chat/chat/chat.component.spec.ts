@@ -5,7 +5,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { NavigationEnd, Router } from '@angular/router'
 import { RouterTestingModule } from '@angular/router/testing'
 import { allIcons, NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { Subject } from 'rxjs'
+import { of, Subject } from 'rxjs'
 import {
   CHAT_METADATA_DELIMITER,
   ChatService,
@@ -40,6 +40,9 @@ describe('ChatComponent', () => {
       .spyOn(router, 'events', 'get')
       .mockReturnValue(routerEvents$.asObservable())
     chatService = TestBed.inject(ChatService)
+    jest
+      .spyOn(chatService, 'validateReferences')
+      .mockImplementation((references) => of(references))
     mockStream$ = new Subject<string>()
     jest
       .spyOn(chatService, 'streamChat')
@@ -141,7 +144,17 @@ describe('ChatComponent', () => {
     fixture.detectChanges()
 
     const link = fixture.nativeElement.querySelector('.chat-references a')
+    const references = fixture.nativeElement.querySelector('.chat-references')
+    expect(references.tagName).toBe('DETAILS')
+    expect(references.open).toBe(false)
+    expect(references.querySelector('summary').textContent).toContain(
+      'References'
+    )
+    expect(references.querySelector('button').getAttribute('aria-label')).toBe(
+      'About references'
+    )
     expect(link.textContent).toContain('Bread Recipe')
+    expect(link.textContent).toContain('[42]')
     expect(link.getAttribute('href')).toContain('/documents/42')
   })
 

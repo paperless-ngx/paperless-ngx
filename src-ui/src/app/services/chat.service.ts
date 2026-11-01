@@ -2,9 +2,10 @@ import {
   HttpClient,
   HttpDownloadProgressEvent,
   HttpEventType,
+  HttpResponse,
 } from '@angular/common/http'
 import { inject, Injectable } from '@angular/core'
-import { filter, map, Observable } from 'rxjs'
+import { catchError, filter, forkJoin, map, Observable, of } from 'rxjs'
 import { environment } from 'src/environments/environment'
 
 export interface ChatMessage {
@@ -17,6 +18,7 @@ export interface ChatMessage {
 export interface ChatReference {
   id: number
   title: string
+  error?: string
 }
 
 export interface ParsedChatResponse {
@@ -59,6 +61,28 @@ export function parseChatResponse(response: string): ParsedChatResponse {
 export class ChatService {
   private http: HttpClient = inject(HttpClient)
 
+  validateReferences(references: ChatReference[]): Observable<ChatReference[]> {
+    if (!references.length) return of([])
+    return forkJoin(
+      references.map((reference) =>
+        this.http
+          .get<{ title: string }>(
+            `${environment.apiBaseUrl}documents/${reference.id}/`,
+            { params: { fields: 'id,title' }, withCredentials: true }
+          )
+          .pipe(
+            map((document) => ({ ...reference, title: document.title })),
+            catchError(() =>
+              of({
+                ...reference,
+                error: $localize`This document could not be fetched. It may have been deleted, access may have changed, or the server may be unavailable.`,
+              })
+            )
+          )
+      )
+    )
+  }
+
   streamChat(documentId: number, prompt: string): Observable<string> {
     return this.http
       .post(
@@ -78,6 +102,9 @@ export class ChatService {
         map((event) => {
           if (event.type === HttpEventType.DownloadProgress) {
             return (event as HttpDownloadProgressEvent).partialText!
+          }
+          if (event.type === HttpEventType.Response) {
+            return (event as HttpResponse<string>).body
           }
         }),
         filter((chunk) => !!chunk)

@@ -3,6 +3,58 @@ import { MarkdownPipe } from './markdown.pipe'
 describe('MarkdownPipe', () => {
   const pipe = new MarkdownPipe()
 
+  it('should link only citations in the retrieved document allowlist', () => {
+    const html = pipe.transform(
+      '**Supported** [[document:42]] Unknown [[document:999]]',
+      [{ id: 42, title: 'Source' }]
+    )
+    expect(html).toContain('<strong>Supported</strong>')
+    expect(html).toContain('href="/documents/42"')
+    expect(html).toContain('title="Source"')
+    expect(html).not.toContain('/documents/999')
+    expect(html).toContain('text-danger')
+    expect(html).toContain('[999]')
+  })
+
+  it('should flag citations when no retrieved documents were returned', () => {
+    const html = pipe.transform('[[document:99]]', [])
+    expect(html).toContain('text-danger')
+    expect(html).not.toContain('<a')
+  })
+
+  it('should flag a retrieved document that could not be fetched', () => {
+    const html = pipe.transform('[[document:42]]', [
+      { id: 42, title: 'Source', error: 'Document unavailable' },
+    ])
+    expect(html).toContain('title="Document unavailable"')
+    expect(html).toContain('text-danger')
+    expect(html).not.toContain('<a')
+  })
+
+  it('should escape document titles in citation tooltips', () => {
+    const html = pipe.transform('[[document:42]]', [
+      { id: 42, title: '\" onmouseover=\"alert(1) <script> & receipt' },
+    ])
+    const element = document.createElement('div')
+    element.innerHTML = html
+    const link = element.querySelector('a')
+    expect(link.getAttribute('title')).toBe(
+      '\" onmouseover=\"alert(1) <script> & receipt'
+    )
+    expect(link.hasAttribute('onmouseover')).toBe(false)
+    expect(element.querySelector('script')).toBeNull()
+  })
+
+  it('should not interpret citation markers inside code or raw HTML', () => {
+    const html = pipe.transform(
+      '`[[document:42]]` <img src=x onerror="alert(1)">',
+      [{ id: 42, title: 'Source' }]
+    )
+    expect(html).toContain('<code>[[document:42]]</code>')
+    expect(html).not.toContain('href="/documents/42"')
+    expect(html).not.toContain('<img')
+  })
+
   it('should return empty string for empty input', () => {
     expect(pipe.transform(null)).toEqual('')
     expect(pipe.transform(undefined)).toEqual('')
