@@ -2,10 +2,27 @@
   <div>
     <form [formGroup]="noteForm" class="needs-validation mt-3" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.Note }" novalidate>
       <div class="form-group">
-        <textarea class="form-control form-control-sm" [class.is-invalid]="newNoteError" rows="3" formControlName="newNote" placeholder="Enter note" i18n-placeholder (keydown)="noteFormKeydown($event)" required></textarea>
-        <div class="invalid-feedback" i18n>
-                Please enter a note.
-            </div>
+        <div class="d-flex justify-content-end mb-2">
+          <fieldset class="btn-group btn-group-sm" aria-label="Note input mode" i18n-aria-label>
+            <input type="radio" class="btn-check" id="noteViewEdit" name="noteViewMode" [value]="NoteViewMode.Edit" [checked]="noteView() === NoteViewMode.Edit" (change)="setNoteView(NoteViewMode.Edit)">
+            <label class="btn btn-outline-secondary" for="noteViewEdit" i18n>Edit</label>
+            <input type="radio" class="btn-check" id="noteViewPreview" name="noteViewMode" [value]="NoteViewMode.Preview" [checked]="noteView() === NoteViewMode.Preview" (change)="setNoteView(NoteViewMode.Preview)">
+            <label class="btn btn-outline-secondary" for="noteViewPreview" i18n>Preview</label>
+          </fieldset>
+        </div>
+        <textarea class="form-control form-control-sm" [class.is-invalid]="newNoteError" [class.d-none]="noteView() !== NoteViewMode.Edit" [attr.aria-invalid]="newNoteError" aria-label="Note" i18n-aria-label aria-describedby="noteFeedback" rows="3" formControlName="newNote" placeholder="Enter note (Markdown is supported)" i18n-placeholder (keydown)="noteFormKeydown($event)" required></textarea>
+        @if (noteView() === NoteViewMode.Preview) {
+          <div class="form-control form-control-sm note-preview" role="region" aria-label="Note preview" i18n-aria-label tabindex="0">
+            @if (noteForm.get('newNote').value) {
+              <div class="markdown-preview" [innerHTML]="noteForm.get('newNote').value | markdown"></div>
+            } @else {
+              <span class="text-muted" i18n>Nothing to preview</span>
+            }
+          </div>
+        }
+        <div id="noteFeedback" class="invalid-feedback" i18n>
+          Please enter a note.
+        </div>
       </div>
       <div class="form-group mt-2 d-flex justify-content-end align-items-center">
         @if (networkActive()) {
@@ -18,7 +35,7 @@
       @for (note of notes(); track note) {
         <div class="card border mb-3">
           <div class="card-body text-dark">
-            <p class="card-text">{{note.note}}</p>
+            <div class="card-text markdown-preview" [innerHTML]="note.note | markdown"></div>
           </div>
           <div class="d-flex card-footer small bg-light text-primary justify-content-between align-items-center">
             <span>{{displayName(note)}} - {{ note.created | customDate}}</span>

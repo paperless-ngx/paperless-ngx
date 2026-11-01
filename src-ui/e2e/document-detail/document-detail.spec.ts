@@ -155,3 +155,135 @@ test('should finish reloading the preview after a remote document update', async
     )
     .toBe(true)
 })
+
+test('should render saved notes as sanitized markdown', async ({ page }) => {
+  const markdown =
+    '**Bold note**\n\n- first item\n- second item\n\n[Paperless](https://example.com)\n\n<script>alert("xss")</script>'
+  await page.route(
+    (url) =>
+      url.pathname.endsWith('/api/documents/1/') &&
+      url.searchParams.get('full_perms') === 'true',
+    async (route) => {
+      const response = await route.fetch()
+      const document = await response.json()
+      await route.fulfill({
+        response,
+        json: {
+          ...document,
+          notes: [
+            { id: 101, note: markdown, created: new Date().toISOString() },
+          ],
+        },
+      })
+    }
+  )
+
+  await page.goto('/documents/1/notes')
+
+  const renderedNote = page.locator('pngx-document-notes .card-text').first()
+  await expect(renderedNote.locator('strong')).toHaveText('Bold note')
+  await expect(renderedNote.locator('li')).toHaveCount(2)
+  await expect(
+    renderedNote.getByRole('link', { name: 'Paperless' })
+  ).toHaveAttribute('href', 'https://example.com')
+  await expect(renderedNote.locator('script')).toHaveCount(0)
+  await page.unrouteAll({ behavior: 'ignoreErrors' })
+})
+
+test('should toggle markdown note preview and retain the draft', async ({
+  page,
+}) => {
+  await page.route(
+    (url) =>
+      url.pathname.endsWith('/api/documents/1/') &&
+      url.searchParams.get('full_perms') === 'true',
+    async (route) => {
+      const response = await route.fetch()
+      const document = await response.json()
+      await route.fulfill({ response, json: { ...document, notes: [] } })
+    }
+  )
+
+  await page.goto('/documents/1/notes')
+
+  const notes = page.locator('pngx-document-notes')
+  const modeGroup = notes.getByRole('group', { name: 'Note input mode' })
+  const editRadio = modeGroup.getByRole('radio', { name: 'Edit', exact: true })
+  const previewRadio = modeGroup.getByRole('radio', {
+    name: 'Preview',
+    exact: true,
+  })
+  const editButton = modeGroup.getByText('Edit', { exact: true })
+  const previewButton = modeGroup.getByText('Preview', { exact: true })
+  await expect(editRadio).toBeChecked()
+  await expect(previewRadio).not.toBeChecked()
+  await previewButton.click()
+  await expect(notes.locator('.note-preview')).toContainText(
+    'Nothing to preview'
+  )
+
+  await editButton.click()
+  const markdown = '**draft**\n\n- list item'
+  await notes.locator('textarea').fill(markdown)
+  await previewButton.click()
+  const preview = notes.locator('.note-preview .markdown-preview')
+  await expect(preview.locator('strong')).toHaveText('draft')
+  await expect(preview.locator('li')).toHaveText('list item')
+  await expect(previewRadio).toBeChecked()
+  await expect(editRadio).not.toBeChecked()
+
+  await editButton.click()
+  await expect(notes.locator('textarea')).toHaveValue(markdown)
+  await expect(editRadio).toBeChecked()
+  await expect(previewRadio).not.toBeChecked()
+  await page.unrouteAll({ behavior: 'ignoreErrors' })
+})
+
+test('should add a markdown note from preview mode', async ({ page }) => {
+  const markdown = '**saved from preview**\n\n- a list item'
+  let documentNotes = []
+  let submittedNote: string | undefined
+
+  await page.route(
+    (url) =>
+      url.pathname.endsWith('/api/documents/1/') &&
+      url.searchParams.get('full_perms') === 'true',
+    async (route) => {
+      const response = await route.fetch()
+      const document = await response.json()
+      await route.fulfill({
+        response,
+        json: { ...document, notes: documentNotes },
+      })
+    }
+  )
+  await page.route('**/api/documents/1/notes/', async (route) => {
+    if (route.request().method() !== 'POST') return route.continue()
+
+    submittedNote = route.request().postDataJSON().note
+    documentNotes = [
+      { id: 102, note: submittedNote, created: new Date().toISOString() },
+    ]
+    await route.fulfill({
+      json: documentNotes,
+    })
+  })
+
+  await page.goto('/documents/1/notes')
+
+  const notes = page.locator('pngx-document-notes')
+  const modeGroup = notes.getByRole('group', { name: 'Note input mode' })
+  const editRadio = modeGroup.getByRole('radio', { name: 'Edit', exact: true })
+  const previewButton = modeGroup.getByText('Preview', { exact: true })
+  await notes.locator('textarea').fill(markdown)
+  await previewButton.click()
+  await notes.getByRole('button', { name: 'Add note', exact: true }).click()
+
+  await expect.poll(() => submittedNote).toBe(markdown)
+  const renderedNote = notes.locator('.card-text').first()
+  await expect(renderedNote.locator('strong')).toHaveText('saved from preview')
+  await expect(renderedNote.locator('li')).toHaveText('a list item')
+  await expect(editRadio).toBeChecked()
+  await expect(notes.locator('textarea')).toHaveValue('')
+  await page.unrouteAll({ behavior: 'ignoreErrors' })
+})

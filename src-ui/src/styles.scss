@@ -848,6 +848,55 @@ code {
   white-space: preserve;
 }
 
+.markdown-preview {
+
+  table {
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+    max-width: 100%;
+  }
+
+  th,
+  td {
+    border: 1px solid var(--bs-border-color);
+    padding: .375rem .75rem;
+  }
+
+  pre {
+    background-color: var(--bs-tertiary-bg);
+    border-radius: var(--bs-border-radius);
+    overflow-x: auto;
+    padding: 1rem;
+  }
+
+  pre code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+  }
+
+  :not(pre) > code {
+    background-color: var(--bs-tertiary-bg);
+    border-radius: .2rem;
+    padding: .1rem .25rem;
+  }
+
+  blockquote {
+    border-left: .25rem solid var(--bs-border-color);
+    color: var(--bs-secondary-color);
+    margin: 0 0 1rem;
+    padding-left: 1rem;
+  }
+
+  > :first-child {
+    margin-top: 0;
+  }
+
+  > :last-child {
+    margin-bottom: 0;
+  }
+}
+
 /* Animate items as they're being sorted. */
 .cdk-drop-list-dragging .cdk-drag:not(.cdk-drag-preview) {
   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
