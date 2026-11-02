@@ -7,7 +7,8 @@ on:
     branches-ignore:
       - 'translations**'
 concurrency:
-  group: lint-${{ github.event.pull_request.number || github.ref }}
+  # Let dev/main commits finish, PR and feature-branch runs supersede older ones
+  group: lint-${{ github.event.pull_request.number || ((github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main') && github.run_id) || github.ref }}
   cancel-in-progress: true
 permissions:
   contents: read
