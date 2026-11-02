@@ -2,14 +2,6 @@
   <div>
     <form [formGroup]="noteForm" class="needs-validation mt-3" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.Note }" novalidate>
       <div class="form-group">
-        <div class="d-flex justify-content-end mb-2">
-          <fieldset class="btn-group btn-group-sm" aria-label="Note input mode" i18n-aria-label>
-            <input type="radio" class="btn-check" id="noteViewEdit" name="noteViewMode" [value]="NoteViewMode.Edit" [checked]="noteView() === NoteViewMode.Edit" (change)="noteView.set(NoteViewMode.Edit)">
-            <label class="btn btn-outline-secondary" for="noteViewEdit" i18n>Edit</label>
-            <input type="radio" class="btn-check" id="noteViewPreview" name="noteViewMode" [value]="NoteViewMode.Preview" [checked]="noteView() === NoteViewMode.Preview" (change)="noteView.set(NoteViewMode.Preview)">
-            <label class="btn btn-outline-secondary" for="noteViewPreview" i18n>Preview</label>
-          </fieldset>
-        </div>
         <textarea class="form-control form-control-sm" [class.is-invalid]="newNoteError" [class.d-none]="noteView() !== NoteViewMode.Edit" [attr.aria-invalid]="newNoteError" aria-label="Note" i18n-aria-label aria-describedby="noteFeedback" rows="3" formControlName="newNote" placeholder="Enter note (Markdown is supported)" i18n-placeholder (keydown)="noteFormKeydown($event)" required></textarea>
         @if (noteView() === NoteViewMode.Preview) {
           <section class="form-control form-control-sm note-preview" aria-label="Note preview" i18n-aria-label>
@@ -24,10 +16,16 @@
           Please enter a note.
         </div>
       </div>
-      <div class="form-group mt-2 d-flex justify-content-end align-items-center">
+      <div class="form-group mt-2 d-flex justify-content-between align-items-center">
         @if (networkActive()) {
           <div class="spinner-border spinner-border-sm fw-normal me-auto" role="status"></div>
         }
+        <fieldset class="btn-group btn-group-sm" aria-label="Note input mode" i18n-aria-label>
+          <input type="radio" class="btn-check" id="noteViewEdit" name="noteViewMode" [value]="NoteViewMode.Edit" [checked]="noteView() === NoteViewMode.Edit" (change)="noteView.set(NoteViewMode.Edit)">
+          <label class="btn btn-outline-secondary" for="noteViewEdit" i18n>Edit</label>
+          <input type="radio" class="btn-check" id="noteViewPreview" name="noteViewMode" [value]="NoteViewMode.Preview" [checked]="noteView() === NoteViewMode.Preview" (change)="noteView.set(NoteViewMode.Preview)">
+          <label class="btn btn-outline-secondary" for="noteViewPreview" i18n>Preview</label>
+        </fieldset>
         <button type="button" class="btn btn-primary btn-sm" [disabled]="networkActive() || addDisabled()" (click)="addNote()" i18n>Add note</button>
       </div>
     </form>
