@@ -1873,9 +1873,17 @@ class DocumentViewSet(
                         "Insufficient permissions to create notes",
                     )
 
+                note_format = request.data.get("format", Note.Format.PLAIN)
+                if note_format not in Note.Format.values:
+                    return Response(
+                        {"format": "Invalid format."},
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+
                 c = Note.objects.create(
                     document=doc,
                     note=request.data["note"],
+                    format=note_format,
                     user=currentUser,
                 )
                 # If audit log is enabled make an entry in the log

@@ -3544,6 +3544,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             {
                 "id": note.id,
                 "note": note.note,
+                "format": Note.Format.PLAIN,
                 "user": {
                     "id": note.user.id,
                     "username": note.user.username,
@@ -3592,10 +3593,48 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         resp_data = resp_data[0]
 
         self.assertEqual(resp_data["note"], "this is a posted note")
+        self.assertEqual(resp_data["format"], Note.Format.PLAIN)
 
         doc = Document.objects.get(pk=doc.pk)
         # modified was updated to today
         self.assertEqual(doc.modified.day, timezone.now().day)
+
+    def test_create_markdown_note(self) -> None:
+        doc = Document.objects.create(
+            title="test",
+            mime_type="application/pdf",
+            content="this is a document which will have a markdown note",
+        )
+
+        response = self.client.post(
+            f"/api/documents/{doc.pk}/notes/",
+            data={"note": "**markdown**", "format": Note.Format.MARKDOWN},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        note = Note.objects.get(document=doc)
+        self.assertEqual(note.format, Note.Format.MARKDOWN)
+
+        response = self.client.get(f"/api/documents/{doc.pk}/notes/", format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json()[0]["format"], Note.Format.MARKDOWN)
+
+    def test_create_note_rejects_unsupported_format(self) -> None:
+        doc = Document.objects.create(
+            title="test",
+            mime_type="application/pdf",
+            content="this is a document which will have a note",
+        )
+
+        response = self.client.post(
+            f"/api/documents/{doc.pk}/notes/",
+            data={"note": "unsupported", "format": "html"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertFalse(Note.objects.filter(document=doc).exists())
 
     def test_create_note_only_saves_document_modified_field(self) -> None:
         """
