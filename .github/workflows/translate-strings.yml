@@ -23,7 +23,7 @@ jobs:
           persist-credentials: true # for pushing translation branch
       - name: Set up Python
         id: setup-python
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
       - name: Install system dependencies
         timeout-minutes: 12
         uses: $/.github/actions/apt-install
@@ -48,7 +48,7 @@ jobs:
         with:
           package_json_file: src-ui/package.json
       - name: Use Node.js 24
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 24.x
           cache: 'pnpm'
@@ -68,7 +68,7 @@ jobs:
           cd src-ui
           pnpm run ng extract-i18n
       - name: Commit changes
-        uses: stefanzweifel/git-auto-commit-action@4a55954c782fc1ea30b9056cd3e7a2b40ca8887d # v7.2.0
+        uses: stefanzweifel/git-auto-commit-action@d0b01107b5db882071f96de5dd4b54961ea93f4c # v7.2.1
         with:
           file_pattern: 'src-ui/messages.xlf src/locale/en_US/LC_MESSAGES/django.po'
           commit_message: "Auto translate strings"
