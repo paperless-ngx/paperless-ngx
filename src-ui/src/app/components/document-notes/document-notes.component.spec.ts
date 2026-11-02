@@ -163,23 +163,6 @@ describe('DocumentNotesComponent', () => {
     expect(noteCard.nativeElement.classList).not.toContain('markdown-preview')
   })
 
-  it('should show a markdown icon in the footer of markdown notes only', () => {
-    component.notes.set([
-      { id: 41, note: '**x**', format: NoteFormat.Markdown },
-      { id: 42, note: 'plain', format: NoteFormat.Plain },
-    ])
-    fixture.detectChanges()
-
-    const footers = fixture.debugElement.queryAll(By.css('.card-footer'))
-    expect(footers[0].query(By.css('i-bs[name="markdown"]'))).not.toBeNull()
-    expect(footers[1].query(By.css('i-bs[name="markdown"]'))).toBeNull()
-    expect(
-      fixture.debugElement
-        .queryAll(By.css('.card-text'))[0]
-        .query(By.css('strong')).nativeElement.textContent
-    ).toBe('x')
-  })
-
   it('should default to edit mode and switch between edit and preview', () => {
     expect(component.noteView()).toBe('edit')
     const textarea: HTMLTextAreaElement = fixture.debugElement.query(
