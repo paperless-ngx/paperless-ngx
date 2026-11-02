@@ -14,7 +14,7 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { DocumentNote } from 'src/app/data/document-note'
+import { DocumentNote, NoteFormat } from 'src/app/data/document-note'
 import { User } from 'src/app/data/user'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
@@ -51,6 +51,7 @@ export class DocumentNotesComponent extends ComponentWithPermissions {
   readonly addDisabled = input(false)
   readonly networkActive = signal(false)
   protected readonly NoteViewMode = NoteViewMode
+  protected readonly NoteFormat = NoteFormat
   protected readonly noteView = signal<NoteViewMode>(NoteViewMode.Edit)
 
   noteForm: FormGroup = new FormGroup({

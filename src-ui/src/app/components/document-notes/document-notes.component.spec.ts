@@ -6,7 +6,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { By } from '@angular/platform-browser'
 import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of, throwError } from 'rxjs'
-import { DocumentNote } from 'src/app/data/document-note'
+import { DocumentNote, NoteFormat } from 'src/app/data/document-note'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { PermissionsService } from 'src/app/services/permissions.service'
@@ -133,8 +133,12 @@ describe('DocumentNotesComponent', () => {
 
   it('should render saved notes as sanitized markdown', () => {
     component.notes.set([
-      { id: 31, note: '**x**' },
-      { id: 32, note: '<script>alert(1)</script>' },
+      { id: 31, note: '**x**', format: NoteFormat.Markdown },
+      {
+        id: 32,
+        note: '<script>alert(1)</script>',
+        format: NoteFormat.Markdown,
+      },
     ])
     fixture.detectChanges()
 
@@ -146,6 +150,34 @@ describe('DocumentNotesComponent', () => {
     expect(noteCards[1].nativeElement.textContent).toContain(
       '<script>alert(1)</script>'
     )
+  })
+
+  it('should render plain notes as plain text', () => {
+    component.notes.set([{ id: 33, note: '**x**', format: NoteFormat.Plain }])
+    fixture.detectChanges()
+
+    const noteCard = fixture.debugElement.query(By.css('.card-text'))
+    expect(noteCard.nativeElement.tagName).toBe('P')
+    expect(noteCard.nativeElement.textContent).toBe('**x**')
+    expect(noteCard.query(By.css('strong'))).toBeNull()
+    expect(noteCard.nativeElement.classList).not.toContain('markdown-preview')
+  })
+
+  it('should show a markdown icon in the footer of markdown notes only', () => {
+    component.notes.set([
+      { id: 41, note: '**x**', format: NoteFormat.Markdown },
+      { id: 42, note: 'plain', format: NoteFormat.Plain },
+    ])
+    fixture.detectChanges()
+
+    const footers = fixture.debugElement.queryAll(By.css('.card-footer'))
+    expect(footers[0].query(By.css('i-bs[name="markdown"]'))).not.toBeNull()
+    expect(footers[1].query(By.css('i-bs[name="markdown"]'))).toBeNull()
+    expect(
+      fixture.debugElement
+        .queryAll(By.css('.card-text'))[0]
+        .query(By.css('strong')).nativeElement.textContent
+    ).toBe('x')
   })
 
   it('should default to edit mode and switch between edit and preview', () => {

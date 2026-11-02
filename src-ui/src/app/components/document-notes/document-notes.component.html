@@ -32,13 +32,22 @@
       </div>
     </form>
     <hr>
-      @for (note of notes(); track note) {
+      @for (note of notes(); track note.id) {
         <div class="card border mb-3">
           <div class="card-body text-dark">
-            <div class="card-text markdown-preview" [innerHTML]="note.note | markdown"></div>
+            @if (note.format === NoteFormat.Markdown) {
+              <div class="card-text markdown-preview" [innerHTML]="note.note | markdown"></div>
+            } @else {
+              <p class="card-text">{{note.note}}</p>
+            }
           </div>
           <div class="d-flex card-footer small bg-light text-primary justify-content-between align-items-center">
-            <span>{{displayName(note)}} - {{ note.created | customDate}}</span>
+            <span>
+              @if (note.format === NoteFormat.Markdown) {
+                <i-bs name="markdown" class="ms-auto me-2" title="Markdown" i18n-title></i-bs>
+              }
+              {{displayName(note)}} - {{ note.created | customDate}}
+            </span>
             <button type="button" class="btn btn-link btn-sm p-0 fade" title="Delete note" i18n-title (click)="deleteNote(note.id)" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Note }">
               <i-bs name="trash"></i-bs>
               <span class="visually-hidden" i18n>Delete note</span>
