@@ -5,3 +5,57 @@
 .card:hover .fade {
     opacity: 1;
 }
+
+.note-preview {
+  min-height: calc(calc(1.5em * 3) + 0.5rem + calc(var(--bs-border-width) * 2)); // textfield height with 3 rows
+}
+
+.markdown-preview ::ng-deep {
+  white-space: normal;
+
+  table {
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+    max-width: 100%;
+  }
+
+  th,
+  td {
+    border: 1px solid var(--bs-border-color);
+    padding: .375rem .75rem;
+  }
+
+  pre {
+    background-color: var(--bs-tertiary-bg);
+    border-radius: var(--bs-border-radius);
+    overflow-x: auto;
+    padding: 1rem;
+  }
+
+  pre code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+  }
+
+  :not(pre) > code {
+    background-color: var(--bs-tertiary-bg);
+    border-radius: .2rem;
+    padding: .1rem .25rem;
+  }
+
+  blockquote {
+    border-left: .25rem solid var(--bs-border-color);
+    color: var(--bs-secondary-color);
+    margin: 0 0 1rem;
+    padding-left: 1rem;
+  }
+
+  > :first-child {
+    margin-top: 0;
+  }
+
+  > :last-child {
+    margin-bottom: 0;
+  }
+}
