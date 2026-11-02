@@ -7,11 +7,18 @@
 }
 
 .note-preview {
-  min-height: calc(calc(1.5em * 3) + 0.5rem + calc(var(--bs-border-width) * 2)); // textfield height with 3 rows
+  min-height: calc(1.5em * 3 + 0.5rem + var(--bs-border-width) * 2); // textfield height with 3 rows
 }
 
 .markdown-preview ::ng-deep {
   white-space: normal;
+
+  h1 { font-size: 2em; }
+  h2 { font-size: 1.75em; }
+  h3 { font-size: 1.5em; }
+  h4 { font-size: 1.25em; }
+  h5 { font-size: 1.125em; }
+  h6 { font-size: 1em; }
 
   table {
     border-collapse: collapse;
