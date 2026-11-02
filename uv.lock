@@ -1967,11 +1967,11 @@ wheels = [
 
 [[package]]
 name = "imap-tools"
-version = "1.15.0"
+version = "1.16.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/59/4e/acf9a7d59932548bc749fe0f5ae852e6da00b640303ed72786f697944b69/imap_tools-1.15.0.tar.gz", hash = "sha256:a90f948549ab000d96caf17c90e63b114f8788ba4a0d3f9274a96c0e108c3805", size = 48497, upload-time = "2026-08-06T10:25:26.567Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/47/ff/013a8cc97cc3d7a74a5cc0d05c5eb637d47a5114efe10312ba7b72b11609/imap_tools-1.16.0.tar.gz", hash = "sha256:70cc760915965f9efd3ce2b43cbdafeca40849aedbea3623019536dc1def95b6", size = 49867, upload-time = "2026-10-14T10:17:57.817Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/50/eb/a4ad6ec962af2806c3484adb1869c24a04d8ef8c2034f2dd2b0f48459b0a/imap_tools-1.15.0-py3-none-any.whl", hash = "sha256:7bb0003c8bf124b80968c7bef786e4577d8365e9afb6551dc15b13161b688bdc", size = 36512, upload-time = "2026-08-06T10:25:24.377Z" },
+    { url = "https://files.pythonhosted.org/packages/92/d8/b9797cfdbfb885c0ebce581234e5e09ec1805f5d8b42247f8d9cde23ca92/imap_tools-1.16.0-py3-none-any.whl", hash = "sha256:8ae0860d626d44ad21c3b917309d135eb4d112159d4ce78b90a03b9bb9ba0de9", size = 36716, upload-time = "2026-10-14T10:17:54.494Z" },
 ]
 
 [[package]]
@@ -3269,7 +3269,7 @@ requires-dist = [
     { name = "granian", extras = ["uvloop"], marker = "extra == 'webserver'", specifier = ">=2.7,<2.9" },
     { name = "httpx-oauth", specifier = "~=0.17" },
     { name = "ijson", specifier = ">=3.5.1" },
-    { name = "imap-tools", specifier = ">=1.14,<1.16" },
+    { name = "imap-tools", specifier = ">=1.16,<1.17" },
     { name = "jinja2", specifier = "~=3.1.6" },
     { name = "langdetect", specifier = "~=1.0.9" },
     { name = "llama-index-core", specifier = ">=0.14.23" },
@@ -3292,7 +3292,7 @@ requires-dist = [
     { name = "psycopg-pool", marker = "extra == 'postgres'", specifier = "==3.3.3" },
     { name = "python-dateutil", specifier = "~=2.9.0" },
     { name = "python-dotenv", specifier = "~=1.2.1" },
-    { name = "python-gnupg", specifier = "~=0.5.4" },
+    { name = "python-gnupg", specifier = "~=0.5.7" },
     { name = "python-ipware", specifier = "~=3.0.0" },
     { name = "python-magic", specifier = "~=0.4.27" },
     { name = "rapidfuzz", specifier = "~=3.14.5" },
@@ -4206,11 +4206,11 @@ wheels = [
 
 [[package]]
 name = "python-gnupg"
-version = "0.5.6"
+version = "0.5.7"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/98/2c/6cd2c7cff4bdbb434be5429ef6b8e96ee6b50155551361f30a1bb2ea3c1d/python_gnupg-0.5.6.tar.gz", hash = "sha256:5743e96212d38923fc19083812dc127907e44dbd3bcf0db4d657e291d3c21eac", size = 66825, upload-time = "2025-12-31T17:19:33.19Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/bb/d4/47aa0f34b6a06a976063e3e0bf1512b140ec1e6efda83bc717fac58071db/python_gnupg-0.5.7.tar.gz", hash = "sha256:73ea46219f992b361eb1ce54cb0968101670654454916a3ee5df8bb9bf0cc8cc", size = 63974, upload-time = "2026-09-29T16:40:09.487Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d2/ab/0ea9de971caf3cd2e268d2b05dfe9883b21cfe686a59249bd2dccb4bae33/python_gnupg-0.5.6-py2.py3-none-any.whl", hash = "sha256:b5050a55663d8ab9fcc8d97556d229af337a87a3ebebd7054cbd8b7e2043394a", size = 22082, upload-time = "2025-12-31T17:16:22.743Z" },
+    { url = "https://files.pythonhosted.org/packages/7c/38/ffad2b8a27e7295e70616ab4d938cead165a56db4496558491f485fa3a87/python_gnupg-0.5.7-py2.py3-none-any.whl", hash = "sha256:dc7afba57a9bc50163c27c726c66cb2fc9692248597f5201f4f7d9eb6097dd1d", size = 22362, upload-time = "2026-09-29T16:40:08.189Z" },
 ]
 
 [[package]]
