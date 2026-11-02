@@ -2,7 +2,7 @@ import { AsyncPipe, KeyValuePipe, TitleCasePipe } from '@angular/common'
 import { Component, Input, OnInit, inject, signal } from '@angular/core'
 import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
-import { Observable, first, map, of, shareReplay } from 'rxjs'
+import { Observable, first, forkJoin, map, of, shareReplay } from 'rxjs'
 import { AuditLogAction, AuditLogEntry } from 'src/app/data/auditlog-entry'
 import { DataType } from 'src/app/data/datatype'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
@@ -10,6 +10,7 @@ import { CorrespondentService } from 'src/app/services/rest/correspondent.servic
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
+import { TagService } from 'src/app/services/rest/tag.service'
 import { UserService } from 'src/app/services/rest/user.service'
 
 @Component({
@@ -30,6 +31,7 @@ export class DocumentHistoryComponent implements OnInit {
   private readonly correspondentService = inject(CorrespondentService)
   private readonly storagePathService = inject(StoragePathService)
   private readonly documentTypeService = inject(DocumentTypeService)
+  private readonly tagService = inject(TagService)
   private readonly userService = inject(UserService)
 
   public AuditLogAction = AuditLogAction
@@ -61,6 +63,30 @@ export class DocumentHistoryComponent implements OnInit {
         this.loading.set(false)
       })
     }
+  }
+
+  getTagNames(tagIds: number[]): Observable<string> {
+    const cacheKey = `tags:${JSON.stringify(tagIds)}`
+    const cachedNames = this.prettyNameCache.get(cacheKey)
+    if (cachedNames) {
+      return cachedNames
+    }
+
+    const tagNames$ = tagIds.length
+      ? forkJoin(
+          tagIds.map((tagId) =>
+            this.tagService.getCached(tagId).pipe(
+              first(),
+              map((tag) => tag?.name ?? String(tagId))
+            )
+          )
+        ).pipe(map((names) => names.join(', ')))
+      : of('')
+    const names$ = tagNames$.pipe(
+      shareReplay({ bufferSize: 1, refCount: true })
+    )
+    this.prettyNameCache.set(cacheKey, names$)
+    return names$
   }
 
   getPrettyName(type: DataType | string, id: string): Observable<string> {
