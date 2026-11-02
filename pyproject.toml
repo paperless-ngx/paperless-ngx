@@ -76,7 +76,7 @@ dependencies = [
   "tantivy~=0.26.0",
   "tika-client[httpx]~=1.0",
   "torch>=2.13,<2.15",
-  "turbohtml~=1.10.0",
+  "turbohtml~=1.15.3",
   "watchfiles>=1.2",
   "whitenoise~=6.11",
   "whoosh-compat[tantivy]==0.3",
