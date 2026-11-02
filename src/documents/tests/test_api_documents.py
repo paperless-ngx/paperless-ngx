@@ -3634,6 +3634,24 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("format", response.json())
+        self.assertFalse(Note.objects.filter(document=doc).exists())
+
+    def test_create_note_requires_note(self) -> None:
+        doc = Document.objects.create(
+            title="test",
+            mime_type="application/pdf",
+            content="this is a document which will have a note",
+        )
+
+        response = self.client.post(
+            f"/api/documents/{doc.pk}/notes/",
+            data={"format": Note.Format.MARKDOWN},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("note", response.json())
         self.assertFalse(Note.objects.filter(document=doc).exists())
 
     def test_create_note_only_saves_document_modified_field(self) -> None:

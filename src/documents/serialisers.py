@@ -971,6 +971,15 @@ class NotesSerializer(serializers.ModelSerializer[Note]):
         ordering = ["-created"]
 
 
+class NoteCreateSerializer(serializers.Serializer[dict[str, Any]]):
+    note = serializers.CharField()
+    format = serializers.ChoiceField(
+        choices=Note.Format.choices,
+        default=Note.Format.PLAIN,
+        required=False,
+    )
+
+
 def _get_viewable_duplicates(
     document: Document,
     user: User | None,

@@ -965,6 +965,7 @@ class Note(SoftDeleteModel):
         max_length=16,
         choices=Format,
         default=Format.PLAIN,
+        verbose_name=_("format"),
     )
 
     created = models.DateTimeField(
