@@ -2,12 +2,6 @@
 
 ## paperless-ngx 3.4.2
 
-### Features / Enhancements
-
-- docker-compose(deps): bump gotenberg/gotenberg from 8.37 to 8.38 in /docker/compose @[dependabot[bot]](https://github.com/apps/dependabot) ([#14634](https://github.com/paperless-ngx/paperless-ngx/pull/14634))
-- docker-compose(deps): bump greenmail/standalone from 2.1.14 to 2.1.15 in /docker/compose @[dependabot[bot]](https://github.com/apps/dependabot) ([#14631](https://github.com/paperless-ngx/paperless-ngx/pull/14631))
-- docker-compose(deps): Bump nginx from 1.31.6-alpine to 1.31.7-alpine in /docker/compose @[dependabot[bot]](https://github.com/apps/dependabot) ([#14633](https://github.com/paperless-ngx/paperless-ngx/pull/14633))
-
 ### Bug Fixes
 
 - Fix: mobile save button display obsessing [@shamoon](https://github.com/shamoon) ([#14676](https://github.com/paperless-ngx/paperless-ngx/pull/14676))
