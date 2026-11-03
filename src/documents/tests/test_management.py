@@ -23,6 +23,7 @@ from documents.tasks import update_document_content_maybe_archive_file
 from paperless_testing.assertions import FileSystemAssertsMixin
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import DocumentFactory
+from paperless_testing.locks import record_media_lock_acquisitions
 from paperless_testing.samples import SIMPLE_DIGITAL_PDF
 
 sample_file: Path = SIMPLE_DIGITAL_PDF
@@ -62,6 +63,28 @@ class TestArchiver(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertIsFile(doc.source_path)
         self.assertTrue(filecmp.cmp(sample_file, doc.source_path))
         self.assertEqual(doc.archive_filename, "none/A.pdf")
+
+    def test_handle_document_takes_media_lock_outside_transaction(self) -> None:
+        """
+        GIVEN:
+            - A document whose archive version is being generated
+        WHEN:
+            - update_document_content_maybe_archive_file runs
+        THEN:
+            - media.lock is acquired
+            - media.lock is never first acquired while a transaction holds the
+              document row
+        """
+        doc = self.make_models()
+        shutil.copy(sample_file, Path(self.dirs.originals_dir) / f"{doc.id:07}.pdf")
+
+        with record_media_lock_acquisitions() as acquisitions:
+            update_document_content_maybe_archive_file(doc.pk)
+
+        self.assertTrue(acquisitions)
+        self.assertFalse(any(a.in_user_transaction for a in acquisitions))
+        doc.refresh_from_db()
+        self.assertIsFile(doc.archive_path)
 
     def test_unknown_mime_type(self) -> None:
         doc = self.make_models()
