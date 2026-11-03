@@ -1478,6 +1478,10 @@
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
           <context context-type="linenumber">166</context>
         </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/saved-views/saved-views.component.html</context>
+          <context context-type="linenumber">46</context>
+        </context-group>
       </trans-unit>
       <trans-unit id="309314153079578337" datatype="html">
         <source>Default Permissions</source>
@@ -6792,21 +6796,21 @@
         <source>Email sent</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/email-document-dialog/email-document-dialog.component.ts</context>
-          <context context-type="linenumber">53</context>
+          <context context-type="linenumber">52</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4632604705213766411" datatype="html">
         <source>Error emailing documents</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/email-document-dialog/email-document-dialog.component.ts</context>
-          <context context-type="linenumber">59</context>
+          <context context-type="linenumber">58</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3742745894977668908" datatype="html">
         <source>Error emailing document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/email-document-dialog/email-document-dialog.component.ts</context>
-          <context context-type="linenumber">60</context>
+          <context context-type="linenumber">59</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6381578200008167206" datatype="html">
@@ -8705,7 +8709,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/main.ts</context>
-          <context context-type="linenumber">483</context>
+          <context context-type="linenumber">168</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5028777105388019087" datatype="html">
@@ -11474,13 +11478,6 @@
           <context context-type="linenumber">4,5</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="8420539325839715135" datatype="html">
-        <source><x id="START_TAG_I_BS" ctype="x-i_bs" equiv-text="&lt;i-bs class=&quot;me-1&quot; name=&quot;person-fill-lock&quot;&gt;"/><x id="CLOSE_TAG_I_BS" ctype="x-i_bs" equiv-text="&lt;/i-bs&gt;"/>Permissions</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/manage/saved-views/saved-views.component.html</context>
-          <context context-type="linenumber">46,47</context>
-        </context-group>
-      </trans-unit>
       <trans-unit id="6338800642797811873" datatype="html">
         <source>Documents page size</source>
         <context-group purpose="location">
@@ -13481,14 +13478,14 @@
         <source>Prev</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/main.ts</context>
-          <context context-type="linenumber">482</context>
+          <context context-type="linenumber">167</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1241348629231510663" datatype="html">
         <source>End</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/main.ts</context>
-          <context context-type="linenumber">484</context>
+          <context context-type="linenumber">169</context>
         </context-group>
       </trans-unit>
     </body>
