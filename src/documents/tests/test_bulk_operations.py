@@ -34,7 +34,6 @@ def bulk_setup(paperless_dirs):
     "endpoint,operation,parameters",
     [
         ("bulk_edit", "set_correspondent", {"correspondent": None}),
-        ("delete", "delete", {}),
     ],
 )
 def test_request_only_queues(bulk_setup, endpoint, operation, parameters):
@@ -135,13 +134,17 @@ def test_tracked_outcome_records_initiator_and_result(bulk_setup, failed):
         },
         body=(
             (),
-            {"operation": "delete", "document_ids": [doc.pk], "user_id": user.pk},
+            {
+                "operation": "set_permissions",
+                "document_ids": [doc.pk],
+                "user_id": user.pk,
+            },
             {},
         ),
     )
     task = PaperlessTask.objects.get(task_id=task_id)
     assert task.owner_id == user.pk
-    assert task.task_type == PaperlessTask.TaskType.BULK_DELETE
+    assert task.task_type == PaperlessTask.TaskType.BULK_UPDATE
     if failed:
         task_failure_handler(task_id=task_id, exception=ValueError("Could not update"))
     else:
@@ -196,13 +199,17 @@ def test_tracked_outcome_notifies_only_initiator(bulk_setup, failed):
         },
         body=(
             (),
-            {"operation": "delete", "document_ids": [doc.pk], "user_id": user.pk},
+            {
+                "operation": "set_permissions",
+                "document_ids": [doc.pk],
+                "user_id": user.pk,
+            },
             {},
         ),
     )
     task = PaperlessTask.objects.get(task_id=task_id)
     assert task.owner_id == user.pk
-    assert task.task_type == PaperlessTask.TaskType.BULK_DELETE
+    assert task.task_type == PaperlessTask.TaskType.BULK_UPDATE
     with mock.patch("documents.signals.handlers.async_to_sync") as send:
         if failed:
             task_failure_handler(
@@ -276,3 +283,27 @@ async def test_completion_socket_is_private(anyio_backend):
     finally:
         await own.disconnect()
         await other.disconnect()
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("endpoint", ["delete", "bulk_edit"])
+def test_trash_remains_synchronous(bulk_setup, endpoint):
+    _, client, doc, _ = bulk_setup
+    data = {"documents": [doc.pk]}
+    if endpoint == "bulk_edit":
+        data.update(method="delete", parameters={})
+    with (
+        mock.patch("documents.views.execute_bulk_operation.apply_async") as enqueue,
+        mock.patch("documents.search.get_backend"),
+    ):
+        response = client.post(
+            f"/api/documents/{endpoint}/",
+            data,
+            format="json",
+            HTTP_ACCEPT="application/json; version=9",
+        )
+    assert response.status_code == 200
+    assert response.data == {"result": "OK"}
+    assert not Document.objects.filter(pk=doc.pk).exists()
+    assert Document.deleted_objects.filter(pk=doc.pk).exists()
+    enqueue.assert_not_called()

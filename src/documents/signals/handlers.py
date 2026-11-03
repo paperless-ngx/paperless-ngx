@@ -1197,11 +1197,6 @@ def before_task_publish_handler(
         _, task_kwargs, _ = body
         task_id = headers["id"]
 
-        if (
-            task_name == "documents.bulk_operations.execute_bulk_operation"
-            and task_kwargs.get("operation") == "delete"
-        ):
-            task_type = PaperlessTask.TaskType.BULK_DELETE
         input_data = _extract_input_data(task_type, task_kwargs)
         trigger_source = _determine_trigger_source(headers)
         owner_id = _extract_owner_id(task_type, task_kwargs)

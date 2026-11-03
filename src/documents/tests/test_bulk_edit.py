@@ -698,10 +698,10 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
     def test_delete_documents_old_uuid_field(self, m) -> None:
         m.side_effect = Exception("Data too long for column 'transaction_id' at row 1")
         doc_ids = [self.doc1.id, self.doc2.id, self.doc3.id]
+        bulk_edit.delete(doc_ids)
         with self.assertLogs(level="WARNING") as cm:
-            with self.assertRaisesRegex(Exception, "Data too long for column"):
-                bulk_edit.delete(doc_ids)
-        self.assertIn("possible incompatible database column", cm.output[0])
+            bulk_edit.delete(doc_ids)
+            self.assertIn("possible incompatible database column", cm.output[0])
 
 
 class TestPDFActions(DirectoriesMixin, TestCase):
