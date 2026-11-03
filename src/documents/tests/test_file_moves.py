@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING
 import pytest
 from asgiref.sync import async_to_sync
 from asgiref.sync import sync_to_async
+from celery.contrib.django.task import DjangoTask
 from django.db import transaction
 from django.http import HttpRequest
 from django.http import HttpResponse
@@ -777,10 +778,12 @@ class TestCeleryTaskScope:
             - A registered task is inspected
         THEN:
             - It runs through FileMoveScopedTask
+            - It keeps Celery's DjangoTask API, such as delay_on_commit
         """
         from paperless.celery import FileMoveScopedTask
 
         assert isinstance(bulk_update_documents, FileMoveScopedTask)
+        assert isinstance(bulk_update_documents, DjangoTask)
 
     def test_failing_task_still_moves_committed_change(
         self,
