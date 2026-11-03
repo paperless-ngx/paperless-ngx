@@ -17,7 +17,11 @@ from __future__ import annotations
 
 import logging
 import shutil
+import threading
+from contextlib import contextmanager
+from contextvars import ContextVar
 from pathlib import Path
+from typing import TYPE_CHECKING
 from typing import Final
 
 from django.conf import settings
@@ -34,6 +38,9 @@ from documents.file_handling import generate_unique_filename
 from documents.media_lock import media_lock
 from documents.models import Document
 from documents.utils import compute_checksum
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
 
 logger = logging.getLogger("paperless.handlers")
 
@@ -55,6 +62,47 @@ def in_user_transaction() -> bool:
     """
     connection = transaction.get_connection()
     return any(not block._from_testcase for block in connection.atomic_blocks)
+
+
+class FileMoveCollector:
+    """Pending document pks for one file move scope."""
+
+    def __init__(self) -> None:
+        self._pending: set[int] = set()
+        self._lock = threading.Lock()
+        self.closed = False
+
+    def add(self, pk: int) -> bool:
+        """Record a pending move. Returns False if the collector is closed."""
+        with self._lock:
+            if self.closed:
+                return False
+            self._pending.add(pk)
+            return True
+
+    def take_pending(self) -> list[int]:
+        """Remove and return the pending pks, sorted, leaving the collector open."""
+        with self._lock:
+            pending = sorted(self._pending)
+            self._pending.clear()
+            return pending
+
+    def close(self) -> list[int]:
+        """Close the collector and return what was still pending, sorted."""
+        with self._lock:
+            self.closed = True
+            pending = sorted(self._pending)
+            self._pending.clear()
+            return pending
+
+
+# Only the scope context managers call set() / reset(). Everything else reads
+# it and mutates the collector, so adds made in a copied context (thread or
+# task hops) are visible to the scope that flushes.
+_active_collector: ContextVar[FileMoveCollector | None] = ContextVar(
+    "paperless_file_move_collector",
+    default=None,
+)
 
 
 def _path_matches_checksum(path: Path, checksum: str | None) -> bool:
@@ -107,6 +155,62 @@ def move_files_for_document(pk: int) -> Document | None:
             move_files_for_document(version_pk)
 
     return document
+
+
+def _flush(pks: list[int]) -> None:
+    """Move each document; one failure never stops the rest or raises."""
+    for pk in pks:
+        try:
+            move_files_for_document(pk)
+        except Exception:
+            logger.exception(f"Unexpected error moving files of document {pk}")
+
+
+def _flush_after_commit(pks: list[int]) -> None:
+    if not pks:
+        return
+    if in_user_transaction():
+        transaction.on_commit(lambda: _flush(pks))
+    else:
+        _flush(pks)
+
+
+def _close_and_flush(collector: FileMoveCollector) -> None:
+    _flush_after_commit(collector.close())
+
+
+@contextmanager
+def defer_file_moves() -> Iterator[None]:
+    """
+    Collect file move requests and perform each once when the outermost scope
+    exits, after its own writes have committed.
+    """
+    current = _active_collector.get()
+    if current is not None and not current.closed:
+        yield
+        return
+
+    collector = FileMoveCollector()
+    token = _active_collector.set(collector)
+    try:
+        yield
+    finally:
+        _active_collector.reset(token)
+        _close_and_flush(collector)
+
+
+def flush_pending_file_moves() -> None:
+    """
+    Perform the current scope's pending moves now, keeping the scope open.
+
+    When called from a task running eagerly inside a request, this flushes the
+    request's collector early, which is harmless: the moves still run after
+    commit and against fresh state.
+    """
+    collector = _active_collector.get()
+    if collector is None:
+        return
+    _flush_after_commit(collector.take_pending())
 
 
 def _validate_move(
@@ -314,12 +418,17 @@ def _move_document_files(document: Document) -> None:
 
 def request_file_move(document: Document) -> None:
     """
-    Ask for the document's files to follow its current committed state.
+    Ask for the document's files to follow its committed state.
 
-    Moves immediately and copies only the final filename columns onto the
-    caller's instance, so code that saves and then reads source_path keeps
-    working without any other in-memory field being touched.
+    Inside an open scope the request is recorded and performed when the scope
+    ends. Otherwise the move happens now, and only the final filename columns
+    are copied onto the caller's instance, so code that saves and then reads
+    source_path keeps working without any other in-memory field being touched.
     """
+    collector = _active_collector.get()
+    if collector is not None and collector.add(document.pk):
+        return
+
     moved = move_files_for_document(document.pk)
     if moved is not None:
         document.filename = moved.filename
