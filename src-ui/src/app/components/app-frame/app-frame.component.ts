@@ -185,6 +185,7 @@ export class AppFrameComponent
       .subscribe(({ status, error }) => {
         this.documentList.reload()
         this.documentList.reduceSelectionToFilter()
+        // maybe someday we can optimize to only refresh affected documents
         this.openDocumentsService.getOpenDocuments().forEach((doc) => {
           this.openDocumentsService.refreshDocument(doc.id)
         })
