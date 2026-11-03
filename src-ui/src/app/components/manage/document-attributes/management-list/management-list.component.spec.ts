@@ -16,7 +16,6 @@ import {
   NgbModalRef,
   NgbPaginationModule,
 } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of, throwError } from 'rxjs'
 import { routes } from 'src/app/app-routing.module'
 import { FILTER_HAS_TAGS_ALL } from 'src/app/data/filter-rule-type'
@@ -86,7 +85,6 @@ describe('ManagementListComponent', () => {
         ReactiveFormsModule,
         NgbModalModule,
         RouterTestingModule.withRoutes(routes),
-        NgxBootstrapIconsModule.pick(allIcons),
         TagListComponent,
         SortableDirective,
         PageHeaderComponent,

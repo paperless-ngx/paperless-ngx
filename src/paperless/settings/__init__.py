@@ -691,6 +691,9 @@ logging.config.dictConfig(LOGGING)
 
 # https://docs.celeryq.dev/en/stable/userguide/configuration.html
 
+# Tasks outside tasks.py must be loaded even when Django skips checks
+CELERY_IMPORTS = ("documents.bulk_edit",)
+
 CELERY_BROKER_URL = _CELERY_REDIS_URL
 CELERY_RESULT_BACKEND = _CELERY_REDIS_URL
 CELERY_RESULT_SERIALIZER = "signed-pickle"

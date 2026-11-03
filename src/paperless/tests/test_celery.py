@@ -1,5 +1,8 @@
 import hmac
+import os
 import pickle
+import subprocess
+import sys
 from hashlib import sha256
 from pathlib import Path
 
@@ -9,6 +12,42 @@ from django.test import override_settings
 from paperless.celery import signed_pickle_dumps
 from paperless.celery import signed_pickle_loads
 from paperless.signed_pickle import HMAC_SIZE
+
+
+def test_tasks_registered_without_system_checks() -> None:
+    # Use a fresh interpreter: Django checks and other tests can import views,
+    # hiding tasks that the worker would otherwise never register.
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-c",
+            """
+import sys
+
+from paperless.celery import app
+
+app.loader.import_default_modules()
+expected = {
+    "documents.bulk_edit.delete",
+    "documents.bulk_edit.restore_archive_serial_numbers_task",
+    "documents.signals.handlers.process_cf_select_update",
+    "documents.workflows.webhooks.send_webhook",
+    "paperless_mail.mail.apply_mail_action",
+    "paperless_mail.mail.error_callback",
+}
+missing = expected - set(app.tasks)
+assert not missing, f"Unregistered tasks: {sorted(missing)}"
+assert "paperless.urls" not in sys.modules
+""",
+        ],
+        env={**os.environ, "CELERY_SKIP_CHECKS": "1"},
+        cwd=Path(__file__).resolve().parents[2],
+        capture_output=True,
+        text=True,
+        timeout=60,
+        check=False,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
 
 
 class TestSignedPickleSerializer:

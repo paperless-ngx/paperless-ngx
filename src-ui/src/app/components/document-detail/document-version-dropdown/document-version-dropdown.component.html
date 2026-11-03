@@ -1,6 +1,6 @@
 <div class="btn-group" ngbDropdown autoClose="outside">
   <button class="btn btn-sm btn-outline-secondary dropdown-toggle" ngbDropdownToggle aria-label="Versions" i18n-aria-label>
-    <i-bs name="file-earmark-diff"></i-bs>
+    <pngx-bs-icon name="file-earmark-diff"></pngx-bs-icon>
     <span class="d-none d-lg-inline ps-1" i18n>Versions</span>
     @if (versions.length > 1) {
       <span class="badge text-bg-secondary ms-1">{{ versions.length }}</span>
@@ -35,7 +35,7 @@
             title="Upload a new version"
             i18n-title
           >
-            <i-bs name="file-earmark-plus"></i-bs><span class="ps-1" i18n>Upload</span>
+            <pngx-bs-icon name="file-earmark-plus"></pngx-bs-icon><span class="ps-1" i18n>Upload</span>
           </button>
           <button
             class="btn btn-sm btn-outline-secondary w-100"
@@ -44,7 +44,7 @@
             title="Use an existing document"
             i18n-title
           >
-            <i-bs name="file-earmark"></i-bs><span class="ps-1" i18n>Existing</span>
+            <pngx-bs-icon name="file-earmark"></pngx-bs-icon><span class="ps-1" i18n>Existing</span>
           </button>
         </div>
       } @else {
@@ -81,9 +81,9 @@
           >
             <div class="check mx-3">
               @if (selectedVersionId === version.id) {
-                <i-bs name="check-circle"></i-bs>
+                <pngx-bs-icon name="check-circle"></pngx-bs-icon>
               } @else {
-                <i-bs class="text-muted" name="circle"></i-bs>
+                <pngx-bs-icon class="text-muted" name="circle"></pngx-bs-icon>
               }
             </div>
             <div class="d-flex flex-column">
@@ -121,9 +121,9 @@
                     (click)="isEditingVersion(version.id) ? submitEditedVersionLabel(version, $event) : beginEditingVersion(version, $event)"
                   >
                     @if (isEditingVersion(version.id)) {
-                      <i-bs width=".8rem" height=".8rem" name="check-lg"></i-bs>
+                      <pngx-bs-icon width=".8rem" height=".8rem" name="check-lg"></pngx-bs-icon>
                     } @else {
-                      <i-bs width=".8rem" height=".8rem" name="pencil"></i-bs>
+                      <pngx-bs-icon width=".8rem" height=".8rem" name="pencil"></pngx-bs-icon>
                     }
                   </button>
                 }

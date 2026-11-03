@@ -10,7 +10,6 @@ import { BrowserModule, By } from '@angular/platform-browser'
 import { ActivatedRoute, Router } from '@angular/router'
 import { RouterTestingModule } from '@angular/router/testing'
 import { NgbModal, NgbModalModule, NgbModule } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { provideUiTour } from 'ngx-ui-tour-ng-bootstrap'
 import { of, throwError } from 'rxjs'
 import { routes } from 'src/app/app-routing.module'
@@ -108,7 +107,6 @@ describe('AppFrameComponent', () => {
         ReactiveFormsModule,
         DragDropModule,
         NgbModalModule,
-        NgxBootstrapIconsModule.pick(allIcons),
         AppFrameComponent,
         IfPermissionsDirective,
         GlobalSearchComponent,

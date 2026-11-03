@@ -1,11 +1,11 @@
 
 <li ngbDropdown class="nav-item" display="dynamic" placement="bottom-end" [popperOptions]="popperOptions" (openChange)="onOpenChange($event)">
   <button class="btn navbar-action border-0" id="chatDropdown" ngbDropdownToggle aria-label="Chat" i18n-aria-label>
-    <i-bs width="1.3em" height="1.3em" name="chatSquareDots"></i-bs>
+    <pngx-bs-icon width="1.3em" height="1.3em" name="chatSquareDots"></pngx-bs-icon>
   </button>
   <div ngbDropdownMenu class="dropdown-menu-end shadow p-0 overflow-hidden" aria-labelledby="chatDropdown">
     <div class="d-flex align-items-center border-bottom px-3 py-2">
-      <i-bs width="1em" height="1em" name="stars" class="text-primary me-2"></i-bs>
+      <pngx-bs-icon width="1em" height="1em" name="stars" class="text-primary me-2"></pngx-bs-icon>
       <span class="fw-semibold">
         @if (documentId()) {
           <ng-container i18n>Ask about this document</ng-container>
@@ -15,7 +15,7 @@
       </span>
       @if (messages().length) {
         <button class="btn btn-sm btn-link text-muted ms-auto p-0" type="button" (click)="clearChat()" title="Clear chat" i18n-title>
-          <i-bs width="1em" height="1em" name="arrow-counterclockwise"></i-bs>
+          <pngx-bs-icon width="1em" height="1em" name="arrow-counterclockwise"></pngx-bs-icon>
         </button>
       }
     </div>
@@ -46,7 +46,7 @@
                 <div class="list-group-item text-muted small py-1" i18n>Sources</div>
                 @for (reference of message.references; track reference.id) {
                   <a class="list-group-item list-group-item-action d-flex align-items-center text-primary" [routerLink]="['/documents', reference.id]" [title]="reference.title">
-                    <i-bs width="0.9em" height="0.9em" name="file-text" class="me-2 flex-shrink-0"></i-bs><span class="text-truncate">{{ reference.title }}</span>
+                    <pngx-bs-icon width="0.9em" height="0.9em" name="file-text" class="me-2 flex-shrink-0"></pngx-bs-icon><span class="text-truncate">{{ reference.title }}</span>
                   </a>
                 }
               </div>
@@ -72,11 +72,11 @@
           />
         @if (loading()) {
           <button class="btn btn-outline-secondary" type="button" (click)="stopStreaming()" title="Stop" i18n-title aria-label="Stop" i18n-aria-label>
-            <i-bs width="1em" height="1em" name="x-lg"></i-bs>
+            <pngx-bs-icon width="1em" height="1em" name="x-lg"></pngx-bs-icon>
           </button>
         } @else {
           <button class="btn btn-primary" type="button" (click)="sendMessage()" title="Send" i18n-title aria-label="Send" i18n-aria-label>
-            <i-bs width="1em" height="1em" name="arrow-return-left"></i-bs>
+            <pngx-bs-icon width="1em" height="1em" name="arrow-return-left"></pngx-bs-icon>
           </button>
         }
       </div>

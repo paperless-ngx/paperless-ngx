@@ -8,7 +8,6 @@ import {
 } from '@angular/forms'
 import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of, throwError } from 'rxjs'
 import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
@@ -39,7 +38,6 @@ describe('UserEditDialogComponent', () => {
         ReactiveFormsModule,
         NgSelectModule,
         NgbModule,
-        NgxBootstrapIconsModule.pick(allIcons),
         UserEditDialogComponent,
         IfPermissionsDirective,
         IfOwnerDirective,

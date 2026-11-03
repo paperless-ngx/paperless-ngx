@@ -6,7 +6,7 @@ import {
   NgbAlertModule,
   NgbProgressbarModule,
 } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { ComponentWithPermissions } from 'src/app/components/with-permissions/with-permissions.component'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
@@ -35,7 +35,7 @@ import {
     RouterModule,
     NgbAlertModule,
     NgbProgressbarModule,
-    NgxBootstrapIconsModule,
+    BootstrapIconComponent,
   ],
 })
 export class UploadStatusTrayComponent extends ComponentWithPermissions {

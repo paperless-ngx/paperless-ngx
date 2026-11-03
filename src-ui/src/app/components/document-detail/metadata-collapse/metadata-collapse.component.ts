@@ -1,12 +1,12 @@
 import { Component, Input } from '@angular/core'
 import { NgbCollapseModule } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 
 @Component({
   selector: 'pngx-metadata-collapse',
   templateUrl: './metadata-collapse.component.html',
   styleUrls: ['./metadata-collapse.component.scss'],
-  imports: [NgbCollapseModule, NgxBootstrapIconsModule],
+  imports: [NgbCollapseModule, BootstrapIconComponent],
 })
 export class MetadataCollapseComponent {
   constructor() {}

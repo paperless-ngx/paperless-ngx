@@ -1,7 +1,7 @@
 <pngx-page-header [title]="getTitle()">
   <div ngbDropdown class="btn-group flex-fill d-sm-none">
     <button class="btn btn-sm btn-outline-primary" id="dropdownSelectMobile" ngbDropdownToggle aria-label="Select" i18n-aria-label>
-      <i-bs name="text-indent-left"></i-bs><div class="d-none d-sm-inline ms-1"><ng-container i18n>Select</ng-container></div>
+      <pngx-bs-icon name="text-indent-left"></pngx-bs-icon><div class="d-none d-sm-inline ms-1"><ng-container i18n>Select</ng-container></div>
       @if (list.hasSelection) {
         <pngx-clearable-badge [selected]="list.hasSelection" [number]="list.selectedCount" (cleared)="list.selectNone()"></pngx-clearable-badge><span class="visually-hidden">selected</span>
       }
@@ -19,20 +19,20 @@
     <div class="btn-group btn-group-sm flex-nowrap">
       @if (list.hasSelection) {
         <button class="btn btn-sm btn-outline-secondary" (click)="list.selectNone()">
-          <i-bs name="slash-circle" class="me-1"></i-bs><ng-container i18n>None</ng-container>
+          <pngx-bs-icon name="slash-circle" class="me-1"></pngx-bs-icon><ng-container i18n>None</ng-container>
         </button>
       }
       <button class="btn btn-sm btn-outline-primary" (click)="list.selectPage()">
-        <i-bs name="file-earmark-check" class="me-1"></i-bs><ng-container i18n>Page</ng-container>
+        <pngx-bs-icon name="file-earmark-check" class="me-1"></pngx-bs-icon><ng-container i18n>Page</ng-container>
       </button>
       <button class="btn btn-sm btn-outline-primary" (click)="list.selectAll()">
-        <i-bs name="check-all" class="me-1"></i-bs><ng-container i18n>All</ng-container>
+        <pngx-bs-icon name="check-all" class="me-1"></pngx-bs-icon><ng-container i18n>All</ng-container>
       </button>
     </div>
   </div>
   <div ngbDropdown class="btn-group flex-fill">
     <button class="btn btn-sm btn-outline-primary" id="dropdownDisplayFields" ngbDropdownToggle aria-label="Show" i18n-aria-label>
-      <i-bs name="card-heading"></i-bs><div class="d-none d-sm-inline ms-1"><ng-container i18n>Show</ng-container></div>
+      <pngx-bs-icon name="card-heading"></pngx-bs-icon><div class="d-none d-sm-inline ms-1"><ng-container i18n>Show</ng-container></div>
     </button>
     <div ngbDropdownMenu aria-labelledby="dropdownDisplayFields" class="shadow">
       <div class="px-3">
@@ -48,31 +48,31 @@
   <div class="btn-group flex-fill" role="group">
     <input type="radio" class="btn-check" [(ngModel)]="list.displayMode" value="table" id="displayModeDetails" name="displayModeDetails">
     <label for="displayModeDetails" class="btn btn-outline-primary btn-sm">
-      <i-bs name="list-ul"></i-bs>
+      <pngx-bs-icon name="list-ul"></pngx-bs-icon>
     </label>
     <input type="radio" class="btn-check" [(ngModel)]="list.displayMode" value="smallCards" id="displayModeSmall" name="displayModeSmall">
     <label for="displayModeSmall" class="btn btn-outline-primary btn-sm">
-      <i-bs name="grid"></i-bs>
+      <pngx-bs-icon name="grid"></pngx-bs-icon>
     </label>
     <input type="radio" class="btn-check" [(ngModel)]="list.displayMode" value="largeCards" id="displayModeLarge" name="displayModeLarge">
     <label for="displayModeLarge" class="btn btn-outline-primary btn-sm">
-      <i-bs name="hdd-stack"></i-bs>
+      <pngx-bs-icon name="hdd-stack"></pngx-bs-icon>
     </label>
   </div>
 
   <div ngbDropdown class="btn-group flex-fill">
     <button class="btn btn-outline-primary btn-sm" id="dropdownBasic1" ngbDropdownToggle aria-label="Sort" i18n-aria-label>
-      <i-bs name="arrow-down-up"></i-bs><div class="d-none d-sm-inline ms-1"><ng-container i18n>Sort</ng-container></div>
+      <pngx-bs-icon name="arrow-down-up"></pngx-bs-icon><div class="d-none d-sm-inline ms-1"><ng-container i18n>Sort</ng-container></div>
     </button>
     <div ngbDropdownMenu aria-labelledby="dropdownBasic1" class="shadow dropdown-menu-right">
       <div class="w-100 d-flex pb-2 mb-1 border-bottom">
         <input type="radio" class="btn-check" [value]="false" [(ngModel)]="listSortReverse" id="listSortReverseFalse">
         <label class="btn btn-outline-primary btn-sm mx-2 flex-fill" for="listSortReverseFalse">
-          <i-bs name="sort-alpha-down"></i-bs>
+          <pngx-bs-icon name="sort-alpha-down"></pngx-bs-icon>
         </label>
         <input type="radio" class="btn-check" [value]="true" [(ngModel)]="listSortReverse" id="listSortReverseTrue">
         <label class="btn btn-outline-primary btn-sm me-2 flex-fill" for="listSortReverseTrue">
-          <i-bs name="sort-alpha-up-alt"></i-bs>
+          <pngx-bs-icon name="sort-alpha-up-alt"></pngx-bs-icon>
         </label>
       </div>
       <div>
@@ -87,7 +87,7 @@
 
   <div class="btn-group flex-fill" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.SavedView }" ngbDropdown #viewsDropdown="ngbDropdown" role="group">
     <button class="btn btn-sm btn-outline-primary dropdown-toggle flex-fill" tourAnchor="tour.documents-views" ngbDropdownToggle aria-label="Views" i18n-aria-label>
-      <i-bs name="window-stack"></i-bs><div class="d-none d-sm-inline ms-1"><ng-container i18n>Views</ng-container></div>
+      <pngx-bs-icon name="window-stack"></pngx-bs-icon><div class="d-none d-sm-inline ms-1"><ng-container i18n>Views</ng-container></div>
       @if (savedViewIsModified) {
         <div class="position-absolute top-0 start-100 p-2 translate-middle badge bg-secondary border border-light rounded-circle">
           <span class="visually-hidden">selected</span>
@@ -99,7 +99,7 @@
         <div class="views-list overflow-y-auto">
           @for (view of savedViewService.allViews; track view.id) {
             <button ngbDropdownItem (click)="loadViewConfig(view.id)">
-              <i-bs class="me-2" [name]="view.icon || 'funnel'"></i-bs>{{view.name}}
+              <pngx-bs-icon class="me-2" [name]="view.icon || 'funnel'"></pngx-bs-icon>{{view.name}}
             </button>
           }
         </div>
@@ -141,12 +141,12 @@
       }
       @if (!list.isReloading && isFiltered) {
         <button class="btn btn-link py-0" (click)="resetFilters()">
-          <i-bs width="1em" height="1em" name="x"></i-bs><small i18n>Reset filters</small>
+          <pngx-bs-icon width="1em" height="1em" name="x"></pngx-bs-icon><small i18n>Reset filters</small>
         </button>
       }
       @if (!list.isReloading && list.hasSelection) {
         <button class="btn btn-link py-0" (click)="list.selectNone()">
-          <i-bs width="1em" height="1em" name="slash-circle" class="me-1"></i-bs><small i18n>Clear selection</small>
+          <pngx-bs-icon width="1em" height="1em" name="slash-circle" class="me-1"></pngx-bs-icon><small i18n>Clear selection</small>
         </button>
       }
       </div>
@@ -325,7 +325,7 @@
                 @if (activeDisplayFields.includes(DisplayField.TITLE)) {
                   <td class="pe-0 text-end align-baseline" (mouseleave)="popupPreview.close()">
                     <pngx-preview-popup [document]="d" linkClasses="btn btn-sm btn-link text-secondary px-1" linkTitle="Preview document" (click)="$event.stopPropagation()" i18n-linkTitle #popupPreview>
-                      <i-bs name="eye"></i-bs>
+                      <pngx-bs-icon name="eye"></pngx-bs-icon>
                     </pngx-preview-popup>
                   </td>
                 }
@@ -351,7 +351,7 @@
                     @if (d.notes.length) {
                       <a routerLink="/documents/{{d.id}}/notes" class="btn btn-sm p-0">
                         <span class="badge rounded-pill bg-light border text-primary">
-                          <i-bs width="1.2em" height="1.2em" class="ms-1 me-1" name="chat-left-text"></i-bs>
+                          <pngx-bs-icon width="1.2em" height="1.2em" class="ms-1 me-1" name="chat-left-text"></pngx-bs-icon>
                         {{d.notes.length}}</span>
                       </a>
                     }

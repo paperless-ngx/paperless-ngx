@@ -3,7 +3,6 @@ import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of } from 'rxjs'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { MergeConfirmDialogComponent } from './merge-confirm-dialog.component'
@@ -15,12 +14,7 @@ describe('MergeConfirmDialogComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [
-        NgxBootstrapIconsModule.pick(allIcons),
-        ReactiveFormsModule,
-        FormsModule,
-        MergeConfirmDialogComponent,
-      ],
+      imports: [ReactiveFormsModule, FormsModule, MergeConfirmDialogComponent],
       providers: [
         NgbActiveModal,
         provideHttpClient(withInterceptorsFromDi()),

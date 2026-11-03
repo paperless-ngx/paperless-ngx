@@ -5,7 +5,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbDateAdapter, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
-import { allIcons, NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { of } from 'rxjs'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import {
@@ -67,7 +66,6 @@ describe('CustomFieldsQueryDropdownComponent', () => {
     await TestBed.configureTestingModule({
       imports: [
         NgbDropdownModule,
-        NgxBootstrapIconsModule.pick(allIcons),
         NgSelectModule,
         FormsModule,
         ReactiveFormsModule,

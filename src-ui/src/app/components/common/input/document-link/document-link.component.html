@@ -9,7 +9,7 @@
         }
         @if (removable) {
           <button type="button" class="btn btn-sm btn-danger position-absolute left-0" (click)="removed.emit(this)">
-            <i-bs name="x" class="me-1"></i-bs><ng-container i18n>Remove</ng-container>
+            <pngx-bs-icon name="x" class="me-1"></pngx-bs-icon><ng-container i18n>Remove</ng-container>
           </button>
         }
       </div>
@@ -41,15 +41,15 @@
     <ng-template ng-label-tmp let-document="item">
       <div class="d-flex align-items-center">
         @if (!disabled) {
-          <button class="btn p-0 lh-1" (click)="unselect(document)" (mousedown)="$event.stopImmediatePropagation()" type="button" title="Remove link" i18n-title><i-bs name="x"></i-bs></button>
+          <button class="btn p-0 lh-1" (click)="unselect(document)" (mousedown)="$event.stopImmediatePropagation()" type="button" title="Remove link" i18n-title><pngx-bs-icon name="x"></pngx-bs-icon></button>
         }
         @if (document.title) {
           <a routerLink="/documents/{{document.id}}" class="badge bg-light text-primary" (mousedown)="$event.stopImmediatePropagation();" title="Open link" i18n-title>
-            <i-bs width="0.9em" height="0.9em" name="file-text" class="me-1"></i-bs><span>{{document.title}}</span>
+            <pngx-bs-icon width="0.9em" height="0.9em" name="file-text" class="me-1"></pngx-bs-icon><span>{{document.title}}</span>
           </a>
         } @else {
           <span class="badge bg-light text-muted">
-            <i-bs width="0.9em" height="0.9em" name="exclamation-triangle-fill" class="me-1"></i-bs><span i18n>Unavailable</span>
+            <pngx-bs-icon width="0.9em" height="0.9em" name="exclamation-triangle-fill" class="me-1"></pngx-bs-icon><span i18n>Unavailable</span>
           </span>
         }
       </div>

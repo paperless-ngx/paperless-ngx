@@ -14,7 +14,6 @@ import {
   NgbModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of, throwError } from 'rxjs'
 import { routes } from 'src/app/app-routing.module'
 import { MailAccount, MailAccountType } from 'src/app/data/mail-account'
@@ -76,7 +75,6 @@ describe('MailComponent', () => {
         ReactiveFormsModule,
         NgbAlertModule,
         NgSelectModule,
-        NgxBootstrapIconsModule.pick(allIcons),
         MailComponent,
         PageHeaderComponent,
         IfPermissionsDirective,

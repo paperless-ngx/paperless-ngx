@@ -28,7 +28,7 @@ module.exports = {
     'abstract-paperless-service',
   ],
   transformIgnorePatterns: [
-    'node_modules/(?!.*(\\.mjs$|tslib|lodash-es|normalize-diacritics|marked|@angular/common/locales/.*\\.js$))',
+    'node_modules/(?!.*(\\.mjs$|tslib|lodash-es|normalize-diacritics|marked|@angular/common/locales/.*\\.js$|bootstrap-icons/icons/.*\\.svg$))',
   ],
   moduleNameMapper: {
     ...esmPreset.moduleNameMapper,

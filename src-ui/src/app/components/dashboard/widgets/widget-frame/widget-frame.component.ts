@@ -1,13 +1,13 @@
 import { DragDropModule } from '@angular/cdk/drag-drop'
 import { NgTemplateOutlet } from '@angular/common'
 import { AfterViewInit, Component, input, signal } from '@angular/core'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 
 @Component({
   selector: 'pngx-widget-frame',
   templateUrl: './widget-frame.component.html',
   styleUrls: ['./widget-frame.component.scss'],
-  imports: [DragDropModule, NgxBootstrapIconsModule, NgTemplateOutlet],
+  imports: [DragDropModule, BootstrapIconComponent, NgTemplateOutlet],
 })
 export class WidgetFrameComponent implements AfterViewInit {
   readonly show = signal(false)

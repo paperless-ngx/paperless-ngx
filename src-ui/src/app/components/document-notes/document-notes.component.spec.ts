@@ -4,7 +4,6 @@ import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { By } from '@angular/platform-browser'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of, throwError } from 'rxjs'
 import { DocumentNote, NoteFormat } from 'src/app/data/document-note'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
@@ -59,7 +58,6 @@ describe('DocumentNotesComponent', () => {
       imports: [
         FormsModule,
         ReactiveFormsModule,
-        NgxBootstrapIconsModule.pick(allIcons),
         DocumentNotesComponent,
         CustomDatePipe,
         IfPermissionsDirective,

@@ -8,7 +8,7 @@
   @if (activeManagementList) {
     <div ngbDropdown class="btn-group flex-fill d-sm-none">
       <button class="btn btn-sm btn-outline-primary" id="dropdownSelectMobile" ngbDropdownToggle aria-label="Select" i18n-aria-label>
-        <i-bs name="text-indent-left"></i-bs><div class="d-none d-sm-inline ms-1"><ng-container i18n>Select</ng-container></div>
+        <pngx-bs-icon name="text-indent-left"></pngx-bs-icon><div class="d-none d-sm-inline ms-1"><ng-container i18n>Select</ng-container></div>
         @if (activeManagementList.hasSelection) {
           <pngx-clearable-badge [selected]="activeManagementList.hasSelection" [number]="activeManagementList.selectedCount" (cleared)="activeManagementList.selectNone()"></pngx-clearable-badge><span class="visually-hidden">selected</span>
         }
@@ -27,34 +27,34 @@
       <div class="btn-group btn-group-sm flex-nowrap">
         @if (activeManagementList.hasSelection) {
           <button class="btn btn-sm btn-outline-secondary" (click)="activeManagementList.selectNone()">
-            <i-bs name="slash-circle" class="me-1"></i-bs><ng-container i18n>None</ng-container>
+            <pngx-bs-icon name="slash-circle" class="me-1"></pngx-bs-icon><ng-container i18n>None</ng-container>
           </button>
         }
         <button class="btn btn-sm btn-outline-primary" (click)="activeManagementList.selectPage(true)">
-          <i-bs name="file-earmark-check" class="me-1"></i-bs><ng-container i18n>Page</ng-container>
+          <pngx-bs-icon name="file-earmark-check" class="me-1"></pngx-bs-icon><ng-container i18n>Page</ng-container>
         </button>
         <button class="btn btn-sm btn-outline-primary" (click)="activeManagementList.selectAll()">
-          <i-bs name="check-all" class="me-1"></i-bs><ng-container i18n>All</ng-container>
+          <pngx-bs-icon name="check-all" class="me-1"></pngx-bs-icon><ng-container i18n>All</ng-container>
         </button>
       </div>
     </div>
 
     <button type="button" class="btn btn-sm btn-outline-primary" (click)="activeManagementList.setPermissions()"
       [disabled]="!activeManagementList.userCanBulkEdit(PermissionAction.Change) || !activeManagementList.hasSelection">
-      <i-bs name="person-fill-lock" class="me-1"></i-bs><ng-container i18n>Permissions</ng-container>
+      <pngx-bs-icon name="person-fill-lock" class="me-1"></pngx-bs-icon><ng-container i18n>Permissions</ng-container>
     </button>
     <button type="button" class="btn btn-sm btn-outline-danger" (click)="activeManagementList.delete()"
       [disabled]="!activeManagementList.userCanBulkEdit(PermissionAction.Delete) || !activeManagementList.hasSelection">
-      <i-bs name="trash" class="me-1"></i-bs><ng-container i18n>Delete</ng-container>
+      <pngx-bs-icon name="trash" class="me-1"></pngx-bs-icon><ng-container i18n>Delete</ng-container>
     </button>
     <button type="button" class="btn btn-sm btn-outline-primary ms-md-5" (click)="activeManagementList.openCreateDialog()"
       *pngxIfPermissions="{ action: PermissionAction.Add, type: activeManagementList.permissionType }">
-      <i-bs name="plus-circle" class="me-1"></i-bs><ng-container i18n>Create</ng-container>
+      <pngx-bs-icon name="plus-circle" class="me-1"></pngx-bs-icon><ng-container i18n>Create</ng-container>
     </button>
   } @else if (customFieldsActive) {
     <button type="button" class="btn btn-sm btn-outline-primary" (click)="addCustomField()"
       *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.CustomField }">
-      <i-bs name="plus-circle" class="me-1"></i-bs><ng-container i18n>Add Field</ng-container>
+      <pngx-bs-icon name="plus-circle" class="me-1"></pngx-bs-icon><ng-container i18n>Add Field</ng-container>
     </button>
   }
 </pngx-page-header>
@@ -63,7 +63,7 @@
   @for (section of visibleSections; track section.id) {
     <li [ngbNavItem]="section.id">
       <a ngbNavLink >
-        <i-bs class="me-2" [name]="section.icon"></i-bs>{{ section.label }}
+        <pngx-bs-icon class="me-2" [name]="section.icon"></pngx-bs-icon>{{ section.label }}
       </a>
     </li>
   }

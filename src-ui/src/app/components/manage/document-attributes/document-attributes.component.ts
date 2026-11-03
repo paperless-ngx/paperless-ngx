@@ -14,8 +14,8 @@ import {
   NgbNavChangeEvent,
   NgbNavModule,
 } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Subject, takeUntil } from 'rxjs'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import {
   PermissionAction,
@@ -64,7 +64,7 @@ interface DocumentAttributesSection {
     NgbNavModule,
     NgbDropdownModule,
     NgComponentOutlet,
-    NgxBootstrapIconsModule,
+    BootstrapIconComponent,
     IfPermissionsDirective,
     ClearableBadgeComponent,
   ],

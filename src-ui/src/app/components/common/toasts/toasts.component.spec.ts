@@ -2,7 +2,6 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { By } from '@angular/platform-browser'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { Subject } from 'rxjs'
 import { Toast, ToastService } from 'src/app/services/toast.service'
 import { MAX_VISIBLE_TOASTS, ToastsComponent } from './toasts.component'
@@ -27,7 +26,7 @@ describe('ToastsComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      imports: [ToastsComponent, NgxBootstrapIconsModule.pick(allIcons)],
+      imports: [ToastsComponent],
       providers: [
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
