@@ -18,6 +18,7 @@ if TYPE_CHECKING:
     from pytest_mock import MockerFixture
 
 from documents.file_handling import generate_filename
+from documents.file_moves import move_files_for_document
 from documents.models import Document
 from documents.tasks import update_document_content_maybe_archive_file
 from paperless_testing.assertions import FileSystemAssertsMixin
@@ -275,6 +276,43 @@ class TestRenamer(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertIsNotFile(doc.archive_path)
         self.assertIsFile(doc2.source_path)
         self.assertIsFile(doc2.archive_path)
+
+    @override_settings(FILENAME_FORMAT="")
+    def test_rename_moves_each_document_by_direct_call(self) -> None:
+        """
+        GIVEN:
+            - Two documents whose filename format changed
+        WHEN:
+            - document_renamer runs
+        THEN:
+            - Each document is moved by a direct call, one per document,
+              not by a fake post_save signal
+            - Both files are at their new paths
+        """
+        docs = []
+        for title in ("first", "second"):
+            doc = Document.objects.create(title=title, mime_type="image/jpeg")
+            doc.filename = generate_filename(doc)
+            doc.save(write_file_paths=True)
+            Path(doc.source_path).touch()
+            docs.append(doc)
+
+        with (
+            override_settings(FILENAME_FORMAT="{title}"),
+            mock.patch(
+                "documents.management.commands.document_renamer.move_files_for_document",
+                wraps=move_files_for_document,
+            ) as mover,
+        ):
+            call_command("document_renamer", skip_checks=True)
+
+        self.assertCountEqual(
+            [c.args[0] for c in mover.call_args_list],
+            [d.pk for d in docs],
+        )
+        for doc in docs:
+            doc.refresh_from_db()
+            self.assertIsFile(doc.source_path)
 
 
 @pytest.mark.management
