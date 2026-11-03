@@ -25,6 +25,7 @@ from documents.file_moves import request_file_move
 from documents.models import CustomField
 from documents.models import Document
 from documents.tasks import bulk_update_documents
+from documents.tasks import empty_trash
 from paperless.celery import app as celery_app
 from paperless.middleware import FileMoveMiddleware
 from paperless_testing.factories import CorrespondentFactory
@@ -833,3 +834,30 @@ class TestCeleryTaskScope:
 
         assert (paperless_dirs.originals_dir / "first-renamed.pdf").is_file()
         assert (paperless_dirs.originals_dir / "second-renamed.pdf").is_file()
+
+
+@pytest.mark.django_db
+class TestEmptyTrashLockOrdering:
+    def test_hard_delete_takes_media_lock_outside_transaction(
+        self,
+        document: Document,
+        paperless_dirs: PaperlessDirs,
+    ) -> None:
+        """
+        GIVEN:
+            - A trashed document with its file on disk
+        WHEN:
+            - The trash is emptied for it
+        THEN:
+            - media.lock is never first acquired inside a transaction
+            - The document row and its file are gone
+        """
+        document.delete()
+
+        with record_media_lock_acquisitions() as acquisitions:
+            empty_trash([document.pk])
+
+        assert acquisitions
+        assert not any(a.in_user_transaction for a in acquisitions)
+        assert not Document.global_objects.filter(pk=document.pk).exists()
+        assert not (paperless_dirs.originals_dir / "original.pdf").exists()
