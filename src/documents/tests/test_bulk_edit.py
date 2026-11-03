@@ -739,7 +739,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             mime_type="application/pdf",
         )
         self.doc1.archive_filename = sample1_archive
-        self.doc1.save()
+        self.doc1.save(write_file_paths=True)
         self.doc2 = Document.objects.create(
             checksum="B",
             title="B",
@@ -749,7 +749,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             created=date(2023, 1, 2),
         )
         self.doc2.archive_filename = sample2_archive
-        self.doc2.save()
+        self.doc2.save(write_file_paths=True)
         self.doc3 = Document.objects.create(
             checksum="C",
             title="C",
@@ -774,7 +774,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
             created=date(2023, 1, 3),
         )
         self.img_doc.archive_filename = img_doc_archive
-        self.img_doc.save()
+        self.img_doc.save(write_file_paths=True)
 
     @staticmethod
     def fake_decrypt(
