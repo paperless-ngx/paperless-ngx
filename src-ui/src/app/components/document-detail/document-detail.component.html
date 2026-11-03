@@ -13,7 +13,7 @@
     (versionsUpdated)="onVersionsUpdated($event)"
   />
 
-  <div class="btn-group ms-4">
+  <div class="btn-group ms-md-4">
     <button (click)="download()" class="btn btn-sm btn-outline-primary" [disabled]="downloading()" aria-label="Download" i18n-aria-label>
       @if (downloading()) {
         <div class="spinner-border spinner-border-sm" role="status"></div>
@@ -40,7 +40,7 @@
     </div>
   </div>
 
-  <div class="ms-auto" ngbDropdown>
+  <div class="ms-md-auto" ngbDropdown>
     <button class="btn btn-sm btn-outline-primary" id="actionsDropdown" ngbDropdownToggle aria-label="Actions" i18n-aria-label>
       <i-bs name="three-dots"></i-bs><div class="d-none d-sm-inline ms-1"><ng-container i18n>Actions</ng-container></div>
     </button>
@@ -69,7 +69,7 @@
     </div>
   </div>
 
-  <div class="ms-auto" ngbDropdown>
+  <div class="ms-md-auto" ngbDropdown>
     <button class="btn btn-sm btn-outline-primary" id="sendDropdown" ngbDropdownToggle aria-label="Send" i18n-aria-label>
       <i-bs name="send"></i-bs><div class="d-none d-sm-inline ms-1"><ng-container i18n>Send</ng-container></div>
     </button>
