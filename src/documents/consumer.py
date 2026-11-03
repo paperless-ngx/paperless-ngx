@@ -27,6 +27,7 @@ from documents.file_handling import generate_filename
 from documents.file_handling import generate_unique_filename
 from documents.file_handling import validate_path_in_root
 from documents.file_moves import defer_file_moves
+from documents.file_moves import flush_pending_file_moves
 from documents.loggers import LoggingMixin
 from documents.media_lock import media_lock
 from documents.models import Correspondent
@@ -809,6 +810,10 @@ class ConsumerPlugin(
                         exc_info=True,
                         exception=e,
                     )
+
+        # The storage scope above nests under the consume task's scope, so its
+        # moves are still pending; place the file before the script reads its path.
+        flush_pending_file_moves()
 
         self.run_post_consume_script(document)
 
