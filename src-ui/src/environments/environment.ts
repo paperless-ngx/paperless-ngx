@@ -6,7 +6,7 @@ export const DEFAULT_APP_TITLE = 'Paperless-ngx'
 
 export const environment = {
   production: false,
-  apiBaseUrl: 'http://localhost:8000/api/',
+  apiBaseUrl: '/api/',
   apiVersion: '10',
   appTitle: DEFAULT_APP_TITLE,
   tag: 'dev',

@@ -51,6 +51,9 @@ importers:
       bootstrap:
         specifier: ^5.3.8
         version: 5.3.8(@popperjs/core@2.11.8)
+      bootstrap-icons:
+        specifier: ^1.13.2
+        version: 1.13.2
       file-saver:
         specifier: ^2.0.5
         version: 2.0.5
@@ -63,9 +66,6 @@ importers:
       mime-names:
         specifier: ^1.0.0
         version: 1.0.0
-      ngx-bootstrap-icons:
-        specifier: ^1.9.3
-        version: 1.9.3(@angular/common@22.2.3(@angular/core@22.2.3(@angular/compiler@22.2.3)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@22.2.3(@angular/compiler@22.2.3)(rxjs@7.8.2))
       ngx-color:
         specifier: ^10.1.0
         version: 10.1.0(@angular/common@22.2.3(@angular/core@22.2.3(@angular/compiler@22.2.3)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@22.2.3(@angular/compiler@22.2.3)(rxjs@7.8.2))
@@ -2391,6 +2391,9 @@ packages:
     resolution: {integrity: sha512-DkVaaQHymRhpYEYo9x1oo7Q7B0Y6KJUsjm3c9eTyFDby4MHLBTwZ6ZDWBel5zrYxj1WsZgC5oLpiz+93MluXeA==}
     engines: {node: '>=20.19.0'}
 
+  bootstrap-icons@1.13.2:
+    resolution: {integrity: sha512-fAU1Ly3dH7hwRg+CB8EZ0Vl0fF80zgXHeUVJyfUOKzoURr+TbwISbCW5tKUoQLERaWYG2emTCybcPbD96hdD1A==}
+
   bootstrap@5.3.8:
     resolution: {integrity: sha512-HP1SZDqaLDPwsNiqRqi5NcP0SSXciX2s9E+RyqJIIqGo+vJeN5AJVM98CXmW/Wux0nQ5L7jeWUdplCEf0Ee+tg==}
     peerDependencies:
@@ -3420,13 +3423,6 @@ packages:
 
   neo-async@2.6.2:
     resolution: {integrity: sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==}
-
-  ngx-bootstrap-icons@1.9.3:
-    resolution: {integrity: sha512-UsFqJ/cn0u5W39hVMIDbm+ze1dCF9fDV839scqeimi70Efcmg41zOx6GgR6i2gWAVFR0OBso1cdqb4E75XhTSw==}
-    engines: {node: '>= 16.18.1', npm: '>= 8.11.0'}
-    peerDependencies:
-      '@angular/common': '>= 13.3.8'
-      '@angular/core': '>= 13.3.8'
 
   ngx-color@10.1.0:
     resolution: {integrity: sha512-yuxlE1LfN+PABIO4hv0Gw5ksq8g9XkMJKrGPn2SWbrre/gsH+kkyyn3rwSCurinnLCnw7czqenwQUtnBJm8yww==}
@@ -6411,6 +6407,8 @@ snapshots:
 
   boolbase@2.0.0: {}
 
+  bootstrap-icons@1.13.2: {}
+
   bootstrap@5.3.8(@popperjs/core@2.11.8):
     dependencies:
       '@popperjs/core': 2.11.8
@@ -7647,12 +7645,6 @@ snapshots:
   natural-compare@1.4.0: {}
 
   neo-async@2.6.2: {}
-
-  ngx-bootstrap-icons@1.9.3(@angular/common@22.2.3(@angular/core@22.2.3(@angular/compiler@22.2.3)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@22.2.3(@angular/compiler@22.2.3)(rxjs@7.8.2)):
-    dependencies:
-      '@angular/common': 22.2.3(@angular/core@22.2.3(@angular/compiler@22.2.3)(rxjs@7.8.2))(rxjs@7.8.2)
-      '@angular/core': 22.2.3(@angular/compiler@22.2.3)(rxjs@7.8.2)
-      tslib: 2.8.1
 
   ngx-color@10.1.0(@angular/common@22.2.3(@angular/core@22.2.3(@angular/compiler@22.2.3)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@22.2.3(@angular/compiler@22.2.3)(rxjs@7.8.2)):
     dependencies:
