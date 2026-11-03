@@ -26,6 +26,7 @@ from documents.file_handling import create_source_path_directory
 from documents.file_handling import generate_filename
 from documents.file_handling import generate_unique_filename
 from documents.file_handling import validate_path_in_root
+from documents.file_moves import defer_file_moves
 from documents.loggers import LoggingMixin
 from documents.media_lock import media_lock
 from documents.models import Correspondent
@@ -605,7 +606,14 @@ class ConsumerPlugin(
                 # now that everything is done, we can start to store the document
                 # in the system. This will be a transaction and reasonably fast.
                 try:
-                    with transaction.atomic():
+                    # File moves requested by saves in here run once, after
+                    # commit and after media.lock is released (in production
+                    # this nests under the consume task's scope). media.lock is
+                    # taken before the transaction: the version path locks the
+                    # root row with select_for_update, and workflows (email
+                    # actions) and file placement below take media.lock again,
+                    # re-entering instead of waiting while rows are locked.
+                    with defer_file_moves(), media_lock(), transaction.atomic():
                         # store the document.
                         if self.input_doc.root_document_id:
                             # If this is a new version of an existing document, we need
@@ -759,9 +767,8 @@ class ConsumerPlugin(
                                     document.archive_path,
                                 )
 
-                        # Don't save with the lock active. Saving will cause the file
-                        # renaming logic to acquire the lock as well.
-                        # This triggers things like file renaming
+                        # Any filename follow-up from this save is deferred by
+                        # the scope above until after commit.
                         document.save(write_file_paths=True)
 
                         if document.root_document_id:

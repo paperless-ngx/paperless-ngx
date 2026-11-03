@@ -27,6 +27,10 @@ from documents.models import Document
 from documents.models import DocumentType
 from documents.models import StoragePath
 from documents.models import Tag
+from documents.models import Workflow
+from documents.models import WorkflowAction
+from documents.models import WorkflowActionEmail
+from documents.models import WorkflowTrigger
 from documents.parsers import ParseError
 from documents.plugins.helpers import ProgressStatusOptions
 from documents.tasks import sanity_check
@@ -38,6 +42,7 @@ from paperless_testing.factories import DocumentFactory
 from paperless_testing.factories import TagFactory
 from paperless_testing.factories import UserFactory
 from paperless_testing.fakes.progress import FakeProgressManager
+from paperless_testing.locks import record_media_lock_acquisitions
 from paperless_testing.permissions import grant_object
 from paperless_testing.samples import MULTI_PAGE_DIGITAL_PDF
 from paperless_testing.samples import MULTI_PAGE_IMAGES_PDF
@@ -220,6 +225,128 @@ class TestConsumer(
         dst = self.dirs.scratch_dir / "sample_archive.pdf"
         shutil.copy(src, dst)
         return dst
+
+    @mock.patch("documents.consumer.load_classifier")
+    def test_consume_takes_media_lock_outside_transaction(self, m) -> None:
+        """
+        GIVEN:
+            - A new document to consume
+        WHEN:
+            - It is consumed
+        THEN:
+            - media.lock is acquired
+            - media.lock is never first acquired inside a transaction
+            - The document's file is in place
+        """
+        m.return_value = MagicMock()
+
+        with record_media_lock_acquisitions() as acquisitions:
+            with self.get_consumer(self.get_test_file()) as consumer:
+                consumer.run()
+
+        self.assertTrue(acquisitions)
+        self.assertFalse(any(a.in_user_transaction for a in acquisitions))
+        document = Document.objects.first()
+        assert document is not None
+        self.assertIsFile(document.source_path)
+
+    @mock.patch("documents.consumer.load_classifier")
+    def test_consume_version_takes_media_lock_outside_transaction(self, m) -> None:
+        """
+        GIVEN:
+            - An existing root document
+        WHEN:
+            - A new version of it is consumed (the root row is locked with
+              select_for_update inside the consumer's transaction)
+        THEN:
+            - media.lock is never first acquired inside a transaction
+            - The root's modified is bumped
+        """
+        m.return_value = MagicMock()
+
+        with self.get_consumer(self.get_test_file()) as consumer:
+            consumer.run()
+        root_doc = Document.objects.first()
+        assert root_doc is not None
+        original_modified = timezone.now() - datetime.timedelta(days=1)
+        Document.objects.filter(pk=root_doc.pk).update(modified=original_modified)
+
+        version_file = self.get_test_file2()
+        status = FakeProgressManager(version_file.name, None)
+        overrides = DocumentMetadataOverrides(version_label="v2")
+        doc = ConsumableDocument(
+            DocumentSource.ApiUpload,
+            original_file=version_file,
+            root_document_id=root_doc.pk,
+        )
+        preflight = ConsumerPreflightPlugin(
+            doc,
+            overrides,
+            status,  # type: ignore[arg-type]
+            self.dirs.scratch_dir,
+            "task-id",
+        )
+        preflight.setup()
+        preflight.run()
+        consumer = ConsumerPlugin(
+            doc,
+            overrides,
+            status,  # type: ignore[arg-type]
+            self.dirs.scratch_dir,
+            "task-id",
+        )
+        consumer.setup()
+
+        try:
+            with record_media_lock_acquisitions() as acquisitions:
+                consumer.run()
+        finally:
+            consumer.cleanup()
+
+        self.assertTrue(acquisitions)
+        self.assertFalse(any(a.in_user_transaction for a in acquisitions))
+        root_doc.refresh_from_db()
+        self.assertGreater(root_doc.modified, original_modified)
+
+    @override_settings(
+        PAPERLESS_EMAIL_HOST="localhost",
+        EMAIL_ENABLED=True,
+        PAPERLESS_URL="http://localhost:8000",
+    )
+    @mock.patch("documents.consumer.load_classifier")
+    @mock.patch("django.core.mail.message.EmailMessage.send", return_value=1)
+    def test_consumption_workflow_email_runs_under_held_lock(self, send, m) -> None:
+        """
+        GIVEN:
+            - A document added workflow with an email action
+        WHEN:
+            - A document is consumed (the consumer holds media.lock while
+              workflows run)
+        THEN:
+            - The email action re-enters media.lock and sends without blocking
+        """
+        m.return_value = MagicMock()
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+        )
+        email = WorkflowActionEmail.objects.create(
+            subject="added",
+            body="body",
+            to="someone@example.com",
+            include_document=True,
+        )
+        action = WorkflowAction.objects.create(
+            type=WorkflowAction.WorkflowActionType.EMAIL,
+            email=email,
+        )
+        workflow = Workflow.objects.create(name="email on add")
+        workflow.triggers.add(trigger)
+        workflow.actions.add(action)
+
+        with self.get_consumer(self.get_test_file()) as consumer:
+            consumer.run()
+
+        send.assert_called_once()
 
     @override_settings(
         FILENAME_FORMAT=None,
