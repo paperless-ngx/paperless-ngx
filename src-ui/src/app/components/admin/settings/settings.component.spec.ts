@@ -15,7 +15,6 @@ import {
   NgbNavLink,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { provideUiTour } from 'ngx-ui-tour-ng-bootstrap'
 import { of, throwError } from 'rxjs'
 import { routes } from 'src/app/app-routing.module'
@@ -133,7 +132,6 @@ describe('SettingsComponent', () => {
         ReactiveFormsModule,
         NgbAlertModule,
         NgSelectModule,
-        NgxBootstrapIconsModule.pick(allIcons),
         NgbModalModule,
         DragDropModule,
         SettingsComponent,

@@ -9,8 +9,8 @@ import {
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NavigationEnd, Router, RouterModule } from '@angular/router'
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { filter, map, Subscription } from 'rxjs'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { MarkdownPipe } from 'src/app/pipes/markdown.pipe'
 import {
   ChatMessage,
@@ -27,7 +27,7 @@ const SLOW_RESPONSE_DELAY_MS = 8000
     FormsModule,
     ReactiveFormsModule,
     RouterModule,
-    NgxBootstrapIconsModule,
+    BootstrapIconComponent,
     NgbDropdownModule,
     MarkdownPipe,
   ],

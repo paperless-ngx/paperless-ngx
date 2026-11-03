@@ -1,6 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { SuggestionSource } from 'src/app/data/ui-settings'
 import { SuggestionsDropdownComponent } from './suggestions-dropdown.component'
 
@@ -10,11 +9,7 @@ describe('SuggestionsDropdownComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [
-        NgbDropdownModule,
-        NgxBootstrapIconsModule.pick(allIcons),
-        SuggestionsDropdownComponent,
-      ],
+      imports: [NgbDropdownModule, SuggestionsDropdownComponent],
       providers: [],
     })
     fixture = TestBed.createComponent(SuggestionsDropdownComponent)

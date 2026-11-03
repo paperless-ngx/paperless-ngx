@@ -4,7 +4,7 @@
     <span class="notification-count badge rounded-pill z-3 pe-none position-absolute" [class.bg-danger]="hasUnreadError()" [class.bg-secondary]="!hasUnreadError()">{{ unread().length }}</span>
   }
   <button class="btn navbar-action border-0" id="notificationsDropdown" ngbDropdownToggle aria-label="Notifications" i18n-aria-label>
-    <i-bs width="1.3em" height="1.3em" name="bell"></i-bs>
+    <pngx-bs-icon width="1.3em" height="1.3em" name="bell"></pngx-bs-icon>
   </button>
   <div ngbDropdownMenu class="dropdown-menu-end shadow p-2" aria-labelledby="notificationsDropdown">
     <div class="d-flex align-items-center px-1 mb-2">
@@ -12,13 +12,13 @@
       @if (toasts().length) {
         <button class="btn btn-link btn-sm p-0 ms-auto text-body-secondary text-decoration-none clear-all"
           (click)="toastService.clearToasts()">
-          <i-bs width="1em" height="1em" name="check2-all" class="me-1"></i-bs><ng-container i18n>Clear All</ng-container>
+          <pngx-bs-icon width="1em" height="1em" name="check2-all" class="me-1"></pngx-bs-icon><ng-container i18n>Clear All</ng-container>
         </button>
       }
     </div>
     @if (toasts().length === 0) {
       <div class="text-center text-body-secondary small py-4">
-        <i-bs width="1.5em" height="1.5em" name="bell" class="d-block mx-auto mb-2 opacity-50"></i-bs>
+        <pngx-bs-icon width="1.5em" height="1.5em" name="bell" class="d-block mx-auto mb-2 opacity-50"></pngx-bs-icon>
         <ng-container i18n>No notifications</ng-container>
       </div>
     }

@@ -5,16 +5,16 @@
     i18n-info
     infoLink="usage/#document-trash">
     <button class="btn btn-sm btn-outline-secondary" (click)="clearSelection()" [hidden]="selectedDocuments().size === 0">
-        <i-bs name="x" class="me-1"></i-bs><ng-container i18n>Clear selection</ng-container>
+        <pngx-bs-icon name="x" class="me-1"></pngx-bs-icon><ng-container i18n>Clear selection</ng-container>
     </button>
     <button type="button" class="btn btn-sm btn-outline-primary" (click)="restoreAll(selectedDocuments())" [disabled]="selectedDocuments().size === 0">
-        <i-bs name="arrow-counterclockwise" class="me-1"></i-bs><ng-container i18n>Restore selected</ng-container>
+        <pngx-bs-icon name="arrow-counterclockwise" class="me-1"></pngx-bs-icon><ng-container i18n>Restore selected</ng-container>
     </button>
     <button type="button" class="btn btn-sm btn-outline-danger" (click)="emptyTrash(selectedDocuments())" [disabled]="selectedDocuments().size === 0">
-        <i-bs name="trash" class="me-1"></i-bs><ng-container i18n>Delete selected</ng-container>
+        <pngx-bs-icon name="trash" class="me-1"></pngx-bs-icon><ng-container i18n>Delete selected</ng-container>
     </button>
     <button type="button" class="btn btn-sm btn-outline-danger" (click)="emptyTrash()" [disabled]="documentsInTrash().length === 0">
-        <i-bs name="trash" class="me-1"></i-bs><ng-container i18n>Empty trash</ng-container>
+        <pngx-bs-icon name="trash" class="me-1"></pngx-bs-icon><ng-container i18n>Empty trash</ng-container>
     </button>
 </pngx-page-header>
 
@@ -59,7 +59,7 @@
                     <td scope="row">
                       {{ document.title }}
                       <pngx-preview-popup [document]="document" linkClasses="btn btn-sm btn-link" #popupPreview>
-                        <i-bs name="eye"></i-bs>
+                        <pngx-bs-icon name="eye"></pngx-bs-icon>
                       </pngx-preview-popup>
                     </td>
                     <td scope="row" class="d-none d-sm-table-cell" i18n>{{ getDaysRemaining(document) }} days</td>
@@ -67,7 +67,7 @@
                     <div class="btn-group d-block d-sm-none">
                         <div ngbDropdown container="body" class="d-inline-block">
                         <button type="button" class="btn btn-link" id="actionsMenuMobile" (click)="$event.stopPropagation()" ngbDropdownToggle aria-label="Actions" i18n-aria-label>
-                            <i-bs name="three-dots-vertical"></i-bs>
+                            <pngx-bs-icon name="three-dots-vertical"></pngx-bs-icon>
                         </button>
                         <div ngbDropdownMenu aria-labelledby="actionsMenuMobile">
                             <button (click)="restore(document)" ngbDropdownItem i18n>Restore</button>
@@ -77,10 +77,10 @@
                     </div>
                     <div class="btn-group d-none d-sm-block">
                         <button class="btn btn-sm btn-outline-secondary" (click)="restore(document); $event.stopPropagation();">
-                            <i-bs width="1em" height="1em" name="arrow-counterclockwise" class="me-1"></i-bs><ng-container i18n>Restore</ng-container>
+                            <pngx-bs-icon width="1em" height="1em" name="arrow-counterclockwise" class="me-1"></pngx-bs-icon><ng-container i18n>Restore</ng-container>
                         </button>
                         <button class="btn btn-sm btn-outline-danger" (click)="delete(document); $event.stopPropagation();">
-                            <i-bs width="1em" height="1em" name="trash" class="me-1"></i-bs><ng-container i18n>Delete</ng-container>
+                            <pngx-bs-icon width="1em" height="1em" name="trash" class="me-1"></pngx-bs-icon><ng-container i18n>Delete</ng-container>
                         </button>
                     </div>
                     </td>

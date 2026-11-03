@@ -10,7 +10,6 @@ import {
   NgbModalRef,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of } from 'rxjs'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
@@ -49,7 +48,6 @@ describe('CustomFieldsDropdownComponent', () => {
         ReactiveFormsModule,
         NgbModalModule,
         NgbDropdownModule,
-        NgxBootstrapIconsModule.pick(allIcons),
         CustomFieldsDropdownComponent,
         SelectComponent,
       ],

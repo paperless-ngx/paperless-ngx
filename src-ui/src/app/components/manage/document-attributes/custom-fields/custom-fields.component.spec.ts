@@ -12,7 +12,6 @@ import {
   NgbPaginationModule,
   NgbPopoverModule,
 } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of, throwError } from 'rxjs'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import {
@@ -61,7 +60,6 @@ describe('CustomFieldsComponent', () => {
         ReactiveFormsModule,
         NgbModalModule,
         NgbPopoverModule,
-        NgxBootstrapIconsModule.pick(allIcons),
         RouterTestingModule,
         CustomFieldsComponent,
         IfPermissionsDirective,

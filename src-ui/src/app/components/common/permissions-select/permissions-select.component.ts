@@ -10,7 +10,7 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms'
 import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import {
   PermissionAction,
@@ -33,7 +33,7 @@ import { ComponentWithPermissions } from '../../with-permissions/with-permission
   styleUrls: ['./permissions-select.component.scss'],
   imports: [
     KeyValuePipe,
-    NgxBootstrapIconsModule,
+    BootstrapIconComponent,
     NgbPopoverModule,
     FormsModule,
     ReactiveFormsModule,

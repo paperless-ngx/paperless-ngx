@@ -12,7 +12,6 @@ import {
 } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { merge, of, Subject } from 'rxjs'
 import {
   filter,
@@ -24,6 +23,7 @@ import {
   takeUntil,
   tap,
 } from 'rxjs/operators'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { DocumentVersionInfo } from 'src/app/data/document'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
@@ -44,7 +44,7 @@ import { AddExistingDocumentVersionDialogComponent } from './add-existing-docume
   imports: [
     FormsModule,
     NgbDropdownModule,
-    NgxBootstrapIconsModule,
+    BootstrapIconComponent,
     ConfirmButtonComponent,
     IfPermissionsDirective,
     SlicePipe,

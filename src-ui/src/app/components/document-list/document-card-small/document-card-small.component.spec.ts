@@ -4,7 +4,6 @@ import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { By } from '@angular/platform-browser'
 import { RouterTestingModule } from '@angular/router/testing'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { TagComponent } from '../../common/tag/tag.component'
 import { DocumentCardSmallComponent } from './document-card-small.component'
 
@@ -32,11 +31,7 @@ describe('DocumentCardSmallComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      imports: [
-        RouterTestingModule,
-        NgxBootstrapIconsModule.pick(allIcons),
-        DocumentCardSmallComponent,
-      ],
+      imports: [RouterTestingModule, DocumentCardSmallComponent],
       providers: [
         DatePipe,
         provideHttpClient(withInterceptorsFromDi()),

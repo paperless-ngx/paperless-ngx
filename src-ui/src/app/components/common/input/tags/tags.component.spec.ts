@@ -15,7 +15,6 @@ import {
   NgbPopoverModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of } from 'rxjs'
 import {
   DEFAULT_MATCHING_ALGORITHM,
@@ -71,7 +70,6 @@ describe('TagsComponent', () => {
         NgbModalModule,
         NgbAccordionModule,
         NgbPopoverModule,
-        NgxBootstrapIconsModule.pick(allIcons),
         TagsComponent,
         TagEditDialogComponent,
         TextComponent,

@@ -7,18 +7,17 @@ import {
   Router,
 } from '@angular/router'
 import { RouterTestingModule } from '@angular/router/testing'
-import { allIcons, NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Subject } from 'rxjs'
 import {
   PermissionAction,
   PermissionsService,
   PermissionType,
 } from 'src/app/services/permissions.service'
+import { CustomFieldsComponent } from './custom-fields/custom-fields.component'
 import {
   DocumentAttributesComponent,
   DocumentAttributesSectionKind,
 } from './document-attributes.component'
-import { CustomFieldsComponent } from './custom-fields/custom-fields.component'
 import { ManagementListComponent } from './management-list/management-list.component'
 
 @Component({
@@ -41,7 +40,6 @@ describe('DocumentAttributesComponent', () => {
     TestBed.configureTestingModule({
       imports: [
         RouterTestingModule,
-        NgxBootstrapIconsModule.pick(allIcons),
         DocumentAttributesComponent,
         DummySectionComponent,
       ],

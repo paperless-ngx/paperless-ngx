@@ -1,7 +1,6 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { Subject } from 'rxjs'
 import { Toast, ToastLevel, ToastService } from 'src/app/services/toast.service'
 import { ToastsDropdownComponent } from './toasts-dropdown.component'
@@ -41,10 +40,7 @@ describe('ToastsDropdownComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      imports: [
-        ToastsDropdownComponent,
-        NgxBootstrapIconsModule.pick(allIcons),
-      ],
+      imports: [ToastsDropdownComponent],
       providers: [
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),

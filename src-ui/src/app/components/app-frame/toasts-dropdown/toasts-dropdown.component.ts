@@ -12,8 +12,8 @@ import {
   NgbDropdownModule,
   NgbProgressbarModule,
 } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Subscription, interval, map } from 'rxjs'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { Toast, ToastLevel, ToastService } from 'src/app/services/toast.service'
 import { ToastComponent } from '../../common/toast/toast.component'
 
@@ -25,7 +25,7 @@ import { ToastComponent } from '../../common/toast/toast.component'
     ToastComponent,
     NgbDropdownModule,
     NgbProgressbarModule,
-    NgxBootstrapIconsModule,
+    BootstrapIconComponent,
   ],
 })
 export class ToastsDropdownComponent {

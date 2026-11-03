@@ -6,7 +6,6 @@ import { ElementRef, QueryList } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { CustomFieldDataType } from 'src/app/data/custom-field'
 import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
@@ -28,7 +27,6 @@ describe('CustomFieldEditDialogComponent', () => {
         ReactiveFormsModule,
         NgSelectModule,
         NgbModule,
-        NgxBootstrapIconsModule.pick(allIcons),
         CustomFieldEditDialogComponent,
         IfPermissionsDirective,
         IfOwnerDirective,

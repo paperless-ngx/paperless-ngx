@@ -142,7 +142,7 @@ main {
       padding-left: 0;
       padding-right: 0;
 
-      i-bs {
+      pngx-bs-icon {
         margin-right: 0 !important;
       }
     }
@@ -268,7 +268,7 @@ main {
     }
   }
 
-  i-bs {
+  pngx-bs-icon {
     position: relative;
     top: -1px;
   }
@@ -279,7 +279,7 @@ main {
   align-items: center;
   min-width: 0;
 
-  > i-bs {
+  > pngx-bs-icon {
     flex: 0 0 auto;
   }
 
@@ -373,11 +373,11 @@ main {
     width: 1.8rem;
     height: 100%;
 
-    i-bs {
+    pngx-bs-icon {
       opacity: 0.5;
     }
 
-    &:hover i-bs {
+    &:hover pngx-bs-icon {
       opacity: 1;
     }
   }
@@ -392,7 +392,7 @@ main {
       text-decoration: underline;
     }
 
-    i-bs {
+    pngx-bs-icon {
       margin-bottom: 2px;
     }
   }
@@ -665,7 +665,7 @@ main {
 .navbar .dropdown-menu {
   font-size: 0.875rem; // body size
 
-  a i-bs, button i-bs {
+  a pngx-bs-icon, button pngx-bs-icon {
     opacity: 0.6;
   }
 }
@@ -693,7 +693,7 @@ main {
   cursor: move;
 }
 
-::ng-deep .navItemDrag .position-absolute i-bs {
+::ng-deep .navItemDrag .position-absolute pngx-bs-icon {
   display: none;
 }
 

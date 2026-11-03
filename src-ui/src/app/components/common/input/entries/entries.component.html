@@ -5,7 +5,7 @@
         <label class="form-label mb-0" [class.mb-md-0]="horizontal" [for]="inputId">{{title}}</label>
       }
       <button type="button" class="btn btn-sm btn-outline-primary ms-4" (click)="addEntry()">
-        <i-bs name="plus-circle" class="me-1"></i-bs><ng-container i18n>Add</ng-container>
+        <pngx-bs-icon name="plus-circle" class="me-1"></pngx-bs-icon><ng-container i18n>Add</ng-container>
       </button>
     </div>
     <div class="position-relative">
@@ -14,7 +14,7 @@
           <input type="text" class="form-control" [(ngModel)]="entry[0]" [ngModelOptions]="{standalone: true}" (change)="inputChange()" [disabled]="disabled" autocomplete="off">
           <input type="text" class="form-control" [(ngModel)]="entry[1]" [ngModelOptions]="{standalone: true}" (change)="inputChange()" [disabled]="disabled" autocomplete="off">
           <button type="button" class="btn btn-outline-secondary" (click)="removeEntry(i)" aria-label="Remove entry" i18n-aria-label>
-            <i-bs class="text-danger" name="trash"></i-bs>
+            <pngx-bs-icon class="text-danger" name="trash"></pngx-bs-icon>
           </button>
         </div>
       }

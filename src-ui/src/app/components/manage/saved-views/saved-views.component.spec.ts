@@ -6,7 +6,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { By } from '@angular/platform-browser'
 import { NgbModal, NgbModule } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { Subject, of, throwError } from 'rxjs'
 import { SavedView } from 'src/app/data/saved-view'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
@@ -54,7 +53,6 @@ describe('SavedViewsComponent', () => {
     TestBed.configureTestingModule({
       imports: [
         NgbModule,
-        NgxBootstrapIconsModule.pick(allIcons),
         ReactiveFormsModule,
         FormsModule,
         DragDropModule,

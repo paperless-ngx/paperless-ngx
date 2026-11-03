@@ -9,7 +9,6 @@ import {
 } from '@angular/forms'
 import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap'
 import { DirtyComponent, dirtyCheck } from '@ngneat/dirty-check-forms'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import {
   BehaviorSubject,
   Observable,
@@ -17,6 +16,7 @@ import {
   first,
   takeUntil,
 } from 'rxjs'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import {
   ConfigCategory,
   ConfigOption,
@@ -52,7 +52,7 @@ import { LoadingComponentWithPermissions } from '../../loading-component/loading
     NgbNavModule,
     FormsModule,
     ReactiveFormsModule,
-    NgxBootstrapIconsModule,
+    BootstrapIconComponent,
   ],
 })
 export class ConfigComponent

@@ -11,8 +11,8 @@ import {
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectComponent } from '@ng-select/ng-select'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { first } from 'rxjs'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { User } from 'src/app/data/user'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import {
@@ -62,7 +62,7 @@ export enum OwnerFilterType {
     NgbDropdownModule,
     NgSelectComponent,
     NgClass,
-    NgxBootstrapIconsModule,
+    BootstrapIconComponent,
   ],
 })
 export class PermissionsFilterDropdownComponent extends ComponentWithPermissions {

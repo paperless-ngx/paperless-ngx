@@ -4,7 +4,6 @@ import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of } from 'rxjs'
 import { StoragePath } from 'src/app/data/storage-path'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
@@ -24,7 +23,6 @@ describe('StoragePathListComponent', () => {
         NgbPaginationModule,
         FormsModule,
         ReactiveFormsModule,
-        NgxBootstrapIconsModule.pick(allIcons),
         StoragePathListComponent,
         SortableDirective,
         PageHeaderComponent,

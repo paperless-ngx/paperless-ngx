@@ -9,7 +9,6 @@ import {
   NgbPaginationModule,
   NgbPopoverModule,
 } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import {
   debounceTime,
   distinctUntilChanged,
@@ -22,6 +21,7 @@ import {
   takeUntil,
   timer,
 } from 'rxjs'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import {
   PaperlessTask,
   PaperlessTaskStatus,
@@ -151,7 +151,7 @@ const TRIGGER_SOURCE_OPTIONS: Array<{
     NgbDropdownModule,
     NgbPaginationModule,
     NgbPopoverModule,
-    NgxBootstrapIconsModule,
+    BootstrapIconComponent,
   ],
 })
 export class TasksComponent

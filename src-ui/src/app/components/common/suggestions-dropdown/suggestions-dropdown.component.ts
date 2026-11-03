@@ -6,14 +6,14 @@ import {
   input,
 } from '@angular/core'
 import { NgbDropdown, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { DocumentSuggestions } from 'src/app/data/document-suggestions'
 import { SuggestionSource } from 'src/app/data/ui-settings'
 import { pngxPopperOptions } from 'src/app/utils/popper-options'
 
 @Component({
   selector: 'pngx-suggestions-dropdown',
-  imports: [NgbDropdownModule, NgxBootstrapIconsModule],
+  imports: [NgbDropdownModule, BootstrapIconComponent],
   templateUrl: './suggestions-dropdown.component.html',
   styleUrl: './suggestions-dropdown.component.scss',
 })

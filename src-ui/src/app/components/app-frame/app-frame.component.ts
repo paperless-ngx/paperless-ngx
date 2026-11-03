@@ -23,10 +23,10 @@ import {
   NgbNavModule,
   NgbPopoverModule,
 } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { TourNgBootstrap } from 'ngx-ui-tour-ng-bootstrap'
 import { Observable } from 'rxjs'
 import { first } from 'rxjs/operators'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { Document } from 'src/app/data/document'
 import { SavedView } from 'src/app/data/saved-view'
 import {
@@ -89,7 +89,7 @@ const SCROLL_THRESHOLD = 16
     NgbPopoverModule,
     NgbCollapseModule,
     NgbNavModule,
-    NgxBootstrapIconsModule,
+    BootstrapIconComponent,
     DragDropModule,
     TourNgBootstrap,
     FormsModule,

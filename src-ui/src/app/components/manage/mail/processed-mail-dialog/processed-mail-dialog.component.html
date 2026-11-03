@@ -1,11 +1,11 @@
 <div class="modal-header">
   <h6 class="modal-title" id="modal-basic-title" i18n>Processed Mail for <em>{{ rule().name }}</em></h6>
   <button class="btn btn-sm btn-link text-muted me-auto p-0 p-md-2" title="What's this?" i18n-title type="button" [ngbPopover]="infoPopover" [autoClose]="true">
-    <i-bs name="question-circle"></i-bs>
+    <pngx-bs-icon name="question-circle"></pngx-bs-icon>
   </button>
   <ng-template #infoPopover>
     <a href="https://docs.paperless-ngx.com/usage#processed-mail" target="_blank" referrerpolicy="noopener noreferrer" i18n>Read more</a>
-    <i-bs class="ms-1" width=".8em" height=".8em" name="box-arrow-up-right"></i-bs>
+    <pngx-bs-icon class="ms-1" width=".8em" height=".8em" name="box-arrow-up-right"></pngx-bs-icon>
   </ng-template>
   <button type="button" class="btn-close" aria-label="Close" (click)="close()"></button>
 </div>
@@ -56,13 +56,13 @@
               <td>
                 @switch (mail.status) {
                   @case ('SUCCESS') {
-                    <i-bs name="check-circle" title="SUCCESS" class="text-success" [ngbTooltip]="statusTooltip"></i-bs>
+                    <pngx-bs-icon name="check-circle" title="SUCCESS" class="text-success" [ngbTooltip]="statusTooltip"></pngx-bs-icon>
                   }
                   @case ('FAILED') {
-                    <i-bs name="exclamation-triangle" title="FAILED" class="text-danger" [ngbTooltip]="statusTooltip"></i-bs>
+                    <pngx-bs-icon name="exclamation-triangle" title="FAILED" class="text-danger" [ngbTooltip]="statusTooltip"></pngx-bs-icon>
                   }
                   @default {
-                    <i-bs name="slash-circle" title="{{ mail.status }}" class="text-muted" [ngbTooltip]="statusTooltip"></i-bs>
+                    <pngx-bs-icon name="slash-circle" title="{{ mail.status }}" class="text-muted" [ngbTooltip]="statusTooltip"></pngx-bs-icon>
                   }
                 }
               </td>
