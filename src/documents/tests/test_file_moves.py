@@ -6,18 +6,29 @@ import logging
 from typing import TYPE_CHECKING
 
 import pytest
+from asgiref.sync import async_to_sync
+from asgiref.sync import sync_to_async
 from django.db import transaction
+from django.http import HttpRequest
+from django.http import HttpResponse
+from django.test import RequestFactory
 from django.utils import timezone
 from filelock import Timeout
+from rest_framework import status
 
 from documents.file_moves import _active_collector
 from documents.file_moves import defer_file_moves
 from documents.file_moves import flush_pending_file_moves
 from documents.file_moves import move_files_for_document
 from documents.file_moves import request_file_move
+from documents.models import CustomField
 from documents.models import Document
+from paperless.middleware import FileMoveMiddleware
 from paperless_testing.factories import CorrespondentFactory
+from paperless_testing.factories import CustomFieldFactory
+from paperless_testing.factories import CustomFieldInstanceFactory
 from paperless_testing.factories import DocumentFactory
+from paperless_testing.factories import StoragePathFactory
 from paperless_testing.factories import TagFactory
 from paperless_testing.locks import record_media_lock_acquisitions
 
@@ -27,6 +38,7 @@ if TYPE_CHECKING:
 
     from pytest_django.fixtures import Settings
     from pytest_mock import MockerFixture
+    from rest_framework.test import APIClient
 
     from paperless_testing.dirs import PaperlessDirs
 
@@ -490,3 +502,252 @@ class TestDeferFileMoves:
 
         assert (paperless_dirs.originals_dir / "b2.pdf").is_file()
         assert (paperless_dirs.originals_dir / "a.pdf").is_file()
+
+
+@pytest.mark.django_db
+class TestFileMoveMiddleware:
+    def test_sync_mode_flushes_before_returning(
+        self,
+        document: Document,
+        paperless_dirs: PaperlessDirs,
+    ) -> None:
+        """
+        GIVEN:
+            - The middleware wrapping a sync view that renames the document
+        WHEN:
+            - A request passes through it
+        THEN:
+            - Nothing moves while the view runs
+            - The file is at its final path when the middleware returns
+        """
+
+        def view(request: HttpRequest) -> HttpResponse:
+            document.title = "renamed"
+            document.save()
+            assert (paperless_dirs.originals_dir / "original.pdf").is_file()
+            return HttpResponse()
+
+        middleware = FileMoveMiddleware(view)
+        assert middleware.async_mode is False
+
+        middleware(RequestFactory().get("/"))
+
+        assert (paperless_dirs.originals_dir / "renamed.pdf").is_file()
+
+    def test_async_mode_flushes_after_await(
+        self,
+        document: Document,
+        paperless_dirs: PaperlessDirs,
+    ) -> None:
+        """
+        GIVEN:
+            - The middleware wrapping an async view that saves through
+              sync_to_async
+        WHEN:
+            - A request passes through it
+        THEN:
+            - Nothing moves while the view runs
+            - The file is at its final path after the await, so the collector
+              survived the context copy into the sync thread
+        """
+
+        def rename() -> None:
+            document.title = "renamed"
+            document.save()
+
+        async def view(request: HttpRequest) -> HttpResponse:
+            await sync_to_async(rename)()
+            assert (paperless_dirs.originals_dir / "original.pdf").is_file()
+            return HttpResponse()
+
+        middleware = FileMoveMiddleware(view)
+        assert middleware.async_mode is True
+
+        async_to_sync(middleware)(RequestFactory().get("/"))
+
+        assert (paperless_dirs.originals_dir / "renamed.pdf").is_file()
+
+    def test_view_raising_after_save_still_moves(
+        self,
+        document: Document,
+        paperless_dirs: PaperlessDirs,
+    ) -> None:
+        """
+        GIVEN:
+            - A view that saves a rename and then raises
+        WHEN:
+            - A request passes through the middleware
+        THEN:
+            - The exception propagates
+            - The committed rename is still moved
+        """
+
+        def view(request: HttpRequest) -> HttpResponse:
+            document.title = "renamed"
+            document.save()
+            raise RuntimeError("view failed")
+
+        with pytest.raises(RuntimeError, match="view failed"):
+            FileMoveMiddleware(view)(RequestFactory().get("/"))
+
+        assert (paperless_dirs.originals_dir / "renamed.pdf").is_file()
+
+
+@pytest.mark.django_db
+class TestFileMovesThroughApi:
+    def test_media_lock_never_taken_inside_a_transaction(
+        self,
+        admin_client: APIClient,
+        document: Document,
+    ) -> None:
+        """
+        GIVEN:
+            - A document and a tag
+        WHEN:
+            - A tag + title PATCH and a note POST are made through the API
+        THEN:
+            - media.lock is acquired at least once
+            - media.lock is never first acquired while a transaction is open,
+              which is the lock ordering that let two such requests deadlock
+        """
+        tag = TagFactory()
+
+        with record_media_lock_acquisitions() as acquisitions:
+            response = admin_client.patch(
+                f"/api/documents/{document.pk}/",
+                {"tags": [tag.pk], "title": "renamed"},
+                format="json",
+            )
+            assert response.status_code == status.HTTP_200_OK
+            response = admin_client.post(
+                f"/api/documents/{document.pk}/notes/",
+                {"note": "a note"},
+                format="json",
+            )
+            assert response.status_code == status.HTTP_200_OK
+
+        assert acquisitions
+        assert not any(a.in_user_transaction for a in acquisitions)
+
+    def test_patch_moves_to_final_path(
+        self,
+        admin_client: APIClient,
+        document: Document,
+        paperless_dirs: PaperlessDirs,
+    ) -> None:
+        """
+        GIVEN:
+            - A document named after its title
+        WHEN:
+            - Its title and tags are changed through the API
+        THEN:
+            - The file is at the final path when the response returns
+        """
+        response = admin_client.patch(
+            f"/api/documents/{document.pk}/",
+            {"tags": [TagFactory().pk], "title": "renamed"},
+            format="json",
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert (paperless_dirs.originals_dir / "renamed.pdf").is_file()
+        assert Document.objects.get(pk=document.pk).filename == "renamed.pdf"
+
+    def test_trash_restore_keeps_db_and_disk_consistent(
+        self,
+        admin_client: APIClient,
+        document: Document,
+    ) -> None:
+        """
+        GIVEN:
+            - A document moved to the trash
+        WHEN:
+            - It is restored through the trash API
+        THEN:
+            - Its DB filename points at a file that exists
+        """
+        admin_client.delete(f"/api/documents/{document.pk}/")
+
+        response = admin_client.post(
+            "/api/trash/",
+            {"action": "restore", "documents": [document.pk]},
+            format="json",
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        restored = Document.objects.get(pk=document.pk)
+        assert restored.source_path.is_file()
+
+    def test_root_storage_path_change_moves_versions(
+        self,
+        admin_client: APIClient,
+        document: Document,
+        paperless_dirs: PaperlessDirs,
+    ) -> None:
+        """
+        GIVEN:
+            - A root document with one version, both with files on disk
+        WHEN:
+            - The root's storage path is changed through the API
+        THEN:
+            - The root and version files both follow the storage path
+        """
+        (paperless_dirs.originals_dir / "version.pdf").write_bytes(CONTENT)
+        version = DocumentFactory(
+            root_document=document,
+            title="version",
+            filename="version.pdf",
+            mime_type="application/pdf",
+            checksum=hashlib.sha256(CONTENT).hexdigest(),
+        )
+        storage_path = StoragePathFactory(path="stored/{{ title }}")
+
+        response = admin_client.patch(
+            f"/api/documents/{document.pk}/",
+            {"storage_path": storage_path.pk},
+            format="json",
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        document.refresh_from_db()
+        version.refresh_from_db()
+        assert document.filename.startswith("stored/")
+        assert version.filename.startswith("stored/")
+        assert document.source_path.is_file()
+        assert version.source_path.is_file()
+
+    def test_custom_field_change_moves_to_final_path(
+        self,
+        admin_client: APIClient,
+        document: Document,
+        paperless_dirs: PaperlessDirs,
+        settings: Settings,
+    ) -> None:
+        """
+        GIVEN:
+            - A filename format that uses a text custom field
+            - A document with that field set
+        WHEN:
+            - The field value is changed through the API
+        THEN:
+            - The file is at the path for the new value
+        """
+        settings.FILENAME_FORMAT = (
+            "{{ custom_fields|get_cf_value('flavor') }}/{{ title }}"
+        )
+        field = CustomFieldFactory(
+            name="flavor",
+            data_type=CustomField.FieldDataType.STRING,
+        )
+        CustomFieldInstanceFactory(field=field, document=document, value_text="apple")
+
+        response = admin_client.patch(
+            f"/api/documents/{document.pk}/",
+            {"custom_fields": [{"field": field.pk, "value": "cherry"}]},
+            format="json",
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        document.refresh_from_db()
+        assert document.filename == "cherry/original.pdf"
+        assert (paperless_dirs.originals_dir / "cherry" / "original.pdf").is_file()
