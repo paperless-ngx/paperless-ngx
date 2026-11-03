@@ -656,19 +656,17 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertEqual(document2.filename, "qwe.pdf")
 
     @override_settings(FILENAME_FORMAT="{title}")
-    @mock.patch("documents.signals.handlers.Document.objects.filter")
-    @mock.patch("documents.signals.handlers.shutil.move")
+    @mock.patch("documents.file_moves.Document.global_objects.filter")
+    @mock.patch("documents.file_moves.shutil.move")
     def test_no_move_only_save(self, mock_move, mock_filter) -> None:
         """
         GIVEN:
             - A document with a filename
-            - The document is saved
-            - The filename is not changed
         WHEN:
-            - The document is saved
+            - The document is saved without a change that affects its path
         THEN:
-            - The document modified date is updated
-            - The document is not moved
+            - The document modified date is updated by the save itself
+            - The file is not moved and the mover writes nothing
         """
         with disable_auditlog():
             doc = Document.objects.create(
@@ -686,7 +684,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             doc.save()
             doc.refresh_from_db()
 
-            mock_filter.assert_called()
+            mock_filter.assert_not_called()
             self.assertNotEqual(original_modified, doc.modified)
             mock_move.assert_not_called()
 
@@ -694,7 +692,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         FILENAME_FORMAT="{{title}}_{{custom_fields|get_cf_value('test')}}",
         CELERY_TASK_ALWAYS_EAGER=True,
     )
-    @mock.patch("documents.signals.handlers.update_filename_and_move_files")
+    @mock.patch("documents.signals.handlers.move_files_for_document")
     def test_select_cf_updated(self, m) -> None:
         """
         GIVEN:
@@ -2045,7 +2043,7 @@ class TestCustomFieldFilenameUpdates(
         Path(self.doc.source_path).parent.mkdir(parents=True, exist_ok=True)
         Path(self.doc.source_path).touch()
 
-        with mock.patch("documents.signals.handlers.generate_unique_filename") as m:
+        with mock.patch("documents.file_moves.generate_unique_filename") as m:
             m.side_effect = generate_unique_filename
             self.cfi.value_text = "updated"
             self.cfi.save()
@@ -2067,7 +2065,7 @@ class TestCustomFieldFilenameUpdates(
         Path(self.doc.source_path).parent.mkdir(parents=True, exist_ok=True)
         Path(self.doc.source_path).touch()
 
-        with mock.patch("documents.signals.handlers.generate_unique_filename") as m:
+        with mock.patch("documents.file_moves.generate_unique_filename") as m:
             m.side_effect = generate_unique_filename
             self.cfi.value_text = "updated"
             self.cfi.save()
@@ -2145,7 +2143,7 @@ def test_refresh_failure_surfaces_database_error(
     GIVEN:
         - A document with a stored filename
     WHEN:
-        - Saving it triggers a filename update and refreshing it from the database fails
+        - Saving it triggers a filename update and loading it from the database fails
     THEN:
         - The database error is raised, not an unbound variable error from the rollback
     """
@@ -2153,8 +2151,8 @@ def test_refresh_failure_surfaces_database_error(
 
     with (
         mock.patch.object(
-            Document,
-            "refresh_from_db",
+            Document.global_objects,
+            "get",
             side_effect=DatabaseError("database is locked"),
         ),
         pytest.raises(DatabaseError, match="database is locked"),

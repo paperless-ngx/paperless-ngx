@@ -750,7 +750,7 @@ class TestConsumer(
         FILENAME_FORMAT="{correspondent}/{title}",
         ARCHIVE_FILE_GENERATION="always",
     )
-    @mock.patch("documents.signals.handlers.generate_unique_filename")
+    @mock.patch("documents.file_moves.generate_unique_filename")
     def testFilenameHandlingUnstableFormat(self, m) -> None:
         filenames = ["this", "that", "now this", "i cannot decide"]
 
