@@ -19,15 +19,7 @@ import {
   NgbModalRef,
 } from '@ng-bootstrap/ng-bootstrap'
 import { saveAs } from 'file-saver'
-import {
-  first,
-  map,
-  Observable,
-  Subject,
-  switchMap,
-  takeUntil,
-  tap,
-} from 'rxjs'
+import { first, map, Observable, Subject, switchMap, takeUntil } from 'rxjs'
 import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { ConfirmDialogComponent } from 'src/app/components/common/confirm-dialog/confirm-dialog.component'
 import { CustomField } from 'src/app/data/custom-field'
@@ -299,7 +291,14 @@ export class BulkEditorComponent
       .bulkEdit(overrideSelection ?? this.getSelectionQuery(), method, args)
       .pipe(first())
       .subscribe({
-        next: () => this.handleOperationSuccess(modal),
+        next: (response) => {
+          if (response.task_id) {
+            modal?.close()
+            this.list.selectNone()
+          } else {
+            this.handleOperationSuccess(modal)
+          }
+        },
         error: (error) => this.handleOperationError(modal, error),
       })
   }
@@ -906,19 +905,26 @@ export class BulkEditorComponent
       ? null
       : Array.from(this.list.selected)
     const count = this.getSelectionSize()
-    this.executeDocumentAction(
-      modal,
-      this.documentService
-        .deleteDocuments(this.getSelectionQuery())
-        .pipe(
-          tap(() =>
+    this.documentService
+      .deleteDocuments(this.getSelectionQuery())
+      .pipe(first())
+      .subscribe({
+        next: (response) => {
+          const completed = () =>
             this.trashService.notifyMovedToTrash(
               $localize`Moved ${count} document(s) to the trash`,
               documents
             )
-          )
-        )
-    )
+          if (response.task_id) {
+            modal?.close()
+            this.list.selectNone()
+          } else {
+            this.handleOperationSuccess(modal)
+            completed()
+          }
+        },
+        error: (error) => this.handleOperationError(modal, error),
+      })
   }
 
   downloadSelected() {
@@ -1089,12 +1095,12 @@ export class BulkEditorComponent
     dialog.selection = this.getSelectionQuery()
     dialog.selectionCount = this.getSelectionSize()
     dialog.succeeded.subscribe((result) => {
-      this.toastService.showSuccess($localize`Custom fields updated.`)
-      this.list.reload()
-      this.list.reduceSelectionToFilter()
-      this.list.selected.forEach((id) => {
-        this.openDocumentService.refreshDocument(id)
-      })
+      if (result?.task_id) {
+        this.list.selectNone()
+      } else {
+        this.toastService.showSuccess($localize`Custom fields updated.`)
+        this.handleOperationSuccess(null)
+      }
     })
     dialog.failed.subscribe((error) => {
       this.toastService.showError(
