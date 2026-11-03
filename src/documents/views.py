@@ -11,6 +11,7 @@ from collections.abc import Callable
 from datetime import datetime
 from datetime import timedelta
 from http import HTTPStatus
+from inspect import signature
 from itertools import islice
 from pathlib import Path
 from time import mktime
@@ -106,6 +107,9 @@ from documents import bulk_edit
 from documents.bulk_download import ArchiveOnlyStrategy
 from documents.bulk_download import OriginalAndArchiveStrategy
 from documents.bulk_download import OriginalsOnlyStrategy
+from documents.bulk_operations import QUEUED_OPERATIONS
+from documents.bulk_operations import execute_bulk_operation
+from documents.bulk_operations import snapshot_field
 from documents.caching import get_llm_suggestion_cache
 from documents.caching import get_metadata_cache
 from documents.caching import get_suggestion_cache
@@ -173,6 +177,7 @@ from documents.permissions import ViewDocumentsPermissions
 from documents.permissions import annotate_document_count_for_related_queryset
 from documents.permissions import get_document_count_filter_for_user
 from documents.permissions import get_permission_grantees
+from documents.permissions import has_document_operation_permissions
 from documents.permissions import has_global_statistics_permission
 from documents.permissions import has_perms_owner_aware
 from documents.permissions import has_system_status_permission
@@ -2982,98 +2987,29 @@ class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
         "merge_as_versions",
     }
 
-    def _has_document_permissions(
-        self,
-        *,
-        user: User,
-        documents: list[int],
-        method,
-        parameters: dict[str, Any],
-    ) -> bool:
-        if user.is_superuser:
-            return True
+    def _has_document_permissions(self, **kwargs) -> bool:
+        return has_document_operation_permissions(**kwargs)
 
-        root_docs = {
-            get_root_document(doc)
-            for doc in Document.objects.select_related(
-                "owner",
-                "root_document__owner",
-            ).filter(pk__in=documents)
-        }
-        user_is_owner_of_all_documents = all(
-            (doc.owner == user or doc.owner is None) for doc in root_docs
+    def _queue_bulk_operation(self, method, documents, parameters, from_webui):
+        if "update_callback" in parameters:
+            raise ValueError("Unsupported bulk operation parameter: update_callback")
+        signature(method).bind(documents, **parameters)
+        task = execute_bulk_operation.apply_async(
+            kwargs={
+                "operation": method.__name__,
+                "document_ids": documents,
+                "parameters": parameters,
+                "user_id": self.request.user.pk,
+            },
+            headers={
+                "trigger_source": (
+                    PaperlessTask.TriggerSource.WEB_UI
+                    if from_webui
+                    else PaperlessTask.TriggerSource.API_UPLOAD
+                ),
+            },
         )
-
-        # check global and object permissions for all documents
-        has_perms = (
-            user.has_perm(
-                "documents.change_document",
-            )
-            and not Document.global_objects.filter(pk__in=documents)
-            .exclude(pk__in=permitted_document_ids(user, perm="change_document"))
-            .exists()
-        )
-
-        # check ownership for methods that change original document
-        if (
-            (
-                has_perms
-                and method
-                in [
-                    bulk_edit.set_permissions,
-                    bulk_edit.delete,
-                    bulk_edit.rotate,
-                    bulk_edit.delete_pages,
-                    bulk_edit.edit_pdf,
-                    bulk_edit.merge_as_versions,
-                    bulk_edit.remove_password,
-                ]
-            )
-            or (
-                method in [bulk_edit.merge, bulk_edit.split]
-                and parameters.get("delete_originals")
-            )
-            or (method == bulk_edit.edit_pdf and parameters.get("update_document"))
-        ):
-            has_perms = has_perms and user_is_owner_of_all_documents
-
-        # check global add permissions for methods that create documents
-        if (
-            has_perms
-            and (
-                method in [bulk_edit.split, bulk_edit.merge]
-                or (
-                    method in [bulk_edit.edit_pdf, bulk_edit.remove_password]
-                    and not parameters.get("update_document")
-                )
-            )
-            and not user.has_perm("documents.add_document")
-        ):
-            has_perms = False
-
-        # check global delete permissions for methods that delete documents
-        if (
-            has_perms
-            and (
-                method == bulk_edit.delete
-                # Sources stop being documents of their own, and removing one
-                # again afterwards needs delete_document
-                or method == bulk_edit.merge_as_versions
-                or (
-                    method in [bulk_edit.merge, bulk_edit.split]
-                    and parameters.get("delete_originals")
-                )
-                or (
-                    method in [bulk_edit.edit_pdf, bulk_edit.remove_password]
-                    and parameters.get("delete_original")
-                    and not parameters.get("update_document")
-                )
-            )
-            and not user.has_perm("documents.delete_document")
-        ):
-            has_perms = False
-
-        return has_perms
+        return Response({"result": "OK", "task_id": task.id})
 
     def _execute_document_action(
         self,
@@ -3119,6 +3055,13 @@ class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
             return HttpResponseForbidden("Insufficient permissions")
 
         try:
+            if method.__name__ in QUEUED_OPERATIONS:
+                return self._queue_bulk_operation(
+                    method,
+                    documents,
+                    parameters,
+                    from_webui,
+                )
             result = method(documents, **parameters)
             return Response({"result": result})
         except Exception as e:
@@ -3141,6 +3084,7 @@ class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
                 name="BulkEditDocumentsResult",
                 fields={
                     "result": serializers.CharField(),
+                    "task_id": serializers.CharField(required=False),
                 },
             ),
         },
@@ -3170,37 +3114,7 @@ class BulkEditView(DocumentOperationPermissionMixin):
 
     serializer_class = BulkEditSerializer
 
-    @staticmethod
-    def _snapshot_field(doc_ids: list[int], field: str) -> dict[int, Any]:
-        """
-        Returns each document's current value of field, for the audit log.
-
-        Tags and custom fields are one row per value, so they are gathered
-        into a sorted list of pks per document (empty when there are none).
-        Reading them through Document.values() instead would join those rows
-        and return one arbitrary value per document.
-        """
-        if field == "tags":
-            rows = (
-                Document.tags.through.objects.filter(document_id__in=doc_ids)
-                .order_by("tag_id")
-                .values_list("document_id", "tag_id")
-            )
-        elif field == "custom_fields":
-            rows = (
-                CustomFieldInstance.objects.filter(document_id__in=doc_ids)
-                .order_by("pk")
-                .values_list("document_id", "pk")
-            )
-        else:
-            return dict(
-                Document.objects.filter(pk__in=doc_ids).values_list("pk", field),
-            )
-
-        values: dict[int, list[int]] = {doc_id: [] for doc_id in doc_ids}
-        for doc_id, pk in rows:
-            values[doc_id].append(pk)
-        return values
+    _snapshot_field = staticmethod(snapshot_field)
 
     def post(self, request, *args, **kwargs):
         request_method = request.data.get("method")
@@ -3246,6 +3160,13 @@ class BulkEditView(DocumentOperationPermissionMixin):
             return HttpResponseForbidden("Insufficient permissions")
 
         try:
+            if method.__name__ in QUEUED_OPERATIONS:
+                return self._queue_bulk_operation(
+                    method,
+                    documents,
+                    parameters,
+                    from_webui,
+                )
             modified_field = self.MODIFIED_FIELD_BY_METHOD.get(method.__name__, None)
             if settings.AUDIT_LOG_ENABLED and modified_field:
                 old_values = self._snapshot_field(documents, modified_field)
@@ -3368,6 +3289,7 @@ class MergeDocumentsAsVersionsView(DocumentOperationPermissionMixin):
                 name="DeleteDocumentsResult",
                 fields={
                     "result": serializers.CharField(),
+                    "task_id": serializers.CharField(required=False),
                 },
             ),
         },
