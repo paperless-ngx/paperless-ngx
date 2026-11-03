@@ -1064,6 +1064,7 @@ TRACKED_TASKS: dict[str, PaperlessTask.TaskType] = {
     "documents.tasks.build_share_link_bundle": PaperlessTask.TaskType.BUILD_SHARE_LINK,
     "documents.bulk_edit.delete": PaperlessTask.TaskType.BULK_DELETE,
     "documents.tasks.apply_ai_suggestions": PaperlessTask.TaskType.APPLY_AI_SUGGESTIONS,
+    "documents.bulk_operations.execute_bulk_operation": PaperlessTask.TaskType.BULK_UPDATE,
 }
 
 _CELERY_STATE_TO_STATUS: dict[str, PaperlessTask.Status] = {
@@ -1081,8 +1082,8 @@ def _extract_input_data(
 
     For consume_file tasks this includes the filename, MIME type, and any
     non-null overrides from the DocumentMetadataOverrides object.  For
-    mail_fetch tasks it captures the account_ids list.  All other task
-    types store no input data and return {}.
+    mail_fetch tasks it captures the account_ids list. Bulk operations store
+    the operation name and document count, without copying the full selection.
     """
     if task_type == PaperlessTask.TaskType.CONSUME_FILE:
         input_doc = task_kwargs.get("input_doc")
@@ -1110,6 +1111,12 @@ def _extract_input_data(
             if override_dict:
                 data["overrides"] = override_dict
         return data
+
+    if "operation" in task_kwargs and "user_id" in task_kwargs:
+        return {
+            "operation": task_kwargs["operation"],
+            "document_count": len(task_kwargs.get("document_ids", [])),
+        }
 
     if task_type == PaperlessTask.TaskType.MAIL_FETCH:
         account_ids = task_kwargs.get("account_ids")
@@ -1147,7 +1154,9 @@ def _extract_owner_id(
     task_type: PaperlessTask.TaskType,
     task_kwargs: dict,
 ) -> int | None:
-    """Return the owner_id from consume_file overrides, or None for all other task types."""
+    """Use the initiator for bulk operations and the document owner for consumption."""
+    if "operation" in task_kwargs:
+        return task_kwargs.get("user_id")
     if task_type != PaperlessTask.TaskType.CONSUME_FILE:
         return None
     overrides = task_kwargs.get("overrides")
@@ -1186,6 +1195,11 @@ def before_task_publish_handler(
         _, task_kwargs, _ = body
         task_id = headers["id"]
 
+        if (
+            task_name == "documents.bulk_operations.execute_bulk_operation"
+            and task_kwargs.get("operation") == "delete"
+        ):
+            task_type = PaperlessTask.TaskType.BULK_DELETE
         input_data = _extract_input_data(task_type, task_kwargs)
         trigger_source = _determine_trigger_source(headers)
         owner_id = _extract_owner_id(task_type, task_kwargs)
