@@ -310,6 +310,7 @@ def sanity_check(*, raise_on_error: bool = True) -> str:
 
 @shared_task
 def bulk_update_documents(document_ids) -> None:
+    from documents.file_moves import flush_pending_file_moves
     from documents.search import get_backend
 
     document_ids = list(document_ids)
@@ -330,6 +331,9 @@ def bulk_update_documents(document_ids) -> None:
             skip_ai_index=True,  # bulk path calls update_llm_index once below
         )
         post_save.send(Document, instance=doc, created=False)
+        # Move this document's files now rather than at the end of the task,
+        # so a long bulk edit makes steady progress.
+        flush_pending_file_moves()
 
     with get_backend().batch_update() as batch:
         batch.add_or_update_ids(document_ids)
