@@ -64,8 +64,11 @@ textarea.rtl {
 .btn-group .btn.order-3 {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
-  border-top-right-radius: var(--bs-border-radius-sm);
-  border-bottom-right-radius: var(--bs-border-radius-sm);
+
+  @media screen and (min-width: 768px) {
+    border-top-right-radius: var(--bs-border-radius-sm);
+    border-bottom-right-radius: var(--bs-border-radius-sm);
+  }
 }
 
 .preview-sticky img {

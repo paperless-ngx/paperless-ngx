@@ -13,7 +13,7 @@
     (versionsUpdated)="onVersionsUpdated($event)"
   />
 
-  <div class="btn-group ms-4">
+  <div class="btn-group ms-md-4">
     <button (click)="download()" class="btn btn-sm btn-outline-primary" [disabled]="downloading()" aria-label="Download" i18n-aria-label>
       @if (downloading()) {
         <div class="spinner-border spinner-border-sm" role="status"></div>
@@ -40,7 +40,7 @@
     </div>
   </div>
 
-  <div class="ms-auto" ngbDropdown>
+  <div class="ms-md-auto" ngbDropdown>
     <button class="btn btn-sm btn-outline-primary" id="actionsDropdown" ngbDropdownToggle aria-label="Actions" i18n-aria-label>
       <i-bs name="three-dots"></i-bs><div class="d-none d-sm-inline ms-1"><ng-container i18n>Actions</ng-container></div>
     </button>
@@ -69,7 +69,7 @@
     </div>
   </div>
 
-  <div class="ms-auto" ngbDropdown>
+  <div class="ms-md-auto" ngbDropdown>
     <button class="btn btn-sm btn-outline-primary" id="sendDropdown" ngbDropdownToggle aria-label="Send" i18n-aria-label>
       <i-bs name="send"></i-bs><div class="d-none d-sm-inline ms-1"><ng-container i18n>Send</ng-container></div>
     </button>
@@ -438,13 +438,26 @@
 <ng-template #saveButtons>
   <div class="btn-group">
     <ng-container *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }">
-      <button type="submit" class="order-3 btn btn-sm btn-primary" i18n [disabled]="!userCanEdit || networkActive() || (isDirty$ | async) !== true">Save</button>
+      <button type="submit" class="order-3 btn btn-sm btn-primary" title="Save" i18n-title [disabled]="!userCanEdit || networkActive() || (isDirty$ | async) !== true">
+        <i-bs class="d-md-none" width="1.2em" height="1.2em" name="check-lg"></i-bs><span class="d-none d-md-inline" i18n>Save</span>
+      </button>
       @if (hasNext()) {
-        <button type="button" class="order-1 btn btn-sm btn-outline-primary" (click)="saveEditNext()" i18n [disabled]="!userCanEdit || networkActive() || (isDirty$ | async) !== true">Save &amp; next</button>
+        <button type="button" class="order-1 btn btn-sm btn-outline-primary d-none d-md-inline-block" (click)="saveEditNext()" i18n [disabled]="!userCanEdit || networkActive() || (isDirty$ | async) !== true">Save &amp; next</button>
       } @else {
-        <button type="button" class="order-2 btn btn-sm btn-outline-primary" (click)="save(true)" i18n [disabled]="!userCanEdit || networkActive() || (isDirty$ | async) !== true">Save &amp; close</button>
+        <button type="button" class="order-2 btn btn-sm btn-outline-primary d-none d-md-inline-block" (click)="save(true)" i18n [disabled]="!userCanEdit || networkActive() || (isDirty$ | async) !== true">Save &amp; close</button>
       }
-      <button type="button" class="order-0 btn btn-sm btn-outline-secondary" (click)="discard()" i18n [disabled]="!userCanEdit || networkActive() || (isDirty$ | async) !== true">Discard</button>
+      <button type="button" class="order-0 btn btn-sm btn-outline-secondary" (click)="discard()" title="Discard" i18n-title [disabled]="!userCanEdit || networkActive() || (isDirty$ | async) !== true">
+        <i-bs class="d-md-none" width="1.2em" height="1.2em" name="arrow-counterclockwise"></i-bs><span class="d-none d-md-inline" i18n>Discard</span>
+      </button>
+      <div class="btn-group order-4 d-md-none" ngbDropdown placement="bottom-end top-end" role="group">
+        <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle dropdown-toggle-split" ngbDropdownToggle aria-label="More save options" i18n-aria-label [disabled]="!userCanEdit || networkActive() || (isDirty$ | async) !== true"></button>
+        <div class="dropdown-menu shadow" ngbDropdownMenu>
+          @if (hasNext()) {
+            <button type="button" ngbDropdownItem (click)="saveEditNext()" i18n>Save &amp; next</button>
+          }
+          <button type="button" ngbDropdownItem (click)="save(true)" i18n>Save &amp; close</button>
+        </div>
+      </div>
     </ng-container>
   </div>
 </ng-template>
