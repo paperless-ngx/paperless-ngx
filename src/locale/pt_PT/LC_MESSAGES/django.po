@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-31 04:47+0000\n"
-"PO-Revision-Date: 2026-10-31 04:49\n"
+"POT-Creation-Date: 2026-10-31 16:33+0000\n"
+"PO-Revision-Date: 2026-11-01 21:44\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
 "Language: pt_PT\n"
@@ -23,7 +23,7 @@ msgstr "Documentos"
 
 #: documents/filters.py:336
 msgid "Expected a date or a relative date such as \"today\" or \"in 30 days\"."
-msgstr ""
+msgstr "Esperada uma data ou uma data relativa como \"hoje\" ou \"em 30 dias\"."
 
 #: documents/filters.py:514
 msgid "Value must be valid JSON."
@@ -55,7 +55,7 @@ msgstr "{data_type} não aceita a expressão de consulta {expr!r}."
 
 #: documents/filters.py:802 documents/models.py:137
 msgid "Maximum nesting depth exceeded."
-msgstr ""
+msgstr "Profundidade máxima de aninhamento excedida."
 
 #: documents/filters.py:1179
 msgid "Custom field not found"
@@ -140,11 +140,11 @@ msgstr "etiquetas"
 
 #: documents/models.py:125
 msgid "Cannot set itself as parent."
-msgstr ""
+msgstr "Impossível definir-se como pai."
 
 #: documents/models.py:127
 msgid "Cannot set parent to a descendant."
-msgstr ""
+msgstr "Não é possível definir o pai para um descendente."
 
 #: documents/models.py:144 documents/models.py:189
 msgid "document type"
@@ -253,23 +253,23 @@ msgstr "A posição do documento no seu arquivo físico de documentos."
 
 #: documents/models.py:323
 msgid "root document for this version"
-msgstr ""
+msgstr "documento raiz para esta versão"
 
 #: documents/models.py:327
 msgid "version index"
-msgstr ""
+msgstr "índice da versão"
 
 #: documents/models.py:331
 msgid "Index of this version within the root document."
-msgstr ""
+msgstr "Índice desta versão dentro do documento raiz."
 
 #: documents/models.py:335
 msgid "version label"
-msgstr ""
+msgstr "rótulo da versão"
 
 #: documents/models.py:339
 msgid "Optional short label for a document version."
-msgstr ""
+msgstr "Rótulo curto opcional para uma versão do documento."
 
 #: documents/models.py:344 documents/models.py:972 documents/models.py:1003
 #: documents/models.py:1107 documents/models.py:2137
@@ -286,27 +286,27 @@ msgstr "Arquivo"
 
 #: documents/models.py:574
 msgid "Bank"
-msgstr ""
+msgstr "Banco"
 
 #: documents/models.py:575
 msgid "Basket"
-msgstr ""
+msgstr "Cesto"
 
 #: documents/models.py:576
 msgid "Bell"
-msgstr ""
+msgstr "Sino"
 
 #: documents/models.py:577
 msgid "Bookmark"
-msgstr ""
+msgstr "Marcador"
 
 #: documents/models.py:578
 msgid "Boxes"
-msgstr ""
+msgstr "Caixas"
 
 #: documents/models.py:579
 msgid "Briefcase"
-msgstr ""
+msgstr "Mala"
 
 #: documents/models.py:580
 msgid "Building"
@@ -314,27 +314,27 @@ msgstr ""
 
 #: documents/models.py:581
 msgid "Calculator"
-msgstr ""
+msgstr "Calculadora"
 
 #: documents/models.py:582
 msgid "Calendar"
-msgstr ""
+msgstr "Calendário"
 
 #: documents/models.py:583
 msgid "Camera"
-msgstr ""
+msgstr "Câmara"
 
 #: documents/models.py:584
 msgid "Checklist"
-msgstr ""
+msgstr "Lista de verificação"
 
 #: documents/models.py:585
 msgid "Cash"
-msgstr ""
+msgstr "Dinheiro"
 
 #: documents/models.py:586
 msgid "Chat"
-msgstr ""
+msgstr "Conversa"
 
 #: documents/models.py:587
 msgid "Check"
@@ -342,63 +342,63 @@ msgstr ""
 
 #: documents/models.py:588
 msgid "Clipboard"
-msgstr ""
+msgstr "Área de transferência"
 
 #: documents/models.py:589
 msgid "Clock"
-msgstr ""
+msgstr "Relógio"
 
 #: documents/models.py:590
 msgid "Credit card"
-msgstr ""
+msgstr "Cartão de crédito"
 
 #: documents/models.py:591
 msgid "Download"
-msgstr ""
+msgstr "Descarregar"
 
 #: documents/models.py:592
 msgid "Envelope"
-msgstr ""
+msgstr "Envelope"
 
 #: documents/models.py:593
 msgid "Warning"
-msgstr ""
+msgstr "Aviso"
 
 #: documents/models.py:594
 msgid "File"
-msgstr ""
+msgstr "Ficheiro"
 
 #: documents/models.py:595
 msgid "Checked file"
-msgstr ""
+msgstr "Ficheiro verificado"
 
 #: documents/models.py:596
 msgid "Locked file"
-msgstr ""
+msgstr "Ficheiro bloqueado"
 
 #: documents/models.py:597
 msgid "Medical file"
-msgstr ""
+msgstr "Ficheiro médico"
 
 #: documents/models.py:598
 msgid "Person file"
-msgstr ""
+msgstr "Ficheiro pessoal"
 
 #: documents/models.py:601
 msgid "Spreadsheet"
-msgstr ""
+msgstr "Folha de cálculo"
 
 #: documents/models.py:603
 msgid "Text file"
-msgstr ""
+msgstr "Arquivo de texto"
 
 #: documents/models.py:604
 msgid "Files"
-msgstr ""
+msgstr "Ficheiros"
 
 #: documents/models.py:605
 msgid "Folder"
-msgstr ""
+msgstr "Pasta"
 
 #: documents/models.py:606 paperless_mail/admin.py:58
 msgid "Filter"
@@ -410,83 +410,83 @@ msgstr ""
 
 #: documents/models.py:608
 msgid "Globe"
-msgstr ""
+msgstr "Globo"
 
 #: documents/models.py:609
 msgid "Hash"
-msgstr ""
+msgstr "Hash"
 
 #: documents/models.py:610
 msgid "Heart"
-msgstr ""
+msgstr "Coração"
 
 #: documents/models.py:611
 msgid "House"
-msgstr ""
+msgstr "Casa"
 
 #: documents/models.py:612
 msgid "Inbox"
-msgstr ""
+msgstr "Caixa de Entrada"
 
 #: documents/models.py:613
 msgid "Journals"
-msgstr ""
+msgstr "Diários"
 
 #: documents/models.py:614
 msgid "Task list"
-msgstr ""
+msgstr "Lista de tarefas"
 
 #: documents/models.py:615
 msgid "Newspaper"
-msgstr ""
+msgstr "Jornal"
 
 #: documents/models.py:616
 msgid "Attachment"
-msgstr ""
+msgstr "Anexo"
 
 #: documents/models.py:617
 msgid "People"
-msgstr ""
+msgstr "Pessoas"
 
 #: documents/models.py:618
 msgid "Person"
-msgstr ""
+msgstr "Pessoa"
 
 #: documents/models.py:619
 msgid "Printer"
-msgstr ""
+msgstr "Impressora"
 
 #: documents/models.py:620
 msgid "Receipt"
-msgstr ""
+msgstr "Recibo"
 
 #: documents/models.py:621
 msgid "Safe"
-msgstr ""
+msgstr "Seguro"
 
 #: documents/models.py:622
 msgid "Search"
-msgstr ""
+msgstr "Pesquisar"
 
 #: documents/models.py:623
 msgid "Send"
-msgstr ""
+msgstr "Enviar"
 
 #: documents/models.py:624
 msgid "Shop"
-msgstr ""
+msgstr "Loja"
 
 #: documents/models.py:625
 msgid "Stack"
-msgstr ""
+msgstr "Pilha"
 
 #: documents/models.py:626
 msgid "Stars"
-msgstr ""
+msgstr "Estrelas"
 
 #: documents/models.py:627
 msgid "Tag"
-msgstr ""
+msgstr "Rótulo"
 
 #: documents/models.py:628 documents/models.py:643 documents/models.py:1815
 msgid "Tags"
@@ -494,19 +494,19 @@ msgstr "Etiquetas"
 
 #: documents/models.py:629
 msgid "Telephone"
-msgstr ""
+msgstr "Telefone"
 
 #: documents/models.py:630
 msgid "Truck"
-msgstr ""
+msgstr "Camião"
 
 #: documents/models.py:631
 msgid "Barcode"
-msgstr ""
+msgstr "Código de barras"
 
 #: documents/models.py:632
 msgid "Wallet"
-msgstr ""
+msgstr "Carteira"
 
 #: documents/models.py:635
 msgid "Table"
@@ -566,7 +566,7 @@ msgstr "Páginas"
 
 #: documents/models.py:657
 msgid "icon"
-msgstr ""
+msgstr "ícone"
 
 #: documents/models.py:664
 msgid "sort field"
@@ -790,15 +790,15 @@ msgstr "o tipo MIME é"
 
 #: documents/models.py:751
 msgid "simple title search"
-msgstr ""
+msgstr "pesquisa de títulos simples"
 
 #: documents/models.py:752
 msgid "simple text search"
-msgstr ""
+msgstr "pesquisa de texto simples"
 
 #: documents/models.py:753
 msgid "has duplicates"
-msgstr ""
+msgstr "tem duplicados"
 
 #: documents/models.py:763
 msgid "rule type"
@@ -822,11 +822,11 @@ msgstr "Pendente"
 
 #: documents/models.py:800 documents/models.py:878
 msgid "Started"
-msgstr ""
+msgstr "Iniciado"
 
 #: documents/models.py:801
 msgid "Success"
-msgstr ""
+msgstr "Sucesso"
 
 #: documents/models.py:802
 msgid "Failure"
@@ -966,11 +966,11 @@ msgstr ""
 
 #: documents/models.py:907
 msgid "Input Data"
-msgstr ""
+msgstr "Dados de entrada"
 
 #: documents/models.py:908
 msgid "Structured input parameters for the task"
-msgstr ""
+msgstr "Parâmetros de entrada estruturados para a tarefa"
 
 #: documents/models.py:914
 msgid "Result Data"
@@ -978,7 +978,7 @@ msgstr "Resultados"
 
 #: documents/models.py:915
 msgid "Structured result data from task execution"
-msgstr ""
+msgstr "Dados estruturados de resultado da execução da tarefa"
 
 #: documents/models.py:921
 msgid "Acknowledged"
@@ -986,11 +986,11 @@ msgstr "Confirmado"
 
 #: documents/models.py:926
 msgid "Task"
-msgstr ""
+msgstr "Tarefa"
 
 #: documents/models.py:927
 msgid "Tasks"
-msgstr ""
+msgstr "Tarefas"
 
 #: documents/models.py:957
 msgid "Note for the document"
@@ -1010,23 +1010,23 @@ msgstr "notas"
 
 #: documents/models.py:1007
 msgid "page"
-msgstr ""
+msgstr "página"
 
 #: documents/models.py:1008
 msgid "Page of the original file, starting at 1"
-msgstr ""
+msgstr "Página do arquivo original, iniciando em 1"
 
 #: documents/models.py:1063
 msgid "format"
-msgstr ""
+msgstr "formato"
 
 #: documents/models.py:1067
 msgid "document barcode"
-msgstr ""
+msgstr "código de barras do documento"
 
 #: documents/models.py:1068
 msgid "document barcodes"
-msgstr ""
+msgstr "códigos de barras do documento"
 
 #: documents/models.py:1077
 msgid "Original"
@@ -1071,11 +1071,11 @@ msgstr "Último erro"
 
 #: documents/models.py:1199
 msgid "file path"
-msgstr ""
+msgstr "caminho do ficheiro"
 
 #: documents/models.py:1205
 msgid "built at"
-msgstr ""
+msgstr "construído em"
 
 #: documents/models.py:1218
 msgid "share link bundle"
@@ -1216,11 +1216,11 @@ msgstr "tem esta(s) tag(s)"
 
 #: documents/models.py:1557
 msgid "has all of these tag(s)"
-msgstr ""
+msgstr "tem todos este(s) rótulos(s)"
 
 #: documents/models.py:1564
 msgid "does not have these tag(s)"
-msgstr ""
+msgstr "não tem este(s) rótulo(s)"
 
 #: documents/models.py:1572
 msgid "has this document type"
@@ -1911,11 +1911,11 @@ msgstr "Registo de conta social para Perpless-ngx"
 #: documents/templates/socialaccount/signup.html:11
 #, python-format
 msgid "You are about to use your %(provider_name)s account to login."
-msgstr ""
+msgstr "Está prestes a utilizar a sua conta %(provider_name)s para iniciar sessão."
 
 #: documents/templates/socialaccount/signup.html:13
 msgid "As a final step, please complete the following form:"
-msgstr ""
+msgstr "Como passo final, por favor preencha o seguinte formulário:"
 
 #: documents/validators.py:36
 msgid ", "
@@ -2084,15 +2084,15 @@ msgstr ""
 
 #: paperless/models.py:156
 msgid "Sets image DPI fallback value"
-msgstr ""
+msgstr "Define o valor de reserva do DPI da imagem."
 
 #: paperless/models.py:163
 msgid "Controls the unpaper cleaning"
-msgstr ""
+msgstr "Controla a limpeza do unpaper"
 
 #: paperless/models.py:170
 msgid "Enables deskew"
-msgstr ""
+msgstr "Habilita o deskew"
 
 #: paperless/models.py:173
 msgid "Enables page rotation"
@@ -2100,19 +2100,20 @@ msgstr "Ativa a rotação da página"
 
 #: paperless/models.py:178
 msgid "Sets the threshold for rotation of pages"
-msgstr ""
+msgstr "Define o limiar para rotação de páginas"
 
 #: paperless/models.py:184
 msgid "Sets the maximum image size for decompression"
-msgstr ""
+msgstr "Define o tamanho máximo da imagem para descompressão"
 
 #: paperless/models.py:190
 msgid "Sets the Ghostscript color conversion strategy"
-msgstr ""
+msgstr "#: paperless/models.py:190\n"
+"Define a estratégia de conversão de cor do Ghostscript"
 
 #: paperless/models.py:198
 msgid "Adds additional user arguments for OCRMyPDF"
-msgstr ""
+msgstr "Adiciona argumentos adicionais do utilizador para o OCRMyPDF"
 
 #: paperless/models.py:207
 msgid "Application title"
@@ -2246,151 +2247,151 @@ msgstr ""
 msgid "paperless application settings"
 msgstr "configurações do paperless"
 
-#: paperless/settings/__init__.py:566
+#: paperless/settings/__init__.py:571
 msgid "English (US)"
 msgstr "Inglês (EUA)"
 
-#: paperless/settings/__init__.py:567
+#: paperless/settings/__init__.py:572
 msgid "Arabic"
 msgstr "Árabe"
 
-#: paperless/settings/__init__.py:568
+#: paperless/settings/__init__.py:573
 msgid "Afrikaans"
 msgstr "Africano"
 
-#: paperless/settings/__init__.py:569
+#: paperless/settings/__init__.py:574
 msgid "Belarusian"
 msgstr "Bielorrusso"
 
-#: paperless/settings/__init__.py:570
+#: paperless/settings/__init__.py:575
 msgid "Bulgarian"
 msgstr "Búlgaro"
 
-#: paperless/settings/__init__.py:571
+#: paperless/settings/__init__.py:576
 msgid "Catalan"
 msgstr "Catalão"
 
-#: paperless/settings/__init__.py:572
+#: paperless/settings/__init__.py:577
 msgid "Czech"
 msgstr "Checo"
 
-#: paperless/settings/__init__.py:573
+#: paperless/settings/__init__.py:578
 msgid "Danish"
 msgstr "Dinamarquês"
 
-#: paperless/settings/__init__.py:574
+#: paperless/settings/__init__.py:579
 msgid "German"
 msgstr "Deutsch"
 
-#: paperless/settings/__init__.py:575
+#: paperless/settings/__init__.py:580
 msgid "Greek"
 msgstr "Grego"
 
-#: paperless/settings/__init__.py:576
+#: paperless/settings/__init__.py:581
 msgid "English (GB)"
 msgstr "Inglês (GB)"
 
-#: paperless/settings/__init__.py:577
+#: paperless/settings/__init__.py:582
 msgid "Spanish"
 msgstr "Espanhol"
 
-#: paperless/settings/__init__.py:578
+#: paperless/settings/__init__.py:583
 msgid "Persian"
 msgstr "Persa"
 
-#: paperless/settings/__init__.py:579
+#: paperless/settings/__init__.py:584
 msgid "Finnish"
 msgstr "Finlandês"
 
-#: paperless/settings/__init__.py:580
+#: paperless/settings/__init__.py:585
 msgid "French"
 msgstr "Français"
 
-#: paperless/settings/__init__.py:581
+#: paperless/settings/__init__.py:586
 msgid "Hungarian"
 msgstr "Húngaro"
 
-#: paperless/settings/__init__.py:582
+#: paperless/settings/__init__.py:587
 msgid "Indonesian"
 msgstr ""
 
-#: paperless/settings/__init__.py:583
+#: paperless/settings/__init__.py:588
 msgid "Italian"
 msgstr "Italiano"
 
-#: paperless/settings/__init__.py:584
+#: paperless/settings/__init__.py:589
 msgid "Japanese"
 msgstr "Japonês"
 
-#: paperless/settings/__init__.py:585
+#: paperless/settings/__init__.py:590
 msgid "Korean"
 msgstr "Coreano"
 
-#: paperless/settings/__init__.py:586
+#: paperless/settings/__init__.py:591
 msgid "Luxembourgish"
 msgstr "Luxemburguês"
 
-#: paperless/settings/__init__.py:587
+#: paperless/settings/__init__.py:592
 msgid "Norwegian"
 msgstr "Norueguês"
 
-#: paperless/settings/__init__.py:588
+#: paperless/settings/__init__.py:593
 msgid "Dutch"
 msgstr "Nederlandse"
 
-#: paperless/settings/__init__.py:589
+#: paperless/settings/__init__.py:594
 msgid "Polish"
 msgstr "Polaco"
 
-#: paperless/settings/__init__.py:590
+#: paperless/settings/__init__.py:595
 msgid "Portuguese (Brazil)"
 msgstr "Português (Brasil)"
 
-#: paperless/settings/__init__.py:591
+#: paperless/settings/__init__.py:596
 msgid "Portuguese"
 msgstr "Português"
 
-#: paperless/settings/__init__.py:592
+#: paperless/settings/__init__.py:597
 msgid "Romanian"
 msgstr "Romeno"
 
-#: paperless/settings/__init__.py:593
+#: paperless/settings/__init__.py:598
 msgid "Russian"
 msgstr "Russo"
 
-#: paperless/settings/__init__.py:594
+#: paperless/settings/__init__.py:599
 msgid "Slovak"
 msgstr "Eslovaco"
 
-#: paperless/settings/__init__.py:595
+#: paperless/settings/__init__.py:600
 msgid "Slovenian"
 msgstr "Esloveno"
 
-#: paperless/settings/__init__.py:596
+#: paperless/settings/__init__.py:601
 msgid "Serbian"
 msgstr "Sérvio"
 
-#: paperless/settings/__init__.py:597
+#: paperless/settings/__init__.py:602
 msgid "Swedish"
 msgstr "Sueco"
 
-#: paperless/settings/__init__.py:598
+#: paperless/settings/__init__.py:603
 msgid "Turkish"
 msgstr "Turco"
 
-#: paperless/settings/__init__.py:599
+#: paperless/settings/__init__.py:604
 msgid "Ukrainian"
 msgstr "Ucraniano"
 
-#: paperless/settings/__init__.py:600
+#: paperless/settings/__init__.py:605
 msgid "Vietnamese"
 msgstr "Vietnamita"
 
-#: paperless/settings/__init__.py:601
+#: paperless/settings/__init__.py:606
 msgid "Chinese Simplified"
 msgstr "Chinês Simplificado"
 
-#: paperless/settings/__init__.py:602
+#: paperless/settings/__init__.py:607
 msgid "Chinese Traditional"
 msgstr ""
 
@@ -2488,7 +2489,7 @@ msgstr "palavra-passe"
 
 #: paperless_mail/models.py:47
 msgid "Is token authentication"
-msgstr ""
+msgstr "É autenticação por token"
 
 #: paperless_mail/models.py:50
 msgid "character set"
@@ -2644,7 +2645,7 @@ msgstr "filtrar nome do arquivo anexo"
 
 #: paperless_mail/models.py:212
 msgid "Do not consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
-msgstr ""
+msgstr "Não consumir documentos que correspondam inteiramente a este nome de ficheiro, se especificado. São permitidos asterísticos como *.pdf ou *invoice*. Sem distinção de maiúsculas e minúsculas."
 
 #: paperless_mail/models.py:219
 msgid "maximum age"
