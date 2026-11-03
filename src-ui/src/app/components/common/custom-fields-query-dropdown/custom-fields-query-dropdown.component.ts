@@ -24,8 +24,8 @@ import {
   NgbDropdownModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectComponent, NgSelectModule } from '@ng-select/ng-select'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { first, Subject, Subscription, takeUntil } from 'rxjs'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import {
   CUSTOM_FIELD_QUERY_MAX_ATOMS,
@@ -235,7 +235,7 @@ export class CustomFieldQueriesModel {
     NgClass,
     NgTemplateOutlet,
     NgSelectModule,
-    NgxBootstrapIconsModule,
+    BootstrapIconComponent,
     NgbDropdownModule,
   ],
 })

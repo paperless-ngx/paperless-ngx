@@ -18,7 +18,6 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { Subject, of, throwError } from 'rxjs'
 import { PaperlessTaskType } from 'src/app/data/paperless-task'
 import {
@@ -88,10 +87,7 @@ describe('SystemStatusDialogComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [
-        SystemStatusDialogComponent,
-        NgxBootstrapIconsModule.pick(allIcons),
-      ],
+      imports: [SystemStatusDialogComponent],
       providers: [
         NgbActiveModal,
         provideHttpClient(withInterceptorsFromDi()),

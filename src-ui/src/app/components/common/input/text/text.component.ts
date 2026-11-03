@@ -5,7 +5,7 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms'
 import { RouterLink } from '@angular/router'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { AbstractInputComponent } from '../abstract-input'
 
 @Component({
@@ -22,7 +22,7 @@ import { AbstractInputComponent } from '../abstract-input'
   imports: [
     FormsModule,
     ReactiveFormsModule,
-    NgxBootstrapIconsModule,
+    BootstrapIconComponent,
     RouterLink,
   ],
 })

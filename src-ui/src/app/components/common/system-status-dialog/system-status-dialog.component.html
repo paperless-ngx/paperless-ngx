@@ -24,7 +24,7 @@
                 {{status().pngx_version}}
                 @if (versionMismatch()) {
                     <button class="btn btn-sm d-inline align-items-center btn-dark text-uppercase small" [ngbPopover]="versionPopover" triggers="click mouseenter:mouseleave" aria-label="View version mismatch details" i18n-aria-label>
-                      <i-bs name="exclamation-triangle-fill" class="text-danger lh-1"></i-bs>
+                      <pngx-bs-icon name="exclamation-triangle-fill" class="text-danger lh-1"></pngx-bs-icon>
                     </button>
                 }
                 <ng-template #versionPopover>
@@ -60,9 +60,9 @@
                 <button class="btn btn-sm d-flex align-items-center btn-dark text-uppercase small" [ngbPopover]="databaseStatus" triggers="click mouseenter:mouseleave">
                   {{status().database.status}}
                   @if (status().database.status === 'OK') {
-                    <i-bs name="check-circle-fill" class="text-primary ms-2 lh-1"></i-bs>
+                    <pngx-bs-icon name="check-circle-fill" class="text-primary ms-2 lh-1"></pngx-bs-icon>
                   } @else {
-                    <i-bs name="exclamation-triangle-fill" class="text-danger ms-2 lh-1"></i-bs>
+                    <pngx-bs-icon name="exclamation-triangle-fill" class="text-danger ms-2 lh-1"></pngx-bs-icon>
                   }
                 </button>
                 <ng-template #databaseStatus>
@@ -77,9 +77,9 @@
               <dd>
                 <button class="btn btn-sm d-flex align-items-center btn-dark text-uppercase small" [ngbPopover]="migrationStatus" triggers="click mouseenter:mouseleave">
                   @if (status().database.migration_status.unapplied_migrations.length === 0) {
-                    <ng-container i18n>Up to date</ng-container><i-bs name="check-circle-fill" class="text-primary ms-2 lh-1"></i-bs>
+                    <ng-container i18n>Up to date</ng-container><pngx-bs-icon name="check-circle-fill" class="text-primary ms-2 lh-1"></pngx-bs-icon>
                   } @else {
-                    <ng-container>{{status().database.migration_status.unapplied_migrations.length}} Pending</ng-container><i-bs name="exclamation-triangle-fill" class="text-warning ms-2 lh-1"></i-bs>
+                    <ng-container>{{status().database.migration_status.unapplied_migrations.length}} Pending</ng-container><pngx-bs-icon name="exclamation-triangle-fill" class="text-warning ms-2 lh-1"></pngx-bs-icon>
                   }
                   <ng-template #migrationStatus>
                     <h6><ng-container i18n>Latest Migration</ng-container>:</h6> <span class="font-monospace small">{{status().database.migration_status.latest_migration}}</span>
@@ -111,9 +111,9 @@
                 <button class="btn btn-sm d-flex align-items-center btn-dark text-uppercase small" [ngbPopover]="redisStatus" triggers="click mouseenter:mouseleave">
                   {{status().tasks.redis_status}}
                   @if (status().tasks.redis_status === 'OK') {
-                    <i-bs name="check-circle-fill" class="text-primary ms-2 lh-1"></i-bs>
+                    <pngx-bs-icon name="check-circle-fill" class="text-primary ms-2 lh-1"></pngx-bs-icon>
                   } @else {
-                    <i-bs name="exclamation-triangle-fill" class="text-danger ms-2 lh-1"></i-bs>
+                    <pngx-bs-icon name="exclamation-triangle-fill" class="text-danger ms-2 lh-1"></pngx-bs-icon>
                   }
                 </button>
                 <ng-template #redisStatus>
@@ -129,11 +129,11 @@
                 <button class="btn btn-sm d-flex align-items-center btn-dark text-uppercase small" [ngbPopover]="celeryStatus" triggers="click mouseenter:mouseleave">
                   {{status().tasks.celery_status}}
                   @if (status().tasks.celery_status === 'OK') {
-                    <i-bs name="check-circle-fill" class="text-primary ms-2 lh-1"></i-bs>
+                    <pngx-bs-icon name="check-circle-fill" class="text-primary ms-2 lh-1"></pngx-bs-icon>
                   } @else {
-                    <i-bs name="exclamation-triangle-fill" class="ms-2 lh-1"
+                    <pngx-bs-icon name="exclamation-triangle-fill" class="ms-2 lh-1"
                     [class.text-danger]="status().tasks.celery_status === SystemStatusItemStatus.ERROR"
-                    [class.text-warning]="status().tasks.celery_status === SystemStatusItemStatus.WARNING"></i-bs>
+                    [class.text-warning]="status().tasks.celery_status === SystemStatusItemStatus.WARNING"></pngx-bs-icon>
                   }
                 </button>
                 <ng-template #celeryStatus>
@@ -186,9 +186,9 @@
                 <button class="btn btn-sm d-flex align-items-center btn-dark text-uppercase small" [ngbPopover]="indexStatus" triggers="click mouseenter:mouseleave">
                   {{status().tasks.index_status}}
                   @if (status().tasks.index_status === 'OK') {
-                    <i-bs name="check-circle-fill" class="text-primary ms-2 lh-1"></i-bs>
+                    <pngx-bs-icon name="check-circle-fill" class="text-primary ms-2 lh-1"></pngx-bs-icon>
                   } @else {
-                    <i-bs name="exclamation-triangle-fill" class="text-danger ms-2 lh-1"></i-bs>
+                    <pngx-bs-icon name="exclamation-triangle-fill" class="text-danger ms-2 lh-1"></pngx-bs-icon>
                   }
                 </button>
               </dd>
@@ -205,14 +205,14 @@
                   {{status().tasks.classifier_status}}
                   @if (status().tasks.classifier_status === 'OK') {
                     @if (isStale(status().tasks.classifier_last_trained)) {
-                      <i-bs name="exclamation-triangle-fill" class="text-warning ms-2 lh-1"></i-bs>
+                      <pngx-bs-icon name="exclamation-triangle-fill" class="text-warning ms-2 lh-1"></pngx-bs-icon>
                     } @else {
-                      <i-bs name="check-circle-fill" class="text-primary ms-2 lh-1"></i-bs>
+                      <pngx-bs-icon name="check-circle-fill" class="text-primary ms-2 lh-1"></pngx-bs-icon>
                     }
                   } @else {
-                    <i-bs name="exclamation-triangle-fill" class="ms-2 lh-1"
+                    <pngx-bs-icon name="exclamation-triangle-fill" class="ms-2 lh-1"
                     [class.text-danger]="status().tasks.classifier_status === SystemStatusItemStatus.ERROR"
-                    [class.text-warning]="status().tasks.classifier_status === SystemStatusItemStatus.WARNING"></i-bs>
+                    [class.text-warning]="status().tasks.classifier_status === SystemStatusItemStatus.WARNING"></pngx-bs-icon>
                   }
                 </button>
                 @if (currentUserIsSuperUser) {
@@ -220,7 +220,7 @@
                     <div class="spinner-border spinner-border-sm ms-2" role="status"></div>
                   } @else {
                     <button class="btn btn-sm d-flex align-items-center btn-dark small ms-2" (click)="runTask(PaperlessTaskType.TrainClassifier)">
-                      <i-bs name="play-fill" class="me-1"></i-bs>
+                      <pngx-bs-icon name="play-fill" class="me-1"></pngx-bs-icon>
                       <ng-container i18n>Run Task</ng-container>
                     </button>
                   }
@@ -239,14 +239,14 @@
                   {{status().tasks.sanity_check_status}}
                   @if (status().tasks.sanity_check_status === 'OK') {
                     @if (isStale(status().tasks.sanity_check_last_run)) {
-                      <i-bs name="exclamation-triangle-fill" class="text-warning ms-2 lh-1"></i-bs>
+                      <pngx-bs-icon name="exclamation-triangle-fill" class="text-warning ms-2 lh-1"></pngx-bs-icon>
                     } @else {
-                      <i-bs name="check-circle-fill" class="text-primary ms-2 lh-1"></i-bs>
+                      <pngx-bs-icon name="check-circle-fill" class="text-primary ms-2 lh-1"></pngx-bs-icon>
                     }
                   } @else {
-                    <i-bs name="exclamation-triangle-fill" class="ms-2 lh-1"
+                    <pngx-bs-icon name="exclamation-triangle-fill" class="ms-2 lh-1"
                     [class.text-danger]="status().tasks.sanity_check_status === SystemStatusItemStatus.ERROR"
-                    [class.text-warning]="status().tasks.sanity_check_status === SystemStatusItemStatus.WARNING"></i-bs>
+                    [class.text-warning]="status().tasks.sanity_check_status === SystemStatusItemStatus.WARNING"></pngx-bs-icon>
                   }
                 </button>
                 @if (currentUserIsSuperUser) {
@@ -254,7 +254,7 @@
                     <div class="spinner-border spinner-border-sm ms-2" role="status"></div>
                   } @else {
                     <button class="btn btn-sm d-flex align-items-center btn-dark small ms-2" (click)="runTask(PaperlessTaskType.SanityCheck)">
-                      <i-bs name="play-fill" class="me-1"></i-bs>
+                      <pngx-bs-icon name="play-fill" class="me-1"></pngx-bs-icon>
                       <ng-container i18n>Run Task</ng-container>
                     </button>
                   }
@@ -272,10 +272,10 @@
                 <span class="btn btn-sm pe-none align-items-center btn-dark text-uppercase small">
                   @if (status().websocket_connected === 'OK') {
                     <ng-container i18n>OK</ng-container>
-                    <i-bs name="check-circle-fill" class="text-primary ms-2 lh-1"></i-bs>
+                    <pngx-bs-icon name="check-circle-fill" class="text-primary ms-2 lh-1"></pngx-bs-icon>
                   } @else {
                     <ng-container i18n>Error</ng-container>
-                    <i-bs name="exclamation-triangle-fill" class="text-danger ms-2 lh-1"></i-bs>
+                    <pngx-bs-icon name="exclamation-triangle-fill" class="text-danger ms-2 lh-1"></pngx-bs-icon>
                   }
                 </span>
               </dd>
@@ -286,15 +286,15 @@
                     {{status().tasks.llmindex_status}}
                     @if (status().tasks.llmindex_status === 'OK') {
                       @if (isStale(status().tasks.llmindex_last_modified)) {
-                        <i-bs name="exclamation-triangle-fill" class="text-warning ms-2 lh-1"></i-bs>
+                        <pngx-bs-icon name="exclamation-triangle-fill" class="text-warning ms-2 lh-1"></pngx-bs-icon>
                       } @else {
-                        <i-bs name="check-circle-fill" class="text-primary ms-2 lh-1"></i-bs>
+                        <pngx-bs-icon name="check-circle-fill" class="text-primary ms-2 lh-1"></pngx-bs-icon>
                       }
                     } @else {
-                      <i-bs name="exclamation-triangle-fill" class="ms-2 lh-1"
+                      <pngx-bs-icon name="exclamation-triangle-fill" class="ms-2 lh-1"
                       [class.text-danger]="status().tasks.llmindex_status === SystemStatusItemStatus.ERROR"
                       [class.text-warning]="status().tasks.llmindex_status === SystemStatusItemStatus.WARNING"
-                      [class.text-muted]="status().tasks.llmindex_status === SystemStatusItemStatus.DISABLED"></i-bs>
+                      [class.text-muted]="status().tasks.llmindex_status === SystemStatusItemStatus.DISABLED"></pngx-bs-icon>
                     }
                   </button>
                   @if (currentUserIsSuperUser) {
@@ -302,7 +302,7 @@
                       <div class="spinner-border spinner-border-sm ms-2" role="status"></div>
                     } @else {
                       <button class="btn btn-sm d-flex align-items-center btn-dark small ms-2" (click)="runTask(PaperlessTaskType.LlmIndex)">
-                        <i-bs name="play-fill" class="me-1"></i-bs>
+                        <pngx-bs-icon name="play-fill" class="me-1"></pngx-bs-icon>
                         <ng-container i18n>Run Task</ng-container>
                       </button>
                     }
@@ -326,10 +326,10 @@
 <div class="modal-footer">
   <button class="btn btn-sm d-flex align-items-center btn-dark btn btn-sm d-flex align-items-center btn-dark btn-outline-secondary" (click)="copy()">
     @if (!copied()) {
-      <i-bs name="clipboard-fill" class="me-1"></i-bs>
+      <pngx-bs-icon name="clipboard-fill" class="me-1"></pngx-bs-icon>
     }
     @if (copied()) {
-      <i-bs name="clipboard-check-fill" class="me-1"></i-bs>
+      <pngx-bs-icon name="clipboard-check-fill" class="me-1"></pngx-bs-icon>
     }
     <ng-container i18n>Copy</ng-container>
   </button>

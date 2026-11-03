@@ -1,7 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { By } from '@angular/platform-browser'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { PasswordRemovalConfirmDialogComponent } from './password-removal-confirm-dialog.component'
 
 describe('PasswordRemovalConfirmDialogComponent', () => {
@@ -11,10 +10,7 @@ describe('PasswordRemovalConfirmDialogComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       providers: [NgbActiveModal],
-      imports: [
-        NgxBootstrapIconsModule.pick(allIcons),
-        PasswordRemovalConfirmDialogComponent,
-      ],
+      imports: [PasswordRemovalConfirmDialogComponent],
     }).compileComponents()
 
     fixture = TestBed.createComponent(PasswordRemovalConfirmDialogComponent)

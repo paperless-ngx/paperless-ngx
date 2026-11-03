@@ -25,7 +25,7 @@
             <div class="btn-group d-block d-sm-none">
               <div ngbDropdown container="body" class="d-inline-block">
                 <button type="button" class="btn btn-link" id="actionsMenuMobile" (click)="$event.stopPropagation()" ngbDropdownToggle aria-label="Actions" i18n-aria-label>
-                  <i-bs name="three-dots-vertical"></i-bs>
+                  <pngx-bs-icon name="three-dots-vertical"></pngx-bs-icon>
                 </button>
                 <div ngbDropdownMenu aria-labelledby="actionsMenuMobile">
                   <button (click)="editField(field)" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.CustomField }" ngbDropdownItem i18n>Edit</button>
@@ -44,10 +44,10 @@
             </div>
             <div class="btn-group d-none d-sm-inline-block">
               <button *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.CustomField }" class="btn btn-sm btn-outline-secondary" type="button" (click)="editField(field)">
-                <i-bs width="1em" height="1em" name="pencil" class="me-1"></i-bs><ng-container i18n>Edit</ng-container>
+                <pngx-bs-icon width="1em" height="1em" name="pencil" class="me-1"></pngx-bs-icon><ng-container i18n>Edit</ng-container>
               </button>
               <button *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.CustomField }" class="btn btn-sm btn-outline-danger" type="button" (click)="deleteField(field)">
-                <i-bs width="1em" height="1em" name="trash" class="me-1"></i-bs><ng-container i18n>Delete</ng-container>
+                <pngx-bs-icon width="1em" height="1em" name="trash" class="me-1"></pngx-bs-icon><ng-container i18n>Delete</ng-container>
               </button>
             </div>
             @if (field.document_count > 0) {
@@ -56,7 +56,7 @@
                   class="btn btn-sm btn-outline-secondary"
                   [routerLink]="getDocumentFilterUrl(field)"
                 >
-                  <i-bs width="1em" height="1em" name="filter" class="me-1"></i-bs><ng-container i18n>Documents</ng-container
+                  <pngx-bs-icon width="1em" height="1em" name="filter" class="me-1"></pngx-bs-icon><ng-container i18n>Documents</ng-container
                   ><span class="badge bg-light text-secondary ms-2">{{ field.document_count }}</span>
                 </a>
               </div>

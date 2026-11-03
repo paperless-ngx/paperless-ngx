@@ -26,7 +26,7 @@
                 <a routerLink="/documents/{{ link.document }}">{{ link.document_title | documentTitle }}</a>
                 <span class="badge bg-primary text-primary-text-contrast ms-3 small fs-normal cursor-pointer" (click)="copyDocumentID(link.document)">
                   @if (copiedDocumentID() === link.document) {
-                    <i-bs width="1em" height="1em" name="clipboard-check" class="me-1"></i-bs><ng-container i18n>Copied!</ng-container>
+                    <pngx-bs-icon width="1em" height="1em" name="clipboard-check" class="me-1"></pngx-bs-icon><ng-container i18n>Copied!</ng-container>
                   } @else {
                     ID: {{link.document}}
                   }
@@ -60,9 +60,9 @@
                       i18n-title
                     >
                       @if (copiedID() === link.id) {
-                        <i-bs name="clipboard-check"></i-bs>
+                        <pngx-bs-icon name="clipboard-check"></pngx-bs-icon>
                       } @else {
-                        <i-bs name="clipboard"></i-bs>
+                        <pngx-bs-icon name="clipboard"></pngx-bs-icon>
                       }
                       <span class="visually-hidden" i18n>Copy share link</span>
                     </button>

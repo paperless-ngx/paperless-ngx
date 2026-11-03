@@ -47,7 +47,7 @@
                         i18n-aria-label
                       >
                         <span class="badge text-bg-warning text-uppercase me-2">{{ statusLabel(bundle.status) }}</span>
-                        <i-bs name="exclamation-triangle-fill" class="text-warning"></i-bs>
+                        <pngx-bs-icon name="exclamation-triangle-fill" class="text-warning"></pngx-bs-icon>
                       </button>
                       <ng-template #errorDetail>
                         @if (bundle.last_error.timestamp) {
@@ -107,10 +107,10 @@
                         i18n-title
                       >
                         @if (copiedSlug() === bundle.slug) {
-                          <i-bs name="clipboard-check"></i-bs>
+                          <pngx-bs-icon name="clipboard-check"></pngx-bs-icon>
                         }
                         @if (copiedSlug() !== bundle.slug) {
-                          <i-bs name="clipboard"></i-bs>
+                          <pngx-bs-icon name="clipboard"></pngx-bs-icon>
                         }
                         <span class="visually-hidden" i18n>Copy share link</span>
                       </button>
@@ -121,7 +121,7 @@
                           [disabled]="loading()"
                           (click)="retry(bundle)"
                         >
-                          <i-bs name="arrow-clockwise"></i-bs>
+                          <pngx-bs-icon name="arrow-clockwise"></pngx-bs-icon>
                           <span class="visually-hidden" i18n>Retry</span>
                         </button>
                       }

@@ -22,7 +22,6 @@ import {
   NgbModal,
   NgbModalRef,
 } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { DeviceDetectorService } from 'ngx-device-detector'
 import { Subject, of, throwError } from 'rxjs'
 import { routes } from 'src/app/app-routing.module'
@@ -152,11 +151,7 @@ describe('DocumentDetailComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      imports: [
-        DocumentDetailComponent,
-        RouterModule.forRoot(routes),
-        NgxBootstrapIconsModule.pick(allIcons),
-      ],
+      imports: [DocumentDetailComponent, RouterModule.forRoot(routes)],
       providers: [
         DocumentTitlePipe,
         {
@@ -890,31 +885,31 @@ describe('DocumentDetailComponent', () => {
     fixture.detectChanges()
     expect(
       fixture.debugElement
-        .queryAll(By.css('button'))
-        .find((b) => b.nativeElement.textContent === 'Save')
+        .queryAll(By.css('button.btn'))
+        .find((b) => b.nativeElement.textContent.trim() === 'Save')
     ).not.toBeUndefined()
     expect(
       fixture.debugElement
-        .queryAll(By.css('button'))
-        .find((b) => b.nativeElement.textContent === 'Save & close')
+        .queryAll(By.css('button.btn'))
+        .find((b) => b.nativeElement.textContent.trim() === 'Save & close')
     ).not.toBeUndefined()
     expect(
       fixture.debugElement
-        .queryAll(By.css('button'))
-        .find((b) => b.nativeElement.textContent === 'Save & next')
+        .queryAll(By.css('button.btn'))
+        .find((b) => b.nativeElement.textContent.trim() === 'Save & next')
     ).toBeUndefined()
     nextSpy.mockReturnValue(true)
     component.networkActive.set(true)
     fixture.detectChanges()
     expect(
       fixture.debugElement
-        .queryAll(By.css('button'))
-        .find((b) => b.nativeElement.textContent === 'Save & close')
+        .queryAll(By.css('button.btn'))
+        .find((b) => b.nativeElement.textContent.trim() === 'Save & close')
     ).toBeUndefined()
     expect(
       fixture.debugElement
-        .queryAll(By.css('button'))
-        .find((b) => b.nativeElement.textContent === 'Save & next')
+        .queryAll(By.css('button.btn'))
+        .find((b) => b.nativeElement.textContent.trim() === 'Save & next')
     ).not.toBeUndefined()
   })
 

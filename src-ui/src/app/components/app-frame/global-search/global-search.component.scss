@@ -1,7 +1,7 @@
 form {
   position: relative;
 
-  > i-bs[name="search"] {
+  > pngx-bs-icon[name="search"] {
     position: absolute;
     left: 0.6rem;
     top: .25rem;
@@ -14,7 +14,7 @@ form {
   }
 
   &:focus-within {
-    i-bs[name="search"],
+    pngx-bs-icon[name="search"],
     .badge {
       display: none !important;
     }
@@ -72,7 +72,7 @@ form {
 
 .dropdown.show {
   // Hide the search icon when the dropdown is shown
-  i-bs[name="search"] {
+  pngx-bs-icon[name="search"] {
     display: none !important;
   }
 

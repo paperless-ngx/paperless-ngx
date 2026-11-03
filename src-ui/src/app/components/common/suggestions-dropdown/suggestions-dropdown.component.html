@@ -4,9 +4,9 @@
       @if (loading()) {
         <div class="spinner-border spinner-border-sm" role="status"></div>
       } @else if (noSuggestions) {
-        <i-bs width="1.2em" height="1.2em" name="check-circle"></i-bs>
+        <pngx-bs-icon width="1.2em" height="1.2em" name="check-circle"></pngx-bs-icon>
       } @else {
-        <i-bs width="1.2em" height="1.2em" name="lightbulb"></i-bs>
+        <pngx-bs-icon width="1.2em" height="1.2em" name="lightbulb"></pngx-bs-icon>
       }
       @if (noSuggestions) {
         <span class="d-none d-lg-inline ps-1" i18n>No suggestions</span>
@@ -31,19 +31,19 @@
             </div>
           }
           @if (suggestions()?.suggested_tags?.length > 0) {
-            <small class="list-group-item text-uppercase text-muted small"><i-bs class="me-2" name="tags"></i-bs><ng-container i18n>Tags</ng-container></small>
+            <small class="list-group-item text-uppercase text-muted small"><pngx-bs-icon class="me-2" name="tags"></pngx-bs-icon><ng-container i18n>Tags</ng-container></small>
             @for (tag of suggestions().suggested_tags; track tag) {
               <button type="button" class="list-group-item list-group-item-action bg-light" (click)="addTag.emit(tag)">{{ tag }}</button>
             }
           }
           @if (suggestions()?.suggested_document_types?.length > 0) {
-            <div class="list-group-item text-uppercase text-muted small"><i-bs class="me-2" name="hash"></i-bs><ng-container i18n>Document Types</ng-container></div>
+            <div class="list-group-item text-uppercase text-muted small"><pngx-bs-icon class="me-2" name="hash"></pngx-bs-icon><ng-container i18n>Document Types</ng-container></div>
             @for (type of suggestions().suggested_document_types; track type) {
               <button type="button" class="list-group-item list-group-item-action bg-light" (click)="addDocumentType.emit(type)">{{ type }}</button>
             }
           }
           @if (suggestions()?.suggested_correspondents?.length > 0) {
-            <div class="list-group-item text-uppercase text-muted small"><i-bs class="me-2" name="person"></i-bs><ng-container i18n>Correspondents</ng-container></div>
+            <div class="list-group-item text-uppercase text-muted small"><pngx-bs-icon class="me-2" name="person"></pngx-bs-icon><ng-container i18n>Correspondents</ng-container></div>
             @for (correspondent of suggestions().suggested_correspondents; track correspondent) {
               <button type="button" class="list-group-item list-group-item-action bg-light" (click)="addCorrespondent.emit(correspondent)">{{ correspondent }}</button>
             }
@@ -61,7 +61,7 @@
   @if (aiEnabled()) {
     <div ngbDropdown autoClose="outside" placement="bottom-end" [popperOptions]="popperOptions">
       <button type="button" class="btn btn-sm btn-link position-relative" ngbDropdownToggle [disabled]="disabled() || loading()" i18n-title title="Suggestion options">
-        <i-bs name="three-dots"></i-bs>
+        <pngx-bs-icon name="three-dots"></pngx-bs-icon>
         @if (source() !== defaultSource()) {
           <span class="position-absolute top-0 start-100 translate-middle p-1 bg-primary border border-light rounded-circle">
             <span class="visually-hidden" i18n>Not using default</span>
@@ -72,11 +72,11 @@
         <div class="small text-muted mb-2" i18n>Suggest using:</div>
         <div class="form-check small">
           <input class="form-check-input" type="checkbox" id="suggestionSourceML" [checked]="useML" [disabled]="useML && !useAI" (change)="setSources($event.target.checked, useAI)">
-          <label class="form-check-label d-inline-flex align-items-center gap-1" for="suggestionSourceML"><i-bs name="cpu"></i-bs><ng-container i18n>ML</ng-container></label>
+          <label class="form-check-label d-inline-flex align-items-center gap-1" for="suggestionSourceML"><pngx-bs-icon name="cpu"></pngx-bs-icon><ng-container i18n>ML</ng-container></label>
         </div>
         <div class="form-check small">
           <input class="form-check-input" type="checkbox" id="suggestionSourceAI" [checked]="useAI" [disabled]="useAI && !useML" (change)="setSources(useML, $event.target.checked)">
-          <label class="form-check-label d-inline-flex align-items-center gap-1" for="suggestionSourceAI"><i-bs name="stars"></i-bs><ng-container i18n>AI</ng-container></label>
+          <label class="form-check-label d-inline-flex align-items-center gap-1" for="suggestionSourceAI"><pngx-bs-icon name="stars"></pngx-bs-icon><ng-container i18n>AI</ng-container></label>
         </div>
       </div>
     </div>

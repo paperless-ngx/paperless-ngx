@@ -8,7 +8,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule } from '@angular/forms'
 import { By } from '@angular/platform-browser'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
 import { ProcessedMailDialogComponent } from './processed-mail-dialog.component'
@@ -47,11 +46,7 @@ describe('ProcessedMailDialogComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [
-        ProcessedMailDialogComponent,
-        FormsModule,
-        NgxBootstrapIconsModule.pick(allIcons),
-      ],
+      imports: [ProcessedMailDialogComponent, FormsModule],
       providers: [
         DatePipe,
         NgbActiveModal,

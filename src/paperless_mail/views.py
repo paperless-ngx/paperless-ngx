@@ -319,6 +319,14 @@ class OauthCallbackView(GenericAPIView[Any]):
 
                 result = oauth_manager.get_outlook_access_token(code)
 
+            else:
+                logger.error(
+                    f"Invalid oauth callback request: unrecognized scope {scope!r}",
+                )
+                return HttpResponseBadRequest(
+                    "Invalid request, see logs for more detail",
+                )
+
             access_token = result["access_token"]
             refresh_token = result["refresh_token"]
             expires_in = result["expires_in"]

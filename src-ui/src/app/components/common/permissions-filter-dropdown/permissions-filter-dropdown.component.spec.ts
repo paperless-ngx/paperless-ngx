@@ -4,7 +4,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of } from 'rxjs'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { PermissionsService } from 'src/app/services/permissions.service'
@@ -31,7 +30,6 @@ describe('PermissionsFilterDropdownComponent', () => {
         FormsModule,
         ReactiveFormsModule,
         NgbModule,
-        NgxBootstrapIconsModule.pick(allIcons),
         PermissionsFilterDropdownComponent,
         ClearableBadgeComponent,
         IfPermissionsDirective,

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-29 17:25+0000\n"
-"PO-Revision-Date: 2026-10-29 17:27\n"
+"POT-Creation-Date: 2026-10-31 04:47+0000\n"
+"PO-Revision-Date: 2026-10-31 04:48\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -21,43 +21,43 @@ msgstr ""
 msgid "Documents"
 msgstr "文档"
 
-#: documents/filters.py:337
+#: documents/filters.py:336
 msgid "Expected a date or a relative date such as \"today\" or \"in 30 days\"."
 msgstr ""
 
-#: documents/filters.py:513
+#: documents/filters.py:514
 msgid "Value must be valid JSON."
 msgstr "值必须是有效的 JSON 格式。"
 
-#: documents/filters.py:534
+#: documents/filters.py:535
 msgid "Invalid custom field query expression"
 msgstr "无效的自定义字段查询表达式"
 
-#: documents/filters.py:544
+#: documents/filters.py:545
 msgid "Invalid expression list. Must be nonempty."
 msgstr "无效的表达式列表。必须不为空。"
 
-#: documents/filters.py:565
+#: documents/filters.py:566
 msgid "Invalid logical operator {op!r}"
 msgstr "无效的逻辑运算符 {op!r}"
 
-#: documents/filters.py:579
+#: documents/filters.py:580
 msgid "Maximum number of query conditions exceeded."
 msgstr "超出查询条件的最大数量。"
 
-#: documents/filters.py:643
+#: documents/filters.py:644
 msgid "{name!r} is not a valid custom field."
 msgstr "{name!r} 不是一个有效的自定义字段。"
 
-#: documents/filters.py:680
+#: documents/filters.py:681
 msgid "{data_type} does not support query expr {expr!r}."
 msgstr "{data_type} 不支持查询表达式 {expr!r}。"
 
-#: documents/filters.py:801 documents/models.py:137
+#: documents/filters.py:802 documents/models.py:137
 msgid "Maximum nesting depth exceeded."
 msgstr "超出最大嵌套深度。"
 
-#: documents/filters.py:1178
+#: documents/filters.py:1179
 msgid "Custom field not found"
 msgstr "Custom field not found"
 
@@ -1640,7 +1640,7 @@ msgid "workflow runs"
 msgstr "工作流运行"
 
 #: documents/serialisers.py:483 documents/serialisers.py:840
-#: documents/serialisers.py:2872 documents/views.py:360 documents/views.py:2730
+#: documents/serialisers.py:2872 documents/views.py:348 documents/views.py:2731
 #: paperless_mail/serialisers.py:156
 msgid "Insufficient permissions."
 msgstr "权限不足。"
@@ -1680,7 +1680,7 @@ msgstr "检测到无效变量。"
 msgid "Duplicate document identifiers are not allowed."
 msgstr "不允许重复文档标识符。"
 
-#: documents/serialisers.py:2958 documents/views.py:4780
+#: documents/serialisers.py:2958 documents/views.py:4781
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr "未找到文档：%(ids)s"
@@ -1921,40 +1921,40 @@ msgstr "作为最后一步，请填写以下表格："
 msgid ", "
 msgstr "，"
 
-#: documents/views.py:315
+#: documents/views.py:303
 msgid "Specify only one of text, title_search, query, or more_like_id."
 msgstr "只能指定 text、title_search、query 或 more_like_id 中的一项。"
 
-#: documents/views.py:353 documents/views.py:2727
+#: documents/views.py:341 documents/views.py:2728
 msgid "Invalid more_like_id"
 msgstr "无效的more_like_id"
 
-#: documents/views.py:1665
+#: documents/views.py:1652
 msgid "Invalid AI configuration."
 msgstr "无效的 AI 配置。"
 
-#: documents/views.py:1676
+#: documents/views.py:1663
 msgid "AI backend request timed out."
 msgstr "AI 后端请求超时。"
 
-#: documents/views.py:1688
+#: documents/views.py:1675
 msgid "AI backend rejected the request. Check logs for details."
 msgstr "AI 后端拒绝了请求。请检查日志的详细信息。"
 
-#: documents/views.py:4796
+#: documents/views.py:4797
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr "权限不足以分享文件：%(id)s。"
 
-#: documents/views.py:4843
+#: documents/views.py:4844
 msgid "Bundle is already being processed."
 msgstr "捆绑包已在处理中。"
 
-#: documents/views.py:4909
+#: documents/views.py:4910
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr "分享链接包仍在准备中，请稍后再试。"
 
-#: documents/views.py:4923
+#: documents/views.py:4924
 msgid "The share link bundle is unavailable."
 msgstr "分享链接包不可用。"
 

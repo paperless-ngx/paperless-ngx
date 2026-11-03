@@ -6,8 +6,10 @@ import {
   NgbPaginationModule,
   NgbPopoverModule,
 } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Subject, catchError, of, switchMap, takeUntil, timer } from 'rxjs'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
+import { ConfirmButtonComponent } from 'src/app/components/common/confirm-button/confirm-button.component'
+import { LoadingComponentWithPermissions } from 'src/app/components/loading-component/loading.component'
 import { FileVersion } from 'src/app/data/share-link'
 import {
   SHARE_LINK_BUNDLE_FILE_VERSION_LABELS,
@@ -25,8 +27,6 @@ import { ShareLinkBundleService } from 'src/app/services/rest/share-link-bundle.
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { environment } from 'src/environments/environment'
-import { ConfirmButtonComponent } from 'src/app/components/common/confirm-button/confirm-button.component'
-import { LoadingComponentWithPermissions } from 'src/app/components/loading-component/loading.component'
 
 @Component({
   selector: 'pngx-share-link-bundle-list',
@@ -38,7 +38,7 @@ import { LoadingComponentWithPermissions } from 'src/app/components/loading-comp
     FormsModule,
     NgbPaginationModule,
     NgbPopoverModule,
-    NgxBootstrapIconsModule,
+    BootstrapIconComponent,
     SortableDirective,
     FileSizePipe,
   ],

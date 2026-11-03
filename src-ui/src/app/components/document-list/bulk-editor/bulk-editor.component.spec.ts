@@ -9,7 +9,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { By } from '@angular/platform-browser'
 import { Router } from '@angular/router'
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap'
-import { allIcons, NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { of, throwError } from 'rxjs'
 import { Correspondent } from 'src/app/data/correspondent'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
@@ -88,7 +87,7 @@ describe('BulkEditorComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      imports: [BulkEditorComponent, NgxBootstrapIconsModule.pick(allIcons)],
+      imports: [BulkEditorComponent],
       providers: [
         PermissionsService,
         {

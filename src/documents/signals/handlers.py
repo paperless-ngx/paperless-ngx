@@ -476,13 +476,13 @@ def update_filename_and_move_files(
         return
 
     with FileLock(settings.MEDIA_LOCK):
-        try:
-            # If this was waiting for the lock, the filename or archive_filename
-            # of this document may have been updated.  This happens if multiple updates
-            # get queued from the UI for the same document
-            # So freshen up the data before doing anything
-            instance.refresh_from_db()
+        # If this was waiting for the lock, the filename or archive_filename
+        # of this document may have been updated.  This happens if multiple updates
+        # get queued from the UI for the same document
+        # So freshen up the data before doing anything
+        instance.refresh_from_db()
 
+        try:
             old_filename = instance.filename
             old_source_path = instance.source_path
             move_original = False

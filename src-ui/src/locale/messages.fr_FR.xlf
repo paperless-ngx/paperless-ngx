@@ -3719,7 +3719,7 @@
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
           <context context-type="linenumber">163</context>
         </context-group>
-        <target state="translated">Erreur lors de la supression de l’utilisateur « <x id="PH" equiv-text="user.username"/> ».</target>
+        <target state="translated">Erreur lors de la suppression de l’utilisateur « <x id="PH" equiv-text="user.username"/> ».</target>
       </trans-unit>
       <trans-unit id="5766640174051730159" datatype="html" approved="yes">
         <source>Saved group &quot;<x id="PH" equiv-text="newGroup.name"/>&quot;.</source>
@@ -3767,7 +3767,7 @@
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
           <context context-type="linenumber">220</context>
         </context-group>
-        <target state="translated">Erreur lors de la supression du groupe « <x id="PH" equiv-text="group.name"/> ».</target>
+        <target state="translated">Erreur lors de la suppression du groupe « <x id="PH" equiv-text="group.name"/> ».</target>
       </trans-unit>
       <trans-unit id="7931334600001636863" datatype="html" approved="yes">
         <source>by Paperless-ngx</source>
@@ -6935,7 +6935,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">410</context>
         </context-group>
-        <target state="translated">Destinatires du courriel</target>
+        <target state="translated">Destinataires du courriel</target>
       </trans-unit>
       <trans-unit id="7916910101279824329" datatype="html">
         <source>Attach document</source>
@@ -10930,7 +10930,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">8,9</context>
         </context-group>
-        <target state="translated"><x id="INTERPOLATION" equiv-text="{{ document().title | documentTitle }}"/> mignature</target>
+        <target state="translated"><x id="INTERPOLATION" equiv-text="{{ document().title | documentTitle }}"/> miniature</target>
       </trans-unit>
       <trans-unit id="2784168796433474565" datatype="html" approved="yes">
         <source>Filter by tag</source>
@@ -11396,21 +11396,21 @@
         </context-group>
         <target state="translated">Trier par <x id="INTERPOLATION" equiv-text="{{getDisplayCustomFieldTitle(field_id)}}"/></target>
       </trans-unit>
-      <trans-unit id="2179847500064178686" datatype="html" approved="yes">
-        <source>Edit document</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">328</context>
-        </context-group>
-        <target state="final">Modifier le document</target>
-      </trans-unit>
       <trans-unit id="3420321797707163677" datatype="html">
         <source>Preview document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">329</context>
+          <context context-type="linenumber">328</context>
         </context-group>
         <target state="translated">Prévisualiser le document</target>
+      </trans-unit>
+      <trans-unit id="2179847500064178686" datatype="html" approved="yes">
+        <source>Edit document</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
+          <context context-type="linenumber">331</context>
+        </context-group>
+        <target state="final">Modifier le document</target>
       </trans-unit>
       <trans-unit id="4512084577073831437" datatype="html">
         <source>Reset filters / selection</source>

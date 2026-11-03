@@ -26,7 +26,6 @@ import {
   NgbNavModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { dirtyCheck, DirtyComponent } from '@ngneat/dirty-check-forms'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { DeviceDetectorService } from 'ngx-device-detector'
 import { BehaviorSubject, merge, Observable, of, Subject, timer } from 'rxjs'
 import {
@@ -41,6 +40,7 @@ import {
   takeUntil,
   tap,
 } from 'rxjs/operators'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { Correspondent } from 'src/app/data/correspondent'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import { CustomFieldInstance } from 'src/app/data/custom-field-instance'
@@ -200,7 +200,7 @@ interface IncomingDocumentUpdate {
     SafeUrlPipe,
     NgbNavModule,
     NgbDropdownModule,
-    NgxBootstrapIconsModule,
+    BootstrapIconComponent,
     TextAreaComponent,
     RouterModule,
     PngxPdfViewerComponent,

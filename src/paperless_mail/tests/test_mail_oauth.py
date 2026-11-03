@@ -264,6 +264,28 @@ class TestMailOAuth(
             MailAccount.objects.filter(imap_server="outlook.office365.com").exists(),
         )
 
+    def test_oauth_callback_view_unrecognized_scope(self) -> None:
+        """
+        GIVEN:
+            - A valid OAuth state and a callback scope that is not Google's
+        WHEN:
+            - OAuth callback is called
+        THEN:
+            - 400 is returned instead of a server error and no account is created
+        """
+        session = self.client.session
+        session["oauth_state"] = "test_state"
+        session.save()
+
+        for scope in ("", "openid", "https://example.com/other"):
+            with self.subTest(scope=scope):
+                response = self.client.get(
+                    "/api/oauth/callback/",
+                    {"code": "test_code", "scope": scope, "state": "test_state"},
+                )
+                self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+                self.assertFalse(MailAccount.objects.exists())
+
     @mock.patch("paperless_mail.mail.get_mailbox")
     @mock.patch(
         "httpx_oauth.oauth2.BaseOAuth2.refresh_token",
@@ -366,3 +388,39 @@ class TestMailOAuth(
                 f"Failed to refresh oauth token for account {mail_account}: test_error",
                 cm.output[0],
             )
+
+    def test_refresh_account_oauth_token_non_oauth_account(self) -> None:
+        """
+        GIVEN:
+            - A mail account which does not use OAuth
+        WHEN:
+            - A token refresh is requested
+        THEN:
+            - False is returned rather than an unbound variable error
+        """
+        account = MailAccountFactory(
+            account_type=MailAccount.MailAccountType.IMAP,
+            refresh_token="token",
+        )
+
+        self.assertFalse(
+            PaperlessMailOAuth2Manager().refresh_account_oauth_token(account),
+        )
+
+    def test_refresh_account_oauth_token_without_refresh_token(self) -> None:
+        """
+        GIVEN:
+            - An OAuth mail account with no refresh token stored
+        WHEN:
+            - A token refresh is requested
+        THEN:
+            - False is returned
+        """
+        account = MailAccountFactory(
+            account_type=MailAccount.MailAccountType.GMAIL_OAUTH,
+            refresh_token=None,
+        )
+
+        self.assertFalse(
+            PaperlessMailOAuth2Manager().refresh_account_oauth_token(account),
+        )

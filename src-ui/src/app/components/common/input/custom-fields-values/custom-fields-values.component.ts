@@ -14,7 +14,7 @@ import {
 } from '@angular/forms'
 import { RouterModule } from '@angular/router'
 import { NgSelectModule } from '@ng-select/ng-select'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { AbstractInputComponent } from '../abstract-input'
@@ -52,7 +52,7 @@ import { UrlComponent } from '../url/url.component'
     FormsModule,
     ReactiveFormsModule,
     RouterModule,
-    NgxBootstrapIconsModule,
+    BootstrapIconComponent,
     TextAreaComponent,
   ],
 })

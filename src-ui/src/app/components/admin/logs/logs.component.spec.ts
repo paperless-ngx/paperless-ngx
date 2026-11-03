@@ -8,7 +8,6 @@ import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { BrowserModule, By } from '@angular/platform-browser'
 import { NgbModule, NgbNavLink } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of, throwError } from 'rxjs'
 import { LogService } from 'src/app/services/rest/log.service'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
@@ -40,7 +39,6 @@ describe('LogsComponent', () => {
       imports: [
         BrowserModule,
         NgbModule,
-        NgxBootstrapIconsModule.pick(allIcons),
         LogsComponent,
         PageHeaderComponent,
         CommonModule,

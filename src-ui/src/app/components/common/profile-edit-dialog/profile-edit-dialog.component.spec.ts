@@ -9,7 +9,6 @@ import {
   NgbModalModule,
   NgbPopoverModule,
 } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { NEVER, of, Subject, throwError } from 'rxjs'
 import { ProfileService } from 'src/app/services/profile.service'
 import { ToastService } from 'src/app/services/toast.service'
@@ -50,7 +49,6 @@ describe('ProfileEditDialogComponent', () => {
         FormsModule,
         NgbModalModule,
         NgbAccordionModule,
-        NgxBootstrapIconsModule.pick(allIcons),
         NgbPopoverModule,
         ProfileEditDialogComponent,
         TextComponent,

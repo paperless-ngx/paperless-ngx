@@ -1,11 +1,11 @@
 import { Component, computed, EventEmitter, input, Output } from '@angular/core'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 
 @Component({
   selector: 'pngx-clearable-badge',
   templateUrl: './clearable-badge.component.html',
   styleUrls: ['./clearable-badge.component.scss'],
-  imports: [NgxBootstrapIconsModule],
+  imports: [BootstrapIconComponent],
 })
 export class ClearableBadgeComponent {
   readonly number = input<number>(undefined)

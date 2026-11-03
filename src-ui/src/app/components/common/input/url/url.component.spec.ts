@@ -4,7 +4,6 @@ import {
   NG_VALUE_ACCESSOR,
   ReactiveFormsModule,
 } from '@angular/forms'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { UrlComponent } from './url.component'
 
 describe('TextComponent', () => {
@@ -15,12 +14,7 @@ describe('TextComponent', () => {
   beforeEach(async () => {
     TestBed.configureTestingModule({
       providers: [],
-      imports: [
-        FormsModule,
-        ReactiveFormsModule,
-        NgxBootstrapIconsModule.pick(allIcons),
-        UrlComponent,
-      ],
+      imports: [FormsModule, ReactiveFormsModule, UrlComponent],
     }).compileComponents()
 
     fixture = TestBed.createComponent(UrlComponent)

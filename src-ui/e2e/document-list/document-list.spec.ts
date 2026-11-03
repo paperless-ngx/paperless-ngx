@@ -123,7 +123,7 @@ test('sorting', async ({ page }) => {
   await page.getByRole('button', { name: 'Notes' }).click()
   await expect(page).toHaveURL(/sort=num_notes/)
   await page.getByRole('button', { name: 'Sort' }).click()
-  await page.locator('.w-100 > label > i-bs').first().click()
+  await page.locator('.w-100 > label > pngx-bs-icon').first().click()
   await expect(page).not.toHaveURL(/reverse=1/)
 })
 

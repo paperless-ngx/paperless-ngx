@@ -1,6 +1,6 @@
 <div class="btn-group w-100" ngbDropdown role="group" [popperOptions]="popperOptions" [placement]="placement">
   <button class="btn btn-sm" id="dropdown{{title}}" ngbDropdownToggle [ngClass]="createdDateTo || createdDateFrom ? 'btn-primary' : 'btn-outline-primary'" [disabled]="disabled" [aria-label]="title">
-    <i-bs width="1em" height="1em" name="calendar-event-fill"></i-bs><div class="d-none d-sm-inline ms-1">{{title}}</div>
+    <pngx-bs-icon width="1em" height="1em" name="calendar-event-fill"></pngx-bs-icon><div class="d-none d-sm-inline ms-1">{{title}}</div>
     <pngx-clearable-badge [selected]="isActive" (cleared)="reset()"></pngx-clearable-badge><span class="visually-hidden">selected</span>
   </button>
   <div [id]="dropdownMenuId" class="dropdown-menu date-dropdown shadow p-2" ngbDropdownMenu attr.aria-labelledby="dropdown{{title}}">
@@ -10,8 +10,8 @@
         <div class="selected-icon">
           @if (createdRelativeDate) {
             <a class="text-light focus-variants" href="javascript:void(0)" (click)="clearCreatedRelativeDate()" aria-label="Clear created relative date" i18n-aria-label>
-              <i-bs width="1em" height="1em" name="check" class="variant-unfocused text-dark"></i-bs>
-              <i-bs width="1em" height="1em" name="x" class="variant-focused text-primary"></i-bs>
+              <pngx-bs-icon width="1em" height="1em" name="check" class="variant-unfocused text-dark"></pngx-bs-icon>
+              <pngx-bs-icon width="1em" height="1em" name="x" class="variant-focused text-primary"></pngx-bs-icon>
             </a>
           }
         </div>
@@ -35,8 +35,8 @@
         <div class="selected-icon">
           @if (createdDateFrom) {
             <a class="text-light focus-variants" href="javascript:void(0)" (click)="clearCreatedFrom()" aria-label="Clear created from date" i18n-aria-label>
-              <i-bs width="1em" height="1em" name="check" class="variant-unfocused"></i-bs>
-              <i-bs width="1em" height="1em" name="x" class="variant-focused text-primary"></i-bs>
+              <pngx-bs-icon width="1em" height="1em" name="check" class="variant-unfocused"></pngx-bs-icon>
+              <pngx-bs-icon width="1em" height="1em" name="x" class="variant-focused text-primary"></pngx-bs-icon>
             </a>
           }
         </div>
@@ -45,7 +45,7 @@
           <input class="form-control small" [placeholder]="datePlaceHolder" (dateSelect)="onChangeDebounce()" (change)="onChangeDebounce()" (keypress)="onKeyPress($event)"
             maxlength="10" [(ngModel)]="createdDateFrom" ngbDatepicker #createdDateFromPicker="ngbDatepicker" [footerTemplate]="createdFromFooterTemplate">
           <button class="btn btn-outline-secondary" (click)="createdDateFromPicker.toggle()" type="button" aria-label="Open created from date picker" i18n-aria-label>
-            <i-bs width="1em" height="1em" name="calendar"></i-bs>
+            <pngx-bs-icon width="1em" height="1em" name="calendar"></pngx-bs-icon>
           </button>
           <ng-template #createdFromFooterTemplate>
             <div class="btn-group-xs border-top p-2 d-flex">
@@ -59,8 +59,8 @@
         <div class="selected-icon">
           @if (createdDateTo) {
             <a class="text-light focus-variants" href="javascript:void(0)" (click)="clearCreatedTo()" aria-label="Clear created to date" i18n-aria-label>
-              <i-bs width="1em" height="1em" name="check" class="variant-unfocused"></i-bs>
-              <i-bs width="1em" height="1em" name="x" class="variant-focused text-primary"></i-bs>
+              <pngx-bs-icon width="1em" height="1em" name="check" class="variant-unfocused"></pngx-bs-icon>
+              <pngx-bs-icon width="1em" height="1em" name="x" class="variant-focused text-primary"></pngx-bs-icon>
             </a>
           }
         </div>
@@ -69,7 +69,7 @@
           <input class="form-control small" [placeholder]="datePlaceHolder" (dateSelect)="onChangeDebounce()" (change)="onChangeDebounce()" (keypress)="onKeyPress($event)"
             maxlength="10" [(ngModel)]="createdDateTo" ngbDatepicker #createdDateToPicker="ngbDatepicker" [footerTemplate]="createdToFooterTemplate">
           <button class="btn btn-outline-secondary" (click)="createdDateToPicker.toggle()" type="button" aria-label="Open created to date picker" i18n-aria-label>
-            <i-bs width="1em" height="1em" name="calendar"></i-bs>
+            <pngx-bs-icon width="1em" height="1em" name="calendar"></pngx-bs-icon>
           </button>
           <ng-template #createdToFooterTemplate>
             <div class="btn-group-xs border-top p-2 d-flex">
@@ -87,8 +87,8 @@
         <div class="selected-icon">
           @if (addedRelativeDate) {
             <a class="text-light focus-variants" href="javascript:void(0)" (click)="clearAddedRelativeDate()" aria-label="Clear added relative date" i18n-aria-label>
-              <i-bs width="1em" height="1em" name="check" class="variant-unfocused text-dark"></i-bs>
-              <i-bs width="1em" height="1em" name="x" class="variant-focused text-primary"></i-bs>
+              <pngx-bs-icon width="1em" height="1em" name="check" class="variant-unfocused text-dark"></pngx-bs-icon>
+              <pngx-bs-icon width="1em" height="1em" name="x" class="variant-focused text-primary"></pngx-bs-icon>
             </a>
           }
         </div>
@@ -112,8 +112,8 @@
         <div class="selected-icon">
           @if (addedDateFrom) {
             <a class="text-light focus-variants" href="javascript:void(0)" (click)="clearAddedFrom()" aria-label="Clear added from date" i18n-aria-label>
-              <i-bs width="1em" height="1em" name="check" class="variant-unfocused"></i-bs>
-              <i-bs width="1em" height="1em" name="x" class="variant-focused text-primary"></i-bs>
+              <pngx-bs-icon width="1em" height="1em" name="check" class="variant-unfocused"></pngx-bs-icon>
+              <pngx-bs-icon width="1em" height="1em" name="x" class="variant-focused text-primary"></pngx-bs-icon>
             </a>
           }
         </div>
@@ -122,7 +122,7 @@
           <input class="form-control small" [placeholder]="datePlaceHolder" (dateSelect)="onChangeDebounce()" (change)="onChangeDebounce()" (keypress)="onKeyPress($event)"
             maxlength="10" [(ngModel)]="addedDateFrom" ngbDatepicker #addedDateFromPicker="ngbDatepicker" [footerTemplate]="addedFromFooterTemplate">
           <button class="btn btn-outline-secondary" (click)="addedDateFromPicker.toggle()" type="button" aria-label="Open added from date picker" i18n-aria-label>
-            <i-bs width="1em" height="1em" name="calendar"></i-bs>
+            <pngx-bs-icon width="1em" height="1em" name="calendar"></pngx-bs-icon>
           </button>
           <ng-template #addedFromFooterTemplate>
             <div class="btn-group-xs border-top p-2 d-flex">
@@ -136,8 +136,8 @@
         <div class="selected-icon">
           @if (addedDateTo) {
             <a class="text-light focus-variants" href="javascript:void(0)" (click)="clearAddedTo()" aria-label="Clear added to date" i18n-aria-label>
-              <i-bs width="1em" height="1em" name="check" class="variant-unfocused"></i-bs>
-              <i-bs width="1em" height="1em" name="x" class="variant-focused text-primary"></i-bs>
+              <pngx-bs-icon width="1em" height="1em" name="check" class="variant-unfocused"></pngx-bs-icon>
+              <pngx-bs-icon width="1em" height="1em" name="x" class="variant-focused text-primary"></pngx-bs-icon>
             </a>
           }
         </div>
@@ -146,7 +146,7 @@
           <input class="form-control small" [placeholder]="datePlaceHolder" (dateSelect)="onChangeDebounce()" (change)="onChangeDebounce()" (keypress)="onKeyPress($event)"
             maxlength="10" [(ngModel)]="addedDateTo" ngbDatepicker #addedDateToPicker="ngbDatepicker" [footerTemplate]="addedToFooterTemplate">
           <button class="btn btn-outline-secondary" (click)="addedDateToPicker.toggle()" type="button" aria-label="Open added to date picker" i18n-aria-label>
-            <i-bs width="1em" height="1em" name="calendar"></i-bs>
+            <pngx-bs-icon width="1em" height="1em" name="calendar"></pngx-bs-icon>
           </button>
           <ng-template #addedToFooterTemplate>
             <div class="btn-group-xs border-top p-2 d-flex">

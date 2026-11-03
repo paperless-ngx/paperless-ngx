@@ -22,7 +22,7 @@
 
           <ng-template ng-label-tmp let-item="item">
             <button class="tag-wrap btn p-0 d-flex align-items-center" (click)="removeTag(item.id)" (mousedown)="$event.stopImmediatePropagation()" type="button" title="Remove tag" i18n-title>
-              <i-bs name="x" style="margin-inline-end: 1px;"></i-bs>
+              <pngx-bs-icon name="x" style="margin-inline-end: 1px;"></pngx-bs-icon>
               @if (item.id && tags) {
                 <pngx-tag style="background-color: none;" [tag]="getTag(item.id)"></pngx-tag>
               }
@@ -32,12 +32,12 @@
             <div class="tag-option-row d-flex align-items-center" [class.w-auto]="!getTag(item.id)?.parent">
               @if (item.id && tags) {
                 @if (getTag(item.id)?.parent) {
-                  <i-bs name="list-nested" class="me-1"></i-bs>
+                  <pngx-bs-icon name="list-nested" class="me-1"></pngx-bs-icon>
                   <span class="hierarchy-reveal d-flex align-items-center">
                     <span class="parents d-flex align-items-center">
                       @for (p of getParentChain(item.id); track p.id) {
                         <span class="badge me-1" [style.background]="p.color" [style.color]="p.text_color">{{p.name}}</span>
-                        <i-bs name="chevron-right" width=".8em" height=".8em" class="me-1"></i-bs>
+                        <pngx-bs-icon name="chevron-right" width=".8em" height=".8em" class="me-1"></pngx-bs-icon>
                       }
                     </span>
                   </span>
@@ -49,12 +49,12 @@
         </ng-select>
         @if (allowCreate && !hideAddButton) {
           <button class="btn btn-outline-secondary" type="button" (click)="createTag(null, true)" [disabled]="disabled" aria-label="Create new tag" i18n-aria-label>
-            <i-bs width="1.2em" height="1.2em" name="plus"></i-bs>
+            <pngx-bs-icon width="1.2em" height="1.2em" name="plus"></pngx-bs-icon>
           </button>
         }
         @if (showFilter) {
           <button class="btn btn-outline-secondary" type="button" (click)="onFilterDocuments()" [disabled]="hasPrivate || this.value === null" i18n-title title="Filter documents with these Tags">
-            <i-bs width="1.2em" height="1.2em" name="filter"></i-bs>
+            <pngx-bs-icon width="1.2em" height="1.2em" name="filter"></pngx-bs-icon>
           </button>
         }
       </div>

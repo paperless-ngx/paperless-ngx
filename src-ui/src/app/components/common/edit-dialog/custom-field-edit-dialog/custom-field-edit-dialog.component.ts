@@ -15,8 +15,8 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms'
 import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { takeUntil } from 'rxjs'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import {
   CustomField,
   CustomFieldDataType,
@@ -41,7 +41,7 @@ const SELECT_OPTION_PAGE_SIZE = 8
     FormsModule,
     ReactiveFormsModule,
     NgbPaginationModule,
-    NgxBootstrapIconsModule,
+    BootstrapIconComponent,
   ],
 })
 export class CustomFieldEditDialogComponent

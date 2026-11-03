@@ -1,7 +1,5 @@
 import logging
 
-from dateparser.languages.loader import LocaleDataLoader
-
 logger = logging.getLogger("paperless.utils")
 
 OCR_TO_DATEPARSER_LANGUAGES = {
@@ -125,6 +123,8 @@ def ocr_to_dateparser_languages(ocr_languages: str) -> list[str]:
     - If a language cannot be mapped or validated, it is skipped with a warning.
     - Returns a list of valid locales, or an empty list if none could be converted.
     """
+    from dateparser.languages.loader import LocaleDataLoader
+
     loader = LocaleDataLoader()
     result = []
     try:

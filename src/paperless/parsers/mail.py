@@ -36,9 +36,6 @@ from humanize import naturalsize
 from imap_tools import MailAttachment
 from imap_tools import MailMessage
 from tika_client import TikaClient
-from turbohtml.clean import Linkify
-from turbohtml.clean import linkify
-from turbohtml.migration.bleach import clean
 
 from documents.parsers import ParseError
 from documents.parsers import make_thumbnail_from_pdf
@@ -622,6 +619,10 @@ class MailDocumentParser:
 
         def clean_html(text: str) -> str:
             """Attempt to clean, escape, and linkify the given HTML string."""
+            from turbohtml.clean import Linkify
+            from turbohtml.clean import linkify
+            from turbohtml.migration.bleach import clean
+
             if isinstance(text, list):
                 text = "\n".join([str(e) for e in text])
             if not isinstance(text, str):

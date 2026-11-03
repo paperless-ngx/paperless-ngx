@@ -10,7 +10,6 @@ import {
   NgbModalModule,
   NgbModalRef,
 } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of } from 'rxjs'
 import { DataType } from 'src/app/data/datatype'
 import {
@@ -138,7 +137,6 @@ describe('GlobalSearchComponent', () => {
         NgbDropdownModule,
         FormsModule,
         ReactiveFormsModule,
-        NgxBootstrapIconsModule.pick(allIcons),
         GlobalSearchComponent,
       ],
       providers: [

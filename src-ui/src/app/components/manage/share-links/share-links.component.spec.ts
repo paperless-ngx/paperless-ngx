@@ -1,7 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { ActivatedRoute, convertToParamMap, Router } from '@angular/router'
 import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of } from 'rxjs'
 import {
   PermissionAction,
@@ -21,12 +20,7 @@ describe('ShareLinksComponent', () => {
 
   const configure = async (type: string = null) => {
     await TestBed.configureTestingModule({
-      imports: [
-        ShareLinksComponent,
-        NgbNavModule,
-        NgxBootstrapIconsModule.pick(allIcons),
-        PageHeaderComponent,
-      ],
+      imports: [ShareLinksComponent, NgbNavModule, PageHeaderComponent],
       providers: [
         PermissionsService,
         {

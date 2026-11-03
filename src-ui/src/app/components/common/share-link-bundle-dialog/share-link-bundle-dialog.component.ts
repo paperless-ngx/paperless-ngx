@@ -2,7 +2,7 @@ import { Clipboard } from '@angular/cdk/clipboard'
 import { CommonModule } from '@angular/common'
 import { Component, inject, signal } from '@angular/core'
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { Document } from 'src/app/data/document'
 import {
   FileVersion,
@@ -26,7 +26,7 @@ import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.compone
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    NgxBootstrapIconsModule,
+    BootstrapIconComponent,
     FileSizePipe,
     DocumentTitlePipe,
   ],

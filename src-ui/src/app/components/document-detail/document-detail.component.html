@@ -1,6 +1,6 @@
 <pngx-page-header [title]="title()" [id]="documentId()">
   <button type="button" class="btn btn-sm btn-outline-danger me-md-4" (click)="delete()" [disabled]="!userIsOwner" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Document }" aria-label="Delete" i18n-aria-label>
-    <i-bs width="1.2em" height="1.2em" name="trash"></i-bs><span class="d-none d-lg-inline ps-1" i18n>Delete</span>
+    <pngx-bs-icon width="1.2em" height="1.2em" name="trash"></pngx-bs-icon><span class="d-none d-lg-inline ps-1" i18n>Delete</span>
   </button>
 
   <pngx-document-version-dropdown
@@ -13,12 +13,12 @@
     (versionsUpdated)="onVersionsUpdated($event)"
   />
 
-  <div class="btn-group ms-4">
+  <div class="btn-group ms-md-4">
     <button (click)="download()" class="btn btn-sm btn-outline-primary" [disabled]="downloading()" aria-label="Download" i18n-aria-label>
       @if (downloading()) {
         <div class="spinner-border spinner-border-sm" role="status"></div>
       } @else {
-        <i-bs width="1.2em" height="1.2em" name="download"></i-bs>
+        <pngx-bs-icon width="1.2em" height="1.2em" name="download"></pngx-bs-icon>
       }
       <span class="d-none d-lg-inline ps-1" i18n>Download</span>
     </button>
@@ -40,25 +40,25 @@
     </div>
   </div>
 
-  <div class="ms-auto" ngbDropdown>
+  <div class="ms-md-auto" ngbDropdown>
     <button class="btn btn-sm btn-outline-primary" id="actionsDropdown" ngbDropdownToggle aria-label="Actions" i18n-aria-label>
-      <i-bs name="three-dots"></i-bs><div class="d-none d-sm-inline ms-1"><ng-container i18n>Actions</ng-container></div>
+      <pngx-bs-icon name="three-dots"></pngx-bs-icon><div class="d-none d-sm-inline ms-1"><ng-container i18n>Actions</ng-container></div>
     </button>
     <div ngbDropdownMenu aria-labelledby="actionsDropdown" class="shadow">
       <button ngbDropdownItem (click)="reprocess()" [disabled]="!userCanEdit || !userIsOwner">
-        <i-bs width="1em" height="1em" name="arrow-counterclockwise" class="me-2"></i-bs><span i18n>Reprocess</span>
+        <pngx-bs-icon width="1em" height="1em" name="arrow-counterclockwise" class="me-2"></pngx-bs-icon><span i18n>Reprocess</span>
       </button>
 
       <button ngbDropdownItem (click)="printDocument()" [hidden]="useNativePdfViewer || isMobile">
-        <i-bs width="1em" height="1em" name="printer" class="me-2"></i-bs><span i18n>Print</span>
+        <pngx-bs-icon width="1em" height="1em" name="printer" class="me-2"></pngx-bs-icon><span i18n>Print</span>
       </button>
 
       <button ngbDropdownItem (click)="moreLike()">
-        <i-bs width="1em" height="1em" name="diagram-3" class="me-2"></i-bs><span i18n>More like this</span>
+        <pngx-bs-icon width="1em" height="1em" name="diagram-3" class="me-2"></pngx-bs-icon><span i18n>More like this</span>
       </button>
 
       <button ngbDropdownItem (click)="editPdf()" [disabled]="!userIsOwner || !userCanEdit || originalContentRenderType !== ContentRenderType.PDF">
-        <i-bs name="pencil" class="me-2"></i-bs><ng-container i18n>PDF Editor</ng-container>
+        <pngx-bs-icon name="pencil" class="me-2"></pngx-bs-icon><ng-container i18n>PDF Editor</ng-container>
       </button>
 
       <div class="d-flex" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.OcrTemplate }">
@@ -79,23 +79,23 @@
 
       @if (userIsOwner && (requiresPassword || password)) {
         <button ngbDropdownItem (click)="removePassword()" [disabled]="!password">
-          <i-bs name="unlock" class="me-2"></i-bs><ng-container i18n>Remove Password</ng-container>
+          <pngx-bs-icon name="unlock" class="me-2"></pngx-bs-icon><ng-container i18n>Remove Password</ng-container>
         </button>
       }
     </div>
   </div>
 
-  <div class="ms-auto" ngbDropdown>
+  <div class="ms-md-auto" ngbDropdown>
     <button class="btn btn-sm btn-outline-primary" id="sendDropdown" ngbDropdownToggle aria-label="Send" i18n-aria-label>
-      <i-bs name="send"></i-bs><div class="d-none d-sm-inline ms-1"><ng-container i18n>Send</ng-container></div>
+      <pngx-bs-icon name="send"></pngx-bs-icon><div class="d-none d-sm-inline ms-1"><ng-container i18n>Send</ng-container></div>
     </button>
     <div ngbDropdownMenu aria-labelledby="sendDropdown" class="shadow">
       <button ngbDropdownItem (click)="openShareLinks()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.ShareLink }">
-        <i-bs name="link" class="me-2"></i-bs><span i18n>Share Links</span>
+        <pngx-bs-icon name="link" class="me-2"></pngx-bs-icon><span i18n>Share Links</span>
       </button>
       @if (emailEnabled) {
         <button ngbDropdownItem (click)="openEmailDocument()">
-          <i-bs name="envelope" class="me-2"></i-bs><span i18n>Email</span>
+          <pngx-bs-icon name="envelope" class="me-2"></pngx-bs-icon><span i18n>Email</span>
         </button>
       }
     </div>
@@ -111,13 +111,13 @@
       <div class="btn-toolbar mb-1 pb-3 gap-2 row-gap-2 border-bottom">
         <div class="btn-group">
           <button type="button" class="btn btn-sm btn-outline-secondary" i18n-title title="Close" (click)="close()">
-            <i-bs width="1.2em" height="1.2em" name="x"></i-bs>
+            <pngx-bs-icon width="1.2em" height="1.2em" name="x"></pngx-bs-icon>
           </button>
           <button type="button" class="btn btn-sm btn-outline-secondary" i18n-title title="Previous" (click)="previousDoc()" [disabled]="!hasPrevious()">
-            <i-bs width="1.2em" height="1.2em" name="arrow-left"></i-bs>
+            <pngx-bs-icon width="1.2em" height="1.2em" name="arrow-left"></pngx-bs-icon>
           </button>
           <button type="button" class="btn btn-sm btn-outline-secondary"  i18n-title title="Next" (click)="nextDoc()" [disabled]="!hasNext()">
-            <i-bs width="1.2em" height="1.2em" name="arrow-right"></i-bs>
+            <pngx-bs-icon width="1.2em" height="1.2em" name="arrow-right"></pngx-bs-icon>
           </button>
         </div>
 
@@ -324,7 +324,7 @@
                   </tr>
                   <tr class="align-middle">
                     <td i18n>Original SHA256 checksum</td>
-                    <td><span class="badge bg-light font-monospace text-wrap text-break text-start">{{metadata()?.original_checksum}}</span></td>
+                    <td><span class="badge bg-light text-dark font-monospace text-wrap text-break text-start">{{metadata()?.original_checksum}}</span></td>
                   </tr>
                   <tr>
                     <td i18n>Original file size</td>
@@ -454,13 +454,26 @@
 <ng-template #saveButtons>
   <div class="btn-group">
     <ng-container *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }">
-      <button type="submit" class="order-3 btn btn-sm btn-primary" i18n [disabled]="!userCanEdit || networkActive() || (isDirty$ | async) !== true">Save</button>
+      <button type="submit" class="order-3 btn btn-sm btn-primary" title="Save" i18n-title [disabled]="!userCanEdit || networkActive() || (isDirty$ | async) !== true">
+        <pngx-bs-icon class="d-md-none" width="1.2em" height="1.2em" name="floppy"></pngx-bs-icon><span class="d-none d-md-inline" i18n>Save</span>
+      </button>
       @if (hasNext()) {
-        <button type="button" class="order-1 btn btn-sm btn-outline-primary" (click)="saveEditNext()" i18n [disabled]="!userCanEdit || networkActive() || (isDirty$ | async) !== true">Save &amp; next</button>
+        <button type="button" class="order-1 btn btn-sm btn-outline-primary d-none d-md-inline-block" (click)="saveEditNext()" i18n [disabled]="!userCanEdit || networkActive() || (isDirty$ | async) !== true">Save &amp; next</button>
       } @else {
-        <button type="button" class="order-2 btn btn-sm btn-outline-primary" (click)="save(true)" i18n [disabled]="!userCanEdit || networkActive() || (isDirty$ | async) !== true">Save &amp; close</button>
+        <button type="button" class="order-2 btn btn-sm btn-outline-primary d-none d-md-inline-block" (click)="save(true)" i18n [disabled]="!userCanEdit || networkActive() || (isDirty$ | async) !== true">Save &amp; close</button>
       }
-      <button type="button" class="order-0 btn btn-sm btn-outline-secondary" (click)="discard()" i18n [disabled]="!userCanEdit || networkActive() || (isDirty$ | async) !== true">Discard</button>
+      <button type="button" class="order-0 btn btn-sm btn-outline-secondary" (click)="discard()" title="Discard" i18n-title [disabled]="!userCanEdit || networkActive() || (isDirty$ | async) !== true">
+        <pngx-bs-icon class="d-md-none" width="1.2em" height="1.2em" name="arrow-counterclockwise"></pngx-bs-icon><span class="d-none d-md-inline" i18n>Discard</span>
+      </button>
+      <div class="btn-group order-4 d-md-none" ngbDropdown placement="bottom-end top-end" role="group">
+        <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle dropdown-toggle-split" ngbDropdownToggle aria-label="More save options" i18n-aria-label [disabled]="!userCanEdit || networkActive() || (isDirty$ | async) !== true"></button>
+        <div class="dropdown-menu shadow" ngbDropdownMenu>
+          @if (hasNext()) {
+            <button type="button" ngbDropdownItem (click)="saveEditNext()" i18n>Save &amp; next</button>
+          }
+          <button type="button" ngbDropdownItem (click)="save(true)" i18n>Save &amp; close</button>
+        </div>
+      </div>
     </ng-container>
   </div>
 </ng-template>
@@ -481,7 +494,7 @@
     @switch (archiveContentRenderType) {
       @case (ContentRenderType.PDF) {
         @if (!useNativePdfViewer) {
-          <div class="preview-sticky pdf-viewer-container">
+          <div class="preview-sticky pdf-viewer-container" tabindex="-1">
             <pngx-pdf-viewer
               [src]="pdfSource()"
               [sourceRevision]="previewRevision()"
@@ -493,7 +506,7 @@
               (loadError)="onError($event)"
               (afterLoadComplete)="pdfPreviewLoaded($event)">
             </pngx-pdf-viewer>
-            <div class="position-absolute bottom-0 start-50 translate-middle-x z-1 mb-3 d-flex gap-2 p-1 bg-body border rounded shadow">
+            <div class="preview-controls position-absolute bottom-0 start-50 translate-middle-x z-1 mb-3 d-flex gap-2 p-1 bg-body border rounded shadow">
               @if (previewNumPages()) {
                 <div class="input-group input-group-sm w-auto flex-nowrap">
                   <input class="form-control flex-grow-0 w-auto" type="number" min="1" [max]="previewNumPages()" [ngModelOptions]="{standalone: true}" [ngModel]="previewCurrentPage()" (ngModelChange)="previewCurrentPage.set($event)" aria-label="Page" i18n-aria-label />
@@ -501,8 +514,8 @@
                 </div>
               }
               <div class="input-group input-group-sm w-auto flex-nowrap">
-                <button class="btn btn-outline-secondary" (click)="decreaseZoom()" aria-label="Zoom out" i18n-aria-label>
-                  <i-bs width="1em" height="1em" name="dash"></i-bs>
+                <button class="btn btn-outline-secondary" type="button" (click)="decreaseZoom()" aria-label="Zoom out" i18n-aria-label>
+                  <pngx-bs-icon width="1em" height="1em" name="dash"></pngx-bs-icon>
                 </button>
                 <select class="form-select" (change)="setZoom($event.target.value)" [ngModelOptions]="{standalone: true}" [ngModel]="currentZoom" aria-label="Zoom" i18n-aria-label>
                   @for (setting of zoomSettings; track setting) {
@@ -511,8 +524,8 @@
                     </option>
                   }
                 </select>
-                <button class="btn btn-outline-secondary" (click)="increaseZoom()" aria-label="Zoom in" i18n-aria-label>
-                  <i-bs width="1em" height="1em" name="plus"></i-bs>
+                <button class="btn btn-outline-secondary" type="button" (click)="increaseZoom()" aria-label="Zoom in" i18n-aria-label>
+                  <pngx-bs-icon width="1em" height="1em" name="plus"></pngx-bs-icon>
                 </button>
               </div>
             </div>

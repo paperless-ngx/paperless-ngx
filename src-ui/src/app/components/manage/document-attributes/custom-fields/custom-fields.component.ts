@@ -5,8 +5,8 @@ import {
   NgbModal,
   NgbPaginationModule,
 } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { takeUntil, tap } from 'rxjs'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { ConfirmDialogComponent } from 'src/app/components/common/confirm-dialog/confirm-dialog.component'
 import { CustomFieldEditDialogComponent } from 'src/app/components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
 import { EditDialogMode } from 'src/app/components/common/edit-dialog/edit-dialog.component'
@@ -34,7 +34,7 @@ import { ToastService } from 'src/app/services/toast.service'
     IfPermissionsDirective,
     NgbDropdownModule,
     NgbPaginationModule,
-    NgxBootstrapIconsModule,
+    BootstrapIconComponent,
     RouterModule,
   ],
 })

@@ -19,7 +19,7 @@ import {
   NgbDatepickerModule,
   NgbDateStruct,
 } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { SettingsService } from 'src/app/services/settings.service'
 import { AbstractInputComponent } from '../abstract-input'
 
@@ -39,7 +39,7 @@ import { AbstractInputComponent } from '../abstract-input'
     FormsModule,
     ReactiveFormsModule,
     RouterModule,
-    NgxBootstrapIconsModule,
+    BootstrapIconComponent,
   ],
 })
 export class DateComponent

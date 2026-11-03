@@ -9,7 +9,6 @@ import {
   NgbPaginationModule,
   NgbPopoverModule,
 } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of, throwError } from 'rxjs'
 import { ToastService } from 'src/app/services/toast.service'
 import { TrashService } from 'src/app/services/trash.service'
@@ -48,7 +47,6 @@ describe('TrashComponent', () => {
         ReactiveFormsModule,
         NgbPopoverModule,
         NgbPaginationModule,
-        NgxBootstrapIconsModule.pick(allIcons),
         TrashComponent,
         PageHeaderComponent,
         ConfirmDialogComponent,

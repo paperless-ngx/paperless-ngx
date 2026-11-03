@@ -6,13 +6,13 @@
   [disabled]="disabled">
   <div class="selected-icon me-1">
     @if (isChecked()) {
-      <i-bs width="1em" height="1em" name="check"></i-bs>
+      <pngx-bs-icon width="1em" height="1em" name="check"></pngx-bs-icon>
     }
     @if (isPartiallyChecked()) {
-      <i-bs width="1em" height="1em" name="dash"></i-bs>
+      <pngx-bs-icon width="1em" height="1em" name="dash"></pngx-bs-icon>
     }
     @if (isExcluded()) {
-      <i-bs width="1em" height="1em" name="x"></i-bs>
+      <pngx-bs-icon width="1em" height="1em" name="x"></pngx-bs-icon>
     }
   </div>
   <div class="me-1 name-cell" [style.--depth]="isTag ? getDepth() + 1 : 1">

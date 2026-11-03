@@ -4,7 +4,6 @@ import { ElementRef } from '@angular/core'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { NavigationEnd, Router } from '@angular/router'
 import { RouterTestingModule } from '@angular/router/testing'
-import { allIcons, NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Subject } from 'rxjs'
 import {
   CHAT_METADATA_DELIMITER,
@@ -22,11 +21,7 @@ describe('ChatComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      imports: [
-        NgxBootstrapIconsModule.pick(allIcons),
-        RouterTestingModule,
-        ChatComponent,
-      ],
+      imports: [RouterTestingModule, ChatComponent],
       providers: [
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
