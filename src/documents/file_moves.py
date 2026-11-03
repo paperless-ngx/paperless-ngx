@@ -126,7 +126,9 @@ def move_files_for_document(pk: int) -> Document | None:
     # Cheap check without the lock: most saves during consumption happen
     # before the file is placed. filename, once set, is never cleared, so a
     # non-empty value here stays non-empty under the lock. This goes through
-    # values_list() (not the manager's filter()) on purpose.
+    # values_list() (not the manager's filter()) so the check stays off
+    # Document.global_objects.filter(), which tests patch to inject database
+    # errors and to observe the mover's own writes.
     filename = (
         Document.global_objects.values_list("filename", flat=True).filter(pk=pk).first()
     )
@@ -443,9 +445,10 @@ async def adefer_file_moves() -> AsyncIterator[None]:
     """
     Async twin of defer_file_moves().
 
-    The close and flush (including the transaction check, which must run in
-    the thread that owns the DB connection) run through sync_to_async so the
-    blocking media.lock never runs on the event loop.
+    The collector is closed on the event loop (no DB access), and only when
+    something was collected does the flush, including the transaction check
+    that must run in the thread owning the DB connection, run through
+    sync_to_async so the blocking media.lock never runs on the event loop.
     """
     current = _active_collector.get()
     if current is not None and not current.closed:
@@ -458,4 +461,6 @@ async def adefer_file_moves() -> AsyncIterator[None]:
         yield
     finally:
         _active_collector.reset(token)
-        await sync_to_async(_close_and_flush, thread_sensitive=True)(collector)
+        pks = collector.close()
+        if pks:
+            await sync_to_async(_flush_after_commit, thread_sensitive=True)(pks)
