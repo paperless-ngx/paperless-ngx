@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Any
 
+from asgiref.sync import async_to_sync
 from celery import shared_task
 from celery.signals import before_task_publish
 from celery.signals import task_failure
@@ -16,6 +17,7 @@ from celery.signals import task_prerun
 from celery.signals import task_revoked
 from celery.signals import worker_process_init
 from celery.signals import worker_process_shutdown
+from channels.layers import get_channel_layer
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
@@ -1242,6 +1244,29 @@ def task_prerun_handler(sender=None, task_id=None, task=None, **kwargs) -> None:
         logger.exception("Setting PaperlessTask started failed")
 
 
+def _send_bulk_operation_status(task_id: str) -> None:
+    """Notify the initiator, task records still happen."""
+    try:
+        task = PaperlessTask.objects.filter(task_id=task_id).first()
+        if task is None or task.owner_id is None or "operation" not in task.input_data:
+            return
+        async_to_sync(get_channel_layer().group_send)(
+            f"bulk_operations_{task.owner_id}",
+            {
+                "type": "bulk_operation_status",
+                "data": {
+                    "task_id": task.task_id,
+                    "status": task.status,
+                    "operation": task.input_data["operation"],
+                    "error": (task.result_data or {}).get("error_message", ""),
+                },
+            },
+        )
+    except Exception:
+        # Just a notification failure
+        logger.exception("Sending bulk operation status failed")
+
+
 @task_postrun.connect
 def task_postrun_handler(
     sender=None,
@@ -1299,6 +1324,7 @@ def task_postrun_handler(
                 changed_fields.append("status")
 
         task_instance.save(update_fields=changed_fields)
+        _send_bulk_operation_status(task_id)
     except Exception:  # pragma: no cover
         logger.exception("Updating PaperlessTask failed")
 
@@ -1364,6 +1390,7 @@ def task_failure_handler(
                     date_started - date_created
                 ).total_seconds()
             task_qs.update(**update_fields)
+            _send_bulk_operation_status(task_id)
     except Exception:  # pragma: no cover
         logger.exception("Updating PaperlessTask on failure failed")
 
@@ -1407,6 +1434,7 @@ def task_revoked_handler(
                 "reason": (reason + " Check worker logs for details."),
             },
         )
+        _send_bulk_operation_status(task_id)
     except Exception:  # pragma: no cover
         logger.exception("Updating PaperlessTask on revocation failed")
 
