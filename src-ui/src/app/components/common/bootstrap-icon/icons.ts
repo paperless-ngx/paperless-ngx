@@ -82,6 +82,7 @@ import fileEarmark from 'bootstrap-icons/icons/file-earmark.svg'
 import fileText from 'bootstrap-icons/icons/file-text.svg'
 import files from 'bootstrap-icons/icons/files.svg'
 import filter from 'bootstrap-icons/icons/filter.svg'
+import floppy from 'bootstrap-icons/icons/floppy.svg'
 import folderFill from 'bootstrap-icons/icons/folder-fill.svg'
 import folder from 'bootstrap-icons/icons/folder.svg'
 import funnel from 'bootstrap-icons/icons/funnel.svg'
@@ -242,6 +243,7 @@ export const icons: Record<string, string> = {
   files,
   fileText,
   filter,
+  floppy,
   folder,
   folderFill,
   funnel,
