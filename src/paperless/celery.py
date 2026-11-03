@@ -1,7 +1,7 @@
 import os
 
 from celery import Celery
-from celery import Task
+from celery.contrib.django.task import DjangoTask
 from celery.signals import worker_process_init
 from kombu.serialization import register
 
@@ -28,12 +28,15 @@ register(
 )
 
 
-class FileMoveScopedTask(Task):
+class FileMoveScopedTask(DjangoTask):
     """
     Run every task inside a document file move scope, so each document a task
     changes is moved once when the task ends, after its writes have committed.
     The scope also flushes when the task raises, for writes that committed
     before the failure.
+
+    Subclasses DjangoTask because a custom task_cls replaces the Django fixup's
+    default, and delay_on_commit lives there.
     """
 
     def __call__(self, *args, **kwargs):
