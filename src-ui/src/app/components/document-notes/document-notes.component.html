@@ -6,7 +6,7 @@
         @if (noteView() === NoteViewMode.Preview) {
           <section class="form-control form-control-sm note-preview" aria-label="Note preview" i18n-aria-label>
             @if (noteForm.get('newNote').value) {
-              <div class="markdown-preview" [innerHTML]="noteForm.get('newNote').value | markdown"></div>
+              <div class="note-markdown text-break text-wrap" [innerHTML]="noteForm.get('newNote').value | markdown"></div>
             } @else {
               <span class="text-muted" i18n>Nothing to preview</span>
             }
@@ -34,7 +34,7 @@
         <div class="card border mb-3">
           <div class="card-body text-dark">
             @if (note.format === NoteFormat.Markdown) {
-              <div class="card-text markdown-preview" [innerHTML]="note.note | markdown"></div>
+              <div class="card-text note-markdown text-break text-wrap" [innerHTML]="note.note | markdown"></div>
             } @else {
               <p class="card-text">{{note.note}}</p>
             }
