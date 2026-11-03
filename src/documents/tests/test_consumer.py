@@ -251,6 +251,38 @@ class TestConsumer(
         self.assertIsFile(document.source_path)
 
     @mock.patch("documents.consumer.load_classifier")
+    def test_consume_places_file_before_post_consume_script(self, m) -> None:
+        """
+        GIVEN:
+            - A new document to consume
+        WHEN:
+            - It is consumed
+        THEN:
+            - Pending file moves are flushed before the post-consume script runs
+        """
+        m.return_value = MagicMock()
+        order = MagicMock()
+
+        with (
+            mock.patch(
+                "documents.consumer.flush_pending_file_moves",
+                order.flush,
+            ),
+            mock.patch.object(
+                ConsumerPlugin,
+                "run_post_consume_script",
+                order.script,
+            ),
+        ):
+            with self.get_consumer(self.get_test_file()) as consumer:
+                consumer.run()
+
+        self.assertEqual(
+            [c[0] for c in order.mock_calls],
+            ["flush", "script"],
+        )
+
+    @mock.patch("documents.consumer.load_classifier")
     def test_consume_version_takes_media_lock_outside_transaction(self, m) -> None:
         """
         GIVEN:
