@@ -15,7 +15,6 @@ from django.db import transaction
 from django.db.models import Max
 from django.db.models import Q
 from django.utils import timezone
-from filelock import FileLock
 from rest_framework.reverse import reverse
 
 from documents.barcodes import read_barcode_values
@@ -28,6 +27,7 @@ from documents.file_handling import generate_filename
 from documents.file_handling import generate_unique_filename
 from documents.file_handling import validate_path_in_root
 from documents.loggers import LoggingMixin
+from documents.media_lock import media_lock
 from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
@@ -695,7 +695,7 @@ class ConsumerPlugin(
 
                         # After everything is in the database, copy the files into
                         # place. If this fails, we'll also rollback the transaction.
-                        with FileLock(settings.MEDIA_LOCK):
+                        with media_lock():
                             generated_filename = generate_unique_filename(document)
                             if (
                                 len(str(generated_filename))

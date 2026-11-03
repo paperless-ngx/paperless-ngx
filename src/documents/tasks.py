@@ -16,7 +16,6 @@ from django.db import models
 from django.db import transaction
 from django.db.models.signals import post_save
 from django.utils import timezone
-from filelock import FileLock
 
 from documents import sanity_checker
 from documents.barcodes import BarcodePlugin
@@ -42,6 +41,7 @@ from documents.double_sided import CollatePlugin
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import generate_unique_filename
 from documents.matching import prefilter_documents_by_workflowtrigger
+from documents.media_lock import media_lock
 from documents.models import Correspondent
 from documents.models import CustomFieldInstance
 from documents.models import Document
@@ -482,7 +482,7 @@ def update_document_content_maybe_archive_file(
                         modified=timezone.now(),
                     )
 
-                with FileLock(settings.MEDIA_LOCK):
+                with media_lock():
                     if parser.get_archive_path():
                         create_source_path_directory(document.archive_path)
                         shutil.move(parser.get_archive_path(), document.archive_path)

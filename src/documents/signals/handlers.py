@@ -26,7 +26,6 @@ from django.db import models
 from django.db.models import Q
 from django.dispatch import receiver
 from django.utils import timezone
-from filelock import FileLock
 from rest_framework import serializers
 
 from documents import matching
@@ -38,6 +37,7 @@ from documents.file_handling import create_source_path_directory
 from documents.file_handling import delete_empty_directories
 from documents.file_handling import generate_filename
 from documents.file_handling import generate_unique_filename
+from documents.media_lock import media_lock
 from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
@@ -339,7 +339,7 @@ def set_storage_path(
 
 # see empty_trash in documents/tasks.py for signal handling
 def cleanup_document_deletion(sender, instance, **kwargs) -> None:
-    with FileLock(settings.MEDIA_LOCK):
+    with media_lock():
         if settings.EMPTY_TRASH_DIR:
             # Find a non-conflicting filename in case a document with the same
             # name was moved to trash earlier
@@ -475,7 +475,7 @@ def update_filename_and_move_files(
         # This will in turn cause this logic to move the file where it belongs.
         return
 
-    with FileLock(settings.MEDIA_LOCK):
+    with media_lock():
         # If this was waiting for the lock, the filename or archive_filename
         # of this document may have been updated.  This happens if multiple updates
         # get queued from the UI for the same document
