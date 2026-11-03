@@ -421,7 +421,13 @@ def update_document_content_maybe_archive_file(
 
             thumbnail = parser.get_thumbnail(document.source_path, mime_type)
 
-            with transaction.atomic():
+            # media.lock first, then the transaction: never wait on media.lock
+            # while this transaction holds the document row. Also keeps the
+            # unique archive filename generation under the lock.
+            with media_lock(), transaction.atomic():
+                # Loaded before the (long) parse; read current metadata now
+                # that the lock is held, for the archive filename.
+                document.refresh_from_db()
                 oldDocument = Document.objects.get(pk=document.pk)
                 if parser.get_archive_path():
                     checksum = compute_checksum(parser.get_archive_path())
@@ -486,11 +492,10 @@ def update_document_content_maybe_archive_file(
                         modified=timezone.now(),
                     )
 
-                with media_lock():
-                    if parser.get_archive_path():
-                        create_source_path_directory(document.archive_path)
-                        shutil.move(parser.get_archive_path(), document.archive_path)
-                    shutil.move(thumbnail, document.thumbnail_path)
+                if parser.get_archive_path():
+                    create_source_path_directory(document.archive_path)
+                    shutil.move(parser.get_archive_path(), document.archive_path)
+                shutil.move(thumbnail, document.thumbnail_path)
 
             document.refresh_from_db()
             logger.info(
