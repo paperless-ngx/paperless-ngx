@@ -411,6 +411,7 @@ export class DocumentListComponent
         display_mode: this.list.displayMode,
         display_fields: this.activeDisplayFields,
       }
+      const title = this.list.activeSavedViewTitle
       this.savedViewService
         .patch(savedView)
         .pipe(first())
@@ -419,13 +420,13 @@ export class DocumentListComponent
             this.activeSavedView = view
             this.unmodifiedSavedView = view
             this.toastService.showSuccess(
-              $localize`View "${this.list.activeSavedViewTitle}" saved successfully.`
+              $localize`View "${view.name ?? title}" saved successfully.`
             )
             this.unmodifiedFilterRules.set(this.list.filterRules)
           },
           error: (err) => {
             this.toastService.showError(
-              $localize`Failed to save view "${this.list.activeSavedViewTitle}".`,
+              $localize`Failed to save view "${title}".`,
               err
             )
           },
