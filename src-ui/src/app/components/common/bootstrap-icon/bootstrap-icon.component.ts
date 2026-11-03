@@ -8,8 +8,6 @@ import {
 } from '@angular/core'
 import { icons } from './icons'
 
-const DEFAULT_SIZE = '16'
-
 /** Converts icon name e.g. `arrow-down-up` to its registry key. */
 const toKey = (name: string) =>
   name.trim().replace(/-(.)/g, (_, char: string) => char.toUpperCase())
@@ -32,25 +30,24 @@ export class BootstrapIconComponent {
 
   constructor() {
     effect(() => {
-      this.elementRef.nativeElement.innerHTML = this.svg()
+      const element = this.elementRef.nativeElement
+      element.innerHTML = this.svg()
+      const svg = element.firstElementChild
+      if (!svg) return
+      const width = this.width()
+      const height = this.height()
+      if (width) svg.setAttribute('width', String(width))
+      if (height) svg.setAttribute('height', String(height))
     })
   }
 
   private svg(): string {
     const name = this.name()
     if (!name) return ''
-    let svg = icons[toKey(name)]
+    const svg = icons[toKey(name)]
     if (!svg) {
       console.warn(`Icon not found: ${name}`)
       return ''
-    }
-    const width = this.width()
-    const height = this.height()
-    if (width) {
-      svg = svg.replace(`width="${DEFAULT_SIZE}"`, `width="${width}"`)
-    }
-    if (height) {
-      svg = svg.replace(`height="${DEFAULT_SIZE}"`, `height="${height}"`)
     }
     return svg
   }

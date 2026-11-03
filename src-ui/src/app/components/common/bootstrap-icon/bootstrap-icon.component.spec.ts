@@ -30,6 +30,17 @@ describe('BootstrapIconComponent', () => {
     expect(svg.getAttribute('height')).toEqual('2')
   })
 
+  it('should not allow width or height to inject attributes', () => {
+    fixture.componentRef.setInput('name', 'x-lg')
+    fixture.componentRef.setInput('width', '1" onload="alert(1)')
+    fixture.componentRef.setInput('height', '1" onclick="alert(1)')
+    fixture.detectChanges()
+    const svg: SVGElement = fixture.nativeElement.querySelector('svg')
+    expect(svg.hasAttribute('onload')).toBe(false)
+    expect(svg.hasAttribute('onclick')).toBe(false)
+    expect(svg.getAttribute('width')).toEqual('1" onload="alert(1)')
+  })
+
   it('should update when the name changes', () => {
     fixture.componentRef.setInput('name', 'x-lg')
     fixture.detectChanges()
