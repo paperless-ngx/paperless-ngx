@@ -18,13 +18,13 @@
         <div class="d-flex align-items-top">
         @switch (toast.level) {
             @case (ToastLevel.Success) {
-                <i-bs width="0.9em" height="0.9em" name="check-circle" class="toast-icon"></i-bs>
+                <pngx-bs-icon width="0.9em" height="0.9em" name="check-circle" class="toast-icon"></pngx-bs-icon>
             }
             @case (ToastLevel.Error) {
-                <i-bs width="0.9em" height="0.9em" name="exclamation-triangle" class="toast-icon"></i-bs>
+                <pngx-bs-icon width="0.9em" height="0.9em" name="exclamation-triangle" class="toast-icon"></pngx-bs-icon>
             }
             @default {
-                <i-bs width="0.9em" height="0.9em" name="info-circle" class="toast-icon"></i-bs>
+                <pngx-bs-icon width="0.9em" height="0.9em" name="info-circle" class="toast-icon"></pngx-bs-icon>
             }
         }
         <div class="toast-content">
@@ -46,10 +46,10 @@
                     <div class="col offset-sm-3">
                     <button class="btn btn-sm btn-outline-secondary" (click)="copyError(toast.error)">
                         @if (!copied()) {
-                        <i-bs name="clipboard" class="me-1"></i-bs>
+                        <pngx-bs-icon name="clipboard" class="me-1"></pngx-bs-icon>
                         }
                         @if (copied()) {
-                        <i-bs name="clipboard-check" class="me-1"></i-bs>
+                        <pngx-bs-icon name="clipboard-check" class="me-1"></pngx-bs-icon>
                         }
                         <ng-container i18n>Copy Raw Error</ng-container>
                     </button>

@@ -30,7 +30,7 @@
               <div class="d-flex">
                 <p class="p-2" i18n>Trigger Workflow On:</p>
                 <button type="button" class="btn btn-sm btn-outline-primary ms-auto mb-3" (click)="addTrigger()">
-                  <i-bs name="plus-circle" class="me-1"></i-bs><ng-container i18n>Add Trigger</ng-container>
+                  <pngx-bs-icon name="plus-circle" class="me-1"></pngx-bs-icon><ng-container i18n>Add Trigger</ng-container>
                 </button>
               </div>
               <div ngbAccordion [closeOthers]="true">
@@ -72,7 +72,7 @@
               <div class="d-flex">
                 <p class="p-2" i18n>Apply Actions:</p>
                 <button type="button" class="btn btn-sm btn-outline-primary ms-auto mb-3" (click)="addAction()">
-                  <i-bs name="plus-circle" class="me-1"></i-bs><ng-container i18n>Add Action</ng-container>
+                  <pngx-bs-icon name="plus-circle" class="me-1"></pngx-bs-icon><ng-container i18n>Add Action</ng-container>
                 </button>
               </div>
               <div ngbAccordion [closeOthers]="true" cdkDropList (cdkDropListDropped)="onActionDrop($event)">
@@ -80,7 +80,7 @@
                   <div ngbAccordionItem [formGroup]="actionFields.controls[i]">
                     <div ngbAccordionHeader cdkDrag>
                       <button ngbAccordionButton>
-                        <i-bs name="grip-vertical" class="ms-n3 pe-1"></i-bs>
+                        <pngx-bs-icon name="grip-vertical" class="ms-n3 pe-1"></pngx-bs-icon>
                         {{i + 1}}. {{getActionTypeOptionName(actionFields.controls[i].value.type)}}
                         @if(action.id) {
                           <span class="badge bg-primary text-primary-text-contrast ms-2">ID: {{action.id}}</span>
@@ -187,7 +187,7 @@
                 (click)="addFilter(formGroup)"
                 [disabled]="!canAddFilter(formGroup)"
               >
-                <i-bs name="plus-circle" class="me-1"></i-bs><span i18n>Add filter</span>
+                <pngx-bs-icon name="plus-circle" class="me-1"></pngx-bs-icon><span i18n>Add filter</span>
               </button>
             </div>
             <ul class="mt-2 list-group filters" formArrayName="filters">
@@ -240,7 +240,7 @@
                       class="btn btn-link text-danger p-0"
                       (click)="removeFilter(formGroup, filterIndex)"
                     >
-                      <i-bs name="trash"></i-bs><span class="ms-1" i18n>Delete</span>
+                      <pngx-bs-icon name="trash"></pngx-bs-icon><span class="ms-1" i18n>Delete</span>
                     </button>
                   </div>
                 </li>

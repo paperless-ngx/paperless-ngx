@@ -1,6 +1,6 @@
 <pngx-page-header [title]="title()" [id]="documentId()">
   <button type="button" class="btn btn-sm btn-outline-danger me-md-4" (click)="delete()" [disabled]="!userIsOwner" *pngxIfPermissions="{ action: PermissionAction.Delete, type: PermissionType.Document }" aria-label="Delete" i18n-aria-label>
-    <i-bs width="1.2em" height="1.2em" name="trash"></i-bs><span class="d-none d-lg-inline ps-1" i18n>Delete</span>
+    <pngx-bs-icon width="1.2em" height="1.2em" name="trash"></pngx-bs-icon><span class="d-none d-lg-inline ps-1" i18n>Delete</span>
   </button>
 
   <pngx-document-version-dropdown
@@ -18,7 +18,7 @@
       @if (downloading()) {
         <div class="spinner-border spinner-border-sm" role="status"></div>
       } @else {
-        <i-bs width="1.2em" height="1.2em" name="download"></i-bs>
+        <pngx-bs-icon width="1.2em" height="1.2em" name="download"></pngx-bs-icon>
       }
       <span class="d-none d-lg-inline ps-1" i18n>Download</span>
     </button>
@@ -42,28 +42,28 @@
 
   <div class="ms-md-auto" ngbDropdown>
     <button class="btn btn-sm btn-outline-primary" id="actionsDropdown" ngbDropdownToggle aria-label="Actions" i18n-aria-label>
-      <i-bs name="three-dots"></i-bs><div class="d-none d-sm-inline ms-1"><ng-container i18n>Actions</ng-container></div>
+      <pngx-bs-icon name="three-dots"></pngx-bs-icon><div class="d-none d-sm-inline ms-1"><ng-container i18n>Actions</ng-container></div>
     </button>
     <div ngbDropdownMenu aria-labelledby="actionsDropdown" class="shadow">
       <button ngbDropdownItem (click)="reprocess()" [disabled]="!userCanEdit || !userIsOwner">
-        <i-bs width="1em" height="1em" name="arrow-counterclockwise" class="me-2"></i-bs><span i18n>Reprocess</span>
+        <pngx-bs-icon width="1em" height="1em" name="arrow-counterclockwise" class="me-2"></pngx-bs-icon><span i18n>Reprocess</span>
       </button>
 
       <button ngbDropdownItem (click)="printDocument()" [hidden]="useNativePdfViewer || isMobile">
-        <i-bs width="1em" height="1em" name="printer" class="me-2"></i-bs><span i18n>Print</span>
+        <pngx-bs-icon width="1em" height="1em" name="printer" class="me-2"></pngx-bs-icon><span i18n>Print</span>
       </button>
 
       <button ngbDropdownItem (click)="moreLike()">
-        <i-bs width="1em" height="1em" name="diagram-3" class="me-2"></i-bs><span i18n>More like this</span>
+        <pngx-bs-icon width="1em" height="1em" name="diagram-3" class="me-2"></pngx-bs-icon><span i18n>More like this</span>
       </button>
 
       <button ngbDropdownItem (click)="editPdf()" [disabled]="!userIsOwner || !userCanEdit || originalContentRenderType !== ContentRenderType.PDF">
-        <i-bs name="pencil" class="me-2"></i-bs><ng-container i18n>PDF Editor</ng-container>
+        <pngx-bs-icon name="pencil" class="me-2"></pngx-bs-icon><ng-container i18n>PDF Editor</ng-container>
       </button>
 
       @if (userIsOwner && (requiresPassword || password)) {
         <button ngbDropdownItem (click)="removePassword()" [disabled]="!password">
-          <i-bs name="unlock" class="me-2"></i-bs><ng-container i18n>Remove Password</ng-container>
+          <pngx-bs-icon name="unlock" class="me-2"></pngx-bs-icon><ng-container i18n>Remove Password</ng-container>
         </button>
       }
     </div>
@@ -71,15 +71,15 @@
 
   <div class="ms-md-auto" ngbDropdown>
     <button class="btn btn-sm btn-outline-primary" id="sendDropdown" ngbDropdownToggle aria-label="Send" i18n-aria-label>
-      <i-bs name="send"></i-bs><div class="d-none d-sm-inline ms-1"><ng-container i18n>Send</ng-container></div>
+      <pngx-bs-icon name="send"></pngx-bs-icon><div class="d-none d-sm-inline ms-1"><ng-container i18n>Send</ng-container></div>
     </button>
     <div ngbDropdownMenu aria-labelledby="sendDropdown" class="shadow">
       <button ngbDropdownItem (click)="openShareLinks()" *pngxIfPermissions="{ action: PermissionAction.Add, type: PermissionType.ShareLink }">
-        <i-bs name="link" class="me-2"></i-bs><span i18n>Share Links</span>
+        <pngx-bs-icon name="link" class="me-2"></pngx-bs-icon><span i18n>Share Links</span>
       </button>
       @if (emailEnabled) {
         <button ngbDropdownItem (click)="openEmailDocument()">
-          <i-bs name="envelope" class="me-2"></i-bs><span i18n>Email</span>
+          <pngx-bs-icon name="envelope" class="me-2"></pngx-bs-icon><span i18n>Email</span>
         </button>
       }
     </div>
@@ -95,13 +95,13 @@
       <div class="btn-toolbar mb-1 pb-3 gap-2 row-gap-2 border-bottom">
         <div class="btn-group">
           <button type="button" class="btn btn-sm btn-outline-secondary" i18n-title title="Close" (click)="close()">
-            <i-bs width="1.2em" height="1.2em" name="x"></i-bs>
+            <pngx-bs-icon width="1.2em" height="1.2em" name="x"></pngx-bs-icon>
           </button>
           <button type="button" class="btn btn-sm btn-outline-secondary" i18n-title title="Previous" (click)="previousDoc()" [disabled]="!hasPrevious()">
-            <i-bs width="1.2em" height="1.2em" name="arrow-left"></i-bs>
+            <pngx-bs-icon width="1.2em" height="1.2em" name="arrow-left"></pngx-bs-icon>
           </button>
           <button type="button" class="btn btn-sm btn-outline-secondary"  i18n-title title="Next" (click)="nextDoc()" [disabled]="!hasNext()">
-            <i-bs width="1.2em" height="1.2em" name="arrow-right"></i-bs>
+            <pngx-bs-icon width="1.2em" height="1.2em" name="arrow-right"></pngx-bs-icon>
           </button>
         </div>
 
@@ -499,7 +499,7 @@
               }
               <div class="input-group input-group-sm w-auto flex-nowrap">
                 <button class="btn btn-outline-secondary" type="button" (click)="decreaseZoom()" aria-label="Zoom out" i18n-aria-label>
-                  <i-bs width="1em" height="1em" name="dash"></i-bs>
+                  <pngx-bs-icon width="1em" height="1em" name="dash"></pngx-bs-icon>
                 </button>
                 <select class="form-select" (change)="setZoom($event.target.value)" [ngModelOptions]="{standalone: true}" [ngModel]="currentZoom" aria-label="Zoom" i18n-aria-label>
                   @for (setting of zoomSettings; track setting) {
@@ -509,7 +509,7 @@
                   }
                 </select>
                 <button class="btn btn-outline-secondary" type="button" (click)="increaseZoom()" aria-label="Zoom in" i18n-aria-label>
-                  <i-bs width="1em" height="1em" name="plus"></i-bs>
+                  <pngx-bs-icon width="1em" height="1em" name="plus"></pngx-bs-icon>
                 </button>
               </div>
             </div>

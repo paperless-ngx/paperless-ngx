@@ -49,15 +49,15 @@ describe('DocumentBarcodesComponent', () => {
     fixture.detectChanges()
     expect(copySpy).toHaveBeenCalledWith('ASN00123')
     expect(component.copiedIndex()).toEqual(0)
-    expect(buttons[0].querySelector('i-bs').getAttribute('name')).toEqual(
-      'clipboard-check'
-    )
+    expect(
+      buttons[0].querySelector('pngx-bs-icon').getAttribute('name')
+    ).toEqual('clipboard-check')
     jest.advanceTimersByTime(3000)
     fixture.detectChanges()
     expect(component.copiedIndex()).toBeNull()
-    expect(buttons[0].querySelector('i-bs').getAttribute('name')).toEqual(
-      'clipboard'
-    )
+    expect(
+      buttons[0].querySelector('pngx-bs-icon').getAttribute('name')
+    ).toEqual('clipboard')
     jest.useRealTimers()
   })
 

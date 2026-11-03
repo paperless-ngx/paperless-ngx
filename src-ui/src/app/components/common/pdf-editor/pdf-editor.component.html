@@ -7,21 +7,21 @@
   <div class="btn-toolbar mb-2">
     <div class="btn-group me-3">
       <button class="btn btn-sm btn-secondary" (click)="selectAll()" title="Select all pages" i18n-title>
-        <i-bs name="check-all"></i-bs>
+        <pngx-bs-icon name="check-all"></pngx-bs-icon>
       </button>
       <button class="btn btn-sm btn-secondary" (click)="deselectAll()" [disabled]="!hasSelection()" title="Deselect all pages" i18n-title>
-        <i-bs name="x"></i-bs>
+        <pngx-bs-icon name="x"></pngx-bs-icon>
       </button>
     </div>
     <div class="btn-group">
       <button class="btn btn-sm btn-secondary" (click)="rotateSelected(-90)" [disabled]="!hasSelection()" title="Rotate selected pages counter-clockwise" i18n-title>
-        <i-bs name="arrow-counterclockwise"></i-bs>
+        <pngx-bs-icon name="arrow-counterclockwise"></pngx-bs-icon>
       </button>
       <button class="btn btn-sm btn-secondary" (click)="rotateSelected(90)" [disabled]="!hasSelection()" title="Rotate selected pages clockwise" i18n-title>
-        <i-bs name="arrow-clockwise"></i-bs>
+        <pngx-bs-icon name="arrow-clockwise"></pngx-bs-icon>
       </button>
       <button class="btn btn-sm btn-danger" (click)="deleteSelected()" [disabled]="!hasSelection()" title="Delete selected pages" i18n-title>
-        <i-bs name="trash"></i-bs>
+        <pngx-bs-icon name="trash"></pngx-bs-icon>
       </button>
     </div>
   </div>
@@ -31,18 +31,18 @@
         <div class="btn-toolbar hover-actions z-10">
           <div class="btn-group me-2">
             <button class="btn btn-sm btn-dark" (click)="rotate(i, true); $event.stopPropagation()" title="Rotate page counter-clockwise" i18n-title>
-              <i-bs name="arrow-counterclockwise"></i-bs>
+              <pngx-bs-icon name="arrow-counterclockwise"></pngx-bs-icon>
             </button>
             <button class="btn btn-sm btn-dark" (click)="rotate(i); $event.stopPropagation()" title="Rotate page clockwise" i18n-title>
-              <i-bs name="arrow-clockwise"></i-bs>
+              <pngx-bs-icon name="arrow-clockwise"></pngx-bs-icon>
             </button>
           </div>
           <div class="btn-group">
             <button class="btn btn-sm btn-dark text-danger" (click)="remove(i); $event.stopPropagation()" title="Delete page" i18n-title>
-              <i-bs name="trash"></i-bs>
+              <pngx-bs-icon name="trash"></pngx-bs-icon>
             </button>
             <button class="btn btn-sm btn-dark" (click)="toggleSplit(i); $event.stopPropagation()" title="Add / remove document split here" i18n-title>
-              <i-bs name="scissors"></i-bs>
+              <pngx-bs-icon name="scissors"></pngx-bs-icon>
             </button>
           </div>
         </div>
@@ -78,12 +78,12 @@
     <div class="btn-group" role="group">
       <input type="radio" class="btn-check" [(ngModel)]="editMode" [value]="PdfEditorEditMode.Create" id="editModeCreate" name="editmode">
       <label for="editModeCreate" class="btn btn-outline-primary btn-sm">
-        <i-bs name="plus"></i-bs>
+        <pngx-bs-icon name="plus"></pngx-bs-icon>
         <span class="form-check-label ms-1" i18n>Create new document(s)</span>
       </label>
       <input type="radio" class="btn-check" [(ngModel)]="editMode" [value]="PdfEditorEditMode.Update" id="editModeUpdate" name="editmode" [disabled]="hasSplit()">
       <label for="editModeUpdate" class="btn btn-outline-primary btn-sm">
-        <i-bs name="pencil"></i-bs>
+        <pngx-bs-icon name="pencil"></pngx-bs-icon>
         <span class="form-check-label ms-2" i18n>Add document version</span>
       </label>
     </div>

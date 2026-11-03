@@ -883,7 +883,7 @@ canvas.hiddenCanvasElement {
 }
 
 // bs icons
-.btn-sm i-bs svg {
+.btn-sm pngx-bs-icon svg {
   vertical-align: text-bottom;
 }
 
@@ -900,7 +900,7 @@ canvas.hiddenCanvasElement {
     border-color: var(--pngx-card-hover-border) !important;
   }
 
-  .card-footer i-bs svg {
+  .card-footer pngx-bs-icon svg {
     vertical-align: middle;
   }
 }

@@ -5,7 +5,7 @@
   i18n-info
   >
   <button class="btn btn-sm btn-outline-primary" (click)="tourService.start()">
-    <i-bs class="me-2" name="airplane"></i-bs><ng-container i18n>Start tour</ng-container>
+    <pngx-bs-icon class="me-2" name="airplane"></pngx-bs-icon><ng-container i18n>Start tour</ng-container>
   </button>
   @if (canViewSystemStatus) {
     <button class="btn btn-sm btn-outline-primary position-relative ms-md-5 me-1" (click)="showSystemStatus()"
@@ -13,14 +13,14 @@
       @if (!systemStatus()) {
         <div class="spinner-border spinner-border-sm me-2 h-75" role="status"></div>
       } @else {
-        <i-bs class="me-2" name="card-checklist"></i-bs>
+        <pngx-bs-icon class="me-2" name="card-checklist"></pngx-bs-icon>
         @if (systemStatusHasErrors) {
           <span class="badge bg-body position-absolute top-0 start-100 translate-middle rounded-pill p-0">
-            <i-bs name="exclamation-circle-fill" class="text-danger" width="1.75em" height="1.75em"></i-bs>
+            <pngx-bs-icon name="exclamation-circle-fill" class="text-danger" width="1.75em" height="1.75em"></pngx-bs-icon>
           </span>
         } @else {
           <span class="badge bg-body position-absolute top-0 start-100 translate-middle rounded-pill p-0">
-            <i-bs name="check-circle-fill" class="text-primary" width="1.75em" height="1.75em"></i-bs>
+            <pngx-bs-icon name="check-circle-fill" class="text-primary" width="1.75em" height="1.75em"></pngx-bs-icon>
           </span>
         }
       }
@@ -30,7 +30,7 @@
   @if (permissionsService.isAdmin()) {
     <a class="btn btn-sm btn-primary" href="admin/" target="_blank">
       <ng-container i18n>Open Django Admin</ng-container>
-      <i-bs class="ms-2" name="arrow-up-right"></i-bs>
+      <pngx-bs-icon class="ms-2" name="arrow-up-right"></pngx-bs-icon>
     </a>
   }
 </pngx-page-header>
@@ -151,7 +151,7 @@
               </div>
               <div class="col-2">
                 <button class="btn btn-link btn-sm pt-2 ps-0" [disabled]="!this.settingsForm.get('themeColor').value" (click)="clearThemeColor()">
-                  <i-bs width="1em" height="1em" name="x"></i-bs><ng-container i18n>Reset</ng-container>
+                  <pngx-bs-icon width="1em" height="1em" name="x"></pngx-bs-icon><ng-container i18n>Reset</ng-container>
                 </button>
               </div>
             </div>
@@ -181,7 +181,7 @@
               <div class="col d-flex flex-row align-items-start">
                 <pngx-input-check i18n-title title="Enable update checking" formControlName="updateCheckingEnabled"></pngx-input-check>
                 <button class="btn btn-sm btn-link text-muted me-auto p-0 ms-2" title="What's this?" i18n-title type="button" triggers="mouseenter:mouseleave" [ngbPopover]="updatesPopover" [autoClose]="true">
-                  <i-bs name="question-circle"></i-bs>
+                  <pngx-bs-icon name="question-circle"></pngx-bs-icon>
                 </button>
                 <ng-template #updatesPopover>
                   <p i18n>
@@ -263,9 +263,9 @@
                     <input type="radio" class="btn-check" id="suggestionSourceBoth" [value]="SuggestionSource.Both" formControlName="documentEditingSuggestionSource">
                     <label class="btn btn-outline-primary" for="suggestionSourceBoth"><ng-container i18n>Both</ng-container></label>
                     <input type="radio" class="btn-check" id="suggestionSourceML" [value]="SuggestionSource.ML" formControlName="documentEditingSuggestionSource">
-                    <label class="btn btn-outline-primary" for="suggestionSourceML"><i-bs class="me-1" name="cpu"></i-bs><ng-container i18n>ML only</ng-container></label>
+                    <label class="btn btn-outline-primary" for="suggestionSourceML"><pngx-bs-icon class="me-1" name="cpu"></pngx-bs-icon><ng-container i18n>ML only</ng-container></label>
                     <input type="radio" class="btn-check" id="suggestionSourceAI" [value]="SuggestionSource.AI" formControlName="documentEditingSuggestionSource">
-                    <label class="btn btn-outline-primary" for="suggestionSourceAI"><i-bs class="me-1" name="stars"></i-bs><ng-container i18n>AI only</ng-container></label>
+                    <label class="btn btn-outline-primary" for="suggestionSourceAI"><pngx-bs-icon class="me-1" name="stars"></pngx-bs-icon><ng-container i18n>AI only</ng-container></label>
                   </fieldset>
                 </div>
               </div>

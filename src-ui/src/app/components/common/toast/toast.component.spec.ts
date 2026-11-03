@@ -139,7 +139,7 @@ describe('ToastComponent', () => {
     }
     fixture.detectChanges()
     const el: HTMLElement = fixture.nativeElement
-    expect(el.querySelector('i-bs[name="check-circle"]')).not.toBeNull()
+    expect(el.querySelector('pngx-bs-icon[name="check-circle"]')).not.toBeNull()
     expect(el.querySelector('ngb-toast').classList).not.toContain('toast-error')
 
     fixture = TestBed.createComponent(ToastComponent)
@@ -151,7 +151,7 @@ describe('ToastComponent', () => {
     fixture.detectChanges()
     const errorEl: HTMLElement = fixture.nativeElement
     expect(
-      errorEl.querySelector('i-bs[name="exclamation-triangle"]')
+      errorEl.querySelector('pngx-bs-icon[name="exclamation-triangle"]')
     ).not.toBeNull()
     expect(errorEl.querySelector('ngb-toast').classList).toContain(
       'toast-error'
@@ -161,7 +161,7 @@ describe('ToastComponent', () => {
     fixture.componentInstance.toast = { content: 'Started', delay: 5000 }
     fixture.detectChanges()
     expect(
-      fixture.nativeElement.querySelector('i-bs[name="info-circle"]')
+      fixture.nativeElement.querySelector('pngx-bs-icon[name="info-circle"]')
     ).not.toBeNull()
   })
 

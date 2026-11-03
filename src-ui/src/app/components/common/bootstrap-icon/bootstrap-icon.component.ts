@@ -19,9 +19,7 @@ const toKey = (name: string) =>
  * Icons must be registered in `./icons.ts`.
  */
 @Component({
-  // keep the selector of the ngx-bootstrap-icons
-  // eslint-disable-next-line @angular-eslint/component-selector
-  selector: 'i-bs',
+  selector: 'pngx-bs-icon',
   template: '',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

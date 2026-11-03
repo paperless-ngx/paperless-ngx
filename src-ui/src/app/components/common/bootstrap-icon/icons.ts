@@ -154,7 +154,7 @@ import xLg from 'bootstrap-icons/icons/x-lg.svg'
 import x from 'bootstrap-icons/icons/x.svg'
 
 /**
- * `<i-bs>`. Only icons registered here are bundled but can add
+ * `<pngx-bs-icon>`. Only icons registered here are bundled but can add
  * new ones (any icon from the bootstrap-icons package) as needed.
  */
 export const icons: Record<string, string> = {
