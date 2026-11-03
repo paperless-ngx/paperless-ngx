@@ -18,12 +18,14 @@ from __future__ import annotations
 import logging
 import shutil
 import threading
+from contextlib import asynccontextmanager
 from contextlib import contextmanager
 from contextvars import ContextVar
 from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Final
 
+from asgiref.sync import sync_to_async
 from django.conf import settings
 from django.db import DatabaseError
 from django.db import transaction
@@ -40,6 +42,7 @@ from documents.models import Document
 from documents.utils import compute_checksum
 
 if TYPE_CHECKING:
+    from collections.abc import AsyncIterator
     from collections.abc import Iterator
 
 logger = logging.getLogger("paperless.handlers")
@@ -433,3 +436,26 @@ def request_file_move(document: Document) -> None:
     if moved is not None:
         document.filename = moved.filename
         document.archive_filename = moved.archive_filename
+
+
+@asynccontextmanager
+async def adefer_file_moves() -> AsyncIterator[None]:
+    """
+    Async twin of defer_file_moves().
+
+    The close and flush (including the transaction check, which must run in
+    the thread that owns the DB connection) run through sync_to_async so the
+    blocking media.lock never runs on the event loop.
+    """
+    current = _active_collector.get()
+    if current is not None and not current.closed:
+        yield
+        return
+
+    collector = FileMoveCollector()
+    token = _active_collector.set(collector)
+    try:
+        yield
+    finally:
+        _active_collector.reset(token)
+        await sync_to_async(_close_and_flush, thread_sensitive=True)(collector)
