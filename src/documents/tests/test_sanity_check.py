@@ -129,7 +129,7 @@ class TestCheckSanityOriginal:
 class TestCheckSanityArchive:
     def test_checksum_without_filename(self, sample_doc: Document) -> None:
         sample_doc.archive_filename = None
-        sample_doc.save()
+        sample_doc.save(write_file_paths=True)
         messages = check_sanity()
         assert messages.has_error
         assert any(
@@ -182,7 +182,7 @@ class TestCheckSanityArchive:
         Path(sample_doc.archive_path).unlink()
         sample_doc.archive_checksum = None
         sample_doc.archive_filename = None
-        sample_doc.save()
+        sample_doc.save(write_file_paths=True)
         messages = check_sanity()
         assert not messages.has_error
 

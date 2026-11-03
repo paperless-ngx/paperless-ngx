@@ -92,7 +92,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         # Ensure that filename is properly generated
         self.assertEqual(document.filename, Path("none/none.pdf"))
 
-        document.save()
+        document.save(write_file_paths=True)
 
         # test that creating dirs for the source_path creates the correct directory
         create_source_path_directory(document.source_path)
@@ -190,7 +190,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         # Set a correspondent and save the document
         document.correspondent = Correspondent.objects.get_or_create(name="test")[0]
-        document.save()
+        document.save(write_file_paths=True)
 
         # Check proper handling of files
         self.assertIsFile(
@@ -232,7 +232,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             disable_auditlog(),
         ):
             m.side_effect = DatabaseError()
-            document.save()
+            document.save(write_file_paths=True)
 
             # Check proper handling of files
             self.assertIsFile(document.source_path)
@@ -336,7 +336,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         # Ensure that filename is properly generated
         document.filename = generate_filename(document)
-        document.save()
+        document.save(write_file_paths=True)
         self.assertEqual(document.filename, "none/none.pdf")
 
         create_source_path_directory(document.source_path)
@@ -362,7 +362,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         # Ensure that filename is properly generated
         document.filename = generate_filename(document)
-        document.save()
+        document.save(write_file_paths=True)
         self.assertEqual(document.filename, "none/none.pdf")
 
         create_source_path_directory(document.source_path)
@@ -385,7 +385,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         document.save()
         document.filename = generate_filename(document)
-        document.save()
+        document.save(write_file_paths=True)
         create_source_path_directory(document.source_path)
         Path(document.source_path).touch()
         document.delete()
@@ -421,7 +421,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         # Set a correspondent and save the document
         document.correspondent = Correspondent.objects.get_or_create(name="test")[0]
-        document.save()
+        document.save(write_file_paths=True)
 
         # Check proper handling of files
         self.assertIsDir(settings.ORIGINALS_DIR / "test")
@@ -476,7 +476,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
     def test_filename_relative(self) -> None:
         doc = Document.objects.create(title="doc1", mime_type="application/pdf")
         doc.filename = generate_filename(doc)
-        doc.save()
+        doc.save(write_file_paths=True)
 
         self.assertEqual(
             doc.source_path,
@@ -532,7 +532,7 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
 
         # Ensure that filename is properly generated
         document.filename = generate_filename(document)
-        document.save()
+        document.save(write_file_paths=True)
         self.assertEqual(document.filename, "none/none/none.pdf")
         create_source_path_directory(document.source_path)
         Path(document.source_path).touch()
@@ -620,13 +620,13 @@ class TestFileHandling(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         Path(document.source_path).touch()
         Path(document2.source_path).touch()
         document.filename = "0000001.pdf"
-        document.save()
+        document.save(write_file_paths=True)
 
         self.assertIsFile(document.source_path)
         self.assertEqual(document.filename, "qwe.pdf")
 
         document2.filename = "0000002.pdf"
-        document2.save()
+        document2.save(write_file_paths=True)
 
         self.assertIsFile(document.source_path)
         self.assertEqual(document2.filename, "qwe_01.pdf")

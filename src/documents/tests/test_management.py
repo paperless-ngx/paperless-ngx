@@ -236,7 +236,7 @@ class TestRenamer(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         doc = Document.objects.create(title="test", mime_type="image/jpeg")
         doc.filename = generate_filename(doc)
         doc.archive_filename = generate_filename(doc, archive_filename=True)
-        doc.save()
+        doc.save(write_file_paths=True)
 
         Path(doc.source_path).touch()
         Path(doc.archive_path).touch()
