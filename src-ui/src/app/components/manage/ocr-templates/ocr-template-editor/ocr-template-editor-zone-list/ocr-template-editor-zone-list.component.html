@@ -9,13 +9,13 @@
           <button type="button" class="btn btn-link p-0 fw-semibold text-reset text-decoration-none text-truncate mw-100 stretched-link" (click)="zoneSelected.emit(i)">{{ zone.name }}</button>
           @if (!hasField(zone)) {
             <div class="small text-warning text-truncate">
-              <i-bs name="exclamation-triangle" class="me-1" aria-hidden="true"></i-bs><span i18n>No field selected</span>
+              <pngx-bs-icon name="exclamation-triangle" class="me-1" aria-hidden="true"></pngx-bs-icon><span i18n>No field selected</span>
             </div>
           } @else {
             <div class="small text-muted text-truncate">
               {{ getZoneTargetName(zone) }}
               @if (isCombined(zone)) {
-                <i-bs name="braces" class="ms-1" title="Combined with other zones" i18n-title></i-bs>
+                <pngx-bs-icon name="braces" class="ms-1" title="Combined with other zones" i18n-title></pngx-bs-icon>
               }
             </div>
           }
@@ -28,7 +28,7 @@
           }
         </small>
         <button type="button" class="btn btn-sm btn-link text-danger position-relative z-2" (click)="zoneRemoved.emit(i)" title="Delete zone" i18n-title aria-label="Delete zone" i18n-aria-label>
-          <i-bs name="trash"></i-bs>
+          <pngx-bs-icon name="trash"></pngx-bs-icon>
         </button>
       </div>
     }

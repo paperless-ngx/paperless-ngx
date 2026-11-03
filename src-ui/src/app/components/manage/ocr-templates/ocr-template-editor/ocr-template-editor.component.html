@@ -42,18 +42,18 @@
             @if (selectedZone; as zone) {
               <div class="d-flex align-items-center gap-2 mb-3">
                 <button type="button" class="btn btn-sm btn-link px-0 me-auto" (click)="deselectZone()">
-                  <i-bs name="arrow-left" class="me-1"></i-bs><ng-container i18n>All zones</ng-container>
+                  <pngx-bs-icon name="arrow-left" class="me-1"></pngx-bs-icon><ng-container i18n>All zones</ng-container>
                 </button>
                 <button type="button" class="btn btn-sm btn-outline-primary" (click)="testZone()" [disabled]="!previewDocId || zoneTesting">
                   @if (zoneTesting) {
                     <span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
                   } @else {
-                    <i-bs name="play-fill" class="me-1"></i-bs>
+                    <pngx-bs-icon name="play-fill" class="me-1"></pngx-bs-icon>
                   }
                   <ng-container i18n>Test</ng-container>
                 </button>
                 <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeZone(selectedZoneIndex)" title="Delete zone" i18n-title aria-label="Delete zone" i18n-aria-label>
-                  <i-bs name="trash"></i-bs>
+                  <pngx-bs-icon name="trash"></pngx-bs-icon>
                 </button>
               </div>
 
@@ -195,9 +195,9 @@
             <span class="input-group-text" i18n>of {{ previewPageCount() ?? '?' }}</span>
           </div>
           <fieldset class="input-group w-auto flex-nowrap" aria-label="Zoom" i18n-aria-label>
-            <button type="button" class="btn btn-outline-secondary" aria-label="Zoom out" i18n-aria-label [disabled]="!pageLoaded() || zoom <= 0.5" (click)="zoomOut()"><i-bs name="dash"></i-bs></button>
+            <button type="button" class="btn btn-outline-secondary" aria-label="Zoom out" i18n-aria-label [disabled]="!pageLoaded() || zoom <= 0.5" (click)="zoomOut()"><pngx-bs-icon name="dash"></pngx-bs-icon></button>
             <button type="button" class="btn btn-outline-secondary preview-zoom" title="Reset zoom" i18n-title [disabled]="!pageLoaded()" (click)="resetZoom()">{{ zoom | percent: '1.0-0' }}</button>
-            <button type="button" class="btn btn-outline-secondary" aria-label="Zoom in" i18n-aria-label [disabled]="!pageLoaded() || zoom >= 4" (click)="zoomIn()"><i-bs name="plus"></i-bs></button>
+            <button type="button" class="btn btn-outline-secondary" aria-label="Zoom in" i18n-aria-label [disabled]="!pageLoaded() || zoom >= 4" (click)="zoomIn()"><pngx-bs-icon name="plus"></pngx-bs-icon></button>
           </fieldset>
         }
       </div>
@@ -205,9 +205,9 @@
         <div class="h-100 overflow-auto border" [attr.aria-busy]="previewDocId && !pageLoaded()">
           @if (pageFailed()) {
             <div class="py-5 px-3 text-center" role="alert">
-              <i-bs name="exclamation-triangle" width="32" height="32" class="text-warning"></i-bs>
+              <pngx-bs-icon name="exclamation-triangle" width="32" height="32" class="text-warning"></pngx-bs-icon>
               <p class="my-3" i18n>Could not load this page.</p>
-              <button type="button" class="btn btn-sm btn-outline-secondary" (click)="setSampleDocument(sampleDocumentIds)"><i-bs name="arrow-clockwise" class="me-1"></i-bs><span i18n>Retry</span></button>
+              <button type="button" class="btn btn-sm btn-outline-secondary" (click)="setSampleDocument(sampleDocumentIds)"><pngx-bs-icon name="arrow-clockwise" class="me-1"></pngx-bs-icon><span i18n>Retry</span></button>
             </div>
           } @else if (previewDocId) {
             <div class="position-relative" [class.d-none]="!pageLoaded()" [style.width.%]="zoom * 100">
@@ -293,7 +293,7 @@
             }
           } @else {
             <div class="py-5 px-3 text-center text-muted">
-              <i-bs name="file-text" width="32" height="32"></i-bs>
+              <pngx-bs-icon name="file-text" width="32" height="32"></pngx-bs-icon>
               <p class="mt-3 mb-0" i18n>No sample document selected.</p>
             </div>
           }

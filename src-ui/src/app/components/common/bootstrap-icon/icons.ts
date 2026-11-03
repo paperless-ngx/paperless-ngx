@@ -16,6 +16,7 @@ import basket from 'bootstrap-icons/icons/basket.svg'
 import bell from 'bootstrap-icons/icons/bell.svg'
 import bodyText from 'bootstrap-icons/icons/body-text.svg'
 import bookmark from 'bootstrap-icons/icons/bookmark.svg'
+import boundingBoxCircles from 'bootstrap-icons/icons/bounding-box-circles.svg'
 import boxArrowInRight from 'bootstrap-icons/icons/box-arrow-in-right.svg'
 import boxArrowUpRight from 'bootstrap-icons/icons/box-arrow-up-right.svg'
 import boxArrowUp from 'bootstrap-icons/icons/box-arrow-up.svg'
@@ -77,6 +78,7 @@ import fileEarmarkMinus from 'bootstrap-icons/icons/file-earmark-minus.svg'
 import fileEarmarkPerson from 'bootstrap-icons/icons/file-earmark-person.svg'
 import fileEarmarkPlus from 'bootstrap-icons/icons/file-earmark-plus.svg'
 import fileEarmarkRichtext from 'bootstrap-icons/icons/file-earmark-richtext.svg'
+import fileEarmarkRuled from 'bootstrap-icons/icons/file-earmark-ruled.svg'
 import fileEarmarkSpreadsheet from 'bootstrap-icons/icons/file-earmark-spreadsheet.svg'
 import fileEarmark from 'bootstrap-icons/icons/file-earmark.svg'
 import fileText from 'bootstrap-icons/icons/file-text.svg'
@@ -130,6 +132,7 @@ import search from 'bootstrap-icons/icons/search.svg'
 import send from 'bootstrap-icons/icons/send.svg'
 import shop from 'bootstrap-icons/icons/shop.svg'
 import slashCircle from 'bootstrap-icons/icons/slash-circle.svg'
+import sliders2 from 'bootstrap-icons/icons/sliders2.svg'
 import sliders2Vertical from 'bootstrap-icons/icons/sliders2-vertical.svg'
 import sortAlphaDown from 'bootstrap-icons/icons/sort-alpha-down.svg'
 import sortAlphaUpAlt from 'bootstrap-icons/icons/sort-alpha-up-alt.svg'
@@ -178,6 +181,7 @@ export const icons: Record<string, string> = {
   braces,
   bodyText,
   bookmark,
+  boundingBoxCircles,
   boxArrowInRight,
   boxArrowUp,
   boxArrowUpRight,
@@ -239,6 +243,7 @@ export const icons: Record<string, string> = {
   fileEarmarkPerson,
   fileEarmarkPlus,
   fileEarmarkRichtext,
+  fileEarmarkRuled,
   fileEarmarkSpreadsheet,
   files,
   fileText,
@@ -290,6 +295,7 @@ export const icons: Record<string, string> = {
   search,
   send,
   slashCircle,
+  sliders2,
   shop,
   sliders2Vertical,
   sortAlphaDown,

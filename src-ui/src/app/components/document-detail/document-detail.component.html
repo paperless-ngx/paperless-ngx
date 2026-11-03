@@ -63,7 +63,7 @@
 
       <div class="d-flex" *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.OcrTemplate }">
         <button ngbDropdownItem (click)="runZoneOcr()" [disabled]="!userCanEdit || networkActive()">
-          <i-bs width="1em" height="1em" name="bounding-box-circles" class="me-2"></i-bs><span i18n>Run Zone OCR</span>
+          <pngx-bs-icon width="1em" height="1em" name="bounding-box-circles" class="me-2"></pngx-bs-icon><span i18n>Run Zone OCR</span>
         </button>
         <button
           ngbDropdownItem
@@ -73,7 +73,7 @@
           title="Choose OCR template"
           i18n-title
         >
-          <i-bs width="1em" height="1em" name="sliders2"></i-bs>
+          <pngx-bs-icon width="1em" height="1em" name="sliders2"></pngx-bs-icon>
         </button>
       </div>
 
