@@ -2,8 +2,8 @@ import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { ActivatedRoute } from '@angular/router'
 import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Subject, first, takeUntil, tap } from 'rxjs'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { MailAccount, MailAccountType } from 'src/app/data/mail-account'
 import { MailRule } from 'src/app/data/mail-rule'
 import { ObjectWithPermissions } from 'src/app/data/object-with-permissions'
@@ -39,7 +39,7 @@ import { ProcessedMailDialogComponent } from './processed-mail-dialog/processed-
     FormsModule,
     ReactiveFormsModule,
     NgbDropdownModule,
-    NgxBootstrapIconsModule,
+    BootstrapIconComponent,
   ],
 })
 export class MailComponent

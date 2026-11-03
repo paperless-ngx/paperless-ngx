@@ -1,6 +1,5 @@
 import { Clipboard } from '@angular/cdk/clipboard'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { DocumentBarcodesComponent } from './document-barcodes.component'
 
 const barcodes = [
@@ -16,10 +15,7 @@ describe('DocumentBarcodesComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      imports: [
-        DocumentBarcodesComponent,
-        NgxBootstrapIconsModule.pick(allIcons),
-      ],
+      imports: [DocumentBarcodesComponent],
     }).compileComponents()
 
     fixture = TestBed.createComponent(DocumentBarcodesComponent)

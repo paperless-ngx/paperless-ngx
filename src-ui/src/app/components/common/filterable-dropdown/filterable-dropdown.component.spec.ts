@@ -2,7 +2,6 @@ import { ScrollingModule } from '@angular/cdk/scrolling'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { NEVER, Subject } from 'rxjs'
 import { NEGATIVE_NULL_FILTER_VALUE } from 'src/app/data/filter-rule-type'
 import {
@@ -63,7 +62,7 @@ describe('FilterableDropdownComponent & FilterableDropdownSelectionModel', () =>
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
       ],
-      imports: [NgxBootstrapIconsModule.pick(allIcons), ScrollingModule],
+      imports: [ScrollingModule],
     }).compileComponents()
 
     hotkeyService = TestBed.inject(HotKeyService)

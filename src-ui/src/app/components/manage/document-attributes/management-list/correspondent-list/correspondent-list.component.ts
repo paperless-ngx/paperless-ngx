@@ -6,7 +6,7 @@ import {
   NgbDropdownModule,
   NgbPaginationModule,
 } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { CorrespondentEditDialogComponent } from 'src/app/components/common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
 import { Correspondent } from 'src/app/data/correspondent'
 import { FILTER_HAS_CORRESPONDENT_ANY } from 'src/app/data/filter-rule-type'
@@ -32,7 +32,7 @@ import { ManagementListComponent } from '../management-list.component'
     NgTemplateOutlet,
     NgbDropdownModule,
     NgbPaginationModule,
-    NgxBootstrapIconsModule,
+    BootstrapIconComponent,
   ],
 })
 export class CorrespondentListComponent extends ManagementListComponent<Correspondent> {

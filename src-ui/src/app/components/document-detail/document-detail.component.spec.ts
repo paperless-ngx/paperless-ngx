@@ -22,7 +22,6 @@ import {
   NgbModal,
   NgbModalRef,
 } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { DeviceDetectorService } from 'ngx-device-detector'
 import { Subject, of, throwError } from 'rxjs'
 import { routes } from 'src/app/app-routing.module'
@@ -152,11 +151,7 @@ describe('DocumentDetailComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      imports: [
-        DocumentDetailComponent,
-        RouterModule.forRoot(routes),
-        NgxBootstrapIconsModule.pick(allIcons),
-      ],
+      imports: [DocumentDetailComponent, RouterModule.forRoot(routes)],
       providers: [
         DocumentTitlePipe,
         {

@@ -1,3 +1,4 @@
+import { _IdGenerator } from '@angular/cdk/a11y'
 import { NgClass, NgTemplateOutlet } from '@angular/common'
 import {
   Component,
@@ -15,15 +16,14 @@ import {
   NgbDropdownModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Subject, Subscription } from 'rxjs'
 import { debounceTime } from 'rxjs/operators'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ISODateAdapter } from 'src/app/utils/ngb-iso-date-adapter'
 import { pngxPopperOptions } from 'src/app/utils/popper-options'
 import { ClearableBadgeComponent } from '../clearable-badge/clearable-badge.component'
-import { _IdGenerator } from '@angular/cdk/a11y'
 
 export interface DateSelection {
   createdTo?: string
@@ -57,7 +57,7 @@ export enum RelativeDate {
   imports: [
     ClearableBadgeComponent,
     CustomDatePipe,
-    NgxBootstrapIconsModule,
+    BootstrapIconComponent,
     NgbDatepickerModule,
     NgbDropdownModule,
     NgSelectModule,

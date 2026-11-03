@@ -7,7 +7,6 @@ import {
 } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { By } from '@angular/platform-browser'
-import { allIcons, NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { of, throwError } from 'rxjs'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { DocumentService } from 'src/app/services/rest/document.service'
@@ -33,7 +32,6 @@ describe('PreviewPopupComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [NgxBootstrapIconsModule.pick(allIcons)],
       providers: [
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),

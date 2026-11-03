@@ -15,8 +15,8 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms'
 import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Subscription, catchError, map, of, takeUntil } from 'rxjs'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { Correspondent } from 'src/app/data/correspondent'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import { DocumentType } from 'src/app/data/document-type'
@@ -496,7 +496,7 @@ const FILTER_HANDLERS: Record<TriggerFilterType, FilterHandler> = {
     NgbAccordionModule,
     NgTemplateOutlet,
     DragDropModule,
-    NgxBootstrapIconsModule,
+    BootstrapIconComponent,
   ],
 })
 export class WorkflowEditDialogComponent

@@ -11,8 +11,8 @@ import {
 } from '@angular/core'
 import { Router, RouterModule } from '@angular/router'
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Subject, takeUntil } from 'rxjs'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { CustomFieldDisplayComponent } from 'src/app/components/common/custom-field-display/custom-field-display.component'
 import { PreviewPopupComponent } from 'src/app/components/common/preview-popup/preview-popup.component'
 import { TagComponent } from 'src/app/components/common/tag/tag.component'
@@ -80,7 +80,7 @@ import { WidgetFrameComponent } from '../widget-frame/widget-frame.component'
     NgClass,
     NgStyle,
     RouterModule,
-    NgxBootstrapIconsModule,
+    BootstrapIconComponent,
   ],
 })
 export class SavedViewWidgetComponent

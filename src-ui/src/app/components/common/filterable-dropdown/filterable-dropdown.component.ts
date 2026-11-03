@@ -20,8 +20,8 @@ import {
   NgbDropdownModule,
   NgbModalRef,
 } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Subject, filter, first, merge, takeUntil } from 'rxjs'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { NEGATIVE_NULL_FILTER_VALUE } from 'src/app/data/filter-rule-type'
 import { MatchingModel } from 'src/app/data/matching-model'
 import { ObjectWithPermissions } from 'src/app/data/object-with-permissions'
@@ -706,7 +706,7 @@ export class FilterableDropdownSelectionModel {
     ToggleableDropdownButtonComponent,
     FormsModule,
     ReactiveFormsModule,
-    NgxBootstrapIconsModule,
+    BootstrapIconComponent,
     NgbDropdownModule,
     NgClass,
     ScrollingModule,

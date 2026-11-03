@@ -1,13 +1,13 @@
 import { Component } from '@angular/core'
 import { FormsModule } from '@angular/forms'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { ConfirmDialogComponent } from '../confirm-dialog.component'
 
 @Component({
   selector: 'pngx-password-removal-confirm-dialog',
   templateUrl: './password-removal-confirm-dialog.component.html',
   styleUrls: ['./password-removal-confirm-dialog.component.scss'],
-  imports: [FormsModule, NgxBootstrapIconsModule],
+  imports: [FormsModule, BootstrapIconComponent],
 })
 export class PasswordRemovalConfirmDialogComponent extends ConfirmDialogComponent {
   updateDocument: boolean = true

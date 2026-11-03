@@ -21,9 +21,9 @@ import {
   NgbModal,
   NgbPaginationModule,
 } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { TourNgBootstrap } from 'ngx-ui-tour-ng-bootstrap'
 import { filter, first, map, Subject, switchMap, takeUntil } from 'rxjs'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import {
   DEFAULT_DISPLAY_FIELDS,
   DisplayField,
@@ -94,7 +94,7 @@ import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-vi
     CorrespondentNamePipe,
     DocumentTypeNamePipe,
     StoragePathNamePipe,
-    NgxBootstrapIconsModule,
+    BootstrapIconComponent,
     AsyncPipe,
     FormsModule,
     ReactiveFormsModule,

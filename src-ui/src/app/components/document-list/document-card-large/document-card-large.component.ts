@@ -13,7 +13,7 @@ import {
   NgbProgressbarModule,
   NgbTooltipModule,
 } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import {
   DEFAULT_DISPLAY_FIELDS,
   DisplayField,
@@ -54,7 +54,7 @@ import { LoadingComponentWithPermissions } from '../../loading-component/loading
     RouterModule,
     NgbTooltipModule,
     NgbProgressbarModule,
-    NgxBootstrapIconsModule,
+    BootstrapIconComponent,
   ],
 })
 export class DocumentCardLargeComponent

@@ -4,7 +4,6 @@ import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ClearableBadgeComponent } from '../clearable-badge/clearable-badge.component'
@@ -26,7 +25,6 @@ describe('DatesDropdownComponent', () => {
         NgbModule,
         FormsModule,
         ReactiveFormsModule,
-        NgxBootstrapIconsModule.pick(allIcons),
         DatesDropdownComponent,
         ClearableBadgeComponent,
         CustomDatePipe,

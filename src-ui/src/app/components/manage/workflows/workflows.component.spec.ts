@@ -10,7 +10,6 @@ import {
   NgbPaginationModule,
   NgbPopoverModule,
 } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of, throwError } from 'rxjs'
 import { Workflow } from 'src/app/data/workflow'
 import { WorkflowActionType } from 'src/app/data/workflow-action'
@@ -87,7 +86,6 @@ describe('WorkflowsComponent', () => {
         ReactiveFormsModule,
         NgbModalModule,
         NgbPopoverModule,
-        NgxBootstrapIconsModule.pick(allIcons),
         WorkflowsComponent,
         IfPermissionsDirective,
         PageHeaderComponent,

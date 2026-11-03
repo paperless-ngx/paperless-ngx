@@ -1,7 +1,6 @@
 import { Clipboard } from '@angular/cdk/clipboard'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { Title } from '@angular/platform-browser'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { environment } from 'src/environments/environment'
 import { PageHeaderComponent } from './page-header.component'
 
@@ -14,7 +13,7 @@ describe('PageHeaderComponent', () => {
   beforeEach(async () => {
     TestBed.configureTestingModule({
       providers: [],
-      imports: [NgxBootstrapIconsModule.pick(allIcons), PageHeaderComponent],
+      imports: [PageHeaderComponent],
     }).compileComponents()
 
     titleService = TestBed.inject(Title)

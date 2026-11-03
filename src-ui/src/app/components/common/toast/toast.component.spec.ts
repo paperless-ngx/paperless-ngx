@@ -4,7 +4,6 @@ import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 
 import { Clipboard } from '@angular/cdk/clipboard'
-import { allIcons, NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { ToastLevel } from 'src/app/services/toast.service'
 import { ToastComponent } from './toast.component'
 
@@ -33,7 +32,7 @@ describe('ToastComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ToastComponent, NgxBootstrapIconsModule.pick(allIcons)],
+      imports: [ToastComponent],
       providers: [
         DatePipe,
         provideHttpClient(withInterceptorsFromDi()),

@@ -1,10 +1,10 @@
 import { AsyncPipe } from '@angular/common'
 import {
   Component,
-  OnDestroy,
-  OnInit,
   computed,
   inject,
+  OnDestroy,
+  OnInit,
   signal,
 } from '@angular/core'
 import {
@@ -15,8 +15,8 @@ import {
 } from '@angular/forms'
 import { NgbModal, NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap'
 import { dirtyCheck } from '@ngneat/dirty-check-forms'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { BehaviorSubject, Observable, of, switchMap, takeUntil } from 'rxjs'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { PermissionsDialogComponent } from 'src/app/components/common/permissions-dialog/permissions-dialog.component'
 import { DisplayMode } from 'src/app/data/document'
 import { SavedView } from 'src/app/data/saved-view'
@@ -56,7 +56,7 @@ import { LoadingComponentWithPermissions } from '../../loading-component/loading
     ReactiveFormsModule,
     AsyncPipe,
     NgbPaginationModule,
-    NgxBootstrapIconsModule,
+    BootstrapIconComponent,
   ],
 })
 export class SavedViewsComponent

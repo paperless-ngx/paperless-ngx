@@ -17,8 +17,8 @@ import {
   NgbToast,
   NgbToastModule,
 } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Subscription, interval, takeWhile } from 'rxjs'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { Toast, ToastLevel } from 'src/app/services/toast.service'
 
@@ -28,7 +28,7 @@ import { Toast, ToastLevel } from 'src/app/services/toast.service'
     DecimalPipe,
     NgbToastModule,
     NgbProgressbarModule,
-    NgxBootstrapIconsModule,
+    BootstrapIconComponent,
   ],
   templateUrl: './toast.component.html',
   styleUrl: './toast.component.scss',

@@ -6,7 +6,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { BrowserModule } from '@angular/platform-browser'
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of, throwError } from 'rxjs'
 import {
   ConfigCategory,
@@ -39,7 +38,6 @@ describe('ConfigComponent', () => {
         NgSelectModule,
         FormsModule,
         ReactiveFormsModule,
-        NgxBootstrapIconsModule.pick(allIcons),
         ConfigComponent,
         TextComponent,
         SelectComponent,
