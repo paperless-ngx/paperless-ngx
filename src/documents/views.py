@@ -3055,13 +3055,6 @@ class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
             return HttpResponseForbidden("Insufficient permissions")
 
         try:
-            if method.__name__ in QUEUED_OPERATIONS:
-                return self._queue_bulk_operation(
-                    method,
-                    documents,
-                    parameters,
-                    from_webui,
-                )
             result = method(documents, **parameters)
             return Response({"result": result})
         except Exception as e:
@@ -3289,7 +3282,6 @@ class MergeDocumentsAsVersionsView(DocumentOperationPermissionMixin):
                 name="DeleteDocumentsResult",
                 fields={
                     "result": serializers.CharField(),
-                    "task_id": serializers.CharField(required=False),
                 },
             ),
         },

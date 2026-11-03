@@ -289,7 +289,6 @@ describe(`DocumentService`, () => {
     )
     expect(req.request.method).toEqual('POST')
     expect(req.request.body).toEqual({
-      from_webui: true,
       documents: ids,
     })
   })

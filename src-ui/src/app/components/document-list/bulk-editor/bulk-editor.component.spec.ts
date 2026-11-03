@@ -1175,18 +1175,17 @@ describe('BulkEditorComponent', () => {
     const notifySpy = jest
       .spyOn(trashService, 'notifyMovedToTrash')
       .mockImplementation(() => {})
-    req.flush({ result: 'OK', task_id: 'queued-task' })
+    req.flush(true)
     expect(req.request.body).toEqual({
-      from_webui: true,
       documents: [3, 4],
     })
-    expect(notifySpy).not.toHaveBeenCalled()
-    httpTestingController.expectNone(
+    expect(notifySpy).toHaveBeenCalledWith(expect.any(String), [3, 4])
+    httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
-    )
-    httpTestingController.expectNone(
+    ) // list reload
+    httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
-    )
+    ) // listAllFilteredIds
 
     component.showConfirmationDialogs = false
     fixture.detectChanges()
@@ -1197,12 +1196,12 @@ describe('BulkEditorComponent', () => {
     req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}documents/delete/`
     )
-    req.flush({ result: 'OK', task_id: 'queued-task' })
-    // Acceptance does not claim deletion has completed.
-    expect(notifySpy).not.toHaveBeenCalled()
-    httpTestingController.expectNone(
+    req.flush(true)
+    // ids aren't known when all matching documents are selected, so no undo
+    expect(notifySpy).toHaveBeenLastCalledWith(expect.any(String), null)
+    httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
-    )
+    ) // list reload
   })
 
   it('should not be accessible with insufficient global permissions', () => {

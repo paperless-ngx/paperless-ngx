@@ -350,13 +350,9 @@ export class DocumentService extends AbstractPaperlessService<Document> {
   }
 
   deleteDocuments(selection: DocumentSelectionQuery) {
-    return this.http.post<BulkOperationResponse>(
-      this.getResourceUrl(null, 'delete'),
-      {
-        ...selection,
-        from_webui: true,
-      }
-    )
+    return this.http.post(this.getResourceUrl(null, 'delete'), {
+      ...selection,
+    })
   }
 
   reprocessDocuments(

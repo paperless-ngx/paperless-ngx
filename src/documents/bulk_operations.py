@@ -1,4 +1,4 @@
-"""Queued document metadata edits and deletion."""
+"""Queued document metadata edits."""
 
 from typing import Any
 
@@ -24,7 +24,6 @@ MODIFIED_FIELDS = {
     "modify_tags": "tags",
     "modify_custom_fields": "custom_fields",
     "set_permissions": None,
-    "delete": None,
 }
 QUEUED_OPERATIONS = frozenset(MODIFIED_FIELDS)
 
@@ -90,10 +89,7 @@ def execute_bulk_operation(
             if settings.AUDIT_LOG_ENABLED and modified_field
             else {}
         )
-        if operation == "delete":
-            method(document_ids, **parameters)
-        else:
-            method(document_ids, **parameters, update_callback=affected_ids.extend)
+        method(document_ids, **parameters, update_callback=affected_ids.extend)
         if settings.AUDIT_LOG_ENABLED and modified_field:
             from auditlog.models import LogEntry
 

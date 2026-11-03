@@ -1792,7 +1792,7 @@ class RemovePasswordDocumentsSerializer(
 
 
 class DeleteDocumentsSerializer(DocumentSelectionSerializer):
-    from_webui = serializers.BooleanField(required=False, default=False)
+    pass
 
 
 class ReprocessDocumentsSerializer(DocumentSelectionSerializer):
