@@ -561,6 +561,7 @@ describe('BulkEditorComponent', () => {
     )
     req.flush(true)
     expect(req.request.body).toEqual({
+      from_webui: true,
       documents: [3, 4],
       method: 'modify_tags',
       parameters: { add_tags: [101], remove_tags: [] },
@@ -609,6 +610,7 @@ describe('BulkEditorComponent', () => {
     )
     req.flush(true)
     expect(req.request.body).toEqual({
+      from_webui: true,
       all: true,
       filters: { title_search: 'apple' },
       excluded_documents: [4],
@@ -731,6 +733,7 @@ describe('BulkEditorComponent', () => {
     )
     req.flush(true)
     expect(req.request.body).toEqual({
+      from_webui: true,
       documents: [3, 4],
       method: 'set_correspondent',
       parameters: { correspondent: 101 },
@@ -829,6 +832,7 @@ describe('BulkEditorComponent', () => {
     )
     req.flush(true)
     expect(req.request.body).toEqual({
+      from_webui: true,
       documents: [3, 4],
       method: 'set_document_type',
       parameters: { document_type: 101 },
@@ -927,6 +931,7 @@ describe('BulkEditorComponent', () => {
     )
     req.flush(true)
     expect(req.request.body).toEqual({
+      from_webui: true,
       documents: [3, 4],
       method: 'set_storage_path',
       parameters: { storage_path: 101 },
@@ -1025,6 +1030,7 @@ describe('BulkEditorComponent', () => {
     )
     req.flush(true)
     expect(req.request.body).toEqual({
+      from_webui: true,
       documents: [3, 4],
       method: 'modify_custom_fields',
       parameters: { add_custom_fields: [101], remove_custom_fields: [102] },
@@ -1171,6 +1177,7 @@ describe('BulkEditorComponent', () => {
       .mockImplementation(() => {})
     req.flush(true)
     expect(req.request.body).toEqual({
+      from_webui: true,
       documents: [3, 4],
     })
     expect(notifySpy).toHaveBeenCalledWith(expect.any(String), [3, 4])
@@ -1540,6 +1547,28 @@ describe('BulkEditorComponent', () => {
     )
   })
 
+  it('closes a queued permissions dialog without refreshing before completion', () => {
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((instances) => {
+      if (instances.length) modal = instances[0]
+    })
+    const reload = jest.spyOn(documentListViewService, 'reload')
+    component.setPermissions()
+    const close = jest.spyOn(modal, 'close')
+    modal.componentInstance.confirmClicked.emit({
+      permissions: {},
+      merge: true,
+    })
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/bulk_edit/`
+    )
+    req.flush({ result: 'OK', task_id: 'queued-operation' })
+    expect(close).toHaveBeenCalledTimes(1)
+    expect(reload).not.toHaveBeenCalled()
+    expect(documentListViewService.selected.size).toBe(0)
+    expect(documentListViewService.allSelected).toBe(false)
+  })
+
   it('should support bulk permissions update', () => {
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((m) => (modal = m[0]))
@@ -1574,6 +1603,7 @@ describe('BulkEditorComponent', () => {
     )
     req.flush(true)
     expect(req.request.body).toEqual({
+      from_webui: true,
       documents: [3, 4],
       method: 'set_permissions',
       parameters: {
