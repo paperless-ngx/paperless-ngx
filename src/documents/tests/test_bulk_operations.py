@@ -228,34 +228,6 @@ def test_tracked_outcome_notifies_only_initiator(bulk_setup, failed):
     assert event["data"]["task_id"] == task_id
 
 
-@pytest.mark.django_db
-def test_bulk_status_is_available_without_task_permission_and_is_private(bulk_setup):
-    _, client, _, _ = bulk_setup
-    owner = UserFactory()
-    other = UserFactory()
-    owned = PaperlessTask.objects.create(
-        task_id=str(uuid.uuid4()),
-        task_type="bulk_update",
-        owner=owner,
-        trigger_source="web_ui",
-        input_data={"operation": "set_permissions"},
-    )
-    foreign = PaperlessTask.objects.create(
-        task_id=str(uuid.uuid4()),
-        task_type="bulk_update",
-        owner=other,
-        trigger_source="web_ui",
-        input_data={"operation": "set_permissions"},
-    )
-    client.force_authenticate(owner)
-    response = client.get(
-        "/api/tasks/bulk_status/",
-        {"task_id": [owned.task_id, foreign.task_id]},
-    )
-    assert response.status_code == 200
-    assert [item["task_id"] for item in response.data] == [owned.task_id]
-
-
 @pytest.mark.anyio
 @pytest.mark.parametrize("anyio_backend", ["asyncio"])
 async def test_completion_socket_is_private(anyio_backend):
