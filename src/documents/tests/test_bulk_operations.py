@@ -182,3 +182,97 @@ def test_large_filtered_selection_is_one_task(bulk_setup):
     assert response.status_code == 200
     enqueue.assert_called_once()
     assert len(enqueue.call_args.kwargs["kwargs"]["document_ids"]) == 10_000
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("failed", [False, True])
+def test_tracked_outcome_notifies_only_initiator(bulk_setup, failed):
+    user, _, doc, _ = bulk_setup
+    task_id = str(uuid.uuid4())
+    before_task_publish_handler(
+        headers={
+            "task": "documents.bulk_operations.execute_bulk_operation",
+            "id": task_id,
+        },
+        body=(
+            (),
+            {"operation": "delete", "document_ids": [doc.pk], "user_id": user.pk},
+            {},
+        ),
+    )
+    task = PaperlessTask.objects.get(task_id=task_id)
+    assert task.owner_id == user.pk
+    assert task.task_type == PaperlessTask.TaskType.BULK_DELETE
+    with mock.patch("documents.signals.handlers.async_to_sync") as send:
+        if failed:
+            task_failure_handler(
+                task_id=task_id,
+                exception=ValueError("Could not update"),
+            )
+        else:
+            task_postrun_handler(
+                task_id=task_id,
+                state="SUCCESS",
+                retval={"document_count": 1},
+            )
+    group, event = send.return_value.call_args.args
+    assert group == f"bulk_operations_{user.pk}"
+    assert event["data"]["status"] == ("failure" if failed else "success")
+    assert event["data"]["task_id"] == task_id
+
+
+@pytest.mark.django_db
+def test_bulk_status_is_available_without_task_permission_and_is_private(bulk_setup):
+    _, client, _, _ = bulk_setup
+    owner = UserFactory()
+    other = UserFactory()
+    owned = PaperlessTask.objects.create(
+        task_id=str(uuid.uuid4()),
+        task_type="bulk_update",
+        owner=owner,
+        trigger_source="web_ui",
+        input_data={"operation": "set_permissions"},
+    )
+    foreign = PaperlessTask.objects.create(
+        task_id=str(uuid.uuid4()),
+        task_type="bulk_update",
+        owner=other,
+        trigger_source="web_ui",
+        input_data={"operation": "set_permissions"},
+    )
+    client.force_authenticate(owner)
+    response = client.get(
+        "/api/tasks/bulk_status/",
+        {"task_id": [owned.task_id, foreign.task_id]},
+    )
+    assert response.status_code == 200
+    assert [item["task_id"] for item in response.data] == [owned.task_id]
+
+
+@pytest.mark.anyio
+@pytest.mark.parametrize("anyio_backend", ["asyncio"])
+async def test_completion_socket_is_private(anyio_backend):
+    from types import SimpleNamespace
+
+    from channels.layers import get_channel_layer
+    from channels.testing import WebsocketCommunicator
+
+    from paperless.consumers import StatusConsumer
+
+    own = WebsocketCommunicator(StatusConsumer.as_asgi(), "/ws/status/")
+    other = WebsocketCommunicator(StatusConsumer.as_asgi(), "/ws/status/")
+    own.scope["user"] = SimpleNamespace(id=1, is_authenticated=True)
+    other.scope["user"] = SimpleNamespace(id=2, is_authenticated=True)
+    assert (await own.connect())[0]
+    assert (await other.connect())[0]
+    try:
+        event = {
+            "type": "bulk_operation_status",
+            "data": {"task_id": "example", "status": "success"},
+        }
+        await get_channel_layer().group_send("bulk_operations_1", event)
+        assert await own.receive_json_from() == event
+        assert await other.receive_nothing(timeout=0.02)
+    finally:
+        await own.disconnect()
+        await other.disconnect()
