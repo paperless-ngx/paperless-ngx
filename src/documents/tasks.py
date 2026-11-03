@@ -540,7 +540,11 @@ def empty_trash(doc_ids=None) -> None:
         deleted_document_ids = list(documents.values_list("id", flat=True))
         # Temporarily connect the cleanup handler
         models.signals.post_delete.connect(cleanup_document_deletion, sender=Document)
-        documents.delete()  # this is effectively a hard delete
+        # media.lock before Django's delete transaction: post_delete runs
+        # cleanup_document_deletion inside it while the rows are locked, and
+        # that handler re-enters the lock instead of waiting.
+        with media_lock():
+            documents.delete()  # this is effectively a hard delete
         logger.info(f"Deleted {len(deleted_document_ids)} documents from trash")
 
         if settings.AUDIT_LOG_ENABLED:
