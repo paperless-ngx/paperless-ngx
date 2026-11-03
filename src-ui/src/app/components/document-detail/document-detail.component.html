@@ -439,7 +439,7 @@
   @let saveDisabled = !userCanEdit || networkActive() || (isDirty$ | async) !== true;
   <div class="btn-group">
     <ng-container *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }">
-      <button type="submit" class="order-3 btn btn-sm" [class.btn-primary]="!saveDisabled" [class.btn-outline-primary]="saveDisabled" title="Save" i18n-title [disabled]="saveDisabled">
+      <button type="submit" class="order-3 btn btn-sm" [class.btn-primary]="!saveDisabled" [class.border-end-0]="saveDisabled" [class.btn-outline-primary]="saveDisabled" title="Save" i18n-title [disabled]="saveDisabled">
         <pngx-bs-icon class="d-md-none" width="1.2em" height="1.2em" name="floppy"></pngx-bs-icon><span class="d-none d-md-inline" i18n>Save</span>
       </button>
       @if (hasNext()) {
@@ -447,7 +447,7 @@
       } @else {
         <button type="button" class="order-2 btn btn-sm btn-outline-primary d-none d-md-inline-block" (click)="save(true)" i18n [disabled]="saveDisabled">Save &amp; close</button>
       }
-      <button type="button" class="order-0 btn btn-sm btn-outline-secondary" (click)="discard()" title="Discard" i18n-title [disabled]="saveDisabled">
+      <button type="button" class="order-0 btn btn-sm btn-outline-secondary" [class.border-end-0]="saveDisabled" (click)="discard()" title="Discard" i18n-title [disabled]="saveDisabled">
         <pngx-bs-icon class="d-md-none" width="1.2em" height="1.2em" name="arrow-counterclockwise"></pngx-bs-icon><span class="d-none d-md-inline" i18n>Discard</span>
       </button>
       <div class="btn-group order-4 d-md-none" ngbDropdown placement="bottom-end top-end" role="group">
