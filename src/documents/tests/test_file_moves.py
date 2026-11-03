@@ -15,6 +15,7 @@ from django.http import HttpRequest
 from django.http import HttpResponse
 from django.test import RequestFactory
 from django.utils import timezone
+from django.utils.dateparse import parse_datetime
 from filelock import Timeout
 from rest_framework import status
 
@@ -671,6 +672,32 @@ class TestFileMovesThroughApi:
         assert response.status_code == status.HTTP_200_OK
         assert (paperless_dirs.originals_dir / "renamed.pdf").is_file()
         assert Document.objects.get(pk=document.pk).filename == "renamed.pdf"
+
+    def test_patch_response_reports_post_move_modified(
+        self,
+        admin_client: APIClient,
+        document: Document,
+        paperless_dirs: PaperlessDirs,
+    ) -> None:
+        """
+        GIVEN:
+            - A document named after its title
+        WHEN:
+            - Its title is changed through the API, causing a rename
+        THEN:
+            - The modified time in the response equals the stored value,
+              which the file move bumped after the edit was saved
+        """
+        response = admin_client.patch(
+            f"/api/documents/{document.pk}/",
+            {"title": "renamed"},
+            format="json",
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        stored = Document.objects.get(pk=document.pk)
+        assert stored.filename == "renamed.pdf"
+        assert parse_datetime(response.json()["modified"]) == stored.modified
 
     def test_trash_restore_keeps_db_and_disk_consistent(
         self,
