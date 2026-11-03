@@ -18,6 +18,9 @@
 
   table {
     margin-bottom: 1rem;
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
   }
 
   th, td {
