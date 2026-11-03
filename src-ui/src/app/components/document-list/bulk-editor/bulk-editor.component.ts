@@ -49,7 +49,6 @@ import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { TagService } from 'src/app/services/rest/tag.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
-import { TrashService } from 'src/app/services/trash.service'
 import { flattenTags } from 'src/app/utils/flatten-tags'
 import { queryParamsFromFilterRules } from 'src/app/utils/query-params'
 import { MergeAsVersionsConfirmDialogComponent } from '../../common/confirm-dialog/merge-as-versions-confirm-dialog/merge-as-versions-confirm-dialog.component'
@@ -100,7 +99,6 @@ export class BulkEditorComponent
   private openDocumentService = inject(OpenDocumentsService)
   private settings = inject(SettingsService)
   private toastService = inject(ToastService)
-  private trashService = inject(TrashService)
   private storagePathService = inject(StoragePathService)
   private customFieldService = inject(CustomFieldsService)
   public readonly permissionService = inject(PermissionsService)
@@ -291,16 +289,14 @@ export class BulkEditorComponent
       .bulkEdit(overrideSelection ?? this.getSelectionQuery(), method, args)
       .pipe(first())
       .subscribe({
-        next: (response) => {
-          if (response.task_id) {
-            modal?.close()
-            this.list.selectNone()
-          } else {
-            this.handleOperationSuccess(modal)
-          }
-        },
+        next: () => this.handleOperationQueued(modal),
         error: (error) => this.handleOperationError(modal, error),
       })
+  }
+
+  private handleOperationQueued(modal: NgbModalRef) {
+    modal?.close()
+    this.list.selectNone()
   }
 
   private executeDocumentAction(
@@ -901,28 +897,11 @@ export class BulkEditorComponent
   }
 
   private deleteSelected(modal: NgbModalRef) {
-    const documents = this.list.allSelected
-      ? null
-      : Array.from(this.list.selected)
-    const count = this.getSelectionSize()
     this.documentService
       .deleteDocuments(this.getSelectionQuery())
       .pipe(first())
       .subscribe({
-        next: (response) => {
-          const completed = () =>
-            this.trashService.notifyMovedToTrash(
-              $localize`Moved ${count} document(s) to the trash`,
-              documents
-            )
-          if (response.task_id) {
-            modal?.close()
-            this.list.selectNone()
-          } else {
-            this.handleOperationSuccess(modal)
-            completed()
-          }
-        },
+        next: () => this.handleOperationQueued(modal),
         error: (error) => this.handleOperationError(modal, error),
       })
   }
@@ -1094,14 +1073,7 @@ export class BulkEditorComponent
 
     dialog.selection = this.getSelectionQuery()
     dialog.selectionCount = this.getSelectionSize()
-    dialog.succeeded.subscribe((result) => {
-      if (result?.task_id) {
-        this.list.selectNone()
-      } else {
-        this.toastService.showSuccess($localize`Custom fields updated.`)
-        this.handleOperationSuccess(null)
-      }
-    })
+    dialog.succeeded.subscribe(() => this.handleOperationQueued(null))
     dialog.failed.subscribe((error) => {
       this.toastService.showError(
         $localize`Error updating custom fields.`,

@@ -1,4 +1,4 @@
 export interface BulkOperationResponse {
   result: string
-  task_id?: string
+  task_id: string
 }
