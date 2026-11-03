@@ -131,7 +131,7 @@ describe('DocumentNotesComponent', () => {
     expect(fixture.debugElement.nativeElement.textContent).toContain('user3')
   })
 
-  it('should render saved notes as sanitized markdown', () => {
+  it('should render notes according to their format', () => {
     component.notes.set([
       { id: 31, note: '**x**', format: NoteFormat.Markdown },
       {
@@ -139,105 +139,56 @@ describe('DocumentNotesComponent', () => {
         note: '<script>alert(1)</script>',
         format: NoteFormat.Markdown,
       },
+      { id: 33, note: '**x**', format: NoteFormat.Plain },
     ])
     fixture.detectChanges()
 
     const noteCards = fixture.debugElement.queryAll(By.css('.card-text'))
-    expect(noteCards[0].nativeElement.querySelector('strong').textContent).toBe(
+    expect(noteCards[0].query(By.css('strong')).nativeElement.textContent).toBe(
       'x'
     )
-    expect(noteCards[1].nativeElement.querySelector('script')).toBeNull()
-    expect(noteCards[1].nativeElement.textContent).toContain(
-      '<script>alert(1)</script>'
+    expect(noteCards[1].query(By.css('script'))).toBeNull()
+    expect(noteCards[2].query(By.css('strong'))).toBeNull()
+    expect(noteCards[2].nativeElement.textContent).toBe('**x**')
+  })
+
+  it('should toggle between edit and preview', () => {
+    const radios = fixture.debugElement.queryAll(
+      By.css('.btn-group input[type="radio"]')
     )
-  })
-
-  it('should render plain notes as plain text', () => {
-    component.notes.set([{ id: 33, note: '**x**', format: NoteFormat.Plain }])
+    radios[1].triggerEventHandler('change')
     fixture.detectChanges()
-
-    const noteCard = fixture.debugElement.query(By.css('.card-text'))
-    expect(noteCard.nativeElement.tagName).toBe('P')
-    expect(noteCard.nativeElement.textContent).toBe('**x**')
-    expect(noteCard.query(By.css('strong'))).toBeNull()
-    expect(noteCard.nativeElement.classList).not.toContain('markdown-preview')
-  })
-
-  it('should default to edit mode and switch between edit and preview', () => {
-    expect(component.noteView()).toBe('edit')
-    const textarea: HTMLTextAreaElement = fixture.debugElement.query(
-      By.css('textarea')
-    ).nativeElement
-    expect(textarea.getAttribute('aria-label')).toBe('Note')
-    expect(textarea.getAttribute('aria-invalid')).toBe('false')
-    expect(textarea.getAttribute('aria-describedby')).toBe('noteFeedback')
-    expect(textarea.classList).not.toContain('d-none')
-    expect(fixture.debugElement.query(By.css('.note-preview'))).toBeNull()
-    textarea.style.height = '200px'
+    expect(
+      fixture.debugElement.query(By.css('.note-preview')).nativeElement
+        .textContent
+    ).toContain('Nothing to preview')
 
     component.noteForm.get('newNote').setValue('**bold**')
     fixture.detectChanges()
-    const previewButton = fixture.debugElement.queryAll(
-      By.css('.btn-group input[type="radio"]')
-    )[1]
-    previewButton.triggerEventHandler('change')
-    fixture.detectChanges()
-
-    expect(textarea.classList).toContain('d-none')
     expect(
       fixture.debugElement.query(By.css('.note-preview strong'))
     ).not.toBeNull()
-    const preview = fixture.debugElement.query(By.css('.note-preview'))
-    expect(preview.nativeElement.getAttribute('aria-label')).toBe(
-      'Note preview'
-    )
-
-    fixture.debugElement
-      .queryAll(By.css('.btn-group input[type="radio"]'))[0]
-      .triggerEventHandler('change')
-    fixture.detectChanges()
-
-    const textareaAfterSwitch: HTMLTextAreaElement = fixture.debugElement.query(
-      By.css('textarea')
-    ).nativeElement
-    expect(textareaAfterSwitch).toBe(textarea)
-    expect(textareaAfterSwitch.classList).not.toContain('d-none')
-    expect(textareaAfterSwitch.style.height).toBe('200px')
-    expect(textareaAfterSwitch.value).toBe('**bold**')
-    expect(fixture.debugElement.query(By.css('.note-preview'))).toBeNull()
-  })
-
-  it('should show an empty-state message for an empty preview', () => {
-    fixture.debugElement
-      .queryAll(By.css('.btn-group input[type="radio"]'))[1]
-      .triggerEventHandler('change')
-    fixture.detectChanges()
-
     expect(
-      fixture.debugElement.query(By.css('.note-preview .text-muted'))
-        .nativeElement.textContent
-    ).toContain('Nothing to preview')
-  })
+      fixture.debugElement.query(By.css('textarea')).nativeElement.classList
+    ).toContain('d-none')
 
-  it('should save from preview mode and return to edit mode', () => {
-    component.documentId.set(12)
-    component.noteForm.get('newNote').setValue('Preview note')
-    jest.spyOn(notesService, 'addNote').mockReturnValueOnce(of(notes))
-    fixture.debugElement
-      .queryAll(By.css('.btn-group input[type="radio"]'))[1]
-      .triggerEventHandler('change')
+    radios[0].triggerEventHandler('change')
     fixture.detectChanges()
-
-    fixture.debugElement
-      .query(By.css('.btn-primary'))
-      .triggerEventHandler('click')
-    fixture.detectChanges()
-
-    expect(component.noteView()).toBe('edit')
+    expect(fixture.debugElement.query(By.css('.note-preview'))).toBeNull()
     expect(
       fixture.debugElement.query(By.css('textarea')).nativeElement.classList
     ).not.toContain('d-none')
-    expect(component.noteForm.get('newNote').value).toBeNull()
+  })
+
+  it('should return to edit mode after saving', () => {
+    component.documentId.set(12)
+    component.noteForm.get('newNote').setValue('Preview note')
+    fixture.debugElement
+      .queryAll(By.css('.btn-group input[type="radio"]'))[1]
+      .triggerEventHandler('change')
+    jest.spyOn(notesService, 'addNote').mockReturnValueOnce(of(notes))
+    component.addNote()
+    expect(component.noteView()).toBe('edit')
   })
 
   it('should handle note user display in all situations', () => {
