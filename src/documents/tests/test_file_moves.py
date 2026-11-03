@@ -6,9 +6,13 @@ import logging
 from typing import TYPE_CHECKING
 
 import pytest
+from django.db import transaction
 from django.utils import timezone
 from filelock import Timeout
 
+from documents.file_moves import _active_collector
+from documents.file_moves import defer_file_moves
+from documents.file_moves import flush_pending_file_moves
 from documents.file_moves import move_files_for_document
 from documents.file_moves import request_file_move
 from documents.models import Document
@@ -18,10 +22,15 @@ from paperless_testing.factories import TagFactory
 from paperless_testing.locks import record_media_lock_acquisitions
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+    from contextlib import AbstractContextManager
+
     from pytest_django.fixtures import Settings
     from pytest_mock import MockerFixture
 
     from paperless_testing.dirs import PaperlessDirs
+
+    OnCommitCapture = Callable[..., AbstractContextManager[list[Callable[[], object]]]]
 
 CONTENT = b"original content"
 
@@ -235,3 +244,249 @@ class TestReceiver:
         tag.documents.add(document)
 
         request.assert_not_called()
+
+
+@pytest.mark.django_db
+class TestDeferFileMoves:
+    def test_moves_once_on_exit(
+        self,
+        document: Document,
+        paperless_dirs: PaperlessDirs,
+    ) -> None:
+        """
+        GIVEN:
+            - An open file move scope
+        WHEN:
+            - The document is saved with a new title inside the scope
+        THEN:
+            - Nothing moves while the scope is open
+            - On exit the file and DB filename follow the final title
+        """
+        with defer_file_moves():
+            document.title = "renamed"
+            document.save()
+            assert (paperless_dirs.originals_dir / "original.pdf").is_file()
+            assert Document.objects.get(pk=document.pk).filename == "original.pdf"
+
+        assert (paperless_dirs.originals_dir / "renamed.pdf").is_file()
+        assert not (paperless_dirs.originals_dir / "original.pdf").exists()
+        assert Document.objects.get(pk=document.pk).filename == "renamed.pdf"
+
+    def test_nested_scope_defers_to_outer(
+        self,
+        document: Document,
+        paperless_dirs: PaperlessDirs,
+    ) -> None:
+        """
+        GIVEN:
+            - A scope nested inside another
+        WHEN:
+            - The document is saved inside the inner scope and the inner scope exits
+        THEN:
+            - Nothing moves until the outer scope exits
+        """
+        with defer_file_moves():
+            with defer_file_moves():
+                document.title = "renamed"
+                document.save()
+            assert (paperless_dirs.originals_dir / "original.pdf").is_file()
+
+        assert (paperless_dirs.originals_dir / "renamed.pdf").is_file()
+
+    def test_closed_collector_moves_immediately(
+        self,
+        document: Document,
+        paperless_dirs: PaperlessDirs,
+    ) -> None:
+        """
+        GIVEN:
+            - A collector that has already been closed (work outliving its scope)
+        WHEN:
+            - A save asks for a move while that collector is still current
+        THEN:
+            - The move happens immediately instead of being lost
+        """
+        with defer_file_moves():
+            collector = _active_collector.get()
+        assert collector is not None
+        token = _active_collector.set(collector)
+        try:
+            document.title = "renamed"
+            document.save()
+        finally:
+            _active_collector.reset(token)
+
+        assert (paperless_dirs.originals_dir / "renamed.pdf").is_file()
+
+    def test_scope_closing_inside_atomic_flushes_on_commit(
+        self,
+        document: Document,
+        paperless_dirs: PaperlessDirs,
+        django_capture_on_commit_callbacks: OnCommitCapture,
+    ) -> None:
+        """
+        GIVEN:
+            - A scope opened and closed inside an atomic block
+        WHEN:
+            - The atomic block commits
+        THEN:
+            - The move runs only once the commit callbacks run
+        """
+        with django_capture_on_commit_callbacks(execute=True):
+            with transaction.atomic(), defer_file_moves():
+                document.title = "renamed"
+                document.save()
+            assert (paperless_dirs.originals_dir / "original.pdf").is_file()
+
+        assert (paperless_dirs.originals_dir / "renamed.pdf").is_file()
+
+    def test_scope_closing_inside_rolled_back_atomic_moves_nothing(
+        self,
+        document: Document,
+        paperless_dirs: PaperlessDirs,
+        django_capture_on_commit_callbacks: OnCommitCapture,
+    ) -> None:
+        """
+        GIVEN:
+            - A scope opened and closed inside an atomic block
+        WHEN:
+            - The atomic block rolls back
+        THEN:
+            - The title change is gone and the file is not moved
+        """
+
+        class Rollback(Exception):
+            pass
+
+        with django_capture_on_commit_callbacks(execute=True):
+            with pytest.raises(Rollback):
+                with transaction.atomic(), defer_file_moves():
+                    document.title = "renamed"
+                    document.save()
+                    raise Rollback
+
+        assert (paperless_dirs.originals_dir / "original.pdf").is_file()
+        assert not (paperless_dirs.originals_dir / "renamed.pdf").exists()
+        assert Document.objects.get(pk=document.pk).title == "original"
+
+    def test_flush_pending_moves_early(
+        self,
+        document: Document,
+        paperless_dirs: PaperlessDirs,
+    ) -> None:
+        """
+        GIVEN:
+            - An open scope with a pending move
+        WHEN:
+            - flush_pending_file_moves is called inside the scope
+        THEN:
+            - The move happens before the scope exits
+        """
+        with defer_file_moves():
+            document.title = "renamed"
+            document.save()
+            flush_pending_file_moves()
+            assert (paperless_dirs.originals_dir / "renamed.pdf").is_file()
+
+    def test_document_without_filename_in_scope_is_noop(
+        self,
+        paperless_dirs: PaperlessDirs,
+        title_format: None,
+    ) -> None:
+        """
+        GIVEN:
+            - A document still being consumed (no filename yet)
+        WHEN:
+            - It is saved inside a scope and the scope exits
+        THEN:
+            - Nothing is written, media.lock is never taken, nothing raises
+        """
+        doc = DocumentFactory(filename=None, mime_type="application/pdf")
+
+        with record_media_lock_acquisitions() as acquisitions:
+            with defer_file_moves():
+                doc.title = "renamed"
+                doc.save()
+
+        assert acquisitions == []
+        doc.refresh_from_db()
+        assert doc.filename is None
+
+    def test_mover_keeps_metadata_changed_after_save(
+        self,
+        document: Document,
+        paperless_dirs: PaperlessDirs,
+        settings: Settings,
+    ) -> None:
+        """
+        GIVEN:
+            - A filename format using correspondent and title
+            - A scope in which the title is saved
+        WHEN:
+            - Another writer changes the correspondent before the scope exits
+        THEN:
+            - The correspondent change survives the flush
+            - The final path reflects both changes
+        """
+        settings.FILENAME_FORMAT = "{correspondent}/{title}"
+        correspondent = CorrespondentFactory(name="acme")
+
+        with defer_file_moves():
+            document.title = "renamed"
+            document.save()
+            Document.objects.filter(pk=document.pk).update(correspondent=correspondent)
+
+        document.refresh_from_db()
+        assert document.correspondent == correspondent
+        assert document.filename == "acme/renamed.pdf"
+        assert (paperless_dirs.originals_dir / "acme" / "renamed.pdf").is_file()
+
+    def test_one_failure_does_not_stop_the_flush(
+        self,
+        paperless_dirs: PaperlessDirs,
+        title_format: None,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - Two documents saved in one scope
+            - Moving the first raises an unexpected error
+        WHEN:
+            - The scope exits
+        THEN:
+            - The scope does not raise
+            - The second document is still moved
+        """
+        (paperless_dirs.originals_dir / "a.pdf").write_bytes(CONTENT)
+        first = DocumentFactory(
+            filename="a.pdf",
+            title="a",
+            mime_type="application/pdf",
+        )
+        (paperless_dirs.originals_dir / "b.pdf").write_bytes(CONTENT)
+        second = DocumentFactory(
+            filename="b.pdf",
+            title="b",
+            mime_type="application/pdf",
+        )
+
+        real_move = move_files_for_document
+
+        def failing_for_first(pk: int) -> Document | None:
+            if pk == first.pk:
+                raise RuntimeError("boom")
+            return real_move(pk)
+
+        mocker.patch(
+            "documents.file_moves.move_files_for_document",
+            side_effect=failing_for_first,
+        )
+
+        with defer_file_moves():
+            first.title = "a2"
+            first.save()
+            second.title = "b2"
+            second.save()
+
+        assert (paperless_dirs.originals_dir / "b2.pdf").is_file()
+        assert (paperless_dirs.originals_dir / "a.pdf").is_file()
