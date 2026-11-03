@@ -25,7 +25,11 @@ from documents.file_moves import move_files_for_document
 from documents.file_moves import request_file_move
 from documents.models import CustomField
 from documents.models import Document
+from documents.models import Workflow
+from documents.models import WorkflowAction
+from documents.models import WorkflowTrigger
 from documents.tasks import bulk_update_documents
+from documents.tasks import check_scheduled_workflows
 from documents.tasks import empty_trash
 from paperless.celery import app as celery_app
 from paperless.middleware import FileMoveMiddleware
@@ -837,6 +841,55 @@ class TestCeleryTaskScope:
 
         assert (paperless_dirs.originals_dir / "first-renamed.pdf").is_file()
         assert (paperless_dirs.originals_dir / "second-renamed.pdf").is_file()
+
+    def test_scheduled_workflows_move_each_document(
+        self,
+        document: Document,
+        paperless_dirs: PaperlessDirs,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - Two documents matched by a scheduled workflow, where running the
+              workflow renames the document
+        WHEN:
+            - check_scheduled_workflows runs
+        THEN:
+            - The first document's file is already moved when the workflow
+              runs for the second, not only when the task ends
+        """
+        (paperless_dirs.originals_dir / "second.pdf").write_bytes(CONTENT)
+        second = DocumentFactory(
+            title="second",
+            filename="second.pdf",
+            mime_type="application/pdf",
+            checksum=hashlib.sha256(CONTENT).hexdigest(),
+        )
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
+            schedule_offset_days=0,
+            schedule_date_field=WorkflowTrigger.ScheduleDateField.ADDED,
+        )
+        workflow = Workflow.objects.create(name="scheduled", order=0)
+        workflow.triggers.add(trigger)
+        workflow.actions.add(WorkflowAction.objects.create(assign_title="unused"))
+
+        seen: dict[int, bool] = {}
+
+        def rename(*, document: Document, **kwargs: object) -> None:
+            seen[document.pk] = (paperless_dirs.originals_dir / "first.pdf").is_file()
+            document.title = "first" if document.pk == first_pk else "other"
+            document.save()
+
+        first_pk = min(document.pk, second.pk)
+        mocker.patch("documents.tasks.run_workflows", side_effect=rename)
+        mocker.patch("documents.tasks.send_websocket_document_updated")
+
+        check_scheduled_workflows.apply()
+
+        second_pk = max(document.pk, second.pk)
+        assert seen[first_pk] is False
+        assert seen[second_pk] is True
 
 
 @pytest.mark.django_db

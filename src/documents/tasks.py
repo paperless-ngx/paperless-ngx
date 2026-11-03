@@ -576,6 +576,8 @@ def check_scheduled_workflows() -> None:
 
     Once a document satisfies this condition, and recurring/non-recurring constraints are met, the workflow is run.
     """
+    from documents.file_moves import flush_pending_file_moves
+
     scheduled_workflows = get_workflows_for_trigger(
         WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
     )
@@ -703,6 +705,9 @@ def check_scheduled_workflows() -> None:
                             sender=None,
                             document=document,
                         )
+                        # Move this document's files now rather than at the end
+                        # of the task, so a long run makes steady progress.
+                        flush_pending_file_moves()
 
 
 @shared_task
