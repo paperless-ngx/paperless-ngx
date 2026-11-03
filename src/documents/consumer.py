@@ -762,7 +762,7 @@ class ConsumerPlugin(
                         # Don't save with the lock active. Saving will cause the file
                         # renaming logic to acquire the lock as well.
                         # This triggers things like file renaming
-                        document.save()
+                        document.save(write_file_paths=True)
 
                         if document.root_document_id:
                             document_updated.send(

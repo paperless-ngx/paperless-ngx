@@ -2,6 +2,7 @@ import datetime
 import uuid
 from pathlib import Path
 from typing import TYPE_CHECKING
+from typing import Any
 from typing import Final
 
 import pathvalidate
@@ -215,6 +216,12 @@ class StoragePath(MatchingModel):
 
 class Document(SoftDeleteModel, ModelWithOwner):  # type: ignore[django-manager-missing]
     MAX_STORED_FILENAME_LENGTH: Final[int] = 1024
+    # Written only by the file mover, the consumer's file placement and the
+    # archiver. A full save() of a stale instance must never write them, or
+    # the DB can point at a path the file has already been moved away from.
+    FILE_PATH_FIELDS: Final[frozenset[str]] = frozenset(
+        {"filename", "archive_filename"},
+    )
     # Per-component limit of common filesystems (ext4, XFS, btrfs, ZFS, APFS)
     MAX_PUBLIC_FILENAME_BYTES: Final[int] = 255
 
@@ -425,6 +432,31 @@ class Document(SoftDeleteModel, ModelWithOwner):  # type: ignore[django-manager-
         if self.title:
             res += f" {self.title}"
         return res
+
+    def save(self, *, write_file_paths: bool = False, **kwargs: Any) -> None:
+        """
+        Save the document without writing filename / archive_filename on an
+        existing row, unless write_file_paths=True or update_fields names them.
+
+        This mirrors how Django narrows a save on a deferred instance: only the
+        loaded, concrete, non-generated, non-primary-key fields are written.
+        """
+        if (
+            not write_file_paths
+            and not self._state.adding
+            and kwargs.get("update_fields") is None
+            and not kwargs.get("force_insert", False)
+        ):
+            deferred = self.get_deferred_fields()
+            kwargs["update_fields"] = [
+                field.attname
+                for field in self._meta.concrete_fields
+                if not field.primary_key
+                and not field.generated
+                and field.name not in self.FILE_PATH_FIELDS
+                and field.attname not in deferred
+            ]
+        super().save(**kwargs)
 
     def get_effective_barcodes(self) -> list["DocumentBarcode"]:
         """

@@ -366,7 +366,7 @@ class ShareLinkBundleBuildTaskTests(DirectoriesMixin, APITestCase):
     def _write_document_file(self, *, archive: bool, content: bytes) -> Path:
         if archive:
             self.document.archive_filename = f"{self.document.pk:07}.pdf"
-            self.document.save()
+            self.document.save(write_file_paths=True)
             path = self.document.archive_path
             assert path is not None
         else:
