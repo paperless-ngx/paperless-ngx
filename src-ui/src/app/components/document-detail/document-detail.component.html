@@ -436,21 +436,22 @@
 </div>
 
 <ng-template #saveButtons>
+  @let saveDisabled = !userCanEdit || networkActive() || (isDirty$ | async) !== true;
   <div class="btn-group">
     <ng-container *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.Document }">
-      <button type="submit" class="order-3 btn btn-sm btn-primary" title="Save" i18n-title [disabled]="!userCanEdit || networkActive() || (isDirty$ | async) !== true">
+      <button type="submit" class="order-3 btn btn-sm" [class.btn-primary]="!saveDisabled" [class.btn-outline-primary]="saveDisabled" title="Save" i18n-title [disabled]="saveDisabled">
         <pngx-bs-icon class="d-md-none" width="1.2em" height="1.2em" name="floppy"></pngx-bs-icon><span class="d-none d-md-inline" i18n>Save</span>
       </button>
       @if (hasNext()) {
-        <button type="button" class="order-1 btn btn-sm btn-outline-primary d-none d-md-inline-block" (click)="saveEditNext()" i18n [disabled]="!userCanEdit || networkActive() || (isDirty$ | async) !== true">Save &amp; next</button>
+        <button type="button" class="order-1 btn btn-sm btn-outline-primary d-none d-md-inline-block" (click)="saveEditNext()" i18n [disabled]="saveDisabled">Save &amp; next</button>
       } @else {
-        <button type="button" class="order-2 btn btn-sm btn-outline-primary d-none d-md-inline-block" (click)="save(true)" i18n [disabled]="!userCanEdit || networkActive() || (isDirty$ | async) !== true">Save &amp; close</button>
+        <button type="button" class="order-2 btn btn-sm btn-outline-primary d-none d-md-inline-block" (click)="save(true)" i18n [disabled]="saveDisabled">Save &amp; close</button>
       }
-      <button type="button" class="order-0 btn btn-sm btn-outline-secondary" (click)="discard()" title="Discard" i18n-title [disabled]="!userCanEdit || networkActive() || (isDirty$ | async) !== true">
+      <button type="button" class="order-0 btn btn-sm btn-outline-secondary" (click)="discard()" title="Discard" i18n-title [disabled]="saveDisabled">
         <pngx-bs-icon class="d-md-none" width="1.2em" height="1.2em" name="arrow-counterclockwise"></pngx-bs-icon><span class="d-none d-md-inline" i18n>Discard</span>
       </button>
       <div class="btn-group order-4 d-md-none" ngbDropdown placement="bottom-end top-end" role="group">
-        <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle dropdown-toggle-split" ngbDropdownToggle aria-label="More save options" i18n-aria-label [disabled]="!userCanEdit || networkActive() || (isDirty$ | async) !== true"></button>
+        <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle dropdown-toggle-split" ngbDropdownToggle aria-label="More save options" i18n-aria-label [disabled]="saveDisabled"></button>
         <div class="dropdown-menu shadow" ngbDropdownMenu>
           @if (hasNext()) {
             <button type="button" ngbDropdownItem (click)="saveEditNext()" i18n>Save &amp; next</button>
