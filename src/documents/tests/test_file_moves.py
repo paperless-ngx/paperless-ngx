@@ -3,6 +3,7 @@ from __future__ import annotations
 import datetime
 import hashlib
 import logging
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 import pytest
@@ -23,6 +24,8 @@ from documents.file_moves import move_files_for_document
 from documents.file_moves import request_file_move
 from documents.models import CustomField
 from documents.models import Document
+from documents.tasks import bulk_update_documents
+from paperless.celery import app as celery_app
 from paperless.middleware import FileMoveMiddleware
 from paperless_testing.factories import CorrespondentFactory
 from paperless_testing.factories import CustomFieldFactory
@@ -62,6 +65,16 @@ def document(paperless_dirs: PaperlessDirs, title_format: None) -> Document:
         mime_type="application/pdf",
         checksum=hashlib.sha256(CONTENT).hexdigest(),
     )
+
+
+@celery_app.task(name="documents.tests.test_file_moves.rename_then_fail")
+def rename_then_fail(pk: int, originals_dir: str) -> None:
+    """Test-only task: rename the document, check nothing moved yet, then fail."""
+    doc = Document.objects.get(pk=pk)
+    doc.title = "renamed"
+    doc.save()
+    assert (Path(originals_dir) / "original.pdf").is_file()
+    raise RuntimeError("task failed after saving")
 
 
 @pytest.mark.django_db
@@ -751,3 +764,72 @@ class TestFileMovesThroughApi:
         document.refresh_from_db()
         assert document.filename == "cherry/original.pdf"
         assert (paperless_dirs.originals_dir / "cherry" / "original.pdf").is_file()
+
+
+@pytest.mark.django_db
+class TestCeleryTaskScope:
+    def test_task_class_opens_scope(self) -> None:
+        """
+        GIVEN:
+            - The paperless Celery app
+        WHEN:
+            - A registered task is inspected
+        THEN:
+            - It runs through FileMoveScopedTask
+        """
+        from paperless.celery import FileMoveScopedTask
+
+        assert isinstance(bulk_update_documents, FileMoveScopedTask)
+
+    def test_failing_task_still_moves_committed_change(
+        self,
+        document: Document,
+        paperless_dirs: PaperlessDirs,
+    ) -> None:
+        """
+        GIVEN:
+            - A task that renames a document, then raises
+        WHEN:
+            - The task is applied
+        THEN:
+            - The task fails with its own error
+            - Nothing moved while the task body ran
+            - The committed rename is moved when the task ends
+        """
+        result = rename_then_fail.apply(
+            args=[document.pk, str(paperless_dirs.originals_dir)],
+        )
+
+        assert result.failed()
+        assert isinstance(result.result, RuntimeError)
+        assert (paperless_dirs.originals_dir / "renamed.pdf").is_file()
+
+    def test_bulk_update_moves_each_document(
+        self,
+        document: Document,
+        paperless_dirs: PaperlessDirs,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - Two documents whose titles changed in the DB without signals
+        WHEN:
+            - bulk_update_documents runs for both
+        THEN:
+            - Each document's file follows its new title
+        """
+        mocker.patch("documents.search.get_backend")
+        (paperless_dirs.originals_dir / "second.pdf").write_bytes(CONTENT)
+        second = DocumentFactory(
+            title="second",
+            filename="second.pdf",
+            mime_type="application/pdf",
+            checksum=hashlib.sha256(CONTENT).hexdigest(),
+        )
+        Document.objects.filter(pk=document.pk).update(title="first-renamed")
+        Document.objects.filter(pk=second.pk).update(title="second-renamed")
+
+        bulk_update_documents.apply(args=[[document.pk, second.pk]])
+
+        assert (paperless_dirs.originals_dir / "first-renamed.pdf").is_file()
+        assert (paperless_dirs.originals_dir / "second-renamed.pdf").is_file()

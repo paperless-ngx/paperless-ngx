@@ -1,6 +1,7 @@
 import os
 
 from celery import Celery
+from celery import Task
 from celery.signals import worker_process_init
 from kombu.serialization import register
 
@@ -26,7 +27,25 @@ register(
     content_encoding="binary",
 )
 
-app = Celery("paperless")
+
+class FileMoveScopedTask(Task):
+    """
+    Run every task inside a document file move scope, so each document a task
+    changes is moved once when the task ends, after its writes have committed.
+    The scope also flushes when the task raises, for writes that committed
+    before the failure.
+    """
+
+    def __call__(self, *args, **kwargs):
+        # Function-local: this module is imported by paperless/__init__.py
+        # before Django apps are loaded.
+        from documents.file_moves import defer_file_moves
+
+        with defer_file_moves():
+            return super().__call__(*args, **kwargs)
+
+
+app = Celery("paperless", task_cls=FileMoveScopedTask)
 
 # Using a string here means the worker doesn't have to serialize
 # the configuration object to child processes.
