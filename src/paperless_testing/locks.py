@@ -27,7 +27,6 @@ def record_media_lock_acquisitions() -> Iterator[list[MediaLockAcquisition]]:
     Reentrant acquisitions by a thread that already holds the lock never wait,
     so they are not recorded. Each record notes whether a real (non test case)
     transaction was open at that moment, which is the lock ordering hazard.
-    Usable from pytest tests and unittest TestCase classes alike.
     """
     from django.conf import settings
     from filelock import BaseFileLock
