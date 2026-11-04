@@ -1,6 +1,7 @@
 import datetime
 import uuid
 from pathlib import Path
+from typing import TYPE_CHECKING
 from typing import Final
 
 import pathvalidate
@@ -27,6 +28,9 @@ from django_softdelete.models import SoftDeleteModel
 
 from documents.data_models import DocumentSource
 from documents.parsers import get_default_file_extension
+
+if TYPE_CHECKING:
+    from documents.tag_hierarchy import TagHierarchy
 
 
 class ModelWithOwner(models.Model):
@@ -128,33 +132,33 @@ class Tag(MatchingModel):
         verbose_name_plural = _("tags")
 
     @classmethod
-    def get_hierarchy(cls):
+    def get_hierarchy(cls) -> "TagHierarchy":
         from documents.tag_hierarchy import TagHierarchy
 
         return TagHierarchy(cls.objects.values_list("pk", "tn_parent_id"))
 
     @property
-    def parent_pk(self):
+    def parent_pk(self) -> int | None:
         return self.tn_parent_id
 
-    def get_parent(self):
+    def get_parent(self) -> "Tag | None":
         return self.tn_parent
 
-    def get_ancestors_pks(self):
+    def get_ancestors_pks(self) -> list[int]:
         return self.get_hierarchy().ancestors(self.tn_parent_id)
 
-    def get_ancestors(self):
+    def get_ancestors(self) -> list["Tag"]:
         ids = self.get_ancestors_pks()
         tags = self.__class__.objects.in_bulk(ids)
         return [tags[pk] for pk in ids]
 
-    def get_descendants_pks(self):
+    def get_descendants_pks(self) -> set[int]:
         return self.get_hierarchy().descendants([self.pk])
 
-    def get_descendants(self):
+    def get_descendants(self) -> "models.QuerySet[Tag]":
         return self.__class__.objects.filter(pk__in=self.get_descendants_pks())
 
-    def get_children_queryset(self):
+    def get_children_queryset(self) -> "models.QuerySet[Tag]":
         return self.__class__.objects.filter(tn_parent_id=self.pk)
 
     def clean(self) -> None:
