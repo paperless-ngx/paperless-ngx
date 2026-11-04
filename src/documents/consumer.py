@@ -607,13 +607,12 @@ class ConsumerPlugin(
                 # now that everything is done, we can start to store the document
                 # in the system. This will be a transaction and reasonably fast.
                 try:
-                    # File moves requested by saves in here run once, after
-                    # commit and after media.lock is released (in production
-                    # this nests under the consume task's scope). media.lock is
-                    # taken before the transaction: the version path locks the
-                    # root row with select_for_update, and workflows (email
-                    # actions) and file placement below take media.lock again,
-                    # re-entering instead of waiting while rows are locked.
+                    # File moves requested in here run after commit and after
+                    # media.lock is released. media.lock is taken before the
+                    # transaction: the version path locks the root row with
+                    # select_for_update, and workflow email actions and file
+                    # placement below re-enter media.lock instead of waiting
+                    # on it while rows are locked.
                     with defer_file_moves(), media_lock(), transaction.atomic():
                         # store the document.
                         if self.input_doc.root_document_id:

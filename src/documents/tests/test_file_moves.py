@@ -172,8 +172,7 @@ class TestMoveFilesForDocument:
         """
         GIVEN:
             - A trashed document whose DB filename is stale
-            - Its file sits at the generated path (checksum matches), placed
-              after the creation-time move already failed
+            - Its file already sits at the generated path (checksum matches)
         WHEN:
             - move_files_for_document is called
         THEN:
@@ -627,8 +626,7 @@ class TestFileMovesThroughApi:
             - A tag + title PATCH and a note POST are made through the API
         THEN:
             - media.lock is acquired at least once
-            - media.lock is never first acquired while a transaction is open,
-              which is the lock ordering that let two such requests deadlock
+            - media.lock is never first acquired while a transaction is open
         """
         tag = TagFactory()
 

@@ -39,8 +39,6 @@ class FileMoveMiddleware:
     Open a document file move scope around each request, so every document the
     request changes is moved once, after its writes have committed, before the
     response is returned.
-
-    Supports both sync and async middleware chains.
     """
 
     sync_capable = True
