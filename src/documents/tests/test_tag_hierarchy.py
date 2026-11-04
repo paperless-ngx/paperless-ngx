@@ -14,9 +14,76 @@ from documents.signals.handlers import run_workflows
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import UserFactory
 from paperless_testing.permissions import grant_global
+from paperless_testing.permissions import grant_object
 
 
 class TestTagHierarchyPermissions(APITestCase):
+    def test_delete_checks_descendant_permissions(self) -> None:
+        for mode in ("detail", "bulk", "all"):
+            for ownership in ("owned", "unowned", "private", "shared", "superuser"):
+                with self.subTest(mode=mode, ownership=ownership):
+                    requester = UserFactory(superuser=ownership == "superuser")
+                    grant_global(requester, "view_tag", "delete_tag")
+                    self.client.force_authenticate(user=requester)
+                    if ownership == "owned":
+                        descendant_owner = requester
+                    elif ownership == "unowned":
+                        descendant_owner = None
+                    else:
+                        descendant_owner = UserFactory()
+                    parent = Tag.objects.create(name="Parent", owner=requester)
+                    child = Tag.objects.create(
+                        name=f"Child {mode} {ownership}",
+                        tn_parent=parent,
+                    )
+                    grandchild = Tag.objects.create(
+                        name=f"Grandchild {mode} {ownership}",
+                        owner=descendant_owner,
+                        tn_parent=child,
+                    )
+                    if ownership == "shared":
+                        grant_object(requester, grandchild, "delete_tag")
+                    document = Document.objects.create(
+                        title="Document",
+                        checksum=f"{mode}-{ownership}",
+                    )
+                    document.tags.add(grandchild)
+                    ids = [parent.pk, child.pk, grandchild.pk]
+
+                    if mode == "detail":
+                        response = self.client.delete(f"/api/tags/{parent.pk}/")
+                    else:
+                        selection = (
+                            {"all": True, "filters": {"id__in": str(parent.pk)}}
+                            if mode == "all"
+                            else {"objects": [parent.pk]}
+                        )
+                        response = self.client.post(
+                            "/api/bulk_edit_objects/",
+                            {"object_type": "tags", "operation": "delete", **selection},
+                            format="json",
+                        )
+
+                    # Detail deletion accepts explicit delete grants; bulk
+                    # deletion requires ownership (or an unowned object).
+                    allowed = ownership in ("owned", "unowned", "superuser") or (
+                        ownership == "shared" and mode == "detail"
+                    )
+                    expected_status = status.HTTP_403_FORBIDDEN
+                    if allowed:
+                        expected_status = (
+                            status.HTTP_204_NO_CONTENT
+                            if mode == "detail"
+                            else status.HTTP_200_OK
+                        )
+                    assert response.status_code == expected_status
+                    assert Tag.objects.filter(pk__in=ids).count() == (
+                        0 if allowed else 3
+                    )
+                    assert document.tags.filter(pk=grandchild.pk).exists() == (
+                        not allowed
+                    )
+
     def test_children_only_include_visible_tags(self) -> None:
         owner = UserFactory(username="owner")
         requester = UserFactory(username="requester")
