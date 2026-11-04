@@ -12,6 +12,8 @@ from documents.models import WorkflowTrigger
 from documents.serialisers import TagSerializer
 from documents.signals.handlers import run_workflows
 from paperless_testing.dirs import DirectoriesMixin
+from paperless_testing.factories import DocumentFactory
+from paperless_testing.factories import TagFactory
 from paperless_testing.factories import UserFactory
 from paperless_testing.permissions import grant_global
 from paperless_testing.permissions import grant_object
@@ -31,22 +33,15 @@ class TestTagHierarchyPermissions(APITestCase):
                         descendant_owner = None
                     else:
                         descendant_owner = UserFactory()
-                    parent = Tag.objects.create(name="Parent", owner=requester)
-                    child = Tag.objects.create(
-                        name=f"Child {mode} {ownership}",
-                        tn_parent=parent,
-                    )
-                    grandchild = Tag.objects.create(
-                        name=f"Grandchild {mode} {ownership}",
+                    parent = TagFactory(owner=requester)
+                    child = TagFactory(tn_parent=parent)
+                    grandchild = TagFactory(
                         owner=descendant_owner,
                         tn_parent=child,
                     )
                     if ownership == "shared":
                         grant_object(requester, grandchild, "delete_tag")
-                    document = Document.objects.create(
-                        title="Document",
-                        checksum=f"{mode}-{ownership}",
-                    )
+                    document = DocumentFactory()
                     document.tags.add(grandchild)
                     ids = [parent.pk, child.pk, grandchild.pk]
 
