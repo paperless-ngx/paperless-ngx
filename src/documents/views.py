@@ -576,6 +576,15 @@ class CorrespondentViewSet(
         return super().retrieve(request, *args, **kwargs)
 
 
+def _with_tag_descendants(tags: QuerySet[Tag]) -> QuerySet[Tag]:
+    """Include every tag that deleting the selected tags will affect."""
+    tag_ids = set()
+    for tag in tags:
+        tag_ids.add(tag.pk)
+        tag_ids.update(tag.get_descendants_pks())
+    return Tag.objects.filter(pk__in=tag_ids)
+
+
 @extend_schema_view(**generate_object_with_permissions_schema(TagSerializer))
 class TagViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet[Tag]):
     model = Tag
@@ -596,6 +605,14 @@ class TagViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet[Tag]):
     )
     filterset_class = TagFilterSet
     ordering_fields = ("color", "name", "matching_algorithm", "match", "document_count")
+
+    def perform_destroy(self, instance):
+        tags = _with_tag_descendants(Tag.objects.filter(pk=instance.pk))
+        if tags.exclude(
+            pk__in=permitted_object_ids(self.request.user, Tag, "delete_tag"),
+        ).exists():
+            raise PermissionDenied(_("Insufficient permissions."))
+        super().perform_destroy(instance)
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
@@ -5074,6 +5091,9 @@ class BulkEditObjectsView(PassUserMixin):
             objs = object_class.objects.select_related("owner").filter(
                 pk__in=object_ids,
             )
+
+        if object_type == "tags" and operation == "delete":
+            objs = _with_tag_descendants(objs)
 
         if not user.is_superuser:
             perm = f"documents.{perm_codename}"
