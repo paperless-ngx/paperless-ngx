@@ -1,16 +1,18 @@
 <div class="row pt-3 pb-2 align-items-center">
   <div class="col-md text-truncate">
     <h3 class="d-flex align-items-center mb-2 mb-md-1" style="line-height: 1.4">
-      <span class="text-truncate">{{title()}}</span>
-      @if (id()) {
-        <button type="button" class="badge border-0 bg-primary text-primary-text-contrast ms-3 small fs-normal" (click)="copyID()" title="Copy ID" i18n-title>
-          @if (copied()) {
-            <pngx-bs-icon width="1em" height="1em" name="clipboard-check" class="me-1"></pngx-bs-icon><ng-container i18n>Copied!</ng-container>
-          } @else {
-            ID: {{id()}}
-          }
-        </button>
-      }
+      <span class="d-flex align-items-center mw-100">
+        <span class="text-truncate">{{title()}}</span>
+        @if (id()) {
+          <button type="button" class="badge border-0 bg-primary text-primary-text-contrast ms-3 small fs-normal flex-shrink-0 text-nowrap" (click)="copyID()" title="Copy ID" i18n-title>
+            @if (copied()) {
+              <pngx-bs-icon width="1em" height="1em" name="clipboard-check" class="me-1"></pngx-bs-icon><ng-container i18n>Copied!</ng-container>
+            } @else {
+              ID: {{id()}}
+            }
+          </button>
+        }
+      </span>
       @if (subTitle()) {
         <span class="page-subtitle h6 mb-0 mt-1 fw-normal ms-md-3 text-truncate" style="line-height: 1.4">{{subTitle()}}</span>
       }
