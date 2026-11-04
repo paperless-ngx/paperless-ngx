@@ -9,6 +9,8 @@ from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
+from django.db import transaction
 from django.forms import ValidationError
 from django.http import HttpRequest
 from django.urls import reverse
@@ -111,13 +113,20 @@ class CustomAccountAdapter(DefaultAccountAdapter):
             path = path.replace("UID-KEY", quote(key))
             return settings.PAPERLESS_URL + path
 
+    @transaction.atomic
     def save_user(self, request, user, form, commit=True):  # noqa: FBT002
         """
         Save the user instance. Default groups are assigned to the user, if
         specified in the settings.
         """
 
-        if (
+        if commit:
+            ContentType.objects.select_for_update().get(
+                app_label=User._meta.app_label,
+                model=User._meta.model_name,
+            )
+
+        if commit and (
             User.objects.exclude(username__in=["consumer", "AnonymousUser"]).count()
             == 0
             and Document.global_objects.count() == 0

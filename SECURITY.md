@@ -66,7 +66,7 @@ The following are not generally considered vulnerabilities unless accompanied by
 - optional webhook, mail, AI, OCR, or integration behavior described without a product-level vulnerability
 - missing limits or hardening settings presented without concrete impact
 - generic AI or static-analysis output that is not confirmed against the current codebase and a real deployment scenario
-- metadata names visible in a document's custom storage path, even when the user cannot access the underlying metadata object; this is expected behavior
+- metadata names or normalized words visible in a document's custom storage path or through search/autocomplete for documents the user can access, even when the user cannot access the underlying metadata object; this is expected behavior
 - the ability to attach objects that a user cannot access to a document by ID is an intentional design choice, and not considered a vulnerability
 
 ## Transparency
