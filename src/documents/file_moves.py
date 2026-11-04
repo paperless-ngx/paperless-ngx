@@ -60,8 +60,8 @@ def in_user_transaction() -> bool:
     created by Django's test case machinery.
 
     Django marks the atomic blocks TestCase (and pytest-django) wrap around
-    each test with _from_testcase, the same flag it uses for durable checks.
-    Ignoring them keeps tests on the same path as production.
+    each test with _from_testcase. Ignoring them keeps tests on the same path
+    as production.
     """
     connection = transaction.get_connection()
     return any(not block._from_testcase for block in connection.atomic_blocks)
@@ -124,11 +124,10 @@ def move_files_for_document(pk: int) -> Document | None:
     the document does not exist, has no filename yet, or the lock timed out.
     """
     # Cheap check without the lock: most saves during consumption happen
-    # before the file is placed. filename, once set, is never cleared, so a
-    # non-empty value here stays non-empty under the lock. This goes through
-    # values_list() (not the manager's filter()) so the check stays off
+    # before the file is placed. filename is never cleared once set, so this
+    # stays true under the lock. values_list() keeps the check off
     # Document.global_objects.filter(), which tests patch to inject database
-    # errors and to observe the mover's own writes.
+    # errors into and observe the mover's own writes.
     filename = (
         Document.global_objects.values_list("filename", flat=True).filter(pk=pk).first()
     )
@@ -208,9 +207,8 @@ def flush_pending_file_moves() -> None:
     """
     Perform the current scope's pending moves now, keeping the scope open.
 
-    When called from a task running eagerly inside a request, this flushes the
-    request's collector early, which is harmless: the moves still run after
-    commit and against fresh state.
+    From an eager task inside a request this flushes the request's collector
+    early, which is harmless: moves still run after commit, on fresh state.
     """
     collector = _active_collector.get()
     if collector is None:
@@ -339,7 +337,6 @@ def _move_document_files(document: Document) -> None:
                 updates["archive_filename"] = document.archive_filename
             if updates:
                 # global_objects so a trashed document's path is fixed too.
-                # modified only changes when a filename column changes.
                 updates["modified"] = timezone.now()
                 # Don't save() here to prevent infinite recursion.
                 Document.global_objects.filter(pk=document.pk).update(**updates)
@@ -426,9 +423,9 @@ def request_file_move(document: Document) -> None:
     Ask for the document's files to follow its committed state.
 
     Inside an open scope the request is recorded and performed when the scope
-    ends. Otherwise the move happens now, and only the final filename columns
-    are copied onto the caller's instance, so code that saves and then reads
-    source_path keeps working without any other in-memory field being touched.
+    ends. Otherwise the move happens now and only the final filename columns
+    are copied onto the caller's instance, so source_path is current after
+    save() while other in-memory fields are left alone.
     """
     collector = _active_collector.get()
     if collector is not None and collector.add(document.pk):
@@ -445,10 +442,9 @@ async def adefer_file_moves() -> AsyncIterator[None]:
     """
     Async twin of defer_file_moves().
 
-    The collector is closed on the event loop (no DB access), and only when
-    something was collected does the flush, including the transaction check
-    that must run in the thread owning the DB connection, run through
-    sync_to_async so the blocking media.lock never runs on the event loop.
+    When something was collected, the flush runs through sync_to_async: its
+    transaction check needs the thread owning the DB connection, and the
+    blocking media.lock must never run on the event loop.
     """
     current = _active_collector.get()
     if current is not None and not current.closed:

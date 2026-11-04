@@ -285,8 +285,7 @@ class TestRenamer(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         WHEN:
             - document_renamer runs
         THEN:
-            - Each document is moved by a direct call, one per document,
-              not by a fake post_save signal
+            - move_files_for_document is called once per document
             - Both files are at their new paths
         """
         docs = []
