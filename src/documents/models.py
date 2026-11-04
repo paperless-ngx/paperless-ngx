@@ -133,6 +133,7 @@ class Tag(MatchingModel):
 
     @classmethod
     def get_hierarchy(cls) -> "TagHierarchy":
+        """Read the tag hierarchy in one query, ready to use across multiple tags."""
         from documents.tag_hierarchy import TagHierarchy
 
         return TagHierarchy(cls.objects.values_list("pk", "tn_parent_id"))
@@ -145,17 +146,37 @@ class Tag(MatchingModel):
         return self.tn_parent
 
     def get_ancestors_pks(self) -> list[int]:
+        """Return ancestor IDs ordered from root to parent.
+
+        Each call reads the full hierarchy. Use Tag.get_hierarchy() once and
+        reuse it when working with several tags.
+        """
         return self.get_hierarchy().ancestors(self.tn_parent_id)
 
     def get_ancestors(self) -> list["Tag"]:
+        """Return ancestors ordered from root to parent.
+
+        Each call reads the full hierarchy. Use Tag.get_hierarchy() once and
+        reuse it when working with several tags.
+        """
         ids = self.get_ancestors_pks()
         tags = self.__class__.objects.in_bulk(ids)
         return [tags[pk] for pk in ids]
 
     def get_descendants_pks(self) -> set[int]:
+        """Return all descendant IDs.
+
+        Each call reads the full hierarchy. Use Tag.get_hierarchy() once and
+        reuse it when working with several tags.
+        """
         return self.get_hierarchy().descendants([self.pk])
 
     def get_descendants(self) -> "models.QuerySet[Tag]":
+        """Return a queryset of all descendants.
+
+        Each call reads the full hierarchy. Use Tag.get_hierarchy() once and
+        reuse it when working with several tags.
+        """
         return self.__class__.objects.filter(pk__in=self.get_descendants_pks())
 
     def get_children_queryset(self) -> "models.QuerySet[Tag]":
