@@ -1,28 +1,30 @@
 <div class="row pt-3 pb-2 align-items-center">
   <div class="col-md text-truncate">
     <h3 class="d-flex align-items-center mb-2 mb-md-1" style="line-height: 1.4">
-      <span class="text-truncate">{{title()}}</span>
-      @if (id()) {
-        <button type="button" class="badge border-0 bg-primary text-primary-text-contrast ms-3 small fs-normal" (click)="copyID()" title="Copy ID" i18n-title>
-          @if (copied()) {
-            <i-bs width="1em" height="1em" name="clipboard-check" class="me-1"></i-bs><ng-container i18n>Copied!</ng-container>
-          } @else {
-            ID: {{id()}}
-          }
-        </button>
-      }
+      <span class="d-flex align-items-center mw-100">
+        <span class="text-truncate">{{title()}}</span>
+        @if (id()) {
+          <button type="button" class="badge border-0 bg-primary text-primary-text-contrast ms-3 small fs-normal flex-shrink-0 text-nowrap" (click)="copyID()" title="Copy ID" i18n-title>
+            @if (copied()) {
+              <pngx-bs-icon width="1em" height="1em" name="clipboard-check" class="me-1"></pngx-bs-icon><ng-container i18n>Copied!</ng-container>
+            } @else {
+              ID: {{id()}}
+            }
+          </button>
+        }
+      </span>
       @if (subTitle()) {
         <span class="page-subtitle h6 mb-0 mt-1 fw-normal ms-md-3 text-truncate" style="line-height: 1.4">{{subTitle()}}</span>
       }
       @if (info()) {
         <button class="btn btn-sm btn-link text-muted p-0 ms-2 p-md-2 ms-md-0" title="What's this?" i18n-title type="button" [ngbPopover]="infoPopover" [autoClose]="true">
-          <i-bs name="question-circle"></i-bs>
+          <pngx-bs-icon name="question-circle"></pngx-bs-icon>
         </button>
         <ng-template #infoPopover>
           <p [class.mb-0]="!infoLink()" [innerHTML]="info()"></p>
           @if (infoLink()) {
             <a href="https://docs.paperless-ngx.com/{{infoLink()}}" target="_blank" referrerpolicy="noopener noreferrer" i18n>Read more</a>
-            <i-bs class="ms-1" width=".8em" height=".8em" name="box-arrow-up-right"></i-bs>
+            <pngx-bs-icon class="ms-1" width=".8em" height=".8em" name="box-arrow-up-right"></pngx-bs-icon>
           }
         </ng-template>
       }

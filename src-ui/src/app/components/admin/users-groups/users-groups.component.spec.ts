@@ -3,7 +3,6 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of, throwError } from 'rxjs'
 import { Group } from 'src/app/data/group'
 import { User } from 'src/app/data/user'
@@ -41,7 +40,6 @@ describe('UsersAndGroupsComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [NgxBootstrapIconsModule.pick(allIcons)],
       providers: [
         CustomDatePipe,
         DatePipe,

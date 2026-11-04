@@ -1,7 +1,6 @@
 import { Clipboard } from '@angular/cdk/clipboard'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { RouterTestingModule } from '@angular/router/testing'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { of, throwError } from 'rxjs'
 import { FileVersion, ShareLink } from 'src/app/data/share-link'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
@@ -38,11 +37,7 @@ describe('ShareLinkListComponent', () => {
     }
 
     TestBed.configureTestingModule({
-      imports: [
-        ShareLinkListComponent,
-        NgxBootstrapIconsModule.pick(allIcons),
-        RouterTestingModule,
-      ],
+      imports: [ShareLinkListComponent, RouterTestingModule],
       providers: [
         { provide: ShareLinkService, useValue: service },
         { provide: ToastService, useValue: toastService },

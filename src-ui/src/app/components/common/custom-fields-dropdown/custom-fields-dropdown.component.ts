@@ -12,8 +12,8 @@ import {
 } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { first, takeUntil } from 'rxjs'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { CustomField, DATA_TYPE_LABELS } from 'src/app/data/custom-field'
 import { CustomFieldInstance } from 'src/app/data/custom-field-instance'
 import {
@@ -34,7 +34,7 @@ import { CustomFieldEditDialogComponent } from '../edit-dialog/custom-field-edit
   styleUrls: ['./custom-fields-dropdown.component.scss'],
   imports: [
     NgbDropdownModule,
-    NgxBootstrapIconsModule,
+    BootstrapIconComponent,
     FormsModule,
     ReactiveFormsModule,
   ],

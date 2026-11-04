@@ -6,7 +6,6 @@ from pathlib import Path
 from typing import Final
 
 from django.conf import settings
-from pikepdf import Pdf
 
 from documents.consumer import ConsumerError
 from documents.converters import convert_from_tiff_to_pdf
@@ -85,6 +84,8 @@ class CollatePlugin(NoCleanupPluginMixin, NoSetupPluginMixin, ConsumeTaskPlugin)
                 valid_staging_exists = True
 
         if valid_staging_exists:
+            from pikepdf import Pdf
+
             try:
                 # Collate pages from second PDF in reverse order
                 with Pdf.open(staging) as pdf1, Pdf.open(pdf_file) as pdf2:

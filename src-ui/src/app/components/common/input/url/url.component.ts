@@ -4,7 +4,7 @@ import {
   NG_VALUE_ACCESSOR,
   ReactiveFormsModule,
 } from '@angular/forms'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { AbstractInputComponent } from '../abstract-input'
 
 @Component({
@@ -18,7 +18,7 @@ import { AbstractInputComponent } from '../abstract-input'
   selector: 'pngx-input-url',
   templateUrl: './url.component.html',
   styleUrls: ['./url.component.scss'],
-  imports: [NgxBootstrapIconsModule, FormsModule, ReactiveFormsModule],
+  imports: [BootstrapIconComponent, FormsModule, ReactiveFormsModule],
 })
 export class UrlComponent extends AbstractInputComponent<string> {
   constructor() {

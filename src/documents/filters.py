@@ -11,7 +11,6 @@ from decimal import InvalidOperation
 from typing import TYPE_CHECKING
 from typing import Any
 
-import dateparser
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Case
@@ -349,6 +348,8 @@ class DateQueryField(serializers.DateField):
         except serializers.ValidationError:
             if not isinstance(value, str):
                 raise
+
+        import dateparser
 
         try:
             parsed = dateparser.parse(

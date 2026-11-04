@@ -572,7 +572,7 @@ class TestAiChatAllDocumentsPermissionBoundary:
     ENDPOINT = "/api/documents/chat/"
 
     @override_settings(AI_ENABLED=True)
-    @patch("documents.views.stream_chat_with_documents")
+    @patch("paperless_ai.chat.stream_chat_with_documents")
     def test_chat_all_documents_excludes_unshared_document(self, mock_stream_chat):
         mock_stream_chat.return_value = iter([b"data"])
 

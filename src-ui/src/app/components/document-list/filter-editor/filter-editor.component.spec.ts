@@ -15,7 +15,6 @@ import {
   NgbTypeaheadModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectComponent, NgSelectModule } from '@ng-select/ng-select'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { provideUiTour } from 'ngx-ui-tour-ng-bootstrap'
 import { of, throwError } from 'rxjs'
 import { Correspondent } from 'src/app/data/correspondent'
@@ -198,7 +197,6 @@ describe('FilterEditorComponent', () => {
         FormsModule,
         ReactiveFormsModule,
         NgbDatepickerModule,
-        NgxBootstrapIconsModule.pick(allIcons),
         NgbTypeaheadModule,
         NgSelectModule,
         FilterEditorComponent,

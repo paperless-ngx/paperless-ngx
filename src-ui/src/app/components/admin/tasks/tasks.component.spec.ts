@@ -10,7 +10,6 @@ import { By } from '@angular/platform-browser'
 import { Router } from '@angular/router'
 import { RouterTestingModule } from '@angular/router/testing'
 import { NgbModal, NgbModalRef, NgbModule } from '@ng-bootstrap/ng-bootstrap'
-import { allIcons, NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { of, throwError } from 'rxjs'
 import { routes } from 'src/app/app-routing.module'
 import {
@@ -174,7 +173,6 @@ describe('TasksComponent', () => {
       imports: [
         NgbModule,
         RouterTestingModule.withRoutes(routes),
-        NgxBootstrapIconsModule.pick(allIcons),
         FormsModule,
         TasksComponent,
         PageHeaderComponent,

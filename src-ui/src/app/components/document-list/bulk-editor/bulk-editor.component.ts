@@ -19,7 +19,6 @@ import {
   NgbModalRef,
 } from '@ng-bootstrap/ng-bootstrap'
 import { saveAs } from 'file-saver'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import {
   first,
   map,
@@ -29,6 +28,7 @@ import {
   takeUntil,
   tap,
 } from 'rxjs'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { ConfirmDialogComponent } from 'src/app/components/common/confirm-dialog/confirm-dialog.component'
 import { CustomField } from 'src/app/data/custom-field'
 import { MatchingModel } from 'src/app/data/matching-model'
@@ -92,7 +92,7 @@ import { CustomFieldsBulkEditDialogComponent } from './custom-fields-bulk-edit-d
     FormsModule,
     ReactiveFormsModule,
     NgbDropdownModule,
-    NgxBootstrapIconsModule,
+    BootstrapIconComponent,
   ],
 })
 export class BulkEditorComponent

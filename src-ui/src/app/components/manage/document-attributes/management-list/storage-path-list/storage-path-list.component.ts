@@ -6,7 +6,7 @@ import {
   NgbDropdownModule,
   NgbPaginationModule,
 } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { StoragePathEditDialogComponent } from 'src/app/components/common/edit-dialog/storage-path-edit-dialog/storage-path-edit-dialog.component'
 import { FILTER_HAS_STORAGE_PATH_ANY } from 'src/app/data/filter-rule-type'
 import { StoragePath } from 'src/app/data/storage-path'
@@ -30,7 +30,7 @@ import { ManagementListComponent } from '../management-list.component'
     NgTemplateOutlet,
     NgbDropdownModule,
     NgbPaginationModule,
-    NgxBootstrapIconsModule,
+    BootstrapIconComponent,
   ],
 })
 export class StoragePathListComponent extends ManagementListComponent<StoragePath> {

@@ -5,24 +5,24 @@
       <trans-unit id="ngb.alert.close" datatype="html" approved="yes">
         <source>Close</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.2_@angular+core@22.2.2_@angular+_56804c6e9d763769999573a32671b982/node_modules/src/alert/alert.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.3_@angular+core@22.2.3_@angular+_2a970977f09c8afdd1f9933e219c8db5/node_modules/src/alert/alert.ts</context>
           <context context-type="linenumber">38,39</context>
         </context-group>
         <target state="final">Fermer</target>
       </trans-unit>
       <trans-unit id="ngb.carousel.slide-number" datatype="html">
-        <source> Slide <x id="INTERPOLATION" equiv-text="xt(source?: Ngb"/> of <x id="INTERPOLATION_1" equiv-text="this._cycleToSe"/> </source>
+        <source> Slide <x id="INTERPOLATION" equiv-text="source?: NgbSli"/> of <x id="INTERPOLATION_1" equiv-text="s._cycleToSelec"/> </source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.2_@angular+core@22.2.2_@angular+_56804c6e9d763769999573a32671b982/node_modules/src/carousel/carousel.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.3_@angular+core@22.2.3_@angular+_2a970977f09c8afdd1f9933e219c8db5/node_modules/src/carousel/carousel.ts</context>
           <context context-type="linenumber">386,393</context>
         </context-group>
         <note priority="1" from="description">Currently selected slide number read by screen reader</note>
-        <target state="needs-translation"> Slide <x id="INTERPOLATION" equiv-text="xt(source?: Ngb"/> of <x id="INTERPOLATION_1" equiv-text="this._cycleToSe"/> </target>
+        <target state="needs-translation"> Slide <x id="INTERPOLATION" equiv-text="source?: NgbSli"/> of <x id="INTERPOLATION_1" equiv-text="s._cycleToSelec"/> </target>
       </trans-unit>
       <trans-unit id="ngb.carousel.previous" datatype="html" approved="yes">
         <source>Previous</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.2_@angular+core@22.2.2_@angular+_56804c6e9d763769999573a32671b982/node_modules/src/carousel/carousel.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.3_@angular+core@22.2.3_@angular+_2a970977f09c8afdd1f9933e219c8db5/node_modules/src/carousel/carousel.ts</context>
           <context context-type="linenumber">425,426</context>
         </context-group>
         <target state="final">Précédent</target>
@@ -30,7 +30,7 @@
       <trans-unit id="ngb.carousel.next" datatype="html" approved="yes">
         <source>Next</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.2_@angular+core@22.2.2_@angular+_56804c6e9d763769999573a32671b982/node_modules/src/carousel/carousel.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.3_@angular+core@22.2.3_@angular+_2a970977f09c8afdd1f9933e219c8db5/node_modules/src/carousel/carousel.ts</context>
           <context context-type="linenumber">452,453</context>
         </context-group>
         <target state="final">Suivant</target>
@@ -38,11 +38,11 @@
       <trans-unit id="ngb.datepicker.select-month" datatype="html" approved="yes">
         <source>Select month</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.2_@angular+core@22.2.2_@angular+_56804c6e9d763769999573a32671b982/node_modules/src/datepicker/datepicker-navigation-select.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.3_@angular+core@22.2.3_@angular+_2a970977f09c8afdd1f9933e219c8db5/node_modules/src/datepicker/datepicker-navigation-select.ts</context>
           <context context-type="linenumber">52</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.2_@angular+core@22.2.2_@angular+_56804c6e9d763769999573a32671b982/node_modules/src/datepicker/datepicker-navigation-select.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.3_@angular+core@22.2.3_@angular+_2a970977f09c8afdd1f9933e219c8db5/node_modules/src/datepicker/datepicker-navigation-select.ts</context>
           <context context-type="linenumber">52</context>
         </context-group>
         <target state="final">Sélectionner le mois</target>
@@ -50,11 +50,11 @@
       <trans-unit id="ngb.datepicker.select-year" datatype="html" approved="yes">
         <source>Select year</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.2_@angular+core@22.2.2_@angular+_56804c6e9d763769999573a32671b982/node_modules/src/datepicker/datepicker-navigation-select.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.3_@angular+core@22.2.3_@angular+_2a970977f09c8afdd1f9933e219c8db5/node_modules/src/datepicker/datepicker-navigation-select.ts</context>
           <context context-type="linenumber">52</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.2_@angular+core@22.2.2_@angular+_56804c6e9d763769999573a32671b982/node_modules/src/datepicker/datepicker-navigation-select.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.3_@angular+core@22.2.3_@angular+_2a970977f09c8afdd1f9933e219c8db5/node_modules/src/datepicker/datepicker-navigation-select.ts</context>
           <context context-type="linenumber">52</context>
         </context-group>
         <target state="final">Sélectionner l'année</target>
@@ -62,11 +62,11 @@
       <trans-unit id="ngb.datepicker.previous-month" datatype="html" approved="yes">
         <source>Previous month</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.2_@angular+core@22.2.2_@angular+_56804c6e9d763769999573a32671b982/node_modules/src/datepicker/datepicker-navigation.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.3_@angular+core@22.2.3_@angular+_2a970977f09c8afdd1f9933e219c8db5/node_modules/src/datepicker/datepicker-navigation.ts</context>
           <context context-type="linenumber">73,76</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.2_@angular+core@22.2.2_@angular+_56804c6e9d763769999573a32671b982/node_modules/src/datepicker/datepicker-navigation.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.3_@angular+core@22.2.3_@angular+_2a970977f09c8afdd1f9933e219c8db5/node_modules/src/datepicker/datepicker-navigation.ts</context>
           <context context-type="linenumber">73,76</context>
         </context-group>
         <target state="final">Mois précédent</target>
@@ -74,11 +74,11 @@
       <trans-unit id="ngb.datepicker.next-month" datatype="html" approved="yes">
         <source>Next month</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.2_@angular+core@22.2.2_@angular+_56804c6e9d763769999573a32671b982/node_modules/src/datepicker/datepicker-navigation.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.3_@angular+core@22.2.3_@angular+_2a970977f09c8afdd1f9933e219c8db5/node_modules/src/datepicker/datepicker-navigation.ts</context>
           <context context-type="linenumber">73,74</context>
         </context-group>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.2_@angular+core@22.2.2_@angular+_56804c6e9d763769999573a32671b982/node_modules/src/datepicker/datepicker-navigation.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.3_@angular+core@22.2.3_@angular+_2a970977f09c8afdd1f9933e219c8db5/node_modules/src/datepicker/datepicker-navigation.ts</context>
           <context context-type="linenumber">73,74</context>
         </context-group>
         <target state="final">Mois suivant</target>
@@ -86,7 +86,7 @@
       <trans-unit id="ngb.pagination.first" datatype="html" approved="yes">
         <source>««</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.2_@angular+core@22.2.2_@angular+_56804c6e9d763769999573a32671b982/node_modules/src/pagination/pagination.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.3_@angular+core@22.2.3_@angular+_2a970977f09c8afdd1f9933e219c8db5/node_modules/src/pagination/pagination.ts</context>
           <context context-type="linenumber">277,278</context>
         </context-group>
         <target state="final">««</target>
@@ -94,7 +94,7 @@
       <trans-unit id="ngb.pagination.previous" datatype="html" approved="yes">
         <source>«</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.2_@angular+core@22.2.2_@angular+_56804c6e9d763769999573a32671b982/node_modules/src/pagination/pagination.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.3_@angular+core@22.2.3_@angular+_2a970977f09c8afdd1f9933e219c8db5/node_modules/src/pagination/pagination.ts</context>
           <context context-type="linenumber">277,278</context>
         </context-group>
         <target state="final">«</target>
@@ -102,7 +102,7 @@
       <trans-unit id="ngb.pagination.next" datatype="html" approved="yes">
         <source>»</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.2_@angular+core@22.2.2_@angular+_56804c6e9d763769999573a32671b982/node_modules/src/pagination/pagination.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.3_@angular+core@22.2.3_@angular+_2a970977f09c8afdd1f9933e219c8db5/node_modules/src/pagination/pagination.ts</context>
           <context context-type="linenumber">277</context>
         </context-group>
         <target state="final">»</target>
@@ -110,7 +110,7 @@
       <trans-unit id="ngb.pagination.last" datatype="html" approved="yes">
         <source>»»</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.2_@angular+core@22.2.2_@angular+_56804c6e9d763769999573a32671b982/node_modules/src/pagination/pagination.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.3_@angular+core@22.2.3_@angular+_2a970977f09c8afdd1f9933e219c8db5/node_modules/src/pagination/pagination.ts</context>
           <context context-type="linenumber">277</context>
         </context-group>
         <target state="final">»»</target>
@@ -118,7 +118,7 @@
       <trans-unit id="ngb.pagination.first-aria" datatype="html" approved="yes">
         <source>First</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.2_@angular+core@22.2.2_@angular+_56804c6e9d763769999573a32671b982/node_modules/src/pagination/pagination.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.3_@angular+core@22.2.3_@angular+_2a970977f09c8afdd1f9933e219c8db5/node_modules/src/pagination/pagination.ts</context>
           <context context-type="linenumber">277,278</context>
         </context-group>
         <target state="final">Premier</target>
@@ -126,7 +126,7 @@
       <trans-unit id="ngb.pagination.previous-aria" datatype="html" approved="yes">
         <source>Previous</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.2_@angular+core@22.2.2_@angular+_56804c6e9d763769999573a32671b982/node_modules/src/pagination/pagination.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.3_@angular+core@22.2.3_@angular+_2a970977f09c8afdd1f9933e219c8db5/node_modules/src/pagination/pagination.ts</context>
           <context context-type="linenumber">277,278</context>
         </context-group>
         <target state="final">Précédent</target>
@@ -134,7 +134,7 @@
       <trans-unit id="ngb.pagination.next-aria" datatype="html" approved="yes">
         <source>Next</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.2_@angular+core@22.2.2_@angular+_56804c6e9d763769999573a32671b982/node_modules/src/pagination/pagination.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.3_@angular+core@22.2.3_@angular+_2a970977f09c8afdd1f9933e219c8db5/node_modules/src/pagination/pagination.ts</context>
           <context context-type="linenumber">277,278</context>
         </context-group>
         <target state="final">Suivant</target>
@@ -142,7 +142,7 @@
       <trans-unit id="ngb.pagination.last-aria" datatype="html" approved="yes">
         <source>Last</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.2_@angular+core@22.2.2_@angular+_56804c6e9d763769999573a32671b982/node_modules/src/pagination/pagination.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.3_@angular+core@22.2.3_@angular+_2a970977f09c8afdd1f9933e219c8db5/node_modules/src/pagination/pagination.ts</context>
           <context context-type="linenumber">277,278</context>
         </context-group>
         <target state="final">Dernier</target>
@@ -152,14 +152,14 @@
           <x id="INTERPOLATION"/>
         </source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.2_@angular+core@22.2.2_@angular+_56804c6e9d763769999573a32671b982/node_modules/src/progressbar/progressbar.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.3_@angular+core@22.2.3_@angular+_2a970977f09c8afdd1f9933e219c8db5/node_modules/src/progressbar/progressbar.ts</context>
           <context context-type="linenumber">39,40</context>
         </context-group>
       </trans-unit>
       <trans-unit id="ngb.timepicker.HH" datatype="html" approved="yes">
         <source>HH</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.2_@angular+core@22.2.2_@angular+_56804c6e9d763769999573a32671b982/node_modules/src/timepicker/timepicker.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.3_@angular+core@22.2.3_@angular+_2a970977f09c8afdd1f9933e219c8db5/node_modules/src/timepicker/timepicker.ts</context>
           <context context-type="linenumber">442</context>
         </context-group>
         <target state="final">HH</target>
@@ -167,7 +167,7 @@
       <trans-unit id="ngb.timepicker.hours" datatype="html" approved="yes">
         <source>Hours</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.2_@angular+core@22.2.2_@angular+_56804c6e9d763769999573a32671b982/node_modules/src/timepicker/timepicker.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.3_@angular+core@22.2.3_@angular+_2a970977f09c8afdd1f9933e219c8db5/node_modules/src/timepicker/timepicker.ts</context>
           <context context-type="linenumber">442</context>
         </context-group>
         <target state="final">Heures</target>
@@ -175,7 +175,7 @@
       <trans-unit id="ngb.timepicker.MM" datatype="html" approved="yes">
         <source>MM</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.2_@angular+core@22.2.2_@angular+_56804c6e9d763769999573a32671b982/node_modules/src/timepicker/timepicker.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.3_@angular+core@22.2.3_@angular+_2a970977f09c8afdd1f9933e219c8db5/node_modules/src/timepicker/timepicker.ts</context>
           <context context-type="linenumber">442</context>
         </context-group>
         <target state="final">MM</target>
@@ -183,7 +183,7 @@
       <trans-unit id="ngb.timepicker.minutes" datatype="html" approved="yes">
         <source>Minutes</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.2_@angular+core@22.2.2_@angular+_56804c6e9d763769999573a32671b982/node_modules/src/timepicker/timepicker.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.3_@angular+core@22.2.3_@angular+_2a970977f09c8afdd1f9933e219c8db5/node_modules/src/timepicker/timepicker.ts</context>
           <context context-type="linenumber">442</context>
         </context-group>
         <target state="final">Minutes</target>
@@ -191,7 +191,7 @@
       <trans-unit id="ngb.timepicker.increment-hours" datatype="html" approved="yes">
         <source>Increment hours</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.2_@angular+core@22.2.2_@angular+_56804c6e9d763769999573a32671b982/node_modules/src/timepicker/timepicker.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.3_@angular+core@22.2.3_@angular+_2a970977f09c8afdd1f9933e219c8db5/node_modules/src/timepicker/timepicker.ts</context>
           <context context-type="linenumber">442</context>
         </context-group>
         <target state="final">Incrémenter les heures</target>
@@ -199,7 +199,7 @@
       <trans-unit id="ngb.timepicker.decrement-hours" datatype="html" approved="yes">
         <source>Decrement hours</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.2_@angular+core@22.2.2_@angular+_56804c6e9d763769999573a32671b982/node_modules/src/timepicker/timepicker.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.3_@angular+core@22.2.3_@angular+_2a970977f09c8afdd1f9933e219c8db5/node_modules/src/timepicker/timepicker.ts</context>
           <context context-type="linenumber">442</context>
         </context-group>
         <target state="final">Décrémenter les heures</target>
@@ -207,7 +207,7 @@
       <trans-unit id="ngb.timepicker.increment-minutes" datatype="html" approved="yes">
         <source>Increment minutes</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.2_@angular+core@22.2.2_@angular+_56804c6e9d763769999573a32671b982/node_modules/src/timepicker/timepicker.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.3_@angular+core@22.2.3_@angular+_2a970977f09c8afdd1f9933e219c8db5/node_modules/src/timepicker/timepicker.ts</context>
           <context context-type="linenumber">442</context>
         </context-group>
         <target state="final">Incrémenter les minutes</target>
@@ -215,7 +215,7 @@
       <trans-unit id="ngb.timepicker.decrement-minutes" datatype="html" approved="yes">
         <source>Decrement minutes</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.2_@angular+core@22.2.2_@angular+_56804c6e9d763769999573a32671b982/node_modules/src/timepicker/timepicker.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.3_@angular+core@22.2.3_@angular+_2a970977f09c8afdd1f9933e219c8db5/node_modules/src/timepicker/timepicker.ts</context>
           <context context-type="linenumber">442</context>
         </context-group>
         <target state="final">Décrémenter les minutes</target>
@@ -223,7 +223,7 @@
       <trans-unit id="ngb.timepicker.SS" datatype="html">
         <source>SS</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.2_@angular+core@22.2.2_@angular+_56804c6e9d763769999573a32671b982/node_modules/src/timepicker/timepicker.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.3_@angular+core@22.2.3_@angular+_2a970977f09c8afdd1f9933e219c8db5/node_modules/src/timepicker/timepicker.ts</context>
           <context context-type="linenumber">442</context>
         </context-group>
         <target state="translated">SS</target>
@@ -231,7 +231,7 @@
       <trans-unit id="ngb.timepicker.seconds" datatype="html" approved="yes">
         <source>Seconds</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.2_@angular+core@22.2.2_@angular+_56804c6e9d763769999573a32671b982/node_modules/src/timepicker/timepicker.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.3_@angular+core@22.2.3_@angular+_2a970977f09c8afdd1f9933e219c8db5/node_modules/src/timepicker/timepicker.ts</context>
           <context context-type="linenumber">442</context>
         </context-group>
         <target state="final">Secondes</target>
@@ -239,7 +239,7 @@
       <trans-unit id="ngb.timepicker.increment-seconds" datatype="html" approved="yes">
         <source>Increment seconds</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.2_@angular+core@22.2.2_@angular+_56804c6e9d763769999573a32671b982/node_modules/src/timepicker/timepicker.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.3_@angular+core@22.2.3_@angular+_2a970977f09c8afdd1f9933e219c8db5/node_modules/src/timepicker/timepicker.ts</context>
           <context context-type="linenumber">442</context>
         </context-group>
         <target state="final">Incrémenter les secondes</target>
@@ -247,7 +247,7 @@
       <trans-unit id="ngb.timepicker.decrement-seconds" datatype="html" approved="yes">
         <source>Decrement seconds</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.2_@angular+core@22.2.2_@angular+_56804c6e9d763769999573a32671b982/node_modules/src/timepicker/timepicker.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.3_@angular+core@22.2.3_@angular+_2a970977f09c8afdd1f9933e219c8db5/node_modules/src/timepicker/timepicker.ts</context>
           <context context-type="linenumber">442</context>
         </context-group>
         <target state="final">Décrémenter les secondes</target>
@@ -257,14 +257,14 @@
           <x id="INTERPOLATION"/>
         </source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.2_@angular+core@22.2.2_@angular+_56804c6e9d763769999573a32671b982/node_modules/src/timepicker/timepicker.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.3_@angular+core@22.2.3_@angular+_2a970977f09c8afdd1f9933e219c8db5/node_modules/src/timepicker/timepicker.ts</context>
           <context context-type="linenumber">442</context>
         </context-group>
       </trans-unit>
       <trans-unit id="ngb.toast.close-aria" datatype="html" approved="yes">
         <source>Close</source>
         <context-group purpose="location">
-          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.2_@angular+core@22.2.2_@angular+_56804c6e9d763769999573a32671b982/node_modules/src/toast/toast.ts</context>
+          <context context-type="sourcefile">node_modules/.pnpm/@ng-bootstrap+ng-bootstrap@21.0.0_@angular+common@22.2.3_@angular+core@22.2.3_@angular+_2a970977f09c8afdd1f9933e219c8db5/node_modules/src/toast/toast.ts</context>
           <context context-type="linenumber">80</context>
         </context-group>
         <target state="final">Fermer</target>
@@ -749,7 +749,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">441,442</context>
+          <context context-type="linenumber">442</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
+          <context context-type="linenumber">443,444</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/custom-fields-bulk-edit-dialog/custom-fields-bulk-edit-dialog.component.html</context>
@@ -933,7 +937,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">460</context>
+          <context context-type="linenumber">474</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
@@ -1537,7 +1541,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">239,240</context>
+          <context context-type="linenumber">240,241</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/document.ts</context>
@@ -1610,6 +1614,10 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
           <context context-type="linenumber">166</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/manage/saved-views/saved-views.component.html</context>
+          <context context-type="linenumber">46</context>
         </context-group>
         <target state="final">Droits d'accès</target>
       </trans-unit>
@@ -1889,7 +1897,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">248,249</context>
+          <context context-type="linenumber">249,250</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
@@ -1925,7 +1933,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">257,258</context>
+          <context context-type="linenumber">258,259</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
@@ -1969,7 +1977,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">221,222</context>
+          <context context-type="linenumber">222,223</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.html</context>
@@ -2473,7 +2481,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">266,267</context>
+          <context context-type="linenumber">267,268</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/share-links/share-link-bundle-list/share-link-bundle-list.component.html</context>
@@ -3719,7 +3727,7 @@
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
           <context context-type="linenumber">163</context>
         </context-group>
-        <target state="translated">Erreur lors de la supression de l’utilisateur « <x id="PH" equiv-text="user.username"/> ».</target>
+        <target state="translated">Erreur lors de la suppression de l’utilisateur « <x id="PH" equiv-text="user.username"/> ».</target>
       </trans-unit>
       <trans-unit id="5766640174051730159" datatype="html" approved="yes">
         <source>Saved group &quot;<x id="PH" equiv-text="newGroup.name"/>&quot;.</source>
@@ -3767,7 +3775,7 @@
           <context context-type="sourcefile">src/app/components/admin/users-groups/users-groups.component.ts</context>
           <context context-type="linenumber">220</context>
         </context-group>
-        <target state="translated">Erreur lors de la supression du groupe « <x id="PH" equiv-text="group.name"/> ».</target>
+        <target state="translated">Erreur lors de la suppression du groupe « <x id="PH" equiv-text="group.name"/> ».</target>
       </trans-unit>
       <trans-unit id="7931334600001636863" datatype="html" approved="yes">
         <source>by Paperless-ngx</source>
@@ -4457,7 +4465,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">388</context>
+          <context context-type="linenumber">391</context>
         </context-group>
         <target state="final">Oui</target>
       </trans-unit>
@@ -4761,7 +4769,7 @@
         <source>Create new field</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-dropdown/custom-fields-dropdown.component.html</context>
-          <context context-type="linenumber">20</context>
+          <context context-type="linenumber">19</context>
         </context-group>
         <target state="final">Créer un nouveau champ</target>
       </trans-unit>
@@ -5197,7 +5205,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">275,276</context>
+          <context context-type="linenumber">276,277</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/document.ts</context>
@@ -6935,7 +6943,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">410</context>
         </context-group>
-        <target state="translated">Destinatires du courriel</target>
+        <target state="translated">Destinataires du courriel</target>
       </trans-unit>
       <trans-unit id="7916910101279824329" datatype="html">
         <source>Attach document</source>
@@ -7237,7 +7245,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">218,219</context>
+          <context context-type="linenumber">219,220</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/filter-editor/filter-editor.component.ts</context>
@@ -7445,7 +7453,7 @@
         <source>Email sent</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/email-document-dialog/email-document-dialog.component.ts</context>
-          <context context-type="linenumber">53</context>
+          <context context-type="linenumber">52</context>
         </context-group>
         <target state="translated">Courriel envoyé</target>
       </trans-unit>
@@ -7453,7 +7461,7 @@
         <source>Error emailing documents</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/email-document-dialog/email-document-dialog.component.ts</context>
-          <context context-type="linenumber">59</context>
+          <context context-type="linenumber">58</context>
         </context-group>
         <target state="translated">Erreur lors de l'envoi des documents</target>
       </trans-unit>
@@ -7461,7 +7469,7 @@
         <source>Error emailing document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/email-document-dialog/email-document-dialog.component.ts</context>
-          <context context-type="linenumber">60</context>
+          <context context-type="linenumber">59</context>
         </context-group>
         <target state="translated">Erreur lors de l'envoi du document par mail</target>
       </trans-unit>
@@ -9257,7 +9265,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">320</context>
+          <context context-type="linenumber">321</context>
         </context-group>
         <target state="final">Filtrer par correspondant</target>
       </trans-unit>
@@ -9273,7 +9281,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">360</context>
+          <context context-type="linenumber">363</context>
         </context-group>
         <target state="final">Filtrer par type de document</target>
       </trans-unit>
@@ -9289,7 +9297,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">367</context>
+          <context context-type="linenumber">370</context>
         </context-group>
         <target state="final">Filtrer par chemin de stockage</target>
       </trans-unit>
@@ -9309,7 +9317,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">388</context>
+          <context context-type="linenumber">391</context>
         </context-group>
         <target state="final">Non</target>
       </trans-unit>
@@ -9457,7 +9465,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">483</context>
+          <context context-type="linenumber">497</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
@@ -9581,7 +9589,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/main.ts</context>
-          <context context-type="linenumber">483</context>
+          <context context-type="linenumber">168</context>
         </context-group>
         <target state="final">Suivant</target>
       </trans-unit>
@@ -9765,7 +9773,11 @@
         <source>Save &amp; next</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">443</context>
+          <context context-type="linenumber">446</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
+          <context context-type="linenumber">457</context>
         </context-group>
         <target state="final">Enregistrer &amp; suivant</target>
       </trans-unit>
@@ -9773,7 +9785,11 @@
         <source>Save &amp; close</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">445</context>
+          <context context-type="linenumber">448</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
+          <context context-type="linenumber">459</context>
         </context-group>
         <target state="final">Enregister &amp; fermer</target>
       </trans-unit>
@@ -9781,15 +9797,27 @@
         <source>Discard</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">447,448</context>
+          <context context-type="linenumber">450</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
+          <context context-type="linenumber">451,452</context>
         </context-group>
         <target state="final">Abandonner</target>
+      </trans-unit>
+      <trans-unit id="5587846594415285055" datatype="html">
+        <source>More save options</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
+          <context context-type="linenumber">454</context>
+        </context-group>
+        <target state="needs-translation">More save options</target>
       </trans-unit>
       <trans-unit id="1309556917227148591" datatype="html">
         <source>Document loading...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">455</context>
+          <context context-type="linenumber">469</context>
         </context-group>
         <target state="translated">Chargement du document…</target>
       </trans-unit>
@@ -9797,7 +9825,7 @@
         <source>of <x id="INTERPOLATION" equiv-text="{{previewNumPages()}}"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">484,485</context>
+          <context context-type="linenumber">498,499</context>
         </context-group>
         <target state="translated">sur <x id="INTERPOLATION" equiv-text="{{previewNumPages()}}"/></target>
       </trans-unit>
@@ -9805,7 +9833,7 @@
         <source>Zoom out</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">488</context>
+          <context context-type="linenumber">502</context>
         </context-group>
         <target state="needs-translation">Zoom out</target>
       </trans-unit>
@@ -9813,7 +9841,7 @@
         <source>Zoom</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">491</context>
+          <context context-type="linenumber">505</context>
         </context-group>
         <target state="needs-translation">Zoom</target>
       </trans-unit>
@@ -9821,7 +9849,7 @@
         <source>Zoom in</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">498</context>
+          <context context-type="linenumber">512</context>
         </context-group>
         <target state="needs-translation">Zoom in</target>
       </trans-unit>
@@ -9829,7 +9857,7 @@
         <source>Enter Password</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">532</context>
+          <context context-type="linenumber">546</context>
         </context-group>
         <target state="translated">Saisir le mot de passe</target>
       </trans-unit>
@@ -10930,7 +10958,7 @@
           <context context-type="sourcefile">src/app/components/document-list/document-card-small/document-card-small.component.html</context>
           <context context-type="linenumber">8,9</context>
         </context-group>
-        <target state="translated"><x id="INTERPOLATION" equiv-text="{{ document().title | documentTitle }}"/> mignature</target>
+        <target state="translated"><x id="INTERPOLATION" equiv-text="{{ document().title | documentTitle }}"/> miniature</target>
       </trans-unit>
       <trans-unit id="2784168796433474565" datatype="html" approved="yes">
         <source>Filter by tag</source>
@@ -10940,7 +10968,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">336</context>
+          <context context-type="linenumber">339</context>
         </context-group>
         <target state="final">Filtrer par étiquette</target>
       </trans-unit>
@@ -11284,7 +11312,7 @@
         <source>Sort by title</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">213</context>
+          <context context-type="linenumber">214</context>
         </context-group>
         <target state="final">Trier par titre</target>
       </trans-unit>
@@ -11292,7 +11320,7 @@
         <source>Sort by owner</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">226</context>
+          <context context-type="linenumber">227</context>
         </context-group>
         <target state="translated">Trier par propriétaire</target>
       </trans-unit>
@@ -11300,7 +11328,7 @@
         <source>Owner</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">230,231</context>
+          <context context-type="linenumber">231,232</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/document.ts</context>
@@ -11316,7 +11344,7 @@
         <source>Sort by notes</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">235</context>
+          <context context-type="linenumber">236</context>
         </context-group>
         <target state="final">Trier par notes</target>
       </trans-unit>
@@ -11324,7 +11352,7 @@
         <source>Sort by document type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">244</context>
+          <context context-type="linenumber">245</context>
         </context-group>
         <target state="final">Trier par type de documents</target>
       </trans-unit>
@@ -11332,7 +11360,7 @@
         <source>Sort by storage path</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">253</context>
+          <context context-type="linenumber">254</context>
         </context-group>
         <target state="final">Trier par chemin de stockage</target>
       </trans-unit>
@@ -11340,7 +11368,7 @@
         <source>Sort by created date</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">262</context>
+          <context context-type="linenumber">263</context>
         </context-group>
         <target state="final">Trier par date de création</target>
       </trans-unit>
@@ -11348,7 +11376,7 @@
         <source>Sort by added date</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">271</context>
+          <context context-type="linenumber">272</context>
         </context-group>
         <target state="final">Trier par date d'ajout</target>
       </trans-unit>
@@ -11356,7 +11384,7 @@
         <source>Sort by number of pages</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">280</context>
+          <context context-type="linenumber">281</context>
         </context-group>
         <target state="translated">Trier par nombre de pages</target>
       </trans-unit>
@@ -11364,7 +11392,7 @@
         <source>Pages</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">284,285</context>
+          <context context-type="linenumber">285,286</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/document.ts</context>
@@ -11384,7 +11412,7 @@
         <source> Shared </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">288</context>
+          <context context-type="linenumber">289</context>
         </context-group>
         <target state="translated"> Partagé </target>
       </trans-unit>
@@ -11392,25 +11420,25 @@
         <source>Sort by <x id="INTERPOLATION" equiv-text="{{getDisplayCustomFieldTitle(field_id)}}"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">294,295</context>
+          <context context-type="linenumber">295,296</context>
         </context-group>
         <target state="translated">Trier par <x id="INTERPOLATION" equiv-text="{{getDisplayCustomFieldTitle(field_id)}}"/></target>
-      </trans-unit>
-      <trans-unit id="2179847500064178686" datatype="html" approved="yes">
-        <source>Edit document</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">328</context>
-        </context-group>
-        <target state="final">Modifier le document</target>
       </trans-unit>
       <trans-unit id="3420321797707163677" datatype="html">
         <source>Preview document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
-          <context context-type="linenumber">329</context>
+          <context context-type="linenumber">327</context>
         </context-group>
         <target state="translated">Prévisualiser le document</target>
+      </trans-unit>
+      <trans-unit id="2179847500064178686" datatype="html" approved="yes">
+        <source>Edit document</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
+          <context context-type="linenumber">335</context>
+        </context-group>
+        <target state="final">Modifier le document</target>
       </trans-unit>
       <trans-unit id="4512084577073831437" datatype="html">
         <source>Reset filters / selection</source>
@@ -11444,27 +11472,27 @@
         </context-group>
         <target state="translated">Page suivante</target>
       </trans-unit>
-      <trans-unit id="2155249406916744630" datatype="html" approved="yes">
-        <source>View &quot;<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>&quot; saved successfully.</source>
+      <trans-unit id="2155249406916744630" datatype="html">
+        <source>View &quot;<x id="PH" equiv-text="view.name ?? title"/>&quot; saved successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">422</context>
+          <context context-type="linenumber">423</context>
         </context-group>
-        <target state="final">Vue "<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>" enregistrée avec succès.</target>
+        <target state="needs-translation">View "<x id="PH" equiv-text="view.name ?? title"/>" saved successfully.</target>
       </trans-unit>
       <trans-unit id="4646273665293421938" datatype="html">
-        <source>Failed to save view &quot;<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>&quot;.</source>
+        <source>Failed to save view &quot;<x id="PH" equiv-text="title"/>&quot;.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">428</context>
+          <context context-type="linenumber">429</context>
         </context-group>
-        <target state="translated">Impossible d'enregistrer la vue "<x id="PH" equiv-text="this.list.activeSavedViewTitle"/>".</target>
+        <target state="needs-translation">Failed to save view "<x id="PH" equiv-text="title"/>".</target>
       </trans-unit>
       <trans-unit id="6837554170707123455" datatype="html" approved="yes">
         <source>View &quot;<x id="PH" equiv-text="savedView.name"/>&quot; created successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">497</context>
+          <context context-type="linenumber">498</context>
         </context-group>
         <target state="final">Vue « <x id="PH" equiv-text="savedView.name"/> » créée avec succès.</target>
       </trans-unit>
@@ -11472,7 +11500,7 @@
         <source>View &quot;<x id="PH" equiv-text="savedView.name"/>&quot; created successfully, but could not update visibility settings.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.ts</context>
-          <context context-type="linenumber">503</context>
+          <context context-type="linenumber">504</context>
         </context-group>
         <target state="needs-translation">View "<x id="PH" equiv-text="savedView.name"/>" created successfully, but could not update visibility settings.</target>
       </trans-unit>
@@ -12643,14 +12671,6 @@
           <context context-type="linenumber">4,5</context>
         </context-group>
         <target state="translated">Personnaliser les vues de vos documents.</target>
-      </trans-unit>
-      <trans-unit id="8420539325839715135" datatype="html">
-        <source><x id="START_TAG_I_BS" ctype="x-i_bs" equiv-text="&lt;i-bs class=&quot;me-1&quot; name=&quot;person-fill-lock&quot;&gt;"/><x id="CLOSE_TAG_I_BS" ctype="x-i_bs" equiv-text="&lt;/i-bs&gt;"/>Permissions</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/manage/saved-views/saved-views.component.html</context>
-          <context context-type="linenumber">46,47</context>
-        </context-group>
-        <target state="needs-translation"><x id="START_TAG_I_BS" ctype="x-i_bs" equiv-text="&lt;i-bs class=&quot;me-1&quot; name=&quot;person-fill-lock&quot;&gt;"/><x id="CLOSE_TAG_I_BS" ctype="x-i_bs" equiv-text="&lt;/i-bs&gt;"/>Permissions</target>
       </trans-unit>
       <trans-unit id="6338800642797811873" datatype="html">
         <source>Documents page size</source>
@@ -14933,7 +14953,7 @@
         <source>Prev</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/main.ts</context>
-          <context context-type="linenumber">482</context>
+          <context context-type="linenumber">167</context>
         </context-group>
         <target state="final">Préc.</target>
       </trans-unit>
@@ -14941,7 +14961,7 @@
         <source>End</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/main.ts</context>
-          <context context-type="linenumber">484</context>
+          <context context-type="linenumber">169</context>
         </context-group>
         <target state="final">Terminer</target>
       </trans-unit>

@@ -4,7 +4,7 @@ import {
   NG_VALUE_ACCESSOR,
   ReactiveFormsModule,
 } from '@angular/forms'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { AbstractInputComponent } from '../abstract-input'
 
@@ -19,7 +19,7 @@ import { AbstractInputComponent } from '../abstract-input'
   selector: 'pngx-input-number',
   templateUrl: './number.component.html',
   styleUrls: ['./number.component.scss'],
-  imports: [FormsModule, ReactiveFormsModule, NgxBootstrapIconsModule],
+  imports: [FormsModule, ReactiveFormsModule, BootstrapIconComponent],
 })
 export class NumberComponent extends AbstractInputComponent<number> {
   private documentService = inject(DocumentService)

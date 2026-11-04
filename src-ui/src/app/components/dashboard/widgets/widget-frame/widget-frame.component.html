@@ -5,12 +5,12 @@
         <div class="d-flex align-items-center">
           @if (draggable()) {
             <div class="ms-n2 me-1" cdkDragHandle>
-              <i-bs name="grip-vertical"></i-bs>
+              <pngx-bs-icon name="grip-vertical"></pngx-bs-icon>
             </div>
           }
           <h6 class="card-title mb-0">
             @if (titleIcon()) {
-              <i-bs class="me-2" [name]="titleIcon()"></i-bs>
+              <pngx-bs-icon class="me-2" [name]="titleIcon()"></pngx-bs-icon>
             }
             {{title()}}
           </h6>

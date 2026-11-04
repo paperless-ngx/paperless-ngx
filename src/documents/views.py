@@ -250,20 +250,8 @@ from paperless.parsers.remote import RemoteEngineConfig
 from paperless.serialisers import GroupSerializer
 from paperless.serialisers import UserSerializer
 from paperless.views import StandardPagination
-from paperless_ai.ai_classifier import get_ai_document_classification
-from paperless_ai.ai_classifier import get_llm_output_language
-from paperless_ai.chat import stream_chat_with_documents
 from paperless_ai.exceptions import LLMProviderError
 from paperless_ai.exceptions import LLMTimeoutError
-from paperless_ai.matching import extract_unmatched_names
-from paperless_ai.matching import match_correspondents_by_name
-from paperless_ai.matching import match_document_types_by_name
-from paperless_ai.matching import match_storage_paths_by_name
-from paperless_ai.matching import match_tags_by_name
-from paperless_ai.matching import resolve_correspondent_ids
-from paperless_ai.matching import resolve_document_type_ids
-from paperless_ai.matching import resolve_storage_path_ids
-from paperless_ai.matching import resolve_tag_ids
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 from paperless_mail.oauth import PaperlessMailOAuth2Manager
@@ -588,6 +576,15 @@ class CorrespondentViewSet(
         return super().retrieve(request, *args, **kwargs)
 
 
+def _with_tag_descendants(tags: QuerySet[Tag]) -> QuerySet[Tag]:
+    """Include every tag that deleting the selected tags will affect."""
+    tag_ids = set()
+    for tag in tags:
+        tag_ids.add(tag.pk)
+        tag_ids.update(tag.get_descendants_pks())
+    return Tag.objects.filter(pk__in=tag_ids)
+
+
 @extend_schema_view(**generate_object_with_permissions_schema(TagSerializer))
 class TagViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet[Tag]):
     model = Tag
@@ -608,6 +605,14 @@ class TagViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet[Tag]):
     )
     filterset_class = TagFilterSet
     ordering_fields = ("color", "name", "matching_algorithm", "match", "document_count")
+
+    def perform_destroy(self, instance):
+        tags = _with_tag_descendants(Tag.objects.filter(pk=instance.pk))
+        if tags.exclude(
+            pk__in=permitted_object_ids(self.request.user, Tag, "delete_tag"),
+        ).exists():
+            raise PermissionDenied(_("Insufficient permissions."))
+        super().perform_destroy(instance)
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
@@ -699,19 +704,6 @@ class EmailDocumentDetailSchema(EmailSerializer):
 
 
 @extend_schema_view(
-    list=extend_schema(
-        parameters=[
-            OpenApiParameter(
-                name=name,
-                type=OpenApiTypes.INT,
-                many=True,
-                style="form",
-                explode=False,
-            )
-            for name, field in DocumentFilterSet.base_filters.items()
-            if isinstance(field, ObjectFilter)
-        ],
-    ),
     retrieve=extend_schema(
         description="Retrieve a single document",
         responses={
@@ -1613,6 +1605,18 @@ class DocumentViewSet(
         if not ai_config.ai_enabled:
             return HttpResponseBadRequest("AI is required for this feature")
 
+        from paperless_ai.ai_classifier import get_ai_document_classification
+        from paperless_ai.ai_classifier import get_llm_output_language
+        from paperless_ai.matching import extract_unmatched_names
+        from paperless_ai.matching import match_correspondents_by_name
+        from paperless_ai.matching import match_document_types_by_name
+        from paperless_ai.matching import match_storage_paths_by_name
+        from paperless_ai.matching import match_tags_by_name
+        from paperless_ai.matching import resolve_correspondent_ids
+        from paperless_ai.matching import resolve_document_type_ids
+        from paperless_ai.matching import resolve_storage_path_ids
+        from paperless_ai.matching import resolve_tag_ids
+
         output_language = get_llm_output_language(
             ai_config=ai_config,
             user=request.user,
@@ -2446,6 +2450,9 @@ class ChatStreamingView(GenericAPIView[Any]):
             )
             unrestricted = user_is_unrestricted(request.user)
 
+        from paperless_ai.ai_classifier import get_llm_output_language
+        from paperless_ai.chat import stream_chat_with_documents
+
         output_language = get_llm_output_language(
             ai_config=ai_config,
             user=request.user,
@@ -2467,6 +2474,17 @@ class ChatStreamingView(GenericAPIView[Any]):
     list=extend_schema(
         description="Document views including search",
         parameters=[
+            *(
+                OpenApiParameter(
+                    name=name,
+                    type=OpenApiTypes.INT,
+                    many=True,
+                    style="form",
+                    explode=False,
+                )
+                for name, field in DocumentFilterSet.base_filters.items()
+                if isinstance(field, ObjectFilter)
+            ),
             OpenApiParameter(
                 name="text",
                 type=OpenApiTypes.STR,
@@ -5069,6 +5087,9 @@ class BulkEditObjectsView(PassUserMixin):
                 pk__in=object_ids,
             )
 
+        if object_type == "tags" and operation == "delete":
+            objs = _with_tag_descendants(objs)
+
         if not user.is_superuser:
             perm = f"documents.{perm_codename}"
             # Limited to the owner (or unowned), same as documents, see BulkEditView
@@ -5262,7 +5283,9 @@ class CustomFieldViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet[Custom
                             "migration_status": inline_serializer(
                                 name="MigrationStatus",
                                 fields={
-                                    "latest_migration": serializers.CharField(),
+                                    "latest_migration": serializers.CharField(
+                                        allow_null=True,
+                                    ),
                                     "unapplied_migrations": serializers.ListSerializer(
                                         child=serializers.CharField(),
                                     ),
@@ -5337,6 +5360,8 @@ class SystemStatusView(PassUserMixin):
         db_conn = connections["default"]
         db_url = str(db_conn.settings_dict["NAME"])
         db_error = None
+        all_migrations: list[str] = []
+        applied_migrations: list[str] = []
 
         try:
             db_conn.ensure_connection()
@@ -5347,7 +5372,8 @@ class SystemStatusView(PassUserMixin):
                 f"{m.app}.{m.name}"
                 for m in MigrationRecorder.Migration.objects.all().order_by("id")
             ]
-        except Exception as e:  # pragma: no cover
+        except Exception as e:
+            all_migrations = []
             applied_migrations = []
             db_status = "ERROR"
             logger.exception(
@@ -5543,7 +5569,9 @@ class SystemStatusView(PassUserMixin):
                     "status": db_status,
                     "error": db_error,
                     "migration_status": {
-                        "latest_migration": applied_migrations[-1],
+                        "latest_migration": (
+                            applied_migrations[-1] if applied_migrations else None
+                        ),
                         "unapplied_migrations": [
                             m for m in all_migrations if m not in applied_migrations
                         ],

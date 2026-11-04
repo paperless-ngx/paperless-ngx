@@ -19,7 +19,7 @@
         }
         @if (_textFilter) {
           <button class="btn btn-link btn-sm px-2 position-absolute top-0 end-0 z-10" (click)="resetTextField()" aria-label="Clear search" i18n-aria-label>
-            <i-bs width="1em" height="1em" name="x"></i-bs>
+            <pngx-bs-icon width="1em" height="1em" name="x"></pngx-bs-icon>
           </button>
         }
         <input #textFilterInput class="form-control form-control-sm" type="text"
@@ -104,7 +104,7 @@
       </div>
       <div class="d-flex flex-wrap d-none d-sm-inline-block">
         <button class="btn btn-outline-secondary btn-sm" [disabled]="!rulesModified" (click)="resetSelected()">
-          <i-bs class="ms-n1" name="x"></i-bs><ng-container i18n>Reset filters</ng-container>
+          <pngx-bs-icon class="ms-n1" name="x"></pngx-bs-icon><ng-container i18n>Reset filters</ng-container>
           </button>
         </div>
       </div>

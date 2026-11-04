@@ -539,3 +539,50 @@ class TestSystemStatus(APITestCase):
         self.assertEqual(response.data["tasks"]["summary"]["success_count"], 1)
         self.assertEqual(response.data["tasks"]["summary"]["failure_count"], 1)
         self.assertEqual(response.data["tasks"]["summary"]["pending_count"], 1)
+
+    def test_system_status_reports_database_error(self) -> None:
+        """
+        GIVEN:
+            - Reading the migration state fails
+        WHEN:
+            - The system status is requested
+        THEN:
+            - The response reports the database error rather than a server error
+        """
+        self.client.force_login(self.user)
+        with mock.patch(
+            "documents.views.MigrationLoader",
+            side_effect=Exception("database is down"),
+        ):
+            response = self.client.get(self.ENDPOINT)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        database = response.data["database"]
+        self.assertEqual(database["status"], "ERROR")
+        self.assertIsNotNone(database["error"])
+        self.assertEqual(
+            database["migration_status"],
+            {"latest_migration": None, "unapplied_migrations": []},
+        )
+
+    def test_system_status_migration_query_error(self) -> None:
+        """
+        GIVEN:
+            - The migration graph loads but reading the applied migrations fails
+        WHEN:
+            - The system status is requested
+        THEN:
+            - No migrations are reported as unapplied, since the state is unknown
+        """
+        self.client.force_login(self.user)
+        with mock.patch("documents.views.MigrationRecorder") as recorder:
+            recorder.Migration.objects.all.side_effect = Exception("query failed")
+            response = self.client.get(self.ENDPOINT)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        database = response.data["database"]
+        self.assertEqual(database["status"], "ERROR")
+        self.assertEqual(
+            database["migration_status"],
+            {"latest_migration": None, "unapplied_migrations": []},
+        )

@@ -74,10 +74,10 @@
               (click)="copy(createdBundle)"
             >
               @if (copied()) {
-                <i-bs name="clipboard-check"></i-bs>
+                <pngx-bs-icon name="clipboard-check"></pngx-bs-icon>
               }
               @if (!copied()) {
-                <i-bs name="clipboard"></i-bs>
+                <pngx-bs-icon name="clipboard"></pngx-bs-icon>
               }
               <span class="visually-hidden" i18n>Copy link</span>
             </button>

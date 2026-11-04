@@ -13,8 +13,8 @@ import {
   NgbPopoverModule,
   NgbProgressbarModule,
 } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Subject, takeUntil } from 'rxjs'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { PaperlessTaskType } from 'src/app/data/paperless-task'
 import {
   SystemStatus,
@@ -42,7 +42,7 @@ import { environment } from 'src/environments/environment'
     NgbProgressbarModule,
     CustomDatePipe,
     FileSizePipe,
-    NgxBootstrapIconsModule,
+    BootstrapIconComponent,
   ],
 })
 export class SystemStatusDialogComponent implements OnInit, OnDestroy {

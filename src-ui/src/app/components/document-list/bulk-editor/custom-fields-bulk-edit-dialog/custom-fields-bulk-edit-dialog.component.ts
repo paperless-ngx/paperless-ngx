@@ -6,8 +6,8 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { first } from 'rxjs'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { CheckComponent } from 'src/app/components/common/input/check/check.component'
 import { DateComponent } from 'src/app/components/common/input/date/date.component'
 import { DocumentLinkComponent } from 'src/app/components/common/input/document-link/document-link.component'
@@ -38,7 +38,7 @@ import { TextAreaComponent } from '../../../common/input/textarea/textarea.compo
     UrlComponent,
     FormsModule,
     ReactiveFormsModule,
-    NgxBootstrapIconsModule,
+    BootstrapIconComponent,
     TextAreaComponent,
   ],
 })

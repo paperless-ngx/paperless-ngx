@@ -7,13 +7,13 @@
   >
   <div class="btn-toolbar col col-md-auto align-items-center gap-2">
     <button class="btn btn-sm btn-outline-secondary me-2" (click)="clearSelection()" [hidden]="selectedTasks.size === 0">
-      <i-bs name="x" class="me-1"></i-bs><ng-container i18n>Clear selection</ng-container>
+      <pngx-bs-icon name="x" class="me-1"></pngx-bs-icon><ng-container i18n>Clear selection</ng-container>
     </button>
     <button class="btn btn-sm btn-outline-primary me-2" (click)="dismissTasks()" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.PaperlessTask }" [disabled]="visibleTasks.length === 0">
-      <i-bs name="check2-all" class="me-1"></i-bs>{{dismissButtonText}}
+      <pngx-bs-icon name="check2-all" class="me-1"></pngx-bs-icon>{{dismissButtonText}}
     </button>
     <button class="btn btn-sm btn-outline-primary me-2" (click)="dismissAllTasks()" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.PaperlessTask }" [disabled]="totalTasks() === 0">
-      <i-bs name="check2-all" class="me-1"></i-bs><ng-container i18n>Dismiss all</ng-container>
+      <pngx-bs-icon name="check2-all" class="me-1"></pngx-bs-icon><ng-container i18n>Dismiss all</ng-container>
     </button>
     <div class="form-check form-switch mb-0 ms-2">
       <input id="autoRefreshSwitch" class="form-check-input" type="checkbox" role="switch" [(ngModel)]="autoRefreshEnabled">
@@ -86,7 +86,7 @@
       </div>
       @if (filterText?.length) {
         <button class="btn btn-link btn-sm px-2 position-absolute top-0 end-0 z-10" (click)="resetFilter()" aria-label="Clear search" i18n-aria-label>
-          <i-bs width="1em" height="1em" name="x"></i-bs>
+          <pngx-bs-icon width="1em" height="1em" name="x"></pngx-bs-icon>
         </button>
       }
       <label class="visually-hidden" for="taskSearch" i18n>Search tasks</label>
@@ -98,7 +98,7 @@
 
   @if (isFiltered) {
     <button class="btn btn-link py-0 ms-md-auto" (click)="resetFilters()">
-      <i-bs width="1em" height="1em" name="x"></i-bs><small i18n>Reset filters</small>
+      <pngx-bs-icon width="1em" height="1em" name="x"></pngx-bs-icon><small i18n>Reset filters</small>
     </button>
   }
 
@@ -125,7 +125,7 @@
       @if (hasMore) {
         <ng-container i18n>{{tasks.length}} of {{count}} tasks</ng-container>
         <button class="btn btn-link show-all p-0 ms-2 align-baseline" type="button" (click)="setSection(section)">
-          <ng-container i18n>Show all</ng-container><i-bs class="ms-1" width="1em" height="1em" name="arrow-right"></i-bs>
+          <ng-container i18n>Show all</ng-container><pngx-bs-icon class="ms-1" width="1em" height="1em" name="arrow-right"></pngx-bs-icon>
         </button>
       } @else {
         <ng-container i18n>{count, plural, =1 {1 task} other {{{count}} tasks}}</ng-container>
@@ -180,7 +180,7 @@
                 @if (taskShowsSeparateTypeLabel(task)) {
                   <span class="me-2">{{ task.task_type_display }}</span>
                 }
-                <span class="text-nowrap"><i-bs class="me-1" width="1em" height="1em" name="box-arrow-in-right"></i-bs>{{ task.trigger_source_display }}</span>
+                <span class="text-nowrap"><pngx-bs-icon class="me-1" width="1em" height="1em" name="box-arrow-in-right"></pngx-bs-icon>{{ task.trigger_source_display }}</span>
               </div>
             </td>
             <td class="d-none d-lg-table-cell created-col">{{ task.date_created | customDate:'short' }}</td>
@@ -197,7 +197,7 @@
                 }
                 @if (duplicateDocumentId(task)) {
                   <div class="small text-warning-emphasis d-flex align-items-center gap-1 mt-1">
-                    <i-bs class="lh-1" width="1em" height="1em" name="exclamation-triangle"></i-bs>
+                    <pngx-bs-icon class="lh-1" width="1em" height="1em" name="exclamation-triangle"></pngx-bs-icon>
                     <span>{{ duplicateTaskLabel(task) }}</span>
                   </div>
                 }
@@ -213,18 +213,18 @@
             }
             <td class="d-lg-none">
               <button class="btn btn-link" (click)="expandTask(task); $event.stopPropagation();" aria-label="View task details" i18n-aria-label>
-                <i-bs width="1.2em" height="1.2em" name="info-circle"></i-bs>
+                <pngx-bs-icon width="1.2em" height="1.2em" name="info-circle"></pngx-bs-icon>
               </button>
             </td>
             <td class="actions-col">
               <div class="btn-group" role="group">
                 <button class="btn btn-sm btn-outline-secondary" (click)="dismissTask(task); $event.stopPropagation();" *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.PaperlessTask }">
-                  <i-bs name="check" class="me-1"></i-bs><ng-container i18n>Dismiss</ng-container>
+                  <pngx-bs-icon name="check" class="me-1"></pngx-bs-icon><ng-container i18n>Dismiss</ng-container>
                 </button>
                 <ng-container *pngxIfPermissions="{ action: PermissionAction.View, type: PermissionType.Document }">
                   @if (task.related_document_ids?.[0]) {
                     <a class="btn btn-sm btn-outline-primary" [routerLink]="['/documents', task.related_document_ids[0]]" (click)="dismissTask(task)">
-                      <i-bs name="file-text" class="me-1"></i-bs><ng-container i18n>Open Document</ng-container>
+                      <pngx-bs-icon name="file-text" class="me-1"></pngx-bs-icon><ng-container i18n>Open Document</ng-container>
                     </a>
                   }
                 </ng-container>

@@ -1,12 +1,12 @@
 import { Clipboard } from '@angular/cdk/clipboard'
 import { Component, inject, input, OnDestroy, signal } from '@angular/core'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { DocumentBarcode } from 'src/app/data/document-barcode'
 
 @Component({
   selector: 'pngx-document-barcodes',
   templateUrl: './document-barcodes.component.html',
-  imports: [NgxBootstrapIconsModule],
+  imports: [BootstrapIconComponent],
 })
 export class DocumentBarcodesComponent implements OnDestroy {
   private readonly clipboard = inject(Clipboard)

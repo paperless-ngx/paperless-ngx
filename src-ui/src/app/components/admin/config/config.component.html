@@ -28,7 +28,7 @@
                                                       {{option.title}}
                                                     </h6>
                                                     <a class="btn btn-sm btn-link" title="Read the documentation about this setting" i18n-title [href]="getDocsUrl(option.config_key)" target="_blank" referrerpolicy="no-referrer">
-                                                        <i-bs name="info-circle"></i-bs>
+                                                        <pngx-bs-icon name="info-circle"></pngx-bs-icon>
                                                     </a>
                                                     @if (isExternallyConfigured(option.config_key)) {
                                                       @if (isSet(option.key)) {
@@ -40,11 +40,11 @@
                                                     @if (isSet(option.key)) {
                                                       @if (isExternallyConfigured(option.config_key)) {
                                                         <button type="button" class="btn btn-sm btn-link text-danger ms-auto pe-0" title="Use the externally configured value" i18n-title (click)="resetOption(option.key)">
-                                                            <i-bs class="me-1" name="x"></i-bs><ng-container i18n>Reset to external</ng-container>
+                                                            <pngx-bs-icon class="me-1" name="x"></pngx-bs-icon><ng-container i18n>Reset to external</ng-container>
                                                         </button>
                                                       } @else {
                                                         <button type="button" class="btn btn-sm btn-link text-danger ms-auto pe-0" title="Reset" i18n-title (click)="resetOption(option.key)">
-                                                            <i-bs class="me-1" name="x"></i-bs><ng-container i18n>Reset</ng-container>
+                                                            <pngx-bs-icon class="me-1" name="x"></pngx-bs-icon><ng-container i18n>Reset</ng-container>
                                                         </button>
                                                       }
                                                     }

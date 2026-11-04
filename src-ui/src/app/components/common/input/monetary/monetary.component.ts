@@ -5,7 +5,7 @@ import {
   NG_VALUE_ACCESSOR,
   ReactiveFormsModule,
 } from '@angular/forms'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { AbstractInputComponent } from '../abstract-input'
 
 @Component({
@@ -23,7 +23,7 @@ import { AbstractInputComponent } from '../abstract-input'
     CurrencyPipe,
     FormsModule,
     ReactiveFormsModule,
-    NgxBootstrapIconsModule,
+    BootstrapIconComponent,
   ],
 })
 export class MonetaryComponent extends AbstractInputComponent<string> {

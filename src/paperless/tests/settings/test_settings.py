@@ -166,3 +166,22 @@ class TestPaperlessURLSettings(TestCase):
 
             self.assertIn(url, settings.CSRF_TRUSTED_ORIGINS)
             self.assertIn(url, settings.CORS_ALLOWED_ORIGINS)
+
+
+@pytest.mark.parametrize("url", ["example.com", "https://", "/just/a/path"])
+def test_paperless_url_without_hostname_is_rejected(
+    monkeypatch: pytest.MonkeyPatch,
+    url: str,
+) -> None:
+    """
+    GIVEN:
+        - PAPERLESS_URL is set to a value with no hostname
+    WHEN:
+        - The URL is parsed
+    THEN:
+        - A configuration error is raised instead of adding None to ALLOWED_HOSTS
+    """
+    monkeypatch.setenv("PAPERLESS_URL", url)
+
+    with pytest.raises(ImproperlyConfigured, match="no hostname"):
+        _parse_paperless_url()
