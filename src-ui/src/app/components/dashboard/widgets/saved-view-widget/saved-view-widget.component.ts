@@ -296,7 +296,20 @@ export class SavedViewWidgetComponent
     return this.savedView?.page_size ?? DEFAULT_DASHBOARD_VIEW_PAGE_SIZE
   }
 
+  /**
+   * Pass the widget's documents to the list service to enable next / previous.
+   */
+  activateViewForNavigation() {
+    this.documentListViewService.activateSavedViewWithDocuments(
+      this.savedView,
+      this.documents(),
+      this.count(),
+      this.pageSize
+    )
+  }
+
   openDocumentDetail(document: Document) {
+    this.activateViewForNavigation()
     this.router.navigate(['documents', document.id])
   }
 
