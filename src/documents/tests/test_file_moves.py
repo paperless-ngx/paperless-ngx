@@ -256,7 +256,7 @@ class TestRequestFileMoveWithoutScope:
 
 @pytest.mark.django_db
 class TestReceiver:
-    def test_reverse_m2m_does_not_request_a_move(
+    def test_reverse_m2m_requests_a_move_per_document(
         self,
         document: Document,
         mocker: MockerFixture,
@@ -267,14 +267,15 @@ class TestReceiver:
         WHEN:
             - A document is added through the tag's reverse relation
         THEN:
-            - No move is requested with the tag as the instance
+            - A move is requested for the added document, never the tag
         """
         tag = TagFactory()
         request = mocker.patch("documents.signals.handlers.request_file_move")
 
         tag.documents.add(document)
 
-        request.assert_not_called()
+        request.assert_called_once()
+        assert request.call_args.args[0].pk == document.pk
 
 
 @pytest.mark.django_db

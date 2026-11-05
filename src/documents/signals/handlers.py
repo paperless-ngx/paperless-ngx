@@ -423,13 +423,16 @@ def update_filename_and_move_files(
     instance: Document | CustomFieldInstance,
     **kwargs,
 ) -> None:
-    if kwargs.get("reverse"):
-        # tag.documents.add(doc): instance is the Tag, not a Document.
-        return
     action = kwargs.get("action")
     if action is not None and action not in {"post_add", "post_remove", "post_clear"}:
         # m2m_changed fires pre_* and post_* actions; only post_* describe the
         # relation state the filename should follow.
+        return
+
+    if kwargs.get("reverse"):
+        # tag.documents.add(doc): instance is the Tag, pk_set holds Document pks.
+        for document in Document.objects.filter(pk__in=kwargs.get("pk_set") or ()):
+            request_file_move(document)
         return
 
     if isinstance(instance, CustomFieldInstance):
