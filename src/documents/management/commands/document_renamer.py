@@ -11,7 +11,8 @@ class Command(PaperlessCommand):
 
     def handle(self, *args, **options):
         for document in self.track(
-            Document.objects.only("pk"),
+            # move_files_for_document handles a root's versions itself
+            Document.objects.filter(root_document__isnull=True).only("pk"),
             description="Renaming...",
         ):
             move_files_for_document(document.pk)
