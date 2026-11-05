@@ -132,7 +132,7 @@ export class SavedViewWidgetComponent
   ngOnInit(): void {
     this.placeholderRows = Array.from(
       {
-        length: this.savedView?.page_size ?? DEFAULT_DASHBOARD_VIEW_PAGE_SIZE,
+        length: this.pageSize,
       },
       (_, index) => index
     )
@@ -187,7 +187,7 @@ export class SavedViewWidgetComponent
     this.documentService
       .listFiltered(
         1,
-        this.savedView?.page_size ?? DEFAULT_DASHBOARD_VIEW_PAGE_SIZE,
+        this.pageSize,
         this.savedView.sort_field,
         this.savedView.sort_reverse,
         this.savedView.filter_rules,
@@ -290,6 +290,10 @@ export class SavedViewWidgetComponent
     this.list.quickFilter([
       { rule_type: FILTER_OWNER_ANY, value: ownerID.toString() },
     ])
+  }
+
+  get pageSize(): number {
+    return this.savedView?.page_size ?? DEFAULT_DASHBOARD_VIEW_PAGE_SIZE
   }
 
   openDocumentDetail(document: Document) {
