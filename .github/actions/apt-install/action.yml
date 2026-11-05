@@ -1,6 +1,6 @@
 name: Install apt packages
 description: >
-  Installs apt packages using Ubuntu mirrors and bounded download retries. Caches downloaded packages as an optimization; apt resolves dependencies on every run.
+  Installs apt packages with bounded download retries and Ubuntu mirror fallback. Caches downloaded packages as an optimization; apt resolves dependencies on every run.
 
 inputs:
   packages:

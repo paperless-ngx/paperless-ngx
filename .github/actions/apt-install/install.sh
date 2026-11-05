@@ -19,16 +19,18 @@ read -r -a requested_packages <<< "$PACKAGES"
 mkdir -p "$CACHE_DIR"
 touch "$CACHE_DIR/.keep"
 
-# Hosted runners use a mirror list; job containers can point directly at Azure.
-# Handle both layouts, leaving other repositories and signature checks intact.
-if [ -f /etc/apt/apt-mirrors.txt ]; then
-	"${SUDO[@]}" sed -i '\|azure\.archive\.ubuntu\.com|d' /etc/apt/apt-mirrors.txt
-fi
-for source in /etc/apt/sources.list /etc/apt/sources.list.d/*.list /etc/apt/sources.list.d/*.sources; do
-	if [ -f "$source" ]; then
-		"${SUDO[@]}" sed -i 's|azure\.archive\.ubuntu\.com|archive.ubuntu.com|g' "$source"
+use_ubuntu_mirrors() {
+	# Hosted runners use a mirror list; job containers can point directly at Azure.
+	# Handle both layouts, leaving other repositories and signature checks intact.
+	if [ -f /etc/apt/apt-mirrors.txt ]; then
+		"${SUDO[@]}" sed -i '\|azure\.archive\.ubuntu\.com|d' /etc/apt/apt-mirrors.txt
 	fi
-done
+	for source in /etc/apt/sources.list /etc/apt/sources.list.d/*.list /etc/apt/sources.list.d/*.sources; do
+		if [ -f "$source" ]; then
+			"${SUDO[@]}" sed -i 's|azure\.archive\.ubuntu\.com|archive.ubuntu.com|g' "$source"
+		fi
+	done
+}
 
 for attempt in $(seq 1 "$ATTEMPTS"); do
 	echo "::group::apt download attempt ${attempt}/${ATTEMPTS}"
@@ -43,6 +45,10 @@ for attempt in $(seq 1 "$ATTEMPTS"); do
 	fi
 	echo "::endgroup::"
 	echo "::warning::apt download attempt ${attempt}/${ATTEMPTS} failed or exceeded ${ATTEMPT_TIMEOUT}s"
+	if [ "$attempt" -eq 1 ] && [ "$ATTEMPTS" -gt 1 ]; then
+		echo "Switching from Azure to Ubuntu archive mirrors for remaining attempts"
+		use_ubuntu_mirrors
+	fi
 done
 
 echo "::error::apt download failed after ${ATTEMPTS} attempts"
