@@ -813,6 +813,7 @@ class ConsumerPlugin(
         # The storage scope above nests under the consume task's scope, so its
         # moves are still pending; place the file before the script reads its path.
         flush_pending_file_moves()
+        document.refresh_from_db()
 
         self.run_post_consume_script(document)
 
@@ -825,9 +826,6 @@ class ConsumerPlugin(
             ConsumerStatusShortMessage.FINISHED,
             document.id,
         )
-
-        # Return the most up to date fields
-        document.refresh_from_db()
 
         return ConsumeFileSuccessResult(document_id=document.pk)
 
