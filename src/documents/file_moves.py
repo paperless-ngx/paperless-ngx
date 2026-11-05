@@ -152,10 +152,12 @@ def move_files_for_document(pk: int) -> Document | None:
 
     # Keep version files in sync with root
     if document.root_document_id is None:
-        for version_pk in Document.objects.filter(root_document_id=pk).values_list(
-            "pk",
-            flat=True,
-        ):
+        version_pks = list(
+            Document.global_objects.values_list("pk", flat=True).filter(
+                root_document_id=pk,
+            ),
+        )
+        for version_pk in version_pks:
             move_files_for_document(version_pk)
 
     return document
