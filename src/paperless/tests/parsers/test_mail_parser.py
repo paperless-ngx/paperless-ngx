@@ -594,6 +594,23 @@ class TestParser:
 
         assert mail_parser.get_archive_path() is not None
 
+    def test_generate_pdf_from_html_with_pdfa(
+        self,
+        httpx_mock: HTTPXMock,
+        mail_parser: MailDocumentParser,
+        html_email_pdf_file: Path,
+    ) -> None:
+        url = "http://localhost:3000/forms/chromium/convert/html"
+        pdf_content = html_email_pdf_file.read_bytes()
+        httpx_mock.add_response(url=url, method="POST", content=pdf_content)
+
+        archive = mail_parser.generate_pdf_from_html("<p>Email body</p>", [])
+
+        assert archive.read_bytes() == pdf_content
+        request = httpx_mock.get_request(url=url)
+        assert request is not None
+        assert b'name="pdfa"\r\n\r\nPDF/A-2b\r\n' in request.content
+
     @pytest.mark.httpx_mock(can_send_already_matched_responses=True)
     def test_generate_pdf_html_email(
         self,
