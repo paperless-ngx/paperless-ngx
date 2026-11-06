@@ -635,6 +635,89 @@ class TestParser:
 
         assert mail_parser.get_archive_path() is not None
 
+    @pytest.mark.httpx_mock(can_send_already_matched_responses=True)
+    def test_generate_pdf_html_email_pdfa_only_on_merge(
+        self,
+        settings: Settings,
+        httpx_mock: HTTPXMock,
+        mail_parser: MailDocumentParser,
+        html_email_file: Path,
+        html_email_pdf_file: Path,
+    ) -> None:
+        """
+        GIVEN:
+            - email with HTML content
+            - PDF/A output is configured
+        WHEN:
+            - Email is parsed
+        THEN:
+            - The two Chromium conversions do not request PDF/A
+            - Only the merge of the two PDFs requests PDF/A
+        """
+        settings.OCR_OUTPUT_TYPE = "pdfa"
+        httpx_mock.add_response(
+            url="http://localhost:9998/tika/text",
+            method="PUT",
+            json={
+                "Content-Type": "text/html",
+                "X-TIKA:Parsed-By": [],
+                "X-TIKA:content": "This is some Tika HTML text",
+            },
+        )
+        httpx_mock.add_response(
+            url="http://localhost:3000/forms/chromium/convert/html",
+            method="POST",
+            content=html_email_pdf_file.read_bytes(),
+        )
+        httpx_mock.add_response(
+            url="http://localhost:3000/forms/pdfengines/merge",
+            method="POST",
+            content=b"Pretend merged PDF content",
+        )
+        mail_parser.parse(html_email_file, "message/rfc822")
+
+        chromium_requests = httpx_mock.get_requests(
+            url="http://localhost:3000/forms/chromium/convert/html",
+        )
+        merge_request = httpx_mock.get_request(
+            url="http://localhost:3000/forms/pdfengines/merge",
+        )
+        assert len(chromium_requests) == 2
+        for request in chromium_requests:
+            assert b'name="pdfa"' not in request.content
+        assert merge_request is not None
+        assert b'name="pdfa"' in merge_request.content
+
+    def test_generate_pdf_simple_email_pdfa(
+        self,
+        settings: Settings,
+        httpx_mock: HTTPXMock,
+        mail_parser: MailDocumentParser,
+        simple_txt_email_file: Path,
+        simple_txt_email_pdf_file: Path,
+    ) -> None:
+        """
+        GIVEN:
+            - Simple text email with no HTML content
+            - PDF/A output is configured
+        WHEN:
+            - Email is parsed
+        THEN:
+            - The single Chromium conversion requests PDF/A, since nothing is merged
+        """
+        settings.OCR_OUTPUT_TYPE = "pdfa"
+        httpx_mock.add_response(
+            url="http://localhost:3000/forms/chromium/convert/html",
+            method="POST",
+            content=simple_txt_email_pdf_file.read_bytes(),
+        )
+
+        mail_parser.parse(simple_txt_email_file, "message/rfc822")
+
+        request = httpx_mock.get_request()
+        assert request is not None
+        assert b'name="pdfa"' in request.content
+
     def test_generate_pdf_html_email_html_to_pdf_failure(
         self,
         httpx_mock: HTTPXMock,

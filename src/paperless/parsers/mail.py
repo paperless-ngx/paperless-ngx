@@ -554,7 +554,14 @@ class MailDocumentParser:
         """
         archive_path = Path(self._tempdir) / "merged.pdf"
 
-        mail_pdf_file = self.generate_pdf_from_mail(mail_message)
+        # Request PDF/A only for the final document. Gotenberg converts to
+        # PDF/A with LibreOffice, and converting its own PDF/A output a second
+        # time (once per part, then again on the merge) turns semi-transparent
+        # content, such as a faint text-shadow, into opaque black boxes.
+        mail_pdf_file = self.generate_pdf_from_mail(
+            mail_message,
+            pdf_a=not mail_message.html,
+        )
 
         if pdf_layout is None:
             pdf_layout = MailRule.PdfLayout(settings.EMAIL_PARSE_DEFAULT_LAYOUT)
@@ -567,6 +574,7 @@ class MailDocumentParser:
             pdf_of_html_content = self.generate_pdf_from_html(
                 mail_message.html,
                 mail_message.attachments,
+                pdf_a=False,
             )
 
             logger.debug("Merging email text and HTML content into single PDF")
@@ -672,13 +680,21 @@ class MailDocumentParser:
 
         return html_file
 
-    def generate_pdf_from_mail(self, mail: MailMessage) -> Path:
+    def generate_pdf_from_mail(
+        self,
+        mail: MailMessage,
+        *,
+        pdf_a: bool = True,
+    ) -> Path:
         """Create a PDF from the email body using an HTML template and Gotenberg.
 
         Parameters
         ----------
         mail:
             Parsed mail message.
+        pdf_a:
+            Request the configured PDF/A format. Pass False when the PDF is
+            merged afterwards, so the merge is the only PDF/A conversion.
 
         Returns
         -------
@@ -708,7 +724,7 @@ class MailDocumentParser:
             client.chromium.html_to_pdf() as route,
         ):
             # Configure requested PDF/A formatting, if any
-            pdf_a_format = self._settings_to_gotenberg_pdfa()
+            pdf_a_format = self._settings_to_gotenberg_pdfa() if pdf_a else None
             if pdf_a_format is not None:
                 route.pdf_format(pdf_a_format)
 
@@ -742,6 +758,8 @@ class MailDocumentParser:
         self,
         orig_html: str,
         attachments: list[MailAttachment],
+        *,
+        pdf_a: bool = True,
     ) -> Path:
         """Generate a PDF from the HTML content of the email.
 
@@ -751,6 +769,9 @@ class MailDocumentParser:
             Raw HTML string from the email body.
         attachments:
             List of email attachments (used as inline resources).
+        pdf_a:
+            Request the configured PDF/A format. Pass False when the PDF is
+            merged afterwards, so the merge is the only PDF/A conversion.
 
         Returns
         -------
@@ -787,7 +808,7 @@ class MailDocumentParser:
             client.chromium.html_to_pdf() as route,
         ):
             # Configure requested PDF/A formatting, if any
-            pdf_a_format = self._settings_to_gotenberg_pdfa()
+            pdf_a_format = self._settings_to_gotenberg_pdfa() if pdf_a else None
             if pdf_a_format is not None:
                 route.pdf_format(pdf_a_format)
 
