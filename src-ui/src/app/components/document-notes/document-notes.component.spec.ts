@@ -5,7 +5,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { By } from '@angular/platform-browser'
 import { of, throwError } from 'rxjs'
-import { DocumentNote } from 'src/app/data/document-note'
+import { DocumentNote, NoteFormat } from 'src/app/data/document-note'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { PermissionsService } from 'src/app/services/permissions.service'
@@ -129,6 +129,66 @@ describe('DocumentNotesComponent', () => {
     expect(fixture.debugElement.nativeElement.textContent).toContain('user3')
   })
 
+  it('should render notes according to their format', () => {
+    component.notes.set([
+      { id: 31, note: '**x**', format: NoteFormat.Markdown },
+      {
+        id: 32,
+        note: '<script>alert(1)</script>',
+        format: NoteFormat.Markdown,
+      },
+      { id: 33, note: '**x**', format: NoteFormat.Plain },
+    ])
+    fixture.detectChanges()
+
+    const noteCards = fixture.debugElement.queryAll(By.css('.card-text'))
+    expect(noteCards[0].query(By.css('strong')).nativeElement.textContent).toBe(
+      'x'
+    )
+    expect(noteCards[1].query(By.css('script'))).toBeNull()
+    expect(noteCards[2].query(By.css('strong'))).toBeNull()
+    expect(noteCards[2].nativeElement.textContent).toBe('**x**')
+  })
+
+  it('should toggle between edit and preview', () => {
+    const radios = fixture.debugElement.queryAll(
+      By.css('.btn-group input[type="radio"]')
+    )
+    radios[1].triggerEventHandler('change')
+    fixture.detectChanges()
+    expect(
+      fixture.debugElement.query(By.css('.note-preview')).nativeElement
+        .textContent
+    ).toContain('Nothing to preview')
+
+    component.noteForm.get('newNote').setValue('**bold**')
+    fixture.detectChanges()
+    expect(
+      fixture.debugElement.query(By.css('.note-preview strong'))
+    ).not.toBeNull()
+    expect(
+      fixture.debugElement.query(By.css('textarea')).nativeElement.classList
+    ).toContain('d-none')
+
+    radios[0].triggerEventHandler('change')
+    fixture.detectChanges()
+    expect(fixture.debugElement.query(By.css('.note-preview'))).toBeNull()
+    expect(
+      fixture.debugElement.query(By.css('textarea')).nativeElement.classList
+    ).not.toContain('d-none')
+  })
+
+  it('should return to edit mode after saving', () => {
+    component.documentId.set(12)
+    component.noteForm.get('newNote').setValue('Preview note')
+    fixture.debugElement
+      .queryAll(By.css('.btn-group input[type="radio"]'))[1]
+      .triggerEventHandler('change')
+    jest.spyOn(notesService, 'addNote').mockReturnValueOnce(of(notes))
+    component.addNote()
+    expect(component.noteView()).toBe('edit')
+  })
+
   it('should handle note user display in all situations', () => {
     expect(
       component.displayName({
@@ -161,7 +221,7 @@ describe('DocumentNotesComponent', () => {
     const addSpy = jest.spyOn(notesService, 'addNote')
     addSpy.mockReturnValueOnce(throwError(() => new Error('error saving note')))
     const toastsSpy = jest.spyOn(toastService, 'showError')
-    const addButton = fixture.debugElement.query(By.css('button'))
+    const addButton = fixture.debugElement.query(By.css('.btn-primary'))
     addButton.triggerEventHandler('click')
     expect(addSpy).toHaveBeenCalledWith(12, note)
     expect(toastsSpy).toHaveBeenCalled()
@@ -190,7 +250,9 @@ describe('DocumentNotesComponent', () => {
     component.documentId.set(12)
     component.notes.set(notes)
     fixture.detectChanges()
-    const deleteButton = fixture.debugElement.queryAll(By.css('button'))[1] // 0 is add button
+    const deleteButton = fixture.debugElement.query(
+      By.css('.card-footer button')
+    )
     const deleteSpy = jest.spyOn(notesService, 'deleteNote')
     const toastsSpy = jest.spyOn(toastService, 'showError')
     deleteSpy.mockReturnValueOnce(

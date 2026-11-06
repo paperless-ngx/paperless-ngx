@@ -967,8 +967,17 @@ class NotesSerializer(serializers.ModelSerializer[Note]):
 
     class Meta:
         model = Note
-        fields = ["id", "note", "created", "user"]
+        fields = ["id", "note", "format", "created", "user"]
         ordering = ["-created"]
+
+
+class NoteCreateSerializer(serializers.Serializer[dict[str, Any]]):
+    note = serializers.CharField()
+    format = serializers.ChoiceField(
+        choices=Note.Format.choices,
+        default=Note.Format.PLAIN,
+        required=False,
+    )
 
 
 def _get_viewable_duplicates(

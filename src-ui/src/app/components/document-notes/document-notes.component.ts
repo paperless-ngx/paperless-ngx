@@ -14,14 +14,20 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms'
 import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
-import { DocumentNote } from 'src/app/data/document-note'
+import { DocumentNote, NoteFormat } from 'src/app/data/document-note'
 import { User } from 'src/app/data/user'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
+import { MarkdownPipe } from 'src/app/pipes/markdown.pipe'
 import { DocumentNotesService } from 'src/app/services/rest/document-notes.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
+
+enum NoteViewMode {
+  Edit = 'edit',
+  Preview = 'preview',
+}
 
 @Component({
   selector: 'pngx-document-notes',
@@ -30,6 +36,7 @@ import { ComponentWithPermissions } from '../with-permissions/with-permissions.c
   imports: [
     IfPermissionsDirective,
     CustomDatePipe,
+    MarkdownPipe,
     FormsModule,
     ReactiveFormsModule,
     BootstrapIconComponent,
@@ -43,6 +50,9 @@ export class DocumentNotesComponent extends ComponentWithPermissions {
   readonly notes = model<DocumentNote[]>([])
   readonly addDisabled = input(false)
   readonly networkActive = signal(false)
+  protected readonly NoteViewMode = NoteViewMode
+  protected readonly NoteFormat = NoteFormat
+  protected readonly noteView = signal<NoteViewMode>(NoteViewMode.Edit)
 
   noteForm: FormGroup = new FormGroup({
     newNote: new FormControl(''),
@@ -75,6 +85,7 @@ export class DocumentNotesComponent extends ComponentWithPermissions {
       next: (result) => {
         this.notes.set(result)
         this.noteForm.get('newNote').reset()
+        this.noteView.set(NoteViewMode.Edit)
         this.networkActive.set(false)
         this.updated.emit(this.notes())
       },
