@@ -38,7 +38,7 @@ export const routes: Routes = [
         path: 'dashboard',
         component: DashboardComponent,
         data: {
-          componentName: 'AppFrameComponent',
+          componentName: 'DashboardComponent',
         },
       },
       {

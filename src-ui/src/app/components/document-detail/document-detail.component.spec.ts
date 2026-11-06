@@ -940,6 +940,20 @@ describe('DocumentDetailComponent', () => {
     expect(navigateSpy).toHaveBeenCalledWith(['view', 77])
   })
 
+  it('should close back to the dashboard even if a saved view is active', () => {
+    initNormally()
+    jest
+      .spyOn(componentRouterService, 'getComponentURLBefore')
+      .mockReturnValue('dashboard')
+    jest
+      .spyOn(documentListViewService, 'activeSavedViewId', 'get')
+      .mockReturnValue(77)
+    const navigateSpy = jest.spyOn(router, 'navigate')
+    component.close()
+    expect(navigateSpy).toHaveBeenCalledWith(['dashboard'])
+    expect(navigateSpy).not.toHaveBeenCalledWith(['view', 77])
+  })
+
   it('should not close if e.g. user-cancelled', () => {
     initNormally()
     jest.spyOn(openDocumentsService, 'closeDocument').mockReturnValue(of(false))
