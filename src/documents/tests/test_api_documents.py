@@ -1766,8 +1766,8 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
               include_selection_data=true
         THEN:
             - Counts reflect only the shared document, not every document the
-              owner has with that correspondent or document type, however the
-              link-table lookups are batched
+              owner has with that correspondent or document type, regardless of
+              the batch size
         """
         owner = User.objects.create_user(username="owner")
         other = User.objects.create_user(username="other")
@@ -1789,10 +1789,10 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
 
         for batch_size in (10_000, 1):
             with (
-                self.subTest(link_batch_size=batch_size),
+                self.subTest(batch_size=batch_size),
                 mock.patch.object(
                     DocumentViewSet,
-                    "selection_data_link_batch_size",
+                    "selection_data_batch_size",
                     batch_size,
                 ),
             ):
@@ -1823,7 +1823,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             - Requesting the document list with include_selection_data=true
         THEN:
             - The document is counted once per correspondent, not once per
-              matching tag, however the link-table lookups are batched
+              matching tag, regardless of the batch size
         """
         correspondent = Correspondent.objects.create(name="c1")
         tag_a = Tag.objects.create(name="a")
@@ -1835,10 +1835,10 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
 
         for batch_size in (10_000, 1):
             with (
-                self.subTest(link_batch_size=batch_size),
+                self.subTest(batch_size=batch_size),
                 mock.patch.object(
                     DocumentViewSet,
-                    "selection_data_link_batch_size",
+                    "selection_data_batch_size",
                     batch_size,
                 ),
             ):

@@ -11,6 +11,7 @@ from collections.abc import Callable
 from datetime import datetime
 from datetime import timedelta
 from http import HTTPStatus
+from itertools import islice
 from pathlib import Path
 from time import mktime
 from time import sleep
@@ -1014,83 +1015,80 @@ class DocumentViewSet(
         "custom_field_",
     )
 
-    # Matching document ids are looked up in the link tables in batches of this
-    # size: one literal IN (...) over every match is a multi-MB statement per
-    # relation and, on SQLite, exceeds the bound-parameter limit.
-    selection_data_link_batch_size = 10_000
+    # Bound the IN clauses used for search results and through-table lookups.
+    selection_data_batch_size = 10_000
 
-    def _get_selection_data_for_queryset(self, queryset):
-        # The filtered queryset is evaluated once, as the page's own filter is,
-        # and never wrapped in a subquery: re-deriving a join or a HAVING
-        # (shared_by__id) per statement is very slow on some databases, and
-        # regrouping the queryset by another column would miscount.
-        # order_by() drops the default/user ordering, which only costs a sort.
-        correspondents: Counter = Counter()
-        document_types: Counter = Counter()
-        storage_paths: Counter = Counter()
-        document_ids: list[int] = []
-        seen: set[int] = set()
-        rows = queryset.order_by().values_list(
-            "pk",
-            "correspondent_id",
-            "document_type_id",
-            "storage_path_id",
+    def _get_selection_data_for_queryset(
+        self,
+        queryset: QuerySet[Document],
+        *,
+        search_ids: list[int] | None = None,
+    ) -> dict[str, list[dict[str, int]]]:
+        # Keep permission and filter predicates at document granularity.
+        # Reusing the filtered queryset as a subquery for each count is slow.
+        rows = (
+            queryset.order_by()
+            .prefetch_related(None)
+            .values_list(
+                "pk",
+                "correspondent_id",
+                "document_type_id",
+                "storage_path_id",
+            )
         )
-        for pk, correspondent, document_type, storage_path in rows:
-            # A filter can join, repeating a document row.
-            if pk in seen:
+        batch_size = self.selection_data_batch_size
+
+        def document_rows():
+            if search_ids is None:
+                yield from rows.iterator()
+            else:
+                for start in range(0, len(search_ids), batch_size):
+                    yield from rows.filter(
+                        pk__in=search_ids[start : start + batch_size],
+                    ).iterator()
+
+        correspondents: Counter[int | None] = Counter()
+        document_types: Counter[int | None] = Counter()
+        storage_paths: Counter[int | None] = Counter()
+        document_ids: set[int] = set()
+        for pk, correspondent, document_type, storage_path in document_rows():
+            # Filters that join multi-valued relations can repeat a document.
+            if pk in document_ids:
                 continue
-            seen.add(pk)
-            document_ids.append(pk)
-            # Documents without a value count under None, which selection()
-            # never looks up.
+            document_ids.add(pk)
             correspondents[correspondent] += 1
             document_types[document_type] += 1
             storage_paths[storage_path] += 1
 
-        def link_table_counts(link_model, field_name: str) -> Counter:
-            result: Counter = Counter()
-            batch_size = self.selection_data_link_batch_size
-            for start in range(0, len(document_ids), batch_size):
-                result.update(
+        tags: Counter[int | None] = Counter()
+        custom_fields: Counter[int | None] = Counter()
+        ids = iter(document_ids)
+        while batch := list(islice(ids, batch_size)):
+            for model, field, counts in (
+                (Document.tags.through, "tag_id", tags),
+                (CustomFieldInstance, "field_id", custom_fields),
+            ):
+                counts.update(
                     dict(
-                        link_model.objects.filter(
-                            document_id__in=document_ids[start : start + batch_size],
-                        )
-                        .values_list(field_name)
+                        model.objects.filter(document_id__in=batch)
+                        .order_by()
+                        .values_list(field)
                         .annotate(document_count=Count("document_id")),
                     ),
                 )
-            return result
 
-        def selection(model, counts: Counter) -> list[dict[str, int]]:
-            # Every object is listed, with 0 for those with no matching document.
+        def selection(model: type[Model], counts: Counter[int | None]):
             return [
-                {"id": pk, "document_count": counts.get(pk, 0)}
-                for pk in model.objects.values_list("pk", flat=True)
+                {"id": pk, "document_count": counts[pk]}
+                for pk in model._default_manager.values_list("pk", flat=True)
             ]
 
         return {
-            "selected_correspondents": selection(
-                Correspondent,
-                correspondents,
-            ),
-            "selected_tags": selection(
-                Tag,
-                link_table_counts(Document.tags.through, "tag_id"),
-            ),
-            "selected_document_types": selection(
-                DocumentType,
-                document_types,
-            ),
-            "selected_storage_paths": selection(
-                StoragePath,
-                storage_paths,
-            ),
-            "selected_custom_fields": selection(
-                CustomField,
-                link_table_counts(CustomFieldInstance, "field_id"),
-            ),
+            "selected_correspondents": selection(Correspondent, correspondents),
+            "selected_tags": selection(Tag, tags),
+            "selected_document_types": selection(DocumentType, document_types),
+            "selected_storage_paths": selection(StoragePath, storage_paths),
+            "selected_custom_fields": selection(CustomField, custom_fields),
         }
 
     @classmethod
@@ -2737,13 +2735,10 @@ class UnifiedSearchViewSet(DocumentViewSet):
                 if get_boolean(
                     str(request.query_params.get("include_selection_data", "false")),
                 ):
-                    # NOTE: pk__in=ordered_ids generates a large SQL IN clause
-                    # for big result sets.  Acceptable today but may need a temp
-                    # table or chunked approach if selection_data becomes slow
-                    # at scale (tens of thousands of matching documents).
                     response.data["selection_data"] = (
                         self._get_selection_data_for_queryset(
-                            filtered_qs.filter(pk__in=result.ordered_ids),
+                            filtered_qs,
+                            search_ids=result.ordered_ids,
                         )
                     )
                 return response
