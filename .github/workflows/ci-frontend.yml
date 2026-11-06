@@ -69,6 +69,7 @@ jobs:
             frontend:
               - 'src-ui/**'
               - '.github/workflows/ci-frontend.yml'
+              - '.github/actions/apt-install/**'
   install-dependencies:
     needs: changes
     if: needs.changes.outputs.frontend_changed == 'true'

@@ -1454,7 +1454,12 @@ export class DocumentDetailComponent
       .subscribe((closed) => {
         if (!closed) return
         if (closedCallback) closedCallback()
-        if (this.documentListViewService.activeSavedViewId) {
+        if (
+          this.componentRouterService.getComponentURLBefore() === 'dashboard'
+        ) {
+          // e.g. opened from a dashboard widget
+          this.router.navigate(['dashboard'])
+        } else if (this.documentListViewService.activeSavedViewId) {
           this.router.navigate([
             'view',
             this.documentListViewService.activeSavedViewId,

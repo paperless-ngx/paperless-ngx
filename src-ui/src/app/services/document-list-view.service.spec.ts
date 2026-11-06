@@ -386,6 +386,46 @@ describe('DocumentListViewService', () => {
     documentListViewService.activateSavedView(null)
   })
 
+  it('should support activating saved view with pre-fetched documents', () => {
+    const routerSpy = jest.spyOn(router, 'navigate')
+    routerSpy.mockClear()
+    documentListViewService.activateSavedViewWithDocuments(
+      view,
+      documents.slice(0, 2),
+      documents.length,
+      2
+    )
+    // no navigation, no reload
+    expect(routerSpy).not.toHaveBeenCalled()
+    httpTestingController.expectNone(
+      (req) => req.url === `${environment.apiBaseUrl}documents/`
+    )
+    expect(documentListViewService.activeSavedViewId).toEqual(view.id)
+    expect(documentListViewService.activeSavedViewTitle).toEqual(view.name)
+    expect(documentListViewService.documents).toEqual(documents.slice(0, 2))
+    expect(documentListViewService.collectionSize).toEqual(documents.length)
+    expect(documentListViewService.currentPage).toEqual(1)
+    expect(documentListViewService.pageSize).toEqual(2)
+    expect(documentListViewService.hasNext(documents[0].id)).toBeTruthy()
+
+    let nextDocId: number
+    documentListViewService
+      .getNext(documents[1].id)
+      .subscribe((docId) => (nextDocId = docId))
+    // crossing the page uses the view's sort + filters and the given page size
+    // (the currentPage setter reloads too, so the first request is cancelled)
+    const reqs = httpTestingController.match(
+      `${environment.apiBaseUrl}documents/?page=2&page_size=2&ordering=-added&truncate_content=true&include_selection_data=true&tags__id__all=${tags__id__all}`
+    )
+    expect(reqs.length).toBeGreaterThan(0)
+    reqs[reqs.length - 1].flush({
+      count: documents.length,
+      results: documents.slice(2, 4),
+    })
+    expect(nextDocId).toEqual(documents[2].id)
+    documentListViewService.activateSavedView(null)
+  })
+
   it('should support navigating next / previous', () => {
     documentListViewService.setFilterRules([])
     let req = httpTestingController.expectOne(
