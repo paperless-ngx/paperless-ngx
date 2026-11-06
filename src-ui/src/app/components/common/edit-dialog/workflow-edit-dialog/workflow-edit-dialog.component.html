@@ -155,6 +155,40 @@
         </div>
       </div>
     }
+    @if (formGroup.get('type').value === WorkflowTriggerType.ActionButton) {
+      <p class="small" i18n>A button with this label and color appears on the document detail page for documents that match the filters below.</p>
+      <div class="row">
+        <div class="col-lg-5">
+          <pngx-input-text i18n-title title="Button label" formControlName="button_label" [error]="error?.button_label"></pngx-input-text>
+        </div>
+        <div class="col-lg-3">
+          <pngx-input-color i18n-title title="Button color" formControlName="button_color" [error]="error?.button_color"></pngx-input-color>
+        </div>
+        <div class="col">
+          <pngx-input-switch i18n-title title="Require confirmation" formControlName="require_confirmation" i18n-hint hint="Ask for confirmation before running the workflow." [error]="error?.require_confirmation"></pngx-input-switch>
+        </div>
+      </div>
+      <div class="mb-3">
+        <label class="form-label" i18n>Trigger permission</label>
+        <p class="text-muted small" i18n>Only these users and groups will see the button and be able to trigger it. The document itself still requires view permission.</p>
+        <div class="row mb-1">
+          <div class="col-lg-3">
+            <label class="form-label d-block my-2 text-nowrap" i18n>Users:</label>
+          </div>
+          <div class="col-lg-9">
+            <pngx-permissions-user type="trigger" formControlName="trigger_users"></pngx-permissions-user>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-lg-3">
+            <label class="form-label d-block my-2 text-nowrap" i18n>Groups:</label>
+          </div>
+          <div class="col-lg-9">
+            <pngx-permissions-group type="trigger" formControlName="trigger_groups"></pngx-permissions-group>
+          </div>
+        </div>
+      </div>
+    }
     <p class="small" i18n>Trigger for documents that match <em>all</em> filters specified below.</p>
     <div class="row">
       <div class="col">
@@ -164,7 +198,7 @@
           <pngx-input-text i18n-title title="Filter path" formControlName="filter_path" horizontal="true" i18n-hint hint="Apply to documents that match this path. Wildcards specified as * are allowed. Case-normalized." [error]="error?.filter_path"></pngx-input-text>
           <pngx-input-select i18n-title title="Filter mail rule" [items]="mailRules()" horizontal="true" [allowNull]="true" formControlName="filter_mailrule" i18n-hint hint="Apply to documents consumed via this mail rule." [error]="error?.filter_mailrule"></pngx-input-select>
         }
-        @if (formGroup.get('type').value === WorkflowTriggerType.DocumentAdded || formGroup.get('type').value === WorkflowTriggerType.DocumentUpdated || formGroup.get('type').value === WorkflowTriggerType.Scheduled) {
+        @if (formGroup.get('type').value === WorkflowTriggerType.DocumentAdded || formGroup.get('type').value === WorkflowTriggerType.DocumentUpdated || formGroup.get('type').value === WorkflowTriggerType.Scheduled || formGroup.get('type').value === WorkflowTriggerType.ActionButton) {
           <pngx-input-select i18n-title title="Content matching algorithm" horizontal="true" [items]="getMatchingAlgorithms()" formControlName="matching_algorithm"></pngx-input-select>
           @if (matchingPatternRequired(formGroup)) {
             <pngx-input-text i18n-title title="Content matching pattern" horizontal="true" formControlName="match" [error]="error?.match"></pngx-input-text>
@@ -175,7 +209,7 @@
         }
       </div>
     </div>
-    @if (formGroup.get('type').value === WorkflowTriggerType.DocumentAdded || formGroup.get('type').value === WorkflowTriggerType.DocumentUpdated || formGroup.get('type').value === WorkflowTriggerType.Scheduled) {
+    @if (formGroup.get('type').value === WorkflowTriggerType.DocumentAdded || formGroup.get('type').value === WorkflowTriggerType.DocumentUpdated || formGroup.get('type').value === WorkflowTriggerType.Scheduled || formGroup.get('type').value === WorkflowTriggerType.ActionButton) {
       <div class="row mt-3">
         <div class="col">
           <div class="trigger-filters mb-3">

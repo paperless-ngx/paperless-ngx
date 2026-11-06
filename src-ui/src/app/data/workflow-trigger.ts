@@ -12,6 +12,7 @@ export enum WorkflowTriggerType {
   DocumentAdded = 2,
   DocumentUpdated = 3,
   Scheduled = 4,
+  ActionButton = 5,
 }
 
 export enum ScheduleDateField {
@@ -73,4 +74,14 @@ export interface WorkflowTrigger extends ObjectWithId {
   schedule_date_field?: ScheduleDateField
 
   schedule_date_custom_field?: number // CustomField.id
+
+  button_label?: string
+
+  button_color?: string
+
+  require_confirmation?: boolean
+
+  trigger_users?: number[] // User.id[]
+
+  trigger_groups?: number[] // Group.id[]
 }

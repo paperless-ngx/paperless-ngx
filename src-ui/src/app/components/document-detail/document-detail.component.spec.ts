@@ -30,6 +30,7 @@ import { CustomFieldDataType } from 'src/app/data/custom-field'
 import { CustomFieldInstance } from 'src/app/data/custom-field-instance'
 import { DataType } from 'src/app/data/datatype'
 import { Document, DocumentVersionInfo } from 'src/app/data/document'
+import { DocumentAction } from 'src/app/data/document-action'
 import { DocumentType } from 'src/app/data/document-type'
 import {
   FILTER_CORRESPONDENT,
@@ -2849,6 +2850,146 @@ describe('DocumentDetailComponent', () => {
       appendChildSpy.mockRestore()
       createObjectURLSpy.mockRestore()
       revokeObjectURLSpy.mockRestore()
+    })
+  })
+
+  describe('applicable actions', () => {
+    const action: DocumentAction = {
+      id: 7,
+      button_label: 'Run it',
+      button_color: '#ff0000',
+      require_confirmation: false,
+    }
+
+    function flushApplicableActions(actions: DocumentAction[] = [action]) {
+      httpTestingController
+        .expectOne(`${environment.apiBaseUrl}documents/${doc.id}/actions/`)
+        .flush(actions)
+    }
+
+    it('should fetch and render applicable actions when the document loads', () => {
+      initNormally()
+      flushApplicableActions()
+      fixture.detectChanges()
+
+      expect(component.applicableActions()).toEqual([action])
+      const button = fixture.debugElement.query(
+        By.css('.btn-group.ms-md-2 button')
+      )
+      expect(button.nativeElement.textContent).toContain('Run it')
+    })
+
+    it('should refetch applicable actions when switching documents', () => {
+      initNormally()
+      flushApplicableActions()
+
+      jest
+        .spyOn(documentService, 'get')
+        .mockReturnValueOnce(of(Object.assign({}, doc, { id: 4 })))
+      component['loadDocument'](4)
+
+      httpTestingController
+        .expectOne(`${environment.apiBaseUrl}documents/4/actions/`)
+        .flush([])
+
+      expect(component.applicableActions()).toEqual([])
+    })
+
+    it('should run an action without confirmation and show a success toast', () => {
+      initNormally()
+      flushApplicableActions()
+      const toastSpy = jest.spyOn(toastService, 'showSuccess')
+
+      component.triggerAction(action)
+
+      const req = httpTestingController.expectOne(
+        `${environment.apiBaseUrl}documents/${doc.id}/actions/`
+      )
+      expect(req.request.method).toEqual('POST')
+      expect(req.request.body).toEqual({ trigger: action.id })
+      req.flush(Object.assign({}, doc, { title: 'Updated by action' }))
+
+      // reload of applicable actions after running the action
+      httpTestingController
+        .expectOne(`${environment.apiBaseUrl}documents/${doc.id}/actions/`)
+        .flush([action])
+
+      expect(toastSpy).toHaveBeenCalled()
+      expect(component.document().title).toEqual('Updated by action')
+    })
+
+    it('should confirm before running an action that requires confirmation', () => {
+      let modal: NgbModalRef
+      modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
+      initNormally()
+      flushApplicableActions([{ ...action, require_confirmation: true }])
+
+      component.triggerAction({ ...action, require_confirmation: true })
+
+      expect(modal).not.toBeUndefined()
+      httpTestingController.expectNone(
+        `${environment.apiBaseUrl}documents/${doc.id}/actions/`
+      )
+
+      modal.componentInstance.confirmClicked.emit()
+      const req = httpTestingController.expectOne(
+        `${environment.apiBaseUrl}documents/${doc.id}/actions/`
+      )
+      req.flush(doc)
+      httpTestingController
+        .expectOne(`${environment.apiBaseUrl}documents/${doc.id}/actions/`)
+        .flush([action])
+    })
+
+    it('should show an error toast if running an action fails', () => {
+      initNormally()
+      flushApplicableActions()
+      const toastSpy = jest.spyOn(toastService, 'showError')
+
+      component.triggerAction(action)
+
+      const req = httpTestingController.expectOne(
+        `${environment.apiBaseUrl}documents/${doc.id}/actions/`
+      )
+      req.error(new ErrorEvent('failed'))
+
+      expect(toastSpy).toHaveBeenCalled()
+    })
+
+    it('should re-fetch applicable actions after a successful manual save', () => {
+      initNormally()
+      flushApplicableActions()
+      jest.spyOn(documentService, 'patch').mockReturnValue(of(doc))
+
+      component.save()
+
+      httpTestingController
+        .expectOne(`${environment.apiBaseUrl}documents/${doc.id}/actions/`)
+        .flush([action])
+
+      expect(component.applicableActions()).toEqual([action])
+    })
+
+    it('should disable action buttons while there are unsaved changes', () => {
+      jest.useFakeTimers()
+      // other specs mutate doc.custom_fields in place via addField()/removeField();
+      // reset it so the dirty-check comparison starts from a known-clean state.
+      doc.custom_fields = [{ field: 0, value: 'custom foo bar' }]
+      initNormally()
+      flushApplicableActions()
+      fixture.detectChanges()
+
+      let button = fixture.debugElement.query(
+        By.css('.btn-group.ms-md-2 button')
+      )
+      expect(button.nativeElement.disabled).toBe(false)
+
+      component.documentForm.get('title').setValue('changed title')
+      jest.advanceTimersByTime(1000)
+      fixture.detectChanges()
+
+      button = fixture.debugElement.query(By.css('.btn-group.ms-md-2 button'))
+      expect(button.nativeElement.disabled).toBe(true)
     })
   })
 })

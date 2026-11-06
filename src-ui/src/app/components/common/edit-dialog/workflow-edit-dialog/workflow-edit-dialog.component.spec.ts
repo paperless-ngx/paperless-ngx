@@ -1313,4 +1313,54 @@ describe('WorkflowEditDialogComponent', () => {
     expect(() => component.save()).not.toThrow()
     expect(component.objectForm.get('actions').value[0].passwords).toEqual([])
   })
+
+  it('should include Action Button in the trigger type options', () => {
+    expect(component.triggerTypeOptions).toContainEqual({
+      id: WorkflowTriggerType.ActionButton,
+      name: 'Action Button',
+    })
+  })
+
+  it('should create and persist action button fields on a trigger', () => {
+    const actionButtonTrigger = {
+      id: 5,
+      type: WorkflowTriggerType.ActionButton,
+      button_label: 'Run it',
+      button_color: '#ff0000',
+      require_confirmation: true,
+      trigger_users: [1],
+      trigger_groups: [2],
+      filter_has_tags: [1],
+    }
+    component.object = {
+      ...workflow,
+      triggers: [actionButtonTrigger as any],
+    }
+    component.ngOnInit()
+
+    const triggerGroup = component.triggerFields.at(0)
+    expect(triggerGroup.get('button_label').value).toEqual('Run it')
+    expect(triggerGroup.get('button_color').value).toEqual('#ff0000')
+    expect(triggerGroup.get('require_confirmation').value).toEqual(true)
+    expect(triggerGroup.get('trigger_users').value).toEqual([1])
+    expect(triggerGroup.get('trigger_groups').value).toEqual([2])
+
+    // Advanced Filters should build for Action Button triggers too, the
+    // same as Document Added/Updated/Scheduled.
+    expect(component.getFiltersFormArray(triggerGroup as any).length).toEqual(1)
+  })
+
+  it('should default action button fields when adding a new trigger', () => {
+    component.object = undefined
+    component.addTrigger()
+    expect(component.object.triggers[0]).toEqual(
+      expect.objectContaining({
+        button_label: '',
+        button_color: '#a6cee3',
+        require_confirmation: false,
+        trigger_users: [],
+        trigger_groups: [],
+      })
+    )
+  })
 })

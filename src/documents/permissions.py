@@ -34,6 +34,7 @@ from rest_framework.permissions import BasePermission
 from rest_framework.permissions import DjangoObjectPermissions
 
 from documents.models import Document
+from documents.models import WorkflowTrigger
 from documents.versioning import get_root_document
 
 PermissionAction = Literal["view", "change"]
@@ -477,6 +478,27 @@ def user_is_active_superuser(user: User | None) -> bool:
     True only for an active, authenticated superuser.
     """
     return user is not None and user_is_unrestricted(user)
+
+
+def user_can_trigger_workflow_trigger(
+    user: User | None,
+    trigger: WorkflowTrigger,
+) -> bool:
+    """
+    True if the user may click an action button backed by the given
+    ACTION_BUTTON WorkflowTrigger: a superuser, a user directly listed in
+    ``trigger.trigger_users``, or a member of a group listed in
+    ``trigger.trigger_groups``. This is a plain per-object grantee list
+    (mirroring ``WorkflowAction.assign_view_users``/``assign_view_groups``),
+    not a guardian object permission.
+    """
+    if user is None:
+        return False
+    if user_is_active_superuser(user):
+        return True
+    if trigger.trigger_users.filter(pk=user.pk).exists():
+        return True
+    return trigger.trigger_groups.filter(pk__in=user.groups.values("id")).exists()
 
 
 def restrict_queryset_to_owner_visible(

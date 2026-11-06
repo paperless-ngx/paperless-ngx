@@ -3137,7 +3137,18 @@ class WorkflowTriggerSerializer(serializers.ModelSerializer[WorkflowTrigger]):
             "schedule_recurring_interval_days",
             "schedule_date_field",
             "schedule_date_custom_field",
+            "button_label",
+            "button_color",
+            "require_confirmation",
+            "trigger_users",
+            "trigger_groups",
         ]
+
+    def validate_button_color(self, color):
+        regex = r"#[0-9a-fA-F]{6}"
+        if not re.match(regex, color):
+            raise serializers.ValidationError(_("Invalid color."))
+        return color
 
     def validate(self, attrs):
         # Empty strings treated as None to avoid unexpected behavior
@@ -3177,6 +3188,13 @@ class WorkflowTriggerSerializer(serializers.ModelSerializer[WorkflowTrigger]):
         ):
             raise serializers.ValidationError(
                 "File name, path or mail rule filter are required",
+            )
+
+        if trigger_type == WorkflowTrigger.WorkflowTriggerType.ACTION_BUTTON and not (
+            attrs.get("button_label", getattr(self.instance, "button_label", None))
+        ):
+            raise serializers.ValidationError(
+                "Button label is required for action button triggers",
             )
 
         return attrs
@@ -3480,6 +3498,8 @@ class WorkflowSerializer(serializers.ModelSerializer[Workflow]):
                     "filter_has_not_storage_paths",
                     None,
                 )
+                trigger_users = trigger.pop("trigger_users", None)
+                trigger_groups = trigger.pop("trigger_groups", None)
                 # Convert sources to strings to handle django-multiselectfield v1.0 changes
                 WorkflowTriggerSerializer.normalize_workflow_trigger_sources(trigger)
                 trigger_instance, _ = WorkflowTrigger.objects.update_or_create(
@@ -3516,6 +3536,10 @@ class WorkflowSerializer(serializers.ModelSerializer[Workflow]):
                     trigger_instance.filter_has_not_storage_paths.set(
                         filter_has_not_storage_paths,
                     )
+                if trigger_users is not None:
+                    trigger_instance.trigger_users.set(trigger_users)
+                if trigger_groups is not None:
+                    trigger_instance.trigger_groups.set(trigger_groups)
                 set_triggers.append(trigger_instance)
 
         if actions is not None and actions is not serializers.empty:

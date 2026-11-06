@@ -4,6 +4,7 @@ import os
 import platform
 import re
 import tempfile
+import uuid
 import zipfile
 from collections import deque
 from collections.abc import Callable
@@ -142,6 +143,7 @@ from documents.filters import TagFilterSet
 from documents.filters import TitleContentFilter
 from documents.mail import EmailAttachment
 from documents.mail import send_email
+from documents.matching import existing_document_matches_workflow
 from documents.matching import match_correspondents
 from documents.matching import match_document_types
 from documents.matching import match_storage_paths
@@ -179,6 +181,7 @@ from documents.permissions import permitted_document_ids
 from documents.permissions import permitted_object_ids
 from documents.permissions import restrict_queryset_to_visible
 from documents.permissions import set_permissions_for_objects
+from documents.permissions import user_can_trigger_workflow_trigger
 from documents.permissions import user_is_unrestricted
 from documents.plugins.date_parsing import get_date_parser
 from documents.schema import generate_object_with_permissions_schema
@@ -223,6 +226,7 @@ from documents.serialisers import WorkflowActionSerializer
 from documents.serialisers import WorkflowSerializer
 from documents.serialisers import WorkflowTriggerSerializer
 from documents.signals import document_updated
+from documents.signals.handlers import run_workflows
 from documents.tasks import build_share_link_bundle
 from documents.tasks import consume_file
 from documents.tasks import empty_trash
@@ -1966,6 +1970,83 @@ class DocumentViewSet(
                 "error": "error",
             },
         )
+
+    @action(
+        methods=["get", "post"],
+        detail=True,
+        permission_classes=[ViewDocumentsPermissions],
+        pagination_class=None,
+        filter_backends=[],
+    )
+    def actions(self, request, pk=None):
+        currentUser = request.user
+        try:
+            doc = Document.objects.select_related(
+                "owner",
+                "root_document__owner",
+            ).get(pk=pk)
+            if currentUser is not None and not has_perms_owner_aware(
+                currentUser,
+                "view_document",
+                doc,
+            ):
+                return HttpResponseForbidden(
+                    "Insufficient permissions to view actions",
+                )
+        except Document.DoesNotExist:
+            raise Http404
+
+        if request.method == "GET":
+            candidate_triggers = WorkflowTrigger.objects.filter(
+                type=WorkflowTrigger.WorkflowTriggerType.ACTION_BUTTON,
+                workflows__enabled=True,
+            ).distinct()
+            applicable_triggers = [
+                {
+                    "id": trigger.id,
+                    "button_label": trigger.button_label,
+                    "button_color": trigger.button_color,
+                    "require_confirmation": trigger.require_confirmation,
+                }
+                for trigger in candidate_triggers
+                if user_can_trigger_workflow_trigger(currentUser, trigger)
+                and existing_document_matches_workflow(doc, trigger)[0]
+            ]
+            return Response(applicable_triggers)
+
+        # POST: re-verify match and trigger permission server-side, never
+        # trusting an earlier GET -- the set of applicable triggers may have
+        # changed in the meantime.
+        trigger_id = request.data.get("trigger")
+        if not trigger_id:
+            raise ValidationError({"trigger": "This field is required."})
+        try:
+            trigger = WorkflowTrigger.objects.get(
+                pk=trigger_id,
+                type=WorkflowTrigger.WorkflowTriggerType.ACTION_BUTTON,
+            )
+        except WorkflowTrigger.DoesNotExist:
+            raise Http404
+
+        workflow = trigger.workflows.filter(enabled=True).first()
+        if (
+            workflow is None
+            or not user_can_trigger_workflow_trigger(currentUser, trigger)
+            or not existing_document_matches_workflow(doc, trigger)[0]
+        ):
+            return HttpResponseForbidden(
+                "Insufficient permissions to trigger this action",
+            )
+
+        run_workflows(
+            trigger_type=WorkflowTrigger.WorkflowTriggerType.ACTION_BUTTON,
+            document=doc,
+            workflow_to_run=workflow,
+            logging_group=uuid.uuid4(),
+        )
+
+        doc.refresh_from_db()
+        return Response(self.get_serializer(doc).data)
 
     @action(methods=["get"], detail=True, filter_backends=[])
     def share_links(self, request, pk=None):

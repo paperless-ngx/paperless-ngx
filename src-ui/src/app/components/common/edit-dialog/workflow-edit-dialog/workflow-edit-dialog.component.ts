@@ -56,6 +56,7 @@ import {
   CustomFieldsQueryDropdownComponent,
 } from '../../custom-fields-query-dropdown/custom-fields-query-dropdown.component'
 import { CheckComponent } from '../../input/check/check.component'
+import { ColorComponent } from '../../input/color/color.component'
 import { CustomFieldsValuesComponent } from '../../input/custom-fields-values/custom-fields-values.component'
 import { EntriesComponent } from '../../input/entries/entries.component'
 import { NumberComponent } from '../../input/number/number.component'
@@ -122,6 +123,10 @@ export const WORKFLOW_TYPE_OPTIONS = [
   {
     id: WorkflowTriggerType.Scheduled,
     name: $localize`Scheduled`,
+  },
+  {
+    id: WorkflowTriggerType.ActionButton,
+    name: $localize`Action Button`,
   },
 ]
 
@@ -479,6 +484,7 @@ const FILTER_HANDLERS: Record<TriggerFilterType, FilterHandler> = {
   styleUrls: ['./workflow-edit-dialog.component.scss'],
   imports: [
     CheckComponent,
+    ColorComponent,
     EntriesComponent,
     SwitchComponent,
     NumberComponent,
@@ -1241,6 +1247,11 @@ export class WorkflowEditDialogComponent
         schedule_date_custom_field: new FormControl(
           trigger.schedule_date_custom_field
         ),
+        button_label: new FormControl(trigger.button_label),
+        button_color: new FormControl(trigger.button_color),
+        require_confirmation: new FormControl(trigger.require_confirmation),
+        trigger_users: new FormControl(trigger.trigger_users),
+        trigger_groups: new FormControl(trigger.trigger_groups),
       }),
       { emitEvent }
     )
@@ -1392,6 +1403,11 @@ export class WorkflowEditDialogComponent
       schedule_recurring_interval_days: 1,
       schedule_date_field: ScheduleDateField.Added,
       schedule_date_custom_field: null,
+      button_label: '',
+      button_color: '#a6cee3',
+      require_confirmation: false,
+      trigger_users: [],
+      trigger_groups: [],
     }
     this.object.triggers.push(trigger)
     this.createTriggerField(trigger)

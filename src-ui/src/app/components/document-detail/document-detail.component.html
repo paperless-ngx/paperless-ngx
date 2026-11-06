@@ -85,6 +85,23 @@
     </div>
   </div>
 
+  @if (applicableActions().length) {
+    @let actionsDisabled = (isDirty$ | async) === true;
+    <div class="btn-group ms-md-2 flex-wrap" role="group">
+      @for (action of applicableActions(); track action.id) {
+        <button
+          type="button"
+          class="btn btn-sm"
+          [style.background-color]="action.button_color"
+          [style.border-color]="action.button_color"
+          [style.color]="getActionButtonTextColor(action.button_color)"
+          [disabled]="actionsDisabled"
+          (click)="triggerAction(action)"
+        >{{action.button_label}}</button>
+      }
+    </div>
+  }
+
 </pngx-page-header>
 
 <div class="row">

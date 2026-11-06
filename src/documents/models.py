@@ -1477,6 +1477,7 @@ class WorkflowTrigger(models.Model):
         DOCUMENT_ADDED = 2, _("Document Added")
         DOCUMENT_UPDATED = 3, _("Document Updated")
         SCHEDULED = 4, _("Scheduled")
+        ACTION_BUTTON = 5, _("Action Button")
 
     class DocumentSourceChoices(models.IntegerChoices):
         CONSUME_FOLDER = DocumentSource.ConsumeFolder.value, _("Consume Folder")
@@ -1678,6 +1679,45 @@ class WorkflowTrigger(models.Model):
         blank=True,
         on_delete=models.SET_NULL,
         verbose_name=_("schedule date custom field"),
+    )
+
+    button_label = models.CharField(
+        _("button label"),
+        max_length=256,
+        blank=True,
+        help_text=_(
+            "For action button triggers, the label shown on the button on "
+            "the document detail page.",
+        ),
+    )
+
+    button_color = models.CharField(
+        _("button color"),
+        max_length=7,
+        default="#a6cee3",
+    )
+
+    require_confirmation = models.BooleanField(
+        _("require confirmation"),
+        default=False,
+        help_text=_(
+            "For action button triggers, ask for confirmation before "
+            "running the workflow.",
+        ),
+    )
+
+    trigger_users = models.ManyToManyField(
+        User,
+        blank=True,
+        related_name="+",
+        verbose_name=_("users who may trigger this action button"),
+    )
+
+    trigger_groups = models.ManyToManyField(
+        Group,
+        blank=True,
+        related_name="+",
+        verbose_name=_("groups who may trigger this action button"),
     )
 
     class Meta:

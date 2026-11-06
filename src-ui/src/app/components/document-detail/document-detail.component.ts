@@ -45,6 +45,7 @@ import { Correspondent } from 'src/app/data/correspondent'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import { CustomFieldInstance } from 'src/app/data/custom-field-instance'
 import { DataType } from 'src/app/data/datatype'
+import { DocumentAction } from 'src/app/data/document-action'
 import { Document, DocumentVersionInfo } from 'src/app/data/document'
 import { DocumentMetadata } from 'src/app/data/document-metadata'
 import { DocumentNote } from 'src/app/data/document-note'
@@ -84,6 +85,7 @@ import {
 } from 'src/app/services/permissions.service'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
+import { DocumentActionsService } from 'src/app/services/rest/document-actions.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import {
   BulkEditSourceMode,
@@ -97,6 +99,7 @@ import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { TrashService } from 'src/app/services/trash.service'
 import { WebsocketStatusService } from 'src/app/services/websocket-status.service'
+import { BRIGHTNESS, estimateBrightnessForColor } from 'src/app/utils/color'
 import { getFilenameFromContentDisposition } from 'src/app/utils/http'
 import { ISODateAdapter } from 'src/app/utils/ngb-iso-date-adapter'
 import * as UTIF from 'utif'
@@ -232,6 +235,7 @@ export class DocumentDetailComponent
   private hotKeyService = inject(HotKeyService)
   private componentRouterService = inject(ComponentRouterService)
   private deviceDetectorService = inject(DeviceDetectorService)
+  private documentActionsService = inject(DocumentActionsService)
   private savedViewService = inject(SavedViewService)
   private readonly websocketStatusService = inject(WebsocketStatusService)
   private readonly useNativePdfViewerSetting = this.settings.getSignal<boolean>(
@@ -275,6 +279,7 @@ export class DocumentDetailComponent
   // per-document, resets on navigation
   readonly suggestionSourceOverride = signal<SuggestionSource>(null)
   readonly fetchedSuggestionSources = signal<SuggestionSource[]>([])
+  readonly applicableActions = signal<DocumentAction[]>([])
   readonly users = signal<User[]>(undefined)
 
   readonly title = signal<string>(undefined)
@@ -615,6 +620,7 @@ export class DocumentDetailComponent
           this.suggestions.set(null)
           this.suggestionSourceOverride.set(null)
           this.fetchedSuggestionSources.set([])
+          this.loadApplicableActions(doc.id)
           const openDocument = this.openDocumentService.getOpenDocument(
             this.documentId()
           )
@@ -1351,6 +1357,9 @@ export class DocumentDetailComponent
           this.store.next(newValues)
           this.openDocumentService.setDirty(this.document(), false)
           this.openDocumentService.save()
+          // Saved fields (tags, correspondent, etc.) may affect which
+          // action buttons apply to this document.
+          this.loadApplicableActions(this.documentId())
           this.toastService.showSuccess(
             $localize`Document "${newValues.title}" saved successfully.`
           )
@@ -1556,6 +1565,65 @@ export class DocumentDetailComponent
             )
           },
         })
+    })
+  }
+
+  private loadApplicableActions(documentId: number): void {
+    this.documentActionsService
+      .getApplicableActions(documentId)
+      .pipe(
+        takeUntil(this.unsubscribeNotifier),
+        takeUntil(this.docChangeNotifier),
+        catchError(() => of([]))
+      )
+      .subscribe((actions) => this.applicableActions.set(actions))
+  }
+
+  getActionButtonTextColor(colorHex: string): string {
+    return estimateBrightnessForColor(colorHex) === BRIGHTNESS.DARK
+      ? '#ffffff'
+      : '#000000'
+  }
+
+  triggerAction(action: DocumentAction) {
+    const run = () => {
+      this.documentActionsService
+        .trigger(this.documentId(), action.id)
+        .pipe(takeUntil(this.unsubscribeNotifier))
+        .subscribe({
+          next: (doc) => {
+            this.updateComponent(doc)
+            this.loadApplicableActions(this.documentId())
+            this.toastService.showSuccess(
+              $localize`Ran "${action.button_label}".`
+            )
+          },
+          error: (error) => {
+            this.toastService.showError(
+              $localize`Error running "${action.button_label}".`,
+              error
+            )
+          },
+        })
+    }
+
+    if (!action.require_confirmation) {
+      run()
+      return
+    }
+
+    const modal = this.modalService.open(ConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.title = $localize`Confirm "${action.button_label}"`
+    modal.componentInstance.messageBold = $localize`This will run the "${action.button_label}" action on this document.`
+    modal.componentInstance.message = $localize`This operation cannot be undone.`
+    modal.componentInstance.btnClass = 'btn-primary'
+    modal.componentInstance.btnCaption = $localize`Proceed`
+    modal.componentInstance.confirmClicked.subscribe(() => {
+      modal.componentInstance.buttonsEnabled.set(false)
+      modal.close()
+      run()
     })
   }
 
