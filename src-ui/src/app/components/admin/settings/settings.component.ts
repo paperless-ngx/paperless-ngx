@@ -113,6 +113,7 @@ const sidebarItemLabels: Record<HideableSidebarItemID, string> = {
   [HideableSidebarItemID.SavedViews]: $localize`Saved Views`,
   [HideableSidebarItemID.ShareLinks]: $localize`Share Links`,
   [HideableSidebarItemID.Workflows]: $localize`Workflows`,
+  [HideableSidebarItemID.OcrTemplates]: $localize`OCR Templates`,
   [HideableSidebarItemID.Mail]: $localize`Mail`,
   [HideableSidebarItemID.Documentation]: $localize`Documentation`,
 }

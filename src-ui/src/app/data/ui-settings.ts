@@ -35,6 +35,7 @@ export enum HideableSidebarItemID {
   SavedViews = 'saved_views',
   ShareLinks = 'share_links',
   Workflows = 'workflows',
+  OcrTemplates = 'ocr_templates',
   Mail = 'mail',
   Documentation = 'documentation',
 }

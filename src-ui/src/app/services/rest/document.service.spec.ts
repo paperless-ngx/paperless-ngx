@@ -563,6 +563,20 @@ describe(`DocumentService`, () => {
 
     req.flush('task-id')
   })
+
+  it('should call appropriate api endpoint for running zone OCR', () => {
+    const url = `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/run-zone-ocr/`
+    subscription = service.runZoneOcr(documents[0].id).subscribe()
+    let req = httpTestingController.expectOne(url)
+    expect(req.request.method).toEqual('POST')
+    expect(req.request.body).toEqual({})
+    req.flush({ status: 'completed', results: [] })
+
+    subscription = service.runZoneOcr(documents[0].id, 3).subscribe()
+    req = httpTestingController.expectOne(url)
+    expect(req.request.body).toEqual({ template: 3 })
+    req.flush({ status: 'completed', results: [] })
+  })
 })
 
 it('should construct sort fields respecting permissions', () => {

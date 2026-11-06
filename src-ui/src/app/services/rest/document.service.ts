@@ -12,6 +12,7 @@ import {
 import { DocumentMetadata } from 'src/app/data/document-metadata'
 import { DocumentSuggestions } from 'src/app/data/document-suggestions'
 import { FilterRule } from 'src/app/data/filter-rule'
+import { OcrZoneRunResponse } from 'src/app/data/ocr-template'
 import { Results, SelectionData } from 'src/app/data/results'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { queryParamsFromFilterRules } from '../../utils/query-params'
@@ -358,6 +359,26 @@ export class DocumentService extends AbstractPaperlessService<Document> {
       ...selection,
       remote_ocr: remoteOcr,
     })
+  }
+
+  runZoneOcrDocuments(
+    selection: DocumentSelectionQuery,
+    templateId: number | null = null
+  ) {
+    return this.http.post(this.getResourceUrl(null, 'run_zone_ocr'), {
+      ...selection,
+      ...(templateId ? { template: templateId } : {}),
+    })
+  }
+
+  runZoneOcr(
+    id: number,
+    templateId: number | null = null
+  ): Observable<OcrZoneRunResponse> {
+    return this.http.post<OcrZoneRunResponse>(
+      this.getResourceUrl(id, 'run-zone-ocr'),
+      templateId ? { template: templateId } : {}
+    )
   }
 
   rotateDocuments(

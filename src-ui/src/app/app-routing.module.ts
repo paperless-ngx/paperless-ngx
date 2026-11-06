@@ -13,6 +13,7 @@ import { DocumentDetailComponent } from './components/document-detail/document-d
 import { DocumentListComponent } from './components/document-list/document-list.component'
 import { DocumentAttributesComponent } from './components/manage/document-attributes/document-attributes.component'
 import { MailComponent } from './components/manage/mail/mail.component'
+import { OcrTemplatesComponent } from './components/manage/ocr-templates/ocr-templates.component'
 import { SavedViewsComponent } from './components/manage/saved-views/saved-views.component'
 import { ShareLinksComponent } from './components/manage/share-links/share-links.component'
 import { WorkflowsComponent } from './components/manage/workflows/workflows.component'
@@ -273,6 +274,18 @@ export const routes: Routes = [
             type: PermissionType.Workflow,
           },
           componentName: 'WorkflowsComponent',
+        },
+      },
+      {
+        path: 'ocr-templates',
+        component: OcrTemplatesComponent,
+        canActivate: [PermissionsGuard],
+        data: {
+          requiredPermission: {
+            action: PermissionAction.View,
+            type: PermissionType.OcrTemplate,
+          },
+          componentName: 'OcrTemplatesComponent',
         },
       },
       {

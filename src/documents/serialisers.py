@@ -23,6 +23,7 @@ from django.core.validators import MaxValueValidator
 from django.core.validators import MinValueValidator
 from django.core.validators import RegexValidator
 from django.core.validators import integer_validator
+from django.db import transaction
 from django.db.models import Count
 from django.db.models import Q
 from django.db.models.functions import Lower
@@ -54,6 +55,7 @@ if settings.AUDIT_LOG_ENABLED:
 from documents import bulk_edit
 from documents.data_models import DocumentSource
 from documents.filters import CustomFieldQueryParser
+from documents.models import OCR_SUPPORTED_FIELD_TYPES
 from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
@@ -62,6 +64,8 @@ from documents.models import DocumentBarcode
 from documents.models import DocumentType
 from documents.models import MatchingModel
 from documents.models import Note
+from documents.models import OcrTemplate
+from documents.models import OcrTemplateZone
 from documents.models import PaperlessTask
 from documents.models import SavedView
 from documents.models import SavedViewFilterRule
@@ -1819,6 +1823,18 @@ class DeleteDocumentsSerializer(DocumentSelectionSerializer):
 
 class ReprocessDocumentsSerializer(DocumentSelectionSerializer):
     remote_ocr = serializers.BooleanField(required=False, default=False)
+
+
+class RunZoneOcrSerializer(serializers.Serializer):
+    template = serializers.PrimaryKeyRelatedField(
+        queryset=OcrTemplate.objects.prefetch_related("zones", "zones__custom_field"),
+        required=False,
+        allow_null=True,
+    )
+
+
+class RunZoneOcrDocumentsSerializer(DocumentSelectionSerializer, RunZoneOcrSerializer):
+    pass
 
 
 class BulkEditSerializer(
@@ -3698,3 +3714,181 @@ class StoragePathTestSerializer(SerializerWithPerms):
             document_field.queryset = Document.objects.filter(
                 id__in=permitted_document_ids(user),
             )
+
+
+class OcrTemplateZoneSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OcrTemplateZone
+        fields = [
+            "id",
+            "name",
+            "target",
+            "custom_field",
+            "page",
+            "x",
+            "y",
+            "width",
+            "height",
+            "ocr_language",
+            "transform",
+            "date_format",
+            "order",
+            "zone_source_width",
+            "zone_source_height",
+            "validation_regex",
+        ]
+
+    def validate_custom_field(self, value):
+        if value is None:
+            return value
+        if value.data_type not in OCR_SUPPORTED_FIELD_TYPES:
+            raise serializers.ValidationError(
+                f"Custom field type '{value.data_type}' is not supported for OCR extraction. "
+                f"Use string, integer, float, date, monetary, boolean, URL, or long text.",
+            )
+        return value
+
+    def validate_page(self, value):
+        if value is not None and value != -1 and value < 1:
+            raise serializers.ValidationError(
+                "Page must be positive or -1 for the last page.",
+            )
+        return value
+
+    def validate(self, data):
+        # A template PATCH still replaces each zone in full.
+        if self.root.partial:
+            for name, field in self.fields.items():
+                if field.required and name not in data:
+                    raise serializers.ValidationError(
+                        {name: field.error_messages["required"]},
+                    )
+        return data
+
+
+class OcrTemplateZoneTestSerializer(OcrTemplateZoneSerializer):
+    name = serializers.CharField(default="test")
+    x = serializers.IntegerField(min_value=0, default=0)
+    y = serializers.IntegerField(min_value=0, default=0)
+    width = serializers.IntegerField(min_value=2)
+    height = serializers.IntegerField(min_value=2)
+
+    class Meta(OcrTemplateZoneSerializer.Meta):
+        fields = [
+            "name",
+            "x",
+            "y",
+            "width",
+            "height",
+            "page",
+            "ocr_language",
+            "transform",
+            "date_format",
+            "validation_regex",
+            "zone_source_width",
+            "zone_source_height",
+        ]
+        extra_kwargs = {
+            "zone_source_width": {"min_value": 1},
+            "zone_source_height": {"min_value": 1},
+        }
+
+
+class OcrTemplateTestSerializer(serializers.Serializer):
+    document = serializers.PrimaryKeyRelatedField(
+        queryset=Document.objects.select_related("root_document__owner"),
+    )
+    zone = OcrTemplateZoneTestSerializer()
+
+
+class OcrTemplateSerializer(MatchingModelSerializer, OwnedObjectSerializer):
+    zones = OcrTemplateZoneSerializer(many=True, required=False)
+    combine_formats = serializers.DictField(
+        child=serializers.CharField(allow_blank=True, trim_whitespace=False),
+        required=False,
+    )
+
+    # Templates are never assigned to documents
+    slug = None
+    document_count = None
+
+    class Meta:
+        model = OcrTemplate
+        fields = [
+            "id",
+            "name",
+            "match",
+            "matching_algorithm",
+            "is_insensitive",
+            "source_width",
+            "source_height",
+            "sample_document",
+            "enabled",
+            "combine_formats",
+            "created",
+            "updated",
+            "zones",
+            "owner",
+            "permissions",
+            "user_can_change",
+            "set_permissions",
+        ]
+        read_only_fields = ["created", "updated"]
+
+    def validate_matching_algorithm(self, value):
+        if value == MatchingModel.MATCH_AUTO:
+            raise serializers.ValidationError(
+                "Automatic matching is not supported for OCR templates.",
+            )
+        return value
+
+    def validate(self, data):
+        data = super().validate(data)
+        zones = data.get("zones", [])
+        if (
+            self.instance
+            and "zones" not in data
+            and ("source_width" in data or "source_height" in data)
+        ):
+            zones = self.instance.zones.values()
+        source_width = data.get(
+            "source_width",
+            getattr(self.instance, "source_width", None),
+        )
+        source_height = data.get(
+            "source_height",
+            getattr(self.instance, "source_height", None),
+        )
+        for zone in zones:
+            width = zone.get("zone_source_width") or source_width
+            height = zone.get("zone_source_height") or source_height
+            if (
+                zone.get("x", 0) + zone.get("width", 0) > width
+                or zone.get("y", 0) + zone.get("height", 0) > height
+            ):
+                raise serializers.ValidationError(
+                    {
+                        "zones": f"Zone '{zone.get('name', '?')}' extends beyond its source dimensions.",
+                    },
+                )
+        return data
+
+    @transaction.atomic
+    def create(self, validated_data):
+        zones_data = validated_data.pop("zones", [])
+        template = super().create(validated_data)
+        for zone_data in zones_data:
+            OcrTemplateZone.objects.create(template=template, **zone_data)
+        return template
+
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        zones_data = validated_data.pop("zones", None)
+        instance = super().update(instance, validated_data)
+
+        if zones_data is not None:
+            instance.zones.all().delete()
+            for zone_data in zones_data:
+                OcrTemplateZone.objects.create(template=instance, **zone_data)
+
+        return instance

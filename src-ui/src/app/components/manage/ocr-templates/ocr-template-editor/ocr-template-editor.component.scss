@@ -1,0 +1,64 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+@media (min-width: 992px) {
+  .modal-body {
+    overflow: hidden;
+  }
+
+  .editor-layout {
+    min-height: 0;
+  }
+}
+
+.preview-page-input {
+  width: 3.5rem;
+}
+
+.preview-zoom {
+  min-width: 4rem;
+}
+
+.zone-overlay {
+  touch-action: none;
+}
+
+.zone-rect,
+.zone-drawing-rect {
+  vector-effect: non-scaling-stroke;
+}
+
+.zone-rect {
+  fill-opacity: 0.2;
+  stroke-width: 2;
+}
+
+.zone-rect-selected {
+  stroke-width: 3;
+}
+
+.zone-label {
+  font-family: var(--bs-font-sans-serif);
+  paint-order: stroke;
+  stroke: #fff;
+  stroke-linejoin: round;
+  stroke-width: 4px;
+  vector-effect: non-scaling-stroke;
+}
+
+.zone-resize-handle {
+  stroke: #fff;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.zone-drawing-rect {
+  fill: var(--bs-primary);
+  fill-opacity: 0.2;
+  stroke: var(--bs-primary);
+  stroke-dasharray: 5 5;
+  stroke-width: 2;
+}

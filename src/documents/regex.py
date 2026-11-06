@@ -77,6 +77,33 @@ def safe_regex_match(pattern: str, text: str, *, flags: int = 0):
         return None
 
 
+def safe_regex_fullmatch(pattern: str, text: str, *, flags: int = 0):
+    """
+    Run a regex full match with a timeout. Returns a match object or None.
+    Validation errors and timeouts are logged and treated as no match.
+    """
+
+    try:
+        validate_regex_pattern(pattern)
+        compiled = regex.compile(pattern, flags=flags)
+    except (regex.error, ValueError) as exc:
+        logger.exception(
+            "Error while processing regular expression %s: %s",
+            textwrap.shorten(pattern, width=80, placeholder="…"),
+            exc,
+        )
+        return None
+
+    try:
+        return compiled.fullmatch(text, timeout=REGEX_TIMEOUT_SECONDS)
+    except TimeoutError:
+        logger.warning(
+            "Regular expression matching timed out for pattern %s",
+            textwrap.shorten(pattern, width=80, placeholder="…"),
+        )
+        return None
+
+
 def safe_regex_sub(pattern: str, repl: str, text: str, *, flags: int = 0) -> str | None:
     """
     Run a regex substitution with a timeout. Returns the substituted string,

@@ -109,7 +109,7 @@ Think of versions as **file history** for a document.
 Paperless-ngx includes management lists for tags, correspondents, document types
 and more. These areas allow you to view, add, edit, delete and manage permissions
 for these objects. You can also manage saved views, mail accounts, mail rules,
-workflows and more from the management sections.
+workflows, [OCR templates](#ocr-templates) and more from the management sections.
 
 ### Nested Tags
 
@@ -794,6 +794,84 @@ The following custom field types are supported:
 - `Monetary`: [ISO 4217 currency code](https://en.wikipedia.org/wiki/ISO_4217#List_of_ISO_4217_currency_codes) and a number with exactly two decimals, e.g. USD12.30
 - `Document Link`: reference(s) to other document(s) displayed as links, automatically creates a symmetrical link in reverse
 - `Select`: a pre-defined list of strings from which the user can choose
+
+## OCR Templates {#ocr-templates}
+
+OCR templates read text from fixed areas ("zones") of a document and write it to a
+[custom field](#custom-fields), or to the document's title, archive serial number or created date. They are
+useful for documents that always share the same layout, such as bills from a particular utility. They allow you
+to draw a zone around the account number once, and every new bill gets its account number filled in.
+
+Like tags or document types, each template has a [matching algorithm](advanced_usage.md#matching) that
+decides which documents it automatically applies to (or not), based on their content.
+
+### Creating a template
+
+1. Open **OCR Templates** under "Manage" and choose **Add Template**.
+2. Give the template a name and set up its matching, for example **Any word** with the utility's name. Choose
+   **None** for a template that should only ever be run manually.
+3. Search for a sample document with the layout the template is for. Its pages are shown next to the template
+   settings.
+4. Draw zones on the document. Click a zone to select and edit it.
+5. Choose the field each zone fills.
+6. Use **Test** to run OCR on the selected zone of the sample document and see the text it finds and the value
+   that would be written.
+
+Zones are positioned relative to the sample document's page, so templates work best when the documents they
+match have an identical layout. Keep the matching specific enough that it only catches documents with that
+layout.
+
+### Zone settings
+
+- **Page**: the page the zone is on. Turn on **Last page** for zones that are always on the final page,
+  regardless of how many pages a document has.
+- **OCR language**: the Tesseract languages used to read the zone. Languages other than the defaults must be
+  installed, see [`PAPERLESS_OCR_LANGUAGES`](configuration.md#PAPERLESS_OCR_LANGUAGES).
+- **Transform**: post-processing applied to the text, such as stripping whitespace, keeping only numbers,
+  parsing a date or reading a QR code or barcode instead of text.
+- **Date format**: for the "Parse date" transform, the format of the date using
+  [Python date codes](https://docs.python.org/3/library/datetime.html#format-codes), e.g. `%d.%m.%Y`.
+  Leave it empty to detect the format automatically.
+- **Validation regex**: a regular expression the whole value must match. Values that do not match are not
+  written.
+
+Zones can fill custom fields of type text, long text, URL, date, integer, number, monetary or boolean.
+Document link and select fields are not supported.
+
+### Combining zones
+
+When several zones fill the same field, a **Combined value** setting appears for that field. Use it to arrange
+the zones' values with `{Zone name}` tokens and any text in between, for example `{Start} - {End}`. If it
+is left empty, the values are joined with spaces in zone order.
+
+### When templates run
+
+When a document is added, every enabled template that matches its content runs automatically. A template is
+only used for a document if the document's owner can view the template, so users' templates apply to their own
+documents, and unowned templates apply to everyone's. Templates run in name order, so if two templates fill the
+same field, the later one wins.
+
+Turn off **Enabled** to pause a template without deleting it. Disabled templates never run automatically, but
+can still be run manually.
+
+### Running templates manually
+
+To run templates on documents that are already in Paperless-ngx, open the **Actions** menu on the document
+details page:
+
+- **Run Zone OCR** runs every enabled template that matches the document.
+- The button next to it opens a dialog where you can choose one template to run
+  instead. A template you choose runs even if it does not match the document or is disabled.
+
+The bulk editor's **Run Zone OCR** action opens the same dialog for the selected documents. Bulk runs are
+processed in the background.
+
+!!! warning
+
+    Zone OCR overwrites the fields it fills. A zone that finds no value leaves its field unchanged.
+
+Managing OCR templates requires the OCR template permissions. Running zone OCR on documents requires
+permission to change them, and choosing a template requires permission to view it.
 
 ## PDF Actions
 
