@@ -19,7 +19,7 @@ import {
   NgbModal,
   NgbNavModule,
 } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { Subject, takeUntil } from 'rxjs'
 import { CustomFieldEditDialogComponent } from 'src/app/components/common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
 import { EditDialogMode } from 'src/app/components/common/edit-dialog/edit-dialog.component'
@@ -153,7 +153,7 @@ const RESIZE_CURSOR: Record<ResizeHandle, string> = {
     CommonModule,
     FormsModule,
     NgbNavModule,
-    NgxBootstrapIconsModule,
+    BootstrapIconComponent,
     OcrTemplateEditorZoneListComponent,
     PermissionsFormComponent,
     IfOwnerDirective,

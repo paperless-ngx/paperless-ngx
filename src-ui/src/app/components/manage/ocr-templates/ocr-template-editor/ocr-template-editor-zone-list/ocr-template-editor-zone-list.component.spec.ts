@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { CustomField } from 'src/app/data/custom-field'
 import {
   OcrTemplateZone,
@@ -32,10 +32,7 @@ describe('OcrTemplateEditorZoneListComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [
-        OcrTemplateEditorZoneListComponent,
-        NgxBootstrapIconsModule.pick(allIcons),
-      ],
+      imports: [OcrTemplateEditorZoneListComponent, BootstrapIconComponent],
     }).compileComponents()
 
     fixture = TestBed.createComponent(OcrTemplateEditorZoneListComponent)

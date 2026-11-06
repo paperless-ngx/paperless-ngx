@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { CustomField } from 'src/app/data/custom-field'
 import {
   getZoneFieldKey,
@@ -11,7 +11,7 @@ import { getZoneColor } from '../zone-geometry'
 
 @Component({
   selector: 'pngx-ocr-template-zone-list',
-  imports: [NgxBootstrapIconsModule],
+  imports: [BootstrapIconComponent],
   templateUrl: './ocr-template-editor-zone-list.component.html',
 })
 export class OcrTemplateEditorZoneListComponent {

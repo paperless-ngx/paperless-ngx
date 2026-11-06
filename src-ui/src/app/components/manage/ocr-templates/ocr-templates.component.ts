@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { firstValueFrom, takeUntil, tap } from 'rxjs'
 import { MATCH_NONE, MATCHING_ALGORITHMS } from 'src/app/data/matching-model'
 import { OcrTemplate } from 'src/app/data/ocr-template'
@@ -27,7 +27,7 @@ import { OcrTemplateEditorComponent } from './ocr-template-editor/ocr-template-e
     IfPermissionsDirective,
     FormsModule,
     NgbDropdownModule,
-    NgxBootstrapIconsModule,
+    BootstrapIconComponent,
   ],
 })
 export class OcrTemplatesComponent

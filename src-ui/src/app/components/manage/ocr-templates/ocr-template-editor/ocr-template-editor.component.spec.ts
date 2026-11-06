@@ -4,7 +4,7 @@ import { ElementRef } from '@angular/core'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { By } from '@angular/platform-browser'
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap'
-import { allIcons, NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { of, Subject, throwError } from 'rxjs'
 import { PermissionsFormComponent } from 'src/app/components/common/input/permissions/permissions-form/permissions-form.component'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
@@ -73,10 +73,7 @@ describe('OcrTemplateEditorComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [
-        NgxBootstrapIconsModule.pick(allIcons),
-        OcrTemplateEditorComponent,
-      ],
+      imports: [BootstrapIconComponent, OcrTemplateEditorComponent],
       providers: [
         { provide: NgbActiveModal, useValue: activeModal },
         provideHttpClient(withInterceptorsFromDi()),
