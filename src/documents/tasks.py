@@ -52,6 +52,7 @@ from documents.models import ShareLink
 from documents.models import ShareLinkBundle
 from documents.models import StoragePath
 from documents.models import Tag
+from documents.models import Workflow
 from documents.models import WorkflowRun
 from documents.models import WorkflowTrigger
 from documents.plugins.base import ConsumeTaskPlugin
@@ -688,6 +689,47 @@ def check_scheduled_workflows() -> None:
                             sender=None,
                             document=document,
                         )
+
+
+@shared_task
+def run_workflows_for_documents(
+    document_ids: list[int],
+    workflow_id: int,
+    *,
+    filter_documents: bool = True,
+) -> None:
+    """
+    Run a single workflow manually against the given documents.
+
+    ``filter_documents`` controls whether the workflow's trigger filters are applied.
+    When True, only documents matching the existing filters will have the workflow run.
+    When False, the workflow will be run on all specified documents regardless of the filters.
+    ``
+    """
+    try:
+        workflow = Workflow.objects.get(id=workflow_id)
+    except Workflow.DoesNotExist:
+        logger.warning(
+            f"Manual workflow run requested for missing workflow {workflow_id}",
+        )
+        return
+
+    for document in Document.objects.filter(
+        id__in=document_ids,
+        root_document__isnull=True,
+    ):
+        run_workflows(
+            trigger_type=WorkflowTrigger.WorkflowTriggerType.MANUAL,
+            document=document,
+            workflow_to_run=workflow,
+            skip_matching=not filter_documents,
+        )
+        # Manual runs dont send a document_updated signal, so push a websocket
+        # update here to ensure clients are refreshed
+        send_websocket_document_updated(
+            sender=None,
+            document=document,
+        )
 
 
 def update_document_parent_tags(tag: Tag, new_parent: Tag) -> None:

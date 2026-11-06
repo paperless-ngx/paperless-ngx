@@ -118,6 +118,7 @@ import personFill from 'bootstrap-icons/icons/person-fill.svg'
 import personLock from 'bootstrap-icons/icons/person-lock.svg'
 import personSquare from 'bootstrap-icons/icons/person-square.svg'
 import person from 'bootstrap-icons/icons/person.svg'
+import playCircle from 'bootstrap-icons/icons/play-circle.svg'
 import playFill from 'bootstrap-icons/icons/play-fill.svg'
 import plusCircle from 'bootstrap-icons/icons/plus-circle.svg'
 import plus from 'bootstrap-icons/icons/plus.svg'
@@ -279,6 +280,7 @@ export const icons: Record<string, string> = {
   personFillLock,
   personLock,
   personSquare,
+  playCircle,
   playFill,
   plus,
   plusCircle,

@@ -14,7 +14,11 @@ from documents.models import Document
 from documents.models import DocumentType
 from documents.models import StoragePath
 from documents.models import Tag
+from documents.models import Workflow
+from documents.models import WorkflowAction
+from documents.models import WorkflowTrigger
 from paperless_testing.dirs import DirectoriesMixin
+from paperless_testing.factories import DocumentFactory
 from paperless_testing.factories import UserFactory
 from paperless_testing.permissions import grant_all_global
 from paperless_testing.permissions import grant_global
@@ -582,6 +586,85 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         args, kwargs = m.call_args
         self.assertEqual(args[0], [self.doc1.id])
         self.assertEqual(kwargs, {"remote_ocr": True})
+
+    def _make_manual_workflow(self) -> Workflow:
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.MANUAL,
+        )
+        action = WorkflowAction.objects.create()
+        workflow = Workflow.objects.create(name="Manual workflow", order=0)
+        workflow.triggers.add(trigger)
+        workflow.actions.add(action)
+        return workflow
+
+    def _run_workflow(self, parameters, documents=None):
+        return self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": documents or [self.doc1.id],
+                    "method": "run_workflow",
+                    "parameters": parameters,
+                },
+            ),
+            content_type="application/json",
+        )
+
+    @mock.patch("documents.views.bulk_edit.run_workflow")
+    def test_run_workflow(self, m) -> None:
+        """A valid run_workflow call passes the docs, workflow id and filter flag through."""
+        self.setup_mock(m, "run_workflow")
+        workflow = self._make_manual_workflow()
+
+        response = self._run_workflow({"workflow": workflow.id})
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        args, kwargs = m.call_args
+        self.assertEqual(args[0], [self.doc1.id])
+        self.assertEqual(kwargs, {"workflow": workflow.id, "filter_documents": True})
+
+        self._run_workflow({"workflow": workflow.id, "filter_documents": False})
+        self.assertFalse(m.call_args.kwargs["filter_documents"])
+
+    @mock.patch("documents.views.bulk_edit.run_workflow")
+    def test_run_workflow_invalid_parameters(self, m) -> None:
+        """Invalid run_workflow parameters are rejected before dispatch."""
+        self.setup_mock(m, "run_workflow")
+        manual = self._make_manual_workflow()
+        non_manual = Workflow.objects.create(name="Non-manual", order=0)
+        non_manual.triggers.add(
+            WorkflowTrigger.objects.create(
+                type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+            ),
+        )
+        for label, parameters in (
+            ("missing workflow", {}),
+            ("nonexistent workflow", {"workflow": 9999}),
+            ("no manual trigger", {"workflow": non_manual.id}),
+            ("non-bool filter", {"workflow": manual.id, "filter_documents": "nope"}),
+        ):
+            with self.subTest(label):
+                response = self._run_workflow(parameters)
+                self.assertEqual(
+                    response.status_code,
+                    status.HTTP_400_BAD_REQUEST,
+                )
+        m.assert_not_called()
+
+    @mock.patch("documents.views.bulk_edit.run_workflow")
+    def test_run_workflow_requires_ownership(self, m) -> None:
+        """A non-owner without document ownership is forbidden (actions mutate docs)."""
+        self.setup_mock(m, "run_workflow")
+        user = UserFactory(username="no_perms")
+        grant_all_global(user)
+        doc = DocumentFactory(owner=UserFactory(username="other"))
+        workflow = self._make_manual_workflow()
+        self.client.force_authenticate(user=user)
+
+        response = self._run_workflow({"workflow": workflow.id}, documents=[doc.id])
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        m.assert_not_called()
 
     @mock.patch("documents.serialisers.bulk_edit.set_storage_path")
     def test_api_set_storage_path(self, m) -> None:

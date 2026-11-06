@@ -140,6 +140,7 @@ from documents.filters import ShareLinkFilterSet
 from documents.filters import StoragePathFilterSet
 from documents.filters import TagFilterSet
 from documents.filters import TitleContentFilter
+from documents.filters import WorkflowFilterSet
 from documents.mail import EmailAttachment
 from documents.mail import send_email
 from documents.matching import match_correspondents
@@ -3020,6 +3021,7 @@ class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
                     bulk_edit.edit_pdf,
                     bulk_edit.merge_as_versions,
                     bulk_edit.remove_password,
+                    bulk_edit.run_workflow,
                 ]
             )
             or (
@@ -3159,6 +3161,7 @@ class BulkEditView(DocumentOperationPermissionMixin):
         "edit_pdf": None,
         "reprocess": "checksum",
         "remove_password": None,
+        "run_workflow": None,
     }
 
     serializer_class = BulkEditSerializer
@@ -5189,6 +5192,8 @@ class WorkflowViewSet(ModelViewSet[Workflow]):
 
     serializer_class = WorkflowSerializer
     pagination_class = StandardPagination
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = WorkflowFilterSet
 
     model = Workflow
 

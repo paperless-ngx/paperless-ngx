@@ -35,6 +35,7 @@ from django_filters.rest_framework import DateTimeFilter
 from django_filters.rest_framework import Filter
 from django_filters.rest_framework import FilterSet
 from django_filters.rest_framework import MultipleChoiceFilter
+from django_filters.rest_framework import NumberFilter
 from drf_spectacular.utils import extend_schema_field
 from guardian.utils import get_group_obj_perms_model
 from guardian.utils import get_user_obj_perms_model
@@ -52,6 +53,7 @@ from documents.models import ShareLink
 from documents.models import ShareLinkBundle
 from documents.models import StoragePath
 from documents.models import Tag
+from documents.models import Workflow
 from documents.permissions import annotate_authorizing_fields
 from documents.permissions import permitted_document_ids
 from documents.permissions import permitted_object_ids
@@ -246,6 +248,16 @@ class CustomFieldFilterSet(FilterSet):
         fields = {
             "id": ID_KWARGS,
             "name": CHAR_KWARGS,
+        }
+
+
+class WorkflowFilterSet(FilterSet):
+    trigger_type = NumberFilter(field_name="triggers__type", distinct=True)
+
+    class Meta:
+        model = Workflow
+        fields = {
+            "id": ID_KWARGS,
         }
 
 
