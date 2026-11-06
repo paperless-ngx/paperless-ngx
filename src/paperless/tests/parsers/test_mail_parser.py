@@ -635,6 +635,20 @@ class TestParser:
 
         assert mail_parser.get_archive_path() is not None
 
+        chromium_requests = httpx_mock.get_requests(
+            url="http://localhost:3000/forms/chromium/convert/html",
+        )
+        assert len(chromium_requests) == 2
+        assert all(
+            b'name="pdfa"' not in request.content for request in chromium_requests
+        )
+
+        merge_request = httpx_mock.get_request(
+            url="http://localhost:3000/forms/pdfengines/merge",
+        )
+        assert merge_request is not None
+        assert b'name="pdfa"\r\n\r\nPDF/A-2b\r\n' in merge_request.content
+
     def test_generate_pdf_html_email_html_to_pdf_failure(
         self,
         httpx_mock: HTTPXMock,
