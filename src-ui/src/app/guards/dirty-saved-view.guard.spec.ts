@@ -3,7 +3,6 @@ import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { TestBed } from '@angular/core/testing'
 import { RouterTestingModule } from '@angular/router/testing'
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap'
-import { allIcons, NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { provideUiTour } from 'ngx-ui-tour-ng-bootstrap'
 import { routes } from '../app-routing.module'
 import { ConfirmDialogComponent } from '../components/common/confirm-dialog/confirm-dialog.component'
@@ -19,11 +18,7 @@ describe('DirtySavedViewGuard', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [
-        RouterTestingModule.withRoutes(routes),
-        ConfirmDialogComponent,
-        NgxBootstrapIconsModule.pick(allIcons),
-      ],
+      imports: [RouterTestingModule.withRoutes(routes), ConfirmDialogComponent],
       providers: [
         DirtySavedViewGuard,
         SettingsService,

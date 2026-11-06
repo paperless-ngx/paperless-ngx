@@ -71,7 +71,7 @@ class TestParseString:
         ):
             # We still need to mock dateparser.parse to force the exception
             mocker.patch(
-                "documents.plugins.date_parsing.base.dateparser.parse",
+                "dateparser.parse",
                 side_effect=ValueError(
                     "Parsing error: 01/01/2024",
                 ),
@@ -260,7 +260,7 @@ class TestRegexDateParser:
         parser = RegexDateParserPlugin(base_config)
 
         # Patch the dateparser.parse
-        target = "documents.plugins.date_parsing.base.dateparser.parse"
+        target = "dateparser.parse"
 
         def fake_parse(
             date_string: str,
@@ -335,7 +335,7 @@ class TestRegexDateParser:
         )
         parser = RegexDateParserPlugin(cfg)
 
-        target = "documents.plugins.date_parsing.base.dateparser.parse"
+        target = "dateparser.parse"
 
         def fake_parse(
             date_string: str,
@@ -400,7 +400,7 @@ class TestRegexDateParser:
         parser = RegexDateParserPlugin(cfg)
 
         # Patch the module's dateparser.parse so we can inspect calls
-        target = "documents.plugins.date_parsing.base.dateparser.parse"
+        target = "dateparser.parse"
 
         def fake_parse(
             date_string: str,

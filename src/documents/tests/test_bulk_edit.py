@@ -24,10 +24,14 @@ from documents.models import DocumentType
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.pdf_ops import PageSpec
+from documents.permissions import PermissionsSpec
 from documents.permissions import set_permissions_for_objects
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import DocumentFactory
 from paperless_testing.permissions import grant_object
+from paperless_testing.samples import MULTI_PAGE_DIGITAL_PDF
+from paperless_testing.samples import SIMPLE_DIGITAL_PDF
+from paperless_testing.samples import WITH_FORM_PDF
 
 
 class TestBulkEdit(DirectoriesMixin, TestCase):
@@ -446,7 +450,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
 
         grant_object(self.group1, self.doc1, "view_document")
 
-        permissions = {
+        permissions: PermissionsSpec = {
             "view": {
                 "users": [self.user1.id, self.user2.id],
                 "groups": [self.group2.id],
@@ -489,7 +493,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         grant_object(self.user1, self.doc1, "view_document")
         grant_object(self.group1, self.doc1, "view_document")
 
-        permissions = {
+        permissions: PermissionsSpec = {
             "view": {
                 "users": [self.user2.id],
                 "groups": [self.group2.id],
@@ -540,7 +544,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
               batched call rather than one call per (document, identity)
               pair
         """
-        permissions = {
+        permissions: PermissionsSpec = {
             "view": {
                 "users": [self.user1.id, self.user2.id],
                 "groups": [self.group2.id],
@@ -647,7 +651,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
         """
         with self.assertRaises(Permission.DoesNotExist):
             set_permissions_for_objects(
-                {"not_a_real_action": {"users": [self.user1.id], "groups": []}},
+                {"not_a_real_action": {"users": [self.user1.id], "groups": []}},  # type: ignore[bad-assignment]
                 Document,
                 [self.doc1.pk],
             )
@@ -675,7 +679,7 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
             set_permissions_for_objects(
                 {
                     "view": {"users": [self.user1.id], "groups": []},
-                    "not_a_real_action": {"users": [self.user1.id], "groups": []},
+                    "not_a_real_action": {"users": [self.user1.id], "groups": []},  # type: ignore[bad-assignment]
                 },
                 Document,
                 [self.doc1.pk],
@@ -705,47 +709,27 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         super().setUp()
         sample1 = self.dirs.scratch_dir / "sample.pdf"
         shutil.copy(
-            Path(__file__).parent
-            / "samples"
-            / "documents"
-            / "originals"
-            / "0000001.pdf",
+            SIMPLE_DIGITAL_PDF,
             sample1,
         )
         sample1_archive = self.dirs.archive_dir / "sample_archive.pdf"
         shutil.copy(
-            Path(__file__).parent
-            / "samples"
-            / "documents"
-            / "originals"
-            / "0000001.pdf",
+            SIMPLE_DIGITAL_PDF,
             sample1_archive,
         )
         sample2 = self.dirs.scratch_dir / "sample2.pdf"
         shutil.copy(
-            Path(__file__).parent
-            / "samples"
-            / "documents"
-            / "originals"
-            / "0000002.pdf",
+            MULTI_PAGE_DIGITAL_PDF,
             sample2,
         )
         sample2_archive = self.dirs.archive_dir / "sample2_archive.pdf"
         shutil.copy(
-            Path(__file__).parent
-            / "samples"
-            / "documents"
-            / "originals"
-            / "0000002.pdf",
+            MULTI_PAGE_DIGITAL_PDF,
             sample2_archive,
         )
         sample3 = self.dirs.scratch_dir / "sample3.pdf"
         shutil.copy(
-            Path(__file__).parent
-            / "samples"
-            / "documents"
-            / "originals"
-            / "0000003.pdf",
+            WITH_FORM_PDF,
             sample3,
         )
         self.doc1 = Document.objects.create(
@@ -779,11 +763,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         )
         img_doc_archive = self.dirs.archive_dir / "sample_image.pdf"
         shutil.copy(
-            Path(__file__).parent
-            / "samples"
-            / "documents"
-            / "originals"
-            / "0000001.pdf",
+            SIMPLE_DIGITAL_PDF,
             img_doc_archive,
         )
         self.img_doc = Document.objects.create(

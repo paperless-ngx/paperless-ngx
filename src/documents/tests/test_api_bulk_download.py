@@ -53,7 +53,7 @@ class TestBulkDownload(DirectoriesMixin, SampleDirMixin, APITestCase):
             archive_checksum="D",
         )
 
-        shutil.copy(self.SAMPLE_DIR / "simple.pdf", self.doc2.source_path)
+        shutil.copy(self.SIMPLE_PDF, self.doc2.source_path)
         shutil.copy(self.SAMPLE_DIR / "simple.png", self.doc2b.source_path)
         shutil.copy(self.SAMPLE_DIR / "simple.jpg", self.doc3.source_path)
         shutil.copy(self.SAMPLE_DIR / "test_with_bom.pdf", self.doc3.archive_path)

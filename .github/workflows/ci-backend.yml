@@ -8,7 +8,8 @@ on:
       - 'translations**'
   workflow_dispatch:
 concurrency:
-  group: backend-${{ github.event.pull_request.number || github.ref }}
+  # Let dev/main commits finish, PR and feature-branch runs supersede older ones
+  group: backend-${{ github.event.pull_request.number || ((github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main') && github.run_id) || github.ref }}
   cancel-in-progress: true
 env:
   DEFAULT_UV_VERSION: "0.13.x"
@@ -99,11 +100,11 @@ jobs:
           docker compose --file docker/compose/docker-compose.ci-test.yml up --detach
       - name: Set up Python
         id: setup-python
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: "${{ matrix.python-version }}"
       - name: Install uv
-        uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e # v10.3.2
+        uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
         with:
           version: ${{ env.DEFAULT_UV_VERSION }}
           enable-cache: true
@@ -169,11 +170,11 @@ jobs:
           persist-credentials: false
       - name: Set up Python
         id: setup-python
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: "${{ env.DEFAULT_PYTHON }}"
       - name: Install uv
-        uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e # v10.3.2
+        uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
         with:
           version: ${{ env.DEFAULT_UV_VERSION }}
           enable-cache: true

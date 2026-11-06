@@ -4,7 +4,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { SettingsService } from 'src/app/services/settings.service'
@@ -28,7 +27,6 @@ describe('TagEditDialogComponent', () => {
         ReactiveFormsModule,
         NgSelectModule,
         NgbModule,
-        NgxBootstrapIconsModule.pick(allIcons),
         TagEditDialogComponent,
         IfPermissionsDirective,
         IfOwnerDirective,

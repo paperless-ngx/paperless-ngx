@@ -3,13 +3,12 @@ import { SimpleChange, signal } from '@angular/core'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { By } from '@angular/platform-browser'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { Subject, of, throwError } from 'rxjs'
 import { DocumentVersionInfo } from 'src/app/data/document'
 import {
   PermissionAction,
-  PermissionsService,
   PermissionType,
+  PermissionsService,
 } from 'src/app/services/permissions.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { SettingsService } from 'src/app/services/settings.service'
@@ -64,10 +63,7 @@ describe('DocumentVersionDropdownComponent', () => {
     }
 
     await TestBed.configureTestingModule({
-      imports: [
-        DocumentVersionDropdownComponent,
-        NgxBootstrapIconsModule.pick(allIcons),
-      ],
+      imports: [DocumentVersionDropdownComponent],
       providers: [
         DatePipe,
         {

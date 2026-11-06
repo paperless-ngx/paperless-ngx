@@ -22,7 +22,6 @@ import {
   NgbModal,
   NgbModalRef,
 } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { DeviceDetectorService } from 'ngx-device-detector'
 import { Subject, of, throwError } from 'rxjs'
 import { routes } from 'src/app/app-routing.module'
@@ -152,11 +151,7 @@ describe('DocumentDetailComponent', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      imports: [
-        DocumentDetailComponent,
-        RouterModule.forRoot(routes),
-        NgxBootstrapIconsModule.pick(allIcons),
-      ],
+      imports: [DocumentDetailComponent, RouterModule.forRoot(routes)],
       providers: [
         DocumentTitlePipe,
         {
@@ -890,31 +885,31 @@ describe('DocumentDetailComponent', () => {
     fixture.detectChanges()
     expect(
       fixture.debugElement
-        .queryAll(By.css('button'))
-        .find((b) => b.nativeElement.textContent === 'Save')
+        .queryAll(By.css('button.btn'))
+        .find((b) => b.nativeElement.textContent.trim() === 'Save')
     ).not.toBeUndefined()
     expect(
       fixture.debugElement
-        .queryAll(By.css('button'))
-        .find((b) => b.nativeElement.textContent === 'Save & close')
+        .queryAll(By.css('button.btn'))
+        .find((b) => b.nativeElement.textContent.trim() === 'Save & close')
     ).not.toBeUndefined()
     expect(
       fixture.debugElement
-        .queryAll(By.css('button'))
-        .find((b) => b.nativeElement.textContent === 'Save & next')
+        .queryAll(By.css('button.btn'))
+        .find((b) => b.nativeElement.textContent.trim() === 'Save & next')
     ).toBeUndefined()
     nextSpy.mockReturnValue(true)
     component.networkActive.set(true)
     fixture.detectChanges()
     expect(
       fixture.debugElement
-        .queryAll(By.css('button'))
-        .find((b) => b.nativeElement.textContent === 'Save & close')
+        .queryAll(By.css('button.btn'))
+        .find((b) => b.nativeElement.textContent.trim() === 'Save & close')
     ).toBeUndefined()
     expect(
       fixture.debugElement
-        .queryAll(By.css('button'))
-        .find((b) => b.nativeElement.textContent === 'Save & next')
+        .queryAll(By.css('button.btn'))
+        .find((b) => b.nativeElement.textContent.trim() === 'Save & next')
     ).not.toBeUndefined()
   })
 
@@ -943,6 +938,20 @@ describe('DocumentDetailComponent', () => {
     const navigateSpy = jest.spyOn(router, 'navigate')
     component.close()
     expect(navigateSpy).toHaveBeenCalledWith(['view', 77])
+  })
+
+  it('should close back to the dashboard even if a saved view is active', () => {
+    initNormally()
+    jest
+      .spyOn(componentRouterService, 'getComponentURLBefore')
+      .mockReturnValue('dashboard')
+    jest
+      .spyOn(documentListViewService, 'activeSavedViewId', 'get')
+      .mockReturnValue(77)
+    const navigateSpy = jest.spyOn(router, 'navigate')
+    component.close()
+    expect(navigateSpy).toHaveBeenCalledWith(['dashboard'])
+    expect(navigateSpy).not.toHaveBeenCalledWith(['view', 77])
   })
 
   it('should not close if e.g. user-cancelled', () => {

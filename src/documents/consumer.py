@@ -38,7 +38,8 @@ from documents.models import StoragePath
 from documents.models import Tag
 from documents.models import WorkflowTrigger
 from documents.parsers import ParseError
-from documents.permissions import set_permissions_for_object
+from documents.permissions import PermissionsSpec
+from documents.permissions import set_permissions_for_objects
 from documents.plugins.base import AlwaysRunPluginMixin
 from documents.plugins.base import ConsumeTaskPlugin
 from documents.plugins.base import NoCleanupPluginMixin
@@ -846,6 +847,19 @@ class ConsumerPlugin(
             local_added,
             self.filename,
             self.filename,
+            custom_fields=[
+                CustomFieldInstance(
+                    field=field,
+                    **{
+                        CustomFieldInstance.get_value_field_name(
+                            field.data_type,
+                        ): self.metadata.custom_fields[field.pk],
+                    },
+                )
+                for field in CustomField.objects.filter(
+                    pk__in=self.metadata.custom_fields or {},
+                )
+            ],
         )
 
     def _store(
@@ -948,7 +962,7 @@ class ConsumerPlugin(
             or self.metadata.change_users is not None
             or self.metadata.change_groups is not None
         ):
-            permissions = {
+            permissions: PermissionsSpec = {
                 "view": {
                     "users": self.metadata.view_users or [],
                     "groups": self.metadata.view_groups or [],
@@ -958,7 +972,7 @@ class ConsumerPlugin(
                     "groups": self.metadata.change_groups or [],
                 },
             }
-            set_permissions_for_object(permissions=permissions, object=document)
+            set_permissions_for_objects(permissions, Document, [document.pk])
 
         if self.metadata.custom_fields:
             for field in CustomField.objects.filter(

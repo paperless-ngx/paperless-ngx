@@ -2,7 +2,6 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { RotateConfirmDialogComponent } from './rotate-confirm-dialog.component'
 
 describe('RotateConfirmDialogComponent', () => {
@@ -11,10 +10,7 @@ describe('RotateConfirmDialogComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [
-        NgxBootstrapIconsModule.pick(allIcons),
-        RotateConfirmDialogComponent,
-      ],
+      imports: [RotateConfirmDialogComponent],
       providers: [
         NgbActiveModal,
         provideHttpClient(withInterceptorsFromDi()),

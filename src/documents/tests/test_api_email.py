@@ -12,6 +12,9 @@ from documents.tests.utils import SampleDirMixin
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import UserFactory
 from paperless_testing.permissions import grant_global
+from paperless_testing.samples import MULTI_PAGE_DIGITAL_PDF
+from paperless_testing.samples import SIMPLE_DIGITAL_PDF
+from paperless_testing.samples import WITH_FORM_PDF
 
 
 class TestEmail(DirectoriesMixin, SampleDirMixin, APITestCase):
@@ -42,15 +45,15 @@ class TestEmail(DirectoriesMixin, SampleDirMixin, APITestCase):
 
         # Copy sample files to document paths (using different files to distinguish versions)
         shutil.copy(
-            self.SAMPLE_DIR / "documents" / "originals" / "0000001.pdf",
+            SIMPLE_DIGITAL_PDF,
             self.doc1.archive_path,
         )
         shutil.copy(
-            self.SAMPLE_DIR / "documents" / "originals" / "0000002.pdf",
+            MULTI_PAGE_DIGITAL_PDF,
             self.doc1.source_path,
         )
         shutil.copy(
-            self.SAMPLE_DIR / "documents" / "originals" / "0000003.pdf",
+            WITH_FORM_PDF,
             self.doc2.source_path,
         )
 
@@ -377,7 +380,7 @@ class TestEmail(DirectoriesMixin, SampleDirMixin, APITestCase):
             checksum="3",
             filename="test3.pdf",
         )
-        shutil.copy(self.SAMPLE_DIR / "simple.pdf", doc3.source_path)
+        shutil.copy(self.SIMPLE_PDF, doc3.source_path)
 
         doc4 = Document.objects.create(
             title="test1",
@@ -386,7 +389,7 @@ class TestEmail(DirectoriesMixin, SampleDirMixin, APITestCase):
             checksum="4",
             filename="test4.pdf",
         )
-        shutil.copy(self.SAMPLE_DIR / "simple.pdf", doc4.source_path)
+        shutil.copy(self.SIMPLE_PDF, doc4.source_path)
 
         response = self.client.post(
             self.ENDPOINT,

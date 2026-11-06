@@ -15,10 +15,11 @@ import pytest
 
 from documents import pdf_ops
 from documents.pdf_ops import PageSpec
+from paperless_testing.samples import MULTI_PAGE_DIGITAL_PDF
 
 SRC_ROOT = Path(__file__).parents[2]
 SAMPLES = Path(__file__).parent / "samples"
-THREE_PAGES = SAMPLES / "documents" / "originals" / "0000002.pdf"
+THREE_PAGES = MULTI_PAGE_DIGITAL_PDF
 TWELVE_PAGES = SAMPLES / "barcodes" / "split-by-asn-2.pdf"
 ENCRYPTED = SAMPLES / "password-is-test.pdf"
 SIGNED = SRC_ROOT / "paperless" / "tests" / "samples" / "tesseract" / "signed.pdf"

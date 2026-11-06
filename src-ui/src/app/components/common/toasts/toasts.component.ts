@@ -4,7 +4,6 @@ import {
   NgbAccordionModule,
   NgbProgressbarModule,
 } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Toast, ToastService } from 'src/app/services/toast.service'
 import { ToastComponent } from '../toast/toast.component'
 
@@ -17,12 +16,7 @@ export const MAX_VISIBLE_TOASTS = 3
   selector: 'pngx-toasts',
   templateUrl: './toasts.component.html',
   styleUrls: ['./toasts.component.scss'],
-  imports: [
-    ToastComponent,
-    NgbAccordionModule,
-    NgbProgressbarModule,
-    NgxBootstrapIconsModule,
-  ],
+  imports: [ToastComponent, NgbAccordionModule, NgbProgressbarModule],
 })
 export class ToastsComponent {
   toastService = inject(ToastService)

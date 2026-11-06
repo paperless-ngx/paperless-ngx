@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Subject, first, takeUntil } from 'rxjs'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { Group } from 'src/app/data/group'
 import { User } from 'src/app/data/user'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
@@ -29,7 +29,7 @@ import { ComponentWithPermissions } from '../../with-permissions/with-permission
   imports: [
     PageHeaderComponent,
     IfPermissionsDirective,
-    NgxBootstrapIconsModule,
+    BootstrapIconComponent,
   ],
 })
 export class UsersAndGroupsComponent

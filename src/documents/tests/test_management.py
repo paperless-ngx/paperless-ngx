@@ -23,8 +23,9 @@ from documents.tasks import update_document_content_maybe_archive_file
 from paperless_testing.assertions import FileSystemAssertsMixin
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import DocumentFactory
+from paperless_testing.samples import SIMPLE_DIGITAL_PDF
 
-sample_file: Path = Path(__file__).parent / "samples" / "simple.pdf"
+sample_file: Path = SIMPLE_DIGITAL_PDF
 
 
 @pytest.mark.management

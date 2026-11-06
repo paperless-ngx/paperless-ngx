@@ -190,7 +190,7 @@ $form-check-radio-checked-bg-image-dark: url("data:image/svg+xml,%3csvg xmlns='h
   }
 
   .search-container {
-    input, input:focus, i-bs[name="search"] , ::placeholder {
+    input, input:focus, pngx-bs-icon[name="search"] , ::placeholder {
       color: var(--pngx-primary-text-contrast) !important;
     }
   }

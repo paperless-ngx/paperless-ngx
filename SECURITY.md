@@ -61,11 +61,12 @@ The following are not generally considered vulnerabilities unless accompanied by
 - claims based solely on the presence of a library, framework feature or code pattern without a working exploit
 - pickle deserialization of internal data from trusted components such as the Redis-compatible broker or Paperless-ngx data directory
 - users with permission to edit users granting themselves additional privileges; this is expected behavior for that trusted permission
+- users with change permission on a mail account redirecting stored credentials to another mail server, including through connectivity tests. Mail account editing is a trusted permission, and UI password masking does not imply credential isolation from account editors
 - reports that rely on admin-level access, application-configuration access, workflow-editing privileges, shell access, or other high-trust roles unless they demonstrate an unintended privilege boundary bypass
 - optional webhook, mail, AI, OCR, or integration behavior described without a product-level vulnerability
 - missing limits or hardening settings presented without concrete impact
 - generic AI or static-analysis output that is not confirmed against the current codebase and a real deployment scenario
-- metadata names visible in a document's custom storage path, even when the user cannot access the underlying metadata object; this is expected behavior
+- metadata names or normalized words visible in a document's custom storage path or through search/autocomplete for documents the user can access, even when the user cannot access the underlying metadata object; this is expected behavior
 - the ability to attach objects that a user cannot access to a document by ID is an intentional design choice, and not considered a vulnerability
 
 ## Transparency

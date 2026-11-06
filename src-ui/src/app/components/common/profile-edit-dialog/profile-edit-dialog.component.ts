@@ -11,8 +11,8 @@ import {
   NgbActiveModal,
   NgbPopoverModule,
 } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { takeUntil } from 'rxjs'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import {
   SocialAccount,
   SocialAccountProvider,
@@ -38,7 +38,7 @@ import { TextComponent } from '../input/text/text.component'
     ReactiveFormsModule,
     NgbAccordionModule,
     NgbPopoverModule,
-    NgxBootstrapIconsModule,
+    BootstrapIconComponent,
   ],
 })
 export class ProfileEditDialogComponent

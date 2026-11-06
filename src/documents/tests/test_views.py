@@ -292,6 +292,33 @@ class TestViews(DirectoriesMixin, TestCase):
             else:
                 assert False, f"Unexpected tag found: {tag['name']}"
 
+    def test_retrieve_with_full_permissions(self) -> None:
+        """
+        GIVEN:
+            - A tag with view granted to two groups and change granted to only
+              one of them
+        WHEN:
+            - The single tag is requested with full permissions
+        THEN:
+            - Each action lists only the groups granted that action
+        """
+        view_only = Group.objects.create(name="view_only")
+        view_and_change = Group.objects.create(name="view_and_change")
+        tag = Tag.objects.create(name="invoice")
+        grant_object(view_only, tag, "view_tag")
+        grant_object(view_and_change, tag, "view_tag", "change_tag")
+        grant_global(self.user, "view_tag")
+
+        self.client.force_login(self.user)
+        response = self.client.get(f"/api/tags/{tag.pk}/?full_perms=true")
+
+        assert response.status_code == 200
+        permissions = response.json()["permissions"]
+        assert sorted(permissions["view"]["groups"]) == sorted(
+            [view_only.pk, view_and_change.pk],
+        )
+        assert permissions["change"]["groups"] == [view_and_change.pk]
+
     def test_list_no_n_plus_1_queries(self) -> None:
         """
         GIVEN:
@@ -447,7 +474,7 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
         self.assertEqual(response.json()["tags"], [])
         self.assertEqual(response.json()["suggested_tags"], [])
 
-    @patch("documents.views.get_ai_document_classification")
+    @patch("paperless_ai.ai_classifier.get_ai_document_classification")
     @override_settings(
         AI_ENABLED=True,
         LLM_BACKEND="mock_backend",
@@ -497,7 +524,7 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
             None,
         )
 
-    @patch("documents.views.get_ai_document_classification")
+    @patch("paperless_ai.ai_classifier.get_ai_document_classification")
     @override_settings(
         AI_ENABLED=True,
         LLM_BACKEND="mock_backend",
@@ -535,7 +562,7 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
             "KI Title",
         )
 
-    @patch("documents.views.get_ai_document_classification")
+    @patch("paperless_ai.ai_classifier.get_ai_document_classification")
     @override_settings(
         AI_ENABLED=True,
         LLM_BACKEND="mock_backend",
@@ -574,7 +601,7 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
             "Titre IA",
         )
 
-    @patch("documents.views.get_ai_document_classification")
+    @patch("paperless_ai.ai_classifier.get_ai_document_classification")
     @override_settings(
         AI_ENABLED=True,
         LLM_BACKEND="mock_backend",
@@ -610,7 +637,7 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
             ),
         )
 
-    @patch("documents.views.get_ai_document_classification")
+    @patch("paperless_ai.ai_classifier.get_ai_document_classification")
     @override_settings(
         AI_ENABLED=True,
         LLM_BACKEND="mock_backend",
@@ -682,7 +709,7 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
             ),
         )
 
-    @patch("documents.views.get_ai_document_classification")
+    @patch("paperless_ai.ai_classifier.get_ai_document_classification")
     @override_settings(
         AI_ENABLED=True,
         LLM_BACKEND="openai-like",
@@ -711,7 +738,7 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
             get_llm_suggestion_cache(self.document.pk, backend="openai-like"),
         )
 
-    @patch("documents.views.get_ai_document_classification")
+    @patch("paperless_ai.ai_classifier.get_ai_document_classification")
     @override_settings(
         AI_ENABLED=True,
         LLM_BACKEND="openai-like",
@@ -738,7 +765,7 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
             get_llm_suggestion_cache(self.document.pk, backend="openai-like"),
         )
 
-    @patch("documents.views.get_ai_document_classification")
+    @patch("paperless_ai.ai_classifier.get_ai_document_classification")
     @override_settings(
         AI_ENABLED=True,
         LLM_BACKEND="openai-like",
@@ -770,7 +797,7 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
             get_llm_suggestion_cache(self.document.pk, backend="openai-like"),
         )
 
-    @patch("documents.views.get_ai_document_classification")
+    @patch("paperless_ai.ai_classifier.get_ai_document_classification")
     @override_settings(
         AI_ENABLED=True,
         LLM_BACKEND="mock_backend",
@@ -808,7 +835,7 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
         self.assertEqual(response.json()["tags"], [self.tag1.pk])
         self.assertEqual(response.json()["suggested_tags"], ["Follow-up"])
 
-    @patch("documents.views.get_ai_document_classification")
+    @patch("paperless_ai.ai_classifier.get_ai_document_classification")
     @override_settings(
         AI_ENABLED=True,
         LLM_BACKEND="mock_backend",
@@ -847,7 +874,7 @@ class TestAISuggestions(DirectoriesMixin, TestCase):
         self.assertEqual(response.json()["tags"], [self.tag1.pk])
         self.assertEqual(response.json()["suggested_tags"], [])
 
-    @patch("documents.views.get_ai_document_classification")
+    @patch("paperless_ai.ai_classifier.get_ai_document_classification")
     @override_settings(
         AI_ENABLED=True,
         LLM_BACKEND="mock_backend",
@@ -969,7 +996,7 @@ class TestAIChatStreamingView(DirectoriesMixin, TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertIn(b"AI is required for this feature", response.content)
 
-    @patch("documents.views.stream_chat_with_documents")
+    @patch("paperless_ai.chat.stream_chat_with_documents")
     @patch("documents.views.permitted_document_ids")
     @override_settings(AI_ENABLED=True)
     def test_post_no_document_id(self, mock_permitted_ids, mock_stream_chat) -> None:
@@ -989,7 +1016,7 @@ class TestAIChatStreamingView(DirectoriesMixin, TestCase):
         self.assertEqual(list(call_kwargs["documents"]), [self.document])
         self.assertIsNone(call_kwargs["output_language"])
 
-    @patch("documents.views.stream_chat_with_documents")
+    @patch("paperless_ai.chat.stream_chat_with_documents")
     @patch("documents.views.permitted_document_ids")
     @override_settings(AI_ENABLED=True)
     def test_post_uses_user_display_language(
@@ -1015,7 +1042,7 @@ class TestAIChatStreamingView(DirectoriesMixin, TestCase):
         self.assertEqual(list(call_kwargs["documents"]), [self.document])
         self.assertEqual(call_kwargs["output_language"], "de-de")
 
-    @patch("documents.views.stream_chat_with_documents")
+    @patch("paperless_ai.chat.stream_chat_with_documents")
     @override_settings(AI_ENABLED=True)
     def test_post_with_document_id(self, mock_stream_chat) -> None:
         self.grant_view_document_permission()
@@ -1052,7 +1079,7 @@ class TestAIChatStreamingView(DirectoriesMixin, TestCase):
         self.assertEqual(response.status_code, 403)
         self.assertIn(b"Insufficient permissions", response.content)
 
-    @patch("documents.views.stream_chat_with_documents")
+    @patch("paperless_ai.chat.stream_chat_with_documents")
     @override_settings(AI_ENABLED=True)
     def test_post_no_document_id_requires_view_document_permission(
         self,
@@ -1066,7 +1093,7 @@ class TestAIChatStreamingView(DirectoriesMixin, TestCase):
         self.assertEqual(response.status_code, 403)
         mock_stream_chat.assert_not_called()
 
-    @patch("documents.views.stream_chat_with_documents")
+    @patch("paperless_ai.chat.stream_chat_with_documents")
     @override_settings(AI_ENABLED=True)
     def test_post_with_document_id_requires_view_document_permission(
         self,

@@ -1,7 +1,7 @@
 
 <div ngbDropdown #resultsDropdown="ngbDropdown" (openChange)="onDropdownOpenChange">
     <form class="form-inline position-relative">
-        <i-bs width="1em" height="1em" name="search"></i-bs>
+        <pngx-bs-icon width="1em" height="1em" name="search"></pngx-bs-icon>
         <div class="input-group">
             <div class="form-control form-control-sm">
                 <input class="bg-transparent border-0 w-100 h-100" #searchInput type="text" name="query"
@@ -25,7 +25,7 @@
                     } @else {
                         <ng-container i18n>Search</ng-container>
                     }
-                    <i-bs width="1em" height="1em" name="arrow-right-short"></i-bs>
+                    <pngx-bs-icon width="1em" height="1em" name="arrow-right-short"></pngx-bs-icon>
                 </button>
             }
         </div>
@@ -35,7 +35,7 @@
         <div #resultItem ngbDropdownItem class="py-2 d-flex align-items-center focus-ring border-0 cursor-pointer" tabindex="-1"
         (click)="primaryAction(type, item, $event)"
         (mouseenter)="onItemHover($event)">
-            <i-bs width="1.2em" height="1.2em" name="{{icon}}" class="me-2 text-muted"></i-bs>
+            <pngx-bs-icon width="1.2em" height="1.2em" name="{{icon}}" class="me-2 text-muted"></pngx-bs-icon>
             <div class="text-truncate">
                 {{item[nameProp]}}
                 @if (date) {
@@ -49,13 +49,13 @@
                 [disabled]="disablePrimaryButton(type, item)"
                 (mouseenter)="onButtonHover($event)">
                     @if (type === DataType.Document) {
-                        <i-bs width="1em" height="1em" name="file-earmark-richtext" class="me-1"></i-bs><span><ng-container i18n>Open</ng-container></span>
+                        <pngx-bs-icon width="1em" height="1em" name="file-earmark-richtext" class="me-1"></pngx-bs-icon><span><ng-container i18n>Open</ng-container></span>
                     } @else if (type === DataType.SavedView) {
-                        <i-bs width="1em" height="1em" name="eye" class="me-1"></i-bs><span><ng-container i18n>Open</ng-container></span>
+                        <pngx-bs-icon width="1em" height="1em" name="eye" class="me-1"></pngx-bs-icon><span><ng-container i18n>Open</ng-container></span>
                     } @else if (type === DataType.Workflow || type === DataType.CustomField || type === DataType.Group || type === DataType.User || type === DataType.MailAccount || type === DataType.MailRule) {
-                        <i-bs width="1em" height="1em" name="pencil" class="me-1"></i-bs><span><ng-container i18n>Open</ng-container></span>
+                        <pngx-bs-icon width="1em" height="1em" name="pencil" class="me-1"></pngx-bs-icon><span><ng-container i18n>Open</ng-container></span>
                     } @else {
-                        <i-bs width="1em" height="1em" name="filter" class="me-1"></i-bs><span><ng-container i18n>Filter documents</ng-container></span>
+                        <pngx-bs-icon width="1em" height="1em" name="filter" class="me-1"></pngx-bs-icon><span><ng-container i18n>Filter documents</ng-container></span>
                     }
                 </button>
                 @if (type !== DataType.SavedView && type !== DataType.Workflow && type !== DataType.CustomField && type !== DataType.Group && type !== DataType.User && type !== DataType.MailAccount && type !== DataType.MailRule) {
@@ -65,9 +65,9 @@
                     [disabled]="disableSecondaryButton(type, item)"
                     (mouseenter)="onButtonHover($event)">
                         @if (type === DataType.Document) {
-                            <i-bs width="1em" height="1em" name="download" class="me-1"></i-bs><span><ng-container i18n>Download</ng-container></span>
+                            <pngx-bs-icon width="1em" height="1em" name="download" class="me-1"></pngx-bs-icon><span><ng-container i18n>Download</ng-container></span>
                         } @else {
-                            <i-bs width="1em" height="1em" name="file-earmark-richtext" class="me-1"></i-bs><span><ng-container i18n>Open</ng-container></span>
+                            <pngx-bs-icon width="1em" height="1em" name="file-earmark-richtext" class="me-1"></pngx-bs-icon><span><ng-container i18n>Open</ng-container></span>
                         }
                     </button>
                 }

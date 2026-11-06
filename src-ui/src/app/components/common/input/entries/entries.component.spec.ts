@@ -4,7 +4,6 @@ import {
   NG_VALUE_ACCESSOR,
   ReactiveFormsModule,
 } from '@angular/forms'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { EntriesComponent } from './entries.component'
 
 describe('EntriesComponent', () => {
@@ -13,12 +12,7 @@ describe('EntriesComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [
-        FormsModule,
-        ReactiveFormsModule,
-        NgxBootstrapIconsModule.pick(allIcons),
-        EntriesComponent,
-      ],
+      imports: [FormsModule, ReactiveFormsModule, EntriesComponent],
     }).compileComponents()
   })
 

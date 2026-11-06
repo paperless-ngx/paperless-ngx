@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import functools
 import importlib.resources
 import logging
 import os
@@ -39,9 +40,12 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger("paperless.parsing.tesseract")
 
-_SRGB_ICC_DATA: Final[bytes] = (
-    importlib.resources.files("ocrmypdf.data").joinpath("sRGB.icc").read_bytes()
-)
+
+@functools.cache
+def _srgb_icc_data() -> bytes:
+    # Read on first use, importing ocrmypdf.data pulls in the whole ocrmypdf package
+    return importlib.resources.files("ocrmypdf.data").joinpath("sRGB.icc").read_bytes()
+
 
 _SUPPORTED_MIME_TYPES: Final[dict[str, str]] = {
     "application/pdf": ".pdf",
@@ -403,7 +407,7 @@ class RasterisedDocumentParser:
         pdfa_path = Path(self.tempdir) / "archive.pdf"
         try:
             with pikepdf.open(plain_pdf_path) as pdf:
-                cs = pdf.make_stream(_SRGB_ICC_DATA)
+                cs = pdf.make_stream(_srgb_icc_data())
                 cs["/N"] = 3
                 output_intent = pikepdf.Dictionary(
                     Type=pikepdf.Name("/OutputIntent"),

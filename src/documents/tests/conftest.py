@@ -12,29 +12,25 @@ if TYPE_CHECKING:
     from paperless_testing.dirs import PaperlessDirs
 
 
-@pytest.fixture(scope="session")
-def document_samples_dir() -> Path:
-    """Path to the shared test sample documents."""
-    return Path(__file__).parent / "samples" / "documents"
-
-
 @pytest.fixture()
 def sample_doc(
     paperless_dirs: "PaperlessDirs",
-    document_samples_dir: Path,
+    simple_digital_pdf_file: Path,
+    multi_page_images_pdf_file: Path,
+    thumbnail_webp_file: Path,
 ) -> "Document":
     """Create a document with valid files and matching checksums."""
     with filelock.FileLock(paperless_dirs.media_lock):
         shutil.copy(
-            document_samples_dir / "originals" / "0000001.pdf",
+            simple_digital_pdf_file,
             paperless_dirs.originals_dir / "0000001.pdf",
         )
         shutil.copy(
-            document_samples_dir / "archive" / "0000001.pdf",
+            multi_page_images_pdf_file,
             paperless_dirs.archive_dir / "0000001.pdf",
         )
         shutil.copy(
-            document_samples_dir / "thumbnails" / "0000001.webp",
+            thumbnail_webp_file,
             paperless_dirs.thumbnail_dir / "0000001.webp",
         )
 

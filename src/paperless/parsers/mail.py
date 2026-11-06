@@ -36,9 +36,6 @@ from humanize import naturalsize
 from imap_tools import MailAttachment
 from imap_tools import MailMessage
 from tika_client import TikaClient
-from turbohtml.clean import Linkify
-from turbohtml.clean import linkify
-from turbohtml.migration.bleach import clean
 
 from documents.parsers import ParseError
 from documents.parsers import make_thumbnail_from_pdf
@@ -557,7 +554,11 @@ class MailDocumentParser:
         """
         archive_path = Path(self._tempdir) / "merged.pdf"
 
-        mail_pdf_file = self.generate_pdf_from_mail(mail_message)
+        # Apply PDF/A conversion once, when producing the final archive.
+        mail_pdf_file = self.generate_pdf_from_mail(
+            mail_message,
+            convert_to_pdfa=not mail_message.html,
+        )
 
         if pdf_layout is None:
             pdf_layout = MailRule.PdfLayout(settings.EMAIL_PARSE_DEFAULT_LAYOUT)
@@ -570,6 +571,7 @@ class MailDocumentParser:
             pdf_of_html_content = self.generate_pdf_from_html(
                 mail_message.html,
                 mail_message.attachments,
+                convert_to_pdfa=False,
             )
 
             logger.debug("Merging email text and HTML content into single PDF")
@@ -622,6 +624,10 @@ class MailDocumentParser:
 
         def clean_html(text: str) -> str:
             """Attempt to clean, escape, and linkify the given HTML string."""
+            from turbohtml.clean import Linkify
+            from turbohtml.clean import linkify
+            from turbohtml.migration.bleach import clean
+
             if isinstance(text, list):
                 text = "\n".join([str(e) for e in text])
             if not isinstance(text, str):
@@ -671,13 +677,20 @@ class MailDocumentParser:
 
         return html_file
 
-    def generate_pdf_from_mail(self, mail: MailMessage) -> Path:
+    def generate_pdf_from_mail(
+        self,
+        mail: MailMessage,
+        *,
+        convert_to_pdfa: bool = True,
+    ) -> Path:
         """Create a PDF from the email body using an HTML template and Gotenberg.
 
         Parameters
         ----------
         mail:
             Parsed mail message.
+        convert_to_pdfa:
+            Apply the configured PDF/A format to this output.
 
         Returns
         -------
@@ -706,10 +719,10 @@ class MailDocumentParser:
             ) as client,
             client.chromium.html_to_pdf() as route,
         ):
-            # Configure requested PDF/A formatting, if any
-            pdf_a_format = self._settings_to_gotenberg_pdfa()
-            if pdf_a_format is not None:
-                route.pdf_format(pdf_a_format)
+            if convert_to_pdfa:
+                pdf_a_format = self._settings_to_gotenberg_pdfa()
+                if pdf_a_format is not None:
+                    route.pdf_format(pdf_a_format)
 
             try:
                 response = (
@@ -741,6 +754,8 @@ class MailDocumentParser:
         self,
         orig_html: str,
         attachments: list[MailAttachment],
+        *,
+        convert_to_pdfa: bool = True,
     ) -> Path:
         """Generate a PDF from the HTML content of the email.
 
@@ -750,6 +765,8 @@ class MailDocumentParser:
             Raw HTML string from the email body.
         attachments:
             List of email attachments (used as inline resources).
+        convert_to_pdfa:
+            Apply the configured PDF/A format to this output.
 
         Returns
         -------
@@ -785,10 +802,10 @@ class MailDocumentParser:
             ) as client,
             client.chromium.html_to_pdf() as route,
         ):
-            # Configure requested PDF/A formatting, if any
-            pdf_a_format = self._settings_to_gotenberg_pdfa()
-            if pdf_a_format is not None:
-                route.pdf_format(pdf_a_format)
+            if convert_to_pdfa:
+                pdf_a_format = self._settings_to_gotenberg_pdfa()
+                if pdf_a_format is not None:
+                    route.pdf_format(pdf_a_format)
 
             # Add attachments as resources, cleaning the filename and replacing
             # it in the index file for inclusion

@@ -11,13 +11,16 @@ import { By } from '@angular/platform-browser'
 import { Router } from '@angular/router'
 import { RouterTestingModule } from '@angular/router/testing'
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule, allIcons } from 'ngx-bootstrap-icons'
 import { Subject, of, throwError } from 'rxjs'
 import { routes } from 'src/app/app-routing.module'
 import { CustomFieldDisplayComponent } from 'src/app/components/common/custom-field-display/custom-field-display.component'
 import { PreviewPopupComponent } from 'src/app/components/common/preview-popup/preview-popup.component'
 import { CustomFieldDataType } from 'src/app/data/custom-field'
-import { DisplayField, DisplayMode } from 'src/app/data/document'
+import {
+  DEFAULT_DASHBOARD_VIEW_PAGE_SIZE,
+  DisplayField,
+  DisplayMode,
+} from 'src/app/data/document'
 import {
   FILTER_CORRESPONDENT,
   FILTER_DOCUMENT_TYPE,
@@ -121,7 +124,6 @@ describe('SavedViewWidgetComponent', () => {
         NgbModule,
         RouterTestingModule.withRoutes(routes),
         DragDropModule,
-        NgxBootstrapIconsModule.pick(allIcons),
         SavedViewWidgetComponent,
         WidgetFrameComponent,
         IfPermissionsDirective,
@@ -279,8 +281,38 @@ describe('SavedViewWidgetComponent', () => {
 
   it('should navigate to document', () => {
     const routerSpy = jest.spyOn(router, 'navigate')
+    const activateSpy = jest.spyOn(
+      documentListViewService,
+      'activateSavedViewWithDocuments'
+    )
     component.openDocumentDetail(documentResults[0])
+    expect(activateSpy).toHaveBeenCalled()
     expect(routerSpy).toHaveBeenCalledWith(['documents', documentResults[0].id])
+  })
+
+  it('should hand its documents to the list service when opening a document', () => {
+    jest.spyOn(documentService, 'listFiltered').mockReturnValue(
+      of({
+        all: [2, 3],
+        count: 25,
+        results: documentResults,
+      })
+    )
+    jest.spyOn(router, 'navigateByUrl').mockResolvedValue(true)
+    const activateSpy = jest
+      .spyOn(documentListViewService, 'activateSavedViewWithDocuments')
+      .mockImplementation(() => {})
+    component.ngOnInit()
+    fixture.detectChanges()
+    fixture.debugElement
+      .query(By.css('a[title="Open document"]'))
+      .nativeElement.click()
+    expect(activateSpy).toHaveBeenCalledWith(savedView, documentResults, 25, 20)
+  })
+
+  it('should fall back to the default dashboard page size', () => {
+    component.savedView = { ...savedView, page_size: undefined }
+    expect(component.pageSize).toEqual(DEFAULT_DASHBOARD_VIEW_PAGE_SIZE)
   })
 
   it('should navigate via quickfilter on click tag', () => {

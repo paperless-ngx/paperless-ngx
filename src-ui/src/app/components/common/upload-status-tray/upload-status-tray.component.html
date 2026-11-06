@@ -9,12 +9,12 @@
               @if (getStatusCompleted().length > 0) {
                 <a class="btn-link small text-nowrap" (click)="dismissCompleted()" [routerLink]="[]">
                   <span class="me-1" i18n="This button dismisses all status messages about processed documents in the tray (failed and successful)">Dismiss completed</span>
-                  <i-bs name="check2-all"></i-bs>
+                  <pngx-bs-icon name="check2-all"></pngx-bs-icon>
                 </a>
               }
               <button type="button" class="btn btn-sm btn-link p-0 text-muted" (click)="toggleCollapsed()"
                 [attr.aria-expanded]="!collapsed()" aria-label="Toggle document processing status" i18n-aria-label>
-                <i-bs [name]="collapsed() ? 'chevron-up' : 'chevron-down'"></i-bs>
+                <pngx-bs-icon [name]="collapsed() ? 'chevron-up' : 'chevron-down'"></pngx-bs-icon>
               </button>
             </div>
           </div>
@@ -42,7 +42,7 @@
           @if (status.documentId) {
             <a class="btn btn-sm btn-outline-primary btn-open" [routerLink]="['/documents', status.documentId]" (click)="dismiss(status)">
               <small i18n>Open document</small>
-              <i-bs name="arrow-right-short"></i-bs>
+              <pngx-bs-icon name="arrow-right-short"></pngx-bs-icon>
             </a>
           }
         </div>

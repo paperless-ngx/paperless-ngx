@@ -5,7 +5,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { By } from '@angular/platform-browser'
 import { RouterTestingModule } from '@angular/router/testing'
 import { NgbAlertModule } from '@ng-bootstrap/ng-bootstrap'
-import { allIcons, NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import {
   provideUiTour,
   TourNgBootstrap,
@@ -81,7 +80,6 @@ describe('DashboardComponent', () => {
         RouterTestingModule,
         TourNgBootstrap,
         DragDropModule,
-        NgxBootstrapIconsModule.pick(allIcons),
         DashboardComponent,
         StatisticsWidgetComponent,
         PageHeaderComponent,

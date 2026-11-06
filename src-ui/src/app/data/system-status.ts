@@ -24,7 +24,7 @@ export interface SystemStatus {
     status: SystemStatusItemStatus
     error?: string
     migration_status: {
-      latest_migration: string
+      latest_migration: string | null
       unapplied_migrations: string[]
     }
   }

@@ -11,6 +11,7 @@ from documents.models import Document
 from documents.parsers import get_default_thumbnail
 from paperless_testing.assertions import FileSystemAssertsMixin
 from paperless_testing.dirs import DirectoriesMixin
+from paperless_testing.samples import SIMPLE_DIGITAL_PDF
 
 
 @pytest.mark.management
@@ -24,7 +25,7 @@ class TestMakeThumbnails(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             filename="test.pdf",
         )
         shutil.copy(
-            Path(__file__).parent / "samples" / "simple.pdf",
+            SIMPLE_DIGITAL_PDF,
             self.d1.source_path,
         )
 
@@ -36,7 +37,7 @@ class TestMakeThumbnails(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
             filename="test2.pdf",
         )
         shutil.copy(
-            Path(__file__).parent / "samples" / "simple.pdf",
+            SIMPLE_DIGITAL_PDF,
             self.d2.source_path,
         )
 

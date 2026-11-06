@@ -14,8 +14,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from typing import NamedTuple
 
-import pikepdf
-
 if TYPE_CHECKING:
     from collections.abc import Callable
     from collections.abc import Iterable
@@ -43,6 +41,8 @@ def rotate_pdf(src: Path, dst: Path, degrees: int) -> None:
     Rotate every page relatively on the opened document, not a rebuild, so Info,
     XMP and outlines are kept. ``src`` is not modified.
     """
+    import pikepdf
+
     with pikepdf.open(src) as pdf:
         for page in pdf.pages:
             page.rotate(degrees, relative=True)
@@ -58,6 +58,8 @@ def remove_pages(src: Path, dst: Path, pages: Iterable[int]) -> None:
     Duplicates are ignored. Pages are removed highest first so earlier removals
     never shift the index of later ones.
     """
+    import pikepdf
+
     unique = sorted(set(pages))
     _require_positive(unique)
     with pikepdf.open(src) as pdf:
@@ -81,6 +83,8 @@ def build_pdfs(
     (Info, XMP, outlines) is not carried over. Returns the written paths in output
     order.
     """
+    import pikepdf
+
     for specs, _ in outputs:
         _require_positive(spec.page for spec in specs)
 
@@ -140,6 +144,8 @@ def needs_decrypt(src: Path) -> bool:
     True if ``src`` is encrypted. A PDF that needs a password to open at all
     counts as encrypted.
     """
+    import pikepdf
+
     try:
         with pikepdf.open(src) as pdf:
             return bool(pdf.is_encrypted)
@@ -154,6 +160,8 @@ def decrypt_pdf(src: Path, make_dst: Callable[[], Path], password: str) -> Path:
     ``make_dst`` is only called once the password has been accepted, so a wrong
     password never leaves a destination behind.
     """
+    import pikepdf
+
     with pikepdf.open(src, password=password) as pdf:
         pdf.remove_unreferenced_resources()
         dst = make_dst()
@@ -170,6 +178,8 @@ class PdfMerger:
     """
 
     def __init__(self) -> None:
+        import pikepdf
+
         self._pdf = pikepdf.new()
         self._version: str = self._pdf.pdf_version
 
@@ -185,6 +195,8 @@ class PdfMerger:
         self._pdf.close()
 
     def add(self, path: Path) -> None:
+        import pikepdf
+
         with pikepdf.open(str(path)) as pdf:
             self._version = max(self._version, pdf.pdf_version)
             self._pdf.pages.extend(pdf.pages)

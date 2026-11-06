@@ -10,9 +10,6 @@ from typing import TYPE_CHECKING
 import regex as regex_mod
 from django.conf import settings
 from pdf2image import convert_from_path
-from pikepdf import Page
-from pikepdf import PasswordError
-from pikepdf import Pdf
 
 from documents.converters import convert_from_tiff_to_pdf
 from documents.data_models import ConsumableDocument
@@ -34,6 +31,7 @@ from documents.utils import maybe_override_pixel_limit
 from paperless.config import BarcodeConfig
 
 if TYPE_CHECKING:
+    from pikepdf import Page
     from PIL import Image
 
 logger = logging.getLogger("paperless.barcodes")
@@ -282,6 +280,8 @@ class BarcodePlugin(ConsumeTaskPlugin):
         # No op if not a TIFF
         self.convert_from_tiff_to_pdf()
 
+        from pikepdf import PasswordError
+
         try:
             self.barcodes = scan_pdf(
                 self.pdf_file,
@@ -433,6 +433,8 @@ class BarcodePlugin(ConsumeTaskPlugin):
 
         document_paths = []
         fname: str = self.input_doc.original_file.stem
+        from pikepdf import Pdf
+
         with Pdf.open(self.pdf_file) as input_pdf:
             # Start with an empty document
             current_document: list[Page] = []
@@ -515,6 +517,8 @@ def scan_pdf(pdf_path: Path, settings: BarcodeConfig, work_dir: Path) -> list[Ba
     so callers can tell a failed scan from one that found nothing.
     """
     barcodes: list[Barcode] = []
+
+    from pikepdf import Pdf
 
     with Pdf.open(pdf_path) as pdf:
         num_of_pages = len(pdf.pages)

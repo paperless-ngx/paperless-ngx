@@ -18,8 +18,8 @@ import {
 import { RouterModule } from '@angular/router'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectComponent, NgSelectModule } from '@ng-select/ng-select'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { first, firstValueFrom, tap } from 'rxjs'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { Tag } from 'src/app/data/tag'
 import { TagService } from 'src/app/services/rest/tag.service'
 import { matchesSearchText } from 'src/app/utils/text-search'
@@ -44,7 +44,7 @@ import { TagComponent } from '../../tag/tag.component'
     FormsModule,
     ReactiveFormsModule,
     RouterModule,
-    NgxBootstrapIconsModule,
+    BootstrapIconComponent,
   ],
 })
 export class TagsComponent implements OnInit, ControlValueAccessor {

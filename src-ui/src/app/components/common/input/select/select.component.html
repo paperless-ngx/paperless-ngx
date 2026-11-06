@@ -7,7 +7,7 @@
         }
         @if (removable) {
           <button type="button" class="btn btn-sm btn-danger position-absolute left-0" (click)="removed.emit(this)">
-            <i-bs  name="x" class="me-1"></i-bs><ng-container i18n>Remove</ng-container>
+            <pngx-bs-icon  name="x" class="me-1"></pngx-bs-icon><ng-container i18n>Remove</ng-container>
             </button>
         }
       </div>
@@ -42,26 +42,26 @@
             }
             <span class="ng-value-label" [title]="item[bindLabel]">
               @if (iconField && item[iconField]) {
-                <i-bs class="me-2" [name]="item[iconField]"></i-bs>
+                <pngx-bs-icon class="me-2" [name]="item[iconField]"></pngx-bs-icon>
               }
               {{item[bindLabel]}}
             </span>
           </ng-template>
           <ng-template ng-option-tmp let-item="item">
               @if (iconField && item[iconField]) {
-                <i-bs class="me-2" [name]="item[iconField]"></i-bs>
+                <pngx-bs-icon class="me-2" [name]="item[iconField]"></pngx-bs-icon>
               }
               <span [title]="item[bindLabel]">{{item[bindLabel]}}</span>
           </ng-template>
         </ng-select>
         @if (allowCreateNew && !hideAddButton) {
           <button class="btn btn-outline-secondary" type="button" (click)="addItem()" [disabled]="disabled" aria-label="Create new item" i18n-aria-label>
-            <i-bs width="1.2em" height="1.2em" name="plus"></i-bs>
+            <pngx-bs-icon width="1.2em" height="1.2em" name="plus"></pngx-bs-icon>
           </button>
         }
         @if (showFilter) {
           <button class="btn btn-outline-secondary" type="button" (click)="onFilterDocuments()" [disabled]="isPrivate || this.value === null" title="{{ filterButtonTitle }}">
-            <i-bs width="1.2em" height="1.2em" name="filter"></i-bs>
+            <pngx-bs-icon width="1.2em" height="1.2em" name="filter"></pngx-bs-icon>
           </button>
         }
       </div>

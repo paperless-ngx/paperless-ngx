@@ -76,9 +76,6 @@ from paperless.logging import consume_task_id
 from paperless.parsers import ParserContext
 from paperless.parsers.registry import get_parser_registry
 from paperless_ai.exceptions import LLMTimeoutError
-from paperless_ai.indexing import llm_index_add_or_update_document
-from paperless_ai.indexing import llm_index_remove_document
-from paperless_ai.indexing import update_llm_index
 
 if settings.AUDIT_LOG_ENABLED:
     from auditlog.models import LogEntry
@@ -339,6 +336,8 @@ def bulk_update_documents(document_ids) -> None:
 
     ai_config = AIConfig()
     if ai_config.llm_index_enabled:
+        from paperless_ai.indexing import update_llm_index
+
         update_llm_index(
             rebuild=False,
             document_ids=document_ids,
@@ -499,6 +498,8 @@ def update_document_content_maybe_archive_file(
 
             ai_config = AIConfig()
             if ai_config.llm_index_enabled:
+                from paperless_ai.indexing import llm_index_add_or_update_document
+
                 llm_index_add_or_update_document(document)
 
             clear_document_caches(document.pk)
@@ -800,11 +801,15 @@ def apply_ai_suggestions(self, action_id: int, document_id: int) -> None:
 
 @shared_task
 def update_document_in_llm_index(document) -> None:
+    from paperless_ai.indexing import llm_index_add_or_update_document
+
     llm_index_add_or_update_document(document)
 
 
 @shared_task
 def remove_document_from_llm_index(document) -> None:
+    from paperless_ai.indexing import llm_index_remove_document
+
     llm_index_remove_document(document)
 
 

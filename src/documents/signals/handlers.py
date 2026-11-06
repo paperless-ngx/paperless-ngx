@@ -476,13 +476,13 @@ def update_filename_and_move_files(
         return
 
     with FileLock(settings.MEDIA_LOCK):
-        try:
-            # If this was waiting for the lock, the filename or archive_filename
-            # of this document may have been updated.  This happens if multiple updates
-            # get queued from the UI for the same document
-            # So freshen up the data before doing anything
-            instance.refresh_from_db()
+        # If this was waiting for the lock, the filename or archive_filename
+        # of this document may have been updated.  This happens if multiple updates
+        # get queued from the UI for the same document
+        # So freshen up the data before doing anything
+        instance.refresh_from_db()
 
+        try:
             old_filename = instance.filename
             old_source_path = instance.source_path
             move_original = False
@@ -1381,9 +1381,17 @@ def task_revoked_handler(
         return
     try:
         close_old_connections()
+        reason = "Task revoked before completion."
+        if expired:
+            reason = "Task expired before execution."
+        elif terminated:
+            reason = "Task terminated during execution."
         PaperlessTask.objects.filter(task_id=task_id).update(
             status=PaperlessTask.Status.REVOKED,
             date_done=timezone.now(),
+            result_data={
+                "reason": (reason + " Check worker logs for details."),
+            },
         )
     except Exception:  # pragma: no cover
         logger.exception("Updating PaperlessTask on revocation failed")

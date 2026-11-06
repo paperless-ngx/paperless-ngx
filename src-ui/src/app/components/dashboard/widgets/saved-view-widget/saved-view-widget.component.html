@@ -62,13 +62,13 @@
                 } @else {
                   @switch (field) {
                     @case (DisplayField.ADDED) {
-                      <a routerLink="/documents/{{doc.id}}" class="btn-link text-dark text-decoration-none py-2 py-md-3" title="Open document" i18n-title>{{doc.added | customDate}}</a>
+                      <a routerLink="/documents/{{doc.id}}" (click)="activateViewForNavigation()" class="btn-link text-dark text-decoration-none py-2 py-md-3" title="Open document" i18n-title>{{doc.added | customDate}}</a>
                     }
                     @case (DisplayField.CREATED) {
-                      <a routerLink="/documents/{{doc.id}}" class="btn-link text-dark text-decoration-none py-2 py-md-3" title="Open document" i18n-title>{{doc.created | customDate}}</a>
+                      <a routerLink="/documents/{{doc.id}}" (click)="activateViewForNavigation()" class="btn-link text-dark text-decoration-none py-2 py-md-3" title="Open document" i18n-title>{{doc.created | customDate}}</a>
                     }
                     @case (DisplayField.TITLE) {
-                      <a routerLink="/documents/{{doc.id}}" title="Open document" i18n-title class="btn-link text-dark text-decoration-none py-2 py-md-3">{{doc.title | documentTitle}}</a>
+                      <a routerLink="/documents/{{doc.id}}" (click)="activateViewForNavigation()" title="Open document" i18n-title class="btn-link text-dark text-decoration-none py-2 py-md-3">{{doc.title | documentTitle}}</a>
                     }
                     @case (DisplayField.CORRESPONDENT) {
                       @if (doc.correspondent) {
@@ -106,9 +106,9 @@
                     }
                     @case (DisplayField.NOTES) {
                       @if (doc.notes.length) {
-                        <a routerLink="/documents/{{doc.id}}/notes" class="btn btn-sm p-0">
+                        <a routerLink="/documents/{{doc.id}}/notes" (click)="activateViewForNavigation()" class="btn btn-sm p-0">
                           <span class="badge rounded-pill bg-light border text-primary">
-                            <i-bs width="1.2em" height="1.2em" class="ms-1 me-1" name="chat-left-text"></i-bs>
+                            <pngx-bs-icon width="1.2em" height="1.2em" class="ms-1 me-1" name="chat-left-text"></pngx-bs-icon>
                           {{doc.notes.length}}</span>
                         </a>
                       }
@@ -120,10 +120,10 @@
                   @if (j === displayFields().length - 1) {
                     <div class="btn-group position-absolute top-50 end-0 translate-middle-y" (mouseleave)="popupPreview.close()">
                       <pngx-preview-popup [document]="doc" linkClasses="btn px-4 btn-dark border-dark-subtle" #popupPreview>
-                        <i-bs width="0.8em" height="0.8em" name="eye"></i-bs>
+                        <pngx-bs-icon width="0.8em" height="0.8em" name="eye"></pngx-bs-icon>
                       </pngx-preview-popup>
                       <a [href]="getDownloadUrl(doc)" class="btn px-4 btn-dark border-dark-subtle" title="Download" i18n-title (click)="$event.stopPropagation()">
-                        <i-bs width="0.8em" height="0.8em" name="download"></i-bs>
+                        <pngx-bs-icon width="0.8em" height="0.8em" name="download"></pngx-bs-icon>
                       </a>
                     </div>
                   }
@@ -150,6 +150,7 @@
         <pngx-document-card-small
           class="p-0"
           [ngStyle]="{ opacity: show() ? 1 : 1 - (i * 1/documents().length) }"
+          (click)="activateViewForNavigation()"
           (dblClickDocument)="openDocumentDetail(d)"
           [document]="d"
           [displayFields]="displayFields()"
@@ -173,6 +174,7 @@
       }
       @for (d of documents(); track d.id; let i = $index) {
         <pngx-document-card-large
+          (click)="activateViewForNavigation()"
           (dblClickDocument)="openDocumentDetail(d)"
           [document]="d"
           [ngStyle]="{ opacity: show() ? 1 : 1 - (i * 1/documents().length) }"

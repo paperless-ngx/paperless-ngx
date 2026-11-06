@@ -15,7 +15,6 @@ import {
 } from '@angular/forms'
 import { RouterModule } from '@angular/router'
 import { NgSelectModule } from '@ng-select/ng-select'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import {
   catchError,
   concat,
@@ -28,6 +27,7 @@ import {
   takeUntil,
   tap,
 } from 'rxjs'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { Document } from 'src/app/data/document'
 import { FILTER_SIMPLE_TITLE } from 'src/app/data/filter-rule-type'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
@@ -53,7 +53,7 @@ import { AbstractInputComponent } from '../abstract-input'
     RouterModule,
     NgTemplateOutlet,
     NgSelectModule,
-    NgxBootstrapIconsModule,
+    BootstrapIconComponent,
   ],
 })
 export class DocumentLinkComponent

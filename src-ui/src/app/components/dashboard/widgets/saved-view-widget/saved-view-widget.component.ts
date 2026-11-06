@@ -11,8 +11,8 @@ import {
 } from '@angular/core'
 import { Router, RouterModule } from '@angular/router'
 import { NgbPopover } from '@ng-bootstrap/ng-bootstrap'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { Subject, takeUntil } from 'rxjs'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { CustomFieldDisplayComponent } from 'src/app/components/common/custom-field-display/custom-field-display.component'
 import { PreviewPopupComponent } from 'src/app/components/common/preview-popup/preview-popup.component'
 import { TagComponent } from 'src/app/components/common/tag/tag.component'
@@ -80,7 +80,7 @@ import { WidgetFrameComponent } from '../widget-frame/widget-frame.component'
     NgClass,
     NgStyle,
     RouterModule,
-    NgxBootstrapIconsModule,
+    BootstrapIconComponent,
   ],
 })
 export class SavedViewWidgetComponent
@@ -132,7 +132,7 @@ export class SavedViewWidgetComponent
   ngOnInit(): void {
     this.placeholderRows = Array.from(
       {
-        length: this.savedView?.page_size ?? DEFAULT_DASHBOARD_VIEW_PAGE_SIZE,
+        length: this.pageSize,
       },
       (_, index) => index
     )
@@ -187,7 +187,7 @@ export class SavedViewWidgetComponent
     this.documentService
       .listFiltered(
         1,
-        this.savedView?.page_size ?? DEFAULT_DASHBOARD_VIEW_PAGE_SIZE,
+        this.pageSize,
         this.savedView.sort_field,
         this.savedView.sort_reverse,
         this.savedView.filter_rules,
@@ -292,7 +292,24 @@ export class SavedViewWidgetComponent
     ])
   }
 
+  get pageSize(): number {
+    return this.savedView?.page_size ?? DEFAULT_DASHBOARD_VIEW_PAGE_SIZE
+  }
+
+  /**
+   * Pass the widget's documents to the list service to enable next / previous.
+   */
+  activateViewForNavigation() {
+    this.documentListViewService.activateSavedViewWithDocuments(
+      this.savedView,
+      this.documents(),
+      this.count(),
+      this.pageSize
+    )
+  }
+
   openDocumentDetail(document: Document) {
+    this.activateViewForNavigation()
     this.router.navigate(['documents', document.id])
   }
 

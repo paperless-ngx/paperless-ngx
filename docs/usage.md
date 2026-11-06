@@ -472,6 +472,8 @@ Users can enable two-factor authentication (2FA) for their accounts from the 'My
 
 Should a user lose access to their 2FA device and all recovery codes, a superuser can disable 2FA for the user from the 'Users & Groups' management screen.
 
+If users log in via an OpenID Connect provider which already enforces multi-factor authentication, see [`PAPERLESS_SOCIAL_ACCOUNT_MFA_TRUSTED_AMR`](configuration.md#PAPERLESS_SOCIAL_ACCOUNT_MFA_TRUSTED_AMR) to skip the Paperless-ngx prompt for those logins.
+
 ## Workflows
 
 !!! note
@@ -724,6 +726,7 @@ applied. You can use the following placeholders in the template with any trigger
 - `{{added_time}}`: added time in HH:MM format
 - `{{original_filename}}`: original file name without extension
 - `{{filename}}`: current file name without extension (for "added" workflows this may not be final yet, you can use `{{original_filename}}`)
+- `{{custom_fields}}`: Custom field names mapped to their type and value, as in [file name templates](advanced_usage.md#additional-variables). For example, `{{ custom_fields.Invoice.value }}` or `{{ custom_fields | get_cf_value("Invoice", "") }}` for a fallback when the field is missing. In title assignments, fields assigned by the same action are available.
 - `{{doc_title}}`: current document title (cannot be used in title assignment)
 
 The following placeholders are only available for "added" or "updated" triggers

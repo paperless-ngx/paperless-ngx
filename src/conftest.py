@@ -11,6 +11,8 @@ from typing import TYPE_CHECKING
 
 import pytest
 
+from paperless_testing import samples
+
 if TYPE_CHECKING:
     from collections.abc import Generator
     from pathlib import Path
@@ -149,3 +151,39 @@ def fake_progress_manager(
 
     monkeypatch.setattr("documents.tasks.ProgressManager", FakeProgressManager)
     return FakeProgressManager
+
+
+@pytest.fixture(scope="session")
+def shared_samples_dir() -> Path:
+    """Directory of sample files used by more than one app's tests."""
+    return samples.SHARED_SAMPLES_DIR
+
+
+@pytest.fixture(scope="session")
+def simple_digital_pdf_file() -> Path:
+    """One-page PDF with a text layer."""
+    return samples.SIMPLE_DIGITAL_PDF
+
+
+@pytest.fixture(scope="session")
+def multi_page_digital_pdf_file() -> Path:
+    """Three-page PDF with a text layer."""
+    return samples.MULTI_PAGE_DIGITAL_PDF
+
+
+@pytest.fixture(scope="session")
+def with_form_pdf_file() -> Path:
+    """PDF containing a fillable form."""
+    return samples.WITH_FORM_PDF
+
+
+@pytest.fixture(scope="session")
+def multi_page_images_pdf_file() -> Path:
+    """Multi-page PDF of scanned images, no text layer."""
+    return samples.MULTI_PAGE_IMAGES_PDF
+
+
+@pytest.fixture(scope="session")
+def thumbnail_webp_file() -> Path:
+    """Small WebP thumbnail."""
+    return samples.THUMBNAIL_WEBP

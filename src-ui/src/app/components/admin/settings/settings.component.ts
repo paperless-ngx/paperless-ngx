@@ -23,7 +23,6 @@ import {
   NgbPopoverModule,
 } from '@ng-bootstrap/ng-bootstrap'
 import { DirtyComponent, dirtyCheck } from '@ngneat/dirty-check-forms'
-import { NgxBootstrapIconsModule } from 'ngx-bootstrap-icons'
 import { TourService } from 'ngx-ui-tour-ng-bootstrap'
 import {
   BehaviorSubject,
@@ -34,6 +33,7 @@ import {
   takeUntil,
   tap,
 } from 'rxjs'
+import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { Group } from 'src/app/data/group'
 import {
   SystemStatus,
@@ -135,7 +135,7 @@ const sidebarItemLabels: Record<HideableSidebarItemID, string> = {
     ReactiveFormsModule,
     NgbNavModule,
     NgbPopoverModule,
-    NgxBootstrapIconsModule,
+    BootstrapIconComponent,
   ],
 })
 export class SettingsComponent

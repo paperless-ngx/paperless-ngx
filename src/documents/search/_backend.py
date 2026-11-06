@@ -48,8 +48,6 @@ if TYPE_CHECKING:
     from pathlib import Path
 
     from django.contrib.auth.models import AbstractUser
-    from django.contrib.auth.models import Group
-    from django.contrib.auth.models import User
     from django.db.models import QuerySet
 
     from documents.models import Document
@@ -528,8 +526,8 @@ class TantivyBackend:
         Annotate the queryset with ``annotate_effective_content`` when indexing
         more than a couple of documents, to resolve that without a query each.
         """
-        from guardian.shortcuts import get_groups_with_perms
-        from guardian.shortcuts import get_users_with_perms
+        from documents.models import Document
+        from documents.permissions import get_permission_grantees
 
         # Every searchable string is normalized on the way in, and every
         # query string on the way out (_parse_query), so the two agree on
@@ -674,28 +672,18 @@ class TantivyBackend:
             doc.add_unsigned("owner_id", document.owner_id)
 
         # Viewers with permission
-        if viewer_ids is None:
-            users_with_perms = get_users_with_perms(
-                document,
-                only_with_perms_in=["view_document"],
-                with_group_users=False,
-            )
-            viewer_ids = list(
-                cast("QuerySet[User]", users_with_perms).values_list("id", flat=True),
-            )
+        if viewer_ids is None or viewer_group_ids is None:
+            view = get_permission_grantees(
+                Document,
+                [document.pk],
+                actions=("view",),
+            )[document.pk]["view"]
+            if viewer_ids is None:
+                viewer_ids = view["users"]
+            if viewer_group_ids is None:
+                viewer_group_ids = view["groups"]
         for viewer_id in viewer_ids:
             doc.add_unsigned("viewer_id", viewer_id)
-        if viewer_group_ids is None:
-            groups_with_perms = get_groups_with_perms(
-                document,
-                only_with_perms_in=["view_document"],
-            )
-            viewer_group_ids = list(
-                cast("QuerySet[Group]", groups_with_perms).values_list(
-                    "id",
-                    flat=True,
-                ),
-            )
         for viewer_group_id in viewer_group_ids:
             doc.add_unsigned("viewer_group_id", viewer_group_id)
 
@@ -1200,12 +1188,6 @@ def chunked(iterable, size):
         yield chunk
 
 
-_EMPTY_VIEWER_GRANT: Final[ViewerGrant] = ViewerGrant(
-    viewer_ids=[],
-    viewer_group_ids=[],
-)
-
-
 class _DocumentViewerStream(QuerySetStream["Document"]):
     """Yield document permission data while batch-loading grants.
 
@@ -1231,7 +1213,7 @@ class _DocumentViewerStream(QuerySetStream["Document"]):
         for chunk in chunked(documents, self._chunk_size):
             grants_by_pk = _bulk_get_viewer_permissions([doc.pk for doc in chunk])
             for doc in chunk:
-                yield doc, grants_by_pk.get(doc.pk, _EMPTY_VIEWER_GRANT)
+                yield doc, grants_by_pk[doc.pk]
 
 
 def _bulk_get_viewer_permissions(
@@ -1243,48 +1225,19 @@ def _bulk_get_viewer_permissions(
     requesting user's current memberships. Expanding groups to user IDs here
     would leave stale access behind after a user is removed from a group.
     """
-    from collections import defaultdict
-
-    from django.contrib.contenttypes.models import ContentType
-    from guardian.models import GroupObjectPermission
-    from guardian.models import UserObjectPermission
-
     from documents.models import Document
-
-    # get_for_model is cached by Django, so this costs at most one query total.
-    ct = ContentType.objects.get_for_model(Document)
-    str_pks = [str(pk) for pk in doc_pks]
-
-    viewer_map: dict[int, set[int]] = defaultdict(set)
-    viewer_group_map: dict[int, set[int]] = defaultdict(set)
-
-    # Fold the permission lookup into the query via a join on codename instead
-    # of a separate Permission.objects.get(), which would otherwise run once per
-    # chunk during a full reindex.
-    user_qs = UserObjectPermission.objects.filter(
-        content_type=ct,
-        permission__content_type=ct,
-        permission__codename="view_document",
-        object_pk__in=str_pks,
-    ).values_list("object_pk", "user_id")
-    for object_pk, user_id in user_qs:
-        viewer_map[int(object_pk)].add(user_id)
-
-    group_qs = GroupObjectPermission.objects.filter(
-        content_type=ct,
-        permission__content_type=ct,
-        permission__codename="view_document",
-        object_pk__in=str_pks,
-    ).values_list("object_pk", "group_id")
-    for object_pk, group_id in group_qs:
-        viewer_group_map[int(object_pk)].add(group_id)
+    from documents.permissions import get_permission_grantees
 
     return {
-        object_pk: ViewerGrant(
-            viewer_ids=list(viewer_map.get(object_pk, ())),
-            viewer_group_ids=list(viewer_group_map.get(object_pk, ())),
+        pk: ViewerGrant(
+            viewer_ids=grantees["view"]["users"],
+            viewer_group_ids=grantees["view"]["groups"],
         )
-        for object_pk in viewer_map.keys() | viewer_group_map.keys()
+        for pk, grantees in get_permission_grantees(
+            Document,
+            doc_pks,
+            actions=("view",),
+        ).items()
     }
 
 
