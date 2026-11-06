@@ -6,9 +6,9 @@ if [ "${1:-}" = download ]; then
 	download_archive_dir=$2
 	shift 2
 	apt-get update -q
-	apt-get install -q --yes --no-install-recommends --download-only \
+	# Keep apt itself under timeout supervision, including the kill grace period.
+	exec apt-get install -q --yes --no-install-recommends --download-only \
 		-o "Dir::Cache::archives=$download_archive_dir" "$@"
-	exit 0
 fi
 
 SUDO=()
@@ -34,7 +34,8 @@ use_ubuntu_mirrors() {
 
 for attempt in $(seq 1 "$ATTEMPTS"); do
 	echo "::group::apt download attempt ${attempt}/${ATTEMPTS}"
-	if timeout --kill-after=10 "$ATTEMPT_TIMEOUT" "${SUDO[@]}" bash "$0" download "$CACHE_DIR" "${requested_packages[@]}"; then
+	# Run timeout as root so it can signal the root-owned apt processes.
+	if "${SUDO[@]}" timeout --kill-after=10 "$ATTEMPT_TIMEOUT" bash "$0" download "$CACHE_DIR" "${requested_packages[@]}"; then
 		echo "::endgroup::"
 		# Apt handles aliases (e.g. libmagic1 -> libmagic1t64) and dependencies.
 		"${SUDO[@]}" apt-get install -q --yes --no-install-recommends --no-download \
