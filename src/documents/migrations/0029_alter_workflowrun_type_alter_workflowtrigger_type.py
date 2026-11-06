@@ -6,7 +6,7 @@ from django.db import models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("documents", "0027_documentbarcode"),
+        ("documents", "0028_replace_tag_tree_fields"),
     ]
 
     operations = [
