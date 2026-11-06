@@ -1,7 +1,6 @@
 from django.conf import settings
 from django.contrib import admin
 from guardian.admin import GuardedModelAdmin
-from treenode.admin import TreeNodeModelAdmin
 
 from documents.models import Correspondent
 from documents.models import CustomField
@@ -29,7 +28,7 @@ class CorrespondentAdmin(GuardedModelAdmin):
     list_editable = ("match", "matching_algorithm")
 
 
-class TagAdmin(GuardedModelAdmin, TreeNodeModelAdmin):
+class TagAdmin(GuardedModelAdmin):
     list_display = ("name", "color", "match", "matching_algorithm")
     list_filter = ("matching_algorithm",)
     list_editable = ("color", "match", "matching_algorithm")

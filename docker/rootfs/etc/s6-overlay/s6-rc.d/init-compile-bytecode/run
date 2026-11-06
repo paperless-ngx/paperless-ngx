@@ -39,7 +39,6 @@ declare -a scope=(
 	"${site_packages}/allauth"
 	"${site_packages}/drf_spectacular"
 	"${site_packages}/drf_spectacular_sidecar"
-	"${site_packages}/treenode"
 	"${site_packages}/compression_middleware"
 )
 
