@@ -913,7 +913,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/page-header/page-header.component.html</context>
-          <context context-type="linenumber">30</context>
+          <context context-type="linenumber">32</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/permissions-dialog/permissions-dialog.component.html</context>
@@ -1245,7 +1245,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/page-header/page-header.component.html</context>
-          <context context-type="linenumber">18</context>
+          <context context-type="linenumber">20</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/permissions-select/permissions-select.component.html</context>
@@ -1497,7 +1497,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1913</context>
+          <context context-type="linenumber">1918</context>
         </context-group>
         <target state="translated">PDF Editor</target>
       </trans-unit>
@@ -3669,11 +3669,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1527</context>
+          <context context-type="linenumber">1532</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1914</context>
+          <context context-type="linenumber">1919</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -4497,7 +4497,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1476</context>
+          <context context-type="linenumber">1481</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -4657,7 +4657,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1967</context>
+          <context context-type="linenumber">1972</context>
         </context-group>
         <target state="translated">Odstrániť ochranu heslom?</target>
       </trans-unit>
@@ -4669,7 +4669,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1968</context>
+          <context context-type="linenumber">1973</context>
         </context-group>
         <target state="translated">Vytvorte nechránenú kópiu alebo nahraďte existujúci súbor.</target>
       </trans-unit>
@@ -4681,7 +4681,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1969</context>
+          <context context-type="linenumber">1974</context>
         </context-group>
         <target state="translated">Štart</target>
       </trans-unit>
@@ -7206,7 +7206,7 @@ zhodujúce sa</target>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1480</context>
+          <context context-type="linenumber">1485</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -7852,7 +7852,7 @@ zhodujúce sa</target>
         <source>Copy ID</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/page-header/page-header.component.html</context>
-          <context context-type="linenumber">6</context>
+          <context context-type="linenumber">7</context>
         </context-group>
         <target state="needs-translation">Copy ID</target>
       </trans-unit>
@@ -7860,7 +7860,7 @@ zhodujúce sa</target>
         <source>Copied!</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/page-header/page-header.component.html</context>
-          <context context-type="linenumber">8</context>
+          <context context-type="linenumber">9</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
@@ -7896,7 +7896,7 @@ zhodujúce sa</target>
         <source>Read more</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/page-header/page-header.component.html</context>
-          <context context-type="linenumber">24,25</context>
+          <context context-type="linenumber">26,27</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/permissions-select/permissions-select.component.html</context>
@@ -9326,7 +9326,7 @@ zhodujúce sa</target>
         <source>No documents</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/saved-view-widget/saved-view-widget.component.html</context>
-          <context context-type="linenumber">189,192</context>
+          <context context-type="linenumber">191,194</context>
         </context-group>
         <target state="needs-translation">No documents</target>
       </trans-unit>
@@ -10078,7 +10078,7 @@ zhodujúce sa</target>
         <source>Do you really want to move the document &quot;<x id="PH" equiv-text="this.document().title"/>&quot; to the trash?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1477</context>
+          <context context-type="linenumber">1482</context>
         </context-group>
         <target state="needs-translation">Do you really want to move the document "<x id="PH" equiv-text="this.document().title"/>" to the trash?</target>
       </trans-unit>
@@ -10086,7 +10086,7 @@ zhodujúce sa</target>
         <source>Documents can be restored prior to permanent deletion.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1478</context>
+          <context context-type="linenumber">1483</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -10098,7 +10098,7 @@ zhodujúce sa</target>
         <source>Moved &quot;<x id="PH" equiv-text="this.document().title"/>&quot; to the trash</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1496</context>
+          <context context-type="linenumber">1501</context>
         </context-group>
         <target state="needs-translation">Moved "<x id="PH" equiv-text="this.document().title"/>" to the trash</target>
       </trans-unit>
@@ -10106,7 +10106,7 @@ zhodujúce sa</target>
         <source>Error deleting document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1503</context>
+          <context context-type="linenumber">1508</context>
         </context-group>
         <target state="needs-translation">Error deleting document</target>
       </trans-unit>
@@ -10114,7 +10114,7 @@ zhodujúce sa</target>
         <source>Reprocess confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1523</context>
+          <context context-type="linenumber">1528</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -10126,7 +10126,7 @@ zhodujúce sa</target>
         <source>This operation will permanently recreate the archive file for this document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1524</context>
+          <context context-type="linenumber">1529</context>
         </context-group>
         <target state="needs-translation">This operation will permanently recreate the archive file for this document.</target>
       </trans-unit>
@@ -10134,7 +10134,7 @@ zhodujúce sa</target>
         <source>The archive file will be re-generated with the current settings.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1525</context>
+          <context context-type="linenumber">1530</context>
         </context-group>
         <target state="needs-translation">The archive file will be re-generated with the current settings.</target>
       </trans-unit>
@@ -10142,7 +10142,7 @@ zhodujúce sa</target>
         <source>Reprocess operation for &quot;<x id="PH" equiv-text="this.document().title"/>&quot; will begin in the background.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1538</context>
+          <context context-type="linenumber">1543</context>
         </context-group>
         <target state="needs-translation">Reprocess operation for "<x id="PH" equiv-text="this.document().title"/>" will begin in the background.</target>
       </trans-unit>
@@ -10150,7 +10150,7 @@ zhodujúce sa</target>
         <source>Error executing operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1549</context>
+          <context context-type="linenumber">1554</context>
         </context-group>
         <target state="needs-translation">Error executing operation</target>
       </trans-unit>
@@ -10158,7 +10158,7 @@ zhodujúce sa</target>
         <source>Error downloading document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1613</context>
+          <context context-type="linenumber">1618</context>
         </context-group>
         <target state="needs-translation">Error downloading document</target>
       </trans-unit>
@@ -10166,7 +10166,7 @@ zhodujúce sa</target>
         <source>Page Fit</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1691</context>
+          <context context-type="linenumber">1696</context>
         </context-group>
         <target state="needs-translation">Page Fit</target>
       </trans-unit>
@@ -10174,7 +10174,7 @@ zhodujúce sa</target>
         <source>PDF edit operation for &quot;<x id="PH" equiv-text="this.document().title"/>&quot; will begin in the background.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1934</context>
+          <context context-type="linenumber">1939</context>
         </context-group>
         <target state="needs-translation">PDF edit operation for "<x id="PH" equiv-text="this.document().title"/>" will begin in the background.</target>
       </trans-unit>
@@ -10182,7 +10182,7 @@ zhodujúce sa</target>
         <source>Error executing PDF edit operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1946</context>
+          <context context-type="linenumber">1951</context>
         </context-group>
         <target state="needs-translation">Error executing PDF edit operation</target>
       </trans-unit>
@@ -10190,7 +10190,7 @@ zhodujúce sa</target>
         <source>Please enter the current password before attempting to remove it.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1957</context>
+          <context context-type="linenumber">1962</context>
         </context-group>
         <target state="needs-translation">Please enter the current password before attempting to remove it.</target>
       </trans-unit>
@@ -10198,7 +10198,7 @@ zhodujúce sa</target>
         <source>Password removal operation for &quot;<x id="PH" equiv-text="this.document().title"/>&quot; will begin in the background.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1991</context>
+          <context context-type="linenumber">1996</context>
         </context-group>
         <target state="needs-translation">Password removal operation for "<x id="PH" equiv-text="this.document().title"/>" will begin in the background.</target>
       </trans-unit>
@@ -10206,7 +10206,7 @@ zhodujúce sa</target>
         <source>Error executing password removal operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">2005</context>
+          <context context-type="linenumber">2010</context>
         </context-group>
         <target state="needs-translation">Error executing password removal operation</target>
       </trans-unit>
@@ -10214,7 +10214,7 @@ zhodujúce sa</target>
         <source>Print failed.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">2055</context>
+          <context context-type="linenumber">2060</context>
         </context-group>
         <target state="needs-translation">Print failed.</target>
       </trans-unit>
@@ -10222,7 +10222,7 @@ zhodujúce sa</target>
         <source>Error loading document for printing.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">2064</context>
+          <context context-type="linenumber">2069</context>
         </context-group>
         <target state="needs-translation">Error loading document for printing.</target>
       </trans-unit>
@@ -10230,11 +10230,11 @@ zhodujúce sa</target>
         <source>An error occurred loading tiff: <x id="PH" equiv-text="err.toString()"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">2147</context>
+          <context context-type="linenumber">2152</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">2153</context>
+          <context context-type="linenumber">2158</context>
         </context-group>
         <target state="needs-translation">An error occurred loading tiff: <x id="PH" equiv-text="err.toString()"/></target>
       </trans-unit>

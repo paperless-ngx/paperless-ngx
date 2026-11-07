@@ -913,7 +913,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/page-header/page-header.component.html</context>
-          <context context-type="linenumber">30</context>
+          <context context-type="linenumber">32</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/permissions-dialog/permissions-dialog.component.html</context>
@@ -1245,7 +1245,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/page-header/page-header.component.html</context>
-          <context context-type="linenumber">18</context>
+          <context context-type="linenumber">20</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/permissions-select/permissions-select.component.html</context>
@@ -1497,7 +1497,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1913</context>
+          <context context-type="linenumber">1918</context>
         </context-group>
         <target state="translated">Éditeur PDF</target>
       </trans-unit>
@@ -3669,11 +3669,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1527</context>
+          <context context-type="linenumber">1532</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1914</context>
+          <context context-type="linenumber">1919</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -4497,7 +4497,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1476</context>
+          <context context-type="linenumber">1481</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -4657,7 +4657,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1967</context>
+          <context context-type="linenumber">1972</context>
         </context-group>
         <target state="translated">Retirer la protection par mot de passe</target>
       </trans-unit>
@@ -4669,7 +4669,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1968</context>
+          <context context-type="linenumber">1973</context>
         </context-group>
         <target state="translated">Créer une copie non protégée ou remplacer le fichier existant.</target>
       </trans-unit>
@@ -4681,7 +4681,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1969</context>
+          <context context-type="linenumber">1974</context>
         </context-group>
         <target state="translated">Démarrer</target>
       </trans-unit>
@@ -7205,7 +7205,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1480</context>
+          <context context-type="linenumber">1485</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -7851,7 +7851,7 @@
         <source>Copy ID</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/page-header/page-header.component.html</context>
-          <context context-type="linenumber">6</context>
+          <context context-type="linenumber">7</context>
         </context-group>
         <target state="needs-translation">Copy ID</target>
       </trans-unit>
@@ -7859,7 +7859,7 @@
         <source>Copied!</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/page-header/page-header.component.html</context>
-          <context context-type="linenumber">8</context>
+          <context context-type="linenumber">9</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
@@ -7895,7 +7895,7 @@
         <source>Read more</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/page-header/page-header.component.html</context>
-          <context context-type="linenumber">24,25</context>
+          <context context-type="linenumber">26,27</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/permissions-select/permissions-select.component.html</context>
@@ -9325,7 +9325,7 @@
         <source>No documents</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/saved-view-widget/saved-view-widget.component.html</context>
-          <context context-type="linenumber">189,192</context>
+          <context context-type="linenumber">191,194</context>
         </context-group>
         <target state="translated">Aucun document</target>
       </trans-unit>
@@ -10077,7 +10077,7 @@
         <source>Do you really want to move the document &quot;<x id="PH" equiv-text="this.document().title"/>&quot; to the trash?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1477</context>
+          <context context-type="linenumber">1482</context>
         </context-group>
         <target state="translated">Voulez-vous vraiment déplacer le document « <x id="PH" equiv-text="this.document().title"/> » vers la corbeille ?</target>
       </trans-unit>
@@ -10085,7 +10085,7 @@
         <source>Documents can be restored prior to permanent deletion.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1478</context>
+          <context context-type="linenumber">1483</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -10097,7 +10097,7 @@
         <source>Moved &quot;<x id="PH" equiv-text="this.document().title"/>&quot; to the trash</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1496</context>
+          <context context-type="linenumber">1501</context>
         </context-group>
         <target state="needs-translation">Moved "<x id="PH" equiv-text="this.document().title"/>" to the trash</target>
       </trans-unit>
@@ -10105,7 +10105,7 @@
         <source>Error deleting document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1503</context>
+          <context context-type="linenumber">1508</context>
         </context-group>
         <target state="final">Erreur lors de la suppression du document</target>
       </trans-unit>
@@ -10113,7 +10113,7 @@
         <source>Reprocess confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1523</context>
+          <context context-type="linenumber">1528</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -10125,7 +10125,7 @@
         <source>This operation will permanently recreate the archive file for this document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1524</context>
+          <context context-type="linenumber">1529</context>
         </context-group>
         <target state="translated">Cette action recréera définitivement le fichier d'archive pour ce document.</target>
       </trans-unit>
@@ -10133,7 +10133,7 @@
         <source>The archive file will be re-generated with the current settings.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1525</context>
+          <context context-type="linenumber">1530</context>
         </context-group>
         <target state="translated">Le fichier d'archive va être régénéré avec les paramètres actuels.</target>
       </trans-unit>
@@ -10141,7 +10141,7 @@
         <source>Reprocess operation for &quot;<x id="PH" equiv-text="this.document().title"/>&quot; will begin in the background.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1538</context>
+          <context context-type="linenumber">1543</context>
         </context-group>
         <target state="needs-translation">Reprocess operation for "<x id="PH" equiv-text="this.document().title"/>" will begin in the background.</target>
       </trans-unit>
@@ -10149,7 +10149,7 @@
         <source>Error executing operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1549</context>
+          <context context-type="linenumber">1554</context>
         </context-group>
         <target state="final">Erreur lors de l'exécution de l'opération</target>
       </trans-unit>
@@ -10157,7 +10157,7 @@
         <source>Error downloading document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1613</context>
+          <context context-type="linenumber">1618</context>
         </context-group>
         <target state="translated">Erreur lors du téléchargement du document</target>
       </trans-unit>
@@ -10165,7 +10165,7 @@
         <source>Page Fit</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1691</context>
+          <context context-type="linenumber">1696</context>
         </context-group>
         <target state="translated">Ajustement de la page</target>
       </trans-unit>
@@ -10173,7 +10173,7 @@
         <source>PDF edit operation for &quot;<x id="PH" equiv-text="this.document().title"/>&quot; will begin in the background.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1934</context>
+          <context context-type="linenumber">1939</context>
         </context-group>
         <target state="needs-translation">PDF edit operation for "<x id="PH" equiv-text="this.document().title"/>" will begin in the background.</target>
       </trans-unit>
@@ -10181,7 +10181,7 @@
         <source>Error executing PDF edit operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1946</context>
+          <context context-type="linenumber">1951</context>
         </context-group>
         <target state="translated">Erreur lors de l’exécution de l’opération de modification du PDF</target>
       </trans-unit>
@@ -10189,7 +10189,7 @@
         <source>Please enter the current password before attempting to remove it.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1957</context>
+          <context context-type="linenumber">1962</context>
         </context-group>
         <target state="translated">Veuillez saisir le mot de passe actuel avant d'essayer de le supprimer.</target>
       </trans-unit>
@@ -10197,7 +10197,7 @@
         <source>Password removal operation for &quot;<x id="PH" equiv-text="this.document().title"/>&quot; will begin in the background.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1991</context>
+          <context context-type="linenumber">1996</context>
         </context-group>
         <target state="needs-translation">Password removal operation for "<x id="PH" equiv-text="this.document().title"/>" will begin in the background.</target>
       </trans-unit>
@@ -10205,7 +10205,7 @@
         <source>Error executing password removal operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">2005</context>
+          <context context-type="linenumber">2010</context>
         </context-group>
         <target state="translated">Erreur lors de la suppression du mot de passe</target>
       </trans-unit>
@@ -10213,7 +10213,7 @@
         <source>Print failed.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">2055</context>
+          <context context-type="linenumber">2060</context>
         </context-group>
         <target state="translated">Impression échouée.</target>
       </trans-unit>
@@ -10221,7 +10221,7 @@
         <source>Error loading document for printing.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">2064</context>
+          <context context-type="linenumber">2069</context>
         </context-group>
         <target state="translated">Erreur lors du chargement du document pour impression.</target>
       </trans-unit>
@@ -10229,11 +10229,11 @@
         <source>An error occurred loading tiff: <x id="PH" equiv-text="err.toString()"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">2147</context>
+          <context context-type="linenumber">2152</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">2153</context>
+          <context context-type="linenumber">2158</context>
         </context-group>
         <target state="translated">Une erreur s’est produite lors du chargement du tiff : <x id="PH" equiv-text="err.toString()"/></target>
       </trans-unit>
