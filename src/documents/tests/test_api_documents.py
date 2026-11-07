@@ -1862,6 +1862,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             checksum="A",
             mime_type="application/pdf",
             content="abc",
+            archive_serial_number=42,
         )
         Document.objects.create(
             title="none2",
@@ -1905,6 +1906,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         self.assertEqual(response.data["correspondent_count"], 2)
         self.assertEqual(response.data["document_type_count"], 1)
         self.assertEqual(response.data["storage_path_count"], 2)
+        self.assertEqual(response.data["current_asn"], 42)
 
     def test_statistics_excludes_document_versions(self) -> None:
         root = Document.objects.create(
@@ -1912,6 +1914,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             checksum="A",
             mime_type="application/pdf",
             content="root",
+            archive_serial_number=42,
         )
         version = Document.objects.create(
             title="version",
@@ -1920,6 +1923,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             content="version",
             root_document=root,
             version_index=1,
+            archive_serial_number=99,
         )
         tag_inbox = Tag.objects.create(name="t1", is_inbox_tag=True)
         version.tags.add(tag_inbox)
@@ -1930,6 +1934,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         self.assertEqual(response.data["documents_total"], 1)
         self.assertEqual(response.data["documents_inbox"], 0)
         self.assertEqual(response.data["character_count"], 4)
+        self.assertEqual(response.data["current_asn"], 42)
         self.assertEqual(
             response.data["document_file_type_counts"][0]["mime_type_count"],
             1,
@@ -1942,6 +1947,45 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["documents_inbox"], None)
         self.assertEqual(response.data["inbox_tags"], None)
+
+    def test_statistics_current_asn_respects_document_permissions(self) -> None:
+        viewer = UserFactory()
+        grant_global(viewer, "view_document")
+        DocumentFactory(owner=viewer, archive_serial_number=12)
+        shared = DocumentFactory(owner=self.user, archive_serial_number=23)
+        grant_object(viewer, shared, "view_document")
+        DocumentFactory(owner=self.user, archive_serial_number=99)
+
+        self.client.force_authenticate(user=viewer)
+        response = self.client.get("/api/statistics/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["current_asn"], 23)
+
+    def test_statistics_current_asn_without_visible_documents(self) -> None:
+        DocumentFactory(owner=self.user, archive_serial_number=99)
+
+        for permissions in ((), ("view_document",)):
+            viewer = UserFactory()
+            grant_global(viewer, *permissions)
+            self.client.force_authenticate(user=viewer)
+
+            with self.subTest(permissions=permissions):
+                response = self.client.get("/api/statistics/")
+
+                self.assertEqual(response.status_code, status.HTTP_200_OK)
+                self.assertEqual(response.data["current_asn"], 0)
+
+    def test_statistics_current_asn_with_global_statistics_permission(self) -> None:
+        viewer = UserFactory()
+        grant_global(viewer, "view_global_statistics")
+        DocumentFactory(owner=self.user, archive_serial_number=99)
+
+        self.client.force_authenticate(user=viewer)
+        response = self.client.get("/api/statistics/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["current_asn"], 99)
 
     def test_statistics_multiple_users(self) -> None:
         """

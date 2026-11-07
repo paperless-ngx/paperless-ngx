@@ -4078,7 +4078,7 @@ class StatisticsView(GenericAPIView[Any]):
             for row in mime_type_stats
         ]
 
-        current_asn = Document.objects.aggregate(
+        current_asn = documents.aggregate(
             Max("archive_serial_number", default=0),
         ).get(
             "archive_serial_number__max",
