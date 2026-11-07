@@ -31,6 +31,7 @@ from guardian.core import ObjectPermissionChecker
 from guardian.models import GroupObjectPermission
 from guardian.models import UserObjectPermission
 from rest_framework.permissions import BasePermission
+from rest_framework.permissions import DjangoModelPermissions
 from rest_framework.permissions import DjangoObjectPermissions
 
 from documents.models import Document
@@ -61,6 +62,17 @@ class PermissionGranteesUpdate(TypedDict, total=False):
 
 
 PermissionsSpec: TypeAlias = Mapping[PermissionAction, PermissionGranteesUpdate]
+
+
+class PaperlessModelPermissions(DjangoModelPermissions):
+    """Require basic global model permissions."""
+
+    perms_map = {
+        **DjangoModelPermissions.perms_map,
+        "GET": ["%(app_label)s.view_%(model_name)s"],
+        "OPTIONS": ["%(app_label)s.view_%(model_name)s"],
+        "HEAD": ["%(app_label)s.view_%(model_name)s"],
+    }
 
 
 class PaperlessObjectPermissions(DjangoObjectPermissions):
