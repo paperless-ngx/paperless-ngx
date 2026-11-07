@@ -1862,6 +1862,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             checksum="A",
             mime_type="application/pdf",
             content="abc",
+            archive_serial_number=42,
         )
         Document.objects.create(
             title="none2",
@@ -1905,6 +1906,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         self.assertEqual(response.data["correspondent_count"], 2)
         self.assertEqual(response.data["document_type_count"], 1)
         self.assertEqual(response.data["storage_path_count"], 2)
+        self.assertEqual(response.data["current_asn"], 42)
 
     def test_statistics_excludes_document_versions(self) -> None:
         root = Document.objects.create(
@@ -1912,6 +1914,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             checksum="A",
             mime_type="application/pdf",
             content="root",
+            archive_serial_number=42,
         )
         version = Document.objects.create(
             title="version",
@@ -1920,6 +1923,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
             content="version",
             root_document=root,
             version_index=1,
+            archive_serial_number=99,
         )
         tag_inbox = Tag.objects.create(name="t1", is_inbox_tag=True)
         version.tags.add(tag_inbox)
@@ -1930,6 +1934,7 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         self.assertEqual(response.data["documents_total"], 1)
         self.assertEqual(response.data["documents_inbox"], 0)
         self.assertEqual(response.data["character_count"], 4)
+        self.assertEqual(response.data["current_asn"], 42)
         self.assertEqual(
             response.data["document_file_type_counts"][0]["mime_type_count"],
             1,
