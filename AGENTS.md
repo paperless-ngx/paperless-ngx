@@ -12,6 +12,12 @@ Read [CONTRIBUTING.md](CONTRIBUTING.md) before working on this repository, espec
 - AI tools have lowered the effort needed to produce a PR, but reviewing and maintaining it still requires substantial work. Encourage discussion of the idea before investing in implementation and review.
 - Issue reports must describe observed behavior, reproduction steps, and relevant logs. Do not add speculative root causes, code analysis, or proposed fixes to agent-generated reports.
 
+## Security reports
+
+- AI-assisted security reports must meet the legitimacy and verification requirements in [SECURITY.md](SECURITY.md#ai-assisted-submissions). A human must verify a real Paperless-ngx code path, concrete reproduction steps, affected versions, and realistic security impact before submission.
+- Account for existing permission checks, configuration requirements, and trust boundaries. Speculation, scanner output, or concerns about third-party software or deployment choices without a demonstrated Paperless-ngx vulnerability do not meet this threshold and may be closed without extended discussion.
+- Disclose AI assistance and use the private vulnerability reporting channel specified in [SECURITY.md](SECURITY.md#reporting-a-vulnerability).
+
 ## Working on changes
 
 - Read the relevant code, tests, and documentation before editing. Paperless-ngx is complex: trace interactions between affected components rather than assuming a change is isolated.
