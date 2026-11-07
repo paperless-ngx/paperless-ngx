@@ -1948,6 +1948,45 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         self.assertEqual(response.data["documents_inbox"], None)
         self.assertEqual(response.data["inbox_tags"], None)
 
+    def test_statistics_current_asn_respects_document_permissions(self) -> None:
+        viewer = UserFactory()
+        grant_global(viewer, "view_document")
+        DocumentFactory(owner=viewer, archive_serial_number=12)
+        shared = DocumentFactory(owner=self.user, archive_serial_number=23)
+        grant_object(viewer, shared, "view_document")
+        DocumentFactory(owner=self.user, archive_serial_number=99)
+
+        self.client.force_authenticate(user=viewer)
+        response = self.client.get("/api/statistics/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["current_asn"], 23)
+
+    def test_statistics_current_asn_without_visible_documents(self) -> None:
+        DocumentFactory(owner=self.user, archive_serial_number=99)
+
+        for permissions in ((), ("view_document",)):
+            viewer = UserFactory()
+            grant_global(viewer, *permissions)
+            self.client.force_authenticate(user=viewer)
+
+            with self.subTest(permissions=permissions):
+                response = self.client.get("/api/statistics/")
+
+                self.assertEqual(response.status_code, status.HTTP_200_OK)
+                self.assertEqual(response.data["current_asn"], 0)
+
+    def test_statistics_current_asn_with_global_statistics_permission(self) -> None:
+        viewer = UserFactory()
+        grant_global(viewer, "view_global_statistics")
+        DocumentFactory(owner=self.user, archive_serial_number=99)
+
+        self.client.force_authenticate(user=viewer)
+        response = self.client.get("/api/statistics/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["current_asn"], 99)
+
     def test_statistics_multiple_users(self) -> None:
         """
         GIVEN:
