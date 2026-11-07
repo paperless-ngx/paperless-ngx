@@ -10,6 +10,12 @@ Paperless-ngx places a high value on trust between contributors and maintainers.
 
 Paperless-ngx is complex, and understanding how its components interact takes time. A change that appears correct in isolation can have consequences elsewhere in the application. Contributors should understand the code they submit, explain how it fits into the project, and work with maintainers through review. Starting with smaller, focused contributions can help build that understanding and trust.
 
+We prefer thoughtful, well-described ideas to AI-generated pull requests. You do not need to supply an implementation for your contribution to be valuable. Explain the problem you have encountered, your use case, the behavior you would like to see, and who would benefit. Concrete examples, alternatives you have considered, and relevant constraints help the community discuss and refine the idea.
+
+AI tools have lowered the effort needed to produce a pull request, but evaluating one still requires substantial maintainer time. Maintainers still need to establish whether the implementation is correct, fits the project, and can be maintained over time.
+
+A flawed implementation can also obscure a good idea: discussion becomes focused on problems with the generated code before the community has considered whether the underlying proposal is useful. Starting with the idea gives it a fair discussion on its own merits and lets contributors and maintainers agree on an approach before investing in implementation and review.
+
 If you want to implement something big:
 
 - As above, please start with a discussion! Maybe something similar is already in development and we can make it happen together.

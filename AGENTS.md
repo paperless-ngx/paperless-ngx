@@ -8,6 +8,8 @@ Read [CONTRIBUTING.md](CONTRIBUTING.md) before working on this repository, espec
 - The project does not accept PRs that are entirely or mostly AI-derived. Human submission and disclosure do not override this rule.
 - AI-generated content must be clearly disclosed as described in the contributing guidelines. When handing work back to a human, identify what was generated or changed with AI assistance so they can disclose it accurately.
 - Trust matters. Encourage first-time contributors to discuss their proposed change before preparing a PR, especially for large changes or changes involving AI-generated code. New features and enhancements should almost always target an existing feature request with community interest and discussion.
+- The project prefers thoughtful, well-described ideas to AI-generated pull requests. Help contributors describe their problem, use case, desired behavior, and who would benefit. An implementation is not required for a valuable contribution, and a flawed implementation can obscure a useful idea before it receives proper discussion.
+- AI tools have lowered the effort needed to produce a PR, but reviewing and maintaining it still requires substantial work. Encourage discussion of the idea before investing in implementation and review.
 - Issue reports must describe observed behavior, reproduction steps, and relevant logs. Do not add speculative root causes, code analysis, or proposed fixes to agent-generated reports.
 
 ## Working on changes
