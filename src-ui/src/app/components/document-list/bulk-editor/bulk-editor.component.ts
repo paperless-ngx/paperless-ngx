@@ -299,14 +299,31 @@ export class BulkEditorComponent
       .bulkEdit(overrideSelection ?? this.getSelectionQuery(), method, args)
       .pipe(first())
       .subscribe({
-        next: () => this.handleOperationQueued(modal),
+        next: ({ task_id }) => this.handleOperationQueued(modal, task_id),
         error: (error) => this.handleOperationError(modal, error),
       })
   }
 
-  private handleOperationQueued(modal: NgbModalRef) {
+  private handleOperationQueued(modal: NgbModalRef, taskId: string) {
     modal?.close()
     this.list.selectNone()
+    const canViewTasks = this.permissionService.currentUserCan(
+      PermissionAction.View,
+      PermissionType.PaperlessTask
+    )
+    this.toastService.show({
+      content: $localize`Bulk operation queued.`,
+      delay: 5000,
+      ...(canViewTasks
+        ? {
+            actionName: $localize`View task`,
+            action: () =>
+              this.router.navigate(['/tasks'], {
+                queryParams: { task_id: taskId },
+              }),
+          }
+        : {}),
+    })
   }
 
   private executeDocumentAction(
@@ -1093,7 +1110,9 @@ export class BulkEditorComponent
 
     dialog.selection = this.getSelectionQuery()
     dialog.selectionCount = this.getSelectionSize()
-    dialog.succeeded.subscribe(() => this.handleOperationQueued(null))
+    dialog.succeeded.subscribe(({ task_id }) =>
+      this.handleOperationQueued(null, task_id)
+    )
     dialog.failed.subscribe((error) => {
       this.toastService.showError(
         $localize`Error updating custom fields.`,

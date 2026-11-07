@@ -1546,27 +1546,46 @@ describe('BulkEditorComponent', () => {
     )
   })
 
-  it('closes a queued permissions dialog without refreshing before completion', () => {
-    let modal: NgbModalRef
-    modalService.activeInstances.subscribe((instances) => {
-      if (instances.length) modal = instances[0]
-    })
-    const reload = jest.spyOn(documentListViewService, 'reload')
-    component.setPermissions()
-    const close = jest.spyOn(modal, 'close')
-    modal.componentInstance.confirmClicked.emit({
-      permissions: {},
-      merge: true,
-    })
-    const req = httpTestingController.expectOne(
-      `${environment.apiBaseUrl}documents/bulk_edit/`
-    )
-    req.flush({ result: 'OK', task_id: 'queued-operation' })
-    expect(close).toHaveBeenCalledTimes(1)
-    expect(reload).not.toHaveBeenCalled()
-    expect(documentListViewService.selected.size).toBe(0)
-    expect(documentListViewService.allSelected).toBe(false)
-  })
+  it.each([true, false])(
+    'shows queued feedback and gates the task link on permission (%s)',
+    (canViewTasks) => {
+      jest
+        .spyOn(permissionsService, 'currentUserCan')
+        .mockReturnValue(canViewTasks)
+      const queued = jest.spyOn(toastService, 'show')
+      let modal: NgbModalRef
+      modalService.activeInstances.subscribe((instances) => {
+        if (instances.length) modal = instances[0]
+      })
+      const reload = jest.spyOn(documentListViewService, 'reload')
+      component.setPermissions()
+      const close = jest.spyOn(modal, 'close')
+      modal.componentInstance.confirmClicked.emit({
+        permissions: {},
+        merge: true,
+      })
+      const req = httpTestingController.expectOne(
+        `${environment.apiBaseUrl}documents/bulk_edit/`
+      )
+      req.flush({ result: 'OK', task_id: 'queued-operation' })
+      expect(close).toHaveBeenCalledTimes(1)
+      const notification = queued.mock.calls.at(-1)[0]
+      expect(notification.content).toBe('Bulk operation queued.')
+      if (canViewTasks) {
+        expect(notification.actionName).toBe('View task')
+        notification.action()
+        expect(router.navigate).toHaveBeenCalledWith(['/tasks'], {
+          queryParams: { task_id: 'queued-operation' },
+        })
+      } else {
+        expect(notification.action).toBeUndefined()
+        expect(notification.actionName).toBeUndefined()
+      }
+      expect(reload).not.toHaveBeenCalled()
+      expect(documentListViewService.selected.size).toBe(0)
+      expect(documentListViewService.allSelected).toBe(false)
+    }
+  )
 
   it('should support bulk permissions update', () => {
     let modal: NgbModalRef
