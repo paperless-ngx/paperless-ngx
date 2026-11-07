@@ -5,11 +5,13 @@ import platform
 import re
 import tempfile
 import zipfile
+from collections import Counter
 from collections import deque
 from collections.abc import Callable
 from datetime import datetime
 from datetime import timedelta
 from http import HTTPStatus
+from itertools import islice
 from pathlib import Path
 from time import mktime
 from time import sleep
@@ -168,7 +170,6 @@ from documents.permissions import PaperlessNotePermissions
 from documents.permissions import PaperlessObjectPermissions
 from documents.permissions import TrashPermissions
 from documents.permissions import ViewDocumentsPermissions
-from documents.permissions import annotate_document_count_by_ids
 from documents.permissions import annotate_document_count_for_related_queryset
 from documents.permissions import get_document_count_filter_for_user
 from documents.permissions import get_permission_grantees
@@ -1014,71 +1015,80 @@ class DocumentViewSet(
         "custom_field_",
     )
 
-    def _get_selection_data_for_queryset(self, queryset):
-        # Resolve once instead of once per model below. `queryset` can carry an
-        # arbitrarily expensive WHERE clause (user filters plus the permission
-        # filter); re-embedding it as a subquery inside 5 separate Count(...)
-        # calls forces the database to re-evaluate that whole thing 5 times, and
-        # -- for FK relations especially -- can defeat semi-join planning
-        # entirely at scale. A concrete id list is cheap to reuse.
-        # order_by() drops the default/user ordering -- irrelevant for a plain
-        # id list, but left in place it forces a sort over the full filtered
-        # set before the ids can even be collected.
-        document_ids = list(queryset.order_by().values_list("pk", flat=True))
+    # Bound the IN clauses used for search results and through-table lookups.
+    selection_data_batch_size = 10_000
 
-        correspondents = Correspondent.objects.annotate(
-            document_count=Count(
-                "documents",
-                filter=Q(documents__id__in=document_ids),
-                distinct=True,
-            ),
+    def _get_selection_data_for_queryset(
+        self,
+        queryset: QuerySet[Document],
+        *,
+        search_ids: list[int] | None = None,
+    ) -> dict[str, list[dict[str, int]]]:
+        # Keep permission and filter predicates at document granularity.
+        # Reusing the filtered queryset as a subquery for each count is slow.
+        rows = (
+            queryset.order_by()
+            .prefetch_related(None)
+            .values_list(
+                "pk",
+                "correspondent_id",
+                "document_type_id",
+                "storage_path_id",
+            )
         )
-        document_types = DocumentType.objects.annotate(
-            document_count=Count(
-                "documents",
-                filter=Q(documents__id__in=document_ids),
-                distinct=True,
-            ),
-        )
-        storage_paths = StoragePath.objects.annotate(
-            document_count=Count(
-                "documents",
-                filter=Q(documents__id__in=document_ids),
-                distinct=True,
-            ),
-        )
-        # Tag and CustomField reach Document through an M2M/through-model table;
-        # a plain Count(filter=...) there is a much more expensive plan than the
-        # FK relations above once the bridge table is large -- see
-        # annotate_document_count_by_ids() for why.
-        tags = annotate_document_count_by_ids(
-            Tag.objects.all(),
-            through_model=Document.tags.through,
-            related_object_field="tag_id",
-            document_ids=document_ids,
-        )
-        custom_fields = annotate_document_count_by_ids(
-            CustomField.objects.all(),
-            through_model=CustomFieldInstance,
-            related_object_field="field_id",
-            document_ids=document_ids,
-        )
+        batch_size = self.selection_data_batch_size
+
+        def document_rows():
+            if search_ids is None:
+                yield from rows.iterator()
+            else:
+                for start in range(0, len(search_ids), batch_size):
+                    yield from rows.filter(
+                        pk__in=search_ids[start : start + batch_size],
+                    ).iterator()
+
+        correspondents: Counter[int | None] = Counter()
+        document_types: Counter[int | None] = Counter()
+        storage_paths: Counter[int | None] = Counter()
+        document_ids: set[int] = set()
+        for pk, correspondent, document_type, storage_path in document_rows():
+            # Filters that join multi-valued relations can repeat a document.
+            if pk in document_ids:
+                continue
+            document_ids.add(pk)
+            correspondents[correspondent] += 1
+            document_types[document_type] += 1
+            storage_paths[storage_path] += 1
+
+        tags: Counter[int | None] = Counter()
+        custom_fields: Counter[int | None] = Counter()
+        ids = iter(document_ids)
+        while batch := list(islice(ids, batch_size)):
+            for model, field, counts in (
+                (Document.tags.through, "tag_id", tags),
+                (CustomFieldInstance, "field_id", custom_fields),
+            ):
+                counts.update(
+                    dict(
+                        model.objects.filter(document_id__in=batch)
+                        .order_by()
+                        .values_list(field)
+                        .annotate(document_count=Count("document_id")),
+                    ),
+                )
+
+        def selection(model: type[Model], counts: Counter[int | None]):
+            return [
+                {"id": pk, "document_count": counts[pk]}
+                for pk in model._default_manager.values_list("pk", flat=True)
+            ]
+
         return {
-            "selected_correspondents": [
-                {"id": t.id, "document_count": t.document_count} for t in correspondents
-            ],
-            "selected_tags": [
-                {"id": t.id, "document_count": t.document_count} for t in tags
-            ],
-            "selected_document_types": [
-                {"id": t.id, "document_count": t.document_count} for t in document_types
-            ],
-            "selected_storage_paths": [
-                {"id": t.id, "document_count": t.document_count} for t in storage_paths
-            ],
-            "selected_custom_fields": [
-                {"id": t.id, "document_count": t.document_count} for t in custom_fields
-            ],
+            "selected_correspondents": selection(Correspondent, correspondents),
+            "selected_tags": selection(Tag, tags),
+            "selected_document_types": selection(DocumentType, document_types),
+            "selected_storage_paths": selection(StoragePath, storage_paths),
+            "selected_custom_fields": selection(CustomField, custom_fields),
         }
 
     @classmethod
@@ -2725,13 +2735,10 @@ class UnifiedSearchViewSet(DocumentViewSet):
                 if get_boolean(
                     str(request.query_params.get("include_selection_data", "false")),
                 ):
-                    # NOTE: pk__in=ordered_ids generates a large SQL IN clause
-                    # for big result sets.  Acceptable today but may need a temp
-                    # table or chunked approach if selection_data becomes slow
-                    # at scale (tens of thousands of matching documents).
                     response.data["selection_data"] = (
                         self._get_selection_data_for_queryset(
-                            filtered_qs.filter(pk__in=result.ordered_ids),
+                            filtered_qs,
+                            search_ids=result.ordered_ids,
                         )
                     )
                 return response
