@@ -183,7 +183,7 @@ export class AppFrameComponent
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe(({ status, error }) => {
-        this.documentList.reload()
+        this.documentList.reload(null, false)
         this.documentList.reduceSelectionToFilter()
         // maybe someday we can optimize to only refresh affected documents
         this.openDocumentsService.getOpenDocuments().forEach((doc) => {

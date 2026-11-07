@@ -226,6 +226,7 @@ describe('AppFrameComponent', () => {
       status: PaperlessTaskStatus.Success,
     })
     expect(reload).toHaveBeenCalledTimes(1)
+    expect(reload).toHaveBeenCalledWith(null, false)
     expect(refresh).toHaveBeenCalledWith(document.id)
     expect(maybeRefreshSpy).toHaveBeenCalledTimes(1)
     expect(tasksReload).toHaveBeenCalledTimes(1)
