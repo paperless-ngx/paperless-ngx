@@ -765,7 +765,9 @@ export class SettingsService {
 
   sidebarItemIsHidden(item: HideableSidebarItemID): boolean {
     return (
-      this.sidebarHiddenItemsEditing() ?? this.hiddenSidebarItems()
+      this.sidebarHiddenItemsEditing() ??
+      this.hiddenSidebarItems() ??
+      []
     ).includes(item)
   }
 
@@ -774,7 +776,7 @@ export class SettingsService {
     visible: boolean
   ): void {
     const hiddenItems = new Set(
-      this.sidebarHiddenItemsEditing() ?? this.hiddenSidebarItems()
+      this.sidebarHiddenItemsEditing() ?? this.hiddenSidebarItems() ?? []
     )
     if (visible) {
       hiddenItems.delete(item)

@@ -260,6 +260,18 @@ describe('SettingsService', () => {
     ).toBe(false)
   })
 
+  it('handles null values for sidebar hidden items', () => {
+    httpTestingController
+      .expectOne(`${environment.apiBaseUrl}ui_settings/`)
+      .flush(ui_settings)
+
+    settingsService.set(SETTINGS_KEYS.SIDEBAR_HIDDEN_ITEMS, null)
+
+    expect(
+      settingsService.sidebarItemIsHidden(HideableSidebarItemID.Workflows)
+    ).toBe(false)
+  })
+
   it('updates setting signals when settings are reinitialized', () => {
     let req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}ui_settings/`
