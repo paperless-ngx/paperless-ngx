@@ -69,6 +69,7 @@ from documents.utils import IterWrapper
 from documents.utils import compute_checksum
 from documents.utils import identity
 from documents.versioning import annotate_effective_content
+from documents.versioning import latest_version
 from documents.workflows.utils import get_workflows_for_trigger
 from documents.zone_ocr import run_zone_extraction
 from paperless.config import AIConfig
@@ -391,7 +392,7 @@ def extract_zones(document_id: int, template_id: int | None = None) -> None:
             return
         templates = [template]
 
-    run_zone_extraction(document, templates=templates, reindex=True)
+    run_zone_extraction(latest_version(document), templates=templates, reindex=True)
 
 
 @shared_task

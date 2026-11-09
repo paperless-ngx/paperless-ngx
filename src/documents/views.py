@@ -247,6 +247,7 @@ from documents.versioning import get_latest_version_for_root
 from documents.versioning import get_request_version_param
 from documents.versioning import get_root_document
 from documents.versioning import latest_version_content_prefetch
+from documents.versioning import resolve_effective_document
 from documents.versioning import resolve_requested_version_for_root
 from documents.versioning import versions_newest_first
 from paperless import version
@@ -2261,6 +2262,14 @@ class DocumentViewSet(
 
     @extend_schema(
         operation_id="documents_run_zone_ocr",
+        parameters=[
+            OpenApiParameter(
+                name="version",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.QUERY,
+                description="File version ID. Defaults to the latest version.",
+            ),
+        ],
         request=RunZoneOcrSerializer,
         responses=inline_serializer(
             name="RunZoneOcrResult",
@@ -2308,22 +2317,31 @@ class DocumentViewSet(
         from documents.zone_ocr import get_templates_for_document
         from documents.zone_ocr import run_zone_extraction
 
+        resolution = resolve_effective_document(document, request)
+        if resolution.error == VersionResolutionError.INVALID:
+            raise NotFound("Invalid version parameter")
+        file_document = resolution.document
+        if file_document is None:
+            raise Http404
+
         templates = (
-            [template] if template is not None else get_templates_for_document(document)
+            [template]
+            if template is not None
+            else get_templates_for_document(file_document)
         )
         if not templates:
             return Response(
                 {"status": "skipped", "reason": "no_template", "results": []},
             )
 
-        doc_path = document.archive_path or document.source_path
+        doc_path = file_document.archive_path or file_document.source_path
         if not doc_path or not Path(doc_path).is_file():
             return Response(
                 {"error": "Document file not found"},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        results = run_zone_extraction(document, templates=templates, reindex=True)
+        results = run_zone_extraction(file_document, templates=templates, reindex=True)
         return Response(
             {"status": "completed", "results": [asdict(result) for result in results]},
         )

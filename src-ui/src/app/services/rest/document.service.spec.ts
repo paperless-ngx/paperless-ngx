@@ -572,8 +572,8 @@ describe(`DocumentService`, () => {
     expect(req.request.body).toEqual({})
     req.flush({ status: 'completed', results: [] })
 
-    subscription = service.runZoneOcr(documents[0].id, 3).subscribe()
-    req = httpTestingController.expectOne(url)
+    subscription = service.runZoneOcr(documents[0].id, 3, 10).subscribe()
+    req = httpTestingController.expectOne(`${url}?version=10`)
     expect(req.request.body).toEqual({ template: 3 })
     req.flush({ status: 'completed', results: [] })
   })

@@ -863,8 +863,11 @@ details page:
 - The button next to it opens a dialog where you can choose one template to run
   instead. A template you choose runs even if it does not match the document or is disabled.
 
-The bulk editor's **Run Zone OCR** action opens the same dialog for the selected documents. Bulk runs are
-processed in the background.
+Both actions use the file version selected in document details. The latest version is selected by default.
+Extracted values update the document's metadata, which is shared across its versions.
+
+The bulk editor's **Run Zone OCR** action opens the same dialog for the selected documents. Bulk runs use
+the latest version of each document and are processed in the background.
 
 !!! warning
 

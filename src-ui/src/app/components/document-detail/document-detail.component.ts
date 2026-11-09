@@ -1572,8 +1572,9 @@ export class DocumentDetailComponent
   runZoneOcr() {
     if (this.networkActive()) return
     const documentId = this.documentId()
+    const versionId = this.getSelectedNonLatestVersionId()
     if (!this.hasLocalEdits(this.document())) {
-      this.executeZoneOcr(documentId, null)
+      this.executeZoneOcr(documentId, null, versionId)
       return
     }
     const modal = this.modalService.open(ConfirmDialogComponent, {
@@ -1589,7 +1590,7 @@ export class DocumentDetailComponent
       .subscribe(() => {
         modal.close()
         if (this.documentId() === documentId && !this.networkActive()) {
-          this.executeZoneOcr(documentId, null)
+          this.executeZoneOcr(documentId, null, versionId)
         }
       })
   }
@@ -1598,6 +1599,7 @@ export class DocumentDetailComponent
   runZoneOcrWithOptions() {
     if (this.networkActive()) return
     const documentId = this.documentId()
+    const versionId = this.getSelectedNonLatestVersionId()
     const modal = this.modalService.open(ZoneOcrConfirmDialogComponent, {
       backdrop: 'static',
     })
@@ -1616,16 +1618,20 @@ export class DocumentDetailComponent
       .subscribe(() => {
         modal.close()
         if (this.documentId() === documentId && !this.networkActive()) {
-          this.executeZoneOcr(documentId, dialog.template)
+          this.executeZoneOcr(documentId, dialog.template, versionId)
         }
       })
   }
 
-  private executeZoneOcr(documentId: number, templateId: number | null) {
+  private executeZoneOcr(
+    documentId: number,
+    templateId: number | null,
+    versionId: number | null
+  ) {
     this.zoneOcrRunning.set(true)
     this.networkActive.set(true)
     this.documentsService
-      .runZoneOcr(documentId, templateId)
+      .runZoneOcr(documentId, templateId, versionId)
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe({
         next: (response) => {

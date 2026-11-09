@@ -9,6 +9,7 @@ import pytest
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.db import IntegrityError
+from django.utils import timezone
 from PIL import Image
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -31,8 +32,10 @@ CONTENT = "Northwind Power & Light statement"
 
 @pytest.mark.django_db
 @pytest.mark.parametrize("entry_point", ["ingestion", "single", "bulk"])
+@pytest.mark.parametrize("versioned", [False, True], ids=["original", "versioned"])
 def test_zone_ocr_indexes_extracted_metadata(
     entry_point,
+    versioned,
     admin_client,
     paperless_dirs,
     django_capture_on_commit_callbacks,
@@ -40,11 +43,22 @@ def test_zone_ocr_indexes_extracted_metadata(
 ):
     document = DocumentFactory(
         title="Before OCR",
-        content=CONTENT,
+        content="Previous layout" if versioned else CONTENT,
         mime_type="image/png",
+        page_count=2 if versioned else 1,
     )
+    file_document = document
+    if versioned:
+        file_document = DocumentFactory(
+            root_document=document,
+            version_index=1,
+            title="Uploaded version",
+            content=CONTENT,
+            mime_type="image/png",
+            page_count=1,
+        )
     with Image.new("RGB", (100, 100), "white") as image:
-        image.save(document.source_path, format="PNG")
+        image.save(file_document.source_path, format="PNG")
     template = OcrTemplate.objects.create(
         name="Invoice template",
         match="Northwind",
@@ -57,6 +71,7 @@ def test_zone_ocr_indexes_extracted_metadata(
         template=template,
         name="Title",
         target="title",
+        page=-1,
         x=0,
         y=0,
         width=50,
@@ -66,6 +81,7 @@ def test_zone_ocr_indexes_extracted_metadata(
         template=template,
         name="Invoice code",
         custom_field=field,
+        page=-1,
         x=0,
         y=50,
         width=50,
@@ -84,7 +100,7 @@ def test_zone_ocr_indexes_extracted_metadata(
 
     with django_capture_on_commit_callbacks(execute=True):
         if entry_point == "ingestion":
-            document_consumption_finished.send(sender=None, document=document)
+            document_consumption_finished.send(sender=None, document=file_document)
         elif entry_point == "single":
             response = admin_client.post(f"/api/documents/{document.pk}/run-zone-ocr/")
             assert response.status_code == status.HTTP_200_OK
@@ -93,6 +109,10 @@ def test_zone_ocr_indexes_extracted_metadata(
 
     document.refresh_from_db()
     assert document.title == "After OCR"
+    if versioned:
+        file_document.refresh_from_db()
+        assert file_document.title == "Uploaded version"
+        assert not file_document.custom_fields.exists()
     assert backend.search_ids("title:before", user=None) == []
     assert backend.search_ids("title:after", user=None) == [document.pk]
     assert backend.search_ids("custom_fields.value:INV42", user=None) == [document.pk]
@@ -861,6 +881,54 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.json()["status"], "completed")
         extract.assert_called_once_with(document, templates=[template], reindex=True)
+
+    @patch("documents.zone_ocr.run_zone_extraction", return_value=[])
+    def test_run_zone_ocr_matches_the_requested_file_version(self, extract):
+        document = DocumentFactory(content=CONTENT)
+        older = DocumentFactory(
+            root_document=document,
+            version_index=1,
+            content=CONTENT,
+        )
+        DocumentFactory(root_document=document, version_index=2, content="Contoso")
+        template = OcrTemplate.objects.create(
+            name="Northwind",
+            match="Northwind",
+            source_width=100,
+            source_height=100,
+        )
+        url = f"/api/documents/{document.pk}/run-zone-ocr/"
+
+        for file_document in (document, older):
+            with self.subTest(version=file_document.pk):
+                file_document.source_path.write_bytes(b"test PDF")
+                response = self.client.post(f"{url}?version={file_document.pk}")
+                self.assertEqual(response.status_code, status.HTTP_200_OK)
+                self.assertEqual(response.json()["status"], "completed")
+                extract.assert_called_once_with(
+                    file_document,
+                    templates=[template],
+                    reindex=True,
+                )
+                extract.reset_mock()
+
+    @patch("documents.zone_ocr.run_zone_extraction")
+    def test_run_zone_ocr_rejects_invalid_or_unavailable_versions(self, extract):
+        document = DocumentFactory()
+        unrelated = DocumentFactory()
+        deleted = DocumentFactory(
+            root_document=document,
+            version_index=1,
+            deleted_at=timezone.now(),
+        )
+
+        for version in ("invalid", unrelated.pk, deleted.pk):
+            with self.subTest(version=version):
+                response = self.client.post(
+                    f"/api/documents/{document.pk}/run-zone-ocr/?version={version}",
+                )
+                self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        extract.assert_not_called()
 
     @patch("documents.zone_ocr.run_zone_extraction")
     def test_run_zone_ocr_rejects_a_template_the_user_cannot_view(self, extract):

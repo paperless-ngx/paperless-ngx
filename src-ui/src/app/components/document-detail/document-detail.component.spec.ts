@@ -1909,9 +1909,10 @@ describe('DocumentDetailComponent', () => {
     expect(toastSpy).toHaveBeenCalledWith('Document reloaded.')
   })
 
-  it('should run zone OCR, report results and reload the document', () => {
+  it('should run a chosen zone OCR template on the selected version and reload', () => {
     component.documentId.set(doc.id)
-    component.document.set(doc)
+    component.document.set({ ...doc, versions: docVersions })
+    component.selectedVersionId.set(10)
     jest.spyOn(documentService, 'runZoneOcr').mockReturnValue(
       of({
         results: [
@@ -1935,7 +1936,7 @@ describe('DocumentDetailComponent', () => {
     dialog.template = 3
     dialog.confirmClicked.emit()
 
-    expect(documentService.runZoneOcr).toHaveBeenCalledWith(doc.id, 3)
+    expect(documentService.runZoneOcr).toHaveBeenCalledWith(doc.id, 3, 10)
     expect(toastSpy).toHaveBeenCalledWith(
       'Filled 1 of 2 fields. No value found for: Due'
     )
@@ -1949,7 +1950,8 @@ describe('DocumentDetailComponent', () => {
 
   it('should summarize zone OCR results', () => {
     component.documentId.set(doc.id)
-    component.document.set(doc)
+    component.document.set({ ...doc, versions: docVersions })
+    component.selectedVersionId.set(12)
     jest.spyOn(component as any, 'loadDocument').mockImplementation(() => {})
     const runSpy = jest.spyOn(documentService, 'runZoneOcr')
     const toastSpy = jest.spyOn(toastService, 'showInfo')
@@ -1958,7 +1960,7 @@ describe('DocumentDetailComponent', () => {
     runSpy.mockReturnValueOnce(of({ status: 'completed', results: [] }))
     component.runZoneOcr()
     expect(modalSpy).not.toHaveBeenCalled()
-    expect(runSpy).toHaveBeenCalledWith(doc.id, null)
+    expect(runSpy).toHaveBeenCalledWith(doc.id, null, null)
     expect(toastSpy).toHaveBeenLastCalledWith(
       'Zone OCR found no fields to fill.'
     )
@@ -2016,7 +2018,12 @@ describe('DocumentDetailComponent', () => {
 
   it('should not allow saving or a second zone OCR run while one is running', () => {
     component.documentId.set(doc.id)
-    component.document.set({ ...doc, __changedFields: ['title'] })
+    component.document.set({
+      ...doc,
+      versions: docVersions,
+      __changedFields: ['title'],
+    })
+    component.selectedVersionId.set(doc.id)
     const pending = new Subject<any>()
     const runSpy = jest
       .spyOn(documentService, 'runZoneOcr')
@@ -2026,7 +2033,7 @@ describe('DocumentDetailComponent', () => {
     component.runZoneOcr()
     modalSpy.mock.results[0].value.componentInstance.confirmClicked.emit()
 
-    expect(runSpy).toHaveBeenCalledWith(doc.id, null)
+    expect(runSpy).toHaveBeenCalledWith(doc.id, null, doc.id)
     expect(component.zoneOcrRunning()).toBe(true)
     expect(component.networkActive()).toBe(true)
     const saveSpy = jest.spyOn(documentService, 'patch')

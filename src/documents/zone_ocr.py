@@ -20,6 +20,7 @@ import zxingcpp
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import transaction
+from django.db.models import F
 from PIL import Image
 
 from documents.matching import matches
@@ -74,9 +75,8 @@ def _zone_result(
 
 def get_templates_for_document(document: Document) -> list[OcrTemplate]:
     """
-    The enabled templates that match the document's content and that its owner
-    can view, the same rule as matching. A version is owned through its root
-    document.
+    The enabled templates that match the selected file's content and that the
+    root document's owner can view.
     """
     owner = get_root_document(document).owner
     templates = (
@@ -87,6 +87,15 @@ def get_templates_for_document(document: Document) -> list[OcrTemplate]:
         .order_by("name", "pk")
         .prefetch_related("zones", "zones__custom_field")
     )
+    if document.root_document_id is None and templates:
+        # The original file can be selected even when newer versions exist.
+        document = (
+            Document.objects.filter(pk=document.pk)
+            .annotate(effective_content=F("content"))
+            .first()
+        )
+        if document is None:
+            return []
     return [template for template in templates if matches(template, document)]
 
 
@@ -98,8 +107,8 @@ def run_zone_extraction(
     reindex: bool = False,
 ) -> list[ZoneOcrResult]:
     """
-    Run zone-based OCR extraction for the given templates, or for every
-    template that matches the document when none are given.
+    Extract zones from the selected file version and update its root document.
+    Run all matching templates when no templates are given.
 
     Manual runs can request a search refresh after successful writes commit.
     """
@@ -150,7 +159,8 @@ def run_zone_extraction(
                 )
     if reindex and any(result.reason is None for result in results):
         # queue a reindex of the document after the transaction commits
-        transaction.on_commit(partial(_reindex_document, document.pk))
+        root_document = get_root_document(document)
+        transaction.on_commit(partial(_reindex_document, root_document.pk))
     return results
 
 
@@ -244,7 +254,7 @@ def _process_template(
                 result.reason = (
                     "unassigned" if key == "custom_field" else "invalid_value"
                 )
-    _apply_field_updates(document, updates)
+    _apply_field_updates(get_root_document(document), updates)
     return results
 
 

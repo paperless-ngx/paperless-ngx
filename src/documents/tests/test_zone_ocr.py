@@ -637,6 +637,16 @@ class TestTemplateVisibility(DirectoriesMixin, TestCase):
             [self.mine, self.unowned],
         )
 
+    def test_matching_uses_the_selected_files_content(self):
+        version = DocumentFactory(root_document=self.document, content="Contoso")
+        contoso = self.template("Contoso", match="Contoso")
+
+        self.assertCountEqual(
+            get_templates_for_document(self.document),
+            [self.mine, self.unowned],
+        )
+        self.assertEqual(get_templates_for_document(version), [contoso])
+
     def test_superuser_owner_can_use_all_visible_templates(self):
         self.owner.is_superuser = True
         self.assertCountEqual(
