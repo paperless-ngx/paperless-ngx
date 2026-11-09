@@ -334,7 +334,7 @@ def _render_pages(
             logger.error("Zone OCR: pdftoppm timed out for page %d", actual_page)
             continue
         except subprocess.CalledProcessError as e:
-            logger.error(
+            logger.exception(
                 "Zone OCR: pdftoppm failed for page %d: %s",
                 actual_page,
                 e.stderr.decode(errors="replace") if e.stderr else str(e),
@@ -424,7 +424,7 @@ def _ocr_text(cropped: Image.Image, zone: OcrTemplateZone, tmp_dir: Path) -> str
         logger.error("Zone OCR: Tesseract timed out for zone '%s'", zone.name)
         return None
     except subprocess.CalledProcessError as e:
-        logger.error(
+        logger.exception(
             "Zone OCR: Tesseract failed for zone '%s': %s",
             zone.name,
             e.stderr[:200] if e.stderr else str(e),
