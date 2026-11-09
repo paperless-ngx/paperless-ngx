@@ -2,6 +2,7 @@
 
 import json
 import subprocess
+from io import BytesIO
 from pathlib import Path
 from unittest.mock import patch
 
@@ -1383,6 +1384,26 @@ class TestOcrTemplatePreviewAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(response["Content-Type"], "image/png")
         self.assertEqual(response.content, b"image contents")
         render.assert_not_called()
+
+    def test_renders_pdf_archive_for_an_image_upload(self):
+        document = DocumentFactory(
+            owner=self.user,
+            mime_type="image/png",
+            archive_filename="archived-image.pdf",
+            page_count=1,
+        )
+        with Image.new("RGB", (100, 100), "white") as image:
+            image.save(document.source_path, format="PNG")
+            image.save(document.archive_path, format="PDF")
+
+        response = self.client.get(self.preview_url(document))
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response["Content-Type"], "image/png")
+        self.assertNotEqual(response.content, document.source_path.read_bytes())
+        with Image.open(BytesIO(response.content)) as rendered:
+            self.assertEqual(rendered.format, "PNG")
+            rendered.verify()
 
     @patch("documents.views.subprocess.run")
     def test_renders_the_requested_pdf_page(self, render):

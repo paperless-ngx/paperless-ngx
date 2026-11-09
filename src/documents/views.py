@@ -5892,13 +5892,13 @@ class OcrTemplateViewSet(BulkPermissionMixin, PassUserMixin, ModelViewSet[OcrTem
                 f"Page {page_num} out of range (document has {document.page_count} pages)",
             )
 
-        doc_path = document.archive_path or document.source_path
-        if not doc_path or not Path(doc_path).is_file():
+        archive_path = document.archive_path
+        doc_path = archive_path or document.source_path
+        if not doc_path.is_file():
             raise Http404("Document file not found")
 
-        if document.mime_type and document.mime_type.startswith("image/"):
-            content = Path(doc_path).read_bytes()
-            return HttpResponse(content, content_type=document.mime_type)
+        if archive_path is None and document.mime_type.startswith("image/"):
+            return HttpResponse(doc_path.read_bytes(), content_type=document.mime_type)
 
         with tempfile.TemporaryDirectory(dir=settings.SCRATCH_DIR) as tmp_dir:
             output_prefix = Path(tmp_dir) / "page"
