@@ -5847,6 +5847,12 @@ class OcrTemplateViewSet(BulkPermissionMixin, PassUserMixin, ModelViewSet[OcrTem
     )
     ordering_fields = ("name",)
 
+    def get_permissions(self):
+        permissions = super().get_permissions()
+        if self.action in {"document_page_image", "test_zone"}:
+            permissions.append(ViewDocumentsPermissions())
+        return permissions
+
     @action(
         detail=False,
         methods=["get"],

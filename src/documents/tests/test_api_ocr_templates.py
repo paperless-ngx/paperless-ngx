@@ -829,7 +829,7 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
     def test_document_page_image_requires_view_permission_on_the_document(self):
         owner = User.objects.create_user(username="owner")
         user = User.objects.create_user(username="template_editor")
-        user.user_permissions.add(Permission.objects.get(codename="view_ocrtemplate"))
+        grant_global(user, "view_ocrtemplate", "view_document")
         document = DocumentFactory(owner=owner)
         self.client.force_authenticate(user=user)
         url = f"{self.ENDPOINT}document-page-image/{document.pk}/0/"
@@ -846,7 +846,7 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
     def test_test_zone_requires_view_permission_on_the_document(self, preview):
         owner = User.objects.create_user(username="owner")
         user = User.objects.create_user(username="template_editor")
-        user.user_permissions.add(Permission.objects.get(codename="add_ocrtemplate"))
+        grant_global(user, "add_ocrtemplate", "view_document")
         document = DocumentFactory(owner=owner)
         self.client.force_authenticate(user=user)
         data = {
@@ -1184,7 +1184,7 @@ class TestOcrTemplatePreviewAPI(DirectoriesMixin, APITestCase):
     def setUp(self):
         super().setUp()
         self.user = User.objects.create_user(username="template_editor")
-        grant_global(self.user, "view_ocrtemplate", "add_ocrtemplate")
+        grant_global(self.user, "view_ocrtemplate", "add_ocrtemplate", "view_document")
         self.client.force_authenticate(self.user)
         self.document = DocumentFactory(
             owner=self.user,
@@ -1206,6 +1206,27 @@ class TestOcrTemplatePreviewAPI(DirectoriesMixin, APITestCase):
             },
             format="json",
         )
+
+    @patch("documents.zone_ocr.extract_zone_preview")
+    def test_previews_require_global_document_view_permission(self, extract):
+        user = User.objects.create_user(username="template_only")
+        grant_global(user, "view_ocrtemplate", "add_ocrtemplate")
+        self.client.force_authenticate(user)
+        document = DocumentFactory(owner=None, mime_type="image/png")
+        document.source_path.write_bytes(b"document contents")
+        extract.return_value = {"raw_text": "document contents", "value": None}
+
+        with self.subTest(action="document-page-image"):
+            response = self.client.get(self.preview_url(document))
+            self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        with self.subTest(action="test-zone"):
+            response = self.client.post(
+                "/api/ocr_templates/test-zone/",
+                {"document": document.pk, "zone": {"width": 100, "height": 50}},
+                format="json",
+            )
+            self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        extract.assert_not_called()
 
     def test_missing_document_and_out_of_range_pages(self):
         response = self.client.get("/api/ocr_templates/document-page-image/99999/0/")
