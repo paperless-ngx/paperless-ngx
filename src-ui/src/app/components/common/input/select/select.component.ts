@@ -4,6 +4,7 @@ import {
   forwardRef,
   Input,
   Output,
+  ViewChild,
 } from '@angular/core'
 import {
   FormsModule,
@@ -11,7 +12,7 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms'
 import { RouterModule } from '@angular/router'
-import { NgSelectModule } from '@ng-select/ng-select'
+import { NgSelectComponent, NgSelectModule } from '@ng-select/ng-select'
 import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { matchesSearchText } from 'src/app/utils/text-search'
 import { AbstractInputComponent } from '../abstract-input'
@@ -124,6 +125,9 @@ export class SelectComponent extends AbstractInputComponent<number | string> {
   @Output()
   filterDocuments = new EventEmitter<any[]>()
 
+  @ViewChild(NgSelectComponent)
+  ngSelectComponent: NgSelectComponent
+
   public addItemRef: (name) => void
 
   private _lastSearchTerm: string
@@ -150,11 +154,13 @@ export class SelectComponent extends AbstractInputComponent<number | string> {
     if (name) this.createNew.next(name)
     else this.createNew.next(this._lastSearchTerm)
     this.clearLastSearchTerm()
+    this.ngSelectComponent?.close()
   }
 
   clickNew() {
     this.createNew.next(this._lastSearchTerm)
     this.clearLastSearchTerm()
+    this.ngSelectComponent?.close()
   }
 
   clearLastSearchTerm() {

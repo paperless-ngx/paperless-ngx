@@ -6,6 +6,7 @@ from guardian.shortcuts import remove_perm
 from documents.data_models import DocumentMetadataOverrides
 from documents.models import CustomFieldInstance
 from documents.models import Document
+from documents.models import Tag
 from documents.models import WorkflowAction
 from documents.permissions import PermissionsSpec
 from documents.permissions import set_permissions_for_objects
@@ -134,10 +135,9 @@ def apply_assignment_to_overrides(
     if action.has_assign_tags:
         if overrides.tag_ids is None:
             overrides.tag_ids = []
-        tag_ids_to_add: set[int] = set()
-        for tag in action.assign_tags.all():
-            tag_ids_to_add.add(tag.pk)
-            tag_ids_to_add.update(int(pk) for pk in tag.get_ancestors_pks())
+        tag_ids_to_add = Tag.get_hierarchy().with_ancestors(
+            tag.pk for tag in action.assign_tags.all()
+        )
 
         overrides.tag_ids = list(set(overrides.tag_ids) | tag_ids_to_add)
 
@@ -216,10 +216,9 @@ def apply_removal_to_document(
     if action.remove_all_tags:
         Document.objects.get(pk=document.pk).tags.clear()
     else:
-        tag_ids_to_remove: set[int] = set()
-        for tag in action.remove_tags.all():
-            tag_ids_to_remove.add(tag.pk)
-            tag_ids_to_remove.update(int(pk) for pk in tag.get_descendants_pks())
+        tag_ids_to_remove = Tag.get_hierarchy().with_descendants(
+            tag.pk for tag in action.remove_tags.all()
+        )
 
         if tag_ids_to_remove:
             Document.objects.get(pk=document.pk).tags.remove(*tag_ids_to_remove)
@@ -297,10 +296,9 @@ def apply_removal_to_overrides(
     if action.remove_all_tags:
         overrides.tag_ids = None
     elif overrides.tag_ids:
-        tag_ids_to_remove: set[int] = set()
-        for tag in action.remove_tags.all():
-            tag_ids_to_remove.add(tag.pk)
-            tag_ids_to_remove.update(int(pk) for pk in tag.get_descendants_pks())
+        tag_ids_to_remove = Tag.get_hierarchy().with_descendants(
+            tag.pk for tag in action.remove_tags.all()
+        )
 
         overrides.tag_ids = [t for t in overrides.tag_ids if t not in tag_ids_to_remove]
 
