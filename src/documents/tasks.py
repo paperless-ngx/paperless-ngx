@@ -4,6 +4,7 @@ import shutil
 import uuid
 import zipfile
 from collections.abc import Callable
+from importlib import import_module
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from tempfile import mkstemp
@@ -925,3 +926,19 @@ def cleanup_expired_share_link_bundles() -> None:
             )
     if count:
         logger.info("Deleted %s expired share link bundle(s)", count)
+
+
+@shared_task
+def clear_expired_sessions() -> None:
+    """
+    Removes expired sessions from the session store. Django does not prune these automatically.
+    """
+    engine = import_module(settings.SESSION_ENGINE)
+    try:
+        engine.SessionStore.clear_expired()
+        logger.info("Cleared expired sessions")
+    except NotImplementedError:
+        logger.warning(
+            "Session engine '%s' does not support clearing expired sessions",
+            settings.SESSION_ENGINE,
+        )

@@ -612,3 +612,57 @@ class TestApplyAISuggestionsTask(DirectoriesMixin, TestCase):
 
         apply_suggestions.assert_not_called()
         self.assertIn("no longer exists", "".join(cm.output))
+
+
+@pytest.mark.django_db
+class TestClearExpiredSessions:
+    def test_clears_only_expired_sessions(self) -> None:
+        """
+        GIVEN:
+            - One expired and one still-valid session in the session store
+        WHEN:
+            - The clear_expired_sessions task runs
+        THEN:
+            - Only the expired session is removed
+        """
+        from django.contrib.sessions.models import Session
+
+        now = timezone.now()
+        Session.objects.create(
+            session_key="expired",
+            session_data="",
+            expire_date=now - timedelta(days=1),
+        )
+        Session.objects.create(
+            session_key="valid",
+            session_data="",
+            expire_date=now + timedelta(days=1),
+        )
+
+        tasks.clear_expired_sessions()
+
+        assert set(Session.objects.values_list("session_key", flat=True)) == {"valid"}
+
+    def test_unsupported_engine_logs_warning(
+        self,
+        caplog: pytest.LogCaptureFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A session engine that does not support clearing expired sessions
+        WHEN:
+            - The clear_expired_sessions task runs
+        THEN:
+            - The error is swallowed and a warning is logged
+        """
+        fake_engine = mock.Mock()
+        fake_engine.SessionStore.clear_expired.side_effect = NotImplementedError
+
+        with (
+            mock.patch("documents.tasks.import_module", return_value=fake_engine),
+            override_settings(SESSION_ENGINE="some.unsupported.engine"),
+            caplog.at_level("WARNING", logger="paperless.tasks"),
+        ):
+            tasks.clear_expired_sessions()
+
+        assert "does not support clearing expired sessions" in caplog.text

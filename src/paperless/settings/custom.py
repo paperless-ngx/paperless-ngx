@@ -165,6 +165,17 @@ def parse_beat_schedule() -> dict:
                 "expires": 23.0 * 60.0 * 60.0,
             },
         },
+        {
+            "name": "Clear expired sessions",
+            "env_key": "PAPERLESS_SESSION_CLEANUP_TASK_CRON",
+            # Default daily at 03:00
+            "env_default": "0 3 * * *",
+            "task": "documents.tasks.clear_expired_sessions",
+            "options": {
+                # 1 hour before default schedule sends again
+                "expires": 23.0 * 60.0 * 60.0,
+            },
+        },
     ]
     for task in tasks:
         # Either get the environment setting or use the default

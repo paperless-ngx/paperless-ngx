@@ -1871,6 +1871,14 @@ processing. This only has an effect if
 
     Defaults to `0 1 * * *`, once per day.
 
+#### [`PAPERLESS_SESSION_CLEANUP_TASK_CRON=<cron expression>`](#PAPERLESS_SESSION_CLEANUP_TASK_CRON) {#PAPERLESS_SESSION_CLEANUP_TASK_CRON}
+
+: Configures the schedule to remove expired sessions from the session store.
+Django does not prune these automatically, so without this they would
+accumulate indefinitely.
+
+    Defaults to `0 3 * * *`, once per day at 03:00.
+
 ## Share links
 
 #### [`PAPERLESS_SHARE_LINK_BUNDLE_CLEANUP_CRON=<cron expression>`](#PAPERLESS_SHARE_LINK_BUNDLE_CLEANUP_CRON) {#PAPERLESS_SHARE_LINK_BUNDLE_CLEANUP_CRON}
