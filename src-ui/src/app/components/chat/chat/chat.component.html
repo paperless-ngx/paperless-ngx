@@ -46,7 +46,7 @@
                 <div class="d-flex align-items-center text-muted mb-1">
                   <span i18n>Sources</span>
                   @if (hiddenReferenceCount(message) > 0 && !expandedReferences().has(message)) {
-                    <button type="button" class="btn btn-link btn-sm p-0 ms-auto text-muted text-decoration-none" (click)="expandReferences(message)" i18n>Show {{ hiddenReferenceCount(message) }} more</button>
+                    <button type="button" class="badge rounded-pill bg-body-secondary text-body-secondary fw-normal border-0 ms-2" (click)="expandReferences(message)" i18n>+{{ hiddenReferenceCount(message) }} more</button>
                   }
                 </div>
                 @for (reference of visibleReferences(message); track reference.id) {
