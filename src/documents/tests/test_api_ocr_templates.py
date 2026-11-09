@@ -5,6 +5,7 @@ import subprocess
 from pathlib import Path
 from unittest.mock import patch
 
+import pytest
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.db import IntegrityError
@@ -17,12 +18,84 @@ from documents.models import CustomFieldInstance
 from documents.models import MatchingModel
 from documents.models import OcrTemplate
 from documents.models import OcrTemplateZone
+from documents.search import get_backend
+from documents.signals import document_consumption_finished
+from documents.tasks import extract_zones
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import DocumentFactory
 from paperless_testing.permissions import grant_global
 from paperless_testing.permissions import grant_object
 
 CONTENT = "Northwind Power & Light statement"
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("entry_point", ["ingestion", "single", "bulk"])
+def test_zone_ocr_indexes_extracted_metadata(
+    entry_point,
+    admin_client,
+    paperless_dirs,
+    django_capture_on_commit_callbacks,
+    mocker,
+):
+    document = DocumentFactory(
+        title="Before OCR",
+        content=CONTENT,
+        mime_type="image/png",
+    )
+    with Image.new("RGB", (100, 100), "white") as image:
+        image.save(document.source_path, format="PNG")
+    template = OcrTemplate.objects.create(
+        name="Invoice template",
+        match="Northwind",
+        matching_algorithm=MatchingModel.MATCH_ANY,
+        source_width=100,
+        source_height=100,
+    )
+    field = CustomField.objects.create(name="Invoice code", data_type="string")
+    OcrTemplateZone.objects.create(
+        template=template,
+        name="Title",
+        target="title",
+        x=0,
+        y=0,
+        width=50,
+        height=50,
+    )
+    OcrTemplateZone.objects.create(
+        template=template,
+        name="Invoice code",
+        custom_field=field,
+        x=0,
+        y=50,
+        width=50,
+        height=50,
+        order=1,
+    )
+    mocker.patch(
+        "documents.zone_ocr.subprocess.run",
+        side_effect=[mocker.Mock(stdout="After OCR"), mocker.Mock(stdout="INV42")],
+    )
+
+    backend = get_backend()
+    if entry_point != "ingestion":
+        backend.add_or_update(document)
+        assert backend.search_ids("title:before", user=None) == [document.pk]
+
+    with django_capture_on_commit_callbacks(execute=True):
+        if entry_point == "ingestion":
+            document_consumption_finished.send(sender=None, document=document)
+        elif entry_point == "single":
+            response = admin_client.post(f"/api/documents/{document.pk}/run-zone-ocr/")
+            assert response.status_code == status.HTTP_200_OK
+        else:
+            extract_zones(document.pk, template.pk)
+
+    document.refresh_from_db()
+    assert document.title == "After OCR"
+    assert backend.search_ids("title:before", user=None) == []
+    assert backend.search_ids("title:after", user=None) == [document.pk]
+    assert backend.search_ids("custom_fields.value:INV42", user=None) == [document.pk]
 
 
 class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
@@ -787,7 +860,7 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.json()["status"], "completed")
-        extract.assert_called_once_with(document, None, templates=[template])
+        extract.assert_called_once_with(document, templates=[template], reindex=True)
 
     @patch("documents.zone_ocr.run_zone_extraction")
     def test_run_zone_ocr_rejects_a_template_the_user_cannot_view(self, extract):

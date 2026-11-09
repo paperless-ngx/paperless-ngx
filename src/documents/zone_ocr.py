@@ -11,6 +11,7 @@ from datetime import date
 from datetime import datetime
 from decimal import Decimal
 from decimal import InvalidOperation
+from functools import partial
 from pathlib import Path
 
 import dateparser
@@ -29,6 +30,7 @@ from documents.models import OcrTemplate
 from documents.models import OcrTemplateZone
 from documents.permissions import permitted_object_ids
 from documents.regex import safe_regex_fullmatch
+from documents.signals.handlers import add_to_index
 from documents.versioning import get_root_document
 
 logger = logging.getLogger("paperless.zone_ocr")
@@ -90,12 +92,16 @@ def get_templates_for_document(document: Document) -> list[OcrTemplate]:
 
 def run_zone_extraction(
     document: Document,
-    original_file: Path | None,
+    original_file: Path | None = None,
     templates: list[OcrTemplate] | None = None,
+    *,
+    reindex: bool = False,
 ) -> list[ZoneOcrResult]:
     """
     Run zone-based OCR extraction for the given templates, or for every
     template that matches the document when none are given.
+
+    Manual runs can request a search refresh after successful writes commit.
     """
     if templates is None:
         templates = get_templates_for_document(document)
@@ -142,7 +148,16 @@ def run_zone_extraction(
                     _zone_result(template, zone, reason="template_failed")
                     for zone in zones
                 )
+    if reindex and any(result.reason is None for result in results):
+        # queue a reindex of the document after the transaction commits
+        transaction.on_commit(partial(_reindex_document, document.pk))
     return results
+
+
+def _reindex_document(document_id: int) -> None:
+    document = Document.objects.filter(pk=document_id).first()
+    if document is not None:
+        add_to_index(sender=None, document=document)
 
 
 def _resolve_doc_path(

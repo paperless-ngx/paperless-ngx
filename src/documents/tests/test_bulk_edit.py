@@ -1941,7 +1941,7 @@ class TestBulkEditRunZoneOcr:
 
         extract_zones(doc.id)
 
-        extract.assert_called_once_with(doc, None)
+        extract.assert_called_once_with(doc, templates=None, reindex=True)
 
     def test_task_runs_the_chosen_template(self, mocker: MockerFixture) -> None:
         """
@@ -1962,7 +1962,7 @@ class TestBulkEditRunZoneOcr:
 
         extract_zones(doc.id, template.pk)
 
-        extract.assert_called_once_with(doc, None, templates=[template])
+        extract.assert_called_once_with(doc, templates=[template], reindex=True)
 
     def test_task_skips_a_deleted_template(self, mocker: MockerFixture) -> None:
         """

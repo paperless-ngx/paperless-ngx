@@ -2306,6 +2306,7 @@ class DocumentViewSet(
             return HttpResponseForbidden("Insufficient permissions")
 
         from documents.zone_ocr import get_templates_for_document
+        from documents.zone_ocr import run_zone_extraction
 
         templates = (
             [template] if template is not None else get_templates_for_document(document)
@@ -2322,9 +2323,7 @@ class DocumentViewSet(
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        from documents.zone_ocr import run_zone_extraction
-
-        results = run_zone_extraction(document, None, templates=templates)
+        results = run_zone_extraction(document, templates=templates, reindex=True)
         return Response(
             {"status": "completed", "results": [asdict(result) for result in results]},
         )

@@ -376,22 +376,22 @@ def extract_zones(document_id: int, template_id: int | None = None) -> None:
     matches it when no template is given.
     """
     document = Document.objects.get(id=document_id)
-    if template_id is None:
-        run_zone_extraction(document, None)
-        return
+    templates = None
+    if template_id is not None:
+        try:
+            template = OcrTemplate.objects.prefetch_related(
+                "zones",
+                "zones__custom_field",
+            ).get(id=template_id)
+        except OcrTemplate.DoesNotExist:
+            logger.warning(
+                "OCR template %s no longer exists, not running zone OCR",
+                template_id,
+            )
+            return
+        templates = [template]
 
-    try:
-        template = OcrTemplate.objects.prefetch_related(
-            "zones",
-            "zones__custom_field",
-        ).get(id=template_id)
-    except OcrTemplate.DoesNotExist:
-        logger.warning(
-            "OCR template %s no longer exists, not running zone OCR",
-            template_id,
-        )
-        return
-    run_zone_extraction(document, None, templates=[template])
+    run_zone_extraction(document, templates=templates, reindex=True)
 
 
 @shared_task
