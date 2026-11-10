@@ -5,8 +5,11 @@ from unittest import mock
 
 import pytest
 from django.conf import settings
+from django.contrib.sessions.models import Session
+from django.db import connection
 from django.test import TestCase
 from django.test import override_settings
+from django.test.utils import CaptureQueriesContext
 from django.utils import timezone
 
 from documents import tasks
@@ -612,3 +615,36 @@ class TestApplyAISuggestionsTask(DirectoriesMixin, TestCase):
 
         apply_suggestions.assert_not_called()
         self.assertIn("no longer exists", "".join(cm.output))
+
+
+@pytest.mark.django_db
+class TestClearExpiredSessions:
+    def test_clears_only_expired_sessions_in_batches(self) -> None:
+        """
+        GIVEN:
+            - More than one batch of expired sessions and one still-valid session
+        WHEN:
+            - The clear_expired_sessions task runs
+        THEN:
+            - Only expired sessions are removed, using multiple deletes
+        """
+        now = timezone.now()
+        Session.objects.bulk_create(
+            Session(
+                session_key=f"expired-{i}",
+                session_data="",
+                expire_date=now - timedelta(days=1),
+            )
+            for i in range(501)
+        )
+        Session.objects.create(
+            session_key="valid",
+            session_data="",
+            expire_date=now + timedelta(days=1),
+        )
+
+        with CaptureQueriesContext(connection) as queries:
+            tasks.clear_expired_sessions()
+
+        assert set(Session.objects.values_list("session_key", flat=True)) == {"valid"}
+        assert sum(query["sql"].startswith("DELETE FROM") for query in queries) == 2

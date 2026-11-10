@@ -873,6 +873,14 @@ If both the [PAPERLESS_ACCOUNT_DEFAULT_GROUPS](#PAPERLESS_ACCOUNT_DEFAULT_GROUPS
 
     Defaults to 1209600 (2 weeks)
 
+#### [`PAPERLESS_SESSION_CLEANUP_TASK_CRON=<cron expression>`](#PAPERLESS_SESSION_CLEANUP_TASK_CRON) {#PAPERLESS_SESSION_CLEANUP_TASK_CRON}
+
+: Configures the schedule to remove expired sessions from the session store.
+Django does not prune these automatically, so without this they would
+accumulate indefinitely.
+
+    Defaults to `0 3 * * *`, once per day at 03:00.
+
 #### [`PAPERLESS_TOKEN_THROTTLE_RATE=<rate>`](#PAPERLESS_TOKEN_THROTTLE_RATE) {#PAPERLESS_TOKEN_THROTTLE_RATE}
 
 : Rate limit for the API token authentication endpoint (`/api/token/`), used to mitigate brute-force login attempts.
