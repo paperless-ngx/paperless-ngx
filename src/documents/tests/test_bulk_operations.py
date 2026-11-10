@@ -211,7 +211,7 @@ def test_tracked_outcome_notifies_only_initiator(
     task_id = str(uuid.uuid4())
     before_task_publish_handler(
         headers={
-            "task": "documents.bulk_operations.execute_bulk_operation",
+            "task": execute_bulk_operation.name,
             "id": task_id,
         },
         body=(
@@ -229,14 +229,20 @@ def test_tracked_outcome_notifies_only_initiator(
     assert task.task_type == PaperlessTask.TaskType.BULK_UPDATE
     with mock.patch("documents.signals.handlers.async_to_sync") as send:
         if outcome == "expired":
-            task_revoked_handler(request=mock.Mock(id=task_id), expired=True)
+            task_revoked_handler(
+                sender=execute_bulk_operation,
+                request=mock.Mock(id=task_id),
+                expired=True,
+            )
         elif outcome == "failure":
             task_failure_handler(
+                sender=execute_bulk_operation,
                 task_id=task_id,
                 exception=ValueError("Could not update"),
             )
         else:
             task_postrun_handler(
+                task=execute_bulk_operation,
                 task_id=task_id,
                 state="SUCCESS",
                 retval={"document_count": 1},

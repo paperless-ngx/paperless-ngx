@@ -1053,6 +1053,8 @@ def run_workflows(
 # Task tracking -- Celery signal handlers
 # ---------------------------------------------------------------------------
 
+BULK_OPERATION_TASK_NAME = "documents.bulk_operations.execute_bulk_operation"
+
 TRACKED_TASKS: dict[str, PaperlessTask.TaskType] = {
     "documents.tasks.consume_file": PaperlessTask.TaskType.CONSUME_FILE,
     "documents.tasks.train_classifier": PaperlessTask.TaskType.TRAIN_CLASSIFIER,
@@ -1066,7 +1068,7 @@ TRACKED_TASKS: dict[str, PaperlessTask.TaskType] = {
     "documents.tasks.build_share_link_bundle": PaperlessTask.TaskType.BUILD_SHARE_LINK,
     "documents.bulk_edit.delete": PaperlessTask.TaskType.BULK_DELETE,
     "documents.tasks.apply_ai_suggestions": PaperlessTask.TaskType.APPLY_AI_SUGGESTIONS,
-    "documents.bulk_operations.execute_bulk_operation": PaperlessTask.TaskType.BULK_UPDATE,
+    BULK_OPERATION_TASK_NAME: PaperlessTask.TaskType.BULK_UPDATE,
 }
 
 _CELERY_STATE_TO_STATUS: dict[str, PaperlessTask.Status] = {
@@ -1084,8 +1086,7 @@ def _extract_input_data(
 
     For consume_file tasks this includes the filename, MIME type, and any
     non-null overrides from the DocumentMetadataOverrides object.  For
-    mail_fetch tasks it captures the account_ids list. Bulk operations store
-    the operation name and document count, without copying the full selection.
+    mail_fetch tasks it captures the account_ids list.
     """
     if task_type == PaperlessTask.TaskType.CONSUME_FILE:
         input_doc = task_kwargs.get("input_doc")
@@ -1113,12 +1114,6 @@ def _extract_input_data(
             if override_dict:
                 data["overrides"] = override_dict
         return data
-
-    if "operation" in task_kwargs and "user_id" in task_kwargs:
-        return {
-            "operation": task_kwargs["operation"],
-            "document_count": len(task_kwargs.get("document_ids", [])),
-        }
 
     if task_type == PaperlessTask.TaskType.MAIL_FETCH:
         account_ids = task_kwargs.get("account_ids")
@@ -1156,9 +1151,7 @@ def _extract_owner_id(
     task_type: PaperlessTask.TaskType,
     task_kwargs: dict,
 ) -> int | None:
-    """Use the initiator for bulk operations and the document owner for consumption."""
-    if "operation" in task_kwargs:
-        return task_kwargs.get("user_id")
+    """Return the document owner for consumption tasks."""
     if task_type != PaperlessTask.TaskType.CONSUME_FILE:
         return None
     overrides = task_kwargs.get("overrides")
@@ -1197,9 +1190,16 @@ def before_task_publish_handler(
         _, task_kwargs, _ = body
         task_id = headers["id"]
 
-        input_data = _extract_input_data(task_type, task_kwargs)
+        if task_name == BULK_OPERATION_TASK_NAME:
+            input_data = {
+                "operation": task_kwargs["operation"],
+                "document_count": len(task_kwargs["document_ids"]),
+            }
+            owner_id = task_kwargs["user_id"]
+        else:
+            input_data = _extract_input_data(task_type, task_kwargs)
+            owner_id = _extract_owner_id(task_type, task_kwargs)
         trigger_source = _determine_trigger_source(headers)
-        owner_id = _extract_owner_id(task_type, task_kwargs)
 
         # A retried task is republished with the same task_id, so this fires
         # again for it; get_or_create keeps the original PENDING record
@@ -1239,11 +1239,10 @@ def task_prerun_handler(sender=None, task_id=None, task=None, **kwargs) -> None:
         logger.exception("Setting PaperlessTask started failed")
 
 
-def _send_bulk_operation_status(task_id: str) -> None:
-    """Notify the initiator, task records still happen."""
+def _send_bulk_operation_status(task: PaperlessTask | None) -> None:
+    """Send the recorded outcome to the initiator."""
     try:
-        task = PaperlessTask.objects.filter(task_id=task_id).first()
-        if task is None or task.owner_id is None or "operation" not in task.input_data:
+        if task is None or task.owner_id is None:
             return
         result_data = task.result_data or {}
         async_to_sync(get_channel_layer().group_send)(
@@ -1321,7 +1320,8 @@ def task_postrun_handler(
                 changed_fields.append("status")
 
         task_instance.save(update_fields=changed_fields)
-        _send_bulk_operation_status(task_id)
+        if task and task.name == BULK_OPERATION_TASK_NAME:
+            _send_bulk_operation_status(task_instance)
     except Exception:  # pragma: no cover
         logger.exception("Updating PaperlessTask failed")
 
@@ -1387,7 +1387,8 @@ def task_failure_handler(
                     date_started - date_created
                 ).total_seconds()
             task_qs.update(**update_fields)
-            _send_bulk_operation_status(task_id)
+            if sender and sender.name == BULK_OPERATION_TASK_NAME:
+                _send_bulk_operation_status(task_qs.first())
     except Exception:  # pragma: no cover
         logger.exception("Updating PaperlessTask on failure failed")
 
@@ -1424,14 +1425,16 @@ def task_revoked_handler(
             reason = "Task expired before execution."
         elif terminated:
             reason = "Task terminated during execution."
-        PaperlessTask.objects.filter(task_id=task_id).update(
+        task_qs = PaperlessTask.objects.filter(task_id=task_id)
+        task_qs.update(
             status=PaperlessTask.Status.REVOKED,
             date_done=timezone.now(),
             result_data={
                 "reason": (reason + " Check worker logs for details."),
             },
         )
-        _send_bulk_operation_status(task_id)
+        if sender and sender.name == BULK_OPERATION_TASK_NAME:
+            _send_bulk_operation_status(task_qs.first())
     except Exception:  # pragma: no cover
         logger.exception("Updating PaperlessTask on revocation failed")
 
