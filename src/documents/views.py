@@ -2987,9 +2987,6 @@ class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
         "merge_as_versions",
     }
 
-    def _has_document_permissions(self, **kwargs) -> bool:
-        return has_document_operation_permissions(**kwargs)
-
     def _queue_bulk_operation(self, method, documents, parameters, from_webui):
         if "update_callback" in parameters:
             raise ValueError("Unsupported bulk operation parameter: update_callback")
@@ -3046,7 +3043,7 @@ class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
                 else PaperlessTask.TriggerSource.API_UPLOAD
             )
 
-        if not self._has_document_permissions(
+        if not has_document_operation_permissions(
             user=user,
             documents=documents,
             method=method,
@@ -3084,30 +3081,12 @@ class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
     ),
 )
 class BulkEditView(DocumentOperationPermissionMixin):
-    MODIFIED_FIELD_BY_METHOD = {
-        "set_correspondent": "correspondent",
-        "set_document_type": "document_type",
-        "set_storage_path": "storage_path",
-        "add_tag": "tags",
-        "remove_tag": "tags",
-        "modify_tags": "tags",
-        "modify_custom_fields": "custom_fields",
-        "set_permissions": None,
+    LEGACY_MODIFIED_FIELDS = {
         "delete": "deleted_at",
-        # These operations create new documents/versions no longer altering
-        # fields on the selected document in place
-        "rotate": None,
-        "delete_pages": None,
-        "split": None,
-        "merge": None,
-        "edit_pdf": None,
         "reprocess": "checksum",
-        "remove_password": None,
     }
 
     serializer_class = BulkEditSerializer
-
-    _snapshot_field = staticmethod(snapshot_field)
 
     def post(self, request, *args, **kwargs):
         request_method = request.data.get("method")
@@ -3144,7 +3123,7 @@ class BulkEditView(DocumentOperationPermissionMixin):
                 if from_webui
                 else PaperlessTask.TriggerSource.API_UPLOAD
             )
-        if not self._has_document_permissions(
+        if not has_document_operation_permissions(
             user=user,
             documents=documents,
             method=method,
@@ -3160,14 +3139,14 @@ class BulkEditView(DocumentOperationPermissionMixin):
                     parameters,
                     from_webui,
                 )
-            modified_field = self.MODIFIED_FIELD_BY_METHOD.get(method.__name__, None)
+            modified_field = self.LEGACY_MODIFIED_FIELDS.get(method.__name__)
             if settings.AUDIT_LOG_ENABLED and modified_field:
-                old_values = self._snapshot_field(documents, modified_field)
+                old_values = snapshot_field(documents, modified_field)
 
             result = method(documents, **parameters)
 
             if settings.AUDIT_LOG_ENABLED and modified_field:
-                new_values = self._snapshot_field(documents, modified_field)
+                new_values = snapshot_field(documents, modified_field)
                 for doc in Document.objects.filter(pk__in=documents):
                     LogEntry.objects.log_create(
                         instance=doc,
