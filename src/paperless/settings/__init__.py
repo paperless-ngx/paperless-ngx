@@ -450,7 +450,10 @@ CORS_EXPOSE_HEADERS = [
     "Content-Disposition",
 ]
 
-ALLOWED_HOSTS = get_list_from_env("PAPERLESS_ALLOWED_HOSTS", default=["*"])
+if "PAPERLESS_ALLOWED_HOSTS" in os.environ or os.getenv("PAPERLESS_URL"):
+    ALLOWED_HOSTS = get_list_from_env("PAPERLESS_ALLOWED_HOSTS")
+else:
+    ALLOWED_HOSTS = ["*"]
 if ALLOWED_HOSTS != ["*"]:
     # always allow localhost. Necessary e.g. for healthcheck in docker.
     ALLOWED_HOSTS.append("localhost")
@@ -460,13 +463,15 @@ def _parse_paperless_url():
     global CSRF_TRUSTED_ORIGINS, CORS_ALLOWED_ORIGINS, ALLOWED_HOSTS
     url = os.getenv("PAPERLESS_URL")
     if url:
-        hostname = urlparse(url).hostname
-        if not hostname:
+        hostname = (urlparse(url).hostname or "").removesuffix(".")
+        if not hostname or hostname == "*" or hostname.startswith("."):
             raise ImproperlyConfigured(
-                f"PAPERLESS_URL {url!r} has no hostname, expected a URL like https://example.com",
+                f"PAPERLESS_URL {url!r} has no valid hostname, expected a URL like https://example.com",
             )
         CSRF_TRUSTED_ORIGINS.append(url)
         CORS_ALLOWED_ORIGINS.append(url)
+        if ":" in hostname and not hostname.startswith("["):
+            hostname = f"[{hostname}]"  # Add brackets around IPv6 addresses
         ALLOWED_HOSTS.append(hostname)
 
     return url

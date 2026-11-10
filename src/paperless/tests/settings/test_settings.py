@@ -1,4 +1,8 @@
+import json
 import os
+import subprocess
+import sys
+from pathlib import Path
 from unittest import TestCase
 from unittest import mock
 
@@ -168,8 +172,66 @@ class TestPaperlessURLSettings(TestCase):
             self.assertIn(url, settings.CORS_ALLOWED_ORIGINS)
 
 
-@pytest.mark.parametrize("url", ["example.com", "https://", "/just/a/path"])
-def test_paperless_url_without_hostname_is_rejected(
+@pytest.mark.parametrize(
+    ("url", "allowed_hosts", "expected"),
+    [
+        (None, None, ["*"]),
+        (None, "", ["localhost"]),
+        ("https://example.com:8443", None, ["localhost", "example.com"]),
+        ("https://example.com.", "", ["localhost", "example.com"]),
+        ("http://[::1]:8000", None, ["localhost", "[::1]"]),
+        ("https://example.com", "*", ["*", "example.com"]),
+        (
+            "https://example.com",
+            "lan.example.com",
+            ["lan.example.com", "localhost", "example.com"],
+        ),
+    ],
+)
+def test_allowed_hosts_at_startup(
+    tmp_path: Path,
+    url: str | None,
+    allowed_hosts: str | None,
+    expected: list[str],
+) -> None:
+    config = tmp_path / "paperless.conf"
+    config.touch()
+    env = {
+        **os.environ,
+        "PAPERLESS_CONFIGURATION_PATH": str(config),
+        "PAPERLESS_LOGGING_DIR": str(tmp_path),
+    }
+    for name, value in (
+        ("PAPERLESS_URL", url),
+        ("PAPERLESS_ALLOWED_HOSTS", allowed_hosts),
+    ):
+        if value is None:
+            env.pop(name, None)
+        else:
+            env[name] = value
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-c",
+            "import json; from paperless.settings import ALLOWED_HOSTS; print(json.dumps(ALLOWED_HOSTS))",
+        ],
+        cwd=Path(__file__).resolve().parents[3],
+        env=env,
+        capture_output=True,
+        text=True,
+        timeout=30,
+        check=False,
+    )
+    assert result.returncode == 0, result.stderr
+    assert json.loads(result.stdout) == expected
+
+
+@pytest.mark.parametrize(
+    "url",
+    ["example.com", "https://", "/just/a/path", "https://*", "https://.example.com"],
+)
+def test_paperless_url_without_valid_hostname_is_rejected(
     monkeypatch: pytest.MonkeyPatch,
     url: str,
 ) -> None:
@@ -179,9 +241,9 @@ def test_paperless_url_without_hostname_is_rejected(
     WHEN:
         - The URL is parsed
     THEN:
-        - A configuration error is raised instead of adding None to ALLOWED_HOSTS
+        - A configuration error is raised for missing or wildcard hostnames
     """
     monkeypatch.setenv("PAPERLESS_URL", url)
 
-    with pytest.raises(ImproperlyConfigured, match="no hostname"):
+    with pytest.raises(ImproperlyConfigured, match="no valid hostname"):
         _parse_paperless_url()
