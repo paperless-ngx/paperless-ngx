@@ -4,7 +4,6 @@ import shutil
 import uuid
 import zipfile
 from collections.abc import Callable
-from importlib import import_module
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from tempfile import mkstemp
@@ -13,6 +12,7 @@ from celery import Task
 from celery import shared_task
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.sessions.models import Session
 from django.db import models
 from django.db import transaction
 from django.db.models.signals import post_save
@@ -931,14 +931,12 @@ def cleanup_expired_share_link_bundles() -> None:
 @shared_task
 def clear_expired_sessions() -> None:
     """
-    Removes expired sessions from the session store. Django does not prune these automatically.
+    Remove expired database sessions in batches to limit the size of each delete.
     """
-    engine = import_module(settings.SESSION_ENGINE)
-    try:
-        engine.SessionStore.clear_expired()
-        logger.info("Cleared expired sessions")
-    except NotImplementedError:
-        logger.warning(
-            "Session engine '%s' does not support clearing expired sessions",
-            settings.SESSION_ENGINE,
-        )
+    expired = Session.objects.filter(expire_date__lt=timezone.now())
+    while session_keys := list(
+        expired.order_by("expire_date").values_list("pk", flat=True)[:500],
+    ):
+        expired.filter(pk__in=session_keys).delete()
+
+    logger.info("Cleared expired sessions")

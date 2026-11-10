@@ -5,8 +5,11 @@ from unittest import mock
 
 import pytest
 from django.conf import settings
+from django.contrib.sessions.models import Session
+from django.db import connection
 from django.test import TestCase
 from django.test import override_settings
+from django.test.utils import CaptureQueriesContext
 from django.utils import timezone
 
 from documents import tasks
@@ -616,22 +619,23 @@ class TestApplyAISuggestionsTask(DirectoriesMixin, TestCase):
 
 @pytest.mark.django_db
 class TestClearExpiredSessions:
-    def test_clears_only_expired_sessions(self) -> None:
+    def test_clears_only_expired_sessions_in_batches(self) -> None:
         """
         GIVEN:
-            - One expired and one still-valid session in the session store
+            - More than one batch of expired sessions and one still-valid session
         WHEN:
             - The clear_expired_sessions task runs
         THEN:
-            - Only the expired session is removed
+            - Only expired sessions are removed, using multiple deletes
         """
-        from django.contrib.sessions.models import Session
-
         now = timezone.now()
-        Session.objects.create(
-            session_key="expired",
-            session_data="",
-            expire_date=now - timedelta(days=1),
+        Session.objects.bulk_create(
+            Session(
+                session_key=f"expired-{i}",
+                session_data="",
+                expire_date=now - timedelta(days=1),
+            )
+            for i in range(501)
         )
         Session.objects.create(
             session_key="valid",
@@ -639,30 +643,8 @@ class TestClearExpiredSessions:
             expire_date=now + timedelta(days=1),
         )
 
-        tasks.clear_expired_sessions()
-
-        assert set(Session.objects.values_list("session_key", flat=True)) == {"valid"}
-
-    def test_unsupported_engine_logs_warning(
-        self,
-        caplog: pytest.LogCaptureFixture,
-    ) -> None:
-        """
-        GIVEN:
-            - A session engine that does not support clearing expired sessions
-        WHEN:
-            - The clear_expired_sessions task runs
-        THEN:
-            - The error is swallowed and a warning is logged
-        """
-        fake_engine = mock.Mock()
-        fake_engine.SessionStore.clear_expired.side_effect = NotImplementedError
-
-        with (
-            mock.patch("documents.tasks.import_module", return_value=fake_engine),
-            override_settings(SESSION_ENGINE="some.unsupported.engine"),
-            caplog.at_level("WARNING", logger="paperless.tasks"),
-        ):
+        with CaptureQueriesContext(connection) as queries:
             tasks.clear_expired_sessions()
 
-        assert "does not support clearing expired sessions" in caplog.text
+        assert set(Session.objects.values_list("session_key", flat=True)) == {"valid"}
+        assert sum(query["sql"].startswith("DELETE FROM") for query in queries) == 2
