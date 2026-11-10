@@ -1,15 +1,16 @@
-import json
 import os
-import subprocess
-import sys
-from pathlib import Path
 from unittest import TestCase
 from unittest import mock
 
 import pytest
+from django.core.exceptions import DisallowedHost
 from django.core.exceptions import ImproperlyConfigured
+from django.http import HttpRequest
+from django.test import override_settings
 
+import paperless.settings as paperless_settings
 from paperless.settings import _get_allauth_trusted_proxy_count
+from paperless.settings import _get_allowed_hosts
 from paperless.settings import _get_classifier_language_setting
 from paperless.settings import _get_search_language_setting
 from paperless.settings import _parse_paperless_url
@@ -173,58 +174,80 @@ class TestPaperlessURLSettings(TestCase):
 
 
 @pytest.mark.parametrize(
-    ("url", "allowed_hosts", "expected"),
+    ("url", "allowed_hosts", "expected", "accepted_host", "rejected_host"),
     [
-        (None, None, ["*"]),
-        (None, "", ["localhost"]),
-        ("https://example.com:8443", None, ["localhost", "example.com"]),
-        ("https://example.com.", "", ["localhost", "example.com"]),
-        ("http://[::1]:8000", None, ["localhost", "[::1]"]),
-        ("https://example.com", "*", ["*", "example.com"]),
+        (None, None, ["*"], "other.example.com", None),
+        (None, "", ["localhost"], "localhost:8000", "other.example.com"),
+        (
+            None,
+            "lan.example.com",
+            ["lan.example.com", "localhost"],
+            "lan.example.com",
+            "other.example.com",
+        ),
+        (None, "*", ["*"], "other.example.com", None),
+        (
+            "https://example.com:8443",
+            None,
+            ["localhost", "example.com"],
+            "example.com:8443",
+            "other.example.com",
+        ),
+        (
+            "https://example.com.",
+            "",
+            ["localhost", "example.com"],
+            "example.com.",
+            "other.example.com",
+        ),
+        (
+            "http://[::1]:8000",
+            None,
+            ["localhost", "[::1]"],
+            "[::1]:8000",
+            "other.example.com",
+        ),
+        ("https://example.com", "*", ["*", "example.com"], "other.example.com", None),
         (
             "https://example.com",
             "lan.example.com",
             ["lan.example.com", "localhost", "example.com"],
+            "lan.example.com",
+            "other.example.com",
         ),
     ],
 )
 def test_allowed_hosts_at_startup(
-    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
     url: str | None,
     allowed_hosts: str | None,
     expected: list[str],
+    accepted_host: str,
+    rejected_host: str | None,
 ) -> None:
-    config = tmp_path / "paperless.conf"
-    config.touch()
-    env = {
-        **os.environ,
-        "PAPERLESS_CONFIGURATION_PATH": str(config),
-        "PAPERLESS_LOGGING_DIR": str(tmp_path),
-    }
     for name, value in (
         ("PAPERLESS_URL", url),
         ("PAPERLESS_ALLOWED_HOSTS", allowed_hosts),
     ):
         if value is None:
-            env.pop(name, None)
+            monkeypatch.delenv(name, raising=False)
         else:
-            env[name] = value
+            monkeypatch.setenv(name, value)
 
-    result = subprocess.run(
-        [
-            sys.executable,
-            "-c",
-            "import json; from paperless.settings import ALLOWED_HOSTS; print(json.dumps(ALLOWED_HOSTS))",
-        ],
-        cwd=Path(__file__).resolve().parents[3],
-        env=env,
-        capture_output=True,
-        text=True,
-        timeout=30,
-        check=False,
-    )
-    assert result.returncode == 0, result.stderr
-    assert json.loads(result.stdout) == expected
+    monkeypatch.setattr(paperless_settings, "ALLOWED_HOSTS", _get_allowed_hosts())
+    monkeypatch.setattr(paperless_settings, "CSRF_TRUSTED_ORIGINS", [])
+    monkeypatch.setattr(paperless_settings, "CORS_ALLOWED_ORIGINS", [])
+    assert _parse_paperless_url() == url
+    assert expected == paperless_settings.ALLOWED_HOSTS
+
+    request = HttpRequest()
+    with override_settings(ALLOWED_HOSTS=expected):
+        request.META["HTTP_HOST"] = accepted_host
+        assert request.get_host() == accepted_host
+        if rejected_host:
+            request.META["HTTP_HOST"] = rejected_host
+            with pytest.raises(DisallowedHost):
+                request.get_host()
 
 
 @pytest.mark.parametrize(

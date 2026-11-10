@@ -450,13 +450,19 @@ CORS_EXPOSE_HEADERS = [
     "Content-Disposition",
 ]
 
-if "PAPERLESS_ALLOWED_HOSTS" in os.environ or os.getenv("PAPERLESS_URL"):
-    ALLOWED_HOSTS = get_list_from_env("PAPERLESS_ALLOWED_HOSTS")
-else:
-    ALLOWED_HOSTS = ["*"]
-if ALLOWED_HOSTS != ["*"]:
-    # always allow localhost. Necessary e.g. for healthcheck in docker.
-    ALLOWED_HOSTS.append("localhost")
+
+def _get_allowed_hosts() -> list[str]:
+    if "PAPERLESS_ALLOWED_HOSTS" in os.environ or os.getenv("PAPERLESS_URL"):
+        allowed_hosts = get_list_from_env("PAPERLESS_ALLOWED_HOSTS")
+    else:
+        allowed_hosts = ["*"]
+    if allowed_hosts != ["*"]:
+        # Always allow localhost for the Docker health check.
+        allowed_hosts.append("localhost")
+    return allowed_hosts
+
+
+ALLOWED_HOSTS = _get_allowed_hosts()
 
 
 def _parse_paperless_url():
