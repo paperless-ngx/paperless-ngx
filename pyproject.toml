@@ -212,12 +212,7 @@ extend-select = [
   "UP",   # https://docs.astral.sh/ruff/rules/#pyupgrade-up
   "W",    # https://docs.astral.sh/ruff/rules/#pycodestyle-e-w
 ]
-ignore = [
-  "DJ001",
-  "PLC0415",
-  "RUF012",
-  "SIM105",
-]
+ignore = [ "DJ001", "ICN001", "PLC0415", "RUF012", "SIM105" ]
 # Migrations
 per-file-ignores."*/migrations/*.py" = [
   "E501",
