@@ -1157,6 +1157,9 @@ they use underscores instead of dashes.
         be changed by trusted users. This applies to the `AppConfig` permission as well,
         which allows setting these arguments from the UI.
 
+        Arguments paperless manages itself (`input_file_or_options`, `output_file`
+        and `sidecar`) are rejected by the API and ignored if set here.
+
     Specify arguments as a JSON dictionary. Keep note of lower case
     booleans and double quoted parameter names and strings. Examples:
 

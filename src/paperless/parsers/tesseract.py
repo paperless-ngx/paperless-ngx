@@ -21,6 +21,7 @@ from documents.parsers import make_thumbnail_from_pdf
 from documents.utils import copy_file_with_basic_stats
 from documents.utils import maybe_override_pixel_limit
 from documents.utils import remove_alpha_channel
+from paperless.config import OCR_RESERVED_USER_ARGS
 from paperless.config import OcrConfig
 from paperless.models import CleanChoices
 from paperless.models import ModeChoices
@@ -351,7 +352,22 @@ class RasterisedDocumentParser:
 
         if self.settings.user_args is not None:
             try:
-                ocrmypdf_args = {**ocrmypdf_args, **self.settings.user_args}
+                reserved = sorted(
+                    OCR_RESERVED_USER_ARGS & self.settings.user_args.keys(),
+                )
+                if reserved:
+                    self.log.warning(
+                        f"Ignoring OCR user arguments managed by paperless: "
+                        f"{', '.join(reserved)}",
+                    )
+                ocrmypdf_args = {
+                    **ocrmypdf_args,
+                    **{
+                        k: v
+                        for k, v in self.settings.user_args.items()
+                        if k not in OCR_RESERVED_USER_ARGS
+                    },
+                }
             except Exception as e:
                 self.log.warning(
                     f"There is an issue with PAPERLESS_OCR_USER_ARGS, so "
