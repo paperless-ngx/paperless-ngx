@@ -1245,6 +1245,7 @@ def _send_bulk_operation_status(task_id: str) -> None:
         task = PaperlessTask.objects.filter(task_id=task_id).first()
         if task is None or task.owner_id is None or "operation" not in task.input_data:
             return
+        result_data = task.result_data or {}
         async_to_sync(get_channel_layer().group_send)(
             f"bulk_operations_{task.owner_id}",
             {
@@ -1253,7 +1254,8 @@ def _send_bulk_operation_status(task_id: str) -> None:
                     "task_id": task.task_id,
                     "status": task.status,
                     "operation": task.input_data["operation"],
-                    "error": (task.result_data or {}).get("error_message", ""),
+                    "error": result_data.get("error_message")
+                    or result_data.get("reason", ""),
                 },
             },
         )

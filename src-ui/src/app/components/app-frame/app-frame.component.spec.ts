@@ -255,11 +255,18 @@ describe('AppFrameComponent', () => {
         task_id: 'bulk-task',
         operation: 'set_permissions',
         status,
-        error: 'Could not update',
+        error:
+          status === PaperlessTaskStatus.Revoked
+            ? 'Task expired before execution.'
+            : 'Could not update',
       })
     }
     expect(reload).toHaveBeenCalledTimes(2)
     expect(error).toHaveBeenCalledWith(expect.any(String), 'Could not update')
+    expect(error).toHaveBeenCalledWith(
+      'Bulk operation revoked.',
+      'Task expired before execution.'
+    )
     expect(success).not.toHaveBeenCalled()
   })
 

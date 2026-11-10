@@ -200,6 +200,8 @@ export class AppFrameComponent
         }
         if (status === PaperlessTaskStatus.Success) {
           this.toastService.showSuccess($localize`Bulk operation completed.`)
+        } else if (status === PaperlessTaskStatus.Revoked) {
+          this.toastService.showError($localize`Bulk operation revoked.`, error)
         } else {
           this.toastService.showError(
             $localize`Bulk operation failed. Some changes may already have been applied.`,

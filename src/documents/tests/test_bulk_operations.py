@@ -16,6 +16,7 @@ from documents.models import PaperlessTask
 from documents.signals.handlers import before_task_publish_handler
 from documents.signals.handlers import task_failure_handler
 from documents.signals.handlers import task_postrun_handler
+from documents.signals.handlers import task_revoked_handler
 from paperless_testing.factories import UserFactory
 
 
@@ -188,8 +189,24 @@ def test_large_filtered_selection_is_one_task(bulk_setup):
 
 
 @pytest.mark.django_db
-@pytest.mark.parametrize("failed", [False, True])
-def test_tracked_outcome_notifies_only_initiator(bulk_setup, failed):
+@pytest.mark.parametrize(
+    ("outcome", "expected_status", "expected_error"),
+    [
+        ("success", "success", ""),
+        ("failure", "failure", "Could not update"),
+        (
+            "expired",
+            "revoked",
+            "Task expired before execution. Check worker logs for details.",
+        ),
+    ],
+)
+def test_tracked_outcome_notifies_only_initiator(
+    bulk_setup,
+    outcome,
+    expected_status,
+    expected_error,
+):
     user, _, doc, _ = bulk_setup
     task_id = str(uuid.uuid4())
     before_task_publish_handler(
@@ -211,7 +228,9 @@ def test_tracked_outcome_notifies_only_initiator(bulk_setup, failed):
     assert task.owner_id == user.pk
     assert task.task_type == PaperlessTask.TaskType.BULK_UPDATE
     with mock.patch("documents.signals.handlers.async_to_sync") as send:
-        if failed:
+        if outcome == "expired":
+            task_revoked_handler(request=mock.Mock(id=task_id), expired=True)
+        elif outcome == "failure":
             task_failure_handler(
                 task_id=task_id,
                 exception=ValueError("Could not update"),
@@ -224,7 +243,8 @@ def test_tracked_outcome_notifies_only_initiator(bulk_setup, failed):
             )
     group, event = send.return_value.call_args.args
     assert group == f"bulk_operations_{user.pk}"
-    assert event["data"]["status"] == ("failure" if failed else "success")
+    assert event["data"]["status"] == expected_status
+    assert event["data"]["error"] == expected_error
     assert event["data"]["task_id"] == task_id
 
 
