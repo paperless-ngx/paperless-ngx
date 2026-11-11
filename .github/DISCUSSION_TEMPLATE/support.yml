@@ -1,5 +1,21 @@
 title: "[Support] "
 body:
+  - type: markdown
+    attributes:
+      value: |
+        #### Use of AI tools
+
+        If this post was generated, in whole or in part, by an AI tool or agent you **must** say so using the field below. Failing to clearly disclose this is a violation of our [Code of Conduct](https://github.com/paperless-ngx/paperless-ngx/blob/main/CODE_OF_CONDUCT.md).
+  - type: dropdown
+    id: ai-usage
+    attributes:
+      label: AI usage
+      description: Was any part of this post written by an AI tool or agent?
+      options:
+        - No AI tools were used
+        - Yes, AI tools helped write this post
+    validations:
+      required: true
   - type: textarea
     id: description
     attributes:

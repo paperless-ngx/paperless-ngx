@@ -12,6 +12,10 @@
   display: none;
 }
 
+.message .flex-grow-1 {
+  min-width: 0;
+}
+
 .dropdown-item {
   white-space: initial;
 }

@@ -653,17 +653,9 @@ export class TasksComponent
     if (this.filterTargetID === TaskFilterTargetID.TaskId) {
       return task.task_id.toLowerCase() === query
     }
-    if (this.filterTargetID == TaskFilterTargetID.Name) {
-      return [
-        this.taskDisplayName(task),
-        task.task_type_display,
-        task.trigger_source_display,
-      ]
-        .filter(Boolean)
-        .some((value) => value.toLowerCase().includes(query))
-    }
 
-    return this.taskResultMessage(task)?.toLowerCase().includes(query) ?? false
+    // Text filtering now handled API-side
+    return true
   }
 
   private tasksForOptionCounts({

@@ -243,6 +243,34 @@ class TestParserSettingsFromDb(DirectoriesMixin, FileSystemAssertsMixin, TestCas
             "UseDeviceIndependentColor",
         )
 
+    def test_ocr_user_args_cannot_override_reserved(self) -> None:
+        """
+        GIVEN:
+            - User arguments which attempt to override arguments the parser
+              manages itself, alongside a legitimate argument
+        WHEN:
+            - OCR parameters are constructed
+        THEN:
+            - Reserved arguments keep the parser supplied values
+            - The legitimate argument is still applied
+        """
+        instance = ApplicationConfiguration.objects.all().first()
+        assert instance is not None
+        instance.user_args = {
+            "sidecar": "/tmp/evil.py",
+            "output_file": "/tmp/out.pdf",
+            "input_file_or_options": "/etc/passwd",
+            "unpaper_args": "--pre-rotate 90",
+        }
+        instance.save()
+
+        params = self.get_params()
+
+        self.assertEqual(params["sidecar"], "sidecar.txt")
+        self.assertEqual(params["output_file"], "output.pdf")
+        self.assertEqual(params["input_file_or_options"], "input.pdf")
+        self.assertEqual(params["unpaper_args"], "--pre-rotate 90")
+
     def test_ocr_user_args(self) -> None:
         """
         GIVEN:

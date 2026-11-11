@@ -12,6 +12,17 @@ from paperless.models import ModeChoices
 from paperless.models import OutputTypeChoices
 from paperless.models import RemoteOCRMode
 
+# OCRmyPDF arguments the parser sets itself, pointing into its own temporary
+# directory. The parser reads these files back after OCR, so user supplied
+# values can only break consumption (or write to arbitrary paths), never help.
+OCR_RESERVED_USER_ARGS: frozenset[str] = frozenset(
+    {
+        "input_file_or_options",
+        "output_file",
+        "sidecar",
+    },
+)
+
 
 @dataclasses.dataclass
 class BaseConfig:

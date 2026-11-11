@@ -237,7 +237,11 @@ describe('TasksComponent', () => {
   })
 
   // answers task list requests with the fixture tasks matching their status filter
-  function flushTaskLists(pageSize: number, count?: number) {
+  function flushTaskLists(
+    pageSize: number,
+    count?: number,
+    filteredTasks: PaperlessTask[] = tasks
+  ) {
     httpTestingController
       .match(
         (req) =>
@@ -246,7 +250,9 @@ describe('TasksComponent', () => {
       )
       .forEach((req) => {
         const statuses = req.request.params.getAll('status')
-        const results = tasks.filter((task) => statuses.includes(task.status))
+        const results = filteredTasks.filter((task) =>
+          statuses.includes(task.status)
+        )
         req.flush({ count: count ?? results.length, results })
       })
   }
@@ -854,6 +860,7 @@ describe('TasksComponent', () => {
     input.nativeElement.value = '191092'
     input.nativeElement.dispatchEvent(new Event('input'))
     jest.advanceTimersByTime(150)
+    flushTaskLists(10, undefined, [tasks[1]])
     fixture.detectChanges()
     expect(component.filterText).toEqual('191092')
     expect(component.tasksForSection(TaskSection.NeedsAttention)).toHaveLength(
@@ -865,6 +872,7 @@ describe('TasksComponent', () => {
     component.setSection(TaskSection.InProgress)
     component.filterText = 'system'
     jest.advanceTimersByTime(150)
+    flushTaskLists(25, undefined, [tasks[6]])
 
     expect(component.tasksForSection(TaskSection.InProgress)).toHaveLength(1)
     expect(component.tasksForSection(TaskSection.InProgress)[0].task_type).toBe(
@@ -898,11 +906,59 @@ describe('TasksComponent', () => {
     input.nativeElement.value = 'duplicate'
     input.nativeElement.dispatchEvent(new Event('input'))
     jest.advanceTimersByTime(150)
+    flushTaskLists(25, undefined, [tasks[0], tasks[1]])
     fixture.detectChanges()
     expect(component.filterText).toEqual('duplicate')
     expect(component.tasksForSection(TaskSection.NeedsAttention)).toHaveLength(
       2
     )
+  })
+
+  it('should show server-matched names when the displayed source is translated', () => {
+    component.setSection(TaskSection.InProgress)
+    flushTaskLists(25)
+    component.filterText = 'email'
+    jest.advanceTimersByTime(150)
+
+    const request = httpTestingController.expectOne(
+      (req) =>
+        req.url === `${environment.apiBaseUrl}tasks/` &&
+        req.params.get('name') === 'email' &&
+        req.params.get('page_size') === '25'
+    )
+    const translatedTask = {
+      ...tasks[5],
+      trigger_source_display: 'E-Mail',
+    }
+    request.flush({ count: 1, results: [translatedTask] })
+    fixture.detectChanges()
+
+    expect(component.totalTasks()).toBe(1)
+    expect(component.visibleTasks).toEqual([translatedTask])
+  })
+
+  it('should show server-matched duplicates when the displayed result is translated', () => {
+    component.setSection(TaskSection.NeedsAttention)
+    flushTaskLists(25)
+    jest
+      .spyOn(component, 'taskResultMessage')
+      .mockReturnValue('Duplikat von Document #311')
+    component.setFilterTarget(TaskFilterTargetID.Result)
+    component.filterText = 'duplicate'
+    jest.advanceTimersByTime(150)
+
+    const request = httpTestingController.expectOne(
+      (req) =>
+        req.url === `${environment.apiBaseUrl}tasks/` &&
+        req.params.get('result') === 'duplicate' &&
+        req.params.get('page_size') === '25'
+    )
+    request.flush({ count: 1, results: [tasks[1]] })
+    fixture.detectChanges()
+
+    expect(component.totalTasks()).toBe(1)
+    expect(component.visibleTasks).toEqual([tasks[1]])
+    expect(fixture.nativeElement.textContent).toContain('191092.pdf')
   })
 
   it('should prefer explicit reason in the result message', () => {

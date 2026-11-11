@@ -36,7 +36,7 @@
     [appendTo]="appendTo"
     [loading]="loading()"
     [typeahead]="documentsInput$"
-    (mousedown)="$event.stopImmediatePropagation()"
+    (mousedown)="appendTo && $event.stopImmediatePropagation()"
     (change)="onChange(selectedDocumentIDs)">
     <ng-template ng-label-tmp let-document="item">
       <div class="d-flex align-items-center">
