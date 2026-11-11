@@ -1,5 +1,6 @@
 from unittest.mock import ANY
 from unittest.mock import MagicMock
+from unittest.mock import call
 from unittest.mock import patch
 
 import pytest
@@ -167,8 +168,43 @@ def test_get_embedding_model_huggingface(mock_ai_config):
         MockHuggingFaceEmbedding.assert_called_once_with(
             model_name="sentence-transformers/all-MiniLM-L6-v2",
             cache_folder=str(settings.DATA_DIR / "hf_cache"),
+            local_files_only=True,
         )
         assert model == MockHuggingFaceEmbedding.return_value
+
+
+def test_get_embedding_model_huggingface_downloads_when_not_cached(mock_ai_config):
+    mock_ai_config.return_value.llm_embedding_backend = LLMEmbeddingBackend.HUGGINGFACE
+    mock_ai_config.return_value.llm_embedding_model = "some/model"
+    downloaded = MagicMock()
+
+    with patch(
+        "llama_index.embeddings.huggingface.HuggingFaceEmbedding",
+        side_effect=[OSError("not cached"), downloaded],
+    ) as MockHuggingFaceEmbedding:
+        model = get_embedding_model(mock_ai_config.return_value)
+
+    cache_folder = str(settings.DATA_DIR / "hf_cache")
+    assert MockHuggingFaceEmbedding.call_args_list == [
+        call(model_name="some/model", cache_folder=cache_folder, local_files_only=True),
+        call(model_name="some/model", cache_folder=cache_folder),
+    ]
+    assert model is downloaded
+
+
+def test_get_embedding_model_huggingface_refresh_checks_the_hub(mock_ai_config):
+    mock_ai_config.return_value.llm_embedding_backend = LLMEmbeddingBackend.HUGGINGFACE
+    mock_ai_config.return_value.llm_embedding_model = "some/model"
+
+    with patch(
+        "llama_index.embeddings.huggingface.HuggingFaceEmbedding",
+    ) as MockHuggingFaceEmbedding:
+        get_embedding_model(mock_ai_config.return_value, refresh=True)
+
+    MockHuggingFaceEmbedding.assert_called_once_with(
+        model_name="some/model",
+        cache_folder=str(settings.DATA_DIR / "hf_cache"),
+    )
 
 
 def test_get_embedding_model_ollama(mock_ai_config):
