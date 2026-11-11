@@ -25,6 +25,7 @@ from documents.models import Tag
 from documents.models import Workflow
 from documents.search import get_backend
 from documents.search import reset_backend
+from documents.views import DocumentViewSet
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 from paperless_testing.dirs import DirectoriesMixin
@@ -345,38 +346,39 @@ class TestDocumentSearchApi(DirectoriesMixin, APITestCase):
         storage_path = StoragePath.objects.create(name="sp1")
         tag = Tag.objects.create(name="tag")
 
-        matching_doc = Document.objects.create(
-            title="bank statement",
-            content="bank content",
-            checksum="A",
-            correspondent=correspondent,
-            document_type=doc_type,
-            storage_path=storage_path,
-        )
-        matching_doc.tags.add(tag)
+        for checksum, title in (
+            ("A", "bank statement"),
+            ("B", "bank account"),
+            ("C", "credit card"),
+        ):
+            doc = Document.objects.create(
+                title=title,
+                checksum=checksum,
+                correspondent=correspondent,
+                document_type=doc_type,
+                storage_path=storage_path,
+            )
+            doc.tags.add(tag)
+            get_backend().add_or_update(doc)
 
-        get_backend().add_or_update(matching_doc)
-
-        response = self.client.get(
-            "/api/documents/?query=bank&include_selection_data=true",
-        )
+        with mock.patch.object(DocumentViewSet, "selection_data_batch_size", 1):
+            response = self.client.get(
+                "/api/documents/?query=bank&page_size=1&include_selection_data=true",
+            )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn("selection_data", response.data)
-
-        selected_correspondent = next(
-            item
-            for item in response.data["selection_data"]["selected_correspondents"]
-            if item["id"] == correspondent.id
-        )
-        selected_tag = next(
-            item
-            for item in response.data["selection_data"]["selected_tags"]
-            if item["id"] == tag.id
-        )
-
-        self.assertEqual(selected_correspondent["document_count"], 1)
-        self.assertEqual(selected_tag["document_count"], 1)
+        self.assertEqual(response.data["count"], 2)
+        self.assertEqual(len(response.data["results"]), 1)
+        for key, pk in (
+            ("selected_correspondents", correspondent.pk),
+            ("selected_document_types", doc_type.pk),
+            ("selected_storage_paths", storage_path.pk),
+            ("selected_tags", tag.pk),
+        ):
+            self.assertEqual(
+                response.data["selection_data"][key],
+                [{"id": pk, "document_count": 2}],
+            )
 
     def test_search_custom_field_ordering(self) -> None:
         custom_field = CustomField.objects.create(

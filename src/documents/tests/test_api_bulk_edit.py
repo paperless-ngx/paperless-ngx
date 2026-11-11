@@ -1141,8 +1141,8 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertCountEqual(
             response.data["selected_document_types"],
             [
-                {"id": self.c1.id, "document_count": 1},
-                {"id": self.c2.id, "document_count": 0},
+                {"id": self.dt1.id, "document_count": 1},
+                {"id": self.dt2.id, "document_count": 0},
             ],
         )
 

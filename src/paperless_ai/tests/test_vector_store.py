@@ -20,8 +20,10 @@ from paperless_ai.tables import DocumentChunksTable
 from paperless_ai.tables import DocumentMetaTable
 from paperless_ai.vector_store import _MAX_IN_VALUES
 from paperless_ai.vector_store import DB_FILENAME
+from paperless_ai.vector_store import DB_PAGE_SIZE
 from paperless_ai.vector_store import DEFAULT_TABLE_NAME
 from paperless_ai.vector_store import SCHEMA_VERSION
+from paperless_ai.vector_store import VEC0_CHUNK_SIZE
 from paperless_ai.vector_store import PaperlessSqliteVecVectorStore
 from paperless_ai.vector_store import _build_where
 from paperless_ai.vector_store import _pack
@@ -1128,3 +1130,127 @@ class TestV1ToV2Migration:
         assert "DocumentChunksTable.create" not in source
         assert "DocumentMetaTable.create" not in source
         assert "_create_vec_table(" not in source
+
+
+LEGACY_PAGE_SIZE = 4096
+
+
+def vec_table_sql(db_path: Path) -> str:
+    conn = sqlite3.connect(db_path)
+    try:
+        return conn.execute(
+            "SELECT sql FROM sqlite_master WHERE name = ?",
+            (DEFAULT_TABLE_NAME,),
+        ).fetchone()[0]
+    finally:
+        conn.close()
+
+
+def page_size_of(db_path: Path) -> int:
+    conn = sqlite3.connect(db_path)
+    try:
+        return conn.execute("PRAGMA page_size").fetchone()[0]
+    finally:
+        conn.close()
+
+
+def create_legacy_vec_table(conn: sqlite3.Connection, dim: int) -> None:
+    """The table definition from before chunk_size was set explicitly."""
+    conn.execute(
+        f"CREATE VIRTUAL TABLE {DEFAULT_TABLE_NAME} USING vec0("
+        "id TEXT PRIMARY KEY, document_id INTEGER, +node_content TEXT, "
+        f"embedding float[{dim}] distance_metric=cosine)",
+    )
+
+
+@pytest.fixture
+def legacy_page_size_db(tmp_path: Path) -> Path:
+    """An existing index file created before the page size was set."""
+    db_path = tmp_path / DB_FILENAME
+    conn = sqlite3.connect(db_path)
+    conn.execute(f"PRAGMA page_size={LEGACY_PAGE_SIZE}")
+    conn.execute("CREATE TABLE _seed(x)")
+    conn.execute("DROP TABLE _seed")
+    conn.close()
+    assert page_size_of(db_path) == LEGACY_PAGE_SIZE
+    return db_path
+
+
+class TestVecChunkSize:
+    def test_new_table_uses_configured_chunk_size(
+        self,
+        store: PaperlessSqliteVecVectorStore,
+        tmp_path: Path,
+    ) -> None:
+        """
+        GIVEN an empty store
+        WHEN the first document is indexed and the vec0 table is created
+        THEN the table definition carries the configured chunk size
+        """
+        store.upsert_document(1, [make_node("1-a", 1)])
+
+        assert f"chunk_size={VEC0_CHUNK_SIZE}" in vec_table_sql(tmp_path / DB_FILENAME)
+
+    def test_compact_moves_legacy_table_to_configured_chunk_size(
+        self,
+        store: PaperlessSqliteVecVectorStore,
+        tmp_path: Path,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN an index whose vec0 table was created with the default chunk size
+        WHEN the index is compacted
+        THEN the rebuilt table uses the configured chunk size
+        AND no indexed chunks are lost
+        """
+        legacy = mocker.patch.object(
+            PaperlessSqliteVecVectorStore,
+            "_create_vec_table",
+            staticmethod(create_legacy_vec_table),
+        )
+        store.upsert_document(1, [make_node("1-a", 1), make_node("1-b", 1)])
+        store.upsert_document(2, [make_node("2-a", 2)])
+        mocker.stop(legacy)
+        assert "chunk_size" not in vec_table_sql(tmp_path / DB_FILENAME)
+
+        store.compact(force=True)
+
+        assert f"chunk_size={VEC0_CHUNK_SIZE}" in vec_table_sql(tmp_path / DB_FILENAME)
+        assert DocumentChunksTable.count(store.client) == 3
+
+
+class TestIndexPageSize:
+    def test_new_index_file_uses_configured_page_size(
+        self,
+        store: PaperlessSqliteVecVectorStore,
+        tmp_path: Path,
+    ) -> None:
+        """
+        GIVEN no existing index file
+        WHEN a store is opened and a document is indexed
+        THEN the database file uses the configured page size
+        """
+        store.upsert_document(1, [make_node("1-a", 1)])
+
+        assert page_size_of(tmp_path / DB_FILENAME) == DB_PAGE_SIZE
+
+    def test_compact_moves_legacy_file_to_configured_page_size(
+        self,
+        legacy_page_size_db: Path,
+    ) -> None:
+        """
+        GIVEN an existing index file created with a different page size
+        WHEN the index is compacted
+        THEN the rebuilt file uses the configured page size
+        AND no indexed chunks are lost
+        """
+        with PaperlessSqliteVecVectorStore(
+            uri=str(legacy_page_size_db.parent),
+        ) as store:
+            store.upsert_document(1, [make_node("1-a", 1), make_node("1-b", 1)])
+            assert page_size_of(legacy_page_size_db) == LEGACY_PAGE_SIZE
+
+            store.compact(force=True)
+
+            assert page_size_of(legacy_page_size_db) == DB_PAGE_SIZE
+            assert DocumentChunksTable.count(store.client) == 2

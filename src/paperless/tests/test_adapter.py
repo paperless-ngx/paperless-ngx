@@ -1,6 +1,11 @@
 import logging
+import time
+from concurrent.futures import ThreadPoolExecutor
+from threading import Barrier
+from types import SimpleNamespace
 
 import pytest
+from allauth.account.adapter import DefaultAccountAdapter
 from allauth.account.adapter import get_adapter
 from allauth.account.models import Login
 from allauth.core import context
@@ -12,6 +17,8 @@ from allauth.socialaccount.models import SocialLogin
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
+from django.db import connection
+from django.db import connections
 from django.forms import ValidationError
 from django.http import HttpRequest
 from django.test import RequestFactory
@@ -115,25 +122,71 @@ class TestCustomAccountAdapter:
         assert user.groups.filter(name="group1").exists()
         assert not user.groups.filter(name="group2").exists()
 
-    def test_fresh_install_save_creates_superuser(self, mocker: MockerFixture) -> None:
+    def test_fresh_install_save_creates_superuser(self, settings: Settings) -> None:
+        settings.ACCOUNT_DEFAULT_GROUPS = []
         adapter = get_adapter()
-        form = mocker.MagicMock(
-            cleaned_data={
-                "username": "testuser",
-                "email": "user@paperless-ngx.com",
-            },
+        deferred = adapter.save_user(
+            HttpRequest(),
+            User(),
+            SimpleNamespace(cleaned_data={"username": "deferred"}),
+            commit=False,
         )
-        user = adapter.save_user(HttpRequest(), User(), form, commit=True)
-        assert user.is_superuser
+        assert deferred.pk is None
+        assert not deferred.is_superuser and not deferred.is_staff
 
-        form = mocker.MagicMock(
-            cleaned_data={
-                "username": "testuser2",
-                "email": "user2@paperless-ngx.com",
-            },
-        )
-        user2 = adapter.save_user(HttpRequest(), User(), form, commit=True)
-        assert not user2.is_superuser
+        for username, expected_superuser in (("first", True), ("second", False)):
+            user = adapter.save_user(
+                HttpRequest(),
+                User(),
+                SimpleNamespace(cleaned_data={"username": username}),
+            )
+            assert user.is_superuser == expected_superuser
+            assert user.is_staff == expected_superuser
+
+        deferred.save()
+        assert User.objects.filter(is_superuser=True).count() == 1
+        assert User.objects.filter(is_staff=True).count() == 1
+
+
+@pytest.mark.django_db(transaction=True)
+def test_concurrent_bootstrap_signups_create_only_one_superuser(
+    settings: Settings,
+    mocker: MockerFixture,
+) -> None:
+    if connection.vendor == "sqlite" and connection.is_in_memory_db():
+        pytest.skip("Concurrent SQLite writers require a file-backed test database")
+    settings.ACCOUNT_DEFAULT_GROUPS = []
+    settings.ACCOUNT_ALLOW_SIGNUPS = False
+    admitted = Barrier(2)
+    save_user = DefaultAccountAdapter.save_user
+
+    def delayed_save(*args, **kwargs):
+        # Widen the gap between the bootstrap decision and the actual insert.
+        time.sleep(0.1)
+        return save_user(*args, **kwargs)
+
+    mocker.patch.object(DefaultAccountAdapter, "save_user", delayed_save)
+
+    def signup(index):
+        try:
+            adapter = get_adapter()
+            request = HttpRequest()
+            assert adapter.is_open_for_signup(request)
+            admitted.wait(timeout=5)
+            adapter.save_user(
+                request,
+                User(),
+                SimpleNamespace(cleaned_data={"username": f"signup{index}"}),
+            )
+        finally:
+            connections.close_all()
+
+    with ThreadPoolExecutor(max_workers=2) as workers:
+        list(workers.map(signup, range(2)))
+
+    assert User.objects.filter(username__startswith="signup").count() == 2
+    assert User.objects.filter(is_superuser=True).count() == 1
+    assert User.objects.filter(is_staff=True).count() == 1
 
 
 @pytest.mark.django_db

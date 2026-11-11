@@ -157,7 +157,6 @@ INSTALLED_APPS = [
     "allauth.headless",
     "drf_spectacular",
     "drf_spectacular_sidecar",
-    "treenode",
     *env_apps,
 ]
 
@@ -352,7 +351,7 @@ SOCIAL_ACCOUNT_SYNC_STAFF_GROUP: Final[str | None] = os.getenv(
 )
 SOCIAL_ACCOUNT_MFA_TRUSTED_AMR = get_list_from_env(
     "PAPERLESS_SOCIAL_ACCOUNT_MFA_TRUSTED_AMR",
-    "mfa",
+    default=["mfa"],
 )
 
 HEADLESS_TOKEN_STRATEGY = "paperless.adapter.DrfTokenStrategy"

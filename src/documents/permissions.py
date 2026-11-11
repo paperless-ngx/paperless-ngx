@@ -31,6 +31,7 @@ from guardian.core import ObjectPermissionChecker
 from guardian.models import GroupObjectPermission
 from guardian.models import UserObjectPermission
 from rest_framework.permissions import BasePermission
+from rest_framework.permissions import DjangoModelPermissions
 from rest_framework.permissions import DjangoObjectPermissions
 
 from documents.models import Document
@@ -61,6 +62,17 @@ class PermissionGranteesUpdate(TypedDict, total=False):
 
 
 PermissionsSpec: TypeAlias = Mapping[PermissionAction, PermissionGranteesUpdate]
+
+
+class PaperlessModelPermissions(DjangoModelPermissions):
+    """Require basic global model permissions."""
+
+    perms_map = {
+        **DjangoModelPermissions.perms_map,
+        "GET": ["%(app_label)s.view_%(model_name)s"],
+        "OPTIONS": ["%(app_label)s.view_%(model_name)s"],
+        "HEAD": ["%(app_label)s.view_%(model_name)s"],
+    }
 
 
 class PaperlessObjectPermissions(DjangoObjectPermissions):
@@ -576,12 +588,9 @@ def annotate_document_count_by_ids(
                        or CustomFieldInstance)
         related_object_field: field on the relation pointing back to queryset pk
         document_ids: the document ids to count against -- a concrete list/set,
-                       or a simple (already resolved) queryset of ids. Callers
-                       that need this filtered by a complex condition (e.g. a
-                       permission check) should resolve it to a concrete list
-                       first if the same ids will be reused across multiple
-                       calls, rather than passing the complex queryset itself
-                       into each -- see ``_get_selection_data_for_queryset``.
+                       or a simple (already resolved) queryset of ids. Keep
+                       the list small: it is embedded in the statement as
+                       literal parameters.
         target_field: field on the relation pointing to Document id
     """
 
