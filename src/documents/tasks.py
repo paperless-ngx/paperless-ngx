@@ -12,6 +12,7 @@ from celery import Task
 from celery import shared_task
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.sessions.models import Session
 from django.db import models
 from django.db import transaction
 from django.db.models.signals import post_save
@@ -925,3 +926,17 @@ def cleanup_expired_share_link_bundles() -> None:
             )
     if count:
         logger.info("Deleted %s expired share link bundle(s)", count)
+
+
+@shared_task
+def clear_expired_sessions() -> None:
+    """
+    Remove expired database sessions in batches to limit the size of each delete.
+    """
+    expired = Session.objects.filter(expire_date__lt=timezone.now())
+    while session_keys := list(
+        expired.order_by("expire_date").values_list("pk", flat=True)[:500],
+    ):
+        expired.filter(pk__in=session_keys).delete()
+
+    logger.info("Cleared expired sessions")
