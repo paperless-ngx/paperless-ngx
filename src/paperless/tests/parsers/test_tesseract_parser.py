@@ -18,6 +18,7 @@ from ocrmypdf import SubprocessOutputError
 from PIL import Image
 
 from documents.parsers import ParseError
+from documents.parsers import get_default_thumbnail
 from documents.parsers import rasterize_pdf_page_to_png
 from paperless.models import ModeChoices
 from paperless.parsers import ParserProtocol
@@ -270,6 +271,57 @@ class TestDpiHelpers:
 
 
 class TestGetThumbnail:
+    @pytest.mark.parametrize(
+        ("filename", "mime_type"),
+        [
+            pytest.param("simple.jpg", "image/jpeg", id="jpeg"),
+            pytest.param("simple.png", "image/png", id="png"),
+            pytest.param("simple.tif", "image/tiff", id="tiff"),
+            pytest.param("simple.gif", "image/gif", id="gif"),
+            pytest.param("simple.bmp", "image/bmp", id="bmp"),
+            pytest.param("document.webp", "image/webp", id="webp"),
+            pytest.param("simple.heic", "image/heic", id="heic"),
+        ],
+    )
+    def test_image_without_archive_has_image_thumbnail(
+        self,
+        mocker: MockerFixture,
+        tesseract_parser: RasterisedDocumentParser,
+        tesseract_samples_dir: Path,
+        filename: str,
+        mime_type: str,
+    ) -> None:
+        original = tesseract_samples_dir / filename
+        render_pdf = mocker.patch("documents.parsers.rasterize_pdf_page_to_png")
+
+        thumb = tesseract_parser.get_thumbnail(original, mime_type)
+
+        render_pdf.assert_not_called()
+        assert thumb.read_bytes() != get_default_thumbnail().read_bytes()
+        with Image.open(thumb) as im:
+            assert im.format == "WEBP"
+            assert 0 < im.width <= 500
+            assert 0 < im.height <= 5000
+
+    def test_image_with_archive_uses_pdf_thumbnail(
+        self,
+        mocker: MockerFixture,
+        tesseract_parser: RasterisedDocumentParser,
+        tesseract_samples_dir: Path,
+        simple_digital_pdf_file: Path,
+    ) -> None:
+        tesseract_parser.archive_path = simple_digital_pdf_file
+        target = "paperless.parsers.tesseract.make_thumbnail_from_pdf"
+        make_thumbnail = mocker.patch(target)
+        original = tesseract_samples_dir / "simple.jpg"
+
+        tesseract_parser.get_thumbnail(original, "image/jpeg")
+
+        make_thumbnail.assert_called_once_with(
+            simple_digital_pdf_file,
+            tesseract_parser.tempdir,
+        )
+
     def test_thumbnail_is_file(
         self,
         tesseract_parser: RasterisedDocumentParser,
