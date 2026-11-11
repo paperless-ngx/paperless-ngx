@@ -124,6 +124,42 @@ describe('DocumentListViewService', () => {
     })
   })
 
+  it.each([false, true])(
+    'preserves the current route on a background refresh (saved view: %s)',
+    (savedView) => {
+      if (savedView) documentListViewService.activateSavedView(view)
+      const navigate = jest.mocked(router.navigate)
+      navigate.mockClear()
+      documentListViewService.reload(null, false)
+      httpTestingController
+        .expectOne((req) => req.url === `${environment.apiBaseUrl}documents/`)
+        .flush(full_results)
+      expect(documentListViewService.documents).toEqual(full_results.results)
+      expect(navigate).not.toHaveBeenCalled()
+    }
+  )
+
+  it('preserves the route when a background refresh falls back to the first page', () => {
+    jest
+      .spyOn(documentListViewService, 'saveDocumentListView')
+      .mockImplementation(() => {})
+    documentListViewService.currentPage = 2
+    httpTestingController
+      .expectOne((req) => req.url === `${environment.apiBaseUrl}documents/`)
+      .flush(full_results)
+    const navigate = jest.mocked(router.navigate)
+    navigate.mockClear()
+    documentListViewService.reload(null, false)
+    httpTestingController
+      .expectOne((req) => req.url === `${environment.apiBaseUrl}documents/`)
+      .flush('Not found', { status: 404, statusText: 'Not found' })
+    httpTestingController
+      .expectOne((req) => req.url === `${environment.apiBaseUrl}documents/`)
+      .flush(full_results)
+    expect(documentListViewService.currentPage).toBe(1)
+    expect(navigate).not.toHaveBeenCalled()
+  })
+
   it('should reload the list', () => {
     expect(documentListViewService.currentPage).toEqual(1)
     documentListViewService.reload()

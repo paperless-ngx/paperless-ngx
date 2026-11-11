@@ -7,10 +7,15 @@ import {
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule } from '@angular/forms'
 import { By } from '@angular/platform-browser'
-import { Router } from '@angular/router'
+import {
+  ActivatedRoute,
+  convertToParamMap,
+  ParamMap,
+  Router,
+} from '@angular/router'
 import { RouterTestingModule } from '@angular/router/testing'
 import { NgbModal, NgbModalRef, NgbModule } from '@ng-bootstrap/ng-bootstrap'
-import { of, throwError } from 'rxjs'
+import { BehaviorSubject, of, throwError } from 'rxjs'
 import { routes } from 'src/app/app-routing.module'
 import {
   PaperlessTask,
@@ -159,6 +164,7 @@ const sectionCountResponse = {
 }
 
 describe('TasksComponent', () => {
+  let queryParams: BehaviorSubject<ParamMap>
   let component: TasksComponent
   let fixture: ComponentFixture<TasksComponent>
   let tasksService: TasksService
@@ -169,6 +175,7 @@ describe('TasksComponent', () => {
   let toastService: ToastService
 
   beforeEach(async () => {
+    queryParams = new BehaviorSubject(convertToParamMap({}))
     TestBed.configureTestingModule({
       imports: [
         NgbModule,
@@ -181,6 +188,17 @@ describe('TasksComponent', () => {
         ConfirmDialogComponent,
       ],
       providers: [
+        {
+          provide: ActivatedRoute,
+          useValue: {
+            queryParamMap: queryParams.asObservable(),
+            snapshot: {
+              get queryParamMap() {
+                return queryParams.value
+              },
+            },
+          },
+        },
         {
           provide: PermissionsService,
           useValue: {
@@ -243,6 +261,71 @@ describe('TasksComponent', () => {
     component.setSection(section)
     flushTaskLists(25, count)
   }
+
+  it('consumes a task link on load into the normal resettable Task ID filter', () => {
+    jest
+      .spyOn(tasksService, 'list')
+      .mockReturnValue(of({ count: 0, results: [] }))
+    jest
+      .spyOn(tasksService, 'statusCounts')
+      .mockReturnValue(of(sectionCountResponse))
+    jest.spyOn(router, 'navigate').mockResolvedValue(true)
+    queryParams.next(convertToParamMap({ task_id: 'linked-task' }))
+    fixture.destroy()
+    fixture = TestBed.createComponent(TasksComponent)
+    component = fixture.componentInstance
+    fixture.detectChanges()
+    expect(router.navigate).toHaveBeenCalledTimes(1)
+    expect(router.navigate).toHaveBeenCalledWith(
+      [],
+      expect.objectContaining({
+        queryParams: { task_id: null },
+        replaceUrl: true,
+      })
+    )
+    expect(component.filterTargetName).toBe('Task ID')
+    expect(component.filterText).toBe('linked-task')
+    expect(component.isFiltered).toBe(true)
+    component.setSection(TaskSection.InProgress)
+    expect(tasksService.list).toHaveBeenLastCalledWith(1, 25, {
+      task_id: 'linked-task',
+      status: [PaperlessTaskStatus.Pending, PaperlessTaskStatus.Started],
+    })
+    component.resetFilters()
+    expect(component.filterText).toBe('')
+    expect(component.isFiltered).toBe(false)
+    expect(tasksService.list).toHaveBeenLastCalledWith(1, 25, {
+      acknowledged: false,
+      status: [PaperlessTaskStatus.Pending, PaperlessTaskStatus.Started],
+    })
+    expect(router.navigate).toHaveBeenCalledTimes(1)
+  })
+
+  it('supports manually filtering by Task ID and clearing the text filter', () => {
+    jest
+      .spyOn(tasksService, 'list')
+      .mockReturnValue(of({ count: 0, results: [] }))
+    jest
+      .spyOn(tasksService, 'statusCounts')
+      .mockReturnValue(of(sectionCountResponse))
+    component.setSection(TaskSection.InProgress)
+    component.setFilterTarget(TaskFilterTargetID.TaskId)
+    component.filterText = tasks[0].task_id
+    jest.advanceTimersByTime(150)
+    expect(tasksService.list).toHaveBeenLastCalledWith(1, 25, {
+      task_id: tasks[0].task_id,
+      status: [PaperlessTaskStatus.Pending, PaperlessTaskStatus.Started],
+    })
+    component.pagedTasks.set(tasks)
+    expect(component.tasksForSection(TaskSection.NeedsAttention)).toEqual([
+      tasks[0],
+    ])
+    component.resetFilter()
+    expect(tasksService.list).toHaveBeenLastCalledWith(1, 25, {
+      acknowledged: false,
+      status: [PaperlessTaskStatus.Pending, PaperlessTaskStatus.Started],
+    })
+  })
 
   it('should display task sections with counts', () => {
     expect(component.selectedSection).toBe(TaskSection.All)

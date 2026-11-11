@@ -438,6 +438,20 @@ describe('ConsumerStatusService', () => {
     expect(updated).toBeTruthy()
   })
 
+  it('forwards bulk operation completion events', () => {
+    const received = jest.fn()
+    websocketStatusService.onBulkOperationStatus().subscribe(received)
+    const data = {
+      task_id: 'bulk-task',
+      operation: 'set_permissions',
+      status: 'success',
+    }
+    websocketStatusService.connect()
+    server.send({ type: WebsocketStatusType.BULK_OPERATION_STATUS, data })
+    websocketStatusService.disconnect()
+    expect(received).toHaveBeenCalledWith(data)
+  })
+
   it('should ignore keep-alive heartbeat messages from the server', () => {
     let updated = false
     let deleted = false

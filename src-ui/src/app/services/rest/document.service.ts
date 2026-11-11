@@ -14,6 +14,7 @@ import { DocumentSuggestions } from 'src/app/data/document-suggestions'
 import { FilterRule } from 'src/app/data/filter-rule'
 import { Results, SelectionData } from 'src/app/data/results'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { BulkOperationResponse } from '../../data/bulk-operation'
 import { queryParamsFromFilterRules } from '../../utils/query-params'
 import {
   PermissionAction,
@@ -337,11 +338,15 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     method: DocumentBulkEditMethod,
     args: any
   ) {
-    return this.http.post(this.getResourceUrl(null, 'bulk_edit'), {
-      ...selection,
-      method: method,
-      parameters: args,
-    })
+    return this.http.post<BulkOperationResponse>(
+      this.getResourceUrl(null, 'bulk_edit'),
+      {
+        ...selection,
+        method: method,
+        from_webui: true,
+        parameters: args,
+      }
+    )
   }
 
   deleteDocuments(selection: DocumentSelectionQuery) {

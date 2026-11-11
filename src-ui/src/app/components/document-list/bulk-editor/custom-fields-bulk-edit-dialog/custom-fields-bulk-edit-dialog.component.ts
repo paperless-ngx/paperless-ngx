@@ -16,6 +16,7 @@ import { NumberComponent } from 'src/app/components/common/input/number/number.c
 import { SelectComponent } from 'src/app/components/common/input/select/select.component'
 import { TextComponent } from 'src/app/components/common/input/text/text.component'
 import { UrlComponent } from 'src/app/components/common/input/url/url.component'
+import { BulkOperationResponse } from 'src/app/data/bulk-operation'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import {
   DocumentSelectionQuery,
@@ -49,7 +50,7 @@ export class CustomFieldsBulkEditDialogComponent {
   CustomFieldDataType = CustomFieldDataType
 
   @Output()
-  succeeded = new EventEmitter()
+  succeeded = new EventEmitter<BulkOperationResponse>()
 
   @Output()
   failed = new EventEmitter()
@@ -103,6 +104,8 @@ export class CustomFieldsBulkEditDialogComponent {
   }
 
   public save() {
+    if (this.networkActive) return
+    this.networkActive = true
     this.documentService
       .bulkEdit(this.selection, 'modify_custom_fields', {
         add_custom_fields: this.form.value,
@@ -110,11 +113,12 @@ export class CustomFieldsBulkEditDialogComponent {
       })
       .pipe(first())
       .subscribe({
-        next: () => {
+        next: (response) => {
           this.activeModal.close()
-          this.succeeded.emit()
+          this.succeeded.emit(response)
         },
         error: (error) => {
+          this.networkActive = false
           this.failed.emit(error)
         },
       })

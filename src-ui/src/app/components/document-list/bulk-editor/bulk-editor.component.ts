@@ -104,11 +104,11 @@ export class BulkEditorComponent
   private correspondentService = inject(CorrespondentService)
   list = inject(DocumentListViewService)
   private documentService = inject(DocumentService)
+  private trashService = inject(TrashService)
   private modalService = inject(NgbModal)
   private openDocumentService = inject(OpenDocumentsService)
   private settings = inject(SettingsService)
   private toastService = inject(ToastService)
-  private trashService = inject(TrashService)
   private storagePathService = inject(StoragePathService)
   private customFieldService = inject(CustomFieldsService)
   public readonly permissionService = inject(PermissionsService)
@@ -299,9 +299,31 @@ export class BulkEditorComponent
       .bulkEdit(overrideSelection ?? this.getSelectionQuery(), method, args)
       .pipe(first())
       .subscribe({
-        next: () => this.handleOperationSuccess(modal),
+        next: ({ task_id }) => this.handleOperationQueued(modal, task_id),
         error: (error) => this.handleOperationError(modal, error),
       })
+  }
+
+  private handleOperationQueued(modal: NgbModalRef, taskId: string) {
+    modal?.close()
+    this.list.selectNone()
+    const canViewTasks = this.permissionService.currentUserCan(
+      PermissionAction.View,
+      PermissionType.PaperlessTask
+    )
+    this.toastService.show({
+      content: $localize`Bulk operation queued.`,
+      delay: 5000,
+      ...(canViewTasks
+        ? {
+            actionName: $localize`View task`,
+            action: () =>
+              this.router.navigate(['/tasks'], {
+                queryParams: { task_id: taskId },
+              }),
+          }
+        : {}),
+    })
   }
 
   private executeDocumentAction(
@@ -1088,14 +1110,9 @@ export class BulkEditorComponent
 
     dialog.selection = this.getSelectionQuery()
     dialog.selectionCount = this.getSelectionSize()
-    dialog.succeeded.subscribe((result) => {
-      this.toastService.showSuccess($localize`Custom fields updated.`)
-      this.list.reload()
-      this.list.reduceSelectionToFilter()
-      this.list.selected.forEach((id) => {
-        this.openDocumentService.refreshDocument(id)
-      })
-    })
+    dialog.succeeded.subscribe(({ task_id }) =>
+      this.handleOperationQueued(null, task_id)
+    )
     dialog.failed.subscribe((error) => {
       this.toastService.showError(
         $localize`Error updating custom fields.`,
