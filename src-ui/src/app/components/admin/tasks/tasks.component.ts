@@ -630,23 +630,8 @@ export class TasksComponent
       return false
     }
 
-    if (!this._filterText.length) {
-      return true
-    }
-
-    const query = this._filterText.toLowerCase()
-
-    if (this.filterTargetID == TaskFilterTargetID.Name) {
-      return [
-        this.taskDisplayName(task),
-        task.task_type_display,
-        task.trigger_source_display,
-      ]
-        .filter(Boolean)
-        .some((value) => value.toLowerCase().includes(query))
-    }
-
-    return this.taskResultMessage(task)?.toLowerCase().includes(query) ?? false
+    // Text filtering now handled API-side
+    return true
   }
 
   private tasksForOptionCounts({
