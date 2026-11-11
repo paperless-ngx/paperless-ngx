@@ -17,6 +17,7 @@ from django.conf import settings
 from PIL import Image
 
 from documents.parsers import ParseError
+from documents.parsers import encode_thumbnail_webp
 from documents.parsers import make_thumbnail_from_pdf
 from documents.utils import copy_file_with_basic_stats
 from documents.utils import maybe_override_pixel_limit
@@ -162,6 +163,10 @@ class RasterisedDocumentParser:
     # ------------------------------------------------------------------
 
     def get_thumbnail(self, document_path: Path, mime_type: str) -> Path:
+        if self.archive_path is None and self.is_image(mime_type):
+            thumbnail_path = self.tempdir / "convert.webp"
+            encode_thumbnail_webp(Path(document_path), thumbnail_path)
+            return thumbnail_path
         return make_thumbnail_from_pdf(
             self.archive_path or Path(document_path),
             self.tempdir,
