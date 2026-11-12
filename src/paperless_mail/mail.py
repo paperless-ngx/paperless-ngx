@@ -259,6 +259,7 @@ def apply_mail_action(
     message_subject: str,
     message_date: datetime.datetime,
     uid_validity: str | None = None,
+    document_link_field_id: int | None = None,
 ) -> None:
     """
     This shared task applies the mail action of a particular mail rule to the
@@ -274,7 +275,7 @@ def apply_mail_action(
         message_date = make_aware(message_date)
 
     try:
-        link_mail_documents(result, rule)
+        link_mail_documents(result, rule, field_id=document_link_field_id)
         with get_mailbox(
             server=account.imap_server,
             port=account.imap_port,
@@ -376,6 +377,7 @@ def queue_consumption_tasks(
         message_subject=message.subject,
         message_date=message.date,
         uid_validity=uid_validity,
+        document_link_field_id=rule.assign_document_link_field_id,
     )
     chord(header=consume_tasks, body=mail_action_task).on_error(
         error_callback.s(

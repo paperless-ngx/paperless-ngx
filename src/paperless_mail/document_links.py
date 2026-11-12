@@ -2,6 +2,7 @@
 
 from functools import partial
 
+from django.conf import settings
 from django.db import transaction
 from django.utils import timezone
 
@@ -11,6 +12,7 @@ from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.permissions import permitted_document_ids
 from documents.search import get_backend
+from documents.signals.handlers import update_filename_and_move_files
 from paperless_mail.models import MailRule
 
 
@@ -18,22 +20,33 @@ class MailDocumentLinkError(ValueError):
     """The complete email batch cannot safely be linked."""
 
 
-def _refresh_documents(document_ids: list[int]) -> None:
+def _refresh_documents(document_ids: list[int], field_id: int) -> None:
     # Do not emit document_updated: linking must not rerun user workflows.
+    # File operations belong after the whole batch commits, not in CFI post_save
+    # signals inside a transaction that could still roll back the link values.
+    for instance in CustomFieldInstance.objects.filter(
+        document_id__in=document_ids,
+        field_id=field_id,
+    ).select_related("document__storage_path"):
+        update_filename_and_move_files(CustomFieldInstance, instance)
     for document_id in document_ids:
         clear_document_caches(document_id)
     with get_backend().batch_update() as batch:
         batch.add_or_update_ids(document_ids)
 
 
-def link_mail_documents(results: list, rule: MailRule) -> None:
+def link_mail_documents(
+    results: list,
+    rule: MailRule,
+    *,
+    field_id: int | None,
+) -> None:
     """Add direct, symmetric links without extending existing link groups.
 
     A duplicate belongs to this batch because the consumer identified its exact
     content. Existing neighbours of that document do not belong to this batch.
     Reject incomplete batches before the caller performs a destructive mail action.
     """
-    field_id = rule.assign_document_link_field_id
     if field_id is None:
         return
 
@@ -97,25 +110,52 @@ def link_mail_documents(results: list, rule: MailRule) -> None:
             )
         }
         changed_ids = []
+        to_create = []
+        to_update = []
+        audit_changes = []
         for document in documents:
             instance = existing.get(document.pk)
             previous = (instance.value_document_ids or []) if instance else []
             targets = sorted(set(previous) | (document_ids - {document.pk}))
             if instance is None:
-                CustomFieldInstance.objects.create(
+                instance = CustomFieldInstance(
                     document=document,
                     field=field,
                     value_document_ids=targets,
                 )
+                to_create.append(instance)
+                audit_changes.append((instance, None, targets))
             elif targets != previous:
                 instance.value_document_ids = targets
-                instance.save(update_fields=["value_document_ids"])
+                to_update.append(instance)
+                audit_changes.append((instance, previous, targets))
             else:
                 continue
             changed_ids.append(document.pk)
 
+        # Bulk writes deliberately avoid file-moving post_save receivers.
+        if to_create:
+            CustomFieldInstance.objects.bulk_create(to_create)
+        if to_update:
+            CustomFieldInstance.objects.bulk_update(to_update, ["value_document_ids"])
+        if settings.AUDIT_LOG_ENABLED:
+            from auditlog.models import LogEntry
+
+            for instance, previous, targets in audit_changes:
+                LogEntry.objects.log_create(
+                    instance=instance,
+                    changes={"value_document_ids": [previous, targets]},
+                    action=(
+                        LogEntry.Action.CREATE
+                        if previous is None
+                        else LogEntry.Action.UPDATE
+                    ),
+                    actor=owner,
+                )
         if changed_ids:
             Document.objects.filter(pk__in=changed_ids).update(modified=timezone.now())
         # Refresh even on a retry whose database writes already committed but
         # whose cache/index refresh failed. Repeating the merge itself is safe.
-        transaction.on_commit(partial(_refresh_documents, sorted(document_ids)))
+        transaction.on_commit(
+            partial(_refresh_documents, sorted(document_ids), field_id),
+        )
