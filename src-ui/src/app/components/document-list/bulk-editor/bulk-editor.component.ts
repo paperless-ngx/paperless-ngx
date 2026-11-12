@@ -274,6 +274,7 @@ export class BulkEditorComponent
       this.workflowService
         .list(1, 100000, null, null, {
           trigger_type: WorkflowTriggerType.Manual,
+          enabled: true,
         })
         .pipe(first())
         .subscribe((result) => (this.manualWorkflows = result.results))

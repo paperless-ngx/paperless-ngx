@@ -637,10 +637,14 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
                 type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
             ),
         )
+        disabled = self._make_manual_workflow()
+        disabled.enabled = False
+        disabled.save()
         for label, parameters in (
             ("missing workflow", {}),
             ("nonexistent workflow", {"workflow": 9999}),
             ("no manual trigger", {"workflow": non_manual.id}),
+            ("disabled workflow", {"workflow": disabled.id}),
             ("non-bool filter", {"workflow": manual.id, "filter_documents": "nope"}),
         ):
             with self.subTest(label):

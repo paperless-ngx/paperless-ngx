@@ -851,6 +851,7 @@ export class DocumentDetailComponent
       this.workflowService
         .list(1, 100000, null, null, {
           trigger_type: WorkflowTriggerType.Manual,
+          enabled: true,
         })
         .pipe(first(), takeUntil(this.unsubscribeNotifier))
         .subscribe((result) => this.manualWorkflows.set(result.results))

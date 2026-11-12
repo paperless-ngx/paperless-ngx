@@ -2167,6 +2167,8 @@ class BulkEditSerializer(
             workflow = Workflow.objects.get(id=parameters["workflow"])
         except (Workflow.DoesNotExist, ValueError, TypeError):
             raise serializers.ValidationError("Workflow does not exist")
+        if not workflow.enabled:
+            raise serializers.ValidationError("Workflow is not enabled")
         if not workflow.triggers.filter(
             type=WorkflowTrigger.WorkflowTriggerType.MANUAL,
         ).exists():

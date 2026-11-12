@@ -258,6 +258,7 @@ class WorkflowFilterSet(FilterSet):
         model = Workflow
         fields = {
             "id": ID_KWARGS,
+            "enabled": ["exact"],
         }
 
 
