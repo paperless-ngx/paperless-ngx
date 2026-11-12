@@ -677,6 +677,7 @@ describe('BulkEditorComponent', () => {
     fixture.detectChanges()
     expect(workflowService.list).toHaveBeenCalledWith(1, 100000, null, null, {
       trigger_type: WorkflowTriggerType.Manual,
+      enabled: true,
     })
     expect(component.manualWorkflows).toHaveLength(1)
     expect(component.manualWorkflows[0].id).toEqual(5)

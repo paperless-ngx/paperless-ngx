@@ -2167,6 +2167,12 @@ class BulkEditSerializer(
             workflow = Workflow.objects.get(id=parameters["workflow"])
         except (Workflow.DoesNotExist, ValueError, TypeError):
             raise serializers.ValidationError("Workflow does not exist")
+        request = self.context.get("request")
+        user = getattr(request, "user", None)
+        if user is not None and not user.has_perm("documents.view_workflow"):
+            raise PermissionDenied(
+                "Insufficient permissions to run this workflow",
+            )
         if not workflow.enabled:
             raise serializers.ValidationError("Workflow is not enabled")
         if not workflow.triggers.filter(

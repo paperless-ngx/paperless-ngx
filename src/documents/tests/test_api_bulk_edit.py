@@ -637,9 +637,16 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
                 type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
             ),
         )
-        disabled = self._make_manual_workflow()
-        disabled.enabled = False
-        disabled.save()
+        disabled = Workflow.objects.create(
+            name="Disabled manual",
+            order=0,
+            enabled=False,
+        )
+        disabled.triggers.add(
+            WorkflowTrigger.objects.create(
+                type=WorkflowTrigger.WorkflowTriggerType.MANUAL,
+            ),
+        )
         for label, parameters in (
             ("missing workflow", {}),
             ("nonexistent workflow", {"workflow": 9999}),
@@ -662,6 +669,21 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         user = UserFactory(username="no_perms")
         grant_all_global(user)
         doc = DocumentFactory(owner=UserFactory(username="other"))
+        workflow = self._make_manual_workflow()
+        self.client.force_authenticate(user=user)
+
+        response = self._run_workflow({"workflow": workflow.id}, documents=[doc.id])
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        m.assert_not_called()
+
+    @mock.patch("documents.views.bulk_edit.run_workflow")
+    def test_run_workflow_requires_workflow_permission(self, m) -> None:
+        """Owning the documents is not enough without view_workflow permission."""
+        self.setup_mock(m, "run_workflow")
+        user = UserFactory(username="no_wf_perms")
+        grant_global(user, "change_document")
+        doc = DocumentFactory(owner=user)
         workflow = self._make_manual_workflow()
         self.client.force_authenticate(user=user)
 

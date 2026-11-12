@@ -124,6 +124,23 @@ class TestApiWorkflows(DirectoriesMixin, APITestCase):
         self.assertEqual(response.data["count"], 1)
         self.assertEqual(response.data["results"][0]["id"], manual_workflow.id)
 
+    def test_api_get_workflows_filter_enabled(self) -> None:
+        """
+        GIVEN:
+            - An enabled workflow and a disabled workflow
+        WHEN:
+            - Workflows are requested filtered by enabled
+        THEN:
+            - Only enabled workflows are returned
+        """
+        Workflow.objects.create(name="Disabled", order=1, enabled=False)
+
+        response = self.client.get(f"{self.ENDPOINT}?enabled=true", format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["count"], 1)
+        self.assertEqual(response.data["results"][0]["id"], self.workflow.id)
+
     def test_api_get_workflow_actions_ordered(self) -> None:
         """
         GIVEN:
