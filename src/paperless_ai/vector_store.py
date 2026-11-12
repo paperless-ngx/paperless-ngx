@@ -89,15 +89,10 @@ class _Row(NamedTuple):
     embedding: bytes
 
 
-# _build_where(): the largest IN value list translated into bound SQL
-# parameters. SQLite's own hard limit (SQLITE_MAX_VARIABLE_NUMBER) is 32766
-# by default; this leaves headroom below that for the query's other bound
-# parameters (the embedding blob, k, and any NE clause) and for the limit
-# itself to move. An IN filter this large should not happen in practice --
-# callers are expected to pass None (no filter) rather than every id when
-# the filter would not actually narrow anything -- so this is a guard
-# against a future regression, not a normal code path.
-_MAX_IN_VALUES = 32700
+# _build_where(): the largest IN / NOT IN list bound as one parameter per value,
+# leaving headroom under SQLite's 32766-variable limit for the query's other
+# parameters. Longer lists are bound as a single JSON array via json_each().
+_MAX_INLINE_IN_VALUES = 32700
 
 
 def _pack(embedding: Sequence[float]) -> bytes:
@@ -120,7 +115,7 @@ def _vec0_params(rows: list[_Row]) -> list[tuple[str, int, str, bytes]]:
     return [(r.chunk_id, r.document_id, r.node_content, r.embedding) for r in rows]
 
 
-def _build_where(filters: MetadataFilters | None) -> tuple[str, list[int]]:
+def _build_where(filters: MetadataFilters | None) -> tuple[str, list[int | str]]:
     """Translate the EQ / IN / NIN / NE filters we use into a parameterized
     SQL clause on vec0 metadata columns. Returns ("", []) when there is
     nothing to filter. document_id is vec0's only filterable column and is
@@ -132,7 +127,7 @@ def _build_where(filters: MetadataFilters | None) -> tuple[str, list[int]]:
     if filters is None or not filters.filters:
         return "", []
     clauses: list[str] = []
-    params: list[int] = []
+    params: list[int | str] = []
     for f in filters.filters:
         # filters.filters is Union[MetadataFilter, ExactMatchFilter, MetadataFilters];
         # we only build MetadataFilter entries, so skip anything else at runtime.
@@ -149,21 +144,11 @@ def _build_where(filters: MetadataFilters | None) -> tuple[str, list[int]]:
                 # excludes nothing, so it matches everything.
                 clauses.append("1 = 0" if is_in else "1 = 1")
                 continue
-            if len(values) > _MAX_IN_VALUES:
-                # Refuse rather than risk SQLite's own bound-parameter limit
-                # ("too many SQL variables"): a list this large must match no
-                # rows, never widen the scope to "everything" -- true for
-                # NOT IN too, where failing open would surface every
-                # excluded row.
-                logger.warning(
-                    "Refusing to build a %s filter on %r with %d values "
-                    "(over the %d-value safety limit); returning no rows.",
-                    sql_op,
-                    f.key,
-                    len(values),
-                    _MAX_IN_VALUES,
+            if len(values) > _MAX_INLINE_IN_VALUES:
+                clauses.append(
+                    f"{f.key} {sql_op} (SELECT value FROM json_each(?))",
                 )
-                clauses.append("1 = 0")
+                params.append(json.dumps(values))
                 continue
             placeholders = ",".join("?" for _ in values)
             clauses.append(f"{f.key} {sql_op} ({placeholders})")
@@ -557,6 +542,12 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
         if not self.table_exists():
             return {}
         return DocumentMetaTable.all_modified_times(self._conn)
+
+    def indexed_document_ids(self) -> set[int]:
+        """Return the ids of all indexed documents."""
+        if not self.table_exists():
+            return set()
+        return DocumentMetaTable.all_document_ids(self._conn)
 
     @property
     def _db_path(self) -> str:
