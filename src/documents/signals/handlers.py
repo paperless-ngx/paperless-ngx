@@ -864,6 +864,8 @@ def run_workflows(
     logging_group: uuid.UUID | None = None,
     overrides: DocumentMetadataOverrides | None = None,
     original_file: Path | None = None,
+    *,
+    skip_matching: bool = False,
 ) -> tuple[DocumentMetadataOverrides, str] | None:
     """
     Execute workflows matching a document for the given trigger. When `overrides` is provided
@@ -874,6 +876,10 @@ def run_workflows(
     `document.source_path` (Document) or `document.original_file` (ConsumableDocument).
 
     Passing `workflow_to_run` skips the workflow query (currently only used by scheduled runs).
+
+    Passing `skip_matching` runs the workflow's actions without evaluating its trigger
+    filters against the document. It is only meaningful together with `workflow_to_run`
+    (e.g. a manual run the user has explicitly forced onto the selected documents).
     """
 
     use_overrides = overrides is not None
@@ -923,7 +929,11 @@ def run_workflows(
                 )
                 break
 
-        if matching.document_matches_workflow(document, workflow, trigger_type):
+        if skip_matching or matching.document_matches_workflow(
+            document,
+            workflow,
+            trigger_type,
+        ):
             action: WorkflowAction
             has_move_to_trash_action = False
             for action in workflow.actions.order_by("order", "pk"):

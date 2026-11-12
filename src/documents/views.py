@@ -146,6 +146,7 @@ from documents.filters import ShareLinkFilterSet
 from documents.filters import StoragePathFilterSet
 from documents.filters import TagFilterSet
 from documents.filters import TitleContentFilter
+from documents.filters import WorkflowFilterSet
 from documents.mail import EmailAttachment
 from documents.mail import send_email
 from documents.matching import match_correspondents
@@ -3008,6 +3009,100 @@ class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
         )
         return Response({"result": "OK", "task_id": task.id})
 
+    def _has_document_permissions(
+        self,
+        *,
+        user: User,
+        documents: list[int],
+        method,
+        parameters: dict[str, Any],
+    ) -> bool:
+        if user.is_superuser:
+            return True
+
+        root_docs = {
+            get_root_document(doc)
+            for doc in Document.objects.select_related(
+                "owner",
+                "root_document__owner",
+            ).filter(pk__in=documents)
+        }
+        user_is_owner_of_all_documents = all(
+            (doc.owner == user or doc.owner is None) for doc in root_docs
+        )
+
+        # check global and object permissions for all documents
+        has_perms = (
+            user.has_perm(
+                "documents.change_document",
+            )
+            and not Document.global_objects.filter(pk__in=documents)
+            .exclude(pk__in=permitted_document_ids(user, perm="change_document"))
+            .exists()
+        )
+
+        # check ownership for methods that change original document
+        if (
+            (
+                has_perms
+                and method
+                in [
+                    bulk_edit.set_permissions,
+                    bulk_edit.delete,
+                    bulk_edit.rotate,
+                    bulk_edit.delete_pages,
+                    bulk_edit.edit_pdf,
+                    bulk_edit.merge_as_versions,
+                    bulk_edit.remove_password,
+                    bulk_edit.run_workflow,
+                ]
+            )
+            or (
+                method in [bulk_edit.merge, bulk_edit.split]
+                and parameters.get("delete_originals")
+            )
+            or (method == bulk_edit.edit_pdf and parameters.get("update_document"))
+        ):
+            has_perms = has_perms and user_is_owner_of_all_documents
+
+        # check global add permissions for methods that create documents
+        if (
+            has_perms
+            and (
+                method in [bulk_edit.split, bulk_edit.merge]
+                or (
+                    method in [bulk_edit.edit_pdf, bulk_edit.remove_password]
+                    and not parameters.get("update_document")
+                )
+            )
+            and not user.has_perm("documents.add_document")
+        ):
+            has_perms = False
+
+        # check global delete permissions for methods that delete documents
+        if (
+            has_perms
+            and (
+                method == bulk_edit.delete
+                # Sources stop being documents of their own, and removing one
+                # again afterwards needs delete_document
+                or method == bulk_edit.merge_as_versions
+                or (
+                    method in [bulk_edit.merge, bulk_edit.split]
+                    and parameters.get("delete_originals")
+                )
+                or (
+                    method in [bulk_edit.edit_pdf, bulk_edit.remove_password]
+                    and parameters.get("delete_original")
+                    and not parameters.get("update_document")
+                )
+            )
+            and not user.has_perm("documents.delete_document")
+        ):
+            has_perms = False
+
+        return has_perms
+
     def _execute_document_action(
         self,
         *,
@@ -3084,6 +3179,7 @@ class BulkEditView(DocumentOperationPermissionMixin):
     LEGACY_MODIFIED_FIELDS = {
         "delete": "deleted_at",
         "reprocess": "checksum",
+        "remove_password": None,
     }
 
     serializer_class = BulkEditSerializer
@@ -5089,6 +5185,8 @@ class WorkflowViewSet(ModelViewSet[Workflow]):
 
     serializer_class = WorkflowSerializer
     pagination_class = StandardPagination
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = WorkflowFilterSet
 
     model = Workflow
 

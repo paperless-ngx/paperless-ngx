@@ -39,6 +39,7 @@ export type DocumentBulkEditMethod =
   | 'modify_tags'
   | 'modify_custom_fields'
   | 'set_permissions'
+  | 'run_workflow'
 
 export interface MergeDocumentsRequest {
   metadata_document_id?: number

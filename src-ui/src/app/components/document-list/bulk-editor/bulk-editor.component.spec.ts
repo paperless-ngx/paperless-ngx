@@ -17,6 +17,7 @@ import { FILTER_TITLE } from 'src/app/data/filter-rule-type'
 import { Results } from 'src/app/data/results'
 import { StoragePath } from 'src/app/data/storage-path'
 import { Tag } from 'src/app/data/tag'
+import { WorkflowTriggerType } from 'src/app/data/workflow-trigger'
 import { FilterPipe } from 'src/app/pipes/filter.pipe'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import {
@@ -36,6 +37,7 @@ import { ShareLinkBundleService } from 'src/app/services/rest/share-link-bundle.
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { TagService } from 'src/app/services/rest/tag.service'
 import { UserService } from 'src/app/services/rest/user.service'
+import { WorkflowService } from 'src/app/services/rest/workflow.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { TrashService } from 'src/app/services/trash.service'
@@ -83,6 +85,7 @@ describe('BulkEditorComponent', () => {
   let customFieldsService: CustomFieldsService
   let httpTestingController: HttpTestingController
   let shareLinkBundleService: ShareLinkBundleService
+  let workflowService: WorkflowService
   let router: Router
 
   beforeEach(async () => {
@@ -174,6 +177,22 @@ describe('BulkEditorComponent', () => {
           },
         },
         {
+          provide: WorkflowService,
+          useValue: {
+            list: jest.fn(() =>
+              of({
+                results: [
+                  {
+                    id: 5,
+                    name: 'Manual workflow',
+                    triggers: [{ type: WorkflowTriggerType.Manual }],
+                  },
+                ],
+              })
+            ),
+          },
+        },
+        {
           provide: Router,
           useValue: { navigate: jest.fn().mockResolvedValue(true) },
         },
@@ -195,6 +214,7 @@ describe('BulkEditorComponent', () => {
     customFieldsService = TestBed.inject(CustomFieldsService)
     httpTestingController = TestBed.inject(HttpTestingController)
     shareLinkBundleService = TestBed.inject(ShareLinkBundleService)
+    workflowService = TestBed.inject(WorkflowService)
     router = TestBed.inject(Router)
 
     fixture = TestBed.createComponent(BulkEditorComponent)
@@ -652,6 +672,51 @@ describe('BulkEditorComponent', () => {
     httpTestingController.expectNone(
       `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
     )
+  })
+
+  it('should load manual workflows on init', () => {
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
+    fixture.detectChanges()
+    expect(workflowService.list).toHaveBeenCalledWith(1, 100000, null, null, {
+      trigger_type: WorkflowTriggerType.Manual,
+      enabled: true,
+    })
+    expect(component.manualWorkflows).toHaveLength(1)
+    expect(component.manualWorkflows[0].id).toEqual(5)
+  })
+
+  it('should run a workflow on the selection via the run workflow dialog', () => {
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((m) => (modal = m[0]))
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
+    jest
+      .spyOn(documentListViewService, 'documents', 'get')
+      .mockReturnValue([{ id: 3 }, { id: 4 }])
+    jest
+      .spyOn(documentListViewService, 'selected', 'get')
+      .mockReturnValue(new Set([3, 4]))
+    fixture.detectChanges()
+    component.runWorkflowSelected()
+    expect(modal).not.toBeUndefined()
+    expect(modal.componentInstance.workflows).toEqual(component.manualWorkflows)
+    modal.componentInstance.workflowId = 5
+    modal.componentInstance.force = true
+    modal.componentInstance.confirm()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/bulk_edit/`
+    )
+    expect(req.request.body.method).toEqual('run_workflow')
+    expect(req.request.body.parameters).toEqual({
+      workflow: 5,
+      filter_documents: false,
+    })
+    req.flush(true)
+    httpTestingController.match(
+      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
+    ) // list reload
+    httpTestingController.match(
+      `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
+    ) // listAllFilteredIds
   })
 
   it('should set modal dialog text accordingly for tag edit confirmation', () => {
