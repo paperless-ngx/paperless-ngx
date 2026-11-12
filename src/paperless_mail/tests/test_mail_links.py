@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 import hashlib
 from pathlib import Path
+from typing import TYPE_CHECKING
 from unittest import mock
 
 import pytest
@@ -22,11 +25,22 @@ from paperless_testing.factories import StoragePathFactory
 from paperless_testing.factories import UserFactory
 from paperless_testing.permissions import grant_global
 
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from pytest_django.fixtures import DjangoCaptureOnCommitCallbacks
+    from pytest_django.fixtures import Settings
+
+    from documents.data_models import ConsumeFileDuplicateResult
+    from documents.data_models import ConsumeFileSuccessResult
+    from paperless_mail.models import MailRule
+    from paperless_testing.dirs import PaperlessDirs
+
 pytestmark = pytest.mark.django_db
 
 
 @pytest.fixture
-def link_field():
+def link_field() -> CustomField:
     return CustomField.objects.create(
         name="Email documents",
         data_type=CustomField.FieldDataType.DOCUMENTLINK,
@@ -34,11 +48,11 @@ def link_field():
 
 
 @pytest.fixture
-def rule(link_field):
+def rule(link_field: CustomField) -> MailRule:
     return MailRuleFactory(owner=None, assign_document_link_field=link_field)
 
 
-def link_batch(results, rule):
+def link_batch(results: Sequence[object], rule: MailRule) -> None:
     link_mail_documents(
         results,
         rule,
@@ -46,7 +60,7 @@ def link_batch(results, rule):
     )
 
 
-def linked_ids(document, field):
+def linked_ids(document: Document, field: CustomField) -> set[int]:
     return set(
         CustomFieldInstance.objects.get(
             document=document,
@@ -55,15 +69,18 @@ def linked_ids(document, field):
     )
 
 
-def success(document):
+def success(document: Document) -> ConsumeFileSuccessResult:
     return {"document_id": document.pk}
 
 
-def duplicate(document):
+def duplicate(document: Document) -> ConsumeFileDuplicateResult:
     return {"duplicate_of": document.pk, "duplicate_in_trash": False}
 
 
-def test_same_email_links_are_symmetric_and_preserve_other_metadata(rule, link_field):
+def test_same_email_links_are_symmetric_and_preserve_other_metadata(
+    rule: MailRule,
+    link_field: CustomField,
+) -> None:
     first, second, third, old = DocumentFactory.create_batch(4, owner=None)
     other_field = CustomField.objects.create(name="Unrelated", data_type="string")
     other_value = CustomFieldInstance.objects.create(
@@ -92,7 +109,10 @@ def test_same_email_links_are_symmetric_and_preserve_other_metadata(rule, link_f
     assert other_value.value_text == "Keep this"
 
 
-def test_shared_duplicate_does_not_merge_other_email_members(rule, link_field):
+def test_shared_duplicate_does_not_merge_other_email_members(
+    rule: MailRule,
+    link_field: CustomField,
+) -> None:
     first, shared, second = DocumentFactory.create_batch(3, owner=None)
     link_batch([success(first), success(shared)], rule)
     link_batch([success(second), duplicate(shared)], rule)
@@ -104,7 +124,10 @@ def test_shared_duplicate_does_not_merge_other_email_members(rule, link_field):
     assert CustomFieldInstance.objects.filter(field=link_field).count() == 3
 
 
-def test_duplicate_occurrences_do_not_self_link(rule, link_field):
+def test_duplicate_occurrences_do_not_self_link(
+    rule: MailRule,
+    link_field: CustomField,
+) -> None:
     first, second = DocumentFactory.create_batch(2, owner=None)
     link_batch([success(first), duplicate(first), success(second)], rule)
     assert linked_ids(first, link_field) == {second.pk}
@@ -112,13 +135,16 @@ def test_duplicate_occurrences_do_not_self_link(rule, link_field):
 
 
 @pytest.mark.parametrize("results", [[], [{"reason": "split"}], [None]])
-def test_disabled_linking_preserves_existing_behavior(results, rule):
+def test_disabled_linking_preserves_existing_behavior(
+    results: Sequence[object],
+    rule: MailRule,
+) -> None:
     rule.assign_document_link_field = None
     link_batch(results, rule)
     assert not CustomFieldInstance.objects.exists()
 
 
-def test_single_document_has_no_link(rule):
+def test_single_document_has_no_link(rule: MailRule) -> None:
     document = DocumentFactory(owner=None)
     link_batch([success(document)], rule)
     assert not CustomFieldInstance.objects.exists()
@@ -138,7 +164,10 @@ def test_single_document_has_no_link(rule):
         {"duplicate_of": 1},
     ],
 )
-def test_incomplete_results_reject_the_whole_batch(result, rule):
+def test_incomplete_results_reject_the_whole_batch(
+    result: object,
+    rule: MailRule,
+) -> None:
     document = DocumentFactory(owner=None)
     with pytest.raises(MailDocumentLinkError):
         link_batch([success(document), result], rule)
@@ -146,7 +175,11 @@ def test_incomplete_results_reject_the_whole_batch(result, rule):
 
 
 @pytest.mark.parametrize("trashed", [True, False])
-def test_unavailable_document_rejects_the_whole_batch(trashed, rule):
+def test_unavailable_document_rejects_the_whole_batch(
+    *,
+    trashed: bool,
+    rule: MailRule,
+) -> None:
     first, second = DocumentFactory.create_batch(2, owner=None)
     if trashed:
         Document.objects.filter(pk=second.pk).update(deleted_at=timezone.now())
@@ -158,7 +191,7 @@ def test_unavailable_document_rejects_the_whole_batch(trashed, rule):
     assert not CustomFieldInstance.objects.exists()
 
 
-def test_ownerless_rule_cannot_link_owned_document(rule):
+def test_ownerless_rule_cannot_link_owned_document(rule: MailRule) -> None:
     first = DocumentFactory(owner=None)
     second = DocumentFactory(owner=UserFactory())
     with pytest.raises(MailDocumentLinkError, match="permissions"):
@@ -168,10 +201,11 @@ def test_ownerless_rule_cannot_link_owned_document(rule):
 
 @pytest.mark.parametrize("active,global_permission", [(False, True), (True, False)])
 def test_owner_requires_active_account_and_global_permission(
-    active,
-    global_permission,
-    rule,
-):
+    *,
+    active: bool,
+    global_permission: bool,
+    rule: MailRule,
+) -> None:
     owner = UserFactory(is_active=active)
     if global_permission:
         grant_global(owner, "change_document")
@@ -182,7 +216,7 @@ def test_owner_requires_active_account_and_global_permission(
     assert not CustomFieldInstance.objects.exists()
 
 
-def test_owner_requires_permission_on_every_document(rule):
+def test_owner_requires_permission_on_every_document(rule: MailRule) -> None:
     owner = UserFactory()
     grant_global(owner, "change_document")
     rule.owner = owner
@@ -193,7 +227,7 @@ def test_owner_requires_permission_on_every_document(rule):
     assert not CustomFieldInstance.objects.exists()
 
 
-def test_authorized_owner_can_link(rule, link_field):
+def test_authorized_owner_can_link(rule: MailRule, link_field: CustomField) -> None:
     owner = UserFactory()
     grant_global(owner, "change_document")
     rule.owner = owner
@@ -203,7 +237,10 @@ def test_authorized_owner_can_link(rule, link_field):
 
 
 @pytest.fixture
-def stored_documents(paperless_dirs, link_field):
+def stored_documents(
+    paperless_dirs: PaperlessDirs,
+    link_field: CustomField,
+) -> list[Document]:
     path = StoragePathFactory(
         path=(
             "{% if custom_fields|get_cf_value('Email documents') %}linked"
@@ -233,8 +270,12 @@ def stored_documents(paperless_dirs, link_field):
     return documents
 
 
-@pytest.mark.django_db(transaction=True)
-def test_link_write_failure_does_not_move_originals(rule, link_field, stored_documents):
+def test_link_write_failure_does_not_move_originals(
+    rule: MailRule,
+    link_field: CustomField,
+    stored_documents: list[Document],
+    django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks,
+) -> None:
     before = {
         document.pk: (document.source_path, document.source_path.read_bytes())
         for document in stored_documents
@@ -246,10 +287,12 @@ def test_link_write_failure_does_not_move_originals(rule, link_field, stored_doc
             side_effect=DatabaseError("Second write failed"),
         ),
         mock.patch("paperless_mail.document_links._refresh_documents") as refresh,
+        django_capture_on_commit_callbacks(execute=True) as callbacks,
         pytest.raises(DatabaseError),
     ):
         link_batch([success(document) for document in stored_documents], rule)
     refresh.assert_not_called()
+    assert callbacks == []
     assert CustomFieldInstance.objects.filter(field=link_field).count() == 1
     assert linked_ids(stored_documents[0], link_field) == set()
     for document in stored_documents:
@@ -259,17 +302,30 @@ def test_link_write_failure_does_not_move_originals(rule, link_field, stored_doc
         assert old_path.read_bytes() == payload
 
 
-@pytest.mark.django_db(transaction=True)
-def test_successful_commit_updates_custom_field_paths(rule, stored_documents):
+def test_successful_commit_updates_custom_field_paths(
+    rule: MailRule,
+    stored_documents: list[Document],
+    django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks,
+) -> None:
     before = {
         document.pk: (document.source_path, document.source_path.read_bytes())
         for document in stored_documents
     }
-    with mock.patch("paperless_mail.document_links.get_backend"):
+    with (
+        mock.patch("paperless_mail.document_links.get_backend"),
+        django_capture_on_commit_callbacks(execute=True) as callbacks,
+    ):
         link_batch([success(document) for document in stored_documents], rule)
+        for document in stored_documents:
+            document.refresh_from_db()
+            old_path, payload = before[document.pk]
+            assert document.source_path == old_path
+            assert old_path.read_bytes() == payload
+    assert len(callbacks) == 1
     for document in stored_documents:
         document.refresh_from_db()
         old_path, payload = before[document.pk]
+        assert document.filename is not None
         assert Path(document.filename) == Path("linked") / f"{document.title}.pdf"
         assert document.source_path != old_path
         assert not old_path.exists()
@@ -277,9 +333,9 @@ def test_successful_commit_updates_custom_field_paths(rule, stored_documents):
 
 
 def test_refresh_after_commit_repeats_on_idempotent_retry(
-    rule,
-    django_capture_on_commit_callbacks,
-):
+    rule: MailRule,
+    django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks,
+) -> None:
     documents = DocumentFactory.create_batch(2, owner=None)
     results = [success(document) for document in documents]
     with mock.patch("paperless_mail.document_links._refresh_documents") as refresh:
@@ -290,7 +346,7 @@ def test_refresh_after_commit_repeats_on_idempotent_retry(
     assert CustomFieldInstance.objects.count() == 2
 
 
-def test_refresh_only_clears_caches_and_updates_search_index():
+def test_refresh_only_clears_caches_and_updates_search_index() -> None:
     with (
         mock.patch("paperless_mail.document_links.clear_document_caches") as clear,
         mock.patch("paperless_mail.document_links.get_backend") as backend,
@@ -303,7 +359,7 @@ def test_refresh_only_clears_caches_and_updates_search_index():
     updated.assert_not_called()
 
 
-def test_link_failure_does_not_perform_mail_action(rule):
+def test_link_failure_does_not_perform_mail_action(rule: MailRule) -> None:
     with (
         mock.patch("paperless_mail.mail.get_mailbox") as mailbox,
         pytest.raises(MailDocumentLinkError),
@@ -320,8 +376,21 @@ def test_link_failure_does_not_perform_mail_action(rule):
     assert ProcessedMail.objects.get(rule=rule, uid="42").status == "FAILED"
 
 
-@pytest.mark.django_db(transaction=True)
-def test_committed_links_retry_after_refresh_failure_without_deleting_mail(rule):
+def test_committed_links_retry_after_refresh_failure_without_deleting_mail(
+    rule: MailRule,
+    django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks,
+) -> None:
+    def link_and_run_commit_callbacks(
+        results: Sequence[object],
+        rule: MailRule,
+        *,
+        field_id: int | None,
+    ) -> None:
+        # Execute the real helper's callbacks after its atomic block while the
+        # test's outer transaction preserves the suite's migration seed data.
+        with django_capture_on_commit_callbacks(execute=True):
+            link_mail_documents(results, rule, field_id=field_id)
+
     first, second = DocumentFactory.create_batch(2, owner=None)
     callback_args = {
         "rule_id": rule.pk,
@@ -331,6 +400,10 @@ def test_committed_links_retry_after_refresh_failure_without_deleting_mail(rule)
         "document_link_field_id": rule.assign_document_link_field_id,
     }
     with (
+        mock.patch(
+            "paperless_mail.mail.link_mail_documents",
+            side_effect=link_and_run_commit_callbacks,
+        ),
         mock.patch("paperless_mail.document_links._refresh_documents") as refresh,
         mock.patch("paperless_mail.mail.get_mailbox") as mailbox,
         mock.patch("paperless_mail.mail.mailbox_login"),
@@ -354,8 +427,12 @@ def test_committed_links_retry_after_refresh_failure_without_deleting_mail(rule)
     assert CustomFieldInstance.objects.count() == 2
 
 
-def test_bulk_link_writes_remain_audited(rule, link_field, settings):
-    from auditlog.models import LogEntry
+def test_bulk_link_writes_remain_audited(
+    rule: MailRule,
+    link_field: CustomField,
+    settings: Settings,
+) -> None:
+    from auditlog.models import LogEntry  # type: ignore[import-untyped]
 
     settings.AUDIT_LOG_ENABLED = True
     first, second = DocumentFactory.create_batch(2, owner=None)
@@ -373,7 +450,11 @@ def test_bulk_link_writes_remain_audited(rule, link_field, settings):
 
 
 @pytest.mark.parametrize("enabled", [False, True])
-def test_queue_snapshots_the_selected_link_field(rule, enabled):
+def test_queue_snapshots_the_selected_link_field(
+    rule: MailRule,
+    *,
+    enabled: bool,
+) -> None:
     if not enabled:
         rule.assign_document_link_field = None
     message = mock.Mock(uid="42", subject="Example", date=timezone.now())
@@ -390,7 +471,10 @@ def test_queue_snapshots_the_selected_link_field(rule, enabled):
     )
 
 
-def test_deleted_snapshotted_field_prevents_mail_action(rule, link_field):
+def test_deleted_snapshotted_field_prevents_mail_action(
+    rule: MailRule,
+    link_field: CustomField,
+) -> None:
     document = DocumentFactory(owner=None)
     queued_field_id = link_field.pk
     link_field.delete()
@@ -412,7 +496,7 @@ def test_deleted_snapshotted_field_prevents_mail_action(rule, link_field):
     assert ProcessedMail.objects.get(rule=rule).status == "FAILED"
 
 
-def test_callback_without_link_snapshot_keeps_legacy_behavior(rule):
+def test_callback_without_link_snapshot_keeps_legacy_behavior(rule: MailRule) -> None:
     with (
         mock.patch("paperless_mail.mail.get_mailbox") as mailbox,
         mock.patch("paperless_mail.mail.mailbox_login"),

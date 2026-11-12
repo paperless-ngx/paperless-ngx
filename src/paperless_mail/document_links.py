@@ -1,6 +1,9 @@
 """Link only documents returned by one email's consumption batch."""
 
+from __future__ import annotations
+
 from functools import partial
+from typing import TYPE_CHECKING
 
 from django.conf import settings
 from django.db import transaction
@@ -13,7 +16,11 @@ from documents.models import Document
 from documents.permissions import permitted_document_ids
 from documents.search import get_backend
 from documents.signals.handlers import update_filename_and_move_files
-from paperless_mail.models import MailRule
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from paperless_mail.models import MailRule
 
 
 class MailDocumentLinkError(ValueError):
@@ -36,7 +43,7 @@ def _refresh_documents(document_ids: list[int], field_id: int) -> None:
 
 
 def link_mail_documents(
-    results: list,
+    results: Sequence[object],
     rule: MailRule,
     *,
     field_id: int | None,
@@ -140,7 +147,7 @@ def link_mail_documents(
         if to_update:
             CustomFieldInstance.objects.bulk_update(to_update, ["value_document_ids"])
         if settings.AUDIT_LOG_ENABLED:
-            from auditlog.models import LogEntry
+            from auditlog.models import LogEntry  # type: ignore[import-untyped]
 
             for instance, previous, targets, created in audit_changes:
                 LogEntry.objects.log_create(
