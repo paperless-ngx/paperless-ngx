@@ -18,7 +18,7 @@ from paperless_ai.migrations import Migration
 from paperless_ai.migrations import m0001_v1_to_v2
 from paperless_ai.tables import DocumentChunksTable
 from paperless_ai.tables import DocumentMetaTable
-from paperless_ai.vector_store import _MAX_IN_VALUES
+from paperless_ai.vector_store import _MAX_INLINE_IN_VALUES
 from paperless_ai.vector_store import DB_FILENAME
 from paperless_ai.vector_store import DB_PAGE_SIZE
 from paperless_ai.vector_store import DEFAULT_TABLE_NAME
@@ -354,37 +354,39 @@ class TestBuildWhere:
         assert params == []
 
     @pytest.mark.parametrize(
-        "build_filter",
-        [_in_filter, _nin_filter],
-        ids=["in", "nin"],
+        ("build_filter", "expected_ids"),
+        [
+            pytest.param(_in_filter, ["a", "c"], id="in"),
+            pytest.param(_nin_filter, ["b"], id="nin"),
+        ],
     )
-    def test_fails_closed_when_filter_exceeds_max_values(
+    def test_query_with_oversized_filter_scopes_results(
         self,
+        store: PaperlessSqliteVecVectorStore,
         build_filter: Callable[[list[str]], MetadataFilters],
-        caplog: pytest.LogCaptureFixture,
+        expected_ids: list[str],
     ) -> None:
         """
         GIVEN:
-            - An IN or NOT IN filter with more values than _MAX_IN_VALUES
-              (SQLite's own bound-parameter limit is 32766; this guard sits
-              below that with headroom for the query's other bound parameters)
+            - A store holding documents 1, 2 and 40000
+            - An IN or NOT IN filter naming documents 1 and 40000, padded
+              past _MAX_INLINE_IN_VALUES with unindexed ids
         WHEN:
-            - _build_where() translates it to SQL
+            - The store is queried and get_nodes() is called with that filter
         THEN:
-            - It fails closed ("1 = 0", no params) instead of building a
-              clause SQLite would reject, and logs a warning -- this filter
-              scopes document access, so refusing to build it must never
-              widen the scope to "everything" by accident. Failing open on
-              a NOT IN would surface exactly the excluded rows
+            - Both return exactly the documents the filter allows
         """
-        oversized = build_filter([str(i) for i in range(_MAX_IN_VALUES + 1)])
+        store.add(
+            [make_node("a", 1), make_node("b", 2), make_node("c", 40000)],
+        )
+        padding = range(100, 100 + _MAX_INLINE_IN_VALUES)
+        filters = build_filter([str(i) for i in (1, 40000, *padding)])
 
-        with caplog.at_level("WARNING"):
-            where, params = _build_where(oversized)
+        result = _query(store, [0.0] * DIM, top_k=5, filters=filters)
+        nodes = store.get_nodes(filters=filters)
 
-        assert where == "(1 = 0)"
-        assert params == []
-        assert "document_id" in caplog.text
+        assert sorted(result.ids) == expected_ids
+        assert sorted(n.node_id for n in nodes) == expected_ids
 
     def test_query_with_untranslatable_filter_returns_no_rows(
         self,
