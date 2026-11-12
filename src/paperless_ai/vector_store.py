@@ -543,6 +543,12 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
             return {}
         return DocumentMetaTable.all_modified_times(self._conn)
 
+    def indexed_document_ids(self) -> set[int]:
+        """Return the ids of all indexed documents."""
+        if not self.table_exists():
+            return set()
+        return DocumentMetaTable.all_document_ids(self._conn)
+
     @property
     def _db_path(self) -> str:
         return str(Path(self._uri) / DB_FILENAME)
