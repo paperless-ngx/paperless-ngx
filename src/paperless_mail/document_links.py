@@ -115,7 +115,8 @@ def link_mail_documents(
         audit_changes = []
         for document in documents:
             instance = existing.get(document.pk)
-            previous = (instance.value_document_ids or []) if instance else []
+            previous_value = instance.value_document_ids if instance else None
+            previous = previous_value or []
             targets = sorted(set(previous) | (document_ids - {document.pk}))
             if instance is None:
                 instance = CustomFieldInstance(
@@ -124,11 +125,11 @@ def link_mail_documents(
                     value_document_ids=targets,
                 )
                 to_create.append(instance)
-                audit_changes.append((instance, None, targets))
+                audit_changes.append((instance, None, targets, True))
             elif targets != previous:
                 instance.value_document_ids = targets
                 to_update.append(instance)
-                audit_changes.append((instance, previous, targets))
+                audit_changes.append((instance, previous_value, targets, False))
             else:
                 continue
             changed_ids.append(document.pk)
@@ -141,14 +142,12 @@ def link_mail_documents(
         if settings.AUDIT_LOG_ENABLED:
             from auditlog.models import LogEntry
 
-            for instance, previous, targets in audit_changes:
+            for instance, previous, targets, created in audit_changes:
                 LogEntry.objects.log_create(
                     instance=instance,
                     changes={"value_document_ids": [previous, targets]},
                     action=(
-                        LogEntry.Action.CREATE
-                        if previous is None
-                        else LogEntry.Action.UPDATE
+                        LogEntry.Action.CREATE if created else LogEntry.Action.UPDATE
                     ),
                     actor=owner,
                 )
