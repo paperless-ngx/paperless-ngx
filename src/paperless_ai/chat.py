@@ -129,11 +129,9 @@ def _stream_chat_with_documents(
 
     config = AIConfig()
     if unrestricted:
-        # Exclude trashed ids (usually few) instead of an IN filter over the
-        # full permitted set, which risks the vector store's bound parameter
-        # limit (_MAX_IN_VALUES) on large installs. Trashed documents stay
-        # indexed until permanent deletion (delete_document_from_llm_index
-        # hangs off post_delete, not trash), so must be excluded explicitly.
+        # Exclude trashed ids (usually few) rather than send every permitted
+        # id on each query. Trashed documents stay indexed until permanent
+        # deletion (post_delete, not trash), so must be excluded explicitly.
         trashed_ids = Document.deleted_objects.values_list("pk", flat=True)
         filters = exclude_document_ids_filter(str(pk) for pk in trashed_ids)
     else:

@@ -412,10 +412,8 @@ class TestStreamChatRetrieval:
         WHEN:
             - stream_chat_with_documents is called with unrestricted=True
         THEN:
-            - The retriever receives a NOT IN filter excluding zero ids, so
-              the whole index is effectively searched -- and no IN-list is
-              built from the full permitted set, which is what risks the
-              vector store's safety limit on large installs
+            - The retriever receives a NOT IN filter excluding zero ids
+              rather than an IN list of every permitted id
         """
         document = DocumentFactory.create(content="indexed document content")
         indexing.llm_index_add_or_update_document(document)
