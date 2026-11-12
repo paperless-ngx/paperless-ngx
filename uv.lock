@@ -3149,11 +3149,11 @@ mariadb = [
 ]
 postgres = [
     { name = "psycopg", extra = ["c", "pool"] },
-    { name = "psycopg-c", version = "3.3.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or python_full_version == '3.13.*' or python_full_version >= '3.15' or (platform_machine != 'aarch64' and platform_machine != 'x86_64') or sys_platform != 'linux'" },
-    { name = "psycopg-c", version = "3.3.4", source = { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.4/psycopg_c-3.3.4-cp312-cp312-linux_aarch64.whl" }, marker = "python_full_version == '3.12.*' and platform_machine == 'aarch64' and sys_platform == 'linux'" },
-    { name = "psycopg-c", version = "3.3.4", source = { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.4/psycopg_c-3.3.4-cp312-cp312-linux_x86_64.whl" }, marker = "python_full_version == '3.12.*' and platform_machine == 'x86_64' and sys_platform == 'linux'" },
-    { name = "psycopg-c", version = "3.3.4", source = { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.4/psycopg_c-3.3.4-cp314-cp314-linux_aarch64.whl" }, marker = "python_full_version == '3.14.*' and platform_machine == 'aarch64' and sys_platform == 'linux'" },
-    { name = "psycopg-c", version = "3.3.4", source = { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.4/psycopg_c-3.3.4-cp314-cp314-linux_x86_64.whl" }, marker = "python_full_version == '3.14.*' and platform_machine == 'x86_64' and sys_platform == 'linux'" },
+    { name = "psycopg-c", version = "3.3.8", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or python_full_version == '3.13.*' or python_full_version >= '3.15' or (platform_machine != 'aarch64' and platform_machine != 'x86_64') or sys_platform != 'linux'" },
+    { name = "psycopg-c", version = "3.3.8", source = { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.8/psycopg_c-3.3.8-cp312-cp312-manylinux_2_38_aarch64.whl" }, marker = "python_full_version == '3.12.*' and platform_machine == 'aarch64' and sys_platform == 'linux'" },
+    { name = "psycopg-c", version = "3.3.8", source = { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.8/psycopg_c-3.3.8-cp312-cp312-manylinux_2_38_x86_64.whl" }, marker = "python_full_version == '3.12.*' and platform_machine == 'x86_64' and sys_platform == 'linux'" },
+    { name = "psycopg-c", version = "3.3.8", source = { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.8/psycopg_c-3.3.8-cp314-cp314-manylinux_2_38_aarch64.whl" }, marker = "python_full_version == '3.14.*' and platform_machine == 'aarch64' and sys_platform == 'linux'" },
+    { name = "psycopg-c", version = "3.3.8", source = { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.8/psycopg_c-3.3.8-cp314-cp314-manylinux_2_38_x86_64.whl" }, marker = "python_full_version == '3.14.*' and platform_machine == 'x86_64' and sys_platform == 'linux'" },
     { name = "psycopg-pool" },
 ]
 webserver = [
@@ -3272,12 +3272,12 @@ requires-dist = [
     { name = "openai", specifier = ">=2.48" },
     { name = "pathvalidate", specifier = "~=3.3.1" },
     { name = "pdf2image", specifier = "~=1.17.0" },
-    { name = "psycopg", extras = ["c", "pool"], marker = "extra == 'postgres'", specifier = "==3.3.4" },
-    { name = "psycopg-c", marker = "python_full_version == '3.12.*' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra == 'postgres'", url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.4/psycopg_c-3.3.4-cp312-cp312-linux_aarch64.whl" },
-    { name = "psycopg-c", marker = "python_full_version == '3.14.*' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra == 'postgres'", url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.4/psycopg_c-3.3.4-cp314-cp314-linux_aarch64.whl" },
-    { name = "psycopg-c", marker = "python_full_version == '3.12.*' and platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'postgres'", url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.4/psycopg_c-3.3.4-cp312-cp312-linux_x86_64.whl" },
-    { name = "psycopg-c", marker = "python_full_version == '3.14.*' and platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'postgres'", url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.4/psycopg_c-3.3.4-cp314-cp314-linux_x86_64.whl" },
-    { name = "psycopg-c", marker = "(python_full_version < '3.12' and extra == 'postgres') or (python_full_version == '3.13.*' and extra == 'postgres') or (python_full_version >= '3.15' and extra == 'postgres') or (platform_machine != 'aarch64' and platform_machine != 'x86_64' and extra == 'postgres') or (sys_platform != 'linux' and extra == 'postgres')", specifier = "==3.3.4" },
+    { name = "psycopg", extras = ["c", "pool"], marker = "extra == 'postgres'", specifier = "==3.3.8" },
+    { name = "psycopg-c", marker = "python_full_version == '3.12.*' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra == 'postgres'", url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.8/psycopg_c-3.3.8-cp312-cp312-manylinux_2_38_aarch64.whl" },
+    { name = "psycopg-c", marker = "python_full_version == '3.14.*' and platform_machine == 'aarch64' and sys_platform == 'linux' and extra == 'postgres'", url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.8/psycopg_c-3.3.8-cp314-cp314-manylinux_2_38_aarch64.whl" },
+    { name = "psycopg-c", marker = "python_full_version == '3.12.*' and platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'postgres'", url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.8/psycopg_c-3.3.8-cp312-cp312-manylinux_2_38_x86_64.whl" },
+    { name = "psycopg-c", marker = "python_full_version == '3.14.*' and platform_machine == 'x86_64' and sys_platform == 'linux' and extra == 'postgres'", url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.8/psycopg_c-3.3.8-cp314-cp314-manylinux_2_38_x86_64.whl" },
+    { name = "psycopg-c", marker = "(python_full_version < '3.12' and extra == 'postgres') or (python_full_version == '3.13.*' and extra == 'postgres') or (python_full_version >= '3.15' and extra == 'postgres') or (platform_machine != 'aarch64' and platform_machine != 'x86_64' and extra == 'postgres') or (sys_platform != 'linux' and extra == 'postgres')", specifier = "==3.3.8" },
     { name = "psycopg-pool", marker = "extra == 'postgres'", specifier = "==3.3.3" },
     { name = "python-dateutil", specifier = "~=2.9.0" },
     { name = "python-dotenv", specifier = "~=1.2.1" },
@@ -3723,23 +3723,23 @@ wheels = [
 
 [[package]]
 name = "psycopg"
-version = "3.3.4"
+version = "3.3.8"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "typing-extensions", marker = "python_full_version < '3.13'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/db/2f/cb91e5502ec9de1de6f1b76cfbf69531932725361168bb06963620c77e2e/psycopg-3.3.4.tar.gz", hash = "sha256:e21207764952cff81b6b8bdacad9a3939f2793367fdac2987b3aac36a651b5bc", size = 165799, upload-time = "2026-05-01T23:31:55.179Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/11/c8/3bd7e09770a5829eb26667df5e49f084d78bd106d5949ade9447288a8e18/psycopg-3.3.8.tar.gz", hash = "sha256:86c135a9a6f5e98404975c5787e620bf436a7807e088baebd1b20fa48d3b4b4f", size = 168902, upload-time = "2026-11-04T09:44:26.142Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/5c/e0/7b3dee031daae7743609ce3c746565d4a3ed7c2c186479eb48e34e838c64/psycopg-3.3.4-py3-none-any.whl", hash = "sha256:b6bbc25ccf05c8fad3b061d9db2ef0909a555171b84b07f29458a447253d679a", size = 213001, upload-time = "2026-05-01T23:20:50.816Z" },
+    { url = "https://files.pythonhosted.org/packages/7b/5c/50a0b0796ccb69b11934f7c5758051c08019bda2fafb417501109fffd569/psycopg-3.3.8-py3-none-any.whl", hash = "sha256:ca50af6072ba9ea6866f33021975230c2555d7bfdb9d8f94ca3af5c3d1bf2167", size = 216209, upload-time = "2026-11-04T09:37:35.491Z" },
 ]
 
 [package.optional-dependencies]
 c = [
-    { name = "psycopg-c", version = "3.3.4", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.12' and implementation_name != 'pypy') or (python_full_version == '3.13.*' and implementation_name != 'pypy') or (python_full_version >= '3.15' and implementation_name != 'pypy') or (implementation_name != 'pypy' and platform_machine != 'aarch64' and platform_machine != 'x86_64') or (implementation_name != 'pypy' and sys_platform != 'linux')" },
-    { name = "psycopg-c", version = "3.3.4", source = { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.4/psycopg_c-3.3.4-cp312-cp312-linux_aarch64.whl" }, marker = "python_full_version == '3.12.*' and implementation_name != 'pypy' and platform_machine == 'aarch64' and sys_platform == 'linux'" },
-    { name = "psycopg-c", version = "3.3.4", source = { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.4/psycopg_c-3.3.4-cp312-cp312-linux_x86_64.whl" }, marker = "python_full_version == '3.12.*' and implementation_name != 'pypy' and platform_machine == 'x86_64' and sys_platform == 'linux'" },
-    { name = "psycopg-c", version = "3.3.4", source = { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.4/psycopg_c-3.3.4-cp314-cp314-linux_aarch64.whl" }, marker = "python_full_version == '3.14.*' and implementation_name != 'pypy' and platform_machine == 'aarch64' and sys_platform == 'linux'" },
-    { name = "psycopg-c", version = "3.3.4", source = { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.4/psycopg_c-3.3.4-cp314-cp314-linux_x86_64.whl" }, marker = "python_full_version == '3.14.*' and implementation_name != 'pypy' and platform_machine == 'x86_64' and sys_platform == 'linux'" },
+    { name = "psycopg-c", version = "3.3.8", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.12' and implementation_name != 'pypy') or (python_full_version == '3.13.*' and implementation_name != 'pypy') or (python_full_version >= '3.15' and implementation_name != 'pypy') or (implementation_name != 'pypy' and platform_machine != 'aarch64' and platform_machine != 'x86_64') or (implementation_name != 'pypy' and sys_platform != 'linux')" },
+    { name = "psycopg-c", version = "3.3.8", source = { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.8/psycopg_c-3.3.8-cp312-cp312-manylinux_2_38_aarch64.whl" }, marker = "python_full_version == '3.12.*' and implementation_name != 'pypy' and platform_machine == 'aarch64' and sys_platform == 'linux'" },
+    { name = "psycopg-c", version = "3.3.8", source = { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.8/psycopg_c-3.3.8-cp312-cp312-manylinux_2_38_x86_64.whl" }, marker = "python_full_version == '3.12.*' and implementation_name != 'pypy' and platform_machine == 'x86_64' and sys_platform == 'linux'" },
+    { name = "psycopg-c", version = "3.3.8", source = { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.8/psycopg_c-3.3.8-cp314-cp314-manylinux_2_38_aarch64.whl" }, marker = "python_full_version == '3.14.*' and implementation_name != 'pypy' and platform_machine == 'aarch64' and sys_platform == 'linux'" },
+    { name = "psycopg-c", version = "3.3.8", source = { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.8/psycopg_c-3.3.8-cp314-cp314-manylinux_2_38_x86_64.whl" }, marker = "python_full_version == '3.14.*' and implementation_name != 'pypy' and platform_machine == 'x86_64' and sys_platform == 'linux'" },
 ]
 pool = [
     { name = "psycopg-pool" },
@@ -3747,7 +3747,7 @@ pool = [
 
 [[package]]
 name = "psycopg-c"
-version = "3.3.4"
+version = "3.3.8"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
     "python_full_version >= '3.15' and sys_platform == 'darwin'",
@@ -3757,50 +3757,50 @@ resolution-markers = [
     "python_full_version < '3.12' and sys_platform == 'darwin'",
     "python_full_version < '3.12' and sys_platform == 'linux'",
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/21/7c/c08364f2eab2913e4068b3b955d963e7a3491986a85429990969525def30/psycopg_c-3.3.4.tar.gz", hash = "sha256:ed8106128b2d04359c185fc9641b4409abfce4d0b6fb1d1ff6800646e27f1a22", size = 647111, upload-time = "2026-05-01T23:31:58.032Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/5b/23/0074f50899d773aae857af496745cd898da868f8f2d9415591d51c391cec/psycopg_c-3.3.8.tar.gz", hash = "sha256:af81a99b02600e6c2cdf468509c04bb8208500ea60d63f70616e32ea9cb2758f", size = 700571, upload-time = "2026-11-04T09:44:27.694Z" }
 
 [[package]]
 name = "psycopg-c"
-version = "3.3.4"
-source = { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.4/psycopg_c-3.3.4-cp312-cp312-linux_aarch64.whl" }
+version = "3.3.8"
+source = { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.8/psycopg_c-3.3.8-cp312-cp312-manylinux_2_38_aarch64.whl" }
 resolution-markers = [
     "python_full_version == '3.12.*' and platform_machine == 'aarch64' and sys_platform == 'linux'",
 ]
 wheels = [
-    { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.4/psycopg_c-3.3.4-cp312-cp312-linux_aarch64.whl", hash = "sha256:44ea0e800dc2126a0d3ce23fac7b96b64db132ed67df3e9ceb011965351ae8dc" },
+    { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.8/psycopg_c-3.3.8-cp312-cp312-manylinux_2_38_aarch64.whl", hash = "sha256:be9f81019ec26eb09b8852ec9cb156a41d91067bbc2093cee93daabc935068e8" },
 ]
 
 [[package]]
 name = "psycopg-c"
-version = "3.3.4"
-source = { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.4/psycopg_c-3.3.4-cp312-cp312-linux_x86_64.whl" }
+version = "3.3.8"
+source = { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.8/psycopg_c-3.3.8-cp312-cp312-manylinux_2_38_x86_64.whl" }
 resolution-markers = [
     "python_full_version == '3.12.*' and platform_machine == 'x86_64' and sys_platform == 'linux'",
 ]
 wheels = [
-    { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.4/psycopg_c-3.3.4-cp312-cp312-linux_x86_64.whl", hash = "sha256:c66169fef7be6b46e701dd361036bd88e346e6b8b15dd25528287f807654f097" },
+    { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.8/psycopg_c-3.3.8-cp312-cp312-manylinux_2_38_x86_64.whl", hash = "sha256:72a24b31600ec991cb75852038de012054b6031b355c95ccfc38680e439559cc" },
 ]
 
 [[package]]
 name = "psycopg-c"
-version = "3.3.4"
-source = { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.4/psycopg_c-3.3.4-cp314-cp314-linux_aarch64.whl" }
+version = "3.3.8"
+source = { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.8/psycopg_c-3.3.8-cp314-cp314-manylinux_2_38_aarch64.whl" }
 resolution-markers = [
     "python_full_version == '3.14.*' and platform_machine == 'aarch64' and sys_platform == 'linux'",
 ]
 wheels = [
-    { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.4/psycopg_c-3.3.4-cp314-cp314-linux_aarch64.whl", hash = "sha256:00d1cc7b82899046acd68e11c801bbb94d109313ab02333f76c2b59dd531cdc1" },
+    { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.8/psycopg_c-3.3.8-cp314-cp314-manylinux_2_38_aarch64.whl", hash = "sha256:dc22c1b4eeee9a2a5e20a8ffbd192e320a2da6fdef5a72f7fa76ed9792de4353" },
 ]
 
 [[package]]
 name = "psycopg-c"
-version = "3.3.4"
-source = { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.4/psycopg_c-3.3.4-cp314-cp314-linux_x86_64.whl" }
+version = "3.3.8"
+source = { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.8/psycopg_c-3.3.8-cp314-cp314-manylinux_2_38_x86_64.whl" }
 resolution-markers = [
     "python_full_version == '3.14.*' and platform_machine == 'x86_64' and sys_platform == 'linux'",
 ]
 wheels = [
-    { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.4/psycopg_c-3.3.4-cp314-cp314-linux_x86_64.whl", hash = "sha256:d02a564c6a3e2c1957b3b5d2dff77e34a274f8551f6bdbcef47523eba59a627a" },
+    { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.8/psycopg_c-3.3.8-cp314-cp314-manylinux_2_38_x86_64.whl", hash = "sha256:d6298166033ad1024d2ba6d0805352ba7042ccd7619771a0c164d1e370cf7976" },
 ]
 
 [[package]]
