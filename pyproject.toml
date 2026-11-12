@@ -151,8 +151,9 @@ typing = [
 required-version = ">=0.9.0"
 prerelease = "disallow"
 environments = [
-  "sys_platform == 'darwin'",
-  "sys_platform == 'linux'",
+  "sys_platform == 'darwin' and platform_machine == 'arm64'",
+  "sys_platform == 'linux' and platform_machine == 'aarch64'",
+  "sys_platform == 'linux' and platform_machine == 'x86_64'",
 ]
 package = false
 [tool.uv.sources]
