@@ -19,6 +19,7 @@ from PIL import Image
 from rest_framework import serializers
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 
+from paperless.config import OCR_RESERVED_USER_ARGS
 from paperless.models import ApplicationConfiguration
 from paperless.network import validate_outbound_http_url
 from paperless.validators import reject_dangerous_svg
@@ -251,6 +252,13 @@ class ApplicationConfigurationSerializer(
 
     def validate_user_args(self, value):
         self._require_json_object("user_args", value)
+        if value is not None:
+            reserved = sorted(OCR_RESERVED_USER_ARGS & value.keys())
+            if reserved:
+                raise serializers.ValidationError(
+                    f"user_args may not set arguments managed by paperless: "
+                    f"{', '.join(reserved)}.",
+                )
         return value
 
     def validate_barcode_tag_mapping(self, value):

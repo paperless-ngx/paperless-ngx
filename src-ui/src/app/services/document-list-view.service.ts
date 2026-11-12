@@ -380,7 +380,7 @@ export class DocumentListViewService {
               queryParams: paramsFromViewState(activeListViewState),
               replaceUrl: !this.router.routerState.snapshot.url.includes('?'), // in case navigating from params-less /documents
             })
-          } else if (this._activeSavedViewId) {
+          } else if (updateQueryParams && this._activeSavedViewId) {
             this.router.navigate([], {
               queryParams: paramsFromViewState(activeListViewState, true),
               queryParamsHandling: 'merge',
@@ -399,7 +399,7 @@ export class DocumentListViewService {
             // this happens when applying a filter: the current page might not be available anymore due to the reduced result set.
             activeListViewState.currentPage = 1
             this.markChanged()
-            this.reload()
+            this.reload(onFinish, updateQueryParams)
           } else if (
             activeListViewState.sortField.indexOf('custom_field') === 0 &&
             !this.settings

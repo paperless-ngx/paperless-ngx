@@ -15,6 +15,7 @@ from paperless.models import ColorConvertChoices
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import UserFactory
 from paperless_testing.http import read_streaming_response
+from paperless_testing.permissions import grant_global
 
 
 class TestApiAppConfig(DirectoriesMixin, APITestCase):
@@ -25,6 +26,67 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
 
         user = UserFactory(username="temp_admin", superuser=True)
         self.client.force_authenticate(user=user)
+
+    def test_api_read_config_requires_view_permission(self) -> None:
+        for permissions in (
+            (),
+            ("change_applicationconfiguration",),
+            ("view_document",),
+        ):
+            user = UserFactory()
+            grant_global(user, *permissions)
+            self.client.force_authenticate(user=user)
+
+            for endpoint in (self.ENDPOINT, f"{self.ENDPOINT}1/"):
+                for method in ("get", "head", "options"):
+                    with self.subTest(
+                        permissions=permissions,
+                        endpoint=endpoint,
+                        method=method,
+                    ):
+                        response = getattr(self.client, method)(endpoint)
+                        self.assertEqual(
+                            response.status_code,
+                            status.HTTP_403_FORBIDDEN,
+                        )
+
+    def test_api_read_config_with_view_permission(self) -> None:
+        user = UserFactory()
+        grant_global(user, "view_applicationconfiguration")
+        self.client.force_authenticate(user=user)
+
+        for endpoint in (self.ENDPOINT, f"{self.ENDPOINT}1/"):
+            for method in ("get", "head", "options"):
+                with self.subTest(endpoint=endpoint, method=method):
+                    response = getattr(self.client, method)(endpoint)
+                    self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_api_view_config_permission_does_not_allow_writes(self) -> None:
+        user = UserFactory()
+        grant_global(user, "view_applicationconfiguration")
+        self.client.force_authenticate(user=user)
+
+        for method in ("put", "patch", "delete"):
+            with self.subTest(method=method):
+                response = getattr(self.client, method)(f"{self.ENDPOINT}1/")
+                self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_api_change_config_permission_allows_updates(self) -> None:
+        user = UserFactory()
+        grant_global(user, "change_applicationconfiguration")
+        self.client.force_authenticate(user=user)
+
+        response = self.client.patch(
+            f"{self.ENDPOINT}1/",
+            {"app_title": "Updated title"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            ApplicationConfiguration.objects.get().app_title,
+            "Updated title",
+        )
 
     def test_api_get_config(self) -> None:
         """
@@ -224,6 +286,28 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
         assert config is not None
         self.assertEqual(config.user_args, user_args)
         self.assertEqual(config.barcode_tag_mapping, barcode_tag_mapping)
+
+    def test_api_update_config_rejects_reserved_user_args(self) -> None:
+        """
+        GIVEN:
+            - API request to update app config with user_args which set an
+              argument the parser manages itself
+        WHEN:
+            - API is called
+        THEN:
+            - Request is rejected with a 400 naming the argument
+            - Config is not updated
+        """
+        response = self.client.patch(
+            f"{self.ENDPOINT}1/",
+            json.dumps({"user_args": json.dumps({"sidecar": "/tmp/x.py"})}),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("sidecar", str(response.data["user_args"]))
+        config = ApplicationConfiguration.objects.first()
+        assert config is not None
+        self.assertIsNone(config.user_args)
 
     def test_api_update_config_rejects_invalid_json_objects(self) -> None:
         """

@@ -97,6 +97,7 @@ describe('SelectComponent', () => {
     let createNewVal
     component.createNew.subscribe((v) => (createNewVal = v))
     expect(component.allowCreateNew).toBeTruthy()
+    const closeSpy = jest.spyOn(component.ngSelectComponent, 'close')
     component.onSearch({ term: 'foo' })
     component.addItem(undefined)
     expect(createNewVal).toEqual('foo')
@@ -105,6 +106,8 @@ describe('SelectComponent', () => {
     component.onSearch({ term: 'baz' })
     component.clickNew()
     expect(createNewVal).toEqual('baz')
+    // dropdown should close when creating a new item so it isn't left open behind the modal
+    expect(closeSpy).toHaveBeenCalled()
   })
 
   it('should search items by independent normalized terms', () => {

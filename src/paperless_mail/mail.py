@@ -1159,7 +1159,13 @@ class MailAccountHandler(LoggingMixin):
                 new_headers += message.obj._headers
                 message.obj._headers = new_headers
 
-            f.write(message.obj.as_bytes())
+            # RFC 5322 requires CRLF; the default compat32 policy writes bare LF,
+            # which Outlook misreads as literal "=" in quoted-printable soft breaks
+            f.write(
+                message.obj.as_bytes(
+                    policy=message.obj.policy.clone(linesep="\r\n"),
+                ),
+            )
 
         correspondent = self._get_correspondent(message, rule)
 

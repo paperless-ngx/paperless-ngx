@@ -1989,15 +1989,15 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
-          <context context-type="linenumber">214</context>
+          <context context-type="linenumber">260</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
-          <context context-type="linenumber">332</context>
+          <context context-type="linenumber">378</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
-          <context context-type="linenumber">361</context>
+          <context context-type="linenumber">407</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6904866445262015585" datatype="html">
@@ -2052,7 +2052,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">58</context>
+          <context context-type="linenumber">60</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
@@ -2098,7 +2098,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">224</context>
+          <context context-type="linenumber">227</context>
         </context-group>
       </trans-unit>
       <trans-unit id="131016739441837046" datatype="html">
@@ -2109,7 +2109,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">236</context>
+          <context context-type="linenumber">239</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3643866539136239218" datatype="html">
@@ -2178,7 +2178,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">53</context>
+          <context context-type="linenumber">54</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
@@ -2471,11 +2471,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">326</context>
+          <context context-type="linenumber">340</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">360</context>
+          <context context-type="linenumber">374</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
@@ -2563,56 +2563,63 @@
         <source>Result</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">54</context>
+          <context context-type="linenumber">55</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7839508346035554208" datatype="html">
+        <source>Task ID</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
+          <context context-type="linenumber">56</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2952127331314675199" datatype="html">
         <source>Needs attention</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">59</context>
+          <context context-type="linenumber">61</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3307214558906712688" datatype="html">
         <source>In progress</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">60</context>
+          <context context-type="linenumber">62</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1371178633976505412" datatype="html">
         <source>Recently completed</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">61</context>
+          <context context-type="linenumber">63</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2936452645673957909" datatype="html">
         <source>Consume File</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">70</context>
+          <context context-type="linenumber">72</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5622386857946132209" datatype="html">
         <source>Train Classifier</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">74</context>
+          <context context-type="linenumber">76</context>
         </context-group>
       </trans-unit>
       <trans-unit id="776309955507105337" datatype="html">
         <source>Sanity Check</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">78</context>
+          <context context-type="linenumber">80</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7502272564743467653" datatype="html">
         <source>Mail Fetch</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">80</context>
+          <context context-type="linenumber">82</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
@@ -2623,63 +2630,63 @@
         <source>LLM Index</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">81</context>
+          <context context-type="linenumber">83</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6402092370576716734" datatype="html">
         <source>Empty Trash</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">84</context>
+          <context context-type="linenumber">86</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4173754487295857311" datatype="html">
         <source>Check Workflows</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">88</context>
+          <context context-type="linenumber">90</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2065831805515896240" datatype="html">
         <source>Bulk Update</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">92</context>
+          <context context-type="linenumber">94</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5062348912423871240" datatype="html">
         <source>Reprocess Document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">96</context>
+          <context context-type="linenumber">98</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6903696804811148799" datatype="html">
         <source>Build Share Link</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">100</context>
+          <context context-type="linenumber">102</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6581973658756561124" datatype="html">
         <source>Bulk Delete</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">104</context>
+          <context context-type="linenumber">106</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5672013191898828327" datatype="html">
         <source>Apply AI Suggestions</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">108</context>
+          <context context-type="linenumber">110</context>
         </context-group>
       </trans-unit>
       <trans-unit id="9172233176401579786" datatype="html">
         <source>Scheduled</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">118</context>
+          <context context-type="linenumber">120</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
@@ -2690,7 +2697,7 @@
         <source>Web UI</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">120</context>
+          <context context-type="linenumber">122</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
@@ -2701,7 +2708,7 @@
         <source>API Upload</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">123</context>
+          <context context-type="linenumber">125</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
@@ -2712,106 +2719,106 @@
         <source>Folder Consume</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">127</context>
+          <context context-type="linenumber">129</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1456901843819961615" datatype="html">
         <source>Email Consume</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">131</context>
+          <context context-type="linenumber">133</context>
         </context-group>
       </trans-unit>
       <trans-unit id="29832309535656200" datatype="html">
         <source>System</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">133</context>
+          <context context-type="linenumber">135</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2233560223291461480" datatype="html">
         <source>Manual</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">134</context>
+          <context context-type="linenumber">136</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5404910960991552159" datatype="html">
         <source>Dismiss selected</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">248</context>
+          <context context-type="linenumber">251</context>
         </context-group>
       </trans-unit>
       <trans-unit id="9169677036332103838" datatype="html">
         <source>Dismiss visible</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">249</context>
+          <context context-type="linenumber">252</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3169751690815214293" datatype="html">
         <source>Confirm Dismiss</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">323</context>
+          <context context-type="linenumber">337</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5029621907742319073" datatype="html">
         <source>Dismiss <x id="PH" equiv-text="tasks.size"/> tasks?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">324</context>
+          <context context-type="linenumber">338</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3597309129998924778" datatype="html">
         <source>Error dismissing tasks</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">335</context>
+          <context context-type="linenumber">349</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">369</context>
+          <context context-type="linenumber">383</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2132179171926568807" datatype="html">
         <source>Error dismissing task</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">347</context>
+          <context context-type="linenumber">361</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1323591410517879795" datatype="html">
         <source>Confirm Dismiss All</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">357</context>
+          <context context-type="linenumber">371</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4157200209636243740" datatype="html">
         <source>Dismiss all <x id="PH" equiv-text="this.totalTasks()"/> tasks?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">358</context>
+          <context context-type="linenumber">372</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8149502458056418229" datatype="html">
         <source>Success. New document id <x id="PH" equiv-text="documentId"/> created</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">417</context>
+          <context context-type="linenumber">431</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8760066891202884337" datatype="html">
         <source>Duplicate of document #<x id="PH" equiv-text="duplicateOf"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">427</context>
+          <context context-type="linenumber">441</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">461</context>
+          <context context-type="linenumber">475</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3418677553313974490" datatype="html">
@@ -3409,19 +3416,19 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">954</context>
+          <context context-type="linenumber">976</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">993</context>
+          <context context-type="linenumber">1015</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">1016</context>
+          <context context-type="linenumber">1038</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">1052</context>
+          <context context-type="linenumber">1074</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-attributes/custom-fields/custom-fields.component.ts</context>
@@ -3764,25 +3771,46 @@
           <context context-type="linenumber">418</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="3562016764120788499" datatype="html">
+        <source>Bulk operation completed.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
+          <context context-type="linenumber">202</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1633341269280627980" datatype="html">
+        <source>Bulk operation revoked.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
+          <context context-type="linenumber">204</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8606600295919857288" datatype="html">
+        <source>Bulk operation failed. Some changes may already have been applied.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
+          <context context-type="linenumber">207</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="1542489069631984294" datatype="html">
         <source>Sidebar views updated</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
-          <context context-type="linenumber">497</context>
+          <context context-type="linenumber">543</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3547923076537026828" datatype="html">
         <source>Error updating sidebar views</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
-          <context context-type="linenumber">500</context>
+          <context context-type="linenumber">546</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2526035785704676448" datatype="html">
         <source>An error occurred while saving update checking settings.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
-          <context context-type="linenumber">521</context>
+          <context context-type="linenumber">567</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4580988005648117665" datatype="html">
@@ -4030,14 +4058,21 @@
         <source>Sources</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/chat/chat/chat.component.html</context>
-          <context context-type="linenumber">46,47</context>
+          <context context-type="linenumber">47,48</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6025275430560167531" datatype="html">
+        <source>+<x id="INTERPOLATION" equiv-text="{{ hiddenReferenceCount(message) }}"/> more</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/chat/chat/chat.component.html</context>
+          <context context-type="linenumber">49,50</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8066608938393600549" datatype="html">
         <source>Message</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/chat/chat/chat.component.html</context>
-          <context context-type="linenumber">61,62</context>
+          <context context-type="linenumber">66,67</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/email-document-dialog/email-document-dialog.component.html</context>
@@ -4048,22 +4083,22 @@
         <source>Stop</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/chat/chat/chat.component.html</context>
-          <context context-type="linenumber">74</context>
+          <context context-type="linenumber">79</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/chat/chat/chat.component.html</context>
-          <context context-type="linenumber">74</context>
+          <context context-type="linenumber">79</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6490688569532630280" datatype="html">
         <source>Send</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/chat/chat/chat.component.html</context>
-          <context context-type="linenumber">78</context>
+          <context context-type="linenumber">83</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/chat/chat/chat.component.html</context>
-          <context context-type="linenumber">78</context>
+          <context context-type="linenumber">83</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
@@ -4090,14 +4125,14 @@
         <source>Ask a question about this document...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/chat/chat/chat.component.ts</context>
-          <context context-type="linenumber">61</context>
+          <context context-type="linenumber">83</context>
         </context-group>
       </trans-unit>
       <trans-unit id="224049052163028286" datatype="html">
         <source>Ask a question about a document...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/chat/chat/chat.component.ts</context>
-          <context context-type="linenumber">62</context>
+          <context context-type="linenumber">84</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8700121026680200191" datatype="html">
@@ -4156,27 +4191,27 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">572</context>
+          <context context-type="linenumber">594</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">612</context>
+          <context context-type="linenumber">634</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">650</context>
+          <context context-type="linenumber">672</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">688</context>
+          <context context-type="linenumber">710</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">750</context>
+          <context context-type="linenumber">772</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">888</context>
+          <context context-type="linenumber">910</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6088768251338567957" datatype="html">
@@ -6579,7 +6614,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">892</context>
+          <context context-type="linenumber">914</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1616074213645042277" datatype="html">
@@ -6984,7 +7019,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/select/select.component.ts</context>
-          <context context-type="linenumber">179</context>
+          <context context-type="linenumber">185</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1880237574877817137" datatype="html">
@@ -7091,7 +7126,7 @@
         <source>Private</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/select/select.component.ts</context>
-          <context context-type="linenumber">72</context>
+          <context context-type="linenumber">73</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/tag/tag.component.html</context>
@@ -7114,7 +7149,7 @@
         <source>No items found</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/select/select.component.ts</context>
-          <context context-type="linenumber">113</context>
+          <context context-type="linenumber">114</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6541407358060244620" datatype="html">
@@ -8356,7 +8391,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">517</context>
+          <context context-type="linenumber">539</context>
         </context-group>
         <note priority="1" from="description">this string is used to separate processing, failed and added on the file upload widget</note>
       </trans-unit>
@@ -9153,7 +9188,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">890</context>
+          <context context-type="linenumber">912</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5992101894268263750" datatype="html">
@@ -9178,7 +9213,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">950</context>
+          <context context-type="linenumber">972</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2951161989614003846" datatype="html">
@@ -9564,7 +9599,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">1050</context>
+          <context context-type="linenumber">1072</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7251533806673754434" datatype="html">
@@ -9595,29 +9630,43 @@
           <context context-type="linenumber">165,166</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="3401633333450192408" datatype="html">
+        <source>Bulk operation queued.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
+          <context context-type="linenumber">315</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5709555629190115111" datatype="html">
+        <source>View task</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
+          <context context-type="linenumber">319</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="1215215387232313677" datatype="html">
         <source>Error executing bulk operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">349</context>
+          <context context-type="linenumber">371</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7894972847287473517" datatype="html">
         <source>&quot;<x id="PH" equiv-text="items[0].name"/>&quot;</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">509</context>
+          <context context-type="linenumber">531</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">515</context>
+          <context context-type="linenumber">537</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8639884465898458690" datatype="html">
         <source>&quot;<x id="PH" equiv-text="items[0].name"/>&quot; and &quot;<x id="PH_1" equiv-text="items[1].name"/>&quot;</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">511</context>
+          <context context-type="linenumber">533</context>
         </context-group>
         <note priority="1" from="description">This is for messages like &apos;modify &quot;tag1&quot; and &quot;tag2&quot;&apos;</note>
       </trans-unit>
@@ -9625,7 +9674,7 @@
         <source><x id="PH" equiv-text="list"/> and &quot;<x id="PH_1" equiv-text="items[items.length - 1].name"/>&quot;</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">519,521</context>
+          <context context-type="linenumber">541,543</context>
         </context-group>
         <note priority="1" from="description">this is for messages like &apos;modify &quot;tag1&quot;, &quot;tag2&quot; and &quot;tag3&quot;&apos;</note>
       </trans-unit>
@@ -9633,14 +9682,14 @@
         <source>Confirm tags assignment</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">536</context>
+          <context context-type="linenumber">558</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6619516195038467207" datatype="html">
         <source>This operation will add the tag &quot;<x id="PH" equiv-text="tag.name"/>&quot; to <x id="PH_1" equiv-text="this.getSelectionSize()"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">542</context>
+          <context context-type="linenumber">564</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1894412783609570695" datatype="html">
@@ -9649,14 +9698,14 @@
         )"/> to <x id="PH_1" equiv-text="this.getSelectionSize()"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">547,549</context>
+          <context context-type="linenumber">569,571</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7181166515756808573" datatype="html">
         <source>This operation will remove the tag &quot;<x id="PH" equiv-text="tag.name"/>&quot; from <x id="PH_1" equiv-text="this.getSelectionSize()"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">555</context>
+          <context context-type="linenumber">577</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3819792277998068944" datatype="html">
@@ -9665,7 +9714,7 @@
         )"/> from <x id="PH_1" equiv-text="this.getSelectionSize()"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">560,562</context>
+          <context context-type="linenumber">582,584</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2739066218579571288" datatype="html">
@@ -9676,84 +9725,84 @@
         )"/> on <x id="PH_2" equiv-text="this.getSelectionSize()"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">564,568</context>
+          <context context-type="linenumber">586,590</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2996713129519325161" datatype="html">
         <source>Confirm correspondent assignment</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">605</context>
+          <context context-type="linenumber">627</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6900893559485781849" datatype="html">
         <source>This operation will assign the correspondent &quot;<x id="PH" equiv-text="correspondent.name"/>&quot; to <x id="PH_1" equiv-text="this.getSelectionSize()"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">607</context>
+          <context context-type="linenumber">629</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1257522660364398440" datatype="html">
         <source>This operation will remove the correspondent from <x id="PH" equiv-text="this.getSelectionSize()"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">609</context>
+          <context context-type="linenumber">631</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5393409374423140648" datatype="html">
         <source>Confirm document type assignment</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">643</context>
+          <context context-type="linenumber">665</context>
         </context-group>
       </trans-unit>
       <trans-unit id="332180123895325027" datatype="html">
         <source>This operation will assign the document type &quot;<x id="PH" equiv-text="documentType.name"/>&quot; to <x id="PH_1" equiv-text="this.getSelectionSize()"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">645</context>
+          <context context-type="linenumber">667</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2236642492594872779" datatype="html">
         <source>This operation will remove the document type from <x id="PH" equiv-text="this.getSelectionSize()"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">647</context>
+          <context context-type="linenumber">669</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6386555513013840736" datatype="html">
         <source>Confirm storage path assignment</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">681</context>
+          <context context-type="linenumber">703</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8750527458618415924" datatype="html">
         <source>This operation will assign the storage path &quot;<x id="PH" equiv-text="storagePath.name"/>&quot; to <x id="PH_1" equiv-text="this.getSelectionSize()"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">683</context>
+          <context context-type="linenumber">705</context>
         </context-group>
       </trans-unit>
       <trans-unit id="60728365335056946" datatype="html">
         <source>This operation will remove the storage path from <x id="PH" equiv-text="this.getSelectionSize()"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">685</context>
+          <context context-type="linenumber">707</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4187352575310415704" datatype="html">
         <source>Confirm custom field assignment</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">714</context>
+          <context context-type="linenumber">736</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7966494636326273856" datatype="html">
         <source>This operation will assign the custom field &quot;<x id="PH" equiv-text="customField.name"/>&quot; to <x id="PH_1" equiv-text="this.getSelectionSize()"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">720</context>
+          <context context-type="linenumber">742</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5789455969634598553" datatype="html">
@@ -9762,14 +9811,14 @@
         )"/> to <x id="PH_1" equiv-text="this.getSelectionSize()"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">725,727</context>
+          <context context-type="linenumber">747,749</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5648572354333199245" datatype="html">
         <source>This operation will remove the custom field &quot;<x id="PH" equiv-text="customField.name"/>&quot; from <x id="PH_1" equiv-text="this.getSelectionSize()"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">733</context>
+          <context context-type="linenumber">755</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6666899594015948817" datatype="html">
@@ -9778,7 +9827,7 @@
         )"/> from <x id="PH_1" equiv-text="this.getSelectionSize()"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">738,740</context>
+          <context context-type="linenumber">760,762</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8050047262594964176" datatype="html">
@@ -9789,112 +9838,105 @@
         )"/> on <x id="PH_2" equiv-text="this.getSelectionSize()"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">742,746</context>
+          <context context-type="linenumber">764,768</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8615059324209654051" datatype="html">
         <source>Move <x id="PH" equiv-text="this.getSelectionSize()"/> selected document(s) to the trash?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">889</context>
+          <context context-type="linenumber">911</context>
         </context-group>
       </trans-unit>
       <trans-unit id="135114644550399974" datatype="html">
         <source>Moved <x id="PH" equiv-text="count"/> document(s) to the trash</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">916</context>
+          <context context-type="linenumber">938</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8585195717323764335" datatype="html">
         <source>This operation will permanently recreate the archive files for <x id="PH" equiv-text="this.getSelectionSize()"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">951</context>
+          <context context-type="linenumber">973</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7366623494074776040" datatype="html">
         <source>The archive files will be re-generated with the current settings.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">952</context>
+          <context context-type="linenumber">974</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6555329262222566158" datatype="html">
         <source>Rotate confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">990</context>
+          <context context-type="linenumber">1012</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5203024009814367559" datatype="html">
         <source>This operation will add rotated versions of the <x id="PH" equiv-text="this.getSelectionSize()"/> document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">991</context>
+          <context context-type="linenumber">1013</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7910756456450124185" datatype="html">
         <source>Merge confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">1014</context>
+          <context context-type="linenumber">1036</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7643543647233874431" datatype="html">
         <source>This operation will merge <x id="PH" equiv-text="this.getSelectionSize()"/> selected documents into a new document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">1015</context>
+          <context context-type="linenumber">1037</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7869008840945899895" datatype="html">
         <source>Merged document will be queued for consumption.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">1038</context>
+          <context context-type="linenumber">1060</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1549333914563613027" datatype="html">
         <source>The selected documents will become versions of the root document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">1051</context>
+          <context context-type="linenumber">1073</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7099667366799629283" datatype="html">
         <source>Documents merged as versions.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">1066</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="476913782630693351" datatype="html">
-        <source>Custom fields updated.</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">1092</context>
+          <context context-type="linenumber">1088</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3873496751167944011" datatype="html">
         <source>Error updating custom fields.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">1101</context>
+          <context context-type="linenumber">1118</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6144801143088984138" datatype="html">
         <source>Share link bundle creation requested.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">1149</context>
+          <context context-type="linenumber">1166</context>
         </context-group>
       </trans-unit>
       <trans-unit id="46019676931295023" datatype="html">
         <source>Share link bundle creation is not available yet.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">1156</context>
+          <context context-type="linenumber">1173</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6307402210351946694" datatype="html">
@@ -13362,42 +13404,42 @@
         <source>Document already exists.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/websocket-status.service.ts</context>
-          <context context-type="linenumber">27</context>
+          <context context-type="linenumber">29</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5103087968344279314" datatype="html">
         <source>Document already exists. Note: existing document is in the trash.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/websocket-status.service.ts</context>
-          <context context-type="linenumber">28</context>
+          <context context-type="linenumber">30</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6108404046106249255" datatype="html">
         <source>Document with ASN already exists.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/websocket-status.service.ts</context>
-          <context context-type="linenumber">29</context>
+          <context context-type="linenumber">31</context>
         </context-group>
       </trans-unit>
       <trans-unit id="65951081560571094" datatype="html">
         <source>Document with ASN already exists. Note: existing document is in the trash.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/websocket-status.service.ts</context>
-          <context context-type="linenumber">30</context>
+          <context context-type="linenumber">32</context>
         </context-group>
       </trans-unit>
       <trans-unit id="148389968432135849" datatype="html">
         <source>File not found.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/websocket-status.service.ts</context>
-          <context context-type="linenumber">31</context>
+          <context context-type="linenumber">33</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1520671543092565667" datatype="html">
         <source>Pre-consume script does not exist.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/websocket-status.service.ts</context>
-          <context context-type="linenumber">32</context>
+          <context context-type="linenumber">34</context>
         </context-group>
         <note priority="1" from="description">Pre-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
       </trans-unit>
@@ -13405,7 +13447,7 @@
         <source>Error while executing pre-consume script.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/websocket-status.service.ts</context>
-          <context context-type="linenumber">33</context>
+          <context context-type="linenumber">35</context>
         </context-group>
         <note priority="1" from="description">Pre-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
       </trans-unit>
@@ -13413,7 +13455,7 @@
         <source>Post-consume script does not exist.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/websocket-status.service.ts</context>
-          <context context-type="linenumber">34</context>
+          <context context-type="linenumber">36</context>
         </context-group>
         <note priority="1" from="description">Post-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
       </trans-unit>
@@ -13421,7 +13463,7 @@
         <source>Error while executing post-consume script.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/websocket-status.service.ts</context>
-          <context context-type="linenumber">35</context>
+          <context context-type="linenumber">37</context>
         </context-group>
         <note priority="1" from="description">Post-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
       </trans-unit>
@@ -13429,49 +13471,49 @@
         <source>Received new file.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/websocket-status.service.ts</context>
-          <context context-type="linenumber">36</context>
+          <context context-type="linenumber">38</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7337565919209746135" datatype="html">
         <source>File type not supported.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/websocket-status.service.ts</context>
-          <context context-type="linenumber">37</context>
+          <context context-type="linenumber">39</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5002399167376099234" datatype="html">
         <source>Processing document...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/websocket-status.service.ts</context>
-          <context context-type="linenumber">38</context>
+          <context context-type="linenumber">40</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1085975194762600381" datatype="html">
         <source>Generating thumbnail...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/websocket-status.service.ts</context>
-          <context context-type="linenumber">39</context>
+          <context context-type="linenumber">41</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3280851677698431426" datatype="html">
         <source>Retrieving date from document...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/websocket-status.service.ts</context>
-          <context context-type="linenumber">40</context>
+          <context context-type="linenumber">42</context>
         </context-group>
       </trans-unit>
       <trans-unit id="7162102384876037296" datatype="html">
         <source>Saving document...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/websocket-status.service.ts</context>
-          <context context-type="linenumber">41</context>
+          <context context-type="linenumber">43</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4550450765009165976" datatype="html">
         <source>Finished.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/websocket-status.service.ts</context>
-          <context context-type="linenumber">42</context>
+          <context context-type="linenumber">44</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2501522447884928778" datatype="html">
