@@ -360,6 +360,39 @@ class TestMail(
             ],
         )
 
+    def test_full_email_and_attachments_share_one_consumption_batch(self) -> None:
+        message = self.mailMocker.messageBuilder.create_message(
+            subject="One email",
+            attachments=2,
+        )
+        rule = MailRuleFactory(
+            consumption_scope=MailRule.ConsumptionScope.EVERYTHING,
+        )
+
+        count = self.mail_account_handler._handle_message(message, rule)
+
+        self.assertEqual(count, 3)
+        self.mailMocker._queue_consumption_tasks_mock.assert_called_once()
+        tasks = self.mailMocker._queue_consumption_tasks_mock.call_args.kwargs[
+            "consume_tasks"
+        ]
+        self.assertEqual(len(tasks), 3)
+        self.assertEqual(tasks[0].kwargs["overrides"].filename, "One email.eml")
+        self.assertFalse(ProcessedMail.objects.filter(rule=rule).exists())
+
+    def test_full_email_with_filtered_attachments_is_not_marked_early(self) -> None:
+        message = self.mailMocker.messageBuilder.create_message(attachments=2)
+        rule = MailRuleFactory(
+            consumption_scope=MailRule.ConsumptionScope.EVERYTHING,
+            filter_attachment_filename_include="*.never",
+        )
+
+        count = self.mail_account_handler._handle_message(message, rule)
+
+        self.assertEqual(count, 1)
+        self.mailMocker._queue_consumption_tasks_mock.assert_called_once()
+        self.assertFalse(ProcessedMail.objects.filter(rule=rule).exists())
+
     def test_bogus_mailbox_uids_and_uid_criteria(self) -> None:
         mailbox = self.mailMocker.bogus_mailbox
         all_messages = list(mailbox.messages)

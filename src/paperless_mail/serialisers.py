@@ -2,6 +2,7 @@ from django.utils.translation import gettext as _
 from rest_framework import serializers
 from rest_framework.exceptions import PermissionDenied
 
+from documents.models import CustomField
 from documents.permissions import has_perms_owner_aware
 from documents.permissions import restrict_queryset_to_visible
 from documents.serialisers import CorrespondentField
@@ -85,6 +86,13 @@ class MailRuleSerializer(OwnedObjectSerializer):
     assign_correspondent = CorrespondentField(allow_null=True, required=False)
     assign_tags = TagsField(many=True, allow_null=True, required=False)
     assign_document_type = DocumentTypeField(allow_null=True, required=False)
+    assign_document_link_field = serializers.PrimaryKeyRelatedField(
+        queryset=CustomField.objects.filter(
+            data_type=CustomField.FieldDataType.DOCUMENTLINK,
+        ),
+        allow_null=True,
+        required=False,
+    )
     order = serializers.IntegerField(required=False)
 
     class Meta:
@@ -109,6 +117,7 @@ class MailRuleSerializer(OwnedObjectSerializer):
             "assign_correspondent_from",
             "assign_correspondent",
             "assign_document_type",
+            "assign_document_link_field",
             "assign_owner_from_rule",
             "order",
             "attachment_type",

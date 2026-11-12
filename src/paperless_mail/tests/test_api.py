@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+from documents.models import CustomField
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 from paperless_mail.models import ProcessedMail
@@ -590,6 +591,65 @@ class TestAPIMailRules(DirectoriesMixin, APITestCase):
         returned_rule1 = MailRule.objects.get(pk=rule1.pk)
         self.assertEqual(returned_rule1.name, "Updated Name 1")
         self.assertEqual(returned_rule1.action, MailRule.MailAction.DELETE)
+
+    def test_mail_rule_document_link_field(self) -> None:
+        account = MailAccountFactory()
+        field = CustomField.objects.create(
+            name="Email documents",
+            data_type=CustomField.FieldDataType.DOCUMENTLINK,
+        )
+        response = self.client.post(
+            self.ENDPOINT,
+            data={
+                "name": "Link email documents",
+                "account": account.pk,
+                "assign_document_link_field": field.pk,
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        rule = MailRule.objects.get(pk=response.data["id"])
+        self.assertEqual(rule.assign_document_link_field, field)
+        self.assertEqual(response.data["assign_document_link_field"], field.pk)
+
+        response = self.client.patch(
+            f"{self.ENDPOINT}{rule.pk}/",
+            data={"assign_document_link_field": None},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        rule.refresh_from_db()
+        self.assertIsNone(rule.assign_document_link_field)
+
+    def test_mail_rule_rejects_non_link_custom_fields(self) -> None:
+        rule = MailRuleFactory()
+        for data_type in CustomField.FieldDataType:
+            if data_type == CustomField.FieldDataType.DOCUMENTLINK:
+                continue
+            with self.subTest(data_type=data_type):
+                field = CustomField.objects.create(
+                    name=f"Not a link: {data_type}",
+                    data_type=data_type,
+                )
+                response = self.client.patch(
+                    f"{self.ENDPOINT}{rule.pk}/",
+                    data={"assign_document_link_field": field.pk},
+                    format="json",
+                )
+                self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+                self.assertIn("assign_document_link_field", response.data)
+        rule.refresh_from_db()
+        self.assertIsNone(rule.assign_document_link_field)
+
+    def test_deleting_link_field_preserves_mail_rule(self) -> None:
+        field = CustomField.objects.create(
+            name="Email documents",
+            data_type=CustomField.FieldDataType.DOCUMENTLINK,
+        )
+        rule = MailRuleFactory(assign_document_link_field=field)
+        field.delete()
+        rule.refresh_from_db()
+        self.assertIsNone(rule.assign_document_link_field)
 
     def test_create_mail_rule_scopes_accounts(self) -> None:
         other_user = UserFactory(username="mail-owner")

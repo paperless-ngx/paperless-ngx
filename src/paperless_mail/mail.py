@@ -47,6 +47,7 @@ from documents.parsers import is_mime_type_supported
 from documents.tasks import consume_file
 from paperless.network import is_public_ip
 from paperless.network import resolve_hostname_ips
+from paperless_mail.document_links import link_mail_documents
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 from paperless_mail.models import ProcessedMail
@@ -273,6 +274,7 @@ def apply_mail_action(
         message_date = make_aware(message_date)
 
     try:
+        link_mail_documents(result, rule)
         with get_mailbox(
             server=account.imap_server,
             port=account.imap_port,
@@ -893,7 +895,7 @@ class MailAccountHandler(LoggingMixin):
     def _handle_message(self, message, rule: MailRule) -> int:
         message = self._preprocess_message(message)
 
-        processed_elements = 0
+        consume_tasks: list[Signature] = []
 
         # Skip Message handling when only attachments are to be processed but
         # message doesn't have any.
@@ -902,7 +904,7 @@ class MailAccountHandler(LoggingMixin):
             and rule.consumption_scope == MailRule.ConsumptionScope.ATTACHMENTS_ONLY
         ):
             self._record_processed_without_consumption(message, rule)
-            return processed_elements
+            return 0
 
         self.log.debug(
             f"Rule {rule}: "
@@ -917,25 +919,28 @@ class MailAccountHandler(LoggingMixin):
             rule.consumption_scope == MailRule.ConsumptionScope.EML_ONLY
             or rule.consumption_scope == MailRule.ConsumptionScope.EVERYTHING
         ):
-            processed_elements += self._process_eml(
-                message,
-                rule,
-                tag_ids,
-                doc_type,
+            consume_tasks.append(
+                self._process_eml(message, rule, tag_ids, doc_type),
             )
 
         if (
             rule.consumption_scope == MailRule.ConsumptionScope.ATTACHMENTS_ONLY
             or rule.consumption_scope == MailRule.ConsumptionScope.EVERYTHING
         ):
-            processed_elements += self._process_attachments(
-                message,
-                rule,
-                tag_ids,
-                doc_type,
+            consume_tasks.extend(
+                self._process_attachments(message, rule, tag_ids, doc_type),
             )
 
-        return processed_elements
+        if consume_tasks:
+            queue_consumption_tasks(
+                consume_tasks=consume_tasks,
+                rule=rule,
+                message=message,
+                uid_validity=self._current_uid_validity,
+            )
+        else:
+            self._record_processed_without_consumption(message, rule)
+        return len(consume_tasks)
 
     def _record_processed_without_consumption(
         self,
@@ -1000,10 +1005,8 @@ class MailAccountHandler(LoggingMixin):
         rule: MailRule,
         tag_ids,
         doc_type,
-    ):
-        processed_attachments = 0
-
-        consume_tasks = []
+    ) -> list[Signature]:
+        consume_tasks: list[Signature] = []
 
         for att in message.attachments:
             if (
@@ -1105,7 +1108,6 @@ class MailAccountHandler(LoggingMixin):
 
                 consume_tasks.append(consume_task)
 
-                processed_attachments += 1
             else:
                 self.log.debug(
                     f"Rule {rule}: "
@@ -1114,18 +1116,7 @@ class MailAccountHandler(LoggingMixin):
                     f"by paperless",
                 )
 
-        if len(consume_tasks) > 0:
-            queue_consumption_tasks(
-                consume_tasks=consume_tasks,
-                rule=rule,
-                message=message,
-                uid_validity=self._current_uid_validity,
-            )
-        else:
-            # No files to consume, just mark as processed if it wasn't by .eml processing
-            self._record_processed_without_consumption(message, rule)
-
-        return processed_attachments
+        return consume_tasks
 
     def _process_eml(
         self,
@@ -1133,7 +1124,7 @@ class MailAccountHandler(LoggingMixin):
         rule: MailRule,
         tag_ids,
         doc_type,
-    ):
+    ) -> Signature:
         settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
         _, temp_filename = tempfile.mkstemp(
             prefix="paperless-mail-",
@@ -1196,12 +1187,4 @@ class MailAccountHandler(LoggingMixin):
             overrides=doc_overrides,
         ).set(headers={"trigger_source": PaperlessTask.TriggerSource.EMAIL_CONSUME})
 
-        queue_consumption_tasks(
-            consume_tasks=[consume_task],
-            rule=rule,
-            message=message,
-            uid_validity=self._current_uid_validity,
-        )
-
-        processed_elements = 1
-        return processed_elements
+        return consume_task

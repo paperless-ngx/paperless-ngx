@@ -279,6 +279,38 @@ different means. These are as follows:
 Paperless is set up to check your mails every 10 minutes. This can be
 configured via [`PAPERLESS_EMAIL_TASK_CRON`](configuration.md#PAPERLESS_EMAIL_TASK_CRON)
 
+#### Linking documents from the same email
+
+Create a custom field of type **Document Link**, then select it in the mail
+rule's **Link documents from the same email** setting. This optional setting
+links the documents imported by that rule from each individual email, including
+the full email when the consumption scope includes it. It also works with
+attachments-only rules. The documents and their original files remain separate;
+the setting does not merge PDFs or create a tag for every email.
+
+Links are added after all files in that email's import batch finish. Existing
+links and other custom fields are preserved. If an attachment already exists,
+Paperless uses that document, provided it is not in the trash and the rule's
+owner can change it. Repeating a successful batch does not add duplicate links.
+The owner must be active and have permission to change every document in the
+batch. Rules without an owner may only link documents without an owner.
+
+These are direct links between documents that appeared together in an email,
+not a permanent record of each originating message. For example, if one email
+contains A and B, and another contains the same B and C, the resulting links are
+A–B and B–C; A and C are not linked automatically. There is no retrospective
+linking of previously imported emails, and links from separate rules are not
+combined into a single import batch.
+
+If a file fails to import, a resulting document is missing or in the trash, or
+the owner lacks permission, the enabled linking operation fails and the mail's
+post-consumption action (including moving or deleting it) is not performed.
+Documents already imported remain available. Check the failed entry in the
+processed mail log and the application logs. After resolving the cause, remove
+the processed mail log entry and ensure the email still matches the rule to
+retry it. The setting does not currently support consumption steps that stop
+the original task and start separate child tasks, such as barcode splitting.
+
 #### Processed Mail
 
 Paperless keeps track of emails it has processed in order to avoid processing the same mail multiple times. This uses the message `UID` provided by the mail server, which should be unique for each message. You can view and manage processed mails from the web UI under Mail > Processed Mails. If you need to re-process a message, you can delete the corresponding processed mail entry, which will allow Paperless-ngx to process the email again the next time the mail fetch task runs.

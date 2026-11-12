@@ -66,6 +66,7 @@
       <div class="col-md-6">
         <pngx-input-tags [horizontal]="true" [allowCreate]="false" formControlName="assign_tags"></pngx-input-tags>
         <pngx-input-select [horizontal]="true" i18n-title title="Assign document type" [items]="documentTypes()" [allowNull]="true" formControlName="assign_document_type"></pngx-input-select>
+        <pngx-input-select [horizontal]="true" i18n-title title="Link documents using" [items]="documentLinkFields()" [allowNull]="true" formControlName="assign_document_link_field" [error]="error?.assign_document_link_field" i18n-hint hint="Automatically link documents imported from the same email. Documents remain separate. Requires an existing Document Link custom field." i18n-notFoundText notFoundText="No Document Link custom fields found"></pngx-input-select>
         <pngx-input-select [horizontal]="true" i18n-title title="Assign correspondent from" [items]="metadataCorrespondentOptions" formControlName="assign_correspondent_from"></pngx-input-select>
         @if (showCorrespondentField) {
           <pngx-input-select [horizontal]="true" i18n-title title="Assign correspondent" [items]="correspondents()" [allowNull]="true" formControlName="assign_correspondent"></pngx-input-select>

@@ -98,6 +98,7 @@ class MailRuleAdmin(GuardedModelAdmin):
                     "assign_title_from",
                     "assign_tags",
                     "assign_document_type",
+                    "assign_document_link_field",
                     "assign_correspondent_from",
                     "assign_correspondent",
                 ),

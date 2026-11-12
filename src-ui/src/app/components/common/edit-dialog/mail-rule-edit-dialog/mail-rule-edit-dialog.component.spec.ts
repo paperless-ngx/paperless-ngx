@@ -2,9 +2,11 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { By } from '@angular/platform-browser'
 import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap'
 import { NgSelectModule } from '@ng-select/ng-select'
 import { of, throwError } from 'rxjs'
+import { CustomFieldDataType } from 'src/app/data/custom-field'
 import {
   MailAction,
   MailMetadataCorrespondentOption,
@@ -12,8 +14,10 @@ import {
 import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
+import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { MailAccountService } from 'src/app/services/rest/mail-account.service'
+import { MailRuleService } from 'src/app/services/rest/mail-rule.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { CheckComponent } from '../../input/check/check.component'
@@ -69,6 +73,27 @@ describe('MailRuleEditDialogComponent', () => {
             listAll: () => of([]),
           },
         },
+        {
+          provide: CustomFieldsService,
+          useValue: {
+            listAll: () =>
+              of({
+                count: 2,
+                results: [
+                  {
+                    id: 1,
+                    name: 'Reference',
+                    data_type: CustomFieldDataType.String,
+                  },
+                  {
+                    id: 2,
+                    name: 'Related documents',
+                    data_type: CustomFieldDataType.DocumentLink,
+                  },
+                ],
+              }),
+          },
+        },
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
       ],
@@ -80,6 +105,126 @@ describe('MailRuleEditDialogComponent', () => {
     component = fixture.componentInstance
 
     fixture.detectChanges()
+  })
+
+  function getDocumentLinkSelect(targetFixture = fixture): SelectComponent {
+    return targetFixture.debugElement.query(
+      By.css('pngx-input-select[formControlName="assign_document_link_field"]')
+    ).componentInstance
+  }
+
+  it('should offer only document link fields and leave linking off by default', () => {
+    const select = getDocumentLinkSelect()
+    expect(select.items).toEqual([
+      {
+        id: 2,
+        name: 'Related documents',
+        data_type: CustomFieldDataType.DocumentLink,
+      },
+    ])
+    expect(select.allowNull).toBe(true)
+    expect(select.value).toBeNull()
+
+    const createSpy = jest
+      .spyOn(TestBed.inject(MailRuleService), 'create')
+      .mockImplementation((rule) => of(rule))
+    component.save()
+    expect(createSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ assign_document_link_field: null })
+    )
+  })
+
+  it('should save the selected document link field', () => {
+    const createSpy = jest
+      .spyOn(TestBed.inject(MailRuleService), 'create')
+      .mockImplementation((rule) => of(rule))
+    const select = getDocumentLinkSelect()
+    select.value = 2
+    select.onChange(2)
+
+    component.save()
+
+    expect(createSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ assign_document_link_field: 2 })
+    )
+  })
+
+  it('should load an existing document link field and allow clearing it', () => {
+    const editFixture = TestBed.createComponent(MailRuleEditDialogComponent)
+    const editComponent = editFixture.componentInstance
+    editComponent.dialogMode.set(EditDialogMode.EDIT)
+    editComponent.object = {
+      ...component.objectForm.value,
+      id: 1,
+      assign_document_link_field: 2,
+    }
+    editFixture.detectChanges()
+
+    const select = getDocumentLinkSelect(editFixture)
+    expect(select.value).toBe(2)
+    const updateSpy = jest
+      .spyOn(TestBed.inject(MailRuleService), 'update')
+      .mockImplementation((rule) => of(rule))
+    select.value = null
+    select.onChange(null)
+    editComponent.save()
+
+    expect(updateSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 1, assign_document_link_field: null })
+    )
+  })
+
+  it('should keep the rule editable when there are no document link fields', () => {
+    jest
+      .spyOn(TestBed.inject(CustomFieldsService), 'listAll')
+      .mockReturnValue(of({ count: 0, results: [] }))
+    const emptyFixture = TestBed.createComponent(MailRuleEditDialogComponent)
+
+    expect(() => emptyFixture.detectChanges()).not.toThrow()
+    expect(getDocumentLinkSelect(emptyFixture).items).toEqual([])
+    expect(getDocumentLinkSelect(emptyFixture).notFoundText).toBe(
+      'No Document Link custom fields found'
+    )
+    expect(
+      emptyFixture.componentInstance.objectForm.value.assign_document_link_field
+    ).toBeNull()
+  })
+
+  it('should preserve an existing link field when custom fields cannot be loaded', () => {
+    const error = new Error('Forbidden')
+    jest
+      .spyOn(TestBed.inject(CustomFieldsService), 'listAll')
+      .mockReturnValue(throwError(() => error))
+    const toastSpy = jest.spyOn(TestBed.inject(ToastService), 'showError')
+    const editFixture = TestBed.createComponent(MailRuleEditDialogComponent)
+    const editComponent = editFixture.componentInstance
+    editComponent.dialogMode.set(EditDialogMode.EDIT)
+    editComponent.object = {
+      ...component.objectForm.value,
+      id: 1,
+      assign_document_link_field: 2,
+    }
+    editFixture.detectChanges()
+
+    expect(toastSpy).toHaveBeenCalledWith(
+      'Error retrieving custom fields',
+      error
+    )
+    expect(getDocumentLinkSelect(editFixture).value).toBe(2)
+    expect(getDocumentLinkSelect(editFixture).isPrivate).toBe(true)
+
+    const updateSpy = jest
+      .spyOn(TestBed.inject(MailRuleService), 'update')
+      .mockImplementation((rule) => of(rule))
+    editComponent.objectForm.get('name').setValue('Updated rule')
+    editComponent.save()
+
+    expect(updateSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'Updated rule',
+        assign_document_link_field: 2,
+      })
+    )
   })
 
   it('should use empty related object lists when retrieval fails', () => {
