@@ -718,18 +718,22 @@ def run_workflows_for_documents(
         id__in=document_ids,
         root_document__isnull=True,
     ):
-        run_workflows(
-            trigger_type=WorkflowTrigger.WorkflowTriggerType.MANUAL,
-            document=document,
-            workflow_to_run=workflow,
-            skip_matching=not filter_documents,
-        )
-        # Manual runs dont send a document_updated signal, so push a websocket
-        # update here to ensure clients are refreshed
-        send_websocket_document_updated(
-            sender=None,
-            document=document,
-        )
+        try:
+            run_workflows(
+                trigger_type=WorkflowTrigger.WorkflowTriggerType.MANUAL,
+                document=document,
+                workflow_to_run=workflow,
+                skip_matching=not filter_documents,
+            )
+            # Manual runs dont send document_updated signal, so ws here to ensure clients are refreshed
+            send_websocket_document_updated(
+                sender=None,
+                document=document,
+            )
+        except Exception:
+            logger.exception(
+                f"Error running workflow {workflow} on document {document.pk}",
+            )
 
 
 def update_document_parent_tags(tag: Tag, new_parent: Tag) -> None:

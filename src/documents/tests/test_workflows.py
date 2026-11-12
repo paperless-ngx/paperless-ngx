@@ -2339,6 +2339,33 @@ class TestWorkflows(
             tasks.run_workflows_for_documents([doc.pk], 9999)
 
     @mock.patch("documents.tasks.send_websocket_document_updated")
+    @mock.patch("documents.tasks.run_workflows")
+    def test_manual_workflow_run_continues_after_error(
+        self,
+        mock_run_workflows,
+        mock_ws,
+    ) -> None:
+        """A failure on one document does not abort the run for the others."""
+        workflow = self._make_manual_workflow()
+        doc1 = DocumentFactory()
+        doc2 = DocumentFactory()
+
+        def side_effect(*args, document, **kwargs):
+            if document.pk == doc1.pk:
+                raise Exception("boom")
+
+        mock_run_workflows.side_effect = side_effect
+
+        with self.assertLogs("paperless.tasks", level="ERROR"):
+            tasks.run_workflows_for_documents([doc1.pk, doc2.pk], workflow.pk)
+
+        # Both documents were attempted; the websocket update only fired for the
+        # one that did not raise.
+        self.assertEqual(mock_run_workflows.call_count, 2)
+        ws_doc_ids = [c.kwargs["document"].pk for c in mock_ws.call_args_list]
+        self.assertEqual(ws_doc_ids, [doc2.pk])
+
+    @mock.patch("documents.tasks.send_websocket_document_updated")
     def test_workflow_scheduled_trigger_sends_websocket_update(
         self,
         mock_send_websocket_document_updated,
