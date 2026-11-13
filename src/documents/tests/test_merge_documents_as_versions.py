@@ -8,6 +8,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from documents.bulk_edit import merge_as_versions
+from documents.bulk_operations import execute_bulk_operation
 from documents.models import Document
 from documents.serialisers import MergeDocumentsAsVersionsSerializer
 from paperless_testing.factories import UserFactory
@@ -349,6 +350,17 @@ class TestMergeDocumentsAsVersionsAPI(APITestCase):
             owner=self.user,
         )
         self.client.force_authenticate(user=self.user)
+        enqueue = mock.patch(
+            "documents.views.execute_bulk_operation.apply_async",
+            side_effect=lambda *, kwargs, headers: self.run_operation(kwargs),
+        )
+        enqueue.start()
+        self.addCleanup(enqueue.stop)
+
+    @staticmethod
+    def run_operation(kwargs):
+        execute_bulk_operation(**kwargs)
+        return mock.Mock(id="test-bulk-operation")
 
     @mock.patch("documents.views.bulk_edit.merge_as_versions")
     def test_merges_documents_as_versions(self, merge_mock) -> None:
@@ -368,7 +380,10 @@ class TestMergeDocumentsAsVersionsAPI(APITestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, {"result": "OK"})
+        self.assertEqual(
+            response.data,
+            {"result": "OK", "task_id": "test-bulk-operation"},
+        )
         merge_mock.assert_called_once_with(
             [self.doc1.id, self.doc2.id],
             root_document_id=self.doc2.id,

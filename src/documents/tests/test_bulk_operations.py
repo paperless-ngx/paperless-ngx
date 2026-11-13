@@ -124,6 +124,26 @@ def test_document_action_runs_with_user_in_worker(bulk_setup):
 
 
 @pytest.mark.django_db
+def test_document_action_queue_contains_only_serializable_parameters(bulk_setup):
+    user, client, doc, _ = bulk_setup
+    with mock.patch("documents.views.execute_bulk_operation.apply_async") as enqueue:
+        enqueue.return_value.id = "rotate-task"
+        response = client.post(
+            "/api/documents/rotate/",
+            {"documents": [doc.pk], "degrees": 90, "from_webui": True},
+            format="json",
+        )
+    assert response.data == {"result": "OK", "task_id": "rotate-task"}
+    assert enqueue.call_args.kwargs["kwargs"] == {
+        "operation": "rotate",
+        "document_ids": [doc.pk],
+        "parameters": {"degrees": 90, "source_mode": "latest_version"},
+        "user_id": user.pk,
+        "trigger_source": "web_ui",
+    }
+
+
+@pytest.mark.django_db
 def test_reprocess_keeps_bulk_audit_entry(bulk_setup, settings):
     user, _, doc, _ = bulk_setup
     settings.AUDIT_LOG_ENABLED = True
@@ -386,19 +406,22 @@ def test_legacy_trash_queues_without_deleting_in_request(bulk_setup):
 
 
 @pytest.mark.django_db
-def test_dedicated_trash_remains_synchronous(bulk_setup):
-    _, client, doc, _ = bulk_setup
-    with (
-        mock.patch("documents.views.execute_bulk_operation.apply_async") as enqueue,
-        mock.patch("documents.search.get_backend"),
-    ):
+def test_dedicated_trash_queues_without_deleting_in_request(bulk_setup):
+    user, client, doc, _ = bulk_setup
+    with mock.patch("documents.views.execute_bulk_operation.apply_async") as enqueue:
+        enqueue.return_value.id = "delete-task"
         response = client.post(
             "/api/documents/delete/",
             {"documents": [doc.pk]},
             format="json",
         )
     assert response.status_code == 200
-    assert response.data == {"result": "OK"}
-    assert not Document.objects.filter(pk=doc.pk).exists()
-    assert Document.deleted_objects.filter(pk=doc.pk).exists()
-    enqueue.assert_not_called()
+    assert response.data == {"result": "OK", "task_id": "delete-task"}
+    assert Document.objects.filter(pk=doc.pk).exists()
+    assert enqueue.call_args.kwargs["kwargs"] == {
+        "operation": "delete",
+        "document_ids": [doc.pk],
+        "parameters": {},
+        "user_id": user.pk,
+        "trigger_source": "api_upload",
+    }
