@@ -11,7 +11,11 @@ import {
   signal,
 } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap'
+import {
+  NgbDropdown,
+  NgbDropdownModule,
+  NgbModal,
+} from '@ng-bootstrap/ng-bootstrap'
 import { first, takeUntil } from 'rxjs'
 import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { CustomField, DATA_TYPE_LABELS } from 'src/app/data/custom-field'
@@ -63,6 +67,7 @@ export class CustomFieldsDropdownComponent extends LoadingComponentWithPermissio
   created: EventEmitter<CustomField> = new EventEmitter()
 
   @ViewChild('listFilterTextInput') listFilterTextInput: ElementRef
+  @ViewChild('fieldDropdown') fieldDropdown: NgbDropdown
   @ViewChildren('button') buttons: QueryList<ElementRef>
 
   private customFields: CustomField[] = []
@@ -120,6 +125,7 @@ export class CustomFieldsDropdownComponent extends LoadingComponentWithPermissio
 
   addField(field: CustomField) {
     this.added.emit(field)
+    this.fieldDropdown.close()
     this.updateUnusedFields()
   }
 

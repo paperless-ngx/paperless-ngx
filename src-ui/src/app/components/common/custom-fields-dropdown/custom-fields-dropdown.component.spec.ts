@@ -4,6 +4,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { By } from '@angular/platform-browser'
 import {
+  NgbDropdown,
   NgbDropdownModule,
   NgbModal,
   NgbModalModule,
@@ -249,5 +250,15 @@ describe('CustomFieldsDropdownComponent', () => {
     component.listFilterEnter()
     expect(createFieldSpy).not.toHaveBeenCalled()
     expect(addFieldSpy).not.toHaveBeenCalled()
+  })
+
+  it('should close the dropdown after selecting a filtered field', () => {
+    const dropdown = fixture.debugElement
+      .query(By.directive(NgbDropdown))
+      .injector.get(NgbDropdown)
+    dropdown.open()
+    component.filterText = 'Field 1'
+    component.listFilterEnter()
+    expect(dropdown.isOpen()).toBe(false)
   })
 })
