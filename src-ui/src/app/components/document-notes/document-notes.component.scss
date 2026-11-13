@@ -16,11 +16,14 @@
     font-weight: bold;
   }
 
+  h1 { font-size: 1.25em; }
+  h2 { font-size: 1.15em; }
+  h3 { font-size: 1.05em; }
+
   table {
     margin-bottom: 1rem;
     display: block;
     overflow-x: auto;
-    white-space: nowrap;
   }
 
   th, td {
