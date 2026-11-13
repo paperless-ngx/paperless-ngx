@@ -789,6 +789,7 @@ def has_document_operation_permissions(
                 bulk_edit.edit_pdf,
                 bulk_edit.merge_as_versions,
                 bulk_edit.remove_password,
+                bulk_edit.run_workflow,
             ]
         )
         or (

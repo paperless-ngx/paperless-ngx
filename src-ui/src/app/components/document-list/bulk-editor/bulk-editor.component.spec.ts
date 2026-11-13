@@ -728,6 +728,27 @@ describe('BulkEditorComponent', () => {
     ) // listAllFilteredIds
   })
 
+  it('should require ownership of selected documents to run a workflow', () => {
+    component.manualWorkflows = [{ id: 5 }] as any
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
+    jest
+      .spyOn(permissionsService, 'currentUserHasObjectPermissions')
+      .mockReturnValue(true)
+    const ownsDocument = jest
+      .spyOn(permissionsService, 'currentUserOwnsObject')
+      .mockReturnValue(false)
+    jest
+      .spyOn(documentListViewService, 'documents', 'get')
+      .mockReturnValue([{ id: 3 }])
+    jest
+      .spyOn(documentListViewService, 'selected', 'get')
+      .mockReturnValue(new Set([3]))
+
+    expect(component.canRunWorkflow).toBe(false)
+    ownsDocument.mockReturnValue(true)
+    expect(component.canRunWorkflow).toBe(true)
+  })
+
   it('should set modal dialog text accordingly for tag edit confirmation', () => {
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((m) => (modal = m[m.length - 1]))
