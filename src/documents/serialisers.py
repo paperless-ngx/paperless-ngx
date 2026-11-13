@@ -1688,6 +1688,7 @@ class MergeDocumentsSerializer(DocumentListSerializer, SourceModeValidationMixin
 
 class MergeDocumentsAsVersionsSerializer(DocumentListSerializer):
     root_document_id = serializers.IntegerField(required=True)
+    from_webui = serializers.BooleanField(required=False, default=False)
     version_label = serializers.CharField(
         required=False,
         allow_blank=True,
@@ -1801,11 +1802,12 @@ class RemovePasswordDocumentsSerializer(
 
 
 class DeleteDocumentsSerializer(DocumentSelectionSerializer):
-    pass
+    from_webui = serializers.BooleanField(required=False, default=False)
 
 
 class ReprocessDocumentsSerializer(DocumentSelectionSerializer):
     remote_ocr = serializers.BooleanField(required=False, default=False)
+    from_webui = serializers.BooleanField(required=False, default=False)
 
 
 class BulkEditSerializer(
