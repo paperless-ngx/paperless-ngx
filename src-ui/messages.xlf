@@ -1366,7 +1366,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1971</context>
+          <context context-type="linenumber">1973</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1577733187050997705" datatype="html">
@@ -3420,7 +3420,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1972</context>
+          <context context-type="linenumber">1974</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
@@ -4339,7 +4339,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">2025</context>
+          <context context-type="linenumber">2027</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6661109599266152398" datatype="html">
@@ -4350,7 +4350,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">2026</context>
+          <context context-type="linenumber">2028</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5162686434580248853" datatype="html">
@@ -4361,7 +4361,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">2027</context>
+          <context context-type="linenumber">2029</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6665634854532231106" datatype="html">
@@ -4413,18 +4413,32 @@
           <context context-type="linenumber">13,14</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="261810320774538615" datatype="html">
+        <source>Run on this document regardless of trigger filters</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/confirm-dialog/run-workflow-confirm-dialog/run-workflow-confirm-dialog.component.html</context>
+          <context context-type="linenumber">22,23</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2322522720854680528" datatype="html">
+        <source>Ignore the workflow&apos;s trigger filters for this document.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/confirm-dialog/run-workflow-confirm-dialog/run-workflow-confirm-dialog.component.html</context>
+          <context context-type="linenumber">23,24</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="4512110365422311821" datatype="html">
         <source>Run on all selected documents</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/confirm-dialog/run-workflow-confirm-dialog/run-workflow-confirm-dialog.component.html</context>
-          <context context-type="linenumber">21,22</context>
+          <context context-type="linenumber">25,26</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6575910678008555513" datatype="html">
         <source>Ignore the workflow&apos;s trigger filters and run on every selected document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/confirm-dialog/run-workflow-confirm-dialog/run-workflow-confirm-dialog.component.html</context>
-          <context context-type="linenumber">22,23</context>
+          <context context-type="linenumber">26,27</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2509141182388535183" datatype="html">
@@ -9304,7 +9318,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1607</context>
+          <context context-type="linenumber">1609</context>
         </context-group>
       </trans-unit>
       <trans-unit id="838042392151392247" datatype="html">
@@ -9329,81 +9343,81 @@
         <source>Workflow will run on &quot;<x id="PH" equiv-text="this.document().title"/>&quot; in the background.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1600</context>
+          <context context-type="linenumber">1602</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6030453331794586802" datatype="html">
         <source>Error downloading document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1671</context>
+          <context context-type="linenumber">1673</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4458954481601077369" datatype="html">
         <source>Page Fit</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1749</context>
+          <context context-type="linenumber">1751</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4663705961777238777" datatype="html">
         <source>PDF edit operation for &quot;<x id="PH" equiv-text="this.document().title"/>&quot; will begin in the background.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1992</context>
+          <context context-type="linenumber">1994</context>
         </context-group>
       </trans-unit>
       <trans-unit id="9043972994040261999" datatype="html">
         <source>Error executing PDF edit operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">2004</context>
+          <context context-type="linenumber">2006</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6172690334763056188" datatype="html">
         <source>Please enter the current password before attempting to remove it.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">2015</context>
+          <context context-type="linenumber">2017</context>
         </context-group>
       </trans-unit>
       <trans-unit id="968660764814228922" datatype="html">
         <source>Password removal operation for &quot;<x id="PH" equiv-text="this.document().title"/>&quot; will begin in the background.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">2049</context>
+          <context context-type="linenumber">2051</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2282118435712883014" datatype="html">
         <source>Error executing password removal operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">2063</context>
+          <context context-type="linenumber">2065</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3740891324955700797" datatype="html">
         <source>Print failed.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">2113</context>
+          <context context-type="linenumber">2115</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6457245677384603573" datatype="html">
         <source>Error loading document for printing.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">2122</context>
+          <context context-type="linenumber">2124</context>
         </context-group>
       </trans-unit>
       <trans-unit id="6085793215710522488" datatype="html">
         <source>An error occurred loading tiff: <x id="PH" equiv-text="err.toString()"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">2205</context>
+          <context context-type="linenumber">2207</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">2211</context>
+          <context context-type="linenumber">2213</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4958946940233632319" datatype="html">
