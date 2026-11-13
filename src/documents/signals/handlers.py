@@ -1206,6 +1206,8 @@ def before_task_publish_handler(
                 "document_count": len(task_kwargs["document_ids"]),
             }
             owner_id = task_kwargs["user_id"]
+            if task_kwargs["operation"] == "delete":
+                task_type = PaperlessTask.TaskType.BULK_DELETE
         else:
             input_data = _extract_input_data(task_type, task_kwargs)
             owner_id = _extract_owner_id(task_type, task_kwargs)

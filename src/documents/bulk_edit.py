@@ -475,9 +475,9 @@ def run_workflow(
     """
     Manually run a single workflow against the given documents.
 
-    Done asynchronously via a Celery task.
+    Called from the tracked bulk operation task.
     """
-    run_workflows_for_documents.delay(
+    run_workflows_for_documents(
         document_ids=doc_ids,
         workflow_id=workflow,
         filter_documents=filter_documents,
