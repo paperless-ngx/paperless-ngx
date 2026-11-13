@@ -749,11 +749,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">442</context>
+          <context context-type="linenumber">448</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">443,444</context>
+          <context context-type="linenumber">449,450</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/custom-fields-bulk-edit-dialog/custom-fields-bulk-edit-dialog.component.html</context>
@@ -913,7 +913,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/page-header/page-header.component.html</context>
-          <context context-type="linenumber">30</context>
+          <context context-type="linenumber">32</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/permissions-dialog/permissions-dialog.component.html</context>
@@ -937,7 +937,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">474</context>
+          <context context-type="linenumber">480</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
@@ -1245,7 +1245,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/page-header/page-header.component.html</context>
-          <context context-type="linenumber">18</context>
+          <context context-type="linenumber">20</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/permissions-select/permissions-select.component.html</context>
@@ -1493,11 +1493,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">61</context>
+          <context context-type="linenumber">67</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1913</context>
+          <context context-type="linenumber">1971</context>
         </context-group>
         <target state="translated">Editor de PDF</target>
       </trans-unit>
@@ -1581,7 +1581,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">386,387</context>
+          <context context-type="linenumber">392,393</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
@@ -1837,7 +1837,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">145</context>
+          <context context-type="linenumber">151</context>
         </context-group>
         <target state="final">Número de série de arquivamento</target>
       </trans-unit>
@@ -1849,11 +1849,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
-          <context context-type="linenumber">174</context>
+          <context context-type="linenumber">178</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">150</context>
+          <context context-type="linenumber">156</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
@@ -1885,11 +1885,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
-          <context context-type="linenumber">178</context>
+          <context context-type="linenumber">182</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">154</context>
+          <context context-type="linenumber">160</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
@@ -1921,11 +1921,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
-          <context context-type="linenumber">182</context>
+          <context context-type="linenumber">186</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">158</context>
+          <context context-type="linenumber">164</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
@@ -1957,7 +1957,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
-          <context context-type="linenumber">170</context>
+          <context context-type="linenumber">174</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/tags/tags.component.ts</context>
@@ -2013,7 +2013,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">78,79</context>
+          <context context-type="linenumber">84,85</context>
         </context-group>
         <target state="translated">Compartilhar Link</target>
       </trans-unit>
@@ -2157,15 +2157,15 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
-          <context context-type="linenumber">214</context>
+          <context context-type="linenumber">260</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
-          <context context-type="linenumber">332</context>
+          <context context-type="linenumber">378</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
-          <context context-type="linenumber">361</context>
+          <context context-type="linenumber">407</context>
         </context-group>
         <target state="translated">Ocorreu um erro ao salvar as configurações.</target>
       </trans-unit>
@@ -2225,7 +2225,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">58</context>
+          <context context-type="linenumber">60</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/custom-fields-query-dropdown/custom-fields-query-dropdown.component.html</context>
@@ -2273,7 +2273,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">224</context>
+          <context context-type="linenumber">227</context>
         </context-group>
         <target state="translated">Todos os tipo</target>
       </trans-unit>
@@ -2285,7 +2285,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">236</context>
+          <context context-type="linenumber">239</context>
         </context-group>
         <target state="translated">Todas as fontes</target>
       </trans-unit>
@@ -2361,7 +2361,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">53</context>
+          <context context-type="linenumber">54</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/trash/trash.component.html</context>
@@ -2661,15 +2661,15 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">326</context>
+          <context context-type="linenumber">340</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">360</context>
+          <context context-type="linenumber">374</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">715</context>
+          <context context-type="linenumber">721</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-version-dropdown/document-version-dropdown.component.html</context>
@@ -2761,15 +2761,23 @@
         <source>Result</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">54</context>
+          <context context-type="linenumber">55</context>
         </context-group>
         <target state="translated">Resultado</target>
+      </trans-unit>
+      <trans-unit id="7839508346035554208" datatype="html">
+        <source>Task ID</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
+          <context context-type="linenumber">56</context>
+        </context-group>
+        <target state="needs-translation">Task ID</target>
       </trans-unit>
       <trans-unit id="2952127331314675199" datatype="html">
         <source>Needs attention</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">59</context>
+          <context context-type="linenumber">61</context>
         </context-group>
         <target state="translated">Requer atenção</target>
       </trans-unit>
@@ -2777,7 +2785,7 @@
         <source>In progress</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">60</context>
+          <context context-type="linenumber">62</context>
         </context-group>
         <target state="translated">Em andamento</target>
       </trans-unit>
@@ -2785,7 +2793,7 @@
         <source>Recently completed</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">61</context>
+          <context context-type="linenumber">63</context>
         </context-group>
         <target state="translated">Completado recentemente</target>
       </trans-unit>
@@ -2793,7 +2801,7 @@
         <source>Consume File</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">70</context>
+          <context context-type="linenumber">72</context>
         </context-group>
         <target state="translated">Consumir Arquivo</target>
       </trans-unit>
@@ -2801,7 +2809,7 @@
         <source>Train Classifier</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">74</context>
+          <context context-type="linenumber">76</context>
         </context-group>
         <target state="translated">Treinar Classificador</target>
       </trans-unit>
@@ -2809,7 +2817,7 @@
         <source>Sanity Check</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">78</context>
+          <context context-type="linenumber">80</context>
         </context-group>
         <target state="translated">Verificação de consistência</target>
       </trans-unit>
@@ -2817,7 +2825,7 @@
         <source>Mail Fetch</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">80</context>
+          <context context-type="linenumber">82</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
@@ -2829,7 +2837,7 @@
         <source>LLM Index</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">81</context>
+          <context context-type="linenumber">83</context>
         </context-group>
         <target state="translated">Índice LLM</target>
       </trans-unit>
@@ -2837,7 +2845,7 @@
         <source>Empty Trash</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">84</context>
+          <context context-type="linenumber">86</context>
         </context-group>
         <target state="translated">Esvaziar a lixeira</target>
       </trans-unit>
@@ -2845,7 +2853,7 @@
         <source>Check Workflows</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">88</context>
+          <context context-type="linenumber">90</context>
         </context-group>
         <target state="translated">Verificar fluxos de trabalho</target>
       </trans-unit>
@@ -2853,7 +2861,7 @@
         <source>Bulk Update</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">92</context>
+          <context context-type="linenumber">94</context>
         </context-group>
         <target state="translated">Atualização em Massa</target>
       </trans-unit>
@@ -2861,7 +2869,7 @@
         <source>Reprocess Document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">96</context>
+          <context context-type="linenumber">98</context>
         </context-group>
         <target state="translated">Reprocessar Documento</target>
       </trans-unit>
@@ -2869,7 +2877,7 @@
         <source>Build Share Link</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">100</context>
+          <context context-type="linenumber">102</context>
         </context-group>
         <target state="translated">Criar Link de Compartilhamento</target>
       </trans-unit>
@@ -2877,7 +2885,7 @@
         <source>Bulk Delete</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">104</context>
+          <context context-type="linenumber">106</context>
         </context-group>
         <target state="translated">Exclusão em massa</target>
       </trans-unit>
@@ -2885,7 +2893,7 @@
         <source>Apply AI Suggestions</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">108</context>
+          <context context-type="linenumber">110</context>
         </context-group>
         <target state="translated">Aplicar sugestões de IA</target>
       </trans-unit>
@@ -2893,7 +2901,7 @@
         <source>Scheduled</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">118</context>
+          <context context-type="linenumber">120</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
@@ -2905,7 +2913,7 @@
         <source>Web UI</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">120</context>
+          <context context-type="linenumber">122</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
@@ -2917,7 +2925,7 @@
         <source>API Upload</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">123</context>
+          <context context-type="linenumber">125</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
@@ -2929,7 +2937,7 @@
         <source>Folder Consume</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">127</context>
+          <context context-type="linenumber">129</context>
         </context-group>
         <target state="translated">Consumo de Pasta</target>
       </trans-unit>
@@ -2937,7 +2945,7 @@
         <source>Email Consume</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">131</context>
+          <context context-type="linenumber">133</context>
         </context-group>
         <target state="translated">Consumir E-mail</target>
       </trans-unit>
@@ -2945,7 +2953,7 @@
         <source>System</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">133</context>
+          <context context-type="linenumber">135</context>
         </context-group>
         <target state="translated">Sistema</target>
       </trans-unit>
@@ -2953,7 +2961,11 @@
         <source>Manual</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">134</context>
+          <context context-type="linenumber">136</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
+          <context context-type="linenumber">128</context>
         </context-group>
         <target state="translated">Manual</target>
       </trans-unit>
@@ -2961,7 +2973,7 @@
         <source>Dismiss selected</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">248</context>
+          <context context-type="linenumber">251</context>
         </context-group>
         <target state="translated">Dispensar selecionado</target>
       </trans-unit>
@@ -2969,7 +2981,7 @@
         <source>Dismiss visible</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">249</context>
+          <context context-type="linenumber">252</context>
         </context-group>
         <target state="translated">Descartar visível</target>
       </trans-unit>
@@ -2977,7 +2989,7 @@
         <source>Confirm Dismiss</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">323</context>
+          <context context-type="linenumber">337</context>
         </context-group>
         <target state="translated">Confirmar Dispensar</target>
       </trans-unit>
@@ -2985,7 +2997,7 @@
         <source>Dismiss <x id="PH" equiv-text="tasks.size"/> tasks?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">324</context>
+          <context context-type="linenumber">338</context>
         </context-group>
         <target state="needs-translation">Dismiss <x id="PH" equiv-text="tasks.size"/> tasks?</target>
       </trans-unit>
@@ -2993,11 +3005,11 @@
         <source>Error dismissing tasks</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">335</context>
+          <context context-type="linenumber">349</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">369</context>
+          <context context-type="linenumber">383</context>
         </context-group>
         <target state="translated">Erro ao ignorar tarefas</target>
       </trans-unit>
@@ -3005,7 +3017,7 @@
         <source>Error dismissing task</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">347</context>
+          <context context-type="linenumber">361</context>
         </context-group>
         <target state="translated">Erro ao ignorar tarefa</target>
       </trans-unit>
@@ -3013,7 +3025,7 @@
         <source>Confirm Dismiss All</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">357</context>
+          <context context-type="linenumber">371</context>
         </context-group>
         <target state="needs-translation">Confirm Dismiss All</target>
       </trans-unit>
@@ -3021,7 +3033,7 @@
         <source>Dismiss all <x id="PH" equiv-text="this.totalTasks()"/> tasks?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">358</context>
+          <context context-type="linenumber">372</context>
         </context-group>
         <target state="translated">Descartar todas as <x id="PH" equiv-text="this.totalTasks()"/> tarefas?</target>
       </trans-unit>
@@ -3029,7 +3041,7 @@
         <source>Success. New document id <x id="PH" equiv-text="documentId"/> created</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">417</context>
+          <context context-type="linenumber">431</context>
         </context-group>
         <target state="translated">Sucesso. Novo documento id <x id="PH" equiv-text="documentId"/> criado</target>
       </trans-unit>
@@ -3037,11 +3049,11 @@
         <source>Duplicate of document #<x id="PH" equiv-text="duplicateOf"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">427</context>
+          <context context-type="linenumber">441</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
-          <context context-type="linenumber">461</context>
+          <context context-type="linenumber">475</context>
         </context-group>
         <target state="translated">Duplicata do documento #<x id="PH" equiv-text="duplicateOf"/></target>
       </trans-unit>
@@ -3193,7 +3205,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
-          <context context-type="linenumber">179</context>
+          <context context-type="linenumber">184</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-attributes/custom-fields/custom-fields.component.html</context>
@@ -3532,6 +3544,10 @@
           <context context-type="linenumber">55,56</context>
         </context-group>
         <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-notes/document-notes.component.html</context>
+          <context context-type="linenumber">25,26</context>
+        </context-group>
+        <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-attributes/custom-fields/custom-fields.component.html</context>
           <context context-type="linenumber">31,32</context>
         </context-group>
@@ -3669,27 +3685,27 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1527</context>
+          <context context-type="linenumber">1552</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1914</context>
+          <context context-type="linenumber">1972</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">954</context>
+          <context context-type="linenumber">1019</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">993</context>
+          <context context-type="linenumber">1058</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">1016</context>
+          <context context-type="linenumber">1081</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">1052</context>
+          <context context-type="linenumber">1117</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/document-attributes/custom-fields/custom-fields.component.ts</context>
@@ -4069,11 +4085,35 @@
         </context-group>
         <target state="translated">Configurar verificação de atualização</target>
       </trans-unit>
+      <trans-unit id="3562016764120788499" datatype="html">
+        <source>Bulk operation completed.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
+          <context context-type="linenumber">202</context>
+        </context-group>
+        <target state="needs-translation">Bulk operation completed.</target>
+      </trans-unit>
+      <trans-unit id="1633341269280627980" datatype="html">
+        <source>Bulk operation revoked.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
+          <context context-type="linenumber">204</context>
+        </context-group>
+        <target state="needs-translation">Bulk operation revoked.</target>
+      </trans-unit>
+      <trans-unit id="8606600295919857288" datatype="html">
+        <source>Bulk operation failed. Some changes may already have been applied.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
+          <context context-type="linenumber">207</context>
+        </context-group>
+        <target state="needs-translation">Bulk operation failed. Some changes may already have been applied.</target>
+      </trans-unit>
       <trans-unit id="1542489069631984294" datatype="html">
         <source>Sidebar views updated</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
-          <context context-type="linenumber">497</context>
+          <context context-type="linenumber">543</context>
         </context-group>
         <target state="translated">Visualizações da barra lateral atualizadas</target>
       </trans-unit>
@@ -4081,7 +4121,7 @@
         <source>Error updating sidebar views</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
-          <context context-type="linenumber">500</context>
+          <context context-type="linenumber">546</context>
         </context-group>
         <target state="translated">Erro ao atualizar visualizações da barra lateral</target>
       </trans-unit>
@@ -4089,7 +4129,7 @@
         <source>An error occurred while saving update checking settings.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/app-frame/app-frame.component.ts</context>
-          <context context-type="linenumber">521</context>
+          <context context-type="linenumber">567</context>
         </context-group>
         <target state="translated">Ocorreu um erro ao salvar as verificações de atualizações.</target>
       </trans-unit>
@@ -4137,11 +4177,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
-          <context context-type="linenumber">142</context>
+          <context context-type="linenumber">147</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
-          <context context-type="linenumber">151</context>
+          <context context-type="linenumber">156</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
@@ -4365,15 +4405,23 @@
         <source>Sources</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/chat/chat/chat.component.html</context>
-          <context context-type="linenumber">46,47</context>
+          <context context-type="linenumber">47,48</context>
         </context-group>
         <target state="needs-translation">Sources</target>
+      </trans-unit>
+      <trans-unit id="6025275430560167531" datatype="html">
+        <source>+<x id="INTERPOLATION" equiv-text="{{ hiddenReferenceCount(message) }}"/> more</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/chat/chat/chat.component.html</context>
+          <context context-type="linenumber">49,50</context>
+        </context-group>
+        <target state="needs-translation">+<x id="INTERPOLATION" equiv-text="{{ hiddenReferenceCount(message) }}"/> more</target>
       </trans-unit>
       <trans-unit id="8066608938393600549" datatype="html">
         <source>Message</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/chat/chat/chat.component.html</context>
-          <context context-type="linenumber">61,62</context>
+          <context context-type="linenumber">66,67</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/email-document-dialog/email-document-dialog.component.html</context>
@@ -4385,11 +4433,11 @@
         <source>Stop</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/chat/chat/chat.component.html</context>
-          <context context-type="linenumber">74</context>
+          <context context-type="linenumber">79</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/chat/chat/chat.component.html</context>
-          <context context-type="linenumber">74</context>
+          <context context-type="linenumber">79</context>
         </context-group>
         <target state="needs-translation">Stop</target>
       </trans-unit>
@@ -4397,27 +4445,27 @@
         <source>Send</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/chat/chat/chat.component.html</context>
-          <context context-type="linenumber">78</context>
+          <context context-type="linenumber">83</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/chat/chat/chat.component.html</context>
-          <context context-type="linenumber">78</context>
+          <context context-type="linenumber">83</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">73</context>
+          <context context-type="linenumber">79</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">74</context>
+          <context context-type="linenumber">80</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
-          <context context-type="linenumber">111</context>
+          <context context-type="linenumber">116</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
-          <context context-type="linenumber">113</context>
+          <context context-type="linenumber">118</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/saved-view-icons.ts</context>
@@ -4429,7 +4477,7 @@
         <source>Ask a question about this document...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/chat/chat/chat.component.ts</context>
-          <context context-type="linenumber">61</context>
+          <context context-type="linenumber">83</context>
         </context-group>
         <target state="translated">Faça uma pergunta sobre este documento...</target>
       </trans-unit>
@@ -4437,7 +4485,7 @@
         <source>Ask a question about a document...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/chat/chat/chat.component.ts</context>
-          <context context-type="linenumber">62</context>
+          <context context-type="linenumber">84</context>
         </context-group>
         <target state="translated">Faça uma pergunta sobre um documento...</target>
       </trans-unit>
@@ -4497,31 +4545,31 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1476</context>
+          <context context-type="linenumber">1501</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">572</context>
+          <context context-type="linenumber">637</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">612</context>
+          <context context-type="linenumber">677</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">650</context>
+          <context context-type="linenumber">715</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">688</context>
+          <context context-type="linenumber">753</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">750</context>
+          <context context-type="linenumber">815</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">888</context>
+          <context context-type="linenumber">953</context>
         </context-group>
         <target state="final">Confirmar</target>
       </trans-unit>
@@ -4657,7 +4705,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1967</context>
+          <context context-type="linenumber">2025</context>
         </context-group>
         <target state="translated">Remover a proteção por senha</target>
       </trans-unit>
@@ -4669,7 +4717,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1968</context>
+          <context context-type="linenumber">2026</context>
         </context-group>
         <target state="translated">Crie uma cópia sem proteção ou substitua o arquivo existente.</target>
       </trans-unit>
@@ -4681,7 +4729,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1969</context>
+          <context context-type="linenumber">2027</context>
         </context-group>
         <target state="translated">Iniciar</target>
       </trans-unit>
@@ -4724,6 +4772,38 @@
           <context context-type="linenumber">25,27</context>
         </context-group>
         <target state="translated">Note que apenas PDFs serão girados.</target>
+      </trans-unit>
+      <trans-unit id="957358589600652803" datatype="html">
+        <source>Workflow</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/confirm-dialog/run-workflow-confirm-dialog/run-workflow-confirm-dialog.component.html</context>
+          <context context-type="linenumber">11,12</context>
+        </context-group>
+        <target state="needs-translation">Workflow</target>
+      </trans-unit>
+      <trans-unit id="6185505570283812140" datatype="html">
+        <source>Select a workflow</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/confirm-dialog/run-workflow-confirm-dialog/run-workflow-confirm-dialog.component.html</context>
+          <context context-type="linenumber">13,14</context>
+        </context-group>
+        <target state="needs-translation">Select a workflow</target>
+      </trans-unit>
+      <trans-unit id="4512110365422311821" datatype="html">
+        <source>Run on all selected documents</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/confirm-dialog/run-workflow-confirm-dialog/run-workflow-confirm-dialog.component.html</context>
+          <context context-type="linenumber">21,22</context>
+        </context-group>
+        <target state="needs-translation">Run on all selected documents</target>
+      </trans-unit>
+      <trans-unit id="6575910678008555513" datatype="html">
+        <source>Ignore the workflow&apos;s trigger filters and run on every selected document.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/common/confirm-dialog/run-workflow-confirm-dialog/run-workflow-confirm-dialog.component.html</context>
+          <context context-type="linenumber">22,23</context>
+        </context-group>
+        <target state="needs-translation">Ignore the workflow's trigger filters and run on every selected document.</target>
       </trans-unit>
       <trans-unit id="2509141182388535183" datatype="html" approved="yes">
         <source>View</source>
@@ -4941,7 +5021,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">97</context>
+          <context context-type="linenumber">103</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/guards/dirty-saved-view.guard.ts</context>
@@ -6213,7 +6293,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">352,353</context>
+          <context context-type="linenumber">358,359</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-notes/document-notes.component.html</context>
+          <context context-type="linenumber">27,28</context>
         </context-group>
         <target state="translated">Pré-visualizar</target>
       </trans-unit>
@@ -6337,7 +6421,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
-          <context context-type="linenumber">139</context>
+          <context context-type="linenumber">143</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
@@ -6345,11 +6429,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">82,83</context>
+          <context context-type="linenumber">88,89</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
-          <context context-type="linenumber">136</context>
+          <context context-type="linenumber">141</context>
         </context-group>
         <target state="translated">E-mail</target>
       </trans-unit>
@@ -7169,7 +7253,7 @@
         <source>Assignment</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
-          <context context-type="linenumber">131</context>
+          <context context-type="linenumber">135</context>
         </context-group>
         <target state="translated">Atribuição</target>
       </trans-unit>
@@ -7177,7 +7261,7 @@
         <source>Removal</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
-          <context context-type="linenumber">135</context>
+          <context context-type="linenumber">139</context>
         </context-group>
         <target state="translated">Remoção</target>
       </trans-unit>
@@ -7185,7 +7269,7 @@
         <source>Webhook</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
-          <context context-type="linenumber">143</context>
+          <context context-type="linenumber">147</context>
         </context-group>
         <target state="translated">Webhook</target>
       </trans-unit>
@@ -7193,7 +7277,7 @@
         <source>Password removal</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
-          <context context-type="linenumber">147</context>
+          <context context-type="linenumber">151</context>
         </context-group>
         <target state="needs-translation">Password removal</target>
       </trans-unit>
@@ -7201,15 +7285,15 @@
         <source>Move to trash</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
-          <context context-type="linenumber">151</context>
+          <context context-type="linenumber">155</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1480</context>
+          <context context-type="linenumber">1505</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">892</context>
+          <context context-type="linenumber">957</context>
         </context-group>
         <target state="translated">Mover para lixeira</target>
       </trans-unit>
@@ -7217,7 +7301,7 @@
         <source>Remote OCR</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
-          <context context-type="linenumber">155</context>
+          <context context-type="linenumber">159</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
@@ -7229,7 +7313,7 @@
         <source>Apply AI suggestions</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
-          <context context-type="linenumber">159</context>
+          <context context-type="linenumber">163</context>
         </context-group>
         <target state="needs-translation">Apply AI suggestions</target>
       </trans-unit>
@@ -7237,11 +7321,11 @@
         <source>Title</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
-          <context context-type="linenumber">166</context>
+          <context context-type="linenumber">170</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">143</context>
+          <context context-type="linenumber">149</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
@@ -7265,7 +7349,7 @@
         <source>Created date</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
-          <context context-type="linenumber">186</context>
+          <context context-type="linenumber">190</context>
         </context-group>
         <target state="needs-translation">Created date</target>
       </trans-unit>
@@ -7273,7 +7357,7 @@
         <source>Has any of these tags</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
-          <context context-type="linenumber">255</context>
+          <context context-type="linenumber">259</context>
         </context-group>
         <target state="translated">Possui alguma destas etiquetas</target>
       </trans-unit>
@@ -7281,7 +7365,7 @@
         <source>Has all of these tags</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
-          <context context-type="linenumber">262</context>
+          <context context-type="linenumber">266</context>
         </context-group>
         <target state="translated">Possui estas etiquetas</target>
       </trans-unit>
@@ -7289,7 +7373,7 @@
         <source>Does not have these tags</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
-          <context context-type="linenumber">269</context>
+          <context context-type="linenumber">273</context>
         </context-group>
         <target state="translated">Não possui estas etiquetas</target>
       </trans-unit>
@@ -7297,7 +7381,7 @@
         <source>Has any of these correspondents</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
-          <context context-type="linenumber">276</context>
+          <context context-type="linenumber">280</context>
         </context-group>
         <target state="needs-translation">Has any of these correspondents</target>
       </trans-unit>
@@ -7305,7 +7389,7 @@
         <source>Has correspondent</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
-          <context context-type="linenumber">284</context>
+          <context context-type="linenumber">288</context>
         </context-group>
         <target state="translated">Possui correspondente</target>
       </trans-unit>
@@ -7313,7 +7397,7 @@
         <source>Does not have correspondents</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
-          <context context-type="linenumber">292</context>
+          <context context-type="linenumber">296</context>
         </context-group>
         <target state="translated">Não possui correspondentes</target>
       </trans-unit>
@@ -7321,7 +7405,7 @@
         <source>Has document type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
-          <context context-type="linenumber">300</context>
+          <context context-type="linenumber">304</context>
         </context-group>
         <target state="translated">Possui tipo de documento</target>
       </trans-unit>
@@ -7329,7 +7413,7 @@
         <source>Has any of these document types</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
-          <context context-type="linenumber">308</context>
+          <context context-type="linenumber">312</context>
         </context-group>
         <target state="needs-translation">Has any of these document types</target>
       </trans-unit>
@@ -7337,7 +7421,7 @@
         <source>Does not have document types</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
-          <context context-type="linenumber">316</context>
+          <context context-type="linenumber">320</context>
         </context-group>
         <target state="translated">Não possui tipos de documento</target>
       </trans-unit>
@@ -7345,7 +7429,7 @@
         <source>Has storage path</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
-          <context context-type="linenumber">324</context>
+          <context context-type="linenumber">328</context>
         </context-group>
         <target state="translated">Possui caminho de armazenamento</target>
       </trans-unit>
@@ -7353,7 +7437,7 @@
         <source>Has any of these storage paths</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
-          <context context-type="linenumber">332</context>
+          <context context-type="linenumber">336</context>
         </context-group>
         <target state="needs-translation">Has any of these storage paths</target>
       </trans-unit>
@@ -7361,7 +7445,7 @@
         <source>Does not have storage paths</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
-          <context context-type="linenumber">340</context>
+          <context context-type="linenumber">344</context>
         </context-group>
         <target state="translated">Não possui caminhos de armazenamento</target>
       </trans-unit>
@@ -7369,7 +7453,7 @@
         <source>Matches custom field query</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
-          <context context-type="linenumber">348</context>
+          <context context-type="linenumber">352</context>
         </context-group>
         <target state="translated">Corresponde à consulta de campo personalizado</target>
       </trans-unit>
@@ -7377,7 +7461,7 @@
         <source>Some workflow options could not be loaded.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
-          <context context-type="linenumber">570</context>
+          <context context-type="linenumber">574</context>
         </context-group>
         <target state="needs-translation">Some workflow options could not be loaded.</target>
       </trans-unit>
@@ -7385,7 +7469,7 @@
         <source>Create new workflow</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
-          <context context-type="linenumber">592</context>
+          <context context-type="linenumber">596</context>
         </context-group>
         <target state="translated">Criar novo fluxo de trabalho</target>
       </trans-unit>
@@ -7393,7 +7477,7 @@
         <source>Edit workflow</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
-          <context context-type="linenumber">596</context>
+          <context context-type="linenumber">600</context>
         </context-group>
         <target state="translated">Editar Fluxo de Trabalho</target>
       </trans-unit>
@@ -7659,7 +7743,7 @@ Erro ao enviar documentos por e-mail</target>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/select/select.component.ts</context>
-          <context context-type="linenumber">179</context>
+          <context context-type="linenumber">185</context>
         </context-group>
         <target state="translated">Filtrar documentos com esse <x id="PH" equiv-text="this.title"/></target>
       </trans-unit>
@@ -7780,7 +7864,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Private</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/select/select.component.ts</context>
-          <context context-type="linenumber">72</context>
+          <context context-type="linenumber">73</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/tag/tag.component.html</context>
@@ -7804,7 +7888,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>No items found</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/input/select/select.component.ts</context>
-          <context context-type="linenumber">113</context>
+          <context context-type="linenumber">114</context>
         </context-group>
         <target state="translated">Nenhum item encontrado</target>
       </trans-unit>
@@ -7852,7 +7936,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Copy ID</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/page-header/page-header.component.html</context>
-          <context context-type="linenumber">6</context>
+          <context context-type="linenumber">7</context>
         </context-group>
         <target state="needs-translation">Copy ID</target>
       </trans-unit>
@@ -7860,7 +7944,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Copied!</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/page-header/page-header.component.html</context>
-          <context context-type="linenumber">8</context>
+          <context context-type="linenumber">9</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/profile-edit-dialog/profile-edit-dialog.component.html</context>
@@ -7896,7 +7980,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Read more</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/page-header/page-header.component.html</context>
-          <context context-type="linenumber">24,25</context>
+          <context context-type="linenumber">26,27</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/common/permissions-select/permissions-select.component.html</context>
@@ -8676,7 +8760,7 @@ Erro ao enviar documentos por e-mail</target>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
-          <context context-type="linenumber">124</context>
+          <context context-type="linenumber">129</context>
         </context-group>
         <target state="needs-translation">Manage share link bundles</target>
       </trans-unit>
@@ -9197,7 +9281,7 @@ Erro ao enviar documentos por e-mail</target>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">517</context>
+          <context context-type="linenumber">582</context>
         </context-group>
         <note priority="1" from="description">this string is used to separate processing, failed and added on the file upload widget</note>
         <target state="translated">, </target>
@@ -9326,7 +9410,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>No documents</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/dashboard/widgets/saved-view-widget/saved-view-widget.component.html</context>
-          <context context-type="linenumber">189,192</context>
+          <context context-type="linenumber">191,194</context>
         </context-group>
         <target state="translated">Nenhum documento</target>
       </trans-unit>
@@ -9466,7 +9550,7 @@ Erro ao enviar documentos por e-mail</target>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">497</context>
+          <context context-type="linenumber">503</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-list.component.html</context>
@@ -9486,7 +9570,7 @@ Erro ao enviar documentos por e-mail</target>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">278,279</context>
+          <context context-type="linenumber">284,285</context>
         </context-group>
         <target state="final">Conteúdo</target>
       </trans-unit>
@@ -9510,7 +9594,7 @@ Erro ao enviar documentos por e-mail</target>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
-          <context context-type="linenumber">154</context>
+          <context context-type="linenumber">159</context>
         </context-group>
         <target state="translated">Opções de download</target>
       </trans-unit>
@@ -9530,7 +9614,7 @@ Erro ao enviar documentos por e-mail</target>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
-          <context context-type="linenumber">170,171</context>
+          <context context-type="linenumber">175,176</context>
         </context-group>
         <target state="translated">Usar nome do arquivo formatado</target>
       </trans-unit>
@@ -9546,11 +9630,31 @@ Erro ao enviar documentos por e-mail</target>
         </context-group>
         <target state="translated">Reprocessar</target>
       </trans-unit>
+      <trans-unit id="4897303135904615511" datatype="html">
+        <source>Run workflow</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
+          <context context-type="linenumber">54,55</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
+          <context context-type="linenumber">1586</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
+          <context context-type="linenumber">103</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
+          <context context-type="linenumber">318</context>
+        </context-group>
+        <target state="needs-translation">Run workflow</target>
+      </trans-unit>
       <trans-unit id="7049887240439736400" datatype="html">
         <source>Print</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">53,54</context>
+          <context context-type="linenumber">59,60</context>
         </context-group>
         <target state="translated">Imprimir</target>
       </trans-unit>
@@ -9558,7 +9662,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>More like this</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">57,58</context>
+          <context context-type="linenumber">63,64</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/document-card-large/document-card-large.component.html</context>
@@ -9570,7 +9674,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Remove Password</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">66</context>
+          <context context-type="linenumber">72</context>
         </context-group>
         <target state="translated">Remover senha</target>
       </trans-unit>
@@ -9578,7 +9682,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Previous</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">100</context>
+          <context context-type="linenumber">106</context>
         </context-group>
         <target state="translated">Anterior</target>
       </trans-unit>
@@ -9586,7 +9690,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Next</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">103</context>
+          <context context-type="linenumber">109</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/main.ts</context>
@@ -9598,7 +9702,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Details</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">140,141</context>
+          <context context-type="linenumber">146,147</context>
         </context-group>
         <target state="final">Detalhes</target>
       </trans-unit>
@@ -9606,7 +9710,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Date created</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">147</context>
+          <context context-type="linenumber">153</context>
         </context-group>
         <target state="final">Data de criação</target>
       </trans-unit>
@@ -9614,7 +9718,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Default</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">159</context>
+          <context context-type="linenumber">165</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/manage/saved-views/saved-views.component.html</context>
@@ -9626,7 +9730,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Metadata</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">287,288</context>
+          <context context-type="linenumber">293,294</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/metadata-collapse/metadata-collapse.component.ts</context>
@@ -9638,7 +9742,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Date modified</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">294,295</context>
+          <context context-type="linenumber">300,301</context>
         </context-group>
         <target state="final">Data de modificação</target>
       </trans-unit>
@@ -9646,7 +9750,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Date added</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">298,299</context>
+          <context context-type="linenumber">304,305</context>
         </context-group>
         <target state="final">Data de adição</target>
       </trans-unit>
@@ -9654,7 +9758,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Media filename</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">302,303</context>
+          <context context-type="linenumber">308,309</context>
         </context-group>
         <target state="final">Nome do arquivo</target>
       </trans-unit>
@@ -9662,7 +9766,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Original filename</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">306,307</context>
+          <context context-type="linenumber">312,313</context>
         </context-group>
         <target state="translated">Nome do arquivo original</target>
       </trans-unit>
@@ -9670,7 +9774,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Original SHA256 checksum</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">310,311</context>
+          <context context-type="linenumber">316,317</context>
         </context-group>
         <target state="translated">Checksum original SHA256</target>
       </trans-unit>
@@ -9678,7 +9782,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Original file size</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">314,315</context>
+          <context context-type="linenumber">320,321</context>
         </context-group>
         <target state="final">Tamanho do arquivo original</target>
       </trans-unit>
@@ -9686,7 +9790,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Original mime type</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">318,319</context>
+          <context context-type="linenumber">324,325</context>
         </context-group>
         <target state="final">Tipo mime original</target>
       </trans-unit>
@@ -9694,7 +9798,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Archive SHA256 checksum</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">323,324</context>
+          <context context-type="linenumber">329,330</context>
         </context-group>
         <target state="translated">Arquivar checksum SHA256</target>
       </trans-unit>
@@ -9702,7 +9806,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Archive file size</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">329,330</context>
+          <context context-type="linenumber">335,336</context>
         </context-group>
         <target state="final">Tamanho arquivado</target>
       </trans-unit>
@@ -9710,7 +9814,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Barcodes</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">338,339</context>
+          <context context-type="linenumber">344,345</context>
         </context-group>
         <target state="translated">Código de barras</target>
       </trans-unit>
@@ -9718,7 +9822,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Original document metadata</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">342</context>
+          <context context-type="linenumber">348</context>
         </context-group>
         <target state="final">Metadados do documento original</target>
       </trans-unit>
@@ -9726,7 +9830,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Archived document metadata</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">345</context>
+          <context context-type="linenumber">351</context>
         </context-group>
         <target state="final">Metadados do documento arquivado</target>
       </trans-unit>
@@ -9734,7 +9838,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Notes <x id="START_BLOCK_IF" equiv-text="@if (document()?.notes.length) {"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge text-bg-secondary ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{document().notes.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_BLOCK_IF" equiv-text="}"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">364,367</context>
+          <context context-type="linenumber">370,373</context>
         </context-group>
         <target state="translated">Notas <x id="START_BLOCK_IF" equiv-text="@if (document()?.notes.length) {"/><x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge text-bg-secondary ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{document().notes.length}}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/><x id="CLOSE_BLOCK_IF" equiv-text="}"/></target>
       </trans-unit>
@@ -9742,7 +9846,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>History</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">375,376</context>
+          <context context-type="linenumber">381,382</context>
         </context-group>
         <target state="translated">Histórico</target>
       </trans-unit>
@@ -9750,7 +9854,7 @@ Erro ao enviar documentos por e-mail</target>
         <source> Duplicates <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge text-bg-secondary ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{ document().duplicate_documents.length }}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">398,401</context>
+          <context context-type="linenumber">404,407</context>
         </context-group>
         <target state="translated"> Duplicados <x id="START_TAG_SPAN" ctype="x-span" equiv-text="&lt;span class=&quot;badge text-bg-secondary ms-1&quot;&gt;"/><x id="INTERPOLATION" equiv-text="{{ document().duplicate_documents.length }}"/><x id="CLOSE_TAG_SPAN" ctype="x-span" equiv-text="&lt;/span&gt;"/></target>
       </trans-unit>
@@ -9758,7 +9862,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Duplicate documents detected:</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">403,404</context>
+          <context context-type="linenumber">409,410</context>
         </context-group>
         <target state="translated">Documentos duplicados detectados:</target>
       </trans-unit>
@@ -9766,7 +9870,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>In trash</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">414,415</context>
+          <context context-type="linenumber">420,421</context>
         </context-group>
         <target state="translated">Em lixo</target>
       </trans-unit>
@@ -9774,11 +9878,11 @@ Erro ao enviar documentos por e-mail</target>
         <source>Save &amp; next</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">446</context>
+          <context context-type="linenumber">452</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">457</context>
+          <context context-type="linenumber">463</context>
         </context-group>
         <target state="final">Salvar &amp; próximo</target>
       </trans-unit>
@@ -9786,11 +9890,11 @@ Erro ao enviar documentos por e-mail</target>
         <source>Save &amp; close</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">448</context>
+          <context context-type="linenumber">454</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">459</context>
+          <context context-type="linenumber">465</context>
         </context-group>
         <target state="translated">Salvar &amp; Fechar</target>
       </trans-unit>
@@ -9798,11 +9902,11 @@ Erro ao enviar documentos por e-mail</target>
         <source>Discard</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">450</context>
+          <context context-type="linenumber">456</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">451,452</context>
+          <context context-type="linenumber">457,458</context>
         </context-group>
         <target state="final">Descartar</target>
       </trans-unit>
@@ -9810,7 +9914,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>More save options</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">454</context>
+          <context context-type="linenumber">460</context>
         </context-group>
         <target state="needs-translation">More save options</target>
       </trans-unit>
@@ -9818,7 +9922,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Document loading...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">469</context>
+          <context context-type="linenumber">475</context>
         </context-group>
         <target state="translated">Carregando documentos...</target>
       </trans-unit>
@@ -9826,7 +9930,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>of <x id="INTERPOLATION" equiv-text="{{previewNumPages()}}"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">498,499</context>
+          <context context-type="linenumber">504,505</context>
         </context-group>
         <target state="translated">de <x id="INTERPOLATION" equiv-text="{{previewNumPages()}}"/></target>
       </trans-unit>
@@ -9834,7 +9938,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Zoom out</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">502</context>
+          <context context-type="linenumber">508</context>
         </context-group>
         <target state="translated">Diminuir Zoom</target>
       </trans-unit>
@@ -9842,7 +9946,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Zoom</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">505</context>
+          <context context-type="linenumber">511</context>
         </context-group>
         <target state="translated">Zoom</target>
       </trans-unit>
@@ -9850,7 +9954,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Zoom in</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">512</context>
+          <context context-type="linenumber">518</context>
         </context-group>
         <target state="translated">Aumentar zoom</target>
       </trans-unit>
@@ -9858,7 +9962,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Enter Password</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.html</context>
-          <context context-type="linenumber">546</context>
+          <context context-type="linenumber">552</context>
         </context-group>
         <target state="translated">Digite a senha</target>
       </trans-unit>
@@ -9866,7 +9970,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Error retrieving metadata</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">465</context>
+          <context context-type="linenumber">471</context>
         </context-group>
         <target state="translated">Erro ao recuperar metadados</target>
       </trans-unit>
@@ -9874,11 +9978,11 @@ Erro ao enviar documentos por e-mail</target>
         <source>An error occurred loading content: <x id="PH" equiv-text="err.message ?? err.toString()"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">568,570</context>
+          <context context-type="linenumber">574,576</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1049,1051</context>
+          <context context-type="linenumber">1069,1071</context>
         </context-group>
         <target state="translated">Ocorreu um erro ao carregar o conteúdo: <x id="PH" equiv-text="err.message ?? err.toString()"/></target>
       </trans-unit>
@@ -9886,7 +9990,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Document was updated</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">710</context>
+          <context context-type="linenumber">716</context>
         </context-group>
         <target state="translated">Documento Atualizado</target>
       </trans-unit>
@@ -9894,7 +9998,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Document was updated at <x id="PH" equiv-text="formattedModified"/>.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">711</context>
+          <context context-type="linenumber">717</context>
         </context-group>
         <target state="translated">O documento foi atualizado em <x id="PH" equiv-text="formattedModified"/>.</target>
       </trans-unit>
@@ -9902,7 +10006,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Reload to discard your local unsaved edits and load the latest remote version.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">712</context>
+          <context context-type="linenumber">718</context>
         </context-group>
         <target state="translated">Recarregue para descartar suas edições locais não salvas e carregar a última versão remota.</target>
       </trans-unit>
@@ -9910,7 +10014,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Reload</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">714</context>
+          <context context-type="linenumber">720</context>
         </context-group>
         <target state="translated">Recarregar</target>
       </trans-unit>
@@ -9918,7 +10022,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Document reloaded with latest changes.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">770</context>
+          <context context-type="linenumber">776</context>
         </context-group>
         <target state="translated">Documento recarregado com as últimas alterações.</target>
       </trans-unit>
@@ -9926,7 +10030,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Document reloaded.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">781</context>
+          <context context-type="linenumber">787</context>
         </context-group>
         <target state="translated">Documento recarregado.</target>
       </trans-unit>
@@ -9934,7 +10038,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Next document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">883</context>
+          <context context-type="linenumber">903</context>
         </context-group>
         <target state="translated">Próximo documento</target>
       </trans-unit>
@@ -9942,7 +10046,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Previous document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">893</context>
+          <context context-type="linenumber">913</context>
         </context-group>
         <target state="translated">Documento anterior</target>
       </trans-unit>
@@ -9950,7 +10054,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Close document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">901</context>
+          <context context-type="linenumber">921</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/open-documents.service.ts</context>
@@ -9962,7 +10066,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Save document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">908</context>
+          <context context-type="linenumber">928</context>
         </context-group>
         <target state="translated">Salvar documento</target>
       </trans-unit>
@@ -9970,7 +10074,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Save and close / next</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">917</context>
+          <context context-type="linenumber">937</context>
         </context-group>
         <target state="translated">Salvar e fechar / próximo</target>
       </trans-unit>
@@ -9978,7 +10082,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Error retrieving version content</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1031</context>
+          <context context-type="linenumber">1051</context>
         </context-group>
         <target state="translated">Erro ao carregar o conteúdo da versão</target>
       </trans-unit>
@@ -9986,7 +10090,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Unsaved Changes</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1075</context>
+          <context context-type="linenumber">1095</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/guards/dirty-form.guard.ts</context>
@@ -10010,7 +10114,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>You have unsaved changes to the content of this version.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1076</context>
+          <context context-type="linenumber">1096</context>
         </context-group>
         <target state="translated">Você tem alterações não salvas no conteúdo desta versão.</target>
       </trans-unit>
@@ -10018,7 +10122,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Switching versions will discard them.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1077</context>
+          <context context-type="linenumber">1097</context>
         </context-group>
         <target state="translated">Mudar as versões irá descartar-las.</target>
       </trans-unit>
@@ -10026,7 +10130,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Discard and switch</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1079</context>
+          <context context-type="linenumber">1099</context>
         </context-group>
         <target state="translated">Descartar e alternar</target>
       </trans-unit>
@@ -10034,7 +10138,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Save and switch</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1081</context>
+          <context context-type="linenumber">1101</context>
         </context-group>
         <target state="translated">Salvar e alternar</target>
       </trans-unit>
@@ -10042,7 +10146,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Error retrieving suggestions.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1124</context>
+          <context context-type="linenumber">1144</context>
         </context-group>
         <target state="needs-review-translation" state-qualifier="leveraged-tm">Erro ao recuperar sugestões.</target>
       </trans-unit>
@@ -10050,11 +10154,11 @@ Erro ao enviar documentos por e-mail</target>
         <source>Document &quot;<x id="PH" equiv-text="newValues.title"/>&quot; saved successfully.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1355</context>
+          <context context-type="linenumber">1375</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1383</context>
+          <context context-type="linenumber">1403</context>
         </context-group>
         <target state="translated">Documento "<x id="PH" equiv-text="newValues.title"/>" salvo com sucesso.</target>
       </trans-unit>
@@ -10062,7 +10166,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Error saving document &quot;<x id="PH" equiv-text="this.document().title"/>&quot;</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1389</context>
+          <context context-type="linenumber">1409</context>
         </context-group>
         <target state="translated">Erro ao salvar o documento "<x id="PH" equiv-text="this.document().title"/>"</target>
       </trans-unit>
@@ -10070,7 +10174,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Error saving document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1444</context>
+          <context context-type="linenumber">1464</context>
         </context-group>
         <target state="translated">Erro ao salvar documento</target>
       </trans-unit>
@@ -10078,7 +10182,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Do you really want to move the document &quot;<x id="PH" equiv-text="this.document().title"/>&quot; to the trash?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1477</context>
+          <context context-type="linenumber">1502</context>
         </context-group>
         <target state="translated">Você realmente deseja mover o documento "<x id="PH" equiv-text="this.document().title"/>"?</target>
       </trans-unit>
@@ -10086,11 +10190,11 @@ Erro ao enviar documentos por e-mail</target>
         <source>Documents can be restored prior to permanent deletion.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1478</context>
+          <context context-type="linenumber">1503</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">890</context>
+          <context context-type="linenumber">955</context>
         </context-group>
         <target state="translated">Documentos podem ser restaurados antes da exclusão permanente.</target>
       </trans-unit>
@@ -10098,7 +10202,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Moved &quot;<x id="PH" equiv-text="this.document().title"/>&quot; to the trash</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1496</context>
+          <context context-type="linenumber">1521</context>
         </context-group>
         <target state="translated">Movido "<x id="PH" equiv-text="this.document().title"/>" para lixeira</target>
       </trans-unit>
@@ -10106,7 +10210,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Error deleting document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1503</context>
+          <context context-type="linenumber">1528</context>
         </context-group>
         <target state="translated">Erro ao apagar documento</target>
       </trans-unit>
@@ -10114,11 +10218,11 @@ Erro ao enviar documentos por e-mail</target>
         <source>Reprocess confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1523</context>
+          <context context-type="linenumber">1548</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">950</context>
+          <context context-type="linenumber">1015</context>
         </context-group>
         <target state="translated">Confirmação de reprocessamento</target>
       </trans-unit>
@@ -10126,7 +10230,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>This operation will permanently recreate the archive file for this document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1524</context>
+          <context context-type="linenumber">1549</context>
         </context-group>
         <target state="translated">Essa operação irá recriar permanentemente o arquivo para este documento.</target>
       </trans-unit>
@@ -10134,7 +10238,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>The archive file will be re-generated with the current settings.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1525</context>
+          <context context-type="linenumber">1550</context>
         </context-group>
         <target state="translated">Os arquivos serão re-gerados com as configurações atuais.</target>
       </trans-unit>
@@ -10142,7 +10246,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Reprocess operation for &quot;<x id="PH" equiv-text="this.document().title"/>&quot; will begin in the background.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1538</context>
+          <context context-type="linenumber">1563</context>
         </context-group>
         <target state="translated">A operação de reprocessamento de "<x id="PH" equiv-text="this.document().title"/>" começará em segundo plano.</target>
       </trans-unit>
@@ -10150,15 +10254,47 @@ Erro ao enviar documentos por e-mail</target>
         <source>Error executing operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1549</context>
+          <context context-type="linenumber">1574</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
+          <context context-type="linenumber">1607</context>
         </context-group>
         <target state="translated">Erro ao executar a operação de divisão</target>
+      </trans-unit>
+      <trans-unit id="838042392151392247" datatype="html">
+        <source>Run a workflow on &quot;<x id="PH" equiv-text="this.document().title"/>&quot;.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
+          <context context-type="linenumber">1587</context>
+        </context-group>
+        <target state="needs-translation">Run a workflow on "<x id="PH" equiv-text="this.document().title"/>".</target>
+      </trans-unit>
+      <trans-unit id="3759965007855499397" datatype="html">
+        <source>Run</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
+          <context context-type="linenumber">1588</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
+          <context context-type="linenumber">320</context>
+        </context-group>
+        <target state="needs-translation">Run</target>
+      </trans-unit>
+      <trans-unit id="523213570140181690" datatype="html">
+        <source>Workflow will run on &quot;<x id="PH" equiv-text="this.document().title"/>&quot; in the background.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
+          <context context-type="linenumber">1600</context>
+        </context-group>
+        <target state="needs-translation">Workflow will run on "<x id="PH" equiv-text="this.document().title"/>" in the background.</target>
       </trans-unit>
       <trans-unit id="6030453331794586802" datatype="html">
         <source>Error downloading document</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1613</context>
+          <context context-type="linenumber">1671</context>
         </context-group>
         <target state="translated">Erro ao baixar o documento</target>
       </trans-unit>
@@ -10166,7 +10302,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Page Fit</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1691</context>
+          <context context-type="linenumber">1749</context>
         </context-group>
         <target state="translated">Ajustar à Página</target>
       </trans-unit>
@@ -10174,7 +10310,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>PDF edit operation for &quot;<x id="PH" equiv-text="this.document().title"/>&quot; will begin in the background.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1934</context>
+          <context context-type="linenumber">1992</context>
         </context-group>
         <target state="translated">A operação de edição de PDF para "<x id="PH" equiv-text="this.document().title"/>" começará em segundo plano.</target>
       </trans-unit>
@@ -10182,7 +10318,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Error executing PDF edit operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1946</context>
+          <context context-type="linenumber">2004</context>
         </context-group>
         <target state="translated">Erro ao executar a operação de divisão</target>
       </trans-unit>
@@ -10190,7 +10326,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Please enter the current password before attempting to remove it.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1957</context>
+          <context context-type="linenumber">2015</context>
         </context-group>
         <target state="translated">Digite a senha atual antes de tentar removê-la.</target>
       </trans-unit>
@@ -10198,7 +10334,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Password removal operation for &quot;<x id="PH" equiv-text="this.document().title"/>&quot; will begin in the background.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">1991</context>
+          <context context-type="linenumber">2049</context>
         </context-group>
         <target state="translated">A operação de remoção de senha para "<x id="PH" equiv-text="this.document().title"/>" começará em segundo plano.</target>
       </trans-unit>
@@ -10206,7 +10342,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Error executing password removal operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">2005</context>
+          <context context-type="linenumber">2063</context>
         </context-group>
         <target state="translated">Erro ao executar operação de remoção de senha</target>
       </trans-unit>
@@ -10214,7 +10350,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Print failed.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">2055</context>
+          <context context-type="linenumber">2113</context>
         </context-group>
         <target state="translated">Impressão falhou.</target>
       </trans-unit>
@@ -10222,7 +10358,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Error loading document for printing.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">2064</context>
+          <context context-type="linenumber">2122</context>
         </context-group>
         <target state="translated">Erro ao carregar o documento para impressão.</target>
       </trans-unit>
@@ -10230,11 +10366,11 @@ Erro ao enviar documentos por e-mail</target>
         <source>An error occurred loading tiff: <x id="PH" equiv-text="err.toString()"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">2147</context>
+          <context context-type="linenumber">2205</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
-          <context context-type="linenumber">2153</context>
+          <context context-type="linenumber">2211</context>
         </context-group>
         <target state="translated">Ocorreu um erro ao carregar tiff: <x id="PH" equiv-text="err.toString()"/></target>
       </trans-unit>
@@ -10554,7 +10690,7 @@ Erro ao enviar documentos por e-mail</target>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">1050</context>
+          <context context-type="linenumber">1115</context>
         </context-group>
         <target state="translated">Mesclar como versões</target>
       </trans-unit>
@@ -10562,7 +10698,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Create a share link bundle</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
-          <context context-type="linenumber">119</context>
+          <context context-type="linenumber">124</context>
         </context-group>
         <target state="translated">Criar um link de compartilhamento de pacote</target>
       </trans-unit>
@@ -10570,7 +10706,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Include:</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
-          <context context-type="linenumber">157,158</context>
+          <context context-type="linenumber">162,163</context>
         </context-group>
         <target state="translated">Incluir:</target>
       </trans-unit>
@@ -10578,7 +10714,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Archived files</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
-          <context context-type="linenumber">161,162</context>
+          <context context-type="linenumber">166,167</context>
         </context-group>
         <target state="translated">Arquivos arquivados</target>
       </trans-unit>
@@ -10586,15 +10722,39 @@ Erro ao enviar documentos por e-mail</target>
         <source>Original files</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.html</context>
-          <context context-type="linenumber">165,166</context>
+          <context context-type="linenumber">170,171</context>
         </context-group>
         <target state="translated">Arquivos originais</target>
+      </trans-unit>
+      <trans-unit id="7213350714441481763" datatype="html">
+        <source>Run a workflow on <x id="PH" equiv-text="this.getSelectionSize()"/> selected document(s).</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
+          <context context-type="linenumber">319</context>
+        </context-group>
+        <target state="needs-translation">Run a workflow on <x id="PH" equiv-text="this.getSelectionSize()"/> selected document(s).</target>
+      </trans-unit>
+      <trans-unit id="3401633333450192408" datatype="html">
+        <source>Bulk operation queued.</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
+          <context context-type="linenumber">358</context>
+        </context-group>
+        <target state="needs-translation">Bulk operation queued.</target>
+      </trans-unit>
+      <trans-unit id="5709555629190115111" datatype="html">
+        <source>View task</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
+          <context context-type="linenumber">362</context>
+        </context-group>
+        <target state="needs-translation">View task</target>
       </trans-unit>
       <trans-unit id="1215215387232313677" datatype="html">
         <source>Error executing bulk operation</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">349</context>
+          <context context-type="linenumber">414</context>
         </context-group>
         <target state="translated">Erro ao executar a operação em massa</target>
       </trans-unit>
@@ -10602,11 +10762,11 @@ Erro ao enviar documentos por e-mail</target>
         <source>&quot;<x id="PH" equiv-text="items[0].name"/>&quot;</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">509</context>
+          <context context-type="linenumber">574</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">515</context>
+          <context context-type="linenumber">580</context>
         </context-group>
         <target state="needs-review-translation" state-qualifier="leveraged-tm">"<x id="PH" equiv-text="items[0].name"/>"</target>
       </trans-unit>
@@ -10614,7 +10774,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>&quot;<x id="PH" equiv-text="items[0].name"/>&quot; and &quot;<x id="PH_1" equiv-text="items[1].name"/>&quot;</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">511</context>
+          <context context-type="linenumber">576</context>
         </context-group>
         <note priority="1" from="description">This is for messages like 'modify "tag1" and "tag2"'</note>
         <target state="final">"<x id="PH" equiv-text="items[0].name"/>" e "<x id="PH_1" equiv-text="items[1].name"/>"</target>
@@ -10623,7 +10783,7 @@ Erro ao enviar documentos por e-mail</target>
         <source><x id="PH" equiv-text="list"/> and &quot;<x id="PH_1" equiv-text="items[items.length - 1].name"/>&quot;</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">519,521</context>
+          <context context-type="linenumber">584,586</context>
         </context-group>
         <note priority="1" from="description">this is for messages like 'modify "tag1", "tag2" and "tag3"'</note>
         <target state="final"><x id="PH" equiv-text="list"/> e "<x id="PH_1" equiv-text="items[items.length - 1].name"/>"</target>
@@ -10632,7 +10792,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Confirm tags assignment</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">536</context>
+          <context context-type="linenumber">601</context>
         </context-group>
         <target state="final">Confirmar atribuição de etiqueta</target>
       </trans-unit>
@@ -10640,7 +10800,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>This operation will add the tag &quot;<x id="PH" equiv-text="tag.name"/>&quot; to <x id="PH_1" equiv-text="this.getSelectionSize()"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">542</context>
+          <context context-type="linenumber">607</context>
         </context-group>
         <target state="translated">Essa operação irá adicionar a etiqueta "<x id="PH" equiv-text="tag.name"/>" em <x id="PH_1" equiv-text="this.getSelectionSize()"/> documento(s) selecionado(s).</target>
       </trans-unit>
@@ -10648,7 +10808,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>This operation will add the tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> to <x id="PH_1" equiv-text="this.getSelectionSize()"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">547,549</context>
+          <context context-type="linenumber">612,614</context>
         </context-group>
         <target state="translated">Essa operação irá atribuir o caminho de armazenamento <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> para <x id="PH_1" equiv-text="this.getSelectionSize()"/> documentos(s) selecionado(s).</target>
       </trans-unit>
@@ -10656,7 +10816,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>This operation will remove the tag &quot;<x id="PH" equiv-text="tag.name"/>&quot; from <x id="PH_1" equiv-text="this.getSelectionSize()"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">555</context>
+          <context context-type="linenumber">620</context>
         </context-group>
         <target state="translated">Essa operação irá remover a etiqueta "<x id="PH" equiv-text="tag.name"/>" de <x id="PH_1" equiv-text="this.getSelectionSize()"/> documento(s) selecionado(s).</target>
       </trans-unit>
@@ -10664,7 +10824,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>This operation will remove the tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> from <x id="PH_1" equiv-text="this.getSelectionSize()"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">560,562</context>
+          <context context-type="linenumber">625,627</context>
         </context-group>
         <target state="translated">Essa operação irá remover a etiqueta <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> de <x id="PH_1" equiv-text="this.getSelectionSize()"/> documento(s) selecionado(s).</target>
       </trans-unit>
@@ -10672,7 +10832,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>This operation will add the tags <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> and remove the tags <x id="PH_1" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> on <x id="PH_2" equiv-text="this.getSelectionSize()"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">564,568</context>
+          <context context-type="linenumber">629,633</context>
         </context-group>
         <target state="translated">Esta operação irá atribuir campos customizados  <x id="PH" equiv-text="this._localizeList(           changedTags.itemsToAdd         )"/> e remover os campos customizados  <x id="PH_1" equiv-text="this._localizeList(           changedTags.itemsToRemove         )"/> nos <x id="PH_2" equiv-text="this.getSelectionSize()"/> documentos selecionados.</target>
       </trans-unit>
@@ -10680,7 +10840,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Confirm correspondent assignment</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">605</context>
+          <context context-type="linenumber">670</context>
         </context-group>
         <target state="final">Confirmar atribuição de correspondente</target>
       </trans-unit>
@@ -10688,7 +10848,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>This operation will assign the correspondent &quot;<x id="PH" equiv-text="correspondent.name"/>&quot; to <x id="PH_1" equiv-text="this.getSelectionSize()"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">607</context>
+          <context context-type="linenumber">672</context>
         </context-group>
         <target state="needs-translation">This operation will assign the correspondent "<x id="PH" equiv-text="correspondent.name"/>" to <x id="PH_1" equiv-text="this.getSelectionSize()"/> selected document(s).</target>
       </trans-unit>
@@ -10696,7 +10856,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>This operation will remove the correspondent from <x id="PH" equiv-text="this.getSelectionSize()"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">609</context>
+          <context context-type="linenumber">674</context>
         </context-group>
         <target state="needs-translation">This operation will remove the correspondent from <x id="PH" equiv-text="this.getSelectionSize()"/> selected document(s).</target>
       </trans-unit>
@@ -10704,7 +10864,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Confirm document type assignment</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">643</context>
+          <context context-type="linenumber">708</context>
         </context-group>
         <target state="final">Confirmar atribuição de tipo de documento</target>
       </trans-unit>
@@ -10712,7 +10872,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>This operation will assign the document type &quot;<x id="PH" equiv-text="documentType.name"/>&quot; to <x id="PH_1" equiv-text="this.getSelectionSize()"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">645</context>
+          <context context-type="linenumber">710</context>
         </context-group>
         <target state="needs-translation">This operation will assign the document type "<x id="PH" equiv-text="documentType.name"/>" to <x id="PH_1" equiv-text="this.getSelectionSize()"/> selected document(s).</target>
       </trans-unit>
@@ -10720,7 +10880,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>This operation will remove the document type from <x id="PH" equiv-text="this.getSelectionSize()"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">647</context>
+          <context context-type="linenumber">712</context>
         </context-group>
         <target state="needs-translation">This operation will remove the document type from <x id="PH" equiv-text="this.getSelectionSize()"/> selected document(s).</target>
       </trans-unit>
@@ -10728,7 +10888,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Confirm storage path assignment</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">681</context>
+          <context context-type="linenumber">746</context>
         </context-group>
         <target state="translated">Confirmar atribuição de caminho de armazenamento</target>
       </trans-unit>
@@ -10736,7 +10896,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>This operation will assign the storage path &quot;<x id="PH" equiv-text="storagePath.name"/>&quot; to <x id="PH_1" equiv-text="this.getSelectionSize()"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">683</context>
+          <context context-type="linenumber">748</context>
         </context-group>
         <target state="needs-translation">This operation will assign the storage path "<x id="PH" equiv-text="storagePath.name"/>" to <x id="PH_1" equiv-text="this.getSelectionSize()"/> selected document(s).</target>
       </trans-unit>
@@ -10744,7 +10904,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>This operation will remove the storage path from <x id="PH" equiv-text="this.getSelectionSize()"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">685</context>
+          <context context-type="linenumber">750</context>
         </context-group>
         <target state="needs-translation">This operation will remove the storage path from <x id="PH" equiv-text="this.getSelectionSize()"/> selected document(s).</target>
       </trans-unit>
@@ -10752,7 +10912,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Confirm custom field assignment</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">714</context>
+          <context context-type="linenumber">779</context>
         </context-group>
         <target state="translated">Confirmar atribuição de campo personalizado</target>
       </trans-unit>
@@ -10760,7 +10920,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>This operation will assign the custom field &quot;<x id="PH" equiv-text="customField.name"/>&quot; to <x id="PH_1" equiv-text="this.getSelectionSize()"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">720</context>
+          <context context-type="linenumber">785</context>
         </context-group>
         <target state="needs-translation">This operation will assign the custom field "<x id="PH" equiv-text="customField.name"/>" to <x id="PH_1" equiv-text="this.getSelectionSize()"/> selected document(s).</target>
       </trans-unit>
@@ -10768,7 +10928,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>This operation will assign the custom fields <x id="PH" equiv-text="this._localizeList(           changedCustomFields.itemsToAdd         )"/> to <x id="PH_1" equiv-text="this.getSelectionSize()"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">725,727</context>
+          <context context-type="linenumber">790,792</context>
         </context-group>
         <target state="needs-translation">This operation will assign the custom fields <x id="PH" equiv-text="this._localizeList(           changedCustomFields.itemsToAdd         )"/> to <x id="PH_1" equiv-text="this.getSelectionSize()"/> selected document(s).</target>
       </trans-unit>
@@ -10776,7 +10936,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>This operation will remove the custom field &quot;<x id="PH" equiv-text="customField.name"/>&quot; from <x id="PH_1" equiv-text="this.getSelectionSize()"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">733</context>
+          <context context-type="linenumber">798</context>
         </context-group>
         <target state="needs-translation">This operation will remove the custom field "<x id="PH" equiv-text="customField.name"/>" from <x id="PH_1" equiv-text="this.getSelectionSize()"/> selected document(s).</target>
       </trans-unit>
@@ -10784,7 +10944,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>This operation will remove the custom fields <x id="PH" equiv-text="this._localizeList(           changedCustomFields.itemsToRemove         )"/> from <x id="PH_1" equiv-text="this.getSelectionSize()"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">738,740</context>
+          <context context-type="linenumber">803,805</context>
         </context-group>
         <target state="needs-translation">This operation will remove the custom fields <x id="PH" equiv-text="this._localizeList(           changedCustomFields.itemsToRemove         )"/> from <x id="PH_1" equiv-text="this.getSelectionSize()"/> selected document(s).</target>
       </trans-unit>
@@ -10792,7 +10952,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>This operation will assign the custom fields <x id="PH" equiv-text="this._localizeList(           changedCustomFields.itemsToAdd         )"/> and remove the custom fields <x id="PH_1" equiv-text="this._localizeList(           changedCustomFields.itemsToRemove         )"/> on <x id="PH_2" equiv-text="this.getSelectionSize()"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">742,746</context>
+          <context context-type="linenumber">807,811</context>
         </context-group>
         <target state="needs-translation">This operation will assign the custom fields <x id="PH" equiv-text="this._localizeList(           changedCustomFields.itemsToAdd         )"/> and remove the custom fields <x id="PH_1" equiv-text="this._localizeList(           changedCustomFields.itemsToRemove         )"/> on <x id="PH_2" equiv-text="this.getSelectionSize()"/> selected document(s).</target>
       </trans-unit>
@@ -10800,7 +10960,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Move <x id="PH" equiv-text="this.getSelectionSize()"/> selected document(s) to the trash?</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">889</context>
+          <context context-type="linenumber">954</context>
         </context-group>
         <target state="needs-translation">Move <x id="PH" equiv-text="this.getSelectionSize()"/> selected document(s) to the trash?</target>
       </trans-unit>
@@ -10808,7 +10968,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Moved <x id="PH" equiv-text="count"/> document(s) to the trash</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">916</context>
+          <context context-type="linenumber">981</context>
         </context-group>
         <target state="needs-translation">Moved <x id="PH" equiv-text="count"/> document(s) to the trash</target>
       </trans-unit>
@@ -10816,7 +10976,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>This operation will permanently recreate the archive files for <x id="PH" equiv-text="this.getSelectionSize()"/> selected document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">951</context>
+          <context context-type="linenumber">1016</context>
         </context-group>
         <target state="needs-translation">This operation will permanently recreate the archive files for <x id="PH" equiv-text="this.getSelectionSize()"/> selected document(s).</target>
       </trans-unit>
@@ -10824,7 +10984,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>The archive files will be re-generated with the current settings.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">952</context>
+          <context context-type="linenumber">1017</context>
         </context-group>
         <target state="translated">Os arquivos serão re-gerados com as configurações atuais.</target>
       </trans-unit>
@@ -10832,7 +10992,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Rotate confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">990</context>
+          <context context-type="linenumber">1055</context>
         </context-group>
         <target state="translated">Confirmar Rotação</target>
       </trans-unit>
@@ -10840,7 +11000,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>This operation will add rotated versions of the <x id="PH" equiv-text="this.getSelectionSize()"/> document(s).</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">991</context>
+          <context context-type="linenumber">1056</context>
         </context-group>
         <target state="needs-translation">This operation will add rotated versions of the <x id="PH" equiv-text="this.getSelectionSize()"/> document(s).</target>
       </trans-unit>
@@ -10848,7 +11008,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Merge confirm</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">1014</context>
+          <context context-type="linenumber">1079</context>
         </context-group>
         <target state="translated">Confirmar junção</target>
       </trans-unit>
@@ -10856,7 +11016,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>This operation will merge <x id="PH" equiv-text="this.getSelectionSize()"/> selected documents into a new document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">1015</context>
+          <context context-type="linenumber">1080</context>
         </context-group>
         <target state="needs-translation">This operation will merge <x id="PH" equiv-text="this.getSelectionSize()"/> selected documents into a new document.</target>
       </trans-unit>
@@ -10864,7 +11024,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Merged document will be queued for consumption.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">1038</context>
+          <context context-type="linenumber">1103</context>
         </context-group>
         <target state="translated">O documento juntado será colocado na fila para consumo.</target>
       </trans-unit>
@@ -10872,7 +11032,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>The selected documents will become versions of the root document.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">1051</context>
+          <context context-type="linenumber">1116</context>
         </context-group>
         <target state="needs-translation">The selected documents will become versions of the root document.</target>
       </trans-unit>
@@ -10880,23 +11040,15 @@ Erro ao enviar documentos por e-mail</target>
         <source>Documents merged as versions.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">1066</context>
+          <context context-type="linenumber">1131</context>
         </context-group>
         <target state="needs-translation">Documents merged as versions.</target>
-      </trans-unit>
-      <trans-unit id="476913782630693351" datatype="html">
-        <source>Custom fields updated.</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">1092</context>
-        </context-group>
-        <target state="translated">Campos personalizados atualizados.</target>
       </trans-unit>
       <trans-unit id="3873496751167944011" datatype="html">
         <source>Error updating custom fields.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">1101</context>
+          <context context-type="linenumber">1161</context>
         </context-group>
         <target state="translated">Erro ao atualizar campos personalizados.</target>
       </trans-unit>
@@ -10904,7 +11056,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Share link bundle creation requested.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">1149</context>
+          <context context-type="linenumber">1209</context>
         </context-group>
         <target state="needs-translation">Share link bundle creation requested.</target>
       </trans-unit>
@@ -10912,7 +11064,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Share link bundle creation is not available yet.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
-          <context context-type="linenumber">1156</context>
+          <context context-type="linenumber">1216</context>
         </context-group>
         <target state="needs-translation">Share link bundle creation is not available yet.</target>
       </trans-unit>
@@ -11806,27 +11958,59 @@ Erro ao enviar documentos por e-mail</target>
         </context-group>
         <target state="translated">O erro retornado foi</target>
       </trans-unit>
-      <trans-unit id="1044349881182559852" datatype="html">
-        <source>Enter note</source>
+      <trans-unit id="4388879716045736175" datatype="html">
+        <source>Note</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-notes/document-notes.component.html</context>
           <context context-type="linenumber">5</context>
         </context-group>
-        <target state="translated">Inserir nota</target>
+        <target state="needs-translation">Note</target>
+      </trans-unit>
+      <trans-unit id="8039873301454218547" datatype="html">
+        <source>Enter note (Markdown is supported)</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-notes/document-notes.component.html</context>
+          <context context-type="linenumber">5</context>
+        </context-group>
+        <target state="needs-translation">Enter note (Markdown is supported)</target>
+      </trans-unit>
+      <trans-unit id="2713764221056344068" datatype="html">
+        <source>Note preview</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-notes/document-notes.component.html</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
+        <target state="needs-translation">Note preview</target>
+      </trans-unit>
+      <trans-unit id="7604794618690171820" datatype="html">
+        <source>Nothing to preview</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-notes/document-notes.component.html</context>
+          <context context-type="linenumber">11,12</context>
+        </context-group>
+        <target state="needs-translation">Nothing to preview</target>
       </trans-unit>
       <trans-unit id="7770536883443596194" datatype="html">
         <source> Please enter a note. </source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-notes/document-notes.component.html</context>
-          <context context-type="linenumber">7</context>
+          <context context-type="linenumber">16,17</context>
         </context-group>
         <target state="translated"> Por favor, insira uma nota. </target>
+      </trans-unit>
+      <trans-unit id="3124852678467222928" datatype="html">
+        <source>Note input mode</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/components/document-notes/document-notes.component.html</context>
+          <context context-type="linenumber">23</context>
+        </context-group>
+        <target state="needs-translation">Note input mode</target>
       </trans-unit>
       <trans-unit id="8433732438274024544" datatype="html">
         <source>Add note</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-notes/document-notes.component.html</context>
-          <context context-type="linenumber">14,15</context>
+          <context context-type="linenumber">29,30</context>
         </context-group>
         <target state="translated">Adicionar nota</target>
       </trans-unit>
@@ -11834,11 +12018,11 @@ Erro ao enviar documentos por e-mail</target>
         <source>Delete note</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-notes/document-notes.component.html</context>
-          <context context-type="linenumber">25</context>
+          <context context-type="linenumber">46</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-notes/document-notes.component.html</context>
-          <context context-type="linenumber">27,28</context>
+          <context context-type="linenumber">48,49</context>
         </context-group>
         <target state="translated">Excluir nota</target>
       </trans-unit>
@@ -11846,7 +12030,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Error saving note</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-notes/document-notes.component.ts</context>
-          <context context-type="linenumber">83</context>
+          <context context-type="linenumber">94</context>
         </context-group>
         <target state="translated">Erro ao salvar nota</target>
       </trans-unit>
@@ -11854,7 +12038,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Error deleting note</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/components/document-notes/document-notes.component.ts</context>
-          <context context-type="linenumber">97</context>
+          <context context-type="linenumber">108</context>
         </context-group>
         <target state="translated">Erro ao apagar nota</target>
       </trans-unit>
@@ -14823,7 +15007,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Document already exists.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/websocket-status.service.ts</context>
-          <context context-type="linenumber">27</context>
+          <context context-type="linenumber">29</context>
         </context-group>
         <target state="final">Documento já existente.</target>
       </trans-unit>
@@ -14831,7 +15015,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Document already exists. Note: existing document is in the trash.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/websocket-status.service.ts</context>
-          <context context-type="linenumber">28</context>
+          <context context-type="linenumber">30</context>
         </context-group>
         <target state="translated">Documento já existe. Nota: um documento existente na lixeira.</target>
       </trans-unit>
@@ -14839,7 +15023,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Document with ASN already exists.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/websocket-status.service.ts</context>
-          <context context-type="linenumber">29</context>
+          <context context-type="linenumber">31</context>
         </context-group>
         <target state="translated">Documento com o mesmo NSA já existe.</target>
       </trans-unit>
@@ -14847,7 +15031,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Document with ASN already exists. Note: existing document is in the trash.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/websocket-status.service.ts</context>
-          <context context-type="linenumber">30</context>
+          <context context-type="linenumber">32</context>
         </context-group>
         <target state="translated">Documento com ASN já existe. Nota: documento existente está na lixeira.</target>
       </trans-unit>
@@ -14855,7 +15039,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>File not found.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/websocket-status.service.ts</context>
-          <context context-type="linenumber">31</context>
+          <context context-type="linenumber">33</context>
         </context-group>
         <target state="final">Arquivo não encontrado.</target>
       </trans-unit>
@@ -14863,7 +15047,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Pre-consume script does not exist.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/websocket-status.service.ts</context>
-          <context context-type="linenumber">32</context>
+          <context context-type="linenumber">34</context>
         </context-group>
         <note priority="1" from="description">Pre-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
         <target state="final">Script pré-consumo não existe.</target>
@@ -14872,7 +15056,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Error while executing pre-consume script.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/websocket-status.service.ts</context>
-          <context context-type="linenumber">33</context>
+          <context context-type="linenumber">35</context>
         </context-group>
         <note priority="1" from="description">Pre-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
         <target state="final">Erro ao executar script pré-consumo.</target>
@@ -14881,7 +15065,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Post-consume script does not exist.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/websocket-status.service.ts</context>
-          <context context-type="linenumber">34</context>
+          <context context-type="linenumber">36</context>
         </context-group>
         <note priority="1" from="description">Post-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
         <target state="final">Script pós-consumo não existe.</target>
@@ -14890,7 +15074,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Error while executing post-consume script.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/websocket-status.service.ts</context>
-          <context context-type="linenumber">35</context>
+          <context context-type="linenumber">37</context>
         </context-group>
         <note priority="1" from="description">Post-Consume is a term that appears like that in the documentation as well and does not need a specific translation</note>
         <target state="final">Erro ao executar script pós-consumo.</target>
@@ -14899,7 +15083,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Received new file.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/websocket-status.service.ts</context>
-          <context context-type="linenumber">36</context>
+          <context context-type="linenumber">38</context>
         </context-group>
         <target state="final">Novo arquivo recebido.</target>
       </trans-unit>
@@ -14907,7 +15091,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>File type not supported.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/websocket-status.service.ts</context>
-          <context context-type="linenumber">37</context>
+          <context context-type="linenumber">39</context>
         </context-group>
         <target state="final">Tipo de arquivo não suportado.</target>
       </trans-unit>
@@ -14915,7 +15099,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Processing document...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/websocket-status.service.ts</context>
-          <context context-type="linenumber">38</context>
+          <context context-type="linenumber">40</context>
         </context-group>
         <target state="final">Processando documento...</target>
       </trans-unit>
@@ -14923,7 +15107,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Generating thumbnail...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/websocket-status.service.ts</context>
-          <context context-type="linenumber">39</context>
+          <context context-type="linenumber">41</context>
         </context-group>
         <target state="final">Gerando imagem...</target>
       </trans-unit>
@@ -14931,7 +15115,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Retrieving date from document...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/websocket-status.service.ts</context>
-          <context context-type="linenumber">40</context>
+          <context context-type="linenumber">42</context>
         </context-group>
         <target state="final">Buscando data do documento...</target>
       </trans-unit>
@@ -14939,7 +15123,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Saving document...</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/websocket-status.service.ts</context>
-          <context context-type="linenumber">41</context>
+          <context context-type="linenumber">43</context>
         </context-group>
         <target state="final">Salvando documento...</target>
       </trans-unit>
@@ -14947,7 +15131,7 @@ Erro ao enviar documentos por e-mail</target>
         <source>Finished.</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/services/websocket-status.service.ts</context>
-          <context context-type="linenumber">42</context>
+          <context context-type="linenumber">44</context>
         </context-group>
         <target state="final">Encerrado.</target>
       </trans-unit>
