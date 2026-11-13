@@ -41,6 +41,7 @@ from documents.models import PaperlessTask
 from documents.permissions import PaperlessModelPermissions
 from documents.permissions import PaperlessObjectPermissions
 from documents.tasks import llmindex_index
+from paperless.fields import is_obfuscated_password
 from paperless.filters import GroupFilterSet
 from paperless.filters import UserFilterSet
 from paperless.models import ApplicationConfiguration
@@ -260,7 +261,7 @@ class ProfileView(GenericAPIView[Any]):
         user = self.request.user if hasattr(self.request, "user") else None
 
         password = serializer.validated_data.pop("password", None)
-        if password and password.replace("*", ""):
+        if password and not is_obfuscated_password(password):
             user.set_password(password)
             user.save()
 
