@@ -104,6 +104,67 @@ def test_permissions_rechecked_on_worker(bulk_setup):
 
 
 @pytest.mark.django_db
+def test_document_action_runs_with_user_in_worker(bulk_setup):
+    user, _, doc, _ = bulk_setup
+    with mock.patch("documents.bulk_edit.rotate") as rotate:
+        result = execute_bulk_operation(
+            "rotate",
+            [doc.pk],
+            {"degrees": 90},
+            user.pk,
+            trigger_source="web_ui",
+        )
+    rotate.assert_called_once_with(
+        [doc.pk],
+        degrees=90,
+        user=user,
+        trigger_source="web_ui",
+    )
+    assert result == {"operation": "rotate", "document_count": 1}
+
+
+@pytest.mark.django_db
+def test_reprocess_keeps_bulk_audit_entry(bulk_setup, settings):
+    user, _, doc, _ = bulk_setup
+    settings.AUDIT_LOG_ENABLED = True
+    LogEntry.objects.all().delete()
+    with mock.patch("documents.bulk_edit.reprocess"):
+        execute_bulk_operation("reprocess", [doc.pk], {}, user.pk)
+    entry = LogEntry.objects.get_for_object(doc).get()
+    assert entry.changes_dict["checksum"] == [doc.checksum, doc.checksum]
+    assert entry.actor_id == user.pk
+
+
+@pytest.mark.django_db
+def test_workflow_runs_in_tracked_task_instead_of_dispatching_another(bulk_setup):
+    user, _, doc, _ = bulk_setup
+    with mock.patch("documents.bulk_edit.run_workflows_for_documents") as run:
+        execute_bulk_operation(
+            "run_workflow",
+            [doc.pk],
+            {"workflow": 7, "filter_documents": False},
+            user.pk,
+        )
+    run.assert_called_once_with(
+        document_ids=[doc.pk],
+        workflow_id=7,
+        filter_documents=False,
+    )
+
+
+@pytest.mark.django_db
+def test_delete_failure_propagates_from_worker(bulk_setup):
+    user, _, doc, _ = bulk_setup
+    with mock.patch(
+        "documents.models.Document.delete",
+        side_effect=RuntimeError("delete failed"),
+    ):
+        with pytest.raises(RuntimeError, match="delete failed"):
+            execute_bulk_operation("delete", [doc.pk], {}, user.pk)
+    assert Document.objects.filter(pk=doc.pk).exists()
+
+
+@pytest.mark.django_db
 def test_queue_failure_does_not_change_documents(bulk_setup):
     _, client, doc, correspondent = bulk_setup
     with mock.patch(
@@ -161,6 +222,22 @@ def test_tracked_outcome_records_initiator_and_result(bulk_setup, failed):
         assert task.result_data["error_message"] == "Could not update"
     else:
         assert task.result_data == {"document_count": 1}
+
+
+@pytest.mark.django_db
+def test_queued_delete_is_tracked_as_bulk_delete(bulk_setup):
+    user, _, doc, _ = bulk_setup
+    before_task_publish_handler(
+        headers={"task": execute_bulk_operation.name, "id": "delete-task"},
+        body=(
+            (),
+            {"operation": "delete", "document_ids": [doc.pk], "user_id": user.pk},
+            {},
+        ),
+    )
+    task = PaperlessTask.objects.get(task_id="delete-task")
+    assert task.task_type == PaperlessTask.TaskType.BULK_DELETE
+    assert task.owner_id == user.pk
 
 
 @pytest.mark.django_db
@@ -285,8 +362,31 @@ async def test_completion_socket_is_private(anyio_backend):
 
 
 @pytest.mark.django_db
-@pytest.mark.parametrize("endpoint", ["delete", "bulk_edit"])
-def test_trash_remains_synchronous(bulk_setup, endpoint):
+def test_legacy_trash_queues_without_deleting_in_request(bulk_setup):
+    user, client, doc, _ = bulk_setup
+    data = {"documents": [doc.pk], "method": "delete", "parameters": {}}
+    with mock.patch("documents.views.execute_bulk_operation.apply_async") as enqueue:
+        enqueue.return_value.id = "delete-task"
+        response = client.post(
+            "/api/documents/bulk_edit/",
+            data,
+            format="json",
+            HTTP_ACCEPT="application/json; version=9",
+        )
+    assert response.status_code == 200
+    assert response.data == {"result": "OK", "task_id": "delete-task"}
+    assert Document.objects.filter(pk=doc.pk).exists()
+    assert enqueue.call_args.kwargs["kwargs"] == {
+        "operation": "delete",
+        "document_ids": [doc.pk],
+        "parameters": {},
+        "user_id": user.pk,
+        "trigger_source": "api_upload",
+    }
+
+
+@pytest.mark.django_db
+def test_dedicated_trash_remains_synchronous(bulk_setup):
     _, client, doc, _ = bulk_setup
     with (
         mock.patch("documents.views.execute_bulk_operation.apply_async") as enqueue,
