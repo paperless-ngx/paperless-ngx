@@ -13,6 +13,7 @@ from dataclasses import asdict
 from datetime import datetime
 from datetime import timedelta
 from http import HTTPStatus
+from inspect import signature
 from itertools import islice
 from pathlib import Path
 from time import mktime
@@ -108,6 +109,9 @@ from documents import bulk_edit
 from documents.bulk_download import ArchiveOnlyStrategy
 from documents.bulk_download import OriginalAndArchiveStrategy
 from documents.bulk_download import OriginalsOnlyStrategy
+from documents.bulk_operations import QUEUED_OPERATIONS
+from documents.bulk_operations import execute_bulk_operation
+from documents.bulk_operations import snapshot_field
 from documents.caching import get_llm_suggestion_cache
 from documents.caching import get_metadata_cache
 from documents.caching import get_suggestion_cache
@@ -144,6 +148,7 @@ from documents.filters import ShareLinkFilterSet
 from documents.filters import StoragePathFilterSet
 from documents.filters import TagFilterSet
 from documents.filters import TitleContentFilter
+from documents.filters import WorkflowFilterSet
 from documents.mail import EmailAttachment
 from documents.mail import send_email
 from documents.matching import match_correspondents
@@ -177,6 +182,7 @@ from documents.permissions import ViewDocumentsPermissions
 from documents.permissions import annotate_document_count_for_related_queryset
 from documents.permissions import get_document_count_filter_for_user
 from documents.permissions import get_permission_grantees
+from documents.permissions import has_document_operation_permissions
 from documents.permissions import has_global_statistics_permission
 from documents.permissions import has_perms_owner_aware
 from documents.permissions import has_system_status_permission
@@ -206,6 +212,7 @@ from documents.serialisers import EditPdfDocumentsSerializer
 from documents.serialisers import EmailSerializer
 from documents.serialisers import MergeDocumentsAsVersionsSerializer
 from documents.serialisers import MergeDocumentsSerializer
+from documents.serialisers import NoteCreateSerializer
 from documents.serialisers import NotesSerializer
 from documents.serialisers import OcrTemplateSerializer
 from documents.serialisers import OcrTemplateTestSerializer
@@ -837,12 +844,7 @@ class EmailDocumentDetailSchema(EmailSerializer):
     notes=extend_schema(
         description="View, add, or delete notes for the document",
         methods=["GET", "POST", "DELETE"],
-        request=inline_serializer(
-            name="NoteCreateRequest",
-            fields={
-                "note": serializers.CharField(),
-            },
-        ),
+        request=NoteCreateSerializer,
         parameters=[
             OpenApiParameter(
                 name="id",
@@ -1900,19 +1902,23 @@ class DocumentViewSet(
                     {"error": "Error retrieving notes, check logs for more detail."},
                 )
         elif request.method == "POST":
-            try:
-                if currentUser is not None and not has_perms_owner_aware(
-                    currentUser,
-                    "change_document",
-                    doc,
-                ):
-                    return HttpResponseForbidden(
-                        "Insufficient permissions to create notes",
-                    )
+            if currentUser is not None and not has_perms_owner_aware(
+                currentUser,
+                "change_document",
+                doc,
+            ):
+                return HttpResponseForbidden(
+                    "Insufficient permissions to create notes",
+                )
 
+            note_serializer = NoteCreateSerializer(data=request.data)
+            note_serializer.is_valid(raise_exception=True)
+
+            try:
                 c = Note.objects.create(
                     document=doc,
-                    note=request.data["note"],
+                    note=note_serializer.validated_data["note"],
+                    format=note_serializer.validated_data["format"],
                     user=currentUser,
                 )
                 # If audit log is enabled make an entry in the log
@@ -3078,6 +3084,27 @@ class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
         "merge_as_versions",
     }
 
+    def _queue_bulk_operation(self, method, documents, parameters, from_webui):
+        if "update_callback" in parameters:
+            raise ValueError("Unsupported bulk operation parameter: update_callback")
+        signature(method).bind(documents, **parameters)
+        task = execute_bulk_operation.apply_async(
+            kwargs={
+                "operation": method.__name__,
+                "document_ids": documents,
+                "parameters": parameters,
+                "user_id": self.request.user.pk,
+            },
+            headers={
+                "trigger_source": (
+                    PaperlessTask.TriggerSource.WEB_UI
+                    if from_webui
+                    else PaperlessTask.TriggerSource.API_UPLOAD
+                ),
+            },
+        )
+        return Response({"result": "OK", "task_id": task.id})
+
     def _has_document_permissions(
         self,
         *,
@@ -3123,6 +3150,7 @@ class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
                     bulk_edit.edit_pdf,
                     bulk_edit.merge_as_versions,
                     bulk_edit.remove_password,
+                    bulk_edit.run_workflow,
                 ]
             )
             or (
@@ -3206,7 +3234,7 @@ class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
                 else PaperlessTask.TriggerSource.API_UPLOAD
             )
 
-        if not self._has_document_permissions(
+        if not has_document_operation_permissions(
             user=user,
             documents=documents,
             method=method,
@@ -3237,66 +3265,20 @@ class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
                 name="BulkEditDocumentsResult",
                 fields={
                     "result": serializers.CharField(),
+                    "task_id": serializers.CharField(required=False),
                 },
             ),
         },
     ),
 )
 class BulkEditView(DocumentOperationPermissionMixin):
-    MODIFIED_FIELD_BY_METHOD = {
-        "set_correspondent": "correspondent",
-        "set_document_type": "document_type",
-        "set_storage_path": "storage_path",
-        "add_tag": "tags",
-        "remove_tag": "tags",
-        "modify_tags": "tags",
-        "modify_custom_fields": "custom_fields",
-        "set_permissions": None,
+    LEGACY_MODIFIED_FIELDS = {
         "delete": "deleted_at",
-        # These operations create new documents/versions no longer altering
-        # fields on the selected document in place
-        "rotate": None,
-        "delete_pages": None,
-        "split": None,
-        "merge": None,
-        "edit_pdf": None,
         "reprocess": "checksum",
         "remove_password": None,
     }
 
     serializer_class = BulkEditSerializer
-
-    @staticmethod
-    def _snapshot_field(doc_ids: list[int], field: str) -> dict[int, Any]:
-        """
-        Returns each document's current value of field, for the audit log.
-
-        Tags and custom fields are one row per value, so they are gathered
-        into a sorted list of pks per document (empty when there are none).
-        Reading them through Document.values() instead would join those rows
-        and return one arbitrary value per document.
-        """
-        if field == "tags":
-            rows = (
-                Document.tags.through.objects.filter(document_id__in=doc_ids)
-                .order_by("tag_id")
-                .values_list("document_id", "tag_id")
-            )
-        elif field == "custom_fields":
-            rows = (
-                CustomFieldInstance.objects.filter(document_id__in=doc_ids)
-                .order_by("pk")
-                .values_list("document_id", "pk")
-            )
-        else:
-            return dict(
-                Document.objects.filter(pk__in=doc_ids).values_list("pk", field),
-            )
-
-        values: dict[int, list[int]] = {doc_id: [] for doc_id in doc_ids}
-        for doc_id, pk in rows:
-            values[doc_id].append(pk)
-        return values
 
     def post(self, request, *args, **kwargs):
         request_method = request.data.get("method")
@@ -3333,7 +3315,7 @@ class BulkEditView(DocumentOperationPermissionMixin):
                 if from_webui
                 else PaperlessTask.TriggerSource.API_UPLOAD
             )
-        if not self._has_document_permissions(
+        if not has_document_operation_permissions(
             user=user,
             documents=documents,
             method=method,
@@ -3342,14 +3324,21 @@ class BulkEditView(DocumentOperationPermissionMixin):
             return HttpResponseForbidden("Insufficient permissions")
 
         try:
-            modified_field = self.MODIFIED_FIELD_BY_METHOD.get(method.__name__, None)
+            if method.__name__ in QUEUED_OPERATIONS:
+                return self._queue_bulk_operation(
+                    method,
+                    documents,
+                    parameters,
+                    from_webui,
+                )
+            modified_field = self.LEGACY_MODIFIED_FIELDS.get(method.__name__)
             if settings.AUDIT_LOG_ENABLED and modified_field:
-                old_values = self._snapshot_field(documents, modified_field)
+                old_values = snapshot_field(documents, modified_field)
 
             result = method(documents, **parameters)
 
             if settings.AUDIT_LOG_ENABLED and modified_field:
-                new_values = self._snapshot_field(documents, modified_field)
+                new_values = snapshot_field(documents, modified_field)
                 for doc in Document.objects.filter(pk__in=documents):
                     LogEntry.objects.log_create(
                         instance=doc,
@@ -5326,6 +5315,8 @@ class WorkflowViewSet(ModelViewSet[Workflow]):
 
     serializer_class = WorkflowSerializer
     pagination_class = StandardPagination
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = WorkflowFilterSet
 
     model = Workflow
 

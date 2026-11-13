@@ -1,0 +1,32 @@
+<div class="modal-header">
+  <h4 class="modal-title" id="modal-basic-title">{{title}}</h4>
+  <button type="button" class="btn-close" aria-label="Close" (click)="cancel()">
+  </button>
+</div>
+<div class="modal-body">
+  @if (message) {
+    <p class="text-break" [innerHTML]="message"></p>
+  }
+  <div class="mb-3">
+    <label class="form-label" for="runWorkflowSelect" i18n>Workflow</label>
+    <select class="form-select" id="runWorkflowSelect" [(ngModel)]="workflowId" (ngModelChange)="workflowSelected()">
+      <option [ngValue]="null" disabled i18n>Select a workflow</option>
+      @for (workflow of workflows; track workflow.id) {
+        <option [ngValue]="workflow.id">{{workflow.name}}</option>
+      }
+    </select>
+  </div>
+  <div class="form-check">
+    <input class="form-check-input" type="checkbox" id="runWorkflowForce" [(ngModel)]="force" />
+    <label class="form-check-label" for="runWorkflowForce" i18n>Run on all selected documents</label>
+    <div class="form-text" i18n>Ignore the workflow's trigger filters and run on every selected document.</div>
+  </div>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn" [class]="cancelBtnClass" (click)="cancel()" [disabled]="!buttonsEnabled">
+    <span class="d-inline-block" style="padding-bottom: 1px;">{{cancelBtnCaption}}</span>
+  </button>
+  <button type="button" class="btn" [class]="btnClass" (click)="confirm()" [disabled]="!confirmButtonEnabled || !buttonsEnabled">
+    {{btnCaption}}
+  </button>
+</div>

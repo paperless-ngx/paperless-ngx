@@ -182,6 +182,7 @@ def make_expected_schedule(
     workflow_expire = 59.0 * 60.0
     llm_index_expire = 23.0 * 60.0 * 60.0
     share_link_cleanup_expire = 23.0 * 60.0 * 60.0
+    session_cleanup_expire = 23.0 * 60.0 * 60.0
 
     schedule: dict[str, Any] = {
         "Check all e-mail accounts": {
@@ -248,6 +249,14 @@ def make_expected_schedule(
                 "headers": {"trigger_source": "scheduled"},
             },
         },
+        "Clear expired sessions": {
+            "task": "documents.tasks.clear_expired_sessions",
+            "schedule": crontab(minute=0, hour="3"),
+            "options": {
+                "expires": session_cleanup_expire,
+                "headers": {"trigger_source": "scheduled"},
+            },
+        },
     }
 
     overrides = overrides or {}
@@ -298,6 +307,7 @@ class TestParseBeatSchedule:
                     "PAPERLESS_WORKFLOW_SCHEDULED_TASK_CRON": "disable",
                     "PAPERLESS_LLM_INDEX_TASK_CRON": "disable",
                     "PAPERLESS_SHARE_LINK_BUNDLE_CLEANUP_CRON": "disable",
+                    "PAPERLESS_SESSION_CLEANUP_TASK_CRON": "disable",
                 },
                 {},
                 id="all-disabled",

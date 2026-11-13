@@ -1,7 +1,7 @@
 import { HttpParams } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { Observable } from 'rxjs'
-import { DocumentNote } from 'src/app/data/document-note'
+import { DocumentNote, NoteFormat } from 'src/app/data/document-note'
 import { AbstractPaperlessService } from './abstract-paperless-service'
 
 @Injectable({
@@ -22,6 +22,7 @@ export class DocumentNotesService extends AbstractPaperlessService<DocumentNote>
   addNote(id: number, note: string): Observable<DocumentNote[]> {
     return this.http.post<DocumentNote[]>(this.getResourceUrl(id, 'notes'), {
       note: note,
+      format: NoteFormat.Markdown,
     })
   }
 

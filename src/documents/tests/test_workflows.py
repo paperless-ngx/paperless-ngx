@@ -2288,6 +2288,83 @@ class TestWorkflows(
         doc.refresh_from_db()
         self.assertEqual(doc.owner, self.user2)
 
+    def _make_manual_workflow(self, *, require_tag: Tag | None = None) -> Workflow:
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.MANUAL,
+        )
+        if require_tag is not None:
+            trigger.filter_has_all_tags.add(require_tag)
+        action = WorkflowAction.objects.create(assign_owner=self.user2)
+        workflow = Workflow.objects.create(name="Manual workflow", order=0)
+        workflow.triggers.add(trigger)
+        workflow.actions.add(action)
+        return workflow
+
+    @mock.patch("documents.tasks.send_websocket_document_updated")
+    def test_manual_workflow_run_applies_and_notifies(self, mock_ws) -> None:
+        """A manual run applies the workflow's actions and pushes a websocket update."""
+        workflow = self._make_manual_workflow()
+        doc = DocumentFactory()
+
+        tasks.run_workflows_for_documents([doc.pk], workflow.pk)
+
+        doc.refresh_from_db()
+        self.assertEqual(doc.owner, self.user2)
+        self.assertEqual(mock_ws.call_args.kwargs["document"].pk, doc.pk)
+
+    def test_manual_workflow_run_respects_filters(self) -> None:
+        """With filter_documents=True, a document failing the trigger filters is skipped."""
+        workflow = self._make_manual_workflow(require_tag=self.t1)
+        doc = DocumentFactory()
+
+        tasks.run_workflows_for_documents([doc.pk], workflow.pk, filter_documents=True)
+
+        doc.refresh_from_db()
+        self.assertIsNone(doc.owner)
+
+    def test_manual_workflow_run_force_ignores_filters(self) -> None:
+        """With filter_documents=False, actions run regardless of the trigger filters."""
+        workflow = self._make_manual_workflow(require_tag=self.t1)
+        doc = DocumentFactory()
+
+        tasks.run_workflows_for_documents([doc.pk], workflow.pk, filter_documents=False)
+
+        doc.refresh_from_db()
+        self.assertEqual(doc.owner, self.user2)
+
+    def test_manual_workflow_run_missing_workflow(self) -> None:
+        """A missing workflow id logs a warning rather than raising."""
+        doc = DocumentFactory()
+        with self.assertLogs("paperless.tasks", level="WARNING"):
+            tasks.run_workflows_for_documents([doc.pk], 9999)
+
+    @mock.patch("documents.tasks.send_websocket_document_updated")
+    @mock.patch("documents.tasks.run_workflows")
+    def test_manual_workflow_run_continues_after_error(
+        self,
+        mock_run_workflows,
+        mock_ws,
+    ) -> None:
+        """A failure on one document does not abort the run for the others."""
+        workflow = self._make_manual_workflow()
+        doc1 = DocumentFactory()
+        doc2 = DocumentFactory()
+
+        def side_effect(*args, document, **kwargs):
+            if document.pk == doc1.pk:
+                raise Exception("boom")
+
+        mock_run_workflows.side_effect = side_effect
+
+        with self.assertLogs("paperless.tasks", level="ERROR"):
+            tasks.run_workflows_for_documents([doc1.pk, doc2.pk], workflow.pk)
+
+        # Both documents were attempted; the websocket update only fired for the
+        # one that did not raise.
+        self.assertEqual(mock_run_workflows.call_count, 2)
+        ws_doc_ids = [c.kwargs["document"].pk for c in mock_ws.call_args_list]
+        self.assertEqual(ws_doc_ids, [doc2.pk])
+
     @mock.patch("documents.tasks.send_websocket_document_updated")
     def test_workflow_scheduled_trigger_sends_websocket_update(
         self,

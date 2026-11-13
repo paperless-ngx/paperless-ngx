@@ -975,8 +975,17 @@ class NotesSerializer(serializers.ModelSerializer[Note]):
 
     class Meta:
         model = Note
-        fields = ["id", "note", "created", "user"]
+        fields = ["id", "note", "format", "created", "user"]
         ordering = ["-created"]
+
+
+class NoteCreateSerializer(serializers.Serializer[dict[str, Any]]):
+    note = serializers.CharField()
+    format = serializers.ChoiceField(
+        choices=Note.Format.choices,
+        default=Note.Format.PLAIN,
+        required=False,
+    )
 
 
 def _get_viewable_duplicates(
@@ -1845,6 +1854,7 @@ class BulkEditSerializer(
             "modify_tags",
             "modify_custom_fields",
             "set_permissions",
+            "run_workflow",
             *LEGACY_DOCUMENT_ACTION_METHODS,
         ],
         label="Method",
@@ -1934,6 +1944,8 @@ class BulkEditSerializer(
             return bulk_edit.reprocess
         elif method == "set_permissions":
             return bulk_edit.set_permissions
+        elif method == "run_workflow":
+            return bulk_edit.run_workflow
         elif method == "rotate":
             return bulk_edit.rotate
         elif method == "merge":
@@ -2173,6 +2185,35 @@ class BulkEditSerializer(
         else:
             parameters["remote_ocr"] = False
 
+    def _validate_parameters_run_workflow(self, parameters) -> None:
+        if "workflow" not in parameters:
+            raise serializers.ValidationError("workflow not specified")
+        try:
+            workflow = Workflow.objects.get(id=parameters["workflow"])
+        except (Workflow.DoesNotExist, ValueError, TypeError):
+            raise serializers.ValidationError("Workflow does not exist")
+        request = self.context.get("request")
+        user = getattr(request, "user", None)
+        if user is not None and not user.has_perm("documents.view_workflow"):
+            raise PermissionDenied(
+                "Insufficient permissions to run this workflow",
+            )
+        if not workflow.enabled:
+            raise serializers.ValidationError("Workflow is not enabled")
+        if not workflow.triggers.filter(
+            type=WorkflowTrigger.WorkflowTriggerType.MANUAL,
+        ).exists():
+            raise serializers.ValidationError(
+                "Workflow does not have a manual trigger",
+            )
+        if "filter_documents" in parameters:
+            if not isinstance(parameters["filter_documents"], bool):
+                raise serializers.ValidationError(
+                    "filter_documents must be a boolean",
+                )
+        else:
+            parameters["filter_documents"] = True
+
     def validate_parameters_remove_password(self, parameters):
         if "password" not in parameters:
             raise serializers.ValidationError("password not specified")
@@ -2239,6 +2280,8 @@ class BulkEditSerializer(
             self.validate_parameters_remove_password(parameters)
         elif method == bulk_edit.reprocess:
             self._validate_parameters_reprocess(parameters)
+        elif method == bulk_edit.run_workflow:
+            self._validate_parameters_run_workflow(parameters)
 
         return attrs
 

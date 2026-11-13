@@ -15,6 +15,7 @@ import { FilterRule } from 'src/app/data/filter-rule'
 import { OcrZoneRunResponse } from 'src/app/data/ocr-template'
 import { Results, SelectionData } from 'src/app/data/results'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { BulkOperationResponse } from '../../data/bulk-operation'
 import { queryParamsFromFilterRules } from '../../utils/query-params'
 import {
   PermissionAction,
@@ -39,6 +40,7 @@ export type DocumentBulkEditMethod =
   | 'modify_tags'
   | 'modify_custom_fields'
   | 'set_permissions'
+  | 'run_workflow'
 
 export interface MergeDocumentsRequest {
   metadata_document_id?: number
@@ -338,11 +340,15 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     method: DocumentBulkEditMethod,
     args: any
   ) {
-    return this.http.post(this.getResourceUrl(null, 'bulk_edit'), {
-      ...selection,
-      method: method,
-      parameters: args,
-    })
+    return this.http.post<BulkOperationResponse>(
+      this.getResourceUrl(null, 'bulk_edit'),
+      {
+        ...selection,
+        method: method,
+        from_webui: true,
+        parameters: args,
+      }
+    )
   }
 
   deleteDocuments(selection: DocumentSelectionQuery) {

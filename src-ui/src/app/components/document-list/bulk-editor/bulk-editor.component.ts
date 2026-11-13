@@ -34,6 +34,7 @@ import { CustomField } from 'src/app/data/custom-field'
 import { MatchingModel } from 'src/app/data/matching-model'
 import { SelectionDataItem } from 'src/app/data/results'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { Workflow } from 'src/app/data/workflow'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import { OpenDocumentsService } from 'src/app/services/open-documents.service'
@@ -53,6 +54,7 @@ import {
 } from 'src/app/services/rest/document.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { ShareLinkBundleService } from 'src/app/services/rest/share-link-bundle.service'
+import { WorkflowService } from 'src/app/services/rest/workflow.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { TagService } from 'src/app/services/rest/tag.service'
 import { SettingsService } from 'src/app/services/settings.service'
@@ -64,6 +66,7 @@ import { MergeAsVersionsConfirmDialogComponent } from '../../common/confirm-dial
 import { MergeConfirmDialogComponent } from '../../common/confirm-dialog/merge-confirm-dialog/merge-confirm-dialog.component'
 import { ReprocessConfirmDialogComponent } from '../../common/confirm-dialog/reprocess-confirm-dialog/reprocess-confirm-dialog.component'
 import { RotateConfirmDialogComponent } from '../../common/confirm-dialog/rotate-confirm-dialog/rotate-confirm-dialog.component'
+import { RunWorkflowConfirmDialogComponent } from '../../common/confirm-dialog/run-workflow-confirm-dialog/run-workflow-confirm-dialog.component'
 import { ZoneOcrConfirmDialogComponent } from '../../common/confirm-dialog/zone-ocr-confirm-dialog/zone-ocr-confirm-dialog.component'
 import { CorrespondentEditDialogComponent } from '../../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
 import { CustomFieldEditDialogComponent } from '../../common/edit-dialog/custom-field-edit-dialog/custom-field-edit-dialog.component'
@@ -82,6 +85,7 @@ import { PermissionsDialogComponent } from '../../common/permissions-dialog/perm
 import { ShareLinkBundleDialogComponent } from '../../common/share-link-bundle-dialog/share-link-bundle-dialog.component'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 import { CustomFieldsBulkEditDialogComponent } from './custom-fields-bulk-edit-dialog/custom-fields-bulk-edit-dialog.component'
+import { WorkflowTriggerType } from 'src/app/data/workflow-trigger'
 
 @Component({
   selector: 'pngx-bulk-editor',
@@ -105,17 +109,20 @@ export class BulkEditorComponent
   private correspondentService = inject(CorrespondentService)
   list = inject(DocumentListViewService)
   private documentService = inject(DocumentService)
+  private trashService = inject(TrashService)
   private modalService = inject(NgbModal)
   private openDocumentService = inject(OpenDocumentsService)
   private settings = inject(SettingsService)
   private toastService = inject(ToastService)
-  private trashService = inject(TrashService)
   private storagePathService = inject(StoragePathService)
   private customFieldService = inject(CustomFieldsService)
   public readonly permissionService = inject(PermissionsService)
   private savedViewService = inject(SavedViewService)
   private readonly shareLinkBundleService = inject(ShareLinkBundleService)
+  private readonly workflowService = inject(WorkflowService)
   private readonly router = inject(Router)
+
+  public manualWorkflows: Workflow[] = []
 
   tagSelectionModel = new FilterableDropdownSelectionModel(true)
   correspondentSelectionModel = new FilterableDropdownSelectionModel()
@@ -259,6 +266,20 @@ export class BulkEditorComponent
           (result) => (this.customFieldsSelectionModel.items = result.results)
         )
     }
+    if (
+      this.permissionService.currentUserCan(
+        PermissionAction.View,
+        PermissionType.Workflow
+      )
+    ) {
+      this.workflowService
+        .list(1, 100000, null, null, {
+          trigger_type: WorkflowTriggerType.Manual,
+          enabled: true,
+        })
+        .pipe(first())
+        .subscribe((result) => (this.manualWorkflows = result.results))
+    }
 
     this.downloadForm
       .get('downloadFileTypeArchive')
@@ -287,6 +308,28 @@ export class BulkEditorComponent
     this.unsubscribeNotifier.complete()
   }
 
+  get canRunWorkflow(): boolean {
+    return this.userCanEditAll && this.manualWorkflows.length > 0
+  }
+
+  runWorkflowSelected() {
+    const modal = this.modalService.open(RunWorkflowConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.title = $localize`Run workflow`
+    modal.componentInstance.message = $localize`Run a workflow on ${this.getSelectionSize()} selected document(s).`
+    modal.componentInstance.btnCaption = $localize`Run`
+    modal.componentInstance.workflows = this.manualWorkflows
+    modal.componentInstance.confirmClicked
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        this.executeBulkEditMethod(modal, 'run_workflow', {
+          workflow: modal.componentInstance.workflowId,
+          filter_documents: !modal.componentInstance.force,
+        })
+      })
+  }
+
   private executeBulkEditMethod(
     modal: NgbModalRef,
     method: DocumentBulkEditMethod,
@@ -300,9 +343,31 @@ export class BulkEditorComponent
       .bulkEdit(overrideSelection ?? this.getSelectionQuery(), method, args)
       .pipe(first())
       .subscribe({
-        next: () => this.handleOperationSuccess(modal),
+        next: ({ task_id }) => this.handleOperationQueued(modal, task_id),
         error: (error) => this.handleOperationError(modal, error),
       })
+  }
+
+  private handleOperationQueued(modal: NgbModalRef, taskId: string) {
+    modal?.close()
+    this.list.selectNone()
+    const canViewTasks = this.permissionService.currentUserCan(
+      PermissionAction.View,
+      PermissionType.PaperlessTask
+    )
+    this.toastService.show({
+      content: $localize`Bulk operation queued.`,
+      delay: 5000,
+      ...(canViewTasks
+        ? {
+            actionName: $localize`View task`,
+            action: () =>
+              this.router.navigate(['/tasks'], {
+                queryParams: { task_id: taskId },
+              }),
+          }
+        : {}),
+    })
   }
 
   private executeDocumentAction(
@@ -1113,14 +1178,9 @@ export class BulkEditorComponent
 
     dialog.selection = this.getSelectionQuery()
     dialog.selectionCount = this.getSelectionSize()
-    dialog.succeeded.subscribe((result) => {
-      this.toastService.showSuccess($localize`Custom fields updated.`)
-      this.list.reload()
-      this.list.reduceSelectionToFilter()
-      this.list.selected.forEach((id) => {
-        this.openDocumentService.refreshDocument(id)
-      })
-    })
+    dialog.succeeded.subscribe(({ task_id }) =>
+      this.handleOperationQueued(null, task_id)
+    )
     dialog.failed.subscribe((error) => {
       this.toastService.showError(
         $localize`Error updating custom fields.`,

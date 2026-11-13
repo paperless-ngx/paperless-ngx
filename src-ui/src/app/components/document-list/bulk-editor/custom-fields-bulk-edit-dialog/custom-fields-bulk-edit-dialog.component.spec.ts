@@ -59,7 +59,7 @@ describe('CustomFieldsBulkEditDialogComponent', () => {
   it('should emit succeeded event and close modal on successful save', () => {
     const editSpy = jest
       .spyOn(documentService, 'bulkEdit')
-      .mockReturnValue(of('Success'))
+      .mockReturnValue(of({ result: 'OK', task_id: 'custom-fields-task' }))
     const successSpy = jest.spyOn(component.succeeded, 'emit')
 
     component.selection = [1, 2]

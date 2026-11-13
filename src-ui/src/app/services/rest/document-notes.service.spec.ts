@@ -1,6 +1,7 @@
 import { HttpTestingController } from '@angular/common/http/testing'
 import { TestBed } from '@angular/core/testing'
 import { Subscription } from 'rxjs'
+import { NoteFormat } from 'src/app/data/document-note'
 import { environment } from 'src/environments/environment'
 import { commonAbstractPaperlessServiceTests } from './abstract-paperless-service.spec'
 import { DocumentNotesService } from './document-notes.service'
@@ -50,6 +51,7 @@ describe(`Additional service tests for DocumentNotesService`, () => {
     expect(req.request.method).toEqual('POST')
     expect(req.request.body).toEqual({
       note: content,
+      format: NoteFormat.Markdown,
     })
   })
 

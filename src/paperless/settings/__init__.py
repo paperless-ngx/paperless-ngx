@@ -228,6 +228,7 @@ SPECTACULAR_SETTINGS = {
     "ENUM_NAME_OVERRIDES": {
         "MatchingAlgorithm": "documents.models.MatchingModel.MATCHING_ALGORITHMS",
         "BarcodeFormatEnum": "documents.models.DocumentBarcode.Format",
+        "NoteFormatEnum": "documents.models.Note.Format",
     },
     "SCHEMA_PATH_PREFIX_INSERT": FORCE_SCRIPT_NAME or "",
 }
@@ -450,23 +451,34 @@ CORS_EXPOSE_HEADERS = [
     "Content-Disposition",
 ]
 
-ALLOWED_HOSTS = get_list_from_env("PAPERLESS_ALLOWED_HOSTS", default=["*"])
-if ALLOWED_HOSTS != ["*"]:
-    # always allow localhost. Necessary e.g. for healthcheck in docker.
-    ALLOWED_HOSTS.append("localhost")
+
+def _get_allowed_hosts() -> list[str]:
+    if "PAPERLESS_ALLOWED_HOSTS" in os.environ or os.getenv("PAPERLESS_URL"):
+        allowed_hosts = get_list_from_env("PAPERLESS_ALLOWED_HOSTS")
+    else:
+        allowed_hosts = ["*"]
+    if allowed_hosts != ["*"]:
+        # Always allow localhost for the Docker health check.
+        allowed_hosts.append("localhost")
+    return allowed_hosts
+
+
+ALLOWED_HOSTS = _get_allowed_hosts()
 
 
 def _parse_paperless_url():
     global CSRF_TRUSTED_ORIGINS, CORS_ALLOWED_ORIGINS, ALLOWED_HOSTS
     url = os.getenv("PAPERLESS_URL")
     if url:
-        hostname = urlparse(url).hostname
-        if not hostname:
+        hostname = (urlparse(url).hostname or "").removesuffix(".")
+        if not hostname or hostname == "*" or hostname.startswith("."):
             raise ImproperlyConfigured(
-                f"PAPERLESS_URL {url!r} has no hostname, expected a URL like https://example.com",
+                f"PAPERLESS_URL {url!r} has no valid hostname, expected a URL like https://example.com",
             )
         CSRF_TRUSTED_ORIGINS.append(url)
         CORS_ALLOWED_ORIGINS.append(url)
+        if ":" in hostname and not hostname.startswith("["):
+            hostname = f"[{hostname}]"  # Add brackets around IPv6 addresses
         ALLOWED_HOSTS.append(hostname)
 
     return url
@@ -690,7 +702,7 @@ logging.config.dictConfig(LOGGING)
 # https://docs.celeryq.dev/en/stable/userguide/configuration.html
 
 # Tasks outside tasks.py must be loaded even when Django skips checks
-CELERY_IMPORTS = ("documents.bulk_edit",)
+CELERY_IMPORTS = ("documents.bulk_edit", "documents.bulk_operations")
 
 CELERY_BROKER_URL = _CELERY_REDIS_URL
 CELERY_RESULT_BACKEND = _CELERY_REDIS_URL

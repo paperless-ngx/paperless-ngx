@@ -1,6 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core'
 import { Subject } from 'rxjs'
 import { environment } from 'src/environments/environment'
+import { BulkOperationStatus } from '../data/bulk-operation'
 import { User } from '../data/user'
 import { WebsocketDocumentUpdatedMessage } from '../data/websocket-document-updated-message'
 import { WebsocketDocumentsDeletedMessage } from '../data/websocket-documents-deleted-message'
@@ -12,6 +13,7 @@ export enum WebsocketStatusType {
   DOCUMENTS_DELETED = 'documents_deleted',
   DOCUMENT_UPDATED = 'document_updated',
   HEARTBEAT = 'heartbeat',
+  BULK_OPERATION_STATUS = 'bulk_operation_status',
 }
 
 // see ProgressStatusOptions in src/documents/plugins/helpers.py
@@ -116,6 +118,13 @@ export class WebsocketStatusService {
   private readonly documentDeletedSubject = new Subject<boolean>()
   private readonly documentUpdatedSubject =
     new Subject<WebsocketDocumentUpdatedMessage>()
+  private readonly bulkOperationStatusSubject =
+    new Subject<BulkOperationStatus>()
+
+  onBulkOperationStatus() {
+    return this.bulkOperationStatusSubject.asObservable()
+  }
+
   private readonly connectionStatusSubject = new Subject<boolean>()
 
   private get(taskId: string, filename?: string) {
@@ -192,6 +201,7 @@ export class WebsocketStatusService {
           | WebsocketProgressMessage
           | WebsocketDocumentsDeletedMessage
           | WebsocketDocumentUpdatedMessage
+          | BulkOperationStatus
       } = JSON.parse(ev.data)
 
       switch (type) {
@@ -207,6 +217,12 @@ export class WebsocketStatusService {
 
         case WebsocketStatusType.STATUS_UPDATE:
           this.handleProgressUpdate(messageData as WebsocketProgressMessage)
+          break
+
+        case WebsocketStatusType.BULK_OPERATION_STATUS:
+          this.bulkOperationStatusSubject.next(
+            messageData as BulkOperationStatus
+          )
           break
 
         case WebsocketStatusType.HEARTBEAT:

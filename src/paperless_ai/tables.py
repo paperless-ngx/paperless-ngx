@@ -142,6 +142,15 @@ class DocumentMetaTable:
             )
 
     @staticmethod
+    def all_document_ids(conn: sqlite3.Connection) -> set[int]:
+        """Every indexed document_id. document_meta has one row per document,
+        so this is a cheap primary-key scan, unlike reading the vec0 table."""
+        return {
+            row["document_id"]
+            for row in conn.execute("SELECT document_id FROM document_meta")
+        }
+
+    @staticmethod
     def all_modified_times(conn: sqlite3.Connection) -> dict[str, str]:
         """Full document_id -> modified map, for get_modified_times()'s
         public API only. One unbounded read by design (existing behavior).

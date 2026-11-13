@@ -45,12 +45,21 @@ class StatusConsumer(AsyncWebsocketConsumer):
             await self.close()
             return
         await self.channel_layer.group_add("status_updates", self.channel_name)
+        await self.channel_layer.group_add(
+            f"bulk_operations_{self.scope['user'].id}",
+            self.channel_name,
+        )
         await self.accept()
         self._start_heartbeat()
 
     async def disconnect(self, code: int) -> None:
         await self._stop_heartbeat()
         await self.channel_layer.group_discard("status_updates", self.channel_name)
+        if self._authenticated():
+            await self.channel_layer.group_discard(
+                f"bulk_operations_{self.scope['user'].id}",
+                self.channel_name,
+            )
 
     def _start_heartbeat(self) -> None:
         self.heartbeat_task = asyncio.create_task(self._heartbeat_loop())
@@ -83,4 +92,10 @@ class StatusConsumer(AsyncWebsocketConsumer):
         if not self._authenticated():
             await self.close()
         elif await self._can_view(event["data"]):
+            await self.send(json.dumps(event))
+
+    async def bulk_operation_status(self, event: dict) -> None:
+        if not self._authenticated():
+            await self.close()
+        else:
             await self.send(json.dumps(event))

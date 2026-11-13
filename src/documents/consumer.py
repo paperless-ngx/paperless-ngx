@@ -631,9 +631,7 @@ class ConsumerPlugin(
                                     pk=self.metadata.actor_id,
                                 ).first()
                                 if actor is not None:
-                                    from auditlog.context import (  # type: ignore[import-untyped]
-                                        set_actor,
-                                    )
+                                    from auditlog.context import set_actor  # type: ignore[import-untyped]
 
                                     with set_actor(actor):
                                         original_document.save()
@@ -651,9 +649,7 @@ class ConsumerPlugin(
 
                             # Create a log entry for the version addition, if enabled
                             if settings.AUDIT_LOG_ENABLED:
-                                from auditlog.models import (  # type: ignore[import-untyped]
-                                    LogEntry,
-                                )
+                                from auditlog.models import LogEntry  # type: ignore[import-untyped]
 
                                 LogEntry.objects.log_create(
                                     instance=root_doc,

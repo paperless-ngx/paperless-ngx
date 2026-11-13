@@ -7,6 +7,7 @@ from django.test import override_settings
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+from documents.bulk_operations import execute_bulk_operation
 from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
@@ -15,7 +16,11 @@ from documents.models import DocumentType
 from documents.models import OcrTemplate
 from documents.models import StoragePath
 from documents.models import Tag
+from documents.models import Workflow
+from documents.models import WorkflowAction
+from documents.models import WorkflowTrigger
 from paperless_testing.dirs import DirectoriesMixin
+from paperless_testing.factories import DocumentFactory
 from paperless_testing.factories import UserFactory
 from paperless_testing.permissions import grant_all_global
 from paperless_testing.permissions import grant_global
@@ -30,9 +35,18 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.user = user
         self.client.force_authenticate(user=user)
 
-        patcher = mock.patch("documents.bulk_edit.bulk_update_documents.apply_async")
+        patcher = mock.patch("documents.bulk_operations.bulk_update_documents")
         self.async_task = patcher.start()
         self.addCleanup(patcher.stop)
+        # Exercise accepted requests and worker execution together in these
+        # operation/validation tests. Queue-only behavior is tested separately.
+        enqueue = mock.patch(
+            "documents.views.execute_bulk_operation.apply_async",
+            side_effect=lambda *, kwargs, headers: self.run_operation(kwargs),
+        )
+        enqueue.start()
+        self.addCleanup(enqueue.stop)
+
         self.c1 = Correspondent.objects.create(name="c1")
         self.c2 = Correspondent.objects.create(name="c2")
         self.dt1 = DocumentType.objects.create(name="dt1")
@@ -62,11 +76,16 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.cf1 = CustomField.objects.create(name="cf1", data_type="string")
         self.cf2 = CustomField.objects.create(name="cf2", data_type="string")
 
+    @staticmethod
+    def run_operation(kwargs):
+        execute_bulk_operation(**kwargs)
+        return mock.Mock(id="test-bulk-operation")
+
     def setup_mock(self, m, method_name, return_value="OK") -> None:
         m.return_value = return_value
         m.__name__ = method_name
 
-    @mock.patch("documents.bulk_edit.bulk_update_documents.apply_async")
+    @mock.patch("documents.bulk_operations.bulk_update_documents")
     def test_api_set_correspondent(self, bulk_update_task_mock) -> None:
         self.assertNotEqual(self.doc1.correspondent, self.c1)
         response = self.client.post(
@@ -85,11 +104,11 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(self.doc1.correspondent, self.c1)
         bulk_update_task_mock.assert_called_once()
         self.assertCountEqual(
-            bulk_update_task_mock.call_args.kwargs["kwargs"]["document_ids"],
+            bulk_update_task_mock.call_args.args[0],
             [self.doc1.pk],
         )
 
-    @mock.patch("documents.bulk_edit.bulk_update_documents.apply_async")
+    @mock.patch("documents.bulk_operations.bulk_update_documents")
     def test_api_unset_correspondent(self, bulk_update_task_mock) -> None:
         self.doc1.correspondent = self.c1
         self.doc1.save()
@@ -111,7 +130,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.doc1.refresh_from_db()
         self.assertIsNone(self.doc1.correspondent)
 
-    @mock.patch("documents.bulk_edit.bulk_update_documents.apply_async")
+    @mock.patch("documents.bulk_operations.bulk_update_documents")
     def test_api_set_type(self, bulk_update_task_mock) -> None:
         self.assertNotEqual(self.doc1.document_type, self.dt1)
         response = self.client.post(
@@ -130,11 +149,11 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(self.doc1.document_type, self.dt1)
         bulk_update_task_mock.assert_called_once()
         self.assertCountEqual(
-            bulk_update_task_mock.call_args.kwargs["kwargs"]["document_ids"],
+            bulk_update_task_mock.call_args.args[0],
             [self.doc1.pk],
         )
 
-    @mock.patch("documents.bulk_edit.bulk_update_documents.apply_async")
+    @mock.patch("documents.bulk_operations.bulk_update_documents")
     def test_api_unset_type(self, bulk_update_task_mock) -> None:
         self.doc1.document_type = self.dt1
         self.doc1.save()
@@ -155,11 +174,11 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertIsNone(self.doc1.document_type)
         bulk_update_task_mock.assert_called_once()
         self.assertCountEqual(
-            bulk_update_task_mock.call_args.kwargs["kwargs"]["document_ids"],
+            bulk_update_task_mock.call_args.args[0],
             [self.doc1.pk],
         )
 
-    @mock.patch("documents.bulk_edit.bulk_update_documents.apply_async")
+    @mock.patch("documents.bulk_operations.bulk_update_documents")
     def test_api_add_tag(self, bulk_update_task_mock) -> None:
         self.assertFalse(self.doc1.tags.filter(pk=self.t1.pk).exists())
 
@@ -181,11 +200,11 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
 
         bulk_update_task_mock.assert_called_once()
         self.assertCountEqual(
-            bulk_update_task_mock.call_args.kwargs["kwargs"]["document_ids"],
+            bulk_update_task_mock.call_args.args[0],
             [self.doc1.pk],
         )
 
-    @mock.patch("documents.bulk_edit.bulk_update_documents.apply_async")
+    @mock.patch("documents.bulk_operations.bulk_update_documents")
     def test_api_remove_tag(self, bulk_update_task_mock) -> None:
         self.doc1.tags.add(self.t1)
 
@@ -224,6 +243,9 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         m.assert_called_once()
         args, kwargs = m.call_args
+        kwargs = {
+            key: value for key, value in kwargs.items() if key != "update_callback"
+        }
         self.assertListEqual(args[0], [self.doc1.id, self.doc3.id])
         self.assertEqual(kwargs["add_tags"], [self.t1.id])
         self.assertEqual(kwargs["remove_tags"], [self.t2.id])
@@ -278,6 +300,9 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         m.assert_called_once()
         args, kwargs = m.call_args
+        kwargs = {
+            key: value for key, value in kwargs.items() if key != "update_callback"
+        }
         self.assertListEqual(args[0], [self.doc1.id, self.doc3.id])
         self.assertEqual(kwargs["add_custom_fields"], [self.cf1.id])
         self.assertEqual(kwargs["remove_custom_fields"], [self.cf2.id])
@@ -346,6 +371,9 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         m.assert_called_once()
         args, kwargs = m.call_args
+        kwargs = {
+            key: value for key, value in kwargs.items() if key != "update_callback"
+        }
         self.assertListEqual(args[0], [self.doc1.id, self.doc3.id])
         self.assertEqual(kwargs["add_custom_fields"], {self.cf1.id: "foo"})
         self.assertEqual(kwargs["remove_custom_fields"], [self.cf2.id])
@@ -507,6 +535,9 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         m.assert_called_once()
         args, kwargs = m.call_args
+        kwargs = {
+            key: value for key, value in kwargs.items() if key != "update_callback"
+        }
         self.assertEqual(args[0], [self.doc1.id])
         self.assertEqual(len(kwargs), 0)
 
@@ -521,6 +552,9 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         m.assert_called_once()
         args, kwargs = m.call_args
+        kwargs = {
+            key: value for key, value in kwargs.items() if key != "update_callback"
+        }
         self.assertEqual(args[0], [self.doc1.id])
         self.assertEqual(len(kwargs), 0)
 
@@ -545,6 +579,9 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         m.assert_called_once()
         args, kwargs = m.call_args
+        kwargs = {
+            key: value for key, value in kwargs.items() if key != "update_callback"
+        }
         self.assertEqual(args[0], [self.doc1.id])
         self.assertEqual(len(kwargs), 0)
 
@@ -559,6 +596,9 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         m.assert_called_once()
         args, kwargs = m.call_args
+        kwargs = {
+            key: value for key, value in kwargs.items() if key != "update_callback"
+        }
         self.assertEqual(args[0], [self.doc1.id])
         self.assertEqual(kwargs, {"remote_ocr": False})
 
@@ -581,8 +621,116 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         m.assert_called_once()
         args, kwargs = m.call_args
+        kwargs = {
+            key: value for key, value in kwargs.items() if key != "update_callback"
+        }
         self.assertEqual(args[0], [self.doc1.id])
         self.assertEqual(kwargs, {"remote_ocr": True})
+
+    def _make_manual_workflow(self) -> Workflow:
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.MANUAL,
+        )
+        action = WorkflowAction.objects.create()
+        workflow = Workflow.objects.create(name="Manual workflow", order=0)
+        workflow.triggers.add(trigger)
+        workflow.actions.add(action)
+        return workflow
+
+    def _run_workflow(self, parameters, documents=None):
+        return self.client.post(
+            "/api/documents/bulk_edit/",
+            json.dumps(
+                {
+                    "documents": documents or [self.doc1.id],
+                    "method": "run_workflow",
+                    "parameters": parameters,
+                },
+            ),
+            content_type="application/json",
+        )
+
+    @mock.patch("documents.views.bulk_edit.run_workflow")
+    def test_run_workflow(self, m) -> None:
+        """A valid run_workflow call passes the docs, workflow id and filter flag through."""
+        self.setup_mock(m, "run_workflow")
+        workflow = self._make_manual_workflow()
+
+        response = self._run_workflow({"workflow": workflow.id})
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        args, kwargs = m.call_args
+        self.assertEqual(args[0], [self.doc1.id])
+        self.assertEqual(kwargs, {"workflow": workflow.id, "filter_documents": True})
+
+        self._run_workflow({"workflow": workflow.id, "filter_documents": False})
+        self.assertFalse(m.call_args.kwargs["filter_documents"])
+
+    @mock.patch("documents.views.bulk_edit.run_workflow")
+    def test_run_workflow_invalid_parameters(self, m) -> None:
+        """Invalid run_workflow parameters are rejected before dispatch."""
+        self.setup_mock(m, "run_workflow")
+        manual = self._make_manual_workflow()
+        non_manual = Workflow.objects.create(name="Non-manual", order=0)
+        non_manual.triggers.add(
+            WorkflowTrigger.objects.create(
+                type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_ADDED,
+            ),
+        )
+        disabled = Workflow.objects.create(
+            name="Disabled manual",
+            order=0,
+            enabled=False,
+        )
+        disabled.triggers.add(
+            WorkflowTrigger.objects.create(
+                type=WorkflowTrigger.WorkflowTriggerType.MANUAL,
+            ),
+        )
+        for label, parameters in (
+            ("missing workflow", {}),
+            ("nonexistent workflow", {"workflow": 9999}),
+            ("no manual trigger", {"workflow": non_manual.id}),
+            ("disabled workflow", {"workflow": disabled.id}),
+            ("non-bool filter", {"workflow": manual.id, "filter_documents": "nope"}),
+        ):
+            with self.subTest(label):
+                response = self._run_workflow(parameters)
+                self.assertEqual(
+                    response.status_code,
+                    status.HTTP_400_BAD_REQUEST,
+                )
+        m.assert_not_called()
+
+    @mock.patch("documents.views.bulk_edit.run_workflow")
+    def test_run_workflow_requires_ownership(self, m) -> None:
+        """A non-owner without document ownership is forbidden (actions mutate docs)."""
+        self.setup_mock(m, "run_workflow")
+        user = UserFactory(username="no_perms")
+        grant_all_global(user)
+        doc = DocumentFactory(owner=UserFactory(username="other"))
+        workflow = self._make_manual_workflow()
+        self.client.force_authenticate(user=user)
+
+        response = self._run_workflow({"workflow": workflow.id}, documents=[doc.id])
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        m.assert_not_called()
+
+    @mock.patch("documents.views.bulk_edit.run_workflow")
+    def test_run_workflow_requires_workflow_permission(self, m) -> None:
+        """Owning the documents is not enough without view_workflow permission."""
+        self.setup_mock(m, "run_workflow")
+        user = UserFactory(username="no_wf_perms")
+        grant_global(user, "change_document")
+        doc = DocumentFactory(owner=user)
+        workflow = self._make_manual_workflow()
+        self.client.force_authenticate(user=user)
+
+        response = self._run_workflow({"workflow": workflow.id}, documents=[doc.id])
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        m.assert_not_called()
 
     @mock.patch("documents.views.bulk_edit.run_zone_ocr")
     def test_run_zone_ocr_documents_endpoint(self, m) -> None:
@@ -691,6 +839,9 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         m.assert_called_once()
         args, kwargs = m.call_args
+        kwargs = {
+            key: value for key, value in kwargs.items() if key != "update_callback"
+        }
 
         self.assertListEqual(args[0], [self.doc1.id])
         self.assertEqual(kwargs["storage_path"], self.sp1.id)
@@ -721,6 +872,9 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         m.assert_called_once()
         args, kwargs = m.call_args
+        kwargs = {
+            key: value for key, value in kwargs.items() if key != "update_callback"
+        }
 
         self.assertListEqual(args[0], [self.doc1.id])
         self.assertEqual(kwargs["storage_path"], None)
@@ -843,6 +997,9 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         m.assert_called_once()
         args, kwargs = m.call_args
+        kwargs = {
+            key: value for key, value in kwargs.items() if key != "update_callback"
+        }
         self.assertEqual(args[0], [self.doc2.id])
         self.assertEqual(kwargs["storage_path"], self.sp1.id)
 
@@ -866,6 +1023,9 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         m.assert_called_once()
         args, kwargs = m.call_args
+        kwargs = {
+            key: value for key, value in kwargs.items() if key != "update_callback"
+        }
         self.assertCountEqual(args[0], [self.doc1.id, self.doc3.id, self.doc5.id])
         self.assertEqual(kwargs["storage_path"], self.sp1.id)
 
@@ -902,6 +1062,9 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         m.assert_called_once()
         args, kwargs = m.call_args
+        kwargs = {
+            key: value for key, value in kwargs.items() if key != "update_callback"
+        }
         self.assertCountEqual(args[0], [first_duplicate.id, second_duplicate.id])
         self.assertEqual(kwargs["storage_path"], self.sp1.id)
 
@@ -938,6 +1101,11 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
                 self.assertEqual(response.status_code, status.HTTP_200_OK)
                 get_backend.return_value.search_ids.assert_called_once()
                 args, kwargs = m.call_args
+                kwargs = {
+                    key: value
+                    for key, value in kwargs.items()
+                    if key != "update_callback"
+                }
                 self.assertEqual(args[0], [self.doc2.id])
                 self.assertEqual(kwargs["storage_path"], self.sp1.id)
 
@@ -1314,6 +1482,9 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
 
         m.assert_called_once()
         args, kwargs = m.call_args
+        kwargs = {
+            key: value for key, value in kwargs.items() if key != "update_callback"
+        }
         self.assertCountEqual(args[0], [self.doc2.id, self.doc3.id])
         self.assertEqual(len(kwargs["set_permissions"]["view"]["users"]), 2)
 
@@ -1726,6 +1897,9 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         m.assert_called_once()
         args, kwargs = m.call_args
+        kwargs = {
+            key: value for key, value in kwargs.items() if key != "update_callback"
+        }
         self.assertCountEqual(args[0], [self.doc2.id, self.doc3.id])
         self.assertEqual(kwargs["degrees"], 90)
         self.assertEqual(kwargs["source_mode"], "latest_version")
@@ -2012,6 +2186,9 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         m.assert_called_once()
         args, kwargs = m.call_args
+        kwargs = {
+            key: value for key, value in kwargs.items() if key != "update_callback"
+        }
         self.assertCountEqual(args[0], [self.doc2.id, self.doc3.id])
         self.assertEqual(kwargs["metadata_document_id"], self.doc3.id)
         self.assertEqual(kwargs["source_mode"], "latest_version")
@@ -2219,6 +2396,9 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         m.assert_called_once()
         args, kwargs = m.call_args
+        kwargs = {
+            key: value for key, value in kwargs.items() if key != "update_callback"
+        }
         self.assertCountEqual(args[0], [self.doc2.id])
         self.assertEqual(kwargs["operations"], [{"page": 1}])
         self.assertEqual(kwargs["source_mode"], "explicit_selection")
@@ -2564,6 +2744,9 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         m.assert_called_once()
         args, kwargs = m.call_args
+        kwargs = {
+            key: value for key, value in kwargs.items() if key != "update_callback"
+        }
         self.assertCountEqual(args[0], [self.doc2.id])
         self.assertEqual(kwargs["password"], "secret")
         self.assertTrue(kwargs["update_document"])

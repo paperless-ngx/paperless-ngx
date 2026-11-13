@@ -49,6 +49,12 @@
         <pngx-bs-icon width="1em" height="1em" name="arrow-counterclockwise" class="me-2"></pngx-bs-icon><span i18n>Reprocess</span>
       </button>
 
+      @if (manualWorkflows().length > 0) {
+        <button ngbDropdownItem (click)="runWorkflow()" [disabled]="!userCanEdit || !userIsOwner">
+          <pngx-bs-icon width="1em" height="1em" name="play-circle" class="me-2"></pngx-bs-icon><span i18n>Run workflow</span>
+        </button>
+      }
+
       <button ngbDropdownItem (click)="printDocument()" [hidden]="useNativePdfViewer || isMobile">
         <pngx-bs-icon width="1em" height="1em" name="printer" class="me-2"></pngx-bs-icon><span i18n>Print</span>
       </button>

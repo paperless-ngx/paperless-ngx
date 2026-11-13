@@ -493,7 +493,7 @@ fields and permissions, which will be merged.
 
 #### Types {#workflow-trigger-types}
 
-Currently, there are four events that correspond to workflow trigger 'types':
+Currently, there are five events that correspond to workflow trigger 'types':
 
 1. **Consumption Started**: _before_ a document is consumed, so events can include filters by source (mail, consumption
    folder or API), file path, file name, mail rule
@@ -505,8 +505,10 @@ Currently, there are four events that correspond to workflow trigger 'types':
 4. **Scheduled**: a scheduled trigger that can be used to run workflows at a specific time. The date used can be either the document
    added, created, updated date or you can specify a (date) custom field. You can also specify a day offset from the date (positive
    offsets will trigger after the date, negative offsets will trigger before).
+5. **Manual**: a trigger that only runs when you explicitly choose to run the workflow against one or more existing documents. See
+   [running a workflow manually](#running-a-workflow-manually) below.
 
-The following flow diagram illustrates the four document trigger types:
+The following flow diagram illustrates the document trigger types:
 
 ```mermaid
 flowchart TD
@@ -526,6 +528,10 @@ flowchart TD
     matching
     trigger(s)"}
 
+    manual{"Matching
+    'Manual'
+    trigger(s)"}
+
     A[New Document] --> consumption
     consumption --> |Yes| C[Workflow Actions Run]
     consumption --> |No| D
@@ -543,6 +549,10 @@ flowchart TD
     scheduled --> |Yes| N[Workflow Actions Run]
     scheduled --> |No| O[Document Saved]
     N --> O
+    P[User Runs Workflow] --> manual
+    manual --> |Yes| Q[Workflow Actions Run]
+    manual --> |No| R[Document Saved]
+    Q --> R
 ```
 
 #### Filters {#workflow-trigger-filters}
@@ -554,9 +564,9 @@ Workflows allow you to filter by:
 - File path, including wildcards. Note that enabling `PAPERLESS_CONSUMER_RECURSIVE` would allow, for
   example, automatically assigning documents to different owners based on the upload directory.
 - Mail rule. Choosing this option will force 'mail fetch' to be the workflow source.
-- Content matching (`Added`, `Updated` and `Scheduled` triggers only). Filter document content using the matching settings.
+- Content matching (`Added`, `Updated`, `Scheduled` and `Manual` triggers only). Filter document content using the matching settings.
 
-There are also 'advanced' filters available for `Added`, `Updated` and `Scheduled` triggers:
+There are also 'advanced' filters available for `Added`, `Updated`, `Scheduled` and `Manual` triggers:
 
 - Any Tags: Filter for documents with any of the specified tags.
 - All Tags: Filter for documents with all of the specified tags.
@@ -568,6 +578,21 @@ There are also 'advanced' filters available for `Added`, `Updated` and `Schedule
 - Storage path: Filter documents with this storage path.
 - Not Storage paths: Filter documents without any of these storage paths.
 - Custom field query: Filter documents with a custom field query (the same as used for the document list filters).
+
+#### Running a workflow manually {#running-a-workflow-manually}
+
+A workflow with a **Manual** trigger does not run automatically. Instead, it can be run on demand against existing
+documents from the web UI:
+
+- From the document list, select one or more documents and choose **Run workflow** from the "Actions" menu.
+- From an individual document, choose **Run workflow** from the "Actions" menu.
+
+You will be asked which workflow to run. By default the workflow's trigger filters still apply, so documents that do
+not match are skipped. You can instead choose to **run on all selected documents**, which ignores the trigger filters
+and runs the workflow's actions on every selected document.
+
+Manual runs happen in the background. As with scheduled workflows, the document list is not refreshed automatically when
+they finish, so you may need to reload the list to see the results.
 
 ### Workflow Actions
 
@@ -649,7 +674,7 @@ new version of the same document, this time with normal OCR/text extraction appl
 a password-protected file added with this trigger will briefly exist as an un-OCR'd version before
 the properly processed version is created.
 
-**Document Added**, **Document Updated**, **Scheduled**: these triggers run against a document that
+**Document Added**, **Document Updated**, **Scheduled**, **Manual**: these triggers run against a document that
 already exists, so password removal happens immediately: the decrypted content is queued for
 consumption as a new version right away. Note that if the document's initial consumption also
 happened while it was still encrypted, that original version will likewise be missing OCR text.
