@@ -3121,15 +3121,6 @@ class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
         user = self.request.user
         from_webui = validated_data.get("from_webui", False)
 
-        if method.__name__ in USER_OPERATIONS:
-            parameters["user"] = user
-        if method.__name__ in TRIGGER_SOURCE_OPERATIONS:
-            parameters["trigger_source"] = (
-                PaperlessTask.TriggerSource.WEB_UI
-                if from_webui
-                else PaperlessTask.TriggerSource.API_UPLOAD
-            )
-
         if not has_document_operation_permissions(
             user=user,
             documents=documents,
@@ -3139,8 +3130,12 @@ class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
             return HttpResponseForbidden("Insufficient permissions")
 
         try:
-            result = method(documents, **parameters)
-            return Response({"result": result})
+            return self._queue_bulk_operation(
+                method,
+                documents,
+                parameters,
+                from_webui,
+            )
         except Exception as e:
             logger.warning(f"An error occurred performing {operation_label}: {e!s}")
             return HttpResponseBadRequest(
@@ -3228,6 +3223,7 @@ class BulkEditView(DocumentOperationPermissionMixin):
                 name="RotateDocumentsResult",
                 fields={
                     "result": serializers.CharField(),
+                    "task_id": serializers.CharField(),
                 },
             ),
         },
@@ -3255,6 +3251,7 @@ class RotateDocumentsView(DocumentOperationPermissionMixin):
                 name="MergeDocumentsResult",
                 fields={
                     "result": serializers.CharField(),
+                    "task_id": serializers.CharField(),
                 },
             ),
         },
@@ -3282,6 +3279,7 @@ class MergeDocumentsView(DocumentOperationPermissionMixin):
                 name="MergeDocumentsAsVersionsResult",
                 fields={
                     "result": serializers.CharField(),
+                    "task_id": serializers.CharField(),
                 },
             ),
         },
@@ -3309,6 +3307,7 @@ class MergeDocumentsAsVersionsView(DocumentOperationPermissionMixin):
                 name="DeleteDocumentsResult",
                 fields={
                     "result": serializers.CharField(),
+                    "task_id": serializers.CharField(),
                 },
             ),
         },
@@ -3336,6 +3335,7 @@ class DeleteDocumentsView(DocumentOperationPermissionMixin):
                 name="ReprocessDocumentsResult",
                 fields={
                     "result": serializers.CharField(),
+                    "task_id": serializers.CharField(),
                 },
             ),
         },
@@ -3363,6 +3363,7 @@ class ReprocessDocumentsView(DocumentOperationPermissionMixin):
                 name="EditPdfDocumentsResult",
                 fields={
                     "result": serializers.CharField(),
+                    "task_id": serializers.CharField(),
                 },
             ),
         },
@@ -3390,6 +3391,7 @@ class EditPdfDocumentsView(DocumentOperationPermissionMixin):
                 name="RemovePasswordDocumentsResult",
                 fields={
                     "result": serializers.CharField(),
+                    "task_id": serializers.CharField(),
                 },
             ),
         },
