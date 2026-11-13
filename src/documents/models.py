@@ -1007,8 +1007,8 @@ class PaperlessTask(ModelWithOwner):
 
 class Note(SoftDeleteModel):
     class Format(models.TextChoices):
-        PLAIN = "plain"
-        MARKDOWN = "markdown"
+        PLAIN = ("plain", _("Plain"))
+        MARKDOWN = ("markdown", _("Markdown"))
 
     note = models.TextField(
         _("content"),

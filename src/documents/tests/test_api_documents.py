@@ -3745,9 +3745,8 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         self.assertEqual(doc.modified.day, timezone.now().day)
 
     def test_create_markdown_note(self) -> None:
-        doc = Document.objects.create(
+        doc = DocumentFactory(
             title="test",
-            mime_type="application/pdf",
             content="this is a document which will have a markdown note",
         )
 
@@ -3766,9 +3765,8 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         self.assertEqual(response.json()[0]["format"], Note.Format.MARKDOWN)
 
     def test_create_note_rejects_unsupported_format(self) -> None:
-        doc = Document.objects.create(
+        doc = DocumentFactory(
             title="test",
-            mime_type="application/pdf",
             content="this is a document which will have a note",
         )
 
@@ -3783,9 +3781,8 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         self.assertFalse(Note.objects.filter(document=doc).exists())
 
     def test_create_note_requires_note(self) -> None:
-        doc = Document.objects.create(
+        doc = DocumentFactory(
             title="test",
-            mime_type="application/pdf",
             content="this is a document which will have a note",
         )
 
