@@ -10,7 +10,7 @@ from django.db import models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("documents", "0028_replace_tag_tree_fields"),
+        ("documents", "0030_note_format"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
