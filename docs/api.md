@@ -288,6 +288,12 @@ The API supports various bulk-editing operations which are executed asynchronous
 For bulk operations on documents, use the endpoint `/api/documents/bulk_edit/` which accepts
 a json payload of the format:
 
+Document bulk operations, including the dedicated document action endpoints, return
+`{"result":"OK","task_id":"…"}` when queued. Use `/api/tasks/?task_id={uuid}`
+to check the task outcome. Actions that create or reprocess files may start further
+consumption or reprocessing tasks and completion of the bulk task means those tasks
+were scheduled, not that their file processing has finished.
+
 ```json
 {
   "documents": [LIST_OF_DOCUMENT_IDS],
