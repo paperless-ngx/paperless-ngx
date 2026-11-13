@@ -1006,10 +1006,21 @@ class PaperlessTask(ModelWithOwner):
 
 
 class Note(SoftDeleteModel):
+    class Format(models.TextChoices):
+        PLAIN = ("plain", _("Plain"))
+        MARKDOWN = ("markdown", _("Markdown"))
+
     note = models.TextField(
         _("content"),
         blank=True,
         help_text=_("Note for the document"),
+    )
+
+    format = models.CharField(
+        max_length=16,
+        choices=Format,
+        default=Format.PLAIN,
+        verbose_name=_("format"),
     )
 
     created = models.DateTimeField(

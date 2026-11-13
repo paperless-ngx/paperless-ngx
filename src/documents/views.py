@@ -207,6 +207,7 @@ from documents.serialisers import EditPdfDocumentsSerializer
 from documents.serialisers import EmailSerializer
 from documents.serialisers import MergeDocumentsAsVersionsSerializer
 from documents.serialisers import MergeDocumentsSerializer
+from documents.serialisers import NoteCreateSerializer
 from documents.serialisers import NotesSerializer
 from documents.serialisers import PostDocumentSerializer
 from documents.serialisers import RemovePasswordDocumentsSerializer
@@ -833,12 +834,7 @@ class EmailDocumentDetailSchema(EmailSerializer):
     notes=extend_schema(
         description="View, add, or delete notes for the document",
         methods=["GET", "POST", "DELETE"],
-        request=inline_serializer(
-            name="NoteCreateRequest",
-            fields={
-                "note": serializers.CharField(),
-            },
-        ),
+        request=NoteCreateSerializer,
         parameters=[
             OpenApiParameter(
                 name="id",
@@ -1896,19 +1892,23 @@ class DocumentViewSet(
                     {"error": "Error retrieving notes, check logs for more detail."},
                 )
         elif request.method == "POST":
-            try:
-                if currentUser is not None and not has_perms_owner_aware(
-                    currentUser,
-                    "change_document",
-                    doc,
-                ):
-                    return HttpResponseForbidden(
-                        "Insufficient permissions to create notes",
-                    )
+            if currentUser is not None and not has_perms_owner_aware(
+                currentUser,
+                "change_document",
+                doc,
+            ):
+                return HttpResponseForbidden(
+                    "Insufficient permissions to create notes",
+                )
 
+            note_serializer = NoteCreateSerializer(data=request.data)
+            note_serializer.is_valid(raise_exception=True)
+
+            try:
                 c = Note.objects.create(
                     document=doc,
-                    note=request.data["note"],
+                    note=note_serializer.validated_data["note"],
+                    format=note_serializer.validated_data["format"],
                     user=currentUser,
                 )
                 # If audit log is enabled make an entry in the log
