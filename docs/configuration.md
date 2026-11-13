@@ -501,20 +501,20 @@ See the [Django project documentation on the settings](https://docs.djangoprojec
 
 #### [`PAPERLESS_ALLOWED_HOSTS=<comma-separated-list>`](#PAPERLESS_ALLOWED_HOSTS) {#PAPERLESS_ALLOWED_HOSTS}
 
-: If you're planning on putting Paperless on the open internet, then
-you really should set this value to the domain name you're using.
-Failing to do so leaves you open to HTTP host header attacks.
+: If you expose Paperless to the internet, set `PAPERLESS_URL` to its public URL
+or list its public hostname in `PAPERLESS_ALLOWED_HOSTS` to help protect against
+HTTP Host header attacks.
 You can read more about this in [the Django project's documentation](https://docs.djangoproject.com/en/4.1/topics/security/#host-header-validation)
 
-    Just remember that this is a comma-separated list, so
-    "example.com" is fine, as is "example.com,www.example.com", but
-    NOT " example.com" or "example.com,"
+    Separate multiple hostnames with commas, as in `example.com,www.example.com`.
 
-    Can also be set using PAPERLESS_URL (see above).
-
-    "localhost" is always allowed for docker healthcheck
-
-    Defaults to "\*", which is all hosts.
+    - With neither setting configured, Paperless accepts any host.
+    - With only `PAPERLESS_URL` set, Paperless accepts the hostname from that URL
+      and `localhost` (used by the Docker health check).
+    - `PAPERLESS_ALLOWED_HOSTS` adds hosts to `localhost` and the hostname from
+      `PAPERLESS_URL`, if set. A blank list adds no hosts.
+    - With `PAPERLESS_ALLOWED_HOSTS=*`, Paperless accepts any host, even when
+      `PAPERLESS_URL` is set.
 
 #### [`PAPERLESS_CORS_ALLOWED_HOSTS=<comma-separated-list>`](#PAPERLESS_CORS_ALLOWED_HOSTS) {#PAPERLESS_CORS_ALLOWED_HOSTS}
 
@@ -1156,6 +1156,9 @@ they use underscores instead of dashes.
         These arguments are passed directly to OCRmyPDF, so this setting should only
         be changed by trusted users. This applies to the `AppConfig` permission as well,
         which allows setting these arguments from the UI.
+
+        Arguments paperless manages itself (`input_file_or_options`, `output_file`
+        and `sidecar`) are rejected by the API and ignored if set here.
 
     Specify arguments as a JSON dictionary. Keep note of lower case
     booleans and double quoted parameter names and strings. Examples:

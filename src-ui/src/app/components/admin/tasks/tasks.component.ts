@@ -1,7 +1,7 @@
 import { JsonPipe, NgTemplateOutlet } from '@angular/common'
 import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import { Router, RouterLink } from '@angular/router'
+import { ActivatedRoute, Router, RouterLink } from '@angular/router'
 import {
   NgbCollapseModule,
   NgbDropdownModule,
@@ -47,11 +47,13 @@ export enum TaskSection {
 export enum TaskFilterTargetID {
   Name,
   Result,
+  TaskId,
 }
 
 const FILTER_TARGETS = [
   { id: TaskFilterTargetID.Name, name: $localize`Name` },
   { id: TaskFilterTargetID.Result, name: $localize`Result` },
+  { id: TaskFilterTargetID.TaskId, name: $localize`Task ID` },
 ]
 
 const SECTION_LABELS = {
@@ -161,6 +163,7 @@ export class TasksComponent
   tasksService = inject(TasksService)
   private modalService = inject(NgbModal)
   private readonly router = inject(Router)
+  private readonly route = inject(ActivatedRoute)
   private readonly toastService = inject(ToastService)
 
   readonly TaskSection = TaskSection
@@ -275,6 +278,17 @@ export class TasksComponent
   }
 
   ngOnInit() {
+    const taskId = this.route.snapshot.queryParamMap.get('task_id')
+    if (taskId) {
+      this.filterTargetID = TaskFilterTargetID.TaskId
+      this._filterText = taskId
+      this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: { task_id: null },
+        queryParamsHandling: 'merge',
+        replaceUrl: true,
+      })
+    }
     this.tasksService.reload()
     this.reloadPage()
     timer(5000, 5000)
@@ -636,17 +650,12 @@ export class TasksComponent
 
     const query = this._filterText.toLowerCase()
 
-    if (this.filterTargetID == TaskFilterTargetID.Name) {
-      return [
-        this.taskDisplayName(task),
-        task.task_type_display,
-        task.trigger_source_display,
-      ]
-        .filter(Boolean)
-        .some((value) => value.toLowerCase().includes(query))
+    if (this.filterTargetID === TaskFilterTargetID.TaskId) {
+      return task.task_id.toLowerCase() === query
     }
 
-    return this.taskResultMessage(task)?.toLowerCase().includes(query) ?? false
+    // Text filtering now handled API-side
+    return true
   }
 
   private tasksForOptionCounts({
@@ -706,9 +715,15 @@ export class TasksComponent
     }
 
     if (this._filterText.length) {
-      params[
-        this.filterTargetID === TaskFilterTargetID.Name ? 'name' : 'result'
-      ] = this._filterText
+      const parameter = {
+        [TaskFilterTargetID.Name]: 'name',
+        [TaskFilterTargetID.Result]: 'result',
+        [TaskFilterTargetID.TaskId]: 'task_id',
+      }[this.filterTargetID]
+      params[parameter] = this._filterText
+      if (this.filterTargetID === TaskFilterTargetID.TaskId) {
+        delete params.acknowledged
+      }
     }
 
     return params

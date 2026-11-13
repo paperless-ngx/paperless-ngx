@@ -1030,6 +1030,27 @@ describe('DocumentDetailComponent', () => {
     expect(modalCloseSpy).toHaveBeenCalled()
   })
 
+  it('should run a workflow on the document, confirm and close modal', () => {
+    initNormally()
+    const bulkEditSpy = jest.spyOn(documentService, 'bulkEdit')
+    bulkEditSpy.mockReturnValue(of(true))
+    let openModal: NgbModalRef
+    modalService.activeInstances.subscribe((modal) => (openModal = modal[0]))
+    const toastSpy = jest.spyOn(toastService, 'showInfo')
+    component.runWorkflow()
+    const modalCloseSpy = jest.spyOn(openModal, 'close')
+    openModal.componentInstance.workflowId = 5
+    openModal.componentInstance.force = true
+    openModal.componentInstance.confirmClicked.next()
+    expect(bulkEditSpy).toHaveBeenCalledWith(
+      { documents: [doc.id] },
+      'run_workflow',
+      { workflow: 5, filter_documents: false }
+    )
+    expect(toastSpy).toHaveBeenCalled()
+    expect(modalCloseSpy).toHaveBeenCalled()
+  })
+
   it('should pass remote OCR choice when reprocessing', () => {
     initNormally()
     const reprocessSpy = jest.spyOn(documentService, 'reprocessDocuments')

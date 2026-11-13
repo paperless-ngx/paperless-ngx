@@ -17,10 +17,12 @@ from django.conf import settings
 from PIL import Image
 
 from documents.parsers import ParseError
+from documents.parsers import encode_thumbnail_webp
 from documents.parsers import make_thumbnail_from_pdf
 from documents.utils import copy_file_with_basic_stats
 from documents.utils import maybe_override_pixel_limit
 from documents.utils import remove_alpha_channel
+from paperless.config import OCR_RESERVED_USER_ARGS
 from paperless.config import OcrConfig
 from paperless.models import CleanChoices
 from paperless.models import ModeChoices
@@ -161,6 +163,10 @@ class RasterisedDocumentParser:
     # ------------------------------------------------------------------
 
     def get_thumbnail(self, document_path: Path, mime_type: str) -> Path:
+        if self.archive_path is None and self.is_image(mime_type):
+            thumbnail_path = self.tempdir / "convert.webp"
+            encode_thumbnail_webp(Path(document_path), thumbnail_path)
+            return thumbnail_path
         return make_thumbnail_from_pdf(
             self.archive_path or Path(document_path),
             self.tempdir,
@@ -351,7 +357,22 @@ class RasterisedDocumentParser:
 
         if self.settings.user_args is not None:
             try:
-                ocrmypdf_args = {**ocrmypdf_args, **self.settings.user_args}
+                reserved = sorted(
+                    OCR_RESERVED_USER_ARGS & self.settings.user_args.keys(),
+                )
+                if reserved:
+                    self.log.warning(
+                        f"Ignoring OCR user arguments managed by paperless: "
+                        f"{', '.join(reserved)}",
+                    )
+                ocrmypdf_args = {
+                    **ocrmypdf_args,
+                    **{
+                        k: v
+                        for k, v in self.settings.user_args.items()
+                        if k not in OCR_RESERVED_USER_ARGS
+                    },
+                }
             except Exception as e:
                 self.log.warning(
                     f"There is an issue with PAPERLESS_OCR_USER_ARGS, so "

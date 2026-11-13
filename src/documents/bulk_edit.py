@@ -42,12 +42,14 @@ from documents.plugins.helpers import DocumentsStatusManager
 from documents.tasks import bulk_update_documents
 from documents.tasks import consume_file
 from documents.tasks import remove_document_from_index
+from documents.tasks import run_workflows_for_documents
 from documents.tasks import update_document_content_maybe_archive_file
 from documents.versioning import get_latest_version_for_root
 from documents.versioning import get_root_document
 from documents.versioning import versions_newest_first
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
     from collections.abc import Mapping
 
     from django.contrib.auth.models import User
@@ -131,9 +133,24 @@ def _scratch_path(name: str) -> Path:
     return Path(tempfile.mkdtemp(dir=settings.SCRATCH_DIR)) / name
 
 
+def _finish_metadata_edit(
+    document_ids: list[int],
+    update_callback: Callable[[list[int]], None] | None,
+) -> None:
+    if update_callback is not None:
+        update_callback(document_ids)
+    else:
+        bulk_update_documents.apply_async(
+            kwargs={"document_ids": document_ids},
+            headers={"trigger_source": PaperlessTask.TriggerSource.SYSTEM},
+        )
+
+
 def set_correspondent(
     doc_ids: list[int],
     correspondent: Correspondent,
+    *,
+    update_callback: Callable[[list[int]], None] | None = None,
 ) -> Literal["OK"]:
     if correspondent:
         correspondent = Correspondent.objects.only("pk").get(id=correspondent)
@@ -146,15 +163,17 @@ def set_correspondent(
     affected_docs = list(qs.values_list("pk", flat=True))
     qs.update(correspondent=correspondent)
 
-    bulk_update_documents.apply_async(
-        kwargs={"document_ids": affected_docs},
-        headers={"trigger_source": PaperlessTask.TriggerSource.SYSTEM},
-    )
+    _finish_metadata_edit(affected_docs, update_callback)
 
     return "OK"
 
 
-def set_storage_path(doc_ids: list[int], storage_path: StoragePath) -> Literal["OK"]:
+def set_storage_path(
+    doc_ids: list[int],
+    storage_path: StoragePath,
+    *,
+    update_callback: Callable[[list[int]], None] | None = None,
+) -> Literal["OK"]:
     if storage_path:
         storage_path = StoragePath.objects.only("pk").get(id=storage_path)
 
@@ -168,15 +187,17 @@ def set_storage_path(doc_ids: list[int], storage_path: StoragePath) -> Literal["
     affected_docs = list(qs.values_list("pk", flat=True))
     qs.update(storage_path=storage_path)
 
-    bulk_update_documents.apply_async(
-        kwargs={"document_ids": affected_docs},
-        headers={"trigger_source": PaperlessTask.TriggerSource.SYSTEM},
-    )
+    _finish_metadata_edit(affected_docs, update_callback)
 
     return "OK"
 
 
-def set_document_type(doc_ids: list[int], document_type: DocumentType) -> Literal["OK"]:
+def set_document_type(
+    doc_ids: list[int],
+    document_type: DocumentType,
+    *,
+    update_callback: Callable[[list[int]], None] | None = None,
+) -> Literal["OK"]:
     if document_type:
         document_type = DocumentType.objects.only("pk").get(id=document_type)
 
@@ -188,15 +209,17 @@ def set_document_type(doc_ids: list[int], document_type: DocumentType) -> Litera
     affected_docs = list(qs.values_list("pk", flat=True))
     qs.update(document_type=document_type)
 
-    bulk_update_documents.apply_async(
-        kwargs={"document_ids": affected_docs},
-        headers={"trigger_source": PaperlessTask.TriggerSource.SYSTEM},
-    )
+    _finish_metadata_edit(affected_docs, update_callback)
 
     return "OK"
 
 
-def add_tag(doc_ids: list[int], tag: int) -> Literal["OK"]:
+def add_tag(
+    doc_ids: list[int],
+    tag: int,
+    *,
+    update_callback: Callable[[list[int]], None] | None = None,
+) -> Literal["OK"]:
     tag_obj = Tag.objects.get(pk=tag)
     tags_to_add = [tag_obj, *tag_obj.get_ancestors()]
 
@@ -217,15 +240,17 @@ def add_tag(doc_ids: list[int], tag: int) -> Literal["OK"]:
         DocumentTagRelationship.objects.bulk_create(to_create)
 
     if affected_docs:
-        bulk_update_documents.apply_async(
-            kwargs={"document_ids": list(affected_docs)},
-            headers={"trigger_source": PaperlessTask.TriggerSource.SYSTEM},
-        )
+        _finish_metadata_edit(list(affected_docs), update_callback)
 
     return "OK"
 
 
-def remove_tag(doc_ids: list[int], tag: int) -> Literal["OK"]:
+def remove_tag(
+    doc_ids: list[int],
+    tag: int,
+    *,
+    update_callback: Callable[[list[int]], None] | None = None,
+) -> Literal["OK"]:
     tag_obj = Tag.objects.get(pk=tag)
     tag_ids = [tag_obj.id, *tag_obj.get_descendants_pks()]
 
@@ -238,10 +263,7 @@ def remove_tag(doc_ids: list[int], tag: int) -> Literal["OK"]:
     qs.delete()
 
     if affected_docs:
-        bulk_update_documents.apply_async(
-            kwargs={"document_ids": affected_docs},
-            headers={"trigger_source": PaperlessTask.TriggerSource.SYSTEM},
-        )
+        _finish_metadata_edit(affected_docs, update_callback)
 
     return "OK"
 
@@ -250,6 +272,8 @@ def modify_tags(
     doc_ids: list[int],
     add_tags: list[int],
     remove_tags: list[int],
+    *,
+    update_callback: Callable[[list[int]], None] | None = None,
 ) -> Literal["OK"]:
     qs = Document.objects.filter(id__in=doc_ids).only("pk")
     affected_docs = list(qs.values_list("pk", flat=True))
@@ -293,10 +317,7 @@ def modify_tags(
                 )
 
     if affected_docs:
-        bulk_update_documents.apply_async(
-            kwargs={"document_ids": affected_docs},
-            headers={"trigger_source": PaperlessTask.TriggerSource.SYSTEM},
-        )
+        _finish_metadata_edit(affected_docs, update_callback)
 
     return "OK"
 
@@ -305,6 +326,8 @@ def modify_custom_fields(
     doc_ids: list[int],
     add_custom_fields: list[int] | dict,
     remove_custom_fields: list[int],
+    *,
+    update_callback: Callable[[list[int]], None] | None = None,
 ) -> Literal["OK"]:
     qs = Document.objects.filter(id__in=doc_ids).only("pk")
     affected_docs = list(qs.values_list("pk", flat=True))
@@ -367,10 +390,7 @@ def modify_custom_fields(
         field_id__in=remove_custom_fields,
     ).hard_delete()
 
-    bulk_update_documents.apply_async(
-        kwargs={"document_ids": affected_docs},
-        headers={"trigger_source": PaperlessTask.TriggerSource.SYSTEM},
-    )
+    _finish_metadata_edit(affected_docs, update_callback)
 
     return "OK"
 
@@ -445,12 +465,32 @@ def reprocess(doc_ids: list[int], *, remote_ocr: bool = False) -> Literal["OK"]:
     return "OK"
 
 
+def run_workflow(
+    doc_ids: list[int],
+    workflow: int,
+    *,
+    filter_documents: bool = True,
+) -> Literal["OK"]:
+    """
+    Manually run a single workflow against the given documents.
+
+    Done asynchronously via a Celery task.
+    """
+    run_workflows_for_documents.delay(
+        document_ids=doc_ids,
+        workflow_id=workflow,
+        filter_documents=filter_documents,
+    )
+    return "OK"
+
+
 def set_permissions(
     doc_ids: list[int],
     set_permissions: PermissionsSpec,
     *,
     owner: User | None = None,
     merge: bool = False,
+    update_callback: Callable[[list[int]], None] | None = None,
 ) -> Literal["OK"]:
     qs = Document.objects.filter(id__in=doc_ids).select_related("owner")
 
@@ -468,10 +508,7 @@ def set_permissions(
         merge=merge,
     )
 
-    bulk_update_documents.apply_async(
-        kwargs={"document_ids": affected_docs},
-        headers={"trigger_source": PaperlessTask.TriggerSource.SYSTEM},
-    )
+    _finish_metadata_edit(affected_docs, update_callback)
 
     return "OK"
 

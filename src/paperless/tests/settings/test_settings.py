@@ -3,9 +3,14 @@ from unittest import TestCase
 from unittest import mock
 
 import pytest
+from django.core.exceptions import DisallowedHost
 from django.core.exceptions import ImproperlyConfigured
+from django.http import HttpRequest
+from django.test import override_settings
 
+import paperless.settings as paperless_settings
 from paperless.settings import _get_allauth_trusted_proxy_count
+from paperless.settings import _get_allowed_hosts
 from paperless.settings import _get_classifier_language_setting
 from paperless.settings import _get_search_language_setting
 from paperless.settings import _parse_paperless_url
@@ -168,8 +173,88 @@ class TestPaperlessURLSettings(TestCase):
             self.assertIn(url, settings.CORS_ALLOWED_ORIGINS)
 
 
-@pytest.mark.parametrize("url", ["example.com", "https://", "/just/a/path"])
-def test_paperless_url_without_hostname_is_rejected(
+@pytest.mark.parametrize(
+    ("url", "allowed_hosts", "expected", "accepted_host", "rejected_host"),
+    [
+        (None, None, ["*"], "other.example.com", None),
+        (None, "", ["localhost"], "localhost:8000", "other.example.com"),
+        (
+            None,
+            "lan.example.com",
+            ["lan.example.com", "localhost"],
+            "lan.example.com",
+            "other.example.com",
+        ),
+        (None, "*", ["*"], "other.example.com", None),
+        (
+            "https://example.com:8443",
+            None,
+            ["localhost", "example.com"],
+            "example.com:8443",
+            "other.example.com",
+        ),
+        (
+            "https://example.com.",
+            "",
+            ["localhost", "example.com"],
+            "example.com.",
+            "other.example.com",
+        ),
+        (
+            "http://[::1]:8000",
+            None,
+            ["localhost", "[::1]"],
+            "[::1]:8000",
+            "other.example.com",
+        ),
+        ("https://example.com", "*", ["*", "example.com"], "other.example.com", None),
+        (
+            "https://example.com",
+            "lan.example.com",
+            ["lan.example.com", "localhost", "example.com"],
+            "lan.example.com",
+            "other.example.com",
+        ),
+    ],
+)
+def test_allowed_hosts_at_startup(
+    monkeypatch: pytest.MonkeyPatch,
+    url: str | None,
+    allowed_hosts: str | None,
+    expected: list[str],
+    accepted_host: str,
+    rejected_host: str | None,
+) -> None:
+    for name, value in (
+        ("PAPERLESS_URL", url),
+        ("PAPERLESS_ALLOWED_HOSTS", allowed_hosts),
+    ):
+        if value is None:
+            monkeypatch.delenv(name, raising=False)
+        else:
+            monkeypatch.setenv(name, value)
+
+    monkeypatch.setattr(paperless_settings, "ALLOWED_HOSTS", _get_allowed_hosts())
+    monkeypatch.setattr(paperless_settings, "CSRF_TRUSTED_ORIGINS", [])
+    monkeypatch.setattr(paperless_settings, "CORS_ALLOWED_ORIGINS", [])
+    assert _parse_paperless_url() == url
+    assert expected == paperless_settings.ALLOWED_HOSTS
+
+    request = HttpRequest()
+    with override_settings(ALLOWED_HOSTS=expected):
+        request.META["HTTP_HOST"] = accepted_host
+        assert request.get_host() == accepted_host
+        if rejected_host:
+            request.META["HTTP_HOST"] = rejected_host
+            with pytest.raises(DisallowedHost):
+                request.get_host()
+
+
+@pytest.mark.parametrize(
+    "url",
+    ["example.com", "https://", "/just/a/path", "https://*", "https://.example.com"],
+)
+def test_paperless_url_without_valid_hostname_is_rejected(
     monkeypatch: pytest.MonkeyPatch,
     url: str,
 ) -> None:
@@ -179,9 +264,9 @@ def test_paperless_url_without_hostname_is_rejected(
     WHEN:
         - The URL is parsed
     THEN:
-        - A configuration error is raised instead of adding None to ALLOWED_HOSTS
+        - A configuration error is raised for missing or wildcard hostnames
     """
     monkeypatch.setenv("PAPERLESS_URL", url)
 
-    with pytest.raises(ImproperlyConfigured, match="no hostname"):
+    with pytest.raises(ImproperlyConfigured, match="no valid hostname"):
         _parse_paperless_url()

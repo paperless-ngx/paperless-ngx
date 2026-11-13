@@ -13,6 +13,7 @@ from django.utils import timezone
 from llama_index.core import settings as llama_settings
 from llama_index.core.embeddings.mock_embed_model import MockEmbedding
 from llama_index.core.schema import TextNode
+from llama_index.core.vector_stores.types import FilterOperator
 
 from documents.models import Document
 from paperless_ai import chat
@@ -412,10 +413,8 @@ class TestStreamChatRetrieval:
         WHEN:
             - stream_chat_with_documents is called with unrestricted=True
         THEN:
-            - The retriever receives a NOT IN filter excluding zero ids, so
-              the whole index is effectively searched -- and no IN-list is
-              built from the full permitted set, which is what risks the
-              vector store's safety limit on large installs
+            - The retriever receives a NOT IN filter excluding zero ids
+              rather than an IN list of every permitted id
         """
         document = DocumentFactory.create(content="indexed document content")
         indexing.llm_index_add_or_update_document(document)
@@ -467,6 +466,70 @@ class TestStreamChatRetrieval:
         filter_values = _retriever_filter_values(captured_filters)
         assert str(trashed.pk) in filter_values
         assert str(kept.pk) not in filter_values
+
+    def test_restricted_chat_excludes_denied_ids_when_few_are_denied(
+        self,
+        temp_llm_index_dir: Path,
+        mock_embed_model: pytest_mock.MockType,
+        captured_filters: list[Any],
+    ) -> None:
+        """
+        GIVEN:
+            - Three indexed documents, one of which the caller may not see
+        WHEN:
+            - A restricted caller chats
+        THEN:
+            - The retriever receives a NOT IN filter on the denied id, not an
+              IN list of the permitted ids
+        """
+        docs = DocumentFactory.create_batch(3, content="indexed document content")
+        for doc in docs:
+            indexing.llm_index_add_or_update_document(doc)
+        permitted = Document.objects.filter(pk__in=[docs[0].pk, docs[1].pk])
+
+        list(chat.stream_chat_with_documents("question?", permitted))
+
+        metadata_filter = captured_filters[0].filters[0]
+        assert metadata_filter.operator == FilterOperator.NIN
+        assert metadata_filter.value == [str(docs[2].pk)]
+
+    def test_restricted_chat_drops_retrieved_nodes_of_unpermitted_documents(
+        self,
+        temp_llm_index_dir: Path,
+        mock_embed_model: pytest_mock.MockType,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A retriever that returns a node for a document the caller may
+              not see, as when it is indexed after the permitted set was read
+        WHEN:
+            - A restricted caller chats
+        THEN:
+            - Only the node of the permitted document reaches the synthesizer
+        """
+        permitted_doc = DocumentFactory.create(content="permitted content")
+        denied_doc = DocumentFactory.create(content="denied content")
+        permitted_node = MagicMock(metadata={"document_id": str(permitted_doc.pk)})
+        denied_node = MagicMock(metadata={"document_id": str(denied_doc.pk)})
+        mocker.patch("paperless_ai.chat.AIClient")
+        retriever = mocker.patch(
+            "llama_index.core.retrievers.VectorIndexRetriever",
+        ).return_value
+        retriever.retrieve.return_value = [denied_node, permitted_node]
+        synthesizer = mocker.patch(
+            "llama_index.core.response_synthesizers.get_response_synthesizer",
+        ).return_value
+        synthesizer.synthesize.return_value.response_gen = iter(["chunk"])
+
+        list(
+            chat.stream_chat_with_documents(
+                "question?",
+                Document.objects.filter(pk=permitted_doc.pk),
+            ),
+        )
+
+        synthesizer.synthesize.assert_called_once_with("question?", [permitted_node])
 
     @pytest.mark.django_db
     def test_get_document_references_only_queries_referenced_documents(

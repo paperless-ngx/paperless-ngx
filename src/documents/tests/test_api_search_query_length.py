@@ -149,10 +149,10 @@ class TestPostSelectionPathsEnforceTheCap:
         assert str(_MAX_QUERY_LENGTH + 1) in message
         parse_spy.assert_not_called()
 
-    @mock.patch("documents.bulk_edit.bulk_update_documents.apply_async")
+    @mock.patch("documents.views.execute_bulk_operation.apply_async")
     def test_bulk_edit_query_at_exactly_the_cap_is_accepted(
         self,
-        bulk_update_task_mock: mock.MagicMock,
+        enqueue_mock: mock.MagicMock,
         admin_client: APIClient,
         searchable_document: Document,
     ) -> None:
@@ -163,12 +163,12 @@ class TestPostSelectionPathsEnforceTheCap:
             - Its `filters.query` is exactly `_MAX_QUERY_LENGTH` characters
               long
         THEN:
-            - The cap check accepts it and the request reaches the real
-              bulk-edit method (its Celery dispatch is mocked out here,
-              same as every other bulk-edit test, since nothing here is
-              testing that method itself)
+            - The cap check accepts it and queues the metadata operation.
+              Mock the executor dispatch so this exercises query validation
+              without requiring a broker.
         """
         query = "a" * _MAX_QUERY_LENGTH
+        enqueue_mock.return_value.id = "query-cap-task"
 
         response = admin_client.post(
             "/api/documents/bulk_edit/",
@@ -183,6 +183,11 @@ class TestPostSelectionPathsEnforceTheCap:
         )
 
         assert response.status_code == status.HTTP_200_OK
+        assert response.data == {"result": "OK", "task_id": "query-cap-task"}
+        enqueue_mock.assert_called_once()
+        assert (
+            enqueue_mock.call_args.kwargs["kwargs"]["operation"] == "set_document_type"
+        )
 
     def test_bulk_download_query_one_over_the_cap_is_a_400(
         self,

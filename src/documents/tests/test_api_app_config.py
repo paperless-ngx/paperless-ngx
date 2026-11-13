@@ -287,6 +287,28 @@ class TestApiAppConfig(DirectoriesMixin, APITestCase):
         self.assertEqual(config.user_args, user_args)
         self.assertEqual(config.barcode_tag_mapping, barcode_tag_mapping)
 
+    def test_api_update_config_rejects_reserved_user_args(self) -> None:
+        """
+        GIVEN:
+            - API request to update app config with user_args which set an
+              argument the parser manages itself
+        WHEN:
+            - API is called
+        THEN:
+            - Request is rejected with a 400 naming the argument
+            - Config is not updated
+        """
+        response = self.client.patch(
+            f"{self.ENDPOINT}1/",
+            json.dumps({"user_args": json.dumps({"sidecar": "/tmp/x.py"})}),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("sidecar", str(response.data["user_args"]))
+        config = ApplicationConfiguration.objects.first()
+        assert config is not None
+        self.assertIsNone(config.user_args)
+
     def test_api_update_config_rejects_invalid_json_objects(self) -> None:
         """
         GIVEN:
