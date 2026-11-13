@@ -34,6 +34,7 @@ class TestMergeDocumentsAsVersionsSerializer(TestCase):
             {
                 "documents": [self.doc1.id, self.doc2.id, self.doc3.id],
                 "root_document_id": self.doc2.id,
+                "from_webui": False,
             },
         )
 

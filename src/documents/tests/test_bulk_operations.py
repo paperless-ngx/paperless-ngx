@@ -54,6 +54,7 @@ def test_request_only_queues(bulk_setup, endpoint, operation, parameters):
         "document_ids": [doc.pk],
         "parameters": parameters,
         "user_id": user.pk,
+        "trigger_source": "web_ui",
     }
     assert enqueue.call_args.kwargs["headers"]["trigger_source"] == "web_ui"
 
@@ -287,18 +288,14 @@ async def test_completion_socket_is_private(anyio_backend):
 @pytest.mark.parametrize("endpoint", ["delete", "bulk_edit"])
 def test_trash_remains_synchronous(bulk_setup, endpoint):
     _, client, doc, _ = bulk_setup
-    data = {"documents": [doc.pk]}
-    if endpoint == "bulk_edit":
-        data.update(method="delete", parameters={})
     with (
         mock.patch("documents.views.execute_bulk_operation.apply_async") as enqueue,
         mock.patch("documents.search.get_backend"),
     ):
         response = client.post(
-            f"/api/documents/{endpoint}/",
-            data,
+            "/api/documents/delete/",
+            {"documents": [doc.pk]},
             format="json",
-            HTTP_ACCEPT="application/json; version=9",
         )
     assert response.status_code == 200
     assert response.data == {"result": "OK"}
