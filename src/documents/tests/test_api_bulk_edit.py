@@ -703,11 +703,12 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
 
     @mock.patch("documents.views.bulk_edit.run_workflow")
     def test_run_workflow_requires_ownership(self, m) -> None:
-        """A non-owner without document ownership is forbidden (actions mutate docs)."""
+        """A non-owner with change permission cannot run mutating workflow actions."""
         self.setup_mock(m, "run_workflow")
-        user = UserFactory(username="no_perms")
+        user = UserFactory(username="non_owner")
         grant_all_global(user)
         doc = DocumentFactory(owner=UserFactory(username="other"))
+        grant_object(user, doc, "change_document")
         workflow = self._make_manual_workflow()
         self.client.force_authenticate(user=user)
 

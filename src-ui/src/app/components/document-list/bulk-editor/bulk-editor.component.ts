@@ -308,7 +308,9 @@ export class BulkEditorComponent
   }
 
   get canRunWorkflow(): boolean {
-    return this.userCanEditAll && this.manualWorkflows.length > 0
+    return (
+      this.userCanEditAll && this.userOwnsAll && this.manualWorkflows.length > 0
+    )
   }
 
   runWorkflowSelected() {
