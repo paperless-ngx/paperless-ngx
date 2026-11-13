@@ -322,10 +322,23 @@ export class BulkEditorComponent
     modal.componentInstance.confirmClicked
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe(() => {
-        this.executeBulkEditMethod(modal, 'run_workflow', {
-          workflow: modal.componentInstance.workflowId,
-          filter_documents: !modal.componentInstance.force,
-        })
+        modal.componentInstance.buttonsEnabled.set(false)
+        this.documentService
+          .bulkEdit(this.getSelectionQuery(), 'run_workflow', {
+            workflow: modal.componentInstance.workflowId,
+            filter_documents: !modal.componentInstance.force,
+          })
+          .pipe(first())
+          .subscribe({
+            next: () => {
+              modal.close()
+              this.list.selectNone()
+              this.toastService.showInfo(
+                $localize`Workflow will run on the selected documents in the background.`
+              )
+            },
+            error: (error) => this.handleOperationError(modal, error),
+          })
       })
   }
 
