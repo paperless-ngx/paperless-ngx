@@ -427,6 +427,7 @@ def delete(doc_ids: list[int]) -> Literal["OK"]:
                 "Detected a possible incompatible database column. See https://docs.paperless-ngx.com/troubleshooting/#convert-uuid-field",
             )
         logger.error(f"Error deleting documents: {e!s}")
+        raise
 
     return "OK"
 
