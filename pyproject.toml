@@ -86,9 +86,9 @@ mariadb = [
   "mysqlclient>=2.2.7,<2.4",
 ]
 postgres = [
-  "psycopg[c,pool]==3.3.4",
+  "psycopg[c,pool]==3.3.8",
   # Direct dependency for proper resolution of the pre-built wheels
-  "psycopg-c==3.3.4",
+  "psycopg-c==3.3.8",
   "psycopg-pool==3.3.3",
 ]
 webserver = [
@@ -158,10 +158,10 @@ package = false
 [tool.uv.sources]
 # Markers are chosen to select these almost exclusively when building the Docker image
 psycopg-c = [
-  { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.4/psycopg_c-3.3.4-cp312-cp312-linux_x86_64.whl", marker = "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version == '3.12'" },
-  { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.4/psycopg_c-3.3.4-cp312-cp312-linux_aarch64.whl", marker = "sys_platform == 'linux' and platform_machine == 'aarch64' and python_version == '3.12'" },
-  { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.4/psycopg_c-3.3.4-cp314-cp314-linux_x86_64.whl", marker = "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version == '3.14'" },
-  { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.4/psycopg_c-3.3.4-cp314-cp314-linux_aarch64.whl", marker = "sys_platform == 'linux' and platform_machine == 'aarch64' and python_version == '3.14'" },
+  { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.8/psycopg_c-3.3.8-cp312-cp312-manylinux_2_38_x86_64.whl", marker = "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version == '3.12'" },
+  { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.8/psycopg_c-3.3.8-cp312-cp312-manylinux_2_38_aarch64.whl", marker = "sys_platform == 'linux' and platform_machine == 'aarch64' and python_version == '3.12'" },
+  { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.8/psycopg_c-3.3.8-cp314-cp314-manylinux_2_38_x86_64.whl", marker = "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version == '3.14'" },
+  { url = "https://github.com/paperless-ngx/builder/releases/download/psycopg-trixie-3.3.8/psycopg_c-3.3.8-cp314-cp314-manylinux_2_38_aarch64.whl", marker = "sys_platform == 'linux' and platform_machine == 'aarch64' and python_version == '3.14'" },
 ]
 torch = [
   { index = "pytorch-cpu" },
