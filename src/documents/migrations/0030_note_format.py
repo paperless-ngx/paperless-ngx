@@ -6,7 +6,7 @@ from django.db import models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("documents", "0028_replace_tag_tree_fields"),
+        ("documents", "0029_alter_workflowrun_type_alter_workflowtrigger_type"),
     ]
 
     operations = [
