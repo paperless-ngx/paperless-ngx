@@ -17,7 +17,6 @@ from django.db import models
 from django.db import transaction
 from django.db.models.signals import post_save
 from django.utils import timezone
-from filelock import FileLock
 
 from documents import sanity_checker
 from documents.barcodes import BarcodePlugin
@@ -43,6 +42,7 @@ from documents.double_sided import CollatePlugin
 from documents.file_handling import create_source_path_directory
 from documents.file_handling import generate_unique_filename
 from documents.matching import prefilter_documents_by_workflowtrigger
+from documents.media_lock import media_lock
 from documents.models import Correspondent
 from documents.models import CustomFieldInstance
 from documents.models import Document
@@ -312,6 +312,7 @@ def sanity_check(*, raise_on_error: bool = True) -> str:
 
 @shared_task
 def bulk_update_documents(document_ids) -> None:
+    from documents.file_moves import flush_pending_file_moves
     from documents.search import get_backend
 
     document_ids = list(document_ids)
@@ -332,6 +333,9 @@ def bulk_update_documents(document_ids) -> None:
             skip_ai_index=True,  # bulk path calls update_llm_index once below
         )
         post_save.send(Document, instance=doc, created=False)
+        # Move this document's files now rather than at the end of the task,
+        # so a long bulk edit makes steady progress.
+        flush_pending_file_moves()
 
     with get_backend().batch_update() as batch:
         batch.add_or_update_ids(document_ids)
@@ -419,7 +423,13 @@ def update_document_content_maybe_archive_file(
 
             thumbnail = parser.get_thumbnail(document.source_path, mime_type)
 
-            with transaction.atomic():
+            # media.lock first, then the transaction: never wait on media.lock
+            # while this transaction holds the document row. Also keeps the
+            # unique archive filename generation under the lock.
+            with media_lock(), transaction.atomic():
+                # Loaded before the (long) parse; read current metadata now
+                # that the lock is held, for the archive filename.
+                document.refresh_from_db()
                 oldDocument = Document.objects.get(pk=document.pk)
                 if parser.get_archive_path():
                     checksum = compute_checksum(parser.get_archive_path())
@@ -484,11 +494,10 @@ def update_document_content_maybe_archive_file(
                         modified=timezone.now(),
                     )
 
-                with FileLock(settings.MEDIA_LOCK):
-                    if parser.get_archive_path():
-                        create_source_path_directory(document.archive_path)
-                        shutil.move(parser.get_archive_path(), document.archive_path)
-                    shutil.move(thumbnail, document.thumbnail_path)
+                if parser.get_archive_path():
+                    create_source_path_directory(document.archive_path)
+                    shutil.move(parser.get_archive_path(), document.archive_path)
+                shutil.move(thumbnail, document.thumbnail_path)
 
             document.refresh_from_db()
             logger.info(
@@ -533,7 +542,11 @@ def empty_trash(doc_ids=None) -> None:
         deleted_document_ids = list(documents.values_list("id", flat=True))
         # Temporarily connect the cleanup handler
         models.signals.post_delete.connect(cleanup_document_deletion, sender=Document)
-        documents.delete()  # this is effectively a hard delete
+        # media.lock before Django's delete transaction: post_delete runs
+        # cleanup_document_deletion inside it while the rows are locked, and
+        # that handler re-enters the lock instead of waiting.
+        with media_lock():
+            documents.delete()  # this is effectively a hard delete
         logger.info(f"Deleted {len(deleted_document_ids)} documents from trash")
 
         if settings.AUDIT_LOG_ENABLED:
@@ -563,6 +576,8 @@ def check_scheduled_workflows() -> None:
 
     Once a document satisfies this condition, and recurring/non-recurring constraints are met, the workflow is run.
     """
+    from documents.file_moves import flush_pending_file_moves
+
     scheduled_workflows = get_workflows_for_trigger(
         WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
     )
@@ -690,6 +705,9 @@ def check_scheduled_workflows() -> None:
                             sender=None,
                             document=document,
                         )
+                        # Move this document's files now rather than at the end
+                        # of the task, so a long run makes steady progress.
+                        flush_pending_file_moves()
 
 
 @shared_task

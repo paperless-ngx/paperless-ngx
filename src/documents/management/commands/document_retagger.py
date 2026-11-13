@@ -9,6 +9,7 @@ from rich.table import Table
 from rich.text import Text
 
 from documents.classifier import load_classifier
+from documents.file_moves import defer_file_moves
 from documents.management.commands.base import PaperlessCommand
 from documents.models import Document
 from documents.signals.handlers import set_correspondent
@@ -273,61 +274,63 @@ class Command(PaperlessCommand):
                 description="Retagging...",
                 stats_renderer=render_stats,
             ):
-                suggestion = DocumentSuggestion(document=document)
+                # One file move per document, after all of its assignments.
+                with defer_file_moves():
+                    suggestion = DocumentSuggestion(document=document)
 
-                if do_correspondent:
-                    correspondent = set_correspondent(
-                        None,
-                        document,
-                        classifier=classifier,
-                        replace=overwrite,
-                        use_first=use_first,
-                        dry_run=suggest,
-                    )
-                    if correspondent is not None:
-                        stats.correspondents += 1
-                        suggestion.correspondent = correspondent
+                    if do_correspondent:
+                        correspondent = set_correspondent(
+                            None,
+                            document,
+                            classifier=classifier,
+                            replace=overwrite,
+                            use_first=use_first,
+                            dry_run=suggest,
+                        )
+                        if correspondent is not None:
+                            stats.correspondents += 1
+                            suggestion.correspondent = correspondent
 
-                if do_document_type:
-                    document_type = set_document_type(
-                        None,
-                        document,
-                        classifier=classifier,
-                        replace=overwrite,
-                        use_first=use_first,
-                        dry_run=suggest,
-                    )
-                    if document_type is not None:
-                        stats.document_types += 1
-                        suggestion.document_type = document_type
+                    if do_document_type:
+                        document_type = set_document_type(
+                            None,
+                            document,
+                            classifier=classifier,
+                            replace=overwrite,
+                            use_first=use_first,
+                            dry_run=suggest,
+                        )
+                        if document_type is not None:
+                            stats.document_types += 1
+                            suggestion.document_type = document_type
 
-                if do_tags:
-                    tags_to_add, tags_to_remove = set_tags(
-                        None,
-                        document,
-                        classifier=classifier,
-                        replace=overwrite,
-                        dry_run=suggest,
-                    )
-                    stats.tags_added += len(tags_to_add)
-                    stats.tags_removed += len(tags_to_remove)
-                    suggestion.tags_to_add = frozenset(tags_to_add)
-                    suggestion.tags_to_remove = frozenset(tags_to_remove)
+                    if do_tags:
+                        tags_to_add, tags_to_remove = set_tags(
+                            None,
+                            document,
+                            classifier=classifier,
+                            replace=overwrite,
+                            dry_run=suggest,
+                        )
+                        stats.tags_added += len(tags_to_add)
+                        stats.tags_removed += len(tags_to_remove)
+                        suggestion.tags_to_add = frozenset(tags_to_add)
+                        suggestion.tags_to_remove = frozenset(tags_to_remove)
 
-                if do_storage_path:
-                    storage_path = set_storage_path(
-                        None,
-                        document,
-                        classifier=classifier,
-                        replace=overwrite,
-                        use_first=use_first,
-                        dry_run=suggest,
-                    )
-                    if storage_path is not None:
-                        stats.storage_paths += 1
-                        suggestion.storage_path = storage_path
+                    if do_storage_path:
+                        storage_path = set_storage_path(
+                            None,
+                            document,
+                            classifier=classifier,
+                            replace=overwrite,
+                            use_first=use_first,
+                            dry_run=suggest,
+                        )
+                        if storage_path is not None:
+                            stats.storage_paths += 1
+                            suggestion.storage_path = storage_path
 
-                stats.documents_processed += 1
+                    stats.documents_processed += 1
 
                 if suggest:
                     suggestions.append(suggestion)

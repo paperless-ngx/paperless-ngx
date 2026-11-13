@@ -18,9 +18,10 @@ from django.core import serializers
 from django.core.management.base import CommandError
 from django.db import transaction
 from django.utils import timezone
-from filelock import FileLock
 from guardian.models import GroupObjectPermission
 from guardian.models import UserObjectPermission
+
+from documents.media_lock import media_lock
 
 if TYPE_CHECKING:
     from collections.abc import Generator
@@ -328,7 +329,7 @@ class Command(CryptMixin, PaperlessCommand):
             )
 
         # Prevent any ongoing changes in the documents while exporting
-        with FileLock(settings.MEDIA_LOCK), sink:
+        with media_lock(), sink:
             self.dump(sink)
 
     def dump(self, sink: ExportSink) -> None:

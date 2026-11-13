@@ -4,10 +4,13 @@ Tests for the document_retagger management command.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 from django.core.management import call_command
 from django.core.management.base import CommandError
 
+from documents.file_moves import _active_collector
 from documents.models import Correspondent
 from documents.models import Document
 from documents.models import DocumentType
@@ -20,6 +23,12 @@ from paperless_testing.factories import DocumentFactory
 from paperless_testing.factories import DocumentTypeFactory
 from paperless_testing.factories import StoragePathFactory
 from paperless_testing.factories import TagFactory
+
+if TYPE_CHECKING:
+    from pytest_django.fixtures import Settings
+    from pytest_mock import MockerFixture
+
+    from paperless_testing.dirs import PaperlessDirs
 
 # ---------------------------------------------------------------------------
 # Module-level type aliases
@@ -484,3 +493,69 @@ class TestRetaggerEdgeCases(DirectoriesMixin):
 
         assert d_first.tags.count() == 0
         assert d_unrelated.tags.count() == 2
+
+
+@pytest.mark.management
+@pytest.mark.django_db
+class TestRetaggerFileMoves:
+    def test_each_document_is_processed_in_its_own_scope(
+        self,
+        paperless_dirs: PaperlessDirs,
+        settings: Settings,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - Two documents and a filename format using the correspondent
+            - A classifier suggestion assigning a correspondent to each
+        WHEN:
+            - document_retagger runs with --correspondent
+        THEN:
+            - Each document is processed inside an open file move scope
+            - When the second document is processed, the first one's file has
+              already moved
+            - Both files end at their final paths
+        """
+        settings.FILENAME_FORMAT = "{correspondent}/{title}"
+        (paperless_dirs.originals_dir / "none").mkdir(exist_ok=True)
+        for title in ("first", "second"):
+            (paperless_dirs.originals_dir / "none" / f"{title}.pdf").write_bytes(b"x")
+            DocumentFactory(
+                title=title,
+                filename=f"none/{title}.pdf",
+                mime_type="application/pdf",
+            )
+        correspondent = CorrespondentFactory(name="acme")
+        processed: list[Document] = []
+        scope_open: list[bool] = []
+        seen_first_moved: list[bool] = []
+
+        def fake_set_correspondent(sender, document, **kwargs):
+            scope_open.append(_active_collector.get() is not None)
+            # Order-agnostic: on the second call, check the first one's file.
+            if processed:
+                first = processed[0]
+                seen_first_moved.append(
+                    (
+                        paperless_dirs.originals_dir / "acme" / f"{first.title}.pdf"
+                    ).is_file(),
+                )
+            processed.append(document)
+            document.correspondent = correspondent
+            document.save(update_fields=("correspondent",))
+            return correspondent
+
+        mocker.patch(
+            "documents.management.commands.document_retagger.load_classifier",
+        )
+        mocker.patch(
+            "documents.management.commands.document_retagger.set_correspondent",
+            side_effect=fake_set_correspondent,
+        )
+
+        call_command("document_retagger", "--correspondent", skip_checks=True)
+
+        assert scope_open == [True, True]
+        assert seen_first_moved == [True]
+        for title in ("first", "second"):
+            assert (paperless_dirs.originals_dir / "acme" / f"{title}.pdf").is_file()

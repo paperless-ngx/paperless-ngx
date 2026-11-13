@@ -18,11 +18,13 @@ if TYPE_CHECKING:
     from pytest_mock import MockerFixture
 
 from documents.file_handling import generate_filename
+from documents.file_moves import move_files_for_document
 from documents.models import Document
 from documents.tasks import update_document_content_maybe_archive_file
 from paperless_testing.assertions import FileSystemAssertsMixin
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import DocumentFactory
+from paperless_testing.locks import record_media_lock_acquisitions
 from paperless_testing.samples import SIMPLE_DIGITAL_PDF
 
 sample_file: Path = SIMPLE_DIGITAL_PDF
@@ -62,6 +64,28 @@ class TestArchiver(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertIsFile(doc.source_path)
         self.assertTrue(filecmp.cmp(sample_file, doc.source_path))
         self.assertEqual(doc.archive_filename, "none/A.pdf")
+
+    def test_handle_document_takes_media_lock_outside_transaction(self) -> None:
+        """
+        GIVEN:
+            - A document whose archive version is being generated
+        WHEN:
+            - update_document_content_maybe_archive_file runs
+        THEN:
+            - media.lock is acquired
+            - media.lock is never first acquired while a transaction holds the
+              document row
+        """
+        doc = self.make_models()
+        shutil.copy(sample_file, Path(self.dirs.originals_dir) / f"{doc.id:07}.pdf")
+
+        with record_media_lock_acquisitions() as acquisitions:
+            update_document_content_maybe_archive_file(doc.pk)
+
+        self.assertTrue(acquisitions)
+        self.assertFalse(any(a.in_user_transaction for a in acquisitions))
+        doc.refresh_from_db()
+        self.assertIsFile(doc.archive_path)
 
     def test_unknown_mime_type(self) -> None:
         doc = self.make_models()
@@ -236,7 +260,7 @@ class TestRenamer(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         doc = Document.objects.create(title="test", mime_type="image/jpeg")
         doc.filename = generate_filename(doc)
         doc.archive_filename = generate_filename(doc, archive_filename=True)
-        doc.save()
+        doc.save(write_file_paths=True)
 
         Path(doc.source_path).touch()
         Path(doc.archive_path).touch()
@@ -252,6 +276,42 @@ class TestRenamer(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         self.assertIsNotFile(doc.archive_path)
         self.assertIsFile(doc2.source_path)
         self.assertIsFile(doc2.archive_path)
+
+    @override_settings(FILENAME_FORMAT="")
+    def test_rename_moves_each_document_by_direct_call(self) -> None:
+        """
+        GIVEN:
+            - Two documents whose filename format changed
+        WHEN:
+            - document_renamer runs
+        THEN:
+            - move_files_for_document is called once per document
+            - Both files are at their new paths
+        """
+        docs = []
+        for title in ("first", "second"):
+            doc = Document.objects.create(title=title, mime_type="image/jpeg")
+            doc.filename = generate_filename(doc)
+            doc.save(write_file_paths=True)
+            Path(doc.source_path).touch()
+            docs.append(doc)
+
+        with (
+            override_settings(FILENAME_FORMAT="{title}"),
+            mock.patch(
+                "documents.management.commands.document_renamer.move_files_for_document",
+                wraps=move_files_for_document,
+            ) as mover,
+        ):
+            call_command("document_renamer", skip_checks=True)
+
+        self.assertCountEqual(
+            [c.args[0] for c in mover.call_args_list],
+            [d.pk for d in docs],
+        )
+        for doc in docs:
+            doc.refresh_from_db()
+            self.assertIsFile(doc.source_path)
 
 
 @pytest.mark.management

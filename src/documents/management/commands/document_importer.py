@@ -29,7 +29,6 @@ from django.db.models import GeneratedField
 from django.db.models import Model
 from django.db.models.signals import m2m_changed
 from django.db.models.signals import post_save
-from filelock import FileLock
 from guardian.shortcuts import clear_ct_cache
 
 from documents.export.compression import compress_type_readable
@@ -37,6 +36,7 @@ from documents.export.compression import unreadable_method_names
 from documents.file_handling import create_source_path_directory
 from documents.management.commands.base import PaperlessCommand
 from documents.management.commands.mixins import CryptMixin
+from documents.media_lock import media_lock
 from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
@@ -662,7 +662,7 @@ class Command(CryptMixin, PaperlessCommand):
             else:
                 archive_path = None
 
-            with FileLock(settings.MEDIA_LOCK):
+            with media_lock():
                 if Path(document.source_path).is_file():
                     raise FileExistsError(document.source_path)
 
@@ -696,7 +696,7 @@ class Command(CryptMixin, PaperlessCommand):
                     f"Share link bundle {bundle.pk} does not have a valid file path.",
                 )
 
-            with FileLock(settings.MEDIA_LOCK):
+            with media_lock():
                 bundle_target_path.parent.mkdir(parents=True, exist_ok=True)
                 copy_file_with_basic_stats(
                     bundle_source_path,

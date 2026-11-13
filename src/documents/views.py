@@ -132,6 +132,7 @@ from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
 from documents.file_handling import format_filename
+from documents.file_moves import flush_pending_file_moves
 from documents.filters import CorrespondentFilterSet
 from documents.filters import CustomFieldFilterSet
 from documents.filters import DocumentFilterSet
@@ -1293,6 +1294,8 @@ class DocumentViewSet(
         )
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
+        # The response must reflect the post-move filename and modified time
+        flush_pending_file_moves()
 
         if content_updated and content_doc.id != root_doc.id:
             content_doc.content = (

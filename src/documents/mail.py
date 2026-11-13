@@ -4,9 +4,9 @@ from dataclasses import dataclass
 from email import message_from_bytes
 from pathlib import Path
 
-from django.conf import settings
 from django.core.mail import EmailMessage
-from filelock import FileLock
+
+from documents.media_lock import media_lock
 
 
 @dataclass(frozen=True)
@@ -48,7 +48,7 @@ def send_email(
     used_filenames: set[str] = set()
 
     # Something could be renaming the file concurrently so it can't be attached
-    with FileLock(settings.MEDIA_LOCK):
+    with media_lock():
         for attachment in attachments:
             filename = _get_unique_filename(
                 attachment.friendly_name,
