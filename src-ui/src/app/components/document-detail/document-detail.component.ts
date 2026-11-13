@@ -1587,6 +1587,8 @@ export class DocumentDetailComponent
     modal.componentInstance.message = $localize`Run a workflow on "${this.document().title}".`
     modal.componentInstance.btnCaption = $localize`Run`
     modal.componentInstance.workflows = this.manualWorkflows()
+    modal.componentInstance.singleDocument = true
+    modal.componentInstance.force = true
     modal.componentInstance.confirmClicked.subscribe(() => {
       modal.componentInstance.buttonsEnabled.set(false)
       this.documentsService

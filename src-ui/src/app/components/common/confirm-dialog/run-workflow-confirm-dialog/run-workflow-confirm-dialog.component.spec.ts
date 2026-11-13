@@ -39,4 +39,25 @@ describe('RunWorkflowConfirmDialogComponent', () => {
     expect(options).toHaveLength(2)
     expect(options[1].textContent).toContain('Manual workflow')
   })
+
+  it('should describe the checkbox for a selection or a single document', async () => {
+    const checkbox = fixture.nativeElement.querySelector('#runWorkflowForce')
+    expect(checkbox.checked).toBe(false)
+    expect(fixture.nativeElement.textContent).toContain(
+      'Run on all selected documents'
+    )
+
+    component.singleDocument = true
+    component.force = true
+    fixture.detectChanges()
+    await fixture.whenStable()
+    fixture.detectChanges()
+    expect(checkbox.checked).toBe(true)
+    expect(fixture.nativeElement.textContent).toContain(
+      'Run on this document regardless of trigger filters'
+    )
+    expect(fixture.nativeElement.textContent).not.toContain(
+      'Run on all selected documents'
+    )
+  })
 })
