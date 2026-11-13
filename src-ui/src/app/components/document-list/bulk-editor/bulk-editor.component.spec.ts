@@ -686,6 +686,8 @@ describe('BulkEditorComponent', () => {
   })
 
   it('should run a workflow on the selection via the run workflow dialog', () => {
+    const toast = jest.spyOn(toastService, 'show')
+    const infoToast = jest.spyOn(toastService, 'showInfo')
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((m) => (modal = m[0]))
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
@@ -712,7 +714,12 @@ describe('BulkEditorComponent', () => {
       workflow: 5,
       filter_documents: false,
     })
-    req.flush(true)
+    req.flush({ result: 'OK' })
+    expect(infoToast).toHaveBeenCalledWith(
+      'Workflow will run on the selected documents in the background.'
+    )
+    expect(toast.mock.calls.at(-1)[0].actionName).toBeUndefined()
+    expect(documentListViewService.selected.size).toBe(0)
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
     ) // list reload
