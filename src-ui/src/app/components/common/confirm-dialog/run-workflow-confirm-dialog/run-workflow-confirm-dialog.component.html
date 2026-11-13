@@ -18,8 +18,13 @@
   </div>
   <div class="form-check">
     <input class="form-check-input" type="checkbox" id="runWorkflowForce" [(ngModel)]="force" />
-    <label class="form-check-label" for="runWorkflowForce" i18n>Run on all selected documents</label>
-    <div class="form-text" i18n>Ignore the workflow's trigger filters and run on every selected document.</div>
+    @if (singleDocument) {
+      <label class="form-check-label" for="runWorkflowForce" i18n>Run on this document regardless of trigger filters</label>
+      <div class="form-text" i18n>Ignore the workflow's trigger filters for this document.</div>
+    } @else {
+      <label class="form-check-label" for="runWorkflowForce" i18n>Run on all selected documents</label>
+      <div class="form-text" i18n>Ignore the workflow's trigger filters and run on every selected document.</div>
+    }
   </div>
 </div>
 <div class="modal-footer">

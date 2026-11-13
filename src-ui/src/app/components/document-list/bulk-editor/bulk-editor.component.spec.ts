@@ -699,6 +699,8 @@ describe('BulkEditorComponent', () => {
     component.runWorkflowSelected()
     expect(modal).not.toBeUndefined()
     expect(modal.componentInstance.workflows).toEqual(component.manualWorkflows)
+    expect(modal.componentInstance.singleDocument).toBe(false)
+    expect(modal.componentInstance.force).toBe(false)
     modal.componentInstance.workflowId = 5
     modal.componentInstance.force = true
     modal.componentInstance.confirm()

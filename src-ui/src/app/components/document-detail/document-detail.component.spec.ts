@@ -1038,9 +1038,10 @@ describe('DocumentDetailComponent', () => {
     modalService.activeInstances.subscribe((modal) => (openModal = modal[0]))
     const toastSpy = jest.spyOn(toastService, 'showInfo')
     component.runWorkflow()
+    expect(openModal.componentInstance.singleDocument).toBe(true)
+    expect(openModal.componentInstance.force).toBe(true)
     const modalCloseSpy = jest.spyOn(openModal, 'close')
     openModal.componentInstance.workflowId = 5
-    openModal.componentInstance.force = true
     openModal.componentInstance.confirmClicked.next()
     expect(bulkEditSpy).toHaveBeenCalledWith(
       { documents: [doc.id] },
@@ -1049,6 +1050,23 @@ describe('DocumentDetailComponent', () => {
     )
     expect(toastSpy).toHaveBeenCalled()
     expect(modalCloseSpy).toHaveBeenCalled()
+  })
+
+  it('should apply workflow filters when the single-document checkbox is cleared', () => {
+    initNormally()
+    const bulkEditSpy = jest.spyOn(documentService, 'bulkEdit')
+    bulkEditSpy.mockReturnValue(of(true))
+    let openModal: NgbModalRef
+    modalService.activeInstances.subscribe((modal) => (openModal = modal[0]))
+    component.runWorkflow()
+    openModal.componentInstance.workflowId = 5
+    openModal.componentInstance.force = false
+    openModal.componentInstance.confirmClicked.next()
+    expect(bulkEditSpy).toHaveBeenCalledWith(
+      { documents: [doc.id] },
+      'run_workflow',
+      { workflow: 5, filter_documents: true }
+    )
   })
 
   it('should pass remote OCR choice when reprocessing', () => {
