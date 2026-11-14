@@ -81,6 +81,22 @@ describe('TaskNotificationService', () => {
     ])
   })
 
+  it.each([
+    'reprocess',
+    'rotate',
+    'merge',
+    'split',
+    'delete_pages',
+    'edit_pdf',
+    'remove_password',
+  ])('reports %s as submitted rather than completed', (operation) => {
+    service.showQueued('task-1', 'Queued')
+    service.complete({ ...result(), operation })
+    expect(notifications[0].content).toContain('submitted for processing.')
+    expect(notifications[0].content).not.toContain('completed')
+    expect(notifications[0].action).toBeUndefined()
+  })
+
   it('does not show a stale queued state when completion beats the HTTP response', () => {
     service.complete(result())
     service.showQueued('task-1', 'Workflow queued.', {

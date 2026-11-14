@@ -53,7 +53,10 @@ import { SettingsService } from 'src/app/services/settings.service'
 import { TaskNotificationService } from 'src/app/services/task-notification.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { TrashService } from 'src/app/services/trash.service'
-import { getDocumentOperationLabel } from 'src/app/utils/document-operation'
+import {
+  documentOperationHasFollowUpTasks,
+  getDocumentOperationLabel,
+} from 'src/app/utils/document-operation'
 import { flattenTags } from 'src/app/utils/flatten-tags'
 import { queryParamsFromFilterRules } from 'src/app/utils/query-params'
 import { MergeAsVersionsConfirmDialogComponent } from '../../common/confirm-dialog/merge-as-versions-confirm-dialog/merge-as-versions-confirm-dialog.component'
@@ -374,9 +377,13 @@ export class BulkEditorComponent
           ? $localize`Bulk operation '${label}' queued.`
           : $localize`Operation '${label}' queued.`,
         {
-          content: bulk
-            ? $localize`Bulk operation '${label}' completed.`
-            : $localize`Operation '${label}' completed.`,
+          content: documentOperationHasFollowUpTasks(operation)
+            ? bulk
+              ? $localize`Bulk operation '${label}' submitted for processing.`
+              : $localize`Operation '${label}' submitted for processing.`
+            : bulk
+              ? $localize`Bulk operation '${label}' completed.`
+              : $localize`Operation '${label}' completed.`,
         }
       )
     }

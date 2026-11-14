@@ -1388,6 +1388,7 @@ describe('BulkEditorComponent', () => {
   })
 
   it('should support rotate', () => {
+    const toast = jest.spyOn(toastService, 'show')
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((m) => (modal = m[0]))
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
@@ -1409,6 +1410,14 @@ describe('BulkEditorComponent', () => {
       `${environment.apiBaseUrl}documents/rotate/`
     )
     req.flush({ result: 'OK', task_id: 'rotate-1' })
+    TestBed.inject(TaskNotificationService).complete({
+      task_id: 'rotate-1',
+      operation: 'rotate',
+      status: PaperlessTaskStatus.Success,
+    })
+    expect(toast.mock.calls.at(-1)[0].content).toBe(
+      "Bulk operation 'Rotate documents' submitted for processing."
+    )
     expect(req.request.body).toEqual({
       documents: [3, 4],
       degrees: 90,

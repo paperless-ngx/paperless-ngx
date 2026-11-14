@@ -899,6 +899,7 @@ describe('TasksComponent', () => {
     ['modify_tags', 12, 'Bulk operation: Update tags', '(12 documents)'],
     ['run_workflow', 1, 'Run workflow', null],
     ['delete', 3, 'Bulk operation: Move to trash', '(3 documents)'],
+    ['reprocess', 2, 'Bulk operation: Document reprocessing', '(2 documents)'],
   ])(
     'shows the operation, document count and outcome for %s',
     (operation, count, label, summary) => {
@@ -933,7 +934,19 @@ describe('TasksComponent', () => {
       expect(name.textContent).not.toContain(task.task_type_display)
       expect(
         name.closest('tr').querySelector('.results-col').textContent
-      ).toContain('Completed')
+      ).toContain(
+        [
+          'reprocess',
+          'rotate',
+          'merge',
+          'split',
+          'delete_pages',
+          'edit_pdf',
+          'remove_password',
+        ].includes(operation)
+          ? 'Submitted for processing'
+          : 'Completed'
+      )
     }
   )
 

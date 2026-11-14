@@ -33,7 +33,10 @@ import { IfPermissionsDirective } from 'src/app/directives/if-permissions.direct
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { TasksService } from 'src/app/services/tasks.service'
 import { ToastService } from 'src/app/services/toast.service'
-import { getDocumentOperationLabel } from 'src/app/utils/document-operation'
+import {
+  documentOperationHasFollowUpTasks,
+  getDocumentOperationLabel,
+} from 'src/app/utils/document-operation'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
@@ -470,7 +473,9 @@ export class TasksComponent
       task.status === PaperlessTaskStatus.Success &&
       this.taskOperationLabel(task)
     ) {
-      return $localize`Completed`
+      return documentOperationHasFollowUpTasks(task.input_data?.operation)
+        ? $localize`Submitted for processing`
+        : $localize`Completed`
     }
 
     return null

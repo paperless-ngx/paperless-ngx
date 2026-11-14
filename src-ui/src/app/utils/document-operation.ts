@@ -23,3 +23,16 @@ export function getDocumentOperationLabel(operation?: string): string | null {
   const label = operation ? OPERATION_LABELS[operation] : null
   return label ?? null
 }
+
+// These operations queue processing in separate tasks
+export function documentOperationHasFollowUpTasks(operation?: string): boolean {
+  return [
+    'reprocess',
+    'rotate',
+    'merge',
+    'split',
+    'delete_pages',
+    'edit_pdf',
+    'remove_password',
+  ].includes(operation ?? '')
+}

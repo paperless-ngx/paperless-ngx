@@ -1564,7 +1564,7 @@ export class DocumentDetailComponent
             this.taskNotifications.showQueued(
               task_id,
               $localize`Document reprocessing queued.`,
-              { content: $localize`Document reprocessing completed.` }
+              { content: $localize`Document submitted for reprocessing.` }
             )
             if (modal) {
               modal.close()
@@ -2002,7 +2002,7 @@ export class DocumentDetailComponent
                 task_id,
                 $localize`PDF edit queued.`,
                 {
-                  content: $localize`PDF edit completed.`,
+                  content: $localize`PDF edit submitted for processing.`,
                 }
               )
               modal.close()
@@ -2059,7 +2059,9 @@ export class DocumentDetailComponent
               this.taskNotifications.showQueued(
                 task_id,
                 $localize`Password removal queued.`,
-                { content: $localize`Password removal completed.` }
+                {
+                  content: $localize`Password removal submitted for processing.`,
+                }
               )
               this.networkActive.set(false)
               modal.close()

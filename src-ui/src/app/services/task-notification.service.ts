@@ -2,7 +2,10 @@ import { inject, Injectable, OnDestroy } from '@angular/core'
 import { Router } from '@angular/router'
 import { BulkOperationStatus } from '../data/bulk-operation'
 import { PaperlessTaskStatus } from '../data/paperless-task'
-import { getDocumentOperationLabel } from '../utils/document-operation'
+import {
+  documentOperationHasFollowUpTasks,
+  getDocumentOperationLabel,
+} from '../utils/document-operation'
 import {
   PermissionAction,
   PermissionsService,
@@ -80,9 +83,11 @@ export class TaskNotificationService implements OnDestroy {
     const operation = getDocumentOperationLabel(result.operation)
     let content: string
     if (succeeded) {
-      content = operation
-        ? $localize`Operation '${operation}' completed.`
-        : $localize`Operation completed.`
+      content = documentOperationHasFollowUpTasks(result.operation)
+        ? $localize`Operation '${operation}' submitted for processing.`
+        : operation
+          ? $localize`Operation '${operation}' completed.`
+          : $localize`Operation completed.`
     } else if (result.status === PaperlessTaskStatus.Revoked) {
       content = operation
         ? $localize`Operation '${operation}' revoked.`
