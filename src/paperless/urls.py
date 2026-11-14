@@ -30,11 +30,13 @@ from documents.views import IndexView
 from documents.views import LogViewSet
 from documents.views import MergeDocumentsAsVersionsView
 from documents.views import MergeDocumentsView
+from documents.views import OcrTemplateViewSet
 from documents.views import PostDocumentView
 from documents.views import RemoteVersionView
 from documents.views import RemovePasswordDocumentsView
 from documents.views import ReprocessDocumentsView
 from documents.views import RotateDocumentsView
+from documents.views import RunZoneOcrDocumentsView
 from documents.views import SavedViewViewSet
 from documents.views import SearchAutoCompleteView
 from documents.views import SelectionDataView
@@ -90,6 +92,7 @@ api_router.register(r"workflow_triggers", WorkflowTriggerViewSet)
 api_router.register(r"workflow_actions", WorkflowActionViewSet)
 api_router.register(r"workflows", WorkflowViewSet)
 api_router.register(r"custom_fields", CustomFieldViewSet)
+api_router.register(r"ocr_templates", OcrTemplateViewSet)
 api_router.register(r"config", ApplicationConfigurationViewSet)
 api_router.register(r"processed_mail", ProcessedMailViewSet)
 
@@ -165,6 +168,11 @@ urlpatterns = [
                                 "^reprocess/",
                                 ReprocessDocumentsView.as_view(),
                                 name="reprocess_documents",
+                            ),
+                            re_path(
+                                "^run_zone_ocr/",
+                                RunZoneOcrDocumentsView.as_view(),
+                                name="run_zone_ocr_documents",
                             ),
                             re_path(
                                 "^rotate/",

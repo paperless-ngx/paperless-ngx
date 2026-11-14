@@ -103,6 +103,11 @@
               <pngx-bs-icon name="play-circle" class="me-2"></pngx-bs-icon><ng-container i18n>Run workflow</ng-container>
             </button>
           }
+          @if (permissionService.currentUserCan(PermissionAction.View, PermissionType.OcrTemplate)) {
+            <button ngbDropdownItem (click)="runZoneOcrSelected()" [disabled]="!userCanEditAll">
+              <pngx-bs-icon name="bounding-box-circles" class="me-2"></pngx-bs-icon><ng-container i18n>Run Zone OCR</ng-container>
+            </button>
+          }
         </div>
       </div>
     </div>

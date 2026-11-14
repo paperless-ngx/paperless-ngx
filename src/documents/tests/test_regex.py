@@ -4,6 +4,7 @@ from django.conf import settings
 from pytest_mock import MockerFixture
 
 from documents.regex import safe_regex_finditer
+from documents.regex import safe_regex_fullmatch
 from documents.regex import safe_regex_match
 from documents.regex import safe_regex_search
 from documents.regex import safe_regex_sub
@@ -26,7 +27,7 @@ class TestValidateRegexPattern:
 
 
 class TestSafeRegexSearchAndMatch:
-    """Tests for safe_regex_search and safe_regex_match (same contract)."""
+    """Tests for safe_regex_search, _match and _fullmatch (same contract)."""
 
     @pytest.mark.parametrize(
         ("func", "pattern", "text", "expected_group"),
@@ -45,6 +46,13 @@ class TestSafeRegexSearchAndMatch:
                 "123",
                 id="match-match-found",
             ),
+            pytest.param(
+                safe_regex_fullmatch,
+                r"\d+",
+                "123",
+                "123",
+                id="fullmatch-match-found",
+            ),
         ],
     )
     def test_match_found(self, func, pattern, text, expected_group) -> None:
@@ -57,6 +65,12 @@ class TestSafeRegexSearchAndMatch:
         [
             pytest.param(safe_regex_search, r"\d+", "abcdef", id="search-no-match"),
             pytest.param(safe_regex_match, r"\d+", "abc123", id="match-no-match"),
+            pytest.param(
+                safe_regex_fullmatch,
+                r"\d+",
+                "123abc",
+                id="fullmatch-no-match",
+            ),
         ],
     )
     def test_no_match(self, func, pattern, text) -> None:
@@ -67,6 +81,7 @@ class TestSafeRegexSearchAndMatch:
         [
             pytest.param(safe_regex_search, id="search"),
             pytest.param(safe_regex_match, id="match"),
+            pytest.param(safe_regex_fullmatch, id="fullmatch"),
         ],
     )
     def test_invalid_pattern_returns_none(self, func) -> None:
@@ -77,6 +92,7 @@ class TestSafeRegexSearchAndMatch:
         [
             pytest.param(safe_regex_search, id="search"),
             pytest.param(safe_regex_match, id="match"),
+            pytest.param(safe_regex_fullmatch, id="fullmatch"),
         ],
     )
     def test_flags_respected(self, func) -> None:
@@ -87,6 +103,7 @@ class TestSafeRegexSearchAndMatch:
         [
             pytest.param(safe_regex_search, "search", id="search"),
             pytest.param(safe_regex_match, "match", id="match"),
+            pytest.param(safe_regex_fullmatch, "fullmatch", id="fullmatch"),
         ],
     )
     def test_timeout_returns_none(

@@ -3,11 +3,13 @@ import logging
 import os
 import platform
 import re
+import subprocess
 import tempfile
 import zipfile
 from collections import Counter
 from collections import deque
 from collections.abc import Callable
+from dataclasses import asdict
 from datetime import datetime
 from datetime import timedelta
 from http import HTTPStatus
@@ -159,6 +161,8 @@ from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import Note
+from documents.models import OcrTemplate
+from documents.models import OcrTemplateZone
 from documents.models import PaperlessTask
 from documents.models import SavedView
 from documents.models import ShareLink
@@ -188,6 +192,7 @@ from documents.permissions import restrict_queryset_to_visible
 from documents.permissions import set_permissions_for_objects
 from documents.permissions import user_is_unrestricted
 from documents.plugins.date_parsing import get_date_parser
+from documents.regex import safe_regex_fullmatch
 from documents.schema import generate_object_with_permissions_schema
 from documents.search import SearchHit
 from documents.serialisers import AcknowledgeTasksViewSerializer
@@ -209,11 +214,15 @@ from documents.serialisers import MergeDocumentsAsVersionsSerializer
 from documents.serialisers import MergeDocumentsSerializer
 from documents.serialisers import NoteCreateSerializer
 from documents.serialisers import NotesSerializer
+from documents.serialisers import OcrTemplateSerializer
+from documents.serialisers import OcrTemplateTestSerializer
 from documents.serialisers import PostDocumentSerializer
 from documents.serialisers import RemovePasswordDocumentsSerializer
 from documents.serialisers import ReprocessDocumentsSerializer
 from documents.serialisers import RotateDocumentsSerializer
 from documents.serialisers import RunTaskSerializer
+from documents.serialisers import RunZoneOcrDocumentsSerializer
+from documents.serialisers import RunZoneOcrSerializer
 from documents.serialisers import SavedViewSerializer
 from documents.serialisers import SearchResultSerializer
 from documents.serialisers import SerializerWithPerms
@@ -245,6 +254,7 @@ from documents.versioning import get_latest_version_for_root
 from documents.versioning import get_request_version_param
 from documents.versioning import get_root_document
 from documents.versioning import latest_version_content_prefetch
+from documents.versioning import resolve_effective_document
 from documents.versioning import resolve_requested_version_for_root
 from documents.versioning import versions_newest_first
 from paperless import version
@@ -2257,6 +2267,92 @@ class DocumentViewSet(
         return version_doc
 
     @extend_schema(
+        operation_id="documents_run_zone_ocr",
+        parameters=[
+            OpenApiParameter(
+                name="version",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.QUERY,
+                description="File version ID. Defaults to the latest version.",
+            ),
+        ],
+        request=RunZoneOcrSerializer,
+        responses=inline_serializer(
+            name="RunZoneOcrResult",
+            fields={
+                "status": serializers.ChoiceField(choices=["completed", "skipped"]),
+                "reason": serializers.ChoiceField(
+                    choices=["no_template"],
+                    required=False,
+                ),
+                "results": serializers.ListField(child=serializers.DictField()),
+            },
+        ),
+    )
+    @action(
+        methods=["post"],
+        detail=True,
+        url_path="run-zone-ocr",
+        permission_classes=[IsAuthenticated],
+    )
+    def run_zone_ocr(self, request, pk=None):
+        """
+        Run zone-based OCR extraction on this document, with the given template
+        or with every template that matches it.
+        """
+        serializer = RunZoneOcrSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        template = serializer.validated_data.get("template")
+
+        document = get_object_or_404(
+            Document.objects.select_related("root_document__owner"),
+            pk=pk,
+        )
+        if not request.user.has_perm(
+            "documents.change_document",
+        ) or not has_perms_owner_aware(request.user, "change_document", document):
+            return HttpResponseForbidden("Insufficient permissions")
+
+        if template is not None and not has_perms_owner_aware(
+            request.user,
+            "view_ocrtemplate",
+            template,
+        ):
+            return HttpResponseForbidden("Insufficient permissions")
+
+        from documents.zone_ocr import get_templates_for_document
+        from documents.zone_ocr import run_zone_extraction
+
+        resolution = resolve_effective_document(document, request)
+        if resolution.error == VersionResolutionError.INVALID:
+            raise NotFound("Invalid version parameter")
+        file_document = resolution.document
+        if file_document is None:
+            raise Http404
+
+        templates = (
+            [template]
+            if template is not None
+            else get_templates_for_document(file_document)
+        )
+        if not templates:
+            return Response(
+                {"status": "skipped", "reason": "no_template", "results": []},
+            )
+
+        doc_path = file_document.archive_path or file_document.source_path
+        if not doc_path or not Path(doc_path).is_file():
+            return Response(
+                {"error": "Document file not found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        results = run_zone_extraction(file_document, templates=templates, reindex=True)
+        return Response(
+            {"status": "completed", "results": [asdict(result) for result in results]},
+        )
+
+    @extend_schema(
         operation_id="documents_delete_version",
         parameters=[
             OpenApiParameter(
@@ -3399,6 +3495,40 @@ class ReprocessDocumentsView(DocumentOperationPermissionMixin):
             method=bulk_edit.reprocess,
             validated_data=serializer.validated_data,
             operation_label="document reprocess",
+        )
+
+
+@extend_schema_view(
+    post=extend_schema(
+        operation_id="documents_run_zone_ocr_bulk",
+        description="Run OCR template zone extraction on selected documents",
+        responses={
+            200: inline_serializer(
+                name="RunZoneOcrDocumentsResult",
+                fields={
+                    "result": serializers.CharField(),
+                },
+            ),
+        },
+    ),
+)
+class RunZoneOcrDocumentsView(DocumentOperationPermissionMixin):
+    serializer_class = RunZoneOcrDocumentsSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        template = serializer.validated_data.get("template")
+        if template is not None and not has_perms_owner_aware(
+            request.user,
+            "view_ocrtemplate",
+            template,
+        ):
+            return HttpResponseForbidden("Insufficient permissions")
+        return self._execute_document_action(
+            method=bulk_edit.run_zone_ocr,
+            validated_data=serializer.validated_data,
+            operation_label="document zone OCR",
         )
 
 
@@ -5701,3 +5831,147 @@ def serve_logo(request: HttpRequest, filename: str | None = None) -> FileRespons
         filename=logo_name,
         as_attachment=True,
     )
+
+
+class OcrTemplateViewSet(BulkPermissionMixin, PassUserMixin, ModelViewSet[OcrTemplate]):
+    """CRUD for OCR templates with zone definitions."""
+
+    model = OcrTemplate
+
+    queryset = (
+        OcrTemplate.objects.select_related("owner")
+        .prefetch_related(
+            "zones",
+            "zones__custom_field",
+        )
+        .order_by("name")
+    )
+    serializer_class = OcrTemplateSerializer
+    pagination_class = StandardPagination
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    filter_backends = (
+        OrderingFilter,
+        PermittedObjectsFilter,
+    )
+    ordering_fields = ("name",)
+
+    def get_permissions(self):
+        permissions = super().get_permissions()
+        if self.action in {"document_page_image", "test_zone"}:
+            permissions.append(ViewDocumentsPermissions())
+        return permissions
+
+    @action(
+        detail=False,
+        methods=["get"],
+        url_path=r"document-page-image/(?P<doc_id>[0-9]+)/(?P<page>[0-9]+)",
+    )
+    def document_page_image(self, request, doc_id=None, page=None):
+        """Render a page for the template editor's zone overlay."""
+        document = get_object_or_404(
+            Document.objects.select_related("root_document__owner"),
+            pk=doc_id,
+        )
+
+        if not has_perms_owner_aware(request.user, "view_document", document):
+            return HttpResponseForbidden("Insufficient permissions")
+
+        page_num = int(page)
+
+        if document.page_count and page_num >= document.page_count:
+            raise Http404(
+                f"Page {page_num} out of range (document has {document.page_count} pages)",
+            )
+
+        archive_path = document.archive_path
+        doc_path = archive_path or document.source_path
+        if not doc_path.is_file():
+            raise Http404("Document file not found")
+
+        if archive_path is None and document.mime_type.startswith("image/"):
+            return HttpResponse(doc_path.read_bytes(), content_type=document.mime_type)
+
+        with tempfile.TemporaryDirectory(dir=settings.SCRATCH_DIR) as tmp_dir:
+            output_prefix = Path(tmp_dir) / "page"
+            try:
+                subprocess.run(
+                    [
+                        "pdftoppm",
+                        "-png",
+                        "-r",
+                        "150",
+                        "-f",
+                        str(page_num + 1),
+                        "-l",
+                        str(page_num + 1),
+                        str(doc_path),
+                        str(output_prefix),
+                    ],
+                    check=True,
+                    capture_output=True,
+                    timeout=30,
+                )
+            except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as error:
+                logger.warning(
+                    "Failed to render page %s of document %s: %s",
+                    page_num,
+                    document.pk,
+                    error,
+                )
+                raise Http404("Failed to render page") from error
+            except FileNotFoundError as error:
+                logger.warning("pdftoppm is not available")
+                raise Http404("Failed to render page") from error
+
+            rendered = sorted(Path(tmp_dir).glob("page-*.png"))
+            if not rendered:
+                raise Http404("No rendered page found")
+
+            content = rendered[0].read_bytes()
+
+        return HttpResponse(content, content_type="image/png")
+
+    @extend_schema(request=OcrTemplateTestSerializer)
+    @action(detail=False, methods=["post"], url_path="test-zone")
+    def test_zone(self, request):
+        """Extract an ad-hoc zone without changing the document."""
+        from documents.zone_ocr import extract_zone_preview
+
+        serializer = OcrTemplateTestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        document = serializer.validated_data["document"]
+
+        if not has_perms_owner_aware(request.user, "view_document", document):
+            return HttpResponseForbidden("Insufficient permissions")
+
+        doc_path = document.archive_path or document.source_path
+        if not doc_path or not Path(doc_path).is_file():
+            return Response(
+                {"error": "Document file not found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        zone = OcrTemplateZone(**serializer.validated_data["zone"])
+
+        result = extract_zone_preview(
+            Path(doc_path),
+            zone,
+            zone.zone_source_width or 0,
+            zone.zone_source_height or 0,
+            document.page_count,
+        )
+
+        regex_match = None
+        if zone.validation_regex and result.get("value") is not None:
+            regex_match = (
+                safe_regex_fullmatch(zone.validation_regex, result["value"]) is not None
+            )
+
+        return Response(
+            {
+                "raw_text": result.get("raw_text"),
+                "value": result.get("value"),
+                "regex": zone.validation_regex,
+                "regex_match": regex_match,
+            },
+        )

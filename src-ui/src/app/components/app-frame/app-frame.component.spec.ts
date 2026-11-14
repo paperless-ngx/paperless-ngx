@@ -373,6 +373,7 @@ describe('AppFrameComponent', () => {
       HideableSidebarItemID.Dashboard,
       HideableSidebarItemID.Workflows,
       HideableSidebarItemID.ShareLinks,
+      HideableSidebarItemID.OcrTemplates,
     ])
     fixture.detectChanges()
 
@@ -389,6 +390,10 @@ describe('AppFrameComponent', () => {
         .parentElement.classList
     ).toContain('d-none')
     expect(
+      fixture.nativeElement.querySelector('[routerLink="ocr-templates"]')
+        .parentElement.classList
+    ).toContain('d-none')
+    expect(
       fixture.nativeElement.querySelector('[routerLink="mail"]').parentElement
         .classList
     ).not.toContain('d-none')
@@ -400,12 +405,21 @@ describe('AppFrameComponent', () => {
     ])
     settingsService.sidebarHiddenItemsEditing.set([
       HideableSidebarItemID.Dashboard,
+      HideableSidebarItemID.OcrTemplates,
     ])
     fixture.detectChanges()
 
     expect(
       fixture.nativeElement.querySelectorAll('pngx-input-switch').length
-    ).toBe(6)
+    ).toBe(7)
+    const ocrTemplatesLink = fixture.nativeElement.querySelector(
+      '[routerLink="ocr-templates"]'
+    )
+    expect(ocrTemplatesLink.parentElement.classList).not.toContain('d-none')
+    expect(ocrTemplatesLink.classList).toContain('opacity-50')
+    expect(
+      ocrTemplatesLink.parentElement.querySelector('pngx-input-switch')
+    ).not.toBeNull()
     expect(
       fixture.nativeElement.querySelector('[routerLink="dashboard"]')
         .parentElement.classList

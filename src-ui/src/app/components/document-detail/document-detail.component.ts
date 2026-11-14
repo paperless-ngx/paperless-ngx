@@ -64,6 +64,7 @@ import {
   FILTER_STORAGE_PATH,
 } from 'src/app/data/filter-rule-type'
 import { ObjectWithId } from 'src/app/data/object-with-id'
+import { OcrZoneRunResult } from 'src/app/data/ocr-template'
 import { StoragePath } from 'src/app/data/storage-path'
 import { Tag } from 'src/app/data/tag'
 import { SETTINGS_KEYS, SuggestionSource } from 'src/app/data/ui-settings'
@@ -108,6 +109,7 @@ import { ConfirmDialogComponent } from '../common/confirm-dialog/confirm-dialog.
 import { PasswordRemovalConfirmDialogComponent } from '../common/confirm-dialog/password-removal-confirm-dialog/password-removal-confirm-dialog.component'
 import { ReprocessConfirmDialogComponent } from '../common/confirm-dialog/reprocess-confirm-dialog/reprocess-confirm-dialog.component'
 import { RunWorkflowConfirmDialogComponent } from '../common/confirm-dialog/run-workflow-confirm-dialog/run-workflow-confirm-dialog.component'
+import { ZoneOcrConfirmDialogComponent } from '../common/confirm-dialog/zone-ocr-confirm-dialog/zone-ocr-confirm-dialog.component'
 import { CustomFieldsDropdownComponent } from '../common/custom-fields-dropdown/custom-fields-dropdown.component'
 import { CorrespondentEditDialogComponent } from '../common/edit-dialog/correspondent-edit-dialog/correspondent-edit-dialog.component'
 import { DocumentTypeEditDialogComponent } from '../common/edit-dialog/document-type-edit-dialog/document-type-edit-dialog.component'
@@ -271,6 +273,7 @@ export class DocumentDetailComponent
   readonly error = signal<any>(undefined)
 
   readonly networkActive = signal(false)
+  readonly zoneOcrRunning = signal(false)
 
   readonly documentId = signal<number>(undefined)
   readonly document = signal<Document>(undefined)
@@ -549,7 +552,11 @@ export class DocumentDetailComponent
       )
   }
 
-  private loadDocument(documentId: number, forceRemote: boolean = false): void {
+  private loadDocument(
+    documentId: number,
+    forceRemote: boolean = false,
+    onComplete?: () => void
+  ): void {
     let redirectedToRoot = false
     this.closeIncomingUpdateModal()
     this.pendingIncomingUpdate = null
@@ -606,7 +613,8 @@ export class DocumentDetailComponent
         }),
         first(),
         takeUntil(this.unsubscribeNotifier),
-        takeUntil(this.docChangeNotifier)
+        takeUntil(this.docChangeNotifier),
+        finalize(() => onComplete?.())
       )
       .subscribe({
         next: (doc) => {
@@ -1354,6 +1362,7 @@ export class DocumentDetailComponent
   }
 
   save(close: boolean = false, savedCallback: () => void = null) {
+    if (this.zoneOcrRunning()) return
     this.networkActive.set(true)
     ;(document.activeElement as HTMLElement)?.dispatchEvent(new Event('change'))
     this.documentsService
@@ -1612,6 +1621,113 @@ export class DocumentDetailComponent
           },
         })
     })
+  }
+
+  /** Runs every template that matches, confirming only over unsaved changes. */
+  runZoneOcr() {
+    if (this.networkActive()) return
+    const documentId = this.documentId()
+    const versionId = this.getSelectedNonLatestVersionId()
+    if (!this.hasLocalEdits(this.document())) {
+      this.executeZoneOcr(documentId, null, versionId)
+      return
+    }
+    const modal = this.modalService.open(ConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.title = $localize`Run Zone OCR`
+    modal.componentInstance.messageBold = $localize`You have unsaved changes.`
+    modal.componentInstance.message = $localize`Running Zone OCR will discard them.`
+    modal.componentInstance.btnClass = 'btn-warning'
+    modal.componentInstance.btnCaption = $localize`Run Zone OCR`
+    modal.componentInstance.confirmClicked
+      .pipe(first(), takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        modal.close()
+        if (this.documentId() === documentId && !this.networkActive()) {
+          this.executeZoneOcr(documentId, null, versionId)
+        }
+      })
+  }
+
+  /** Opens the dialog to pick which template to run. */
+  runZoneOcrWithOptions() {
+    if (this.networkActive()) return
+    const documentId = this.documentId()
+    const versionId = this.getSelectedNonLatestVersionId()
+    const modal = this.modalService.open(ZoneOcrConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    const dialog = modal.componentInstance as ZoneOcrConfirmDialogComponent
+    dialog.title = $localize`Run Zone OCR`
+    dialog.btnCaption = $localize`Run Zone OCR`
+    if (this.hasLocalEdits(this.document())) {
+      dialog.messageBold = $localize`You have unsaved changes.`
+      dialog.message = $localize`Running Zone OCR will discard them.`
+      dialog.btnClass = 'btn-warning'
+    } else {
+      dialog.message = $localize`Fields filled by the template will be overwritten.`
+    }
+    dialog.confirmClicked
+      .pipe(first(), takeUntil(this.unsubscribeNotifier))
+      .subscribe(() => {
+        modal.close()
+        if (this.documentId() === documentId && !this.networkActive()) {
+          this.executeZoneOcr(documentId, dialog.template, versionId)
+        }
+      })
+  }
+
+  private executeZoneOcr(
+    documentId: number,
+    templateId: number | null,
+    versionId: number | null
+  ) {
+    this.zoneOcrRunning.set(true)
+    this.networkActive.set(true)
+    this.documentsService
+      .runZoneOcr(documentId, templateId, versionId)
+      .pipe(takeUntil(this.unsubscribeNotifier))
+      .subscribe({
+        next: (response) => {
+          if (
+            this.documentId() !== documentId ||
+            response.status === 'skipped'
+          ) {
+            this.finishZoneOcr()
+            if (response.status === 'skipped') {
+              this.toastService.showInfo(
+                $localize`No OCR template applies to this document.`
+              )
+            }
+            return
+          }
+          this.toastService.showInfo(this.zoneOcrSummary(response.results))
+          this.docChangeNotifier.next(documentId)
+          this.loadDocument(documentId, true, () => this.finishZoneOcr())
+        },
+        error: (error) => {
+          this.finishZoneOcr()
+          this.toastService.showError($localize`Error running zone OCR.`, error)
+        },
+      })
+  }
+
+  private zoneOcrSummary(results: OcrZoneRunResult[]): string {
+    if (!results.length) return $localize`Zone OCR found no fields to fill.`
+    const missed = results
+      .filter((result) => !`${result.value ?? ''}`.trim())
+      .map((result) => result.zone)
+    const filled = results.length - missed.length
+    return missed.length
+      ? $localize`Filled ${filled} of ${results.length} fields. No value found for: ${missed.join(', ')}`
+      : $localize`Filled ${filled} of ${results.length} fields.`
+  }
+
+  private finishZoneOcr() {
+    this.zoneOcrRunning.set(false)
+    this.networkActive.set(false)
+    this.flushPendingIncomingUpdate()
   }
 
   private getSelectedNonLatestVersionId(): number | null {
