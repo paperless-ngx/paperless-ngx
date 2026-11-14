@@ -3,6 +3,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { By } from '@angular/platform-browser'
 import { NgbActiveModal, NgbModalModule } from '@ng-bootstrap/ng-bootstrap'
 import { of } from 'rxjs'
+import { User } from 'src/app/data/user'
 import { GroupService } from 'src/app/services/rest/group.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { CheckComponent } from '../../common/input/check/check.component'
@@ -14,6 +15,7 @@ import { TextComponent } from '../../common/input/text/text.component'
 import { SaveViewConfigDialogComponent } from './save-view-config-dialog.component'
 
 describe('SaveViewConfigDialogComponent', () => {
+  const users = [{ id: 10, username: 'user10' }] as User[]
   let component: SaveViewConfigDialogComponent
   let fixture: ComponentFixture<SaveViewConfigDialogComponent>
   let modal: NgbActiveModal
@@ -25,7 +27,7 @@ describe('SaveViewConfigDialogComponent', () => {
         {
           provide: UserService,
           useValue: {
-            listAll: () => of({ results: [] }),
+            listAll: () => of({ results: users }),
           },
         },
         {
@@ -122,6 +124,19 @@ describe('SaveViewConfigDialogComponent', () => {
       showOnDashboard: false,
       permissions_form: permissions,
     })
+  })
+
+  it('should list users in the owner selector', () => {
+    fixture.debugElement
+      .query(By.css('button[ngbAccordionButton]'))
+      .nativeElement.click()
+    fixture.detectChanges()
+
+    const permissionsForm = fixture.debugElement.query(
+      By.directive(PermissionsFormComponent)
+    )
+    const ownerSelect = permissionsForm.query(By.directive(SelectComponent))
+    expect(ownerSelect.componentInstance.items).toEqual(users)
   })
 
   it('should support default name', () => {
