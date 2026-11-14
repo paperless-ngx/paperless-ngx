@@ -1038,8 +1038,9 @@ class TestPDFActions(DirectoriesMixin, TestCase):
 
         mock_consume_file.assert_not_called()
 
+    @mock.patch("documents.bulk_edit.group")
     @mock.patch("documents.tasks.consume_file.s")
-    def test_split(self, mock_consume_file) -> None:
+    def test_split(self, mock_consume_file, mock_group) -> None:
         """
         GIVEN:
             - Existing documents
@@ -1060,6 +1061,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         self.assertIsNone(mock_consume_file.call_args.kwargs["overrides"].asn)
 
         self.assertEqual(result, "OK")
+        mock_group.return_value.delay.assert_called_once()
 
     @mock.patch("documents.bulk_edit.group")
     @mock.patch("documents.pdf_ops.build_pdfs")
@@ -1168,8 +1170,8 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         sig.apply_async.side_effect = Exception("boom")
         mock_chord.return_value = sig
 
-        result = bulk_edit.split(doc_ids, pages, delete_originals=True)
-        self.assertEqual(result, "OK")
+        with self.assertRaisesMessage(Exception, "boom"):
+            bulk_edit.split(doc_ids, pages, delete_originals=True)
 
         self.doc2.refresh_from_db()
         self.assertEqual(self.doc2.archive_serial_number, 222)
@@ -1191,7 +1193,8 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         pages = [[1, 2], [3]]
 
         with self.assertLogs("paperless.bulk_edit", level="ERROR") as cm:
-            bulk_edit.split(doc_ids, pages)
+            with self.assertRaisesMessage(Exception, "Error building PDFs"):
+                bulk_edit.split(doc_ids, pages)
             error_str = cm.output[0]
             expected_str = "Error splitting document 2"
             self.assertIn(expected_str, error_str)
@@ -1240,7 +1243,8 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         doc_ids = [self.doc2.id, self.doc3.id]
 
         with self.assertLogs("paperless.bulk_edit", level="ERROR") as cm:
-            bulk_edit.rotate(doc_ids, 90)
+            with self.assertRaisesMessage(Exception, "Error rotating PDF"):
+                bulk_edit.rotate(doc_ids, 90)
             error_str = cm.output[0]
             expected_str = "Error rotating document"
             self.assertIn(expected_str, error_str)
@@ -1375,7 +1379,8 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         pages = [1, 3]
 
         with self.assertLogs("paperless.bulk_edit", level="ERROR") as cm:
-            bulk_edit.delete_pages(doc_ids, pages)
+            with self.assertRaisesMessage(Exception, "Error removing pages"):
+                bulk_edit.delete_pages(doc_ids, pages)
             error_str = cm.output[0]
             expected_str = "Error deleting pages from document"
             self.assertIn(expected_str, error_str)

@@ -574,6 +574,7 @@ def rotate(
             )
         except Exception as e:
             logger.exception(f"Error rotating document {pair.root_doc.id}: {e}")
+            raise
 
     return "OK"
 
@@ -873,6 +874,7 @@ def split(
 
     except Exception as e:
         logger.exception(f"Error splitting document {doc.id}: {e}")
+        raise
 
     return "OK"
 
@@ -918,6 +920,7 @@ def delete_pages(
         )
     except Exception as e:
         logger.exception(f"Error deleting pages from document {pair.root_doc.id}: {e}")
+        raise
 
     return "OK"
 

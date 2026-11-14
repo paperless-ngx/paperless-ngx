@@ -185,6 +185,38 @@ def test_delete_failure_propagates_from_worker(bulk_setup):
 
 
 @pytest.mark.django_db
+@pytest.mark.parametrize(
+    "operation,parameters,preparation",
+    [
+        ("rotate", {"degrees": 90}, "rotate_pdf"),
+        ("split", {"pages": [[1]]}, "build_pdfs"),
+        ("delete_pages", {"pages": [1]}, "remove_pages"),
+    ],
+)
+def test_preparation_failure_propagates_from_worker(
+    bulk_setup,
+    operation,
+    parameters,
+    preparation,
+):
+    user, _, doc, _ = bulk_setup
+    doc.mime_type = "application/pdf"
+    doc.save()
+    with (
+        mock.patch(
+            f"documents.bulk_edit.pdf_ops.{preparation}",
+            side_effect=RuntimeError("preparation failed"),
+        ),
+        mock.patch("documents.bulk_edit.consume_file.apply_async") as consume,
+        mock.patch("documents.bulk_edit.consume_file.s") as consume_signature,
+        pytest.raises(RuntimeError, match="preparation failed"),
+    ):
+        execute_bulk_operation(operation, [doc.pk], parameters, user.pk)
+    consume.assert_not_called()
+    consume_signature.assert_not_called()
+
+
+@pytest.mark.django_db
 def test_queue_failure_does_not_change_documents(bulk_setup):
     _, client, doc, correspondent = bulk_setup
     with mock.patch(

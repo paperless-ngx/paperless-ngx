@@ -2333,9 +2333,12 @@ class TestWorkflows(
         self.assertEqual(doc.owner, self.user2)
 
     def test_manual_workflow_run_missing_workflow(self) -> None:
-        """A missing workflow id logs a warning rather than raising."""
+        """A workflow removed after queueing fails the task."""
         doc = DocumentFactory()
-        with self.assertLogs("paperless.tasks", level="WARNING"):
+        with (
+            self.assertLogs("paperless.tasks", level="WARNING"),
+            self.assertRaises(Workflow.DoesNotExist),
+        ):
             tasks.run_workflows_for_documents([doc.pk], 9999)
 
     @mock.patch("documents.tasks.send_websocket_document_updated")
@@ -2356,7 +2359,13 @@ class TestWorkflows(
 
         mock_run_workflows.side_effect = side_effect
 
-        with self.assertLogs("paperless.tasks", level="ERROR"):
+        with (
+            self.assertLogs("paperless.tasks", level="ERROR"),
+            self.assertRaisesMessage(
+                RuntimeError,
+                f"failed for document(s): [{doc1.pk}]",
+            ),
+        ):
             tasks.run_workflows_for_documents([doc1.pk, doc2.pk], workflow.pk)
 
         # Both documents were attempted; the websocket update only fired for the
