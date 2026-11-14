@@ -327,7 +327,7 @@ export class DocumentVersionDropdownComponent
                 PermissionType.PaperlessTask
               )
               this.toastService.show({
-                content: $localize`Bulk operation queued.`,
+                content: $localize`Existing document queued to be added as a version.`,
                 delay: 5000,
                 ...(canViewTasks
                   ? {

@@ -1558,9 +1558,10 @@ export class DocumentDetailComponent
           modal.componentInstance.remoteOcr
         )
         .subscribe({
-          next: () => {
-            this.toastService.showInfo(
-              $localize`Reprocess operation for "${this.document().title}" will begin in the background.`
+          next: ({ task_id }) => {
+            this.notifyTaskQueued(
+              task_id,
+              $localize`Document reprocessing queued.`
             )
             if (modal) {
               modal.close()
@@ -1597,10 +1598,8 @@ export class DocumentDetailComponent
           filter_documents: !modal.componentInstance.force,
         })
         .subscribe({
-          next: () => {
-            this.toastService.showInfo(
-              $localize`Workflow will run on "${this.document().title}" in the background.`
-            )
+          next: ({ task_id }) => {
+            this.notifyTaskQueued(task_id, $localize`Workflow queued.`)
             modal.close()
           },
           error: (error) => {
@@ -1611,6 +1610,26 @@ export class DocumentDetailComponent
             )
           },
         })
+    })
+  }
+
+  private notifyTaskQueued(taskId: string, content: string) {
+    const canViewTasks = this.permissionsService.currentUserCan(
+      PermissionAction.View,
+      PermissionType.PaperlessTask
+    )
+    this.toastService.show({
+      content,
+      delay: 5000,
+      ...(canViewTasks
+        ? {
+            actionName: $localize`View task`,
+            action: () =>
+              this.router.navigate(['/tasks'], {
+                queryParams: { task_id: taskId },
+              }),
+          }
+        : {}),
     })
   }
 
@@ -1989,14 +2008,9 @@ export class DocumentDetailComponent
           })
           .pipe(first(), takeUntil(this.unsubscribeNotifier))
           .subscribe({
-            next: () => {
-              this.toastService.showInfo(
-                $localize`PDF edit operation for "${this.document().title}" will begin in the background.`
-              )
+            next: ({ task_id }) => {
+              this.notifyTaskQueued(task_id, $localize`PDF edit queued.`)
               modal.close()
-              if (modal.componentInstance.deleteOriginal) {
-                this.openDocumentService.closeDocument(this.document())
-              }
             },
             error: (error) => {
               if (modal) {
@@ -2046,17 +2060,13 @@ export class DocumentDetailComponent
           })
           .pipe(first(), takeUntil(this.unsubscribeNotifier))
           .subscribe({
-            next: () => {
-              this.toastService.showInfo(
-                $localize`Password removal operation for "${this.document().title}" will begin in the background.`
+            next: ({ task_id }) => {
+              this.notifyTaskQueued(
+                task_id,
+                $localize`Password removal queued.`
               )
               this.networkActive.set(false)
               modal.close()
-              if (!dialog.updateDocument && dialog.deleteOriginal) {
-                this.openDocumentService.closeDocument(this.document())
-              } else if (dialog.updateDocument) {
-                this.openDocumentService.refreshDocument(this.documentId())
-              }
             },
             error: (error) => {
               dialog.buttonsEnabled.set(true)

@@ -418,7 +418,7 @@ describe('DocumentVersionDropdownComponent', () => {
     expect(modal.close).toHaveBeenCalled()
     expect(toastService.show).toHaveBeenCalledWith(
       expect.objectContaining({
-        content: 'Bulk operation queued.',
+        content: 'Existing document queued to be added as a version.',
         actionName: 'View task',
       })
     )
