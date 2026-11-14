@@ -69,7 +69,8 @@ class TestArchiver(DirectoriesMixin, FileSystemAssertsMixin, TestCase):
         doc.save()
         shutil.copy(sample_file, doc.source_path)
 
-        update_document_content_maybe_archive_file(doc.pk)
+        with self.assertRaisesMessage(ValueError, "No parser found"):
+            update_document_content_maybe_archive_file(doc.pk)
 
         doc = Document.objects.get(id=doc.id)
 

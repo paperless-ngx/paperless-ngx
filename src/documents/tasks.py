@@ -394,11 +394,10 @@ def update_document_content_maybe_archive_file(
     )
 
     if not parser_class:
-        logger.error(
+        raise ValueError(
             f"No parser found for mime type {mime_type}, cannot "
-            f"archive document {document} (ID: {document_id})",
+            f"reprocess document {document} (ID: {document_id})",
         )
-        return
 
     with parser_class() as parser:
         parser.configure(ParserContext())
@@ -512,6 +511,7 @@ def update_document_content_maybe_archive_file(
             logger.exception(
                 f"Error while parsing document {document} (ID: {document_id})",
             )
+            raise
 
 
 @shared_task

@@ -1,4 +1,5 @@
 import shutil
+import uuid
 from datetime import timedelta
 from pathlib import Path
 from unittest import mock
@@ -16,6 +17,7 @@ from documents import tasks
 from documents.models import Correspondent
 from documents.models import Document
 from documents.models import DocumentType
+from documents.models import PaperlessTask
 from documents.models import Tag
 from documents.models import WorkflowAction
 from documents.sanity_checker import SanityCheckFailedException
@@ -280,6 +282,60 @@ class TestUpdateContent(DirectoriesMixin, TestCase):
         tasks.update_document_content_maybe_archive_file(doc.pk)
         self.assertNotEqual(Document.objects.get(pk=doc.pk).content, "test")
 
+    @mock.patch("documents.tasks.get_parser_registry")
+    def test_missing_parser_records_failure(self, registry) -> None:
+        doc = DocumentFactory(content="Original content", mime_type="application/pdf")
+        registry.return_value.get_parser_for_file.return_value = None
+        task = PaperlessTask.objects.create(
+            task_id=str(uuid.uuid4()),
+            task_type=PaperlessTask.TaskType.REPROCESS_DOCUMENT,
+        )
+
+        result = tasks.update_document_content_maybe_archive_file.apply(
+            args=[doc.pk],
+            task_id=task.task_id,
+            throw=False,
+        )
+
+        self.assertTrue(result.failed())
+        task.refresh_from_db()
+        self.assertEqual(task.status, PaperlessTask.Status.FAILURE)
+        self.assertIn("No parser found", task.result_data["error_message"])
+        doc.refresh_from_db()
+        self.assertEqual(doc.content, "Original content")
+
+    @mock.patch("documents.tasks.should_produce_archive", return_value=False)
+    @mock.patch("documents.tasks.get_parser_registry")
+    def test_parser_failure_records_failure(self, registry, _produce_archive) -> None:
+        for method in ("parse", "get_thumbnail"):
+            with self.subTest(method=method):
+                doc = DocumentFactory(
+                    content="Original content",
+                    mime_type="application/pdf",
+                )
+                parser = mock.MagicMock()
+                getattr(parser, method).side_effect = RuntimeError("Processing failed")
+                parser_class = mock.MagicMock()
+                parser_class.return_value.__enter__.return_value = parser
+                registry.return_value.get_parser_for_file.return_value = parser_class
+                task = PaperlessTask.objects.create(
+                    task_id=str(uuid.uuid4()),
+                    task_type=PaperlessTask.TaskType.REPROCESS_DOCUMENT,
+                )
+
+                result = tasks.update_document_content_maybe_archive_file.apply(
+                    args=[doc.pk],
+                    task_id=task.task_id,
+                    throw=False,
+                )
+
+                self.assertTrue(result.failed())
+                task.refresh_from_db()
+                self.assertEqual(task.status, PaperlessTask.Status.FAILURE)
+                self.assertEqual(task.result_data["error_message"], "Processing failed")
+                doc.refresh_from_db()
+                self.assertEqual(doc.content, "Original content")
+
     def _create_root_with_version(self) -> tuple[Document, Document]:
         sample1 = self.dirs.scratch_dir / "sample.pdf"
         shutil.copy(SIMPLE_DIGITAL_PDF, sample1)
@@ -370,7 +426,8 @@ class TestUpdateContentRemoteOCR(DirectoriesMixin, TestCase):
         )
 
     def _allow_remote(self, **kwargs) -> bool:
-        tasks.update_document_content_maybe_archive_file(self.doc.pk, **kwargs)
+        with self.assertRaisesMessage(ValueError, "No parser found"):
+            tasks.update_document_content_maybe_archive_file(self.doc.pk, **kwargs)
         _, call_kwargs = self.mock_registry.return_value.get_parser_for_file.call_args
         return call_kwargs["allow_remote"]
 
