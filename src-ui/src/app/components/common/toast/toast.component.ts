@@ -37,9 +37,9 @@ import { Toast, ToastLevel } from 'src/app/services/toast.service'
   providers: [DatePipe, CustomDatePipe],
 })
 export class ToastComponent implements OnInit, OnChanges {
-  private clipboard = inject(Clipboard)
-  private customDatePipe = inject(CustomDatePipe)
-  private destroyRef = inject(DestroyRef)
+  private readonly clipboard = inject(Clipboard)
+  private readonly customDatePipe = inject(CustomDatePipe)
+  private readonly destroyRef = inject(DestroyRef)
   readonly copied = signal(false)
   readonly ToastLevel = ToastLevel
   readonly delayRemaining = signal<number>(null)

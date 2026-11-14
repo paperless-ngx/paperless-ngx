@@ -17,11 +17,11 @@ interface PendingNotification {
 
 @Injectable({ providedIn: 'root' })
 export class TaskNotificationService implements OnDestroy {
-  private toastService = inject(ToastService)
-  private router = inject(Router)
-  private permissionsService = inject(PermissionsService)
-  private pending = new Map<string, PendingNotification>()
-  private completed = new Map<string, BulkOperationStatus>()
+  private readonly toastService = inject(ToastService)
+  private readonly router = inject(Router)
+  private readonly permissionsService = inject(PermissionsService)
+  private readonly pending = new Map<string, PendingNotification>()
+  private readonly completed = new Map<string, BulkOperationStatus>()
 
   ngOnDestroy() {
     this.pending.forEach(({ timer }) => clearTimeout(timer))
