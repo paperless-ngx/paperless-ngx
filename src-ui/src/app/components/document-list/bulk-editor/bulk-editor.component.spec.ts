@@ -1267,14 +1267,15 @@ describe('BulkEditorComponent', () => {
     let req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}documents/delete/`
     )
-    const notifySpy = jest
-      .spyOn(trashService, 'notifyMovedToTrash')
+    const trackSpy = jest
+      .spyOn(trashService, 'trackMovedToTrash')
       .mockImplementation(() => {})
-    req.flush(true)
+    req.flush({ result: 'OK', task_id: 'delete-1' })
     expect(req.request.body).toEqual({
       documents: [3, 4],
+      from_webui: true,
     })
-    expect(notifySpy).toHaveBeenCalledWith(expect.any(String), [3, 4])
+    expect(trackSpy).toHaveBeenCalledWith('delete-1', 2, [3, 4])
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
     ) // list reload
@@ -1291,9 +1292,9 @@ describe('BulkEditorComponent', () => {
     req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}documents/delete/`
     )
-    req.flush(true)
+    req.flush({ result: 'OK', task_id: 'delete-2' })
     // ids aren't known when all matching documents are selected, so no undo
-    expect(notifySpy).toHaveBeenLastCalledWith(expect.any(String), null)
+    expect(trackSpy).toHaveBeenLastCalledWith('delete-2', 0, null)
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
     ) // list reload
@@ -1373,10 +1374,11 @@ describe('BulkEditorComponent', () => {
     let req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}documents/reprocess/`
     )
-    req.flush(true)
+    req.flush({ result: 'OK', task_id: 'reprocess-1' })
     expect(req.request.body).toEqual({
       documents: [3, 4],
       remote_ocr: false,
+      from_webui: true,
     })
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
@@ -1407,11 +1409,12 @@ describe('BulkEditorComponent', () => {
     let req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}documents/rotate/`
     )
-    req.flush(true)
+    req.flush({ result: 'OK', task_id: 'rotate-1' })
     expect(req.request.body).toEqual({
       documents: [3, 4],
       degrees: 90,
       source_mode: 'latest_version',
+      from_webui: true,
     })
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
@@ -1449,10 +1452,11 @@ describe('BulkEditorComponent', () => {
     let req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}documents/merge/`
     )
-    req.flush(true)
+    req.flush({ result: 'OK', task_id: 'merge-1' })
     expect(req.request.body).toEqual({
       documents: [3, 4],
       metadata_document_id: 3,
+      from_webui: true,
     })
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
@@ -1467,11 +1471,12 @@ describe('BulkEditorComponent', () => {
     req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}documents/merge/`
     )
-    req.flush(true)
+    req.flush({ result: 'OK', task_id: 'merge-2' })
     expect(req.request.body).toEqual({
       documents: [3, 4],
       metadata_document_id: 3,
       delete_originals: true,
+      from_webui: true,
     })
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
@@ -1488,11 +1493,12 @@ describe('BulkEditorComponent', () => {
     req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}documents/merge/`
     )
-    req.flush(true)
+    req.flush({ result: 'OK', task_id: 'merge-3' })
     expect(req.request.body).toEqual({
       documents: [3, 4],
       metadata_document_id: 3,
       archive_fallback: true,
+      from_webui: true,
     })
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
@@ -1531,8 +1537,8 @@ describe('BulkEditorComponent', () => {
       .mockReturnValue(true)
     const mergeAsVersionsSpy = jest
       .spyOn(documentService, 'mergeDocumentsAsVersions')
-      .mockReturnValue(of(true))
-    const toastSuccessSpy = jest.spyOn(toastService, 'showSuccess')
+      .mockReturnValue(of({ result: 'OK', task_id: 'versions-1' }))
+    const toastSpy = jest.spyOn(toastService, 'show')
     fixture.detectChanges()
 
     component.mergeSelectedAsVersions()
@@ -1548,8 +1554,8 @@ describe('BulkEditorComponent', () => {
       `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
     )
     expect(documentListViewService.selected.size).toEqual(0)
-    expect(toastSuccessSpy).toHaveBeenCalledWith(
-      'Documents merged as versions.'
+    expect(toastSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ content: 'Bulk operation queued.' })
     )
   })
 

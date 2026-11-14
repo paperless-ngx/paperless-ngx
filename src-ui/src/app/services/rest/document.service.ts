@@ -360,10 +360,14 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     selection: DocumentSelectionQuery,
     remoteOcr: boolean = false
   ) {
-    return this.http.post(this.getResourceUrl(null, 'reprocess'), {
-      ...selection,
-      remote_ocr: remoteOcr,
-    })
+    return this.http.post<BulkOperationResponse>(
+      this.getResourceUrl(null, 'reprocess'),
+      {
+        ...selection,
+        remote_ocr: remoteOcr,
+        from_webui: true,
+      }
+    )
   }
 
   rotateDocuments(
@@ -371,18 +375,26 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     degrees: number,
     sourceMode: BulkEditSourceMode = BulkEditSourceMode.LATEST_VERSION
   ) {
-    return this.http.post(this.getResourceUrl(null, 'rotate'), {
-      ...selection,
-      degrees,
-      source_mode: sourceMode,
-    })
+    return this.http.post<BulkOperationResponse>(
+      this.getResourceUrl(null, 'rotate'),
+      {
+        ...selection,
+        degrees,
+        source_mode: sourceMode,
+        from_webui: true,
+      }
+    )
   }
 
   mergeDocuments(ids: number[], request: MergeDocumentsRequest = {}) {
-    return this.http.post(this.getResourceUrl(null, 'merge'), {
-      documents: ids,
-      ...request,
-    })
+    return this.http.post<BulkOperationResponse>(
+      this.getResourceUrl(null, 'merge'),
+      {
+        documents: ids,
+        ...request,
+        from_webui: true,
+      }
+    )
   }
 
   mergeDocumentsAsVersions(
@@ -390,28 +402,40 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     rootDocumentId: number,
     versionLabel?: string
   ) {
-    return this.http.post(this.getResourceUrl(null, 'merge_as_versions'), {
-      documents: ids,
-      root_document_id: rootDocumentId,
-      ...(versionLabel ? { version_label: versionLabel } : {}),
-    })
+    return this.http.post<BulkOperationResponse>(
+      this.getResourceUrl(null, 'merge_as_versions'),
+      {
+        documents: ids,
+        root_document_id: rootDocumentId,
+        ...(versionLabel ? { version_label: versionLabel } : {}),
+        from_webui: true,
+      }
+    )
   }
 
   editPdfDocuments(ids: number[], request: EditPdfDocumentsRequest) {
-    return this.http.post(this.getResourceUrl(null, 'edit_pdf'), {
-      documents: ids,
-      ...request,
-    })
+    return this.http.post<BulkOperationResponse>(
+      this.getResourceUrl(null, 'edit_pdf'),
+      {
+        documents: ids,
+        ...request,
+        from_webui: true,
+      }
+    )
   }
 
   removePasswordDocuments(
     ids: number[],
     request: RemovePasswordDocumentsRequest
   ) {
-    return this.http.post(this.getResourceUrl(null, 'remove_password'), {
-      documents: ids,
-      ...request,
-    })
+    return this.http.post<BulkOperationResponse>(
+      this.getResourceUrl(null, 'remove_password'),
+      {
+        documents: ids,
+        ...request,
+        from_webui: true,
+      }
+    )
   }
 
   getSelectionData(

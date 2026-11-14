@@ -19,15 +19,8 @@ import {
   NgbModalRef,
 } from '@ng-bootstrap/ng-bootstrap'
 import { saveAs } from 'file-saver'
-import {
-  first,
-  map,
-  Observable,
-  Subject,
-  switchMap,
-  takeUntil,
-  tap,
-} from 'rxjs'
+import { first, map, Observable, Subject, switchMap, takeUntil } from 'rxjs'
+import { BulkOperationResponse } from 'src/app/data/bulk-operation'
 import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { ConfirmDialogComponent } from 'src/app/components/common/confirm-dialog/confirm-dialog.component'
 import { CustomField } from 'src/app/data/custom-field'
@@ -37,7 +30,6 @@ import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { Workflow } from 'src/app/data/workflow'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
-import { OpenDocumentsService } from 'src/app/services/open-documents.service'
 import {
   PermissionAction,
   PermissionsService,
@@ -52,7 +44,6 @@ import {
   DocumentService,
   MergeDocumentsRequest,
 } from 'src/app/services/rest/document.service'
-import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { ShareLinkBundleService } from 'src/app/services/rest/share-link-bundle.service'
 import { WorkflowService } from 'src/app/services/rest/workflow.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
@@ -110,13 +101,11 @@ export class BulkEditorComponent
   private documentService = inject(DocumentService)
   private trashService = inject(TrashService)
   private modalService = inject(NgbModal)
-  private openDocumentService = inject(OpenDocumentsService)
   private settings = inject(SettingsService)
   private toastService = inject(ToastService)
   private storagePathService = inject(StoragePathService)
   private customFieldService = inject(CustomFieldsService)
   public readonly permissionService = inject(PermissionsService)
-  private savedViewService = inject(SavedViewService)
   private readonly shareLinkBundleService = inject(ShareLinkBundleService)
   private readonly workflowService = inject(WorkflowService)
   private readonly router = inject(Router)
@@ -386,39 +375,19 @@ export class BulkEditorComponent
 
   private executeDocumentAction(
     modal: NgbModalRef,
-    request: Observable<any>,
-    options: { clearSelection?: boolean; successMessage?: string } = {}
+    request: Observable<BulkOperationResponse>,
+    onQueued?: (taskId: string) => void
   ) {
     if (modal) {
       modal.componentInstance.buttonsEnabled.set(false)
     }
     request.pipe(first()).subscribe({
-      next: () => {
-        this.handleOperationSuccess(modal, options.clearSelection ?? false)
-        if (options.successMessage) {
-          this.toastService.showSuccess(options.successMessage)
-        }
+      next: ({ task_id }) => {
+        onQueued?.(task_id)
+        this.handleOperationQueued(modal, task_id)
       },
       error: (error) => this.handleOperationError(modal, error),
     })
-  }
-
-  private handleOperationSuccess(
-    modal: NgbModalRef,
-    clearSelection: boolean = false
-  ) {
-    if (clearSelection) {
-      this.list.selected.clear()
-    }
-    this.list.reload()
-    this.list.reduceSelectionToFilter()
-    this.list.selected.forEach((id) => {
-      this.openDocumentService.refreshDocument(id)
-    })
-    this.savedViewService.maybeRefreshDocumentCounts()
-    if (modal) {
-      modal.close()
-    }
   }
 
   private handleOperationError(modal: NgbModalRef, error: any) {
@@ -988,16 +957,8 @@ export class BulkEditorComponent
     const count = this.getSelectionSize()
     this.executeDocumentAction(
       modal,
-      this.documentService
-        .deleteDocuments(this.getSelectionQuery())
-        .pipe(
-          tap(() =>
-            this.trashService.notifyMovedToTrash(
-              $localize`Moved ${count} document(s) to the trash`,
-              documents
-            )
-          )
-        )
+      this.documentService.deleteDocuments(this.getSelectionQuery()),
+      (taskId) => this.trashService.trackMovedToTrash(taskId, count, documents)
     )
   }
 
@@ -1111,11 +1072,7 @@ export class BulkEditorComponent
         mergeDialog.buttonsEnabled.set(false)
         this.executeDocumentAction(
           modal,
-          this.documentService.mergeDocuments(mergeDialog.documentIDs(), args),
-          { clearSelection: !!args.delete_originals }
-        )
-        this.toastService.showInfo(
-          $localize`Merged document will be queued for consumption.`
+          this.documentService.mergeDocuments(mergeDialog.documentIDs(), args)
         )
       })
   }
@@ -1140,11 +1097,7 @@ export class BulkEditorComponent
           this.documentService.mergeDocumentsAsVersions(
             mergeDialog.documentIDs(),
             mergeDialog.rootDocumentID()
-          ),
-          {
-            clearSelection: true,
-            successMessage: $localize`Documents merged as versions.`,
-          }
+          )
         )
       })
   }
