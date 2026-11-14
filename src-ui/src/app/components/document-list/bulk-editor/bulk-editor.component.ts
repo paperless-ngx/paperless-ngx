@@ -20,14 +20,15 @@ import {
 } from '@ng-bootstrap/ng-bootstrap'
 import { saveAs } from 'file-saver'
 import { first, map, Observable, Subject, switchMap, takeUntil } from 'rxjs'
-import { BulkOperationResponse } from 'src/app/data/bulk-operation'
 import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { ConfirmDialogComponent } from 'src/app/components/common/confirm-dialog/confirm-dialog.component'
+import { BulkOperationResponse } from 'src/app/data/bulk-operation'
 import { CustomField } from 'src/app/data/custom-field'
 import { MatchingModel } from 'src/app/data/matching-model'
 import { SelectionDataItem } from 'src/app/data/results'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { Workflow } from 'src/app/data/workflow'
+import { WorkflowTriggerType } from 'src/app/data/workflow-trigger'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { DocumentListViewService } from 'src/app/services/document-list-view.service'
 import {
@@ -45,10 +46,11 @@ import {
   MergeDocumentsRequest,
 } from 'src/app/services/rest/document.service'
 import { ShareLinkBundleService } from 'src/app/services/rest/share-link-bundle.service'
-import { WorkflowService } from 'src/app/services/rest/workflow.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
 import { TagService } from 'src/app/services/rest/tag.service'
+import { WorkflowService } from 'src/app/services/rest/workflow.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { TaskNotificationService } from 'src/app/services/task-notification.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { TrashService } from 'src/app/services/trash.service'
 import { flattenTags } from 'src/app/utils/flatten-tags'
@@ -75,7 +77,6 @@ import { PermissionsDialogComponent } from '../../common/permissions-dialog/perm
 import { ShareLinkBundleDialogComponent } from '../../common/share-link-bundle-dialog/share-link-bundle-dialog.component'
 import { ComponentWithPermissions } from '../../with-permissions/with-permissions.component'
 import { CustomFieldsBulkEditDialogComponent } from './custom-fields-bulk-edit-dialog/custom-fields-bulk-edit-dialog.component'
-import { WorkflowTriggerType } from 'src/app/data/workflow-trigger'
 
 @Component({
   selector: 'pngx-bulk-editor',
@@ -103,6 +104,7 @@ export class BulkEditorComponent
   private modalService = inject(NgbModal)
   private settings = inject(SettingsService)
   private toastService = inject(ToastService)
+  private taskNotifications = inject(TaskNotificationService)
   private storagePathService = inject(StoragePathService)
   private customFieldService = inject(CustomFieldsService)
   public readonly permissionService = inject(PermissionsService)
@@ -351,26 +353,21 @@ export class BulkEditorComponent
       })
   }
 
-  private handleOperationQueued(modal: NgbModalRef, taskId: string) {
+  private handleOperationQueued(
+    modal: NgbModalRef,
+    taskId: string,
+    onQueued?: (taskId: string) => void
+  ) {
     modal?.close()
     this.list.selectNone()
-    const canViewTasks = this.permissionService.currentUserCan(
-      PermissionAction.View,
-      PermissionType.PaperlessTask
-    )
-    this.toastService.show({
-      content: $localize`Bulk operation queued.`,
-      delay: 5000,
-      ...(canViewTasks
-        ? {
-            actionName: $localize`View task`,
-            action: () =>
-              this.router.navigate(['/tasks'], {
-                queryParams: { task_id: taskId },
-              }),
-          }
-        : {}),
-    })
+    if (onQueued) {
+      onQueued(taskId)
+    } else {
+      this.taskNotifications.showQueued(
+        taskId,
+        $localize`Bulk operation queued.`
+      )
+    }
   }
 
   private executeDocumentAction(
@@ -383,8 +380,7 @@ export class BulkEditorComponent
     }
     request.pipe(first()).subscribe({
       next: ({ task_id }) => {
-        this.handleOperationQueued(modal, task_id)
-        onQueued?.(task_id)
+        this.handleOperationQueued(modal, task_id, onQueued)
       },
       error: (error) => this.handleOperationError(modal, error),
     })

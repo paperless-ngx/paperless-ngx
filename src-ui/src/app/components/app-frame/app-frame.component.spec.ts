@@ -33,9 +33,9 @@ import { RemoteVersionService } from 'src/app/services/rest/remote-version.servi
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SearchService } from 'src/app/services/rest/search.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { TaskNotificationService } from 'src/app/services/task-notification.service'
 import { TasksService } from 'src/app/services/tasks.service'
 import { ToastService } from 'src/app/services/toast.service'
-import { TrashService } from 'src/app/services/trash.service'
 import { UploadDocumentsService } from 'src/app/services/upload-documents.service'
 import { WebsocketStatusService } from 'src/app/services/websocket-status.service'
 import { environment } from 'src/environments/environment'
@@ -199,14 +199,14 @@ describe('AppFrameComponent', () => {
     fixture.detectChanges()
   })
 
-  it('refreshes and notifies on completion without client-side task tracking', () => {
+  it('refreshes and updates the task notification on completion', () => {
     const list = TestBed.inject(DocumentListViewService)
     const reload = jest.spyOn(list, 'reload').mockImplementation(() => {})
     jest.spyOn(list, 'reduceSelectionToFilter').mockImplementation(() => {})
     const tasksReload = jest
       .spyOn(tasksService, 'reload')
       .mockImplementation(() => {})
-    const success = jest.spyOn(toastService, 'showSuccess')
+    const success = jest.spyOn(toastService, 'show')
     const refresh = jest
       .spyOn(openDocumentsService, 'refreshDocument')
       .mockImplementation(() => {})
@@ -231,7 +231,12 @@ describe('AppFrameComponent', () => {
     expect(refresh).toHaveBeenCalledWith(document.id)
     expect(maybeRefreshSpy).toHaveBeenCalledTimes(1)
     expect(tasksReload).toHaveBeenCalledTimes(1)
-    expect(success).toHaveBeenCalledWith('Operation completed.')
+    expect(success).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: 'task-bulk-task',
+        content: 'Operation completed.',
+      })
+    )
     fixture.destroy()
     bulkEvents.next({
       task_id: 'bulk-task',
@@ -246,14 +251,14 @@ describe('AppFrameComponent', () => {
     const reload = jest.spyOn(list, 'reload').mockImplementation(() => {})
     jest.spyOn(list, 'reduceSelectionToFilter').mockImplementation(() => {})
     jest.spyOn(tasksService, 'reload').mockImplementation(() => {})
-    const error = jest.spyOn(toastService, 'showError')
+    const error = jest.spyOn(toastService, 'show')
     const success = jest.spyOn(toastService, 'showSuccess')
     for (const status of [
       PaperlessTaskStatus.Failure,
       PaperlessTaskStatus.Revoked,
     ]) {
       bulkEvents.next({
-        task_id: 'bulk-task',
+        task_id: `${status}-task`,
         operation: 'set_permissions',
         status,
         error:
@@ -264,29 +269,35 @@ describe('AppFrameComponent', () => {
     }
     expect(reload).toHaveBeenCalledTimes(2)
     expect(error).toHaveBeenCalledWith(
-      'Operation failed. Some changes may already have been applied.',
-      'Could not update'
+      expect.objectContaining({
+        content:
+          'Operation failed. Some changes may already have been applied.',
+        error: 'Could not update',
+      })
     )
     expect(error).toHaveBeenCalledWith(
-      'Operation revoked.',
-      'Task expired before execution.'
+      expect.objectContaining({
+        content: 'Operation revoked.',
+        error: 'Task expired before execution.',
+      })
     )
     expect(success).not.toHaveBeenCalled()
   })
 
-  it('defers the delete success toast to TrashService', () => {
+  it('passes delete completion to the shared task notification handler', () => {
     const success = jest.spyOn(toastService, 'showSuccess')
-    const trashService = TestBed.inject(TrashService)
-    const handleStatus = jest.spyOn(trashService, 'handleDeleteTaskStatus')
+    const notifications = TestBed.inject(TaskNotificationService)
+    const handleStatus = jest.spyOn(notifications, 'complete')
     bulkEvents.next({
       task_id: 'delete-1',
       operation: 'delete',
       status: PaperlessTaskStatus.Success,
     })
-    expect(handleStatus).toHaveBeenCalledWith(
-      'delete-1',
-      PaperlessTaskStatus.Success
-    )
+    expect(handleStatus).toHaveBeenCalledWith({
+      task_id: 'delete-1',
+      operation: 'delete',
+      status: PaperlessTaskStatus.Success,
+    })
     expect(success).not.toHaveBeenCalled()
   })
 

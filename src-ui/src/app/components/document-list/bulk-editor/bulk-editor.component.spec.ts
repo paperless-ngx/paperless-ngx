@@ -1510,6 +1510,7 @@ describe('BulkEditorComponent', () => {
   })
 
   it('should support merging documents as versions', () => {
+    jest.useFakeTimers()
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((m) => (modal = m[0]))
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
@@ -1554,9 +1555,11 @@ describe('BulkEditorComponent', () => {
       `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
     )
     expect(documentListViewService.selected.size).toEqual(0)
+    jest.advanceTimersByTime(400)
     expect(toastSpy).toHaveBeenCalledWith(
       expect.objectContaining({ content: 'Bulk operation queued.' })
     )
+    jest.useRealTimers()
   })
 
   it('should not report success when merging documents as versions fails', () => {
@@ -1650,6 +1653,7 @@ describe('BulkEditorComponent', () => {
   it.each([true, false])(
     'shows queued feedback and gates the task link on permission (%s)',
     (canViewTasks) => {
+      jest.useFakeTimers()
       jest
         .spyOn(permissionsService, 'currentUserCan')
         .mockReturnValue(canViewTasks)
@@ -1670,6 +1674,8 @@ describe('BulkEditorComponent', () => {
       )
       req.flush({ result: 'OK', task_id: 'queued-operation' })
       expect(close).toHaveBeenCalledTimes(1)
+      expect(queued).not.toHaveBeenCalled()
+      jest.advanceTimersByTime(400)
       const notification = queued.mock.calls.at(-1)[0]
       expect(notification.content).toBe('Bulk operation queued.')
       if (canViewTasks) {
@@ -1685,6 +1691,7 @@ describe('BulkEditorComponent', () => {
       expect(reload).not.toHaveBeenCalled()
       expect(documentListViewService.selected.size).toBe(0)
       expect(documentListViewService.allSelected).toBe(false)
+      jest.useRealTimers()
     }
   )
 

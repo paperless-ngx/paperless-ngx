@@ -68,9 +68,9 @@ describe('ToastsComponent', () => {
     toasts.forEach((t) => toastSubject.next(t))
     expect(component.toasts().map((t) => t.id)).toEqual(['3', '2', '1'])
 
-    // showing a visible toast again moves it to the top without duplicating
+    // Updating a visible toast preserves its position without duplicating it.
     toastSubject.next(toasts[1])
-    expect(component.toasts().map((t) => t.id)).toEqual(['1', '3', '2'])
+    expect(component.toasts().map((t) => t.id)).toEqual(['3', '2', '1'])
   })
 
   it('should remove a popup when it hides without closing it', () => {

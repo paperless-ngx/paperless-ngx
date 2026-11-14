@@ -384,6 +384,7 @@ describe('DocumentVersionDropdownComponent', () => {
   })
 
   it('addExistingDocumentAsVersion should queue with a label and wait to refresh versions', () => {
+    jest.useFakeTimers()
     const confirmClicked = new Subject<number>()
     const modal = {
       componentInstance: {
@@ -416,11 +417,13 @@ describe('DocumentVersionDropdownComponent', () => {
     expect(selectedEmitSpy).not.toHaveBeenCalled()
     expect(component.newVersionLabel).toEqual('')
     expect(modal.close).toHaveBeenCalled()
+    jest.advanceTimersByTime(400)
     expect(toastService.show).toHaveBeenCalledWith(
       expect.objectContaining({
         content: 'Existing document queued to be added as a version.',
         actionName: 'View task',
       })
     )
+    jest.useRealTimers()
   })
 })

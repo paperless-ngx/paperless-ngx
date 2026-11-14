@@ -1014,6 +1014,7 @@ describe('DocumentDetailComponent', () => {
   })
 
   it('should queue reprocess, show the task link and close the modal', () => {
+    jest.useFakeTimers()
     initNormally()
     const reprocessSpy = jest.spyOn(documentService, 'reprocessDocuments')
     reprocessSpy.mockReturnValue(of({ result: 'OK', task_id: 'reprocess-1' }))
@@ -1026,6 +1027,9 @@ describe('DocumentDetailComponent', () => {
     openModal.componentInstance.confirmClicked.next()
     expect(reprocessSpy).toHaveBeenCalledWith({ documents: [doc.id] }, false)
     expect(modalSpy).toHaveBeenCalled()
+    expect(toastSpy).not.toHaveBeenCalled()
+    expect(modalCloseSpy).toHaveBeenCalled()
+    jest.advanceTimersByTime(400)
     expect(toastSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         content: 'Document reprocessing queued.',
@@ -1037,9 +1041,11 @@ describe('DocumentDetailComponent', () => {
       queryParams: { task_id: 'reprocess-1' },
     })
     expect(modalCloseSpy).toHaveBeenCalled()
+    jest.useRealTimers()
   })
 
   it('should run a workflow on the document, confirm and close modal', () => {
+    jest.useFakeTimers()
     initNormally()
     const bulkEditSpy = jest.spyOn(documentService, 'bulkEdit')
     bulkEditSpy.mockReturnValue(of({ result: 'OK', task_id: 'workflow-1' }))
@@ -1057,10 +1063,12 @@ describe('DocumentDetailComponent', () => {
       'run_workflow',
       { workflow: 5, filter_documents: false }
     )
+    jest.advanceTimersByTime(400)
     expect(toastSpy).toHaveBeenCalledWith(
       expect.objectContaining({ content: 'Workflow queued.' })
     )
     expect(modalCloseSpy).toHaveBeenCalled()
+    jest.useRealTimers()
   })
 
   it('should apply workflow filters when the single-document checkbox is cleared', () => {
@@ -2012,6 +2020,7 @@ describe('DocumentDetailComponent', () => {
   })
 
   it('should support pdf editor, handle error', () => {
+    jest.useFakeTimers()
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((m) => (modal = m[0]))
     const closeSpy = jest.spyOn(openDocumentsService, 'closeDocument')
@@ -2049,13 +2058,16 @@ describe('DocumentDetailComponent', () => {
       `${environment.apiBaseUrl}documents/edit_pdf/`
     )
     req.flush({ result: 'OK', task_id: 'edit-pdf-1' })
+    jest.advanceTimersByTime(400)
     expect(closeSpy).not.toHaveBeenCalled()
     expect(queuedToastSpy).toHaveBeenCalledWith(
       expect.objectContaining({ content: 'PDF edit queued.' })
     )
+    jest.useRealTimers()
   })
 
   it('should support removing password protection from pdfs', () => {
+    jest.useFakeTimers()
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((m) => (modal = m[0]))
     const closeSpy = jest.spyOn(openDocumentsService, 'closeDocument')
@@ -2083,10 +2095,12 @@ describe('DocumentDetailComponent', () => {
       from_webui: true,
     })
     req.flush({ result: 'OK', task_id: 'remove-password-1' })
+    jest.advanceTimersByTime(400)
     expect(closeSpy).not.toHaveBeenCalled()
     expect(queuedToastSpy).toHaveBeenCalledWith(
       expect.objectContaining({ content: 'Password removal queued.' })
     )
+    jest.useRealTimers()
   })
 
   it('should require the current password before removing it', () => {

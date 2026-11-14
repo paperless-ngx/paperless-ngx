@@ -3,10 +3,10 @@ import { Injectable, inject } from '@angular/core'
 import { Observable } from 'rxjs'
 import { environment } from 'src/environments/environment'
 import { Document } from '../data/document'
-import { PaperlessTaskStatus } from '../data/paperless-task'
 import { Results } from '../data/results'
 import { DocumentListViewService } from './document-list-view.service'
-import { ToastLevel, ToastService } from './toast.service'
+import { TaskNotificationService } from './task-notification.service'
+import { Toast, ToastLevel, ToastService } from './toast.service'
 
 @Injectable({
   providedIn: 'root',
@@ -15,48 +15,21 @@ export class TrashService {
   private http = inject(HttpClient)
   private toastService = inject(ToastService)
   private documentListViewService = inject(DocumentListViewService)
-  private pendingMoves = new Map<
-    string,
-    { count: number; documents?: number[] }
-  >()
-  private completedMoves = new Map<string, PaperlessTaskStatus>()
+  private taskNotifications = inject(TaskNotificationService)
 
   public trackMovedToTrash(
     taskId: string,
     count: number,
     documents?: number[]
   ) {
-    const status = this.completedMoves.get(taskId)
-    if (status !== undefined) {
-      this.completedMoves.delete(taskId)
-      if (status === PaperlessTaskStatus.Success) {
-        this.notifyMovedToTrash(
-          $localize`Moved ${count} document(s) to the trash`,
-          documents
-        )
-      }
-    } else {
-      this.pendingMoves.set(taskId, { count, documents })
-    }
-  }
-
-  public handleDeleteTaskStatus(taskId: string, status: PaperlessTaskStatus) {
-    const move = this.pendingMoves.get(taskId)
-    if (move) {
-      this.pendingMoves.delete(taskId)
-      if (status === PaperlessTaskStatus.Success) {
-        this.notifyMovedToTrash(
-          $localize`Moved ${move.count} document(s) to the trash`,
-          move.documents
-        )
-      }
-    } else {
-      // in case the task finishes fast
-      this.completedMoves.set(taskId, status)
-      if (this.completedMoves.size > 100) {
-        this.completedMoves.delete(this.completedMoves.keys().next().value)
-      }
-    }
+    this.taskNotifications.showQueued(
+      taskId,
+      $localize`Bulk operation queued.`,
+      this.movedToTrashToast(
+        $localize`Moved ${count} document(s) to the trash`,
+        documents
+      )
+    )
   }
 
   public getTrash(page: number = 1): Observable<Results<Document>> {
@@ -87,14 +60,22 @@ export class TrashService {
    * Shows a toast with an Undo action when possible
    */
   public notifyMovedToTrash(content: string, documents?: number[]) {
+    this.toastService.show(this.movedToTrashToast(content, documents))
+  }
+
+  private movedToTrashToast(content: string, documents?: number[]): Toast {
     const canUndo = documents?.length > 0
-    this.toastService.show({
+    return {
       content,
       delay: 10000,
       level: ToastLevel.Success,
-      actionName: canUndo ? $localize`Undo` : undefined,
-      action: canUndo ? () => this.undoMoveToTrash(documents) : undefined,
-    })
+      ...(canUndo
+        ? {
+            actionName: $localize`Undo`,
+            action: () => this.undoMoveToTrash(documents),
+          }
+        : {}),
+    }
   }
 
   private undoMoveToTrash(documents: number[]) {

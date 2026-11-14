@@ -5,8 +5,10 @@ import {
   DestroyRef,
   EventEmitter,
   Input,
+  OnChanges,
   OnInit,
   Output,
+  SimpleChanges,
   ViewChild,
   inject,
   signal,
@@ -34,7 +36,7 @@ import { Toast, ToastLevel } from 'src/app/services/toast.service'
   styleUrl: './toast.component.scss',
   providers: [DatePipe, CustomDatePipe],
 })
-export class ToastComponent implements OnInit {
+export class ToastComponent implements OnInit, OnChanges {
   private clipboard = inject(Clipboard)
   private customDatePipe = inject(CustomDatePipe)
   private destroyRef = inject(DestroyRef)
@@ -67,6 +69,12 @@ export class ToastComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.autohide) this.delayRemaining.set(this.toast.delay)
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.toast && !changes.toast.firstChange && this.autohide) {
+      this.onShown(this.toast)
+    }
   }
 
   get relativeTimestamp(): string {

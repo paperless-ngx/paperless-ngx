@@ -97,6 +97,7 @@ import { TagService } from 'src/app/services/rest/tag.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { WorkflowService } from 'src/app/services/rest/workflow.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { TaskNotificationService } from 'src/app/services/task-notification.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { TrashService } from 'src/app/services/trash.service'
 import { WebsocketStatusService } from 'src/app/services/websocket-status.service'
@@ -226,6 +227,7 @@ export class DocumentDetailComponent
   private documentListViewService = inject(DocumentListViewService)
   private documentTitlePipe = inject(DocumentTitlePipe)
   private toastService = inject(ToastService)
+  private taskNotifications = inject(TaskNotificationService)
   private trashService = inject(TrashService)
   private settings = inject(SettingsService)
   private storagePathService = inject(StoragePathService)
@@ -1559,9 +1561,10 @@ export class DocumentDetailComponent
         )
         .subscribe({
           next: ({ task_id }) => {
-            this.notifyTaskQueued(
+            this.taskNotifications.showQueued(
               task_id,
-              $localize`Document reprocessing queued.`
+              $localize`Document reprocessing queued.`,
+              { content: $localize`Document reprocessing completed.` }
             )
             if (modal) {
               modal.close()
@@ -1599,7 +1602,13 @@ export class DocumentDetailComponent
         })
         .subscribe({
           next: ({ task_id }) => {
-            this.notifyTaskQueued(task_id, $localize`Workflow queued.`)
+            this.taskNotifications.showQueued(
+              task_id,
+              $localize`Workflow queued.`,
+              {
+                content: $localize`Workflow completed.`,
+              }
+            )
             modal.close()
           },
           error: (error) => {
@@ -1610,26 +1619,6 @@ export class DocumentDetailComponent
             )
           },
         })
-    })
-  }
-
-  private notifyTaskQueued(taskId: string, content: string) {
-    const canViewTasks = this.permissionsService.currentUserCan(
-      PermissionAction.View,
-      PermissionType.PaperlessTask
-    )
-    this.toastService.show({
-      content,
-      delay: 5000,
-      ...(canViewTasks
-        ? {
-            actionName: $localize`View task`,
-            action: () =>
-              this.router.navigate(['/tasks'], {
-                queryParams: { task_id: taskId },
-              }),
-          }
-        : {}),
     })
   }
 
@@ -2009,7 +1998,13 @@ export class DocumentDetailComponent
           .pipe(first(), takeUntil(this.unsubscribeNotifier))
           .subscribe({
             next: ({ task_id }) => {
-              this.notifyTaskQueued(task_id, $localize`PDF edit queued.`)
+              this.taskNotifications.showQueued(
+                task_id,
+                $localize`PDF edit queued.`,
+                {
+                  content: $localize`PDF edit completed.`,
+                }
+              )
               modal.close()
             },
             error: (error) => {
@@ -2061,9 +2056,10 @@ export class DocumentDetailComponent
           .pipe(first(), takeUntil(this.unsubscribeNotifier))
           .subscribe({
             next: ({ task_id }) => {
-              this.notifyTaskQueued(
+              this.taskNotifications.showQueued(
                 task_id,
-                $localize`Password removal queued.`
+                $localize`Password removal queued.`,
+                { content: $localize`Password removal completed.` }
               )
               this.networkActive.set(false)
               modal.close()
