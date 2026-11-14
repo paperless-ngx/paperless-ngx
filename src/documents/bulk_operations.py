@@ -115,7 +115,10 @@ def execute_bulk_operation(
 
     if operation not in MODIFIED_FIELDS:
         execution_parameters = parameters.copy()
-        if operation == "reprocess" and self.request.id is not None:
+        if (
+            operation in TRIGGER_SOURCE_OPERATIONS | {"reprocess"}
+            and self.request.id is not None
+        ):
             execution_parameters["parent_task_id"] = self.request.id
         if operation in USER_OPERATIONS:
             execution_parameters["user"] = user
@@ -128,7 +131,7 @@ def execute_bulk_operation(
                 if settings.AUDIT_LOG_ENABLED and modified_field
                 else {}
             )
-            method(document_ids, **execution_parameters)
+            result = method(document_ids, **execution_parameters)
             if settings.AUDIT_LOG_ENABLED and modified_field:
                 from auditlog.models import LogEntry
 
@@ -143,7 +146,11 @@ def execute_bulk_operation(
                         actor=user,
                         additional_data={"reason": f"Bulk edit: {operation}"},
                     )
-        return {"operation": operation, "document_count": len(document_ids)}
+        return {
+            "operation": operation,
+            "document_count": len(document_ids),
+            **(result if isinstance(result, dict) else {}),
+        }
 
     affected_ids: list[int] = []
     modified_field = MODIFIED_FIELDS[operation]

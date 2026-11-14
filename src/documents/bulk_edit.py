@@ -39,6 +39,8 @@ from documents.models import Tag
 from documents.permissions import PermissionsSpec
 from documents.permissions import set_permissions_for_objects
 from documents.plugins.helpers import DocumentsStatusManager
+from documents.task_tracking import queue_consumption
+from documents.task_tracking import queue_processing_tasks
 from documents.tasks import bulk_update_documents
 from documents.tasks import consume_file
 from documents.tasks import remove_document_from_index
@@ -536,6 +538,7 @@ def rotate(
     source_mode: SourceMode = SourceModeChoices.LATEST_VERSION,
     user: User | None = None,
     trigger_source: PaperlessTask.TriggerSource = PaperlessTask.TriggerSource.WEB_UI,
+    parent_task_id: str | None = None,
 ) -> Literal["OK"]:
     logger.info(
         f"Attempting to rotate {len(doc_ids)} documents by {degrees} degrees.",
@@ -573,16 +576,15 @@ def rotate(
             if user is not None:
                 overrides.actor_id = user.id
 
-            consume_file.apply_async(
-                kwargs={
-                    "input_doc": ConsumableDocument(
-                        source=DocumentSource.ConsumeFolder,
-                        original_file=filepath,
-                        root_document_id=pair.root_doc.id,
-                    ),
-                    "overrides": overrides,
-                },
-                headers={"trigger_source": trigger_source},
+            queue_consumption(
+                input_doc=ConsumableDocument(
+                    source=DocumentSource.ConsumeFolder,
+                    original_file=filepath,
+                    root_document_id=pair.root_doc.id,
+                ),
+                overrides=overrides,
+                trigger_source=trigger_source,
+                parent_task_id=parent_task_id,
             )
             logger.info(
                 f"Queued new rotated version for document {pair.root_doc.id} by {degrees} degrees",
@@ -603,13 +605,15 @@ def merge(
     source_mode: SourceMode = SourceModeChoices.LATEST_VERSION,
     user: User | None = None,
     trigger_source: PaperlessTask.TriggerSource = PaperlessTask.TriggerSource.WEB_UI,
-) -> Literal["OK"]:
+    parent_task_id: str | None = None,
+) -> Literal["OK"] | dict:
     logger.info(
         f"Attempting to merge {len(doc_ids)} documents into a single document.",
     )
     qs = Document.objects.select_related("root_document").filter(id__in=doc_ids)
     docs_by_id = {doc.id: doc for doc in qs}
     affected_docs: list[int] = []
+    failed_ids: list[int] = []
     handoff_asn: int | None = None
     with pdf_ops.PdfMerger() as merger:
         # use doc_ids to preserve order
@@ -635,11 +639,14 @@ def merge(
                 if handoff_asn is None and doc.archive_serial_number is not None:
                     handoff_asn = doc.archive_serial_number
             except Exception as e:
+                failed_ids.append(doc.id)
                 logger.exception(
                     f"Error merging document {doc.id}, it will not be included in the merge: {e}",
                 )
         if len(affected_docs) == 0:
             logger.warning("No documents were merged")
+            if parent_task_id is not None:
+                raise ValueError("None of the selected documents could be merged.")
             return "OK"
 
         filepath = (
@@ -681,6 +688,23 @@ def merge(
         ),
         overrides=overrides,
     ).set(headers={"trigger_source": trigger_source})
+
+    if parent_task_id is not None:
+        backup = (
+            release_archive_serial_numbers(affected_docs) if delete_originals else {}
+        )
+        queue_processing_tasks(
+            parent_task_id,
+            [consume_task],
+            delete_ids=affected_docs if delete_originals else None,
+            asn_backup=backup,
+        )
+        if failed_ids:
+            return {
+                "failed_document_ids": failed_ids,
+                "error_message": f"Documents {failed_ids} were excluded from the merge.",
+            }
+        return "OK"
 
     if delete_originals:
         backup = release_archive_serial_numbers(affected_docs)
@@ -826,6 +850,7 @@ def split(
     source_mode: SourceMode = SourceModeChoices.LATEST_VERSION,
     user: User | None = None,
     trigger_source: PaperlessTask.TriggerSource = PaperlessTask.TriggerSource.WEB_UI,
+    parent_task_id: str | None = None,
 ) -> Literal["OK"]:
     logger.info(
         f"Attempting to split document {doc_ids[0]} into {len(pages)} documents",
@@ -869,7 +894,17 @@ def split(
                 ).set(headers={"trigger_source": trigger_source}),
             )
 
-        if delete_originals:
+        if parent_task_id is not None:
+            backup = (
+                release_archive_serial_numbers([doc.id]) if delete_originals else {}
+            )
+            queue_processing_tasks(
+                parent_task_id,
+                consume_tasks,
+                delete_ids=[doc.id] if delete_originals else None,
+                asn_backup=backup,
+            )
+        elif delete_originals:
             backup = release_archive_serial_numbers([doc.id])
             logger.info(
                 "Queueing removal of original document after consumption of the split documents",
@@ -901,6 +936,7 @@ def delete_pages(
     source_mode: SourceMode = SourceModeChoices.LATEST_VERSION,
     user: User | None = None,
     trigger_source: PaperlessTask.TriggerSource = PaperlessTask.TriggerSource.WEB_UI,
+    parent_task_id: str | None = None,
 ) -> Literal["OK"]:
     logger.info(
         f"Attempting to delete pages {pages} from {len(doc_ids)} documents",
@@ -919,16 +955,15 @@ def delete_pages(
         overrides = DocumentMetadataOverrides().from_document(pair.root_doc)
         if user is not None:
             overrides.actor_id = user.id
-        consume_file.apply_async(
-            kwargs={
-                "input_doc": ConsumableDocument(
-                    source=DocumentSource.ConsumeFolder,
-                    original_file=filepath,
-                    root_document_id=pair.root_doc.id,
-                ),
-                "overrides": overrides,
-            },
-            headers={"trigger_source": trigger_source},
+        queue_consumption(
+            input_doc=ConsumableDocument(
+                source=DocumentSource.ConsumeFolder,
+                original_file=filepath,
+                root_document_id=pair.root_doc.id,
+            ),
+            overrides=overrides,
+            trigger_source=trigger_source,
+            parent_task_id=parent_task_id,
         )
         logger.info(
             f"Queued new version for document {pair.root_doc.id} after deleting pages {pages}",
@@ -950,6 +985,7 @@ def edit_pdf(
     source_mode: SourceMode = SourceModeChoices.LATEST_VERSION,
     user: User | None = None,
     trigger_source: PaperlessTask.TriggerSource = PaperlessTask.TriggerSource.WEB_UI,
+    parent_task_id: str | None = None,
 ) -> Literal["OK"]:
     """
     Operations is a list of dictionaries describing the final PDF pages.
@@ -994,16 +1030,15 @@ def edit_pdf(
             if user is not None:
                 overrides.owner_id = user.id
                 overrides.actor_id = user.id
-            consume_file.apply_async(
-                kwargs={
-                    "input_doc": ConsumableDocument(
-                        source=DocumentSource.ConsumeFolder,
-                        original_file=filepath,
-                        root_document_id=pair.root_doc.id,
-                    ),
-                    "overrides": overrides,
-                },
-                headers={"trigger_source": trigger_source},
+            queue_consumption(
+                input_doc=ConsumableDocument(
+                    source=DocumentSource.ConsumeFolder,
+                    original_file=filepath,
+                    root_document_id=pair.root_doc.id,
+                ),
+                overrides=overrides,
+                trigger_source=trigger_source,
+                parent_task_id=parent_task_id,
             )
         else:
             version_filepaths = pdf_ops.build_pdfs(
@@ -1043,7 +1078,17 @@ def edit_pdf(
                     ).set(headers={"trigger_source": trigger_source}),
                 )
 
-            if delete_original:
+            if parent_task_id is not None:
+                backup = (
+                    release_archive_serial_numbers([doc.id]) if delete_original else {}
+                )
+                queue_processing_tasks(
+                    parent_task_id,
+                    consume_tasks,
+                    delete_ids=[doc.id] if delete_original else None,
+                    asn_backup=backup,
+                )
+            elif delete_original:
                 backup = release_archive_serial_numbers([doc.id])
                 try:
                     chord(
@@ -1077,6 +1122,7 @@ def remove_password(
     source_mode: SourceMode = SourceModeChoices.LATEST_VERSION,
     user: User | None = None,
     trigger_source: PaperlessTask.TriggerSource = PaperlessTask.TriggerSource.WEB_UI,
+    parent_task_id: str | None = None,
     source_paths_by_id: Mapping[int, Path] | None = None,
 ) -> Literal["OK"]:
     """
@@ -1119,16 +1165,15 @@ def remove_password(
                 if user is not None:
                     overrides.owner_id = user.id
                     overrides.actor_id = user.id
-                consume_file.apply_async(
-                    kwargs={
-                        "input_doc": ConsumableDocument(
-                            source=DocumentSource.ConsumeFolder,
-                            original_file=filepath,
-                            root_document_id=pair.root_doc.id,
-                        ),
-                        "overrides": overrides,
-                    },
-                    headers={"trigger_source": trigger_source},
+                queue_consumption(
+                    input_doc=ConsumableDocument(
+                        source=DocumentSource.ConsumeFolder,
+                        original_file=filepath,
+                        root_document_id=pair.root_doc.id,
+                    ),
+                    overrides=overrides,
+                    trigger_source=trigger_source,
+                    parent_task_id=parent_task_id,
                 )
             else:
                 consume_tasks = []
@@ -1151,7 +1196,19 @@ def remove_password(
                     ).set(headers={"trigger_source": trigger_source}),
                 )
 
-                if delete_original:
+                if parent_task_id is not None:
+                    backup = (
+                        release_archive_serial_numbers([doc.id])
+                        if delete_original
+                        else {}
+                    )
+                    queue_processing_tasks(
+                        parent_task_id,
+                        consume_tasks,
+                        delete_ids=[doc.id] if delete_original else None,
+                        asn_backup=backup,
+                    )
+                elif delete_original:
                     chord(
                         header=consume_tasks,
                         body=delete.si([doc.id]),

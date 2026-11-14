@@ -1079,6 +1079,7 @@ TRACKED_TASKS: dict[str, PaperlessTask.TaskType] = {
     "documents.tasks.update_document_content_maybe_archive_file": PaperlessTask.TaskType.REPROCESS_DOCUMENT,
     "documents.tasks.build_share_link_bundle": PaperlessTask.TaskType.BUILD_SHARE_LINK,
     "documents.bulk_edit.delete": PaperlessTask.TaskType.BULK_DELETE,
+    "documents.task_tracking.finish_file_operation": PaperlessTask.TaskType.BULK_DELETE,
     "documents.tasks.apply_ai_suggestions": PaperlessTask.TaskType.APPLY_AI_SUGGESTIONS,
     BULK_OPERATION_TASK_NAME: PaperlessTask.TaskType.BULK_UPDATE,
 }
@@ -1127,6 +1128,8 @@ def _extract_input_data(
                 data["overrides"] = override_dict
         return data
 
+    if task_type == PaperlessTask.TaskType.REPROCESS_DOCUMENT:
+        return {"document_id": task_kwargs["document_id"]}
     if task_type == PaperlessTask.TaskType.MAIL_FETCH:
         account_ids = task_kwargs.get("account_ids")
         if account_ids is not None:
@@ -1214,6 +1217,19 @@ def before_task_publish_handler(
             input_data = _extract_input_data(task_type, task_kwargs)
             owner_id = _extract_owner_id(task_type, task_kwargs)
         trigger_source = _determine_trigger_source(headers)
+        # Consumption can fan out again (e.g. barcode splitting). Keep those
+        # descendants attached so their caller cannot finish before them.
+        parent = None
+        if task_type == PaperlessTask.TaskType.CONSUME_FILE and headers.get(
+            "parent_id",
+        ):
+            parent = PaperlessTask.objects.filter(
+                task_id=headers["parent_id"],
+                parent__isnull=False,
+            ).first()
+            if parent is not None:
+                owner_id = parent.owner_id
+                trigger_source = parent.trigger_source
 
         # A retried task is republished with the same task_id, so this fires
         # again for it; get_or_create keeps the original PENDING record
@@ -1226,6 +1242,7 @@ def before_task_publish_handler(
                 "status": PaperlessTask.Status.PENDING,
                 "input_data": input_data,
                 "owner_id": owner_id,
+                "parent": parent,
             },
         )
     except Exception:  # pragma: no cover
@@ -1336,6 +1353,19 @@ def task_postrun_handler(
             if "duplicate_of" in retval:
                 task_instance.status = PaperlessTask.Status.FAILURE
                 changed_fields.append("status")
+
+        if (
+            task_instance.parent_id is not None
+            and task_instance.task_type == PaperlessTask.TaskType.CONSUME_FILE
+            and (not isinstance(retval, dict) or "document_id" not in retval)
+            and not (isinstance(retval, dict) and "duplicate_of" in retval)
+        ):
+            task_instance.status = PaperlessTask.Status.FAILURE
+            task_instance.result_data = {
+                **(retval if isinstance(retval, dict) else {}),
+                "error_message": "Consumption stopped without creating a document.",
+            }
+            changed_fields.extend(["status", "result_data"])
 
         task_instance.save(update_fields=changed_fields)
         update_parent(task_instance)
