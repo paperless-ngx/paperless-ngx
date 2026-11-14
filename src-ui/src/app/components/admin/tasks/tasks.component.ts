@@ -56,6 +56,27 @@ const FILTER_TARGETS = [
   { id: TaskFilterTargetID.TaskId, name: $localize`Task ID` },
 ]
 
+const OPERATION_LABELS: Record<string, string> = {
+  set_correspondent: $localize`Set correspondent`,
+  set_document_type: $localize`Set document type`,
+  set_storage_path: $localize`Set storage path`,
+  add_tag: $localize`Add tag`,
+  remove_tag: $localize`Remove tag`,
+  modify_tags: $localize`Update tags`,
+  modify_custom_fields: $localize`Update custom fields`,
+  set_permissions: $localize`Set permissions`,
+  delete: $localize`Move to trash`,
+  reprocess: $localize`Document reprocessing`,
+  run_workflow: $localize`Run workflow`,
+  rotate: $localize`Rotate documents`,
+  merge: $localize`Merge documents`,
+  merge_as_versions: $localize`Merge as versions`,
+  split: $localize`Split documents`,
+  delete_pages: $localize`Delete pages`,
+  edit_pdf: $localize`Edit PDF`,
+  remove_password: $localize`Remove password`,
+}
+
 const SECTION_LABELS = {
   [TaskSection.All]: $localize`All`,
   [TaskSection.NeedsAttention]: $localize`Needs attention`,
@@ -414,11 +435,28 @@ export class TasksComponent
   }
 
   taskDisplayName(task: PaperlessTask): string {
-    return task.input_data?.filename?.toString() || task.task_type_display
+    return (
+      task.input_data?.filename?.toString() ||
+      this.taskOperationLabel(task) ||
+      task.task_type_display
+    )
   }
 
   taskShowsSeparateTypeLabel(task: PaperlessTask): boolean {
-    return this.taskDisplayName(task) !== task.task_type_display
+    return (
+      !this.taskOperationLabel(task) &&
+      this.taskDisplayName(task) !== task.task_type_display
+    )
+  }
+
+  private taskOperationLabel(task: PaperlessTask): string | null {
+    const label = OPERATION_LABELS[task.input_data?.operation]
+    return typeof label === 'string' ? label : null
+  }
+
+  taskDocumentCount(task: PaperlessTask): number | null {
+    const count = task.input_data?.document_count
+    return Number.isInteger(count) && count >= 0 ? count : null
   }
 
   taskResultMessage(task: PaperlessTask): string | null {
@@ -444,6 +482,13 @@ export class TasksComponent
     const errorMessage = task.result_data?.['error_message']
     if (typeof errorMessage === 'string') {
       return errorMessage
+    }
+
+    if (
+      task.status === PaperlessTaskStatus.Success &&
+      this.taskOperationLabel(task)
+    ) {
+      return $localize`Completed`
     }
 
     return null
