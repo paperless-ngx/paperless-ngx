@@ -204,12 +204,12 @@ export class AppFrameComponent
           this.trashService.handleDeleteTaskStatus(task_id, status)
         }
         if (status === PaperlessTaskStatus.Success && operation !== 'delete') {
-          this.toastService.showSuccess($localize`Bulk operation completed.`)
+          this.toastService.showSuccess($localize`Operation completed.`)
         } else if (status === PaperlessTaskStatus.Revoked) {
-          this.toastService.showError($localize`Bulk operation revoked.`, error)
+          this.toastService.showError($localize`Operation revoked.`, error)
         } else if (status === PaperlessTaskStatus.Failure) {
           this.toastService.showError(
-            $localize`Bulk operation failed. Some changes may already have been applied.`,
+            $localize`Operation failed. Some changes may already have been applied.`,
             error
           )
         }

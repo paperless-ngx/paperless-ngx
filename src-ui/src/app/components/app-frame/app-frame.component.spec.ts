@@ -231,7 +231,7 @@ describe('AppFrameComponent', () => {
     expect(refresh).toHaveBeenCalledWith(document.id)
     expect(maybeRefreshSpy).toHaveBeenCalledTimes(1)
     expect(tasksReload).toHaveBeenCalledTimes(1)
-    expect(success).toHaveBeenCalledWith('Bulk operation completed.')
+    expect(success).toHaveBeenCalledWith('Operation completed.')
     fixture.destroy()
     bulkEvents.next({
       task_id: 'bulk-task',
@@ -263,9 +263,12 @@ describe('AppFrameComponent', () => {
       })
     }
     expect(reload).toHaveBeenCalledTimes(2)
-    expect(error).toHaveBeenCalledWith(expect.any(String), 'Could not update')
     expect(error).toHaveBeenCalledWith(
-      'Bulk operation revoked.',
+      'Operation failed. Some changes may already have been applied.',
+      'Could not update'
+    )
+    expect(error).toHaveBeenCalledWith(
+      'Operation revoked.',
       'Task expired before execution.'
     )
     expect(success).not.toHaveBeenCalled()
