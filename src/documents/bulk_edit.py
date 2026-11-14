@@ -432,7 +432,12 @@ def delete(doc_ids: list[int]) -> Literal["OK"]:
     return "OK"
 
 
-def reprocess(doc_ids: list[int], *, remote_ocr: bool = False) -> Literal["OK"]:
+def reprocess(
+    doc_ids: list[int],
+    *,
+    remote_ocr: bool = False,
+    parent_task_id: str | None = None,
+) -> Literal["OK"]:
     """
     Re-run parsing for the given documents.
 
@@ -457,6 +462,16 @@ def reprocess(doc_ids: list[int], *, remote_ocr: bool = False) -> Literal["OK"]:
         .values_list("source_id", flat=True)
         .distinct()
     )
+    if parent_task_id is not None:
+        from documents.task_tracking import queue_reprocessing_tasks
+
+        queue_reprocessing_tasks(
+            parent_task_id,
+            list(source_ids),
+            remote_ocr=remote_ocr,
+        )
+        return "OK"
+
     for source_id in source_ids:
         update_document_content_maybe_archive_file.apply_async(
             kwargs={"document_id": source_id, "remote_ocr": remote_ocr},

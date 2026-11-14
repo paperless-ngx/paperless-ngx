@@ -970,6 +970,16 @@ class PaperlessTask(ModelWithOwner):
         help_text=_("Structured result data from task execution"),
     )
 
+    parent = models.ForeignKey(
+        "self",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="children",
+    )
+
+    dispatched = models.BooleanField(default=False)
+
     # Acknowledgment
     acknowledged = models.BooleanField(
         default=False,

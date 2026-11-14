@@ -89,8 +89,9 @@ def snapshot_field(doc_ids: list[int], field: str) -> dict[int, Any]:
     return values
 
 
-@shared_task
+@shared_task(bind=True)
 def execute_bulk_operation(
+    self,
     operation: str,
     document_ids: list[int],
     parameters: dict,
@@ -114,6 +115,8 @@ def execute_bulk_operation(
 
     if operation not in MODIFIED_FIELDS:
         execution_parameters = parameters.copy()
+        if operation == "reprocess" and self.request.id is not None:
+            execution_parameters["parent_task_id"] = self.request.id
         if operation in USER_OPERATIONS:
             execution_parameters["user"] = user
         if operation in TRIGGER_SOURCE_OPERATIONS:

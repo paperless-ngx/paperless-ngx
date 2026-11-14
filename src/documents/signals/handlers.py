@@ -56,6 +56,8 @@ from documents.models import WorkflowRun
 from documents.models import WorkflowTrigger
 from documents.permissions import restrict_queryset_to_visible
 from documents.plugins.helpers import DocumentsStatusManager
+from documents.task_tracking import finish_dispatch
+from documents.task_tracking import update_parent
 from documents.templating.utils import convert_format_str_to_template_format
 from documents.utils import compute_checksum
 from documents.utils import copy_file_with_basic_stats
@@ -1309,6 +1311,10 @@ def task_postrun_handler(
         except PaperlessTask.DoesNotExist:
             return
 
+        if task_instance.children.exists():
+            finish_dispatch(task_instance, retval if isinstance(retval, dict) else {})
+            return
+
         task_instance.status = new_status
         task_instance.date_done = now
         changed_fields = ["status", "date_done"]
@@ -1332,6 +1338,7 @@ def task_postrun_handler(
                 changed_fields.append("status")
 
         task_instance.save(update_fields=changed_fields)
+        update_parent(task_instance)
         if task and task.name == BULK_OPERATION_TASK_NAME:
             _send_bulk_operation_status(task_instance)
     except Exception:  # pragma: no cover
@@ -1388,6 +1395,10 @@ def task_failure_handler(
         }
 
         task_qs = PaperlessTask.objects.filter(task_id=task_id)
+        parent = task_qs.first()
+        if parent is not None and parent.children.exists():
+            finish_dispatch(parent, result_data)
+            return
         task_instance = task_qs.values("date_started", "date_created").first()
         if task_instance:
             date_started = task_instance["date_started"]
@@ -1399,6 +1410,7 @@ def task_failure_handler(
                     date_started - date_created
                 ).total_seconds()
             task_qs.update(**update_fields)
+            update_parent(task_qs.get())
             if sender and sender.name == BULK_OPERATION_TASK_NAME:
                 _send_bulk_operation_status(task_qs.first())
     except Exception:  # pragma: no cover
@@ -1445,6 +1457,8 @@ def task_revoked_handler(
                 "reason": (reason + " Check worker logs for details."),
             },
         )
+        if task_instance := task_qs.first():
+            update_parent(task_instance)
         if sender and sender.name == BULK_OPERATION_TASK_NAME:
             _send_bulk_operation_status(task_qs.first())
     except Exception:  # pragma: no cover

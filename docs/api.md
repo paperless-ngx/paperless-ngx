@@ -290,9 +290,14 @@ a json payload of the format:
 
 Document bulk operations, including the dedicated document action endpoints, return
 `{"result":"OK","task_id":"…"}` when queued. Use `/api/tasks/?task_id={uuid}`
-to check the task outcome. Actions that create or reprocess files may start further
-consumption or reprocessing tasks and completion of the bulk task means those tasks
-were scheduled, not that their file processing has finished.
+to check the task outcome. Reprocessing operations remain started until all of their
+individual document tasks have finished. Their results include `succeeded_count` and
+`failed_count`; any failed or revoked child makes the operation fail, while successful
+changes remain applied. A scheduling failure is also reported, after any tasks already
+published have finished. Child tasks belong to the initiating user.
+
+Other actions that create files may start further consumption tasks. Completion of
+those bulk tasks means consumption was scheduled, not that file processing has finished.
 
 ```json
 {

@@ -2976,8 +2976,9 @@ class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
     parser_classes = (parsers.JSONParser,)
 
     def _queue_bulk_operation(self, method, documents, parameters, from_webui):
-        if "update_callback" in parameters:
-            raise ValueError("Unsupported bulk operation parameter: update_callback")
+        for parameter in ("update_callback", "parent_task_id"):
+            if parameter in parameters:
+                raise ValueError(f"Unsupported bulk operation parameter: {parameter}")
         trigger_source = (
             PaperlessTask.TriggerSource.WEB_UI
             if from_webui
