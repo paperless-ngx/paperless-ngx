@@ -45,7 +45,7 @@ describe('TaskNotificationService', () => {
     jest.useRealTimers()
   })
 
-  it('replaces a queued notification with its result, retaining the task link', () => {
+  it('replaces a queued notification with its result, removing the task link on success', () => {
     service.showQueued('task-1', 'Workflow queued.', {
       content: 'Workflow completed.',
     })
@@ -53,6 +53,11 @@ describe('TaskNotificationService', () => {
     expect(popups).toHaveLength(0)
     jest.advanceTimersByTime(1)
     expect(popups[0].content).toBe('Workflow queued.')
+    expect(popups[0].actionName).toBe('View task')
+    popups[0].action()
+    expect(navigate).toHaveBeenCalledWith(['/tasks'], {
+      queryParams: { task_id: 'task-1' },
+    })
     service.complete(result())
     expect(notifications).toHaveLength(1)
     expect(popups[1]).toEqual(
@@ -60,13 +65,10 @@ describe('TaskNotificationService', () => {
         id: popups[0].id,
         content: 'Workflow completed.',
         level: ToastLevel.Success,
-        actionName: 'View task',
       })
     )
-    popups[1].action()
-    expect(navigate).toHaveBeenCalledWith(['/tasks'], {
-      queryParams: { task_id: 'task-1' },
-    })
+    expect(popups[1].action).toBeUndefined()
+    expect(popups[1].actionName).toBeUndefined()
   })
 
   it('shows only the result when a task completes during the grace period', () => {
@@ -90,6 +92,7 @@ describe('TaskNotificationService', () => {
     )
     expect(notifications).toHaveLength(1)
     expect(notifications[0].content).toBe('Workflow completed.')
+    expect(notifications[0].action).toBeUndefined()
   })
 
   it.each([PaperlessTaskStatus.Failure, PaperlessTaskStatus.Revoked])(

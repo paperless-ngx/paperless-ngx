@@ -95,7 +95,7 @@ export class TaskNotificationService implements OnDestroy {
     )
     this.toastService.show({
       id: `task-${taskId}`,
-      ...(canViewTasks
+      ...(canViewTasks && toast.level !== ToastLevel.Success
         ? {
             actionName: $localize`View task`,
             action: () =>
