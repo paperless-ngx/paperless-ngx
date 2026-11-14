@@ -15,7 +15,7 @@ import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import { DocumentType } from 'src/app/data/document-type'
 import { FILTER_TITLE } from 'src/app/data/filter-rule-type'
 import { PaperlessTaskStatus } from 'src/app/data/paperless-task'
-import { Results } from 'src/app/data/results'
+import { Results, SelectionData } from 'src/app/data/results'
 import { StoragePath } from 'src/app/data/storage-path'
 import { Tag } from 'src/app/data/tag'
 import { WorkflowTriggerType } from 'src/app/data/workflow-trigger'
@@ -29,10 +29,7 @@ import {
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
-import {
-  DocumentService,
-  SelectionData,
-} from 'src/app/services/rest/document.service'
+import { DocumentService } from 'src/app/services/rest/document.service'
 import { GroupService } from 'src/app/services/rest/group.service'
 import { ShareLinkBundleService } from 'src/app/services/rest/share-link-bundle.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
@@ -1802,7 +1799,6 @@ describe('BulkEditorComponent', () => {
         { id: 2, name: 'Tag 2' },
       ],
       count: 2,
-      all: [1, 2],
     }
 
     const modalInstance = {
@@ -1845,7 +1841,6 @@ describe('BulkEditorComponent', () => {
         { id: 2, name: 'Correspondent 2' },
       ],
       count: 2,
-      all: [1, 2],
     }
 
     const modalInstance = {
@@ -1894,7 +1889,6 @@ describe('BulkEditorComponent', () => {
         { id: 2, name: 'Document Type 2' },
       ],
       count: 2,
-      all: [1, 2],
     }
 
     const modalInstance = {
@@ -1940,7 +1934,6 @@ describe('BulkEditorComponent', () => {
         { id: 2, name: 'Storage Path 2' },
       ],
       count: 2,
-      all: [1, 2],
     }
 
     const modalInstance = {
@@ -1994,7 +1987,6 @@ describe('BulkEditorComponent', () => {
         },
       ],
       count: 2,
-      all: [1, 2],
     }
 
     const modalInstance = {
