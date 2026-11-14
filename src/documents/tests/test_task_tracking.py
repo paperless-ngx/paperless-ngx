@@ -105,7 +105,7 @@ def test_fast_children_wait_for_dispatch_to_finish(operation, outcome):
         complete(PaperlessTask.objects.get(task_id=task_id), outcome)
         parent.refresh_from_db()
         assert parent.status == PaperlessTask.Status.STARTED
-        assert not parent.dispatch_complete
+        assert not parent.dispatched
 
     with (
         mock.patch(

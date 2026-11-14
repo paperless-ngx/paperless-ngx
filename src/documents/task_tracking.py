@@ -59,7 +59,7 @@ def finish_dispatch(task: PaperlessTask, result_data: dict) -> None:
             return
         parent.dispatched = True
         parent.result_data = result_data
-        parent.save(update_fields=["dispatch_complete", "result_data"])
+        parent.save(update_fields=["dispatched", "result_data"])
         _finalize_parent(parent)
 
 
