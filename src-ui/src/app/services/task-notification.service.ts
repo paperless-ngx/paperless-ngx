@@ -2,6 +2,7 @@ import { inject, Injectable, OnDestroy } from '@angular/core'
 import { Router } from '@angular/router'
 import { BulkOperationStatus } from '../data/bulk-operation'
 import { PaperlessTaskStatus } from '../data/paperless-task'
+import { getDocumentOperationLabel } from '../utils/document-operation'
 import {
   PermissionAction,
   PermissionsService,
@@ -76,12 +77,23 @@ export class TaskNotificationService implements OnDestroy {
     success: Partial<Toast> = {}
   ) {
     const succeeded = result.status === PaperlessTaskStatus.Success
+    const operation = getDocumentOperationLabel(result.operation)
+    let content: string
+    if (succeeded) {
+      content = operation
+        ? $localize`Operation '${operation}' completed.`
+        : $localize`Operation completed.`
+    } else if (result.status === PaperlessTaskStatus.Revoked) {
+      content = operation
+        ? $localize`Operation '${operation}' revoked.`
+        : $localize`Operation revoked.`
+    } else {
+      content = operation
+        ? $localize`Operation '${operation}' failed. Some changes may already have been applied.`
+        : $localize`Operation failed. Some changes may already have been applied.`
+    }
     this.show(result.task_id, {
-      content: succeeded
-        ? $localize`Operation completed.`
-        : result.status === PaperlessTaskStatus.Revoked
-          ? $localize`Operation revoked.`
-          : $localize`Operation failed. Some changes may already have been applied.`,
+      content,
       delay: succeeded ? 5000 : 10000,
       level: succeeded ? ToastLevel.Success : ToastLevel.Error,
       ...(succeeded ? success : { error: result.error }),

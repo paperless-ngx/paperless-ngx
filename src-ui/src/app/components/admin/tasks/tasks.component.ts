@@ -33,6 +33,7 @@ import { IfPermissionsDirective } from 'src/app/directives/if-permissions.direct
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { TasksService } from 'src/app/services/tasks.service'
 import { ToastService } from 'src/app/services/toast.service'
+import { getDocumentOperationLabel } from 'src/app/utils/document-operation'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
@@ -55,27 +56,6 @@ const FILTER_TARGETS = [
   { id: TaskFilterTargetID.Result, name: $localize`Result` },
   { id: TaskFilterTargetID.TaskId, name: $localize`Task ID` },
 ]
-
-const OPERATION_LABELS: Record<string, string> = {
-  set_correspondent: $localize`Set correspondent`,
-  set_document_type: $localize`Set document type`,
-  set_storage_path: $localize`Set storage path`,
-  add_tag: $localize`Add tag`,
-  remove_tag: $localize`Remove tag`,
-  modify_tags: $localize`Update tags`,
-  modify_custom_fields: $localize`Update custom fields`,
-  set_permissions: $localize`Set permissions`,
-  delete: $localize`Move to trash`,
-  reprocess: $localize`Document reprocessing`,
-  run_workflow: $localize`Run workflow`,
-  rotate: $localize`Rotate documents`,
-  merge: $localize`Merge documents`,
-  merge_as_versions: $localize`Merge as versions`,
-  split: $localize`Split documents`,
-  delete_pages: $localize`Delete pages`,
-  edit_pdf: $localize`Edit PDF`,
-  remove_password: $localize`Remove password`,
-}
 
 const SECTION_LABELS = {
   [TaskSection.All]: $localize`All`,
@@ -453,8 +433,7 @@ export class TasksComponent
   }
 
   private taskOperationLabel(task: PaperlessTask): string | null {
-    const label = OPERATION_LABELS[task.input_data?.operation]
-    return typeof label === 'string' ? label : null
+    return getDocumentOperationLabel(task.input_data?.operation)
   }
 
   taskDocumentCount(task: PaperlessTask): number | null {

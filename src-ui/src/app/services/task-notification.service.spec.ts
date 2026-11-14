@@ -77,7 +77,7 @@ describe('TaskNotificationService', () => {
     service.complete(result())
     jest.advanceTimersByTime(1000)
     expect(popups.map((toast) => toast.content)).toEqual([
-      'Operation completed.',
+      "Operation 'Run workflow' completed.",
     ])
   })
 
@@ -132,7 +132,7 @@ describe('TaskNotificationService', () => {
     expect(notifications).toHaveLength(2)
     expect(notifications.map((toast) => toast.content)).toEqual([
       'Second queued',
-      'Operation completed.',
+      "Operation 'Run workflow' completed.",
     ])
   })
 
@@ -144,5 +144,27 @@ describe('TaskNotificationService', () => {
     expect(popups.every((toast) => !toast.action && !toast.actionName)).toBe(
       true
     )
+  })
+
+  it('identifies concurrent operations even when completion arrives before their queue responses', () => {
+    service.complete({
+      task_id: 'tags',
+      operation: 'modify_tags',
+      status: PaperlessTaskStatus.Success,
+    })
+    service.complete({
+      task_id: 'correspondent',
+      operation: 'set_correspondent',
+      status: PaperlessTaskStatus.Success,
+    })
+    expect(notifications.map((toast) => toast.content)).toEqual([
+      "Operation 'Set correspondent' completed.",
+      "Operation 'Update tags' completed.",
+    ])
+  })
+
+  it('keeps the generic fallback for unknown operation names', () => {
+    service.complete({ ...result(), operation: 'future_operation' })
+    expect(notifications[0].content).toBe('Operation completed.')
   })
 })

@@ -234,7 +234,7 @@ describe('AppFrameComponent', () => {
     expect(success).toHaveBeenCalledWith(
       expect.objectContaining({
         id: 'task-bulk-task',
-        content: 'Operation completed.',
+        content: "Operation 'Set permissions' completed.",
       })
     )
     fixture.destroy()
@@ -271,13 +271,13 @@ describe('AppFrameComponent', () => {
     expect(error).toHaveBeenCalledWith(
       expect.objectContaining({
         content:
-          'Operation failed. Some changes may already have been applied.',
+          "Operation 'Set permissions' failed. Some changes may already have been applied.",
         error: 'Could not update',
       })
     )
     expect(error).toHaveBeenCalledWith(
       expect.objectContaining({
-        content: 'Operation revoked.',
+        content: "Operation 'Set permissions' revoked.",
         error: 'Task expired before execution.',
       })
     )

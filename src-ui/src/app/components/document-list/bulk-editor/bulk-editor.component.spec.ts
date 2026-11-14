@@ -14,6 +14,7 @@ import { Correspondent } from 'src/app/data/correspondent'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import { DocumentType } from 'src/app/data/document-type'
 import { FILTER_TITLE } from 'src/app/data/filter-rule-type'
+import { PaperlessTaskStatus } from 'src/app/data/paperless-task'
 import { Results } from 'src/app/data/results'
 import { StoragePath } from 'src/app/data/storage-path'
 import { Tag } from 'src/app/data/tag'
@@ -39,6 +40,7 @@ import { TagService } from 'src/app/services/rest/tag.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { WorkflowService } from 'src/app/services/rest/workflow.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { TaskNotificationService } from 'src/app/services/task-notification.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { TrashService } from 'src/app/services/trash.service'
 import { environment } from 'src/environments/environment'
@@ -1557,7 +1559,17 @@ describe('BulkEditorComponent', () => {
     expect(documentListViewService.selected.size).toEqual(0)
     jest.advanceTimersByTime(400)
     expect(toastSpy).toHaveBeenCalledWith(
-      expect.objectContaining({ content: 'Bulk operation queued.' })
+      expect.objectContaining({
+        content: "Bulk operation 'Merge as versions' queued.",
+      })
+    )
+    TestBed.inject(TaskNotificationService).complete({
+      task_id: 'versions-1',
+      operation: 'merge_as_versions',
+      status: PaperlessTaskStatus.Success,
+    })
+    expect(toastSpy.mock.calls.at(-1)[0].content).toBe(
+      "Bulk operation 'Merge as versions' completed."
     )
     jest.useRealTimers()
   })
@@ -1650,13 +1662,22 @@ describe('BulkEditorComponent', () => {
     )
   })
 
-  it.each([true, false])(
-    'shows queued feedback and gates the task link on permission (%s)',
-    (canViewTasks) => {
+  it.each<[boolean, number]>([
+    [true, 2],
+    [false, 2],
+    [true, 1],
+  ])(
+    'names queued work and gates the task link (permission %s, documents %s)',
+    (canViewTasks, count) => {
       jest.useFakeTimers()
       jest
         .spyOn(permissionsService, 'currentUserCan')
         .mockReturnValue(canViewTasks)
+      jest
+        .spyOn(documentListViewService, 'selected', 'get')
+        .mockReturnValue(
+          new Set(Array.from({ length: count }, (_, index) => index + 3))
+        )
       const queued = jest.spyOn(toastService, 'show')
       let modal: NgbModalRef
       modalService.activeInstances.subscribe((instances) => {
@@ -1677,7 +1698,8 @@ describe('BulkEditorComponent', () => {
       expect(queued).not.toHaveBeenCalled()
       jest.advanceTimersByTime(400)
       const notification = queued.mock.calls.at(-1)[0]
-      expect(notification.content).toBe('Bulk operation queued.')
+      const prefix = count > 1 ? 'Bulk operation' : 'Operation'
+      expect(notification.content).toBe(`${prefix} \'Set permissions\' queued.`)
       if (canViewTasks) {
         expect(notification.actionName).toBe('View task')
         notification.action()
@@ -1691,6 +1713,14 @@ describe('BulkEditorComponent', () => {
       expect(reload).not.toHaveBeenCalled()
       expect(documentListViewService.selected.size).toBe(0)
       expect(documentListViewService.allSelected).toBe(false)
+      TestBed.inject(TaskNotificationService).complete({
+        task_id: 'queued-operation',
+        operation: 'set_permissions',
+        status: PaperlessTaskStatus.Success,
+      })
+      const completed = queued.mock.calls.at(-1)[0]
+      expect(completed.content).toBe(`${prefix} \'Set permissions\' completed.`)
+      expect(completed.action).toBeUndefined()
       jest.useRealTimers()
     }
   )

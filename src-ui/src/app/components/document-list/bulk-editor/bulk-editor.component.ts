@@ -53,6 +53,7 @@ import { SettingsService } from 'src/app/services/settings.service'
 import { TaskNotificationService } from 'src/app/services/task-notification.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { TrashService } from 'src/app/services/trash.service'
+import { getDocumentOperationLabel } from 'src/app/utils/document-operation'
 import { flattenTags } from 'src/app/utils/flatten-tags'
 import { queryParamsFromFilterRules } from 'src/app/utils/query-params'
 import { MergeAsVersionsConfirmDialogComponent } from '../../common/confirm-dialog/merge-as-versions-confirm-dialog/merge-as-versions-confirm-dialog.component'
@@ -348,7 +349,8 @@ export class BulkEditorComponent
       .bulkEdit(overrideSelection ?? this.getSelectionQuery(), method, args)
       .pipe(first())
       .subscribe({
-        next: ({ task_id }) => this.handleOperationQueued(modal, task_id),
+        next: ({ task_id }) =>
+          this.handleOperationQueued(modal, task_id, method),
         error: (error) => this.handleOperationError(modal, error),
       })
   }
@@ -356,22 +358,33 @@ export class BulkEditorComponent
   private handleOperationQueued(
     modal: NgbModalRef,
     taskId: string,
+    operation: string,
     onQueued?: (taskId: string) => void
   ) {
+    const bulk = this.getSelectionSize() > 1
     modal?.close()
     this.list.selectNone()
     if (onQueued) {
       onQueued(taskId)
     } else {
+      const label = getDocumentOperationLabel(operation)
       this.taskNotifications.showQueued(
         taskId,
-        $localize`Bulk operation queued.`
+        bulk
+          ? $localize`Bulk operation '${label}' queued.`
+          : $localize`Operation '${label}' queued.`,
+        {
+          content: bulk
+            ? $localize`Bulk operation '${label}' completed.`
+            : $localize`Operation '${label}' completed.`,
+        }
       )
     }
   }
 
   private executeDocumentAction(
     modal: NgbModalRef,
+    operation: string,
     request: Observable<BulkOperationResponse>,
     onQueued?: (taskId: string) => void
   ) {
@@ -380,7 +393,7 @@ export class BulkEditorComponent
     }
     request.pipe(first()).subscribe({
       next: ({ task_id }) => {
-        this.handleOperationQueued(modal, task_id, onQueued)
+        this.handleOperationQueued(modal, task_id, operation, onQueued)
       },
       error: (error) => this.handleOperationError(modal, error),
     })
@@ -953,6 +966,7 @@ export class BulkEditorComponent
     const count = this.getSelectionSize()
     this.executeDocumentAction(
       modal,
+      'delete',
       this.documentService.deleteDocuments(this.getSelectionQuery()),
       (taskId) => this.trashService.trackMovedToTrash(taskId, count, documents)
     )
@@ -995,6 +1009,7 @@ export class BulkEditorComponent
         modal.componentInstance.buttonsEnabled.set(false)
         this.executeDocumentAction(
           modal,
+          'reprocess',
           this.documentService.reprocessDocuments(
             this.getSelectionQuery(),
             modal.componentInstance.remoteOcr
@@ -1035,6 +1050,7 @@ export class BulkEditorComponent
         rotateDialog.buttonsEnabled.set(false)
         this.executeDocumentAction(
           modal,
+          'rotate',
           this.documentService.rotateDocuments(
             this.getSelectionQuery(),
             rotateDialog.degrees
@@ -1068,6 +1084,7 @@ export class BulkEditorComponent
         mergeDialog.buttonsEnabled.set(false)
         this.executeDocumentAction(
           modal,
+          'merge',
           this.documentService.mergeDocuments(mergeDialog.documentIDs(), args)
         )
       })
@@ -1090,6 +1107,7 @@ export class BulkEditorComponent
       .subscribe(() => {
         this.executeDocumentAction(
           modal,
+          'merge_as_versions',
           this.documentService.mergeDocumentsAsVersions(
             mergeDialog.documentIDs(),
             mergeDialog.rootDocumentID()
@@ -1118,7 +1136,7 @@ export class BulkEditorComponent
     dialog.selection = this.getSelectionQuery()
     dialog.selectionCount = this.getSelectionSize()
     dialog.succeeded.subscribe(({ task_id }) =>
-      this.handleOperationQueued(null, task_id)
+      this.handleOperationQueued(null, task_id, 'modify_custom_fields')
     )
     dialog.failed.subscribe((error) => {
       this.toastService.showError(

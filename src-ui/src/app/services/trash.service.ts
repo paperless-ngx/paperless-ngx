@@ -24,7 +24,9 @@ export class TrashService {
   ) {
     this.taskNotifications.showQueued(
       taskId,
-      $localize`Bulk operation queued.`,
+      count > 1
+        ? $localize`Bulk move to trash queued.`
+        : $localize`Move to trash queued.`,
       this.movedToTrashToast(
         $localize`Moved ${count} document(s) to the trash`,
         documents
