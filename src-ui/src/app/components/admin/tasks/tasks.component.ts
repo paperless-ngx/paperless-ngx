@@ -435,11 +435,14 @@ export class TasksComponent
   }
 
   taskDisplayName(task: PaperlessTask): string {
-    return (
-      task.input_data?.filename?.toString() ||
-      this.taskOperationLabel(task) ||
-      task.task_type_display
-    )
+    const filename = task.input_data?.filename?.toString()
+    if (filename) return filename
+    const operation = this.taskOperationLabel(task)
+    const count = this.taskDocumentCount(task)
+    if (operation && count !== null && count > 1) {
+      return $localize`Bulk operation: ${operation}`
+    }
+    return operation || task.task_type_display
   }
 
   taskShowsSeparateTypeLabel(task: PaperlessTask): boolean {

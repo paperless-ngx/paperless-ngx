@@ -175,15 +175,16 @@
               </div>
             </td>
             <td class="overflow-auto name-col">
-              <div>{{ taskDisplayName(task) }}</div>
+              @let documentCount = taskDocumentCount(task);
+              <div>
+                {{ taskDisplayName(task) }}
+                @if (documentCount !== null && documentCount > 1) {
+                  <small class="text-muted ms-1" i18n>({documentCount, plural, =1 {1 document} other {{{ documentCount }} documents}})</small>
+                }
+              </div>
               <div class="small text-muted">
                 @if (taskShowsSeparateTypeLabel(task)) {
                   <span class="me-2">{{ task.task_type_display }}</span>
-                }
-                @let documentCount = taskDocumentCount(task);
-                @if (documentCount !== null) {
-                  <span class="me-2" i18n>{documentCount, plural, =1 {1 document} other {{{ documentCount }} documents}}</span>
-                  <span class="me-2" aria-hidden="true">&middot;</span>
                 }
                 <span class="text-nowrap"><pngx-bs-icon class="me-1" width="1em" height="1em" name="box-arrow-in-right"></pngx-bs-icon>{{ task.trigger_source_display }}</span>
               </div>

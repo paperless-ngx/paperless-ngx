@@ -896,9 +896,9 @@ describe('TasksComponent', () => {
   })
 
   it.each([
-    ['modify_tags', 12, 'Update tags', '12 documents'],
-    ['run_workflow', 1, 'Run workflow', '1 document'],
-    ['delete', 3, 'Move to trash', '3 documents'],
+    ['modify_tags', 12, 'Bulk operation: Update tags', '(12 documents)'],
+    ['run_workflow', 1, 'Run workflow', null],
+    ['delete', 3, 'Bulk operation: Move to trash', '(3 documents)'],
   ])(
     'shows the operation, document count and outcome for %s',
     (operation, count, label, summary) => {
@@ -921,7 +921,14 @@ describe('TasksComponent', () => {
 
       const name = fixture.nativeElement.querySelector('tbody .name-col')
       expect(name.textContent).toContain(label)
-      expect(name.textContent).toContain(summary)
+      const countLabel = name.querySelector('small.text-muted')
+      if (summary) {
+        expect(countLabel.textContent).toContain(summary)
+      } else {
+        expect(countLabel).toBeNull()
+        expect(name.textContent).not.toContain('Bulk operation:')
+      }
+      expect(name.textContent).not.toContain('·')
       expect(name.textContent).toContain('Web UI')
       expect(name.textContent).not.toContain(task.task_type_display)
       expect(
@@ -943,7 +950,8 @@ describe('TasksComponent', () => {
 
     const name = fixture.nativeElement.querySelector('tbody .name-col')
     expect(name.textContent).toContain('Document reprocessing')
-    expect(name.textContent).toContain('1 document')
+    expect(name.textContent).not.toContain('Bulk operation:')
+    expect(name.querySelector('small')).toBeNull()
     expect(component.taskResultMessage(task)).toBeNull()
   })
 
