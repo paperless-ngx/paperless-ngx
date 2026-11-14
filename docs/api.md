@@ -285,19 +285,14 @@ The API supports various bulk-editing operations which are executed asynchronous
 
 ### Documents
 
-For bulk operations on documents, use the endpoint `/api/documents/bulk_edit/` which accepts
-a json payload of the format:
+Document bulk operations return `{"result":"OK","task_id":"…"}` when queued.
+Check `/api/tasks/?task_id={uuid}` for the outcome, including any follow-up processing,
+deletion, or recovery. Failed operations may leave partial changes applied.
 
-Document bulk operations, including the dedicated document action endpoints, return
-`{"result":"OK","task_id":"…"}` when queued. Use `/api/tasks/?task_id={uuid}`
-to check the task outcome. Reprocessing operations remain started until all of their
-individual document tasks have finished. Their results include `succeeded_count` and
-`failed_count`; any failed or revoked child makes the operation fail, while successful
-changes remain applied. A scheduling failure is also reported, after any tasks already
-published have finished. Child tasks belong to the initiating user.
+For operations with child tasks, `result_data` includes `succeeded_count` and
+`failed_count` (task counts). Merges report skipped inputs in `failed_document_ids`.
 
-Other actions that create files may start further consumption tasks. Completion of
-those bulk tasks means consumption was scheduled, not that file processing has finished.
+The `/api/documents/bulk_edit/` endpoint accepts:
 
 ```json
 {
