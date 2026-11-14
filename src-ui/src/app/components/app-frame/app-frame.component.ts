@@ -59,6 +59,7 @@ import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { TasksService } from 'src/app/services/tasks.service'
 import { ToastService } from 'src/app/services/toast.service'
+import { TrashService } from 'src/app/services/trash.service'
 import { UploadDocumentsService } from 'src/app/services/upload-documents.service'
 import { WebsocketStatusService } from 'src/app/services/websocket-status.service'
 import { environment } from 'src/environments/environment'
@@ -115,6 +116,7 @@ export class AppFrameComponent
   settingsService = inject(SettingsService)
   tasksService = inject(TasksService)
   private readonly toastService = inject(ToastService)
+  private readonly trashService = inject(TrashService)
   private modalService = inject(NgbModal)
   permissionsService = inject(PermissionsService)
   private djangoMessagesService = inject(DjangoMessagesService)
@@ -182,7 +184,7 @@ export class AppFrameComponent
         ),
         takeUntilDestroyed(this.destroyRef)
       )
-      .subscribe(({ status, error }) => {
+      .subscribe(({ task_id, operation, status, error }) => {
         this.documentList.reload(null, false)
         this.documentList.reduceSelectionToFilter()
         // maybe someday we can optimize to only refresh affected documents
@@ -198,11 +200,14 @@ export class AppFrameComponent
         ) {
           this.tasksService.reload()
         }
-        if (status === PaperlessTaskStatus.Success) {
+        if (operation === 'delete') {
+          this.trashService.handleDeleteTaskStatus(task_id, status)
+        }
+        if (status === PaperlessTaskStatus.Success && operation !== 'delete') {
           this.toastService.showSuccess($localize`Bulk operation completed.`)
         } else if (status === PaperlessTaskStatus.Revoked) {
           this.toastService.showError($localize`Bulk operation revoked.`, error)
-        } else {
+        } else if (status === PaperlessTaskStatus.Failure) {
           this.toastService.showError(
             $localize`Bulk operation failed. Some changes may already have been applied.`,
             error

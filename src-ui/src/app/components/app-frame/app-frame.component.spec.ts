@@ -35,6 +35,7 @@ import { SearchService } from 'src/app/services/rest/search.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { TasksService } from 'src/app/services/tasks.service'
 import { ToastService } from 'src/app/services/toast.service'
+import { TrashService } from 'src/app/services/trash.service'
 import { UploadDocumentsService } from 'src/app/services/upload-documents.service'
 import { WebsocketStatusService } from 'src/app/services/websocket-status.service'
 import { environment } from 'src/environments/environment'
@@ -266,6 +267,22 @@ describe('AppFrameComponent', () => {
     expect(error).toHaveBeenCalledWith(
       'Bulk operation revoked.',
       'Task expired before execution.'
+    )
+    expect(success).not.toHaveBeenCalled()
+  })
+
+  it('defers the delete success toast to TrashService', () => {
+    const success = jest.spyOn(toastService, 'showSuccess')
+    const trashService = TestBed.inject(TrashService)
+    const handleStatus = jest.spyOn(trashService, 'handleDeleteTaskStatus')
+    bulkEvents.next({
+      task_id: 'delete-1',
+      operation: 'delete',
+      status: PaperlessTaskStatus.Success,
+    })
+    expect(handleStatus).toHaveBeenCalledWith(
+      'delete-1',
+      PaperlessTaskStatus.Success
     )
     expect(success).not.toHaveBeenCalled()
   })

@@ -3,6 +3,7 @@ import { Injectable, inject } from '@angular/core'
 import { Observable } from 'rxjs'
 import { environment } from 'src/environments/environment'
 import { Document } from '../data/document'
+import { PaperlessTaskStatus } from '../data/paperless-task'
 import { Results } from '../data/results'
 import { DocumentListViewService } from './document-list-view.service'
 import { ToastLevel, ToastService } from './toast.service'
@@ -14,6 +15,49 @@ export class TrashService {
   private http = inject(HttpClient)
   private toastService = inject(ToastService)
   private documentListViewService = inject(DocumentListViewService)
+  private pendingMoves = new Map<
+    string,
+    { count: number; documents?: number[] }
+  >()
+  private completedMoves = new Map<string, PaperlessTaskStatus>()
+
+  public trackMovedToTrash(
+    taskId: string,
+    count: number,
+    documents?: number[]
+  ) {
+    const status = this.completedMoves.get(taskId)
+    if (status !== undefined) {
+      this.completedMoves.delete(taskId)
+      if (status === PaperlessTaskStatus.Success) {
+        this.notifyMovedToTrash(
+          $localize`Moved ${count} document(s) to the trash`,
+          documents
+        )
+      }
+    } else {
+      this.pendingMoves.set(taskId, { count, documents })
+    }
+  }
+
+  public handleDeleteTaskStatus(taskId: string, status: PaperlessTaskStatus) {
+    const move = this.pendingMoves.get(taskId)
+    if (move) {
+      this.pendingMoves.delete(taskId)
+      if (status === PaperlessTaskStatus.Success) {
+        this.notifyMovedToTrash(
+          $localize`Moved ${move.count} document(s) to the trash`,
+          move.documents
+        )
+      }
+    } else {
+      // in case the task finishes fast
+      this.completedMoves.set(taskId, status)
+      if (this.completedMoves.size > 100) {
+        this.completedMoves.delete(this.completedMoves.keys().next().value)
+      }
+    }
+  }
 
   public getTrash(page: number = 1): Observable<Results<Document>> {
     const httpParams = new HttpParams().set('page', page.toString())

@@ -11,6 +11,7 @@ import {
   SimpleChanges,
 } from '@angular/core'
 import { FormsModule } from '@angular/forms'
+import { Router } from '@angular/router'
 import { NgbDropdownModule, NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { merge, of, Subject } from 'rxjs'
 import {
@@ -27,6 +28,11 @@ import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon
 import { DocumentVersionInfo } from 'src/app/data/document'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
+import {
+  PermissionAction,
+  PermissionsService,
+  PermissionType,
+} from 'src/app/services/permissions.service'
 import { DocumentService } from 'src/app/services/rest/document.service'
 import { ToastService } from 'src/app/services/toast.service'
 import {
@@ -77,6 +83,8 @@ export class DocumentVersionDropdownComponent
   private readonly toastService = inject(ToastService)
   private readonly websocketStatusService = inject(WebsocketStatusService)
   private readonly modalService = inject(NgbModal)
+  private readonly router = inject(Router)
+  private readonly permissionsService = inject(PermissionsService)
   private readonly destroy$ = new Subject<void>()
   private readonly documentChange$ = new Subject<void>()
 
@@ -305,24 +313,32 @@ export class DocumentVersionDropdownComponent
             versionLabel
           )
           .pipe(
-            switchMap(() => this.documentsService.getVersions(this.documentId)),
             first(),
             finalize(() => dialog.buttonsEnabled.set(true)),
             takeUntil(this.destroy$),
             takeUntil(this.documentChange$)
           )
           .subscribe({
-            next: (document) => {
-              if (document?.versions?.length) {
-                this.versionsUpdated.emit(document.versions)
-                // The API returns versions newest first
-                this.versionSelected.emit(document.versions[0].id)
-              }
+            next: ({ task_id }) => {
               this.newVersionLabel = ''
               modal.close()
-              this.toastService.showSuccess(
-                $localize`Existing document added as a version.`
+              const canViewTasks = this.permissionsService.currentUserCan(
+                PermissionAction.View,
+                PermissionType.PaperlessTask
               )
+              this.toastService.show({
+                content: $localize`Bulk operation queued.`,
+                delay: 5000,
+                ...(canViewTasks
+                  ? {
+                      actionName: $localize`View task`,
+                      action: () =>
+                        this.router.navigate(['/tasks'], {
+                          queryParams: { task_id },
+                        }),
+                    }
+                  : {}),
+              })
             },
             error: (error) => {
               this.toastService.showError(

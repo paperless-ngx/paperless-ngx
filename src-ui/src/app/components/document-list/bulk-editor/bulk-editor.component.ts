@@ -383,8 +383,8 @@ export class BulkEditorComponent
     }
     request.pipe(first()).subscribe({
       next: ({ task_id }) => {
-        onQueued?.(task_id)
         this.handleOperationQueued(modal, task_id)
+        onQueued?.(task_id)
       },
       error: (error) => this.handleOperationError(modal, error),
     })

@@ -5,6 +5,7 @@ import {
   HttpTestingController,
 } from '@angular/common/http/testing'
 import { environment } from 'src/environments/environment'
+import { PaperlessTaskStatus } from '../data/paperless-task'
 import { DocumentListViewService } from './document-list-view.service'
 import { Toast, ToastService } from './toast.service'
 import { TrashService } from './trash.service'
@@ -104,5 +105,28 @@ describe('TrashService', () => {
     service.notifyMovedToTrash('Moved 500 document(s) to the trash')
     expect(toast.content).toEqual('Moved 500 document(s) to the trash')
     expect(toast.action).toBeUndefined()
+  })
+
+  it('offers Undo only after the matching delete task succeeds', () => {
+    let toasts: Toast[] = []
+    toastService.getToasts().subscribe((t) => (toasts = [...t]))
+    service.trackMovedToTrash('delete-1', 2, [1, 2])
+    expect(toasts).toHaveLength(0)
+    service.handleDeleteTaskStatus('other-delete', PaperlessTaskStatus.Success)
+    expect(toasts).toHaveLength(0)
+    service.handleDeleteTaskStatus('delete-1', PaperlessTaskStatus.Success)
+    expect(toasts).toHaveLength(1)
+    expect(toasts[0].actionName).toBe('Undo')
+  })
+
+  it('handles completion before the queue response and does not offer Undo on failure', () => {
+    let toasts: Toast[] = []
+    toastService.getToasts().subscribe((t) => (toasts = [...t]))
+    service.handleDeleteTaskStatus('delete-1', PaperlessTaskStatus.Success)
+    service.trackMovedToTrash('delete-1', 1, [1])
+    expect(toasts[0].actionName).toBe('Undo')
+    service.trackMovedToTrash('delete-2', 1, [2])
+    service.handleDeleteTaskStatus('delete-2', PaperlessTaskStatus.Failure)
+    expect(toasts).toHaveLength(1)
   })
 })
