@@ -105,67 +105,6 @@ class TestMergeDocumentsAsVersionsSerializer(TestCase):
         self.assertFalse(serializer.is_valid())
         self.assertIn("documents", serializer.errors)
 
-    def test_rejects_selected_version(self) -> None:
-        version = Document.objects.create(
-            checksum="D",
-            title="D",
-            root_document=self.doc1,
-            version_index=1,
-        )
-        serializer = MergeDocumentsAsVersionsSerializer(
-            data={
-                "documents": [version.id, self.doc2.id],
-                "root_document_id": self.doc2.id,
-            },
-        )
-
-        self.assertFalse(serializer.is_valid())
-        self.assertEqual(
-            serializer.errors["non_field_errors"][0],
-            "Only top-level documents can be merged as versions.",
-        )
-
-    def test_rejects_source_document_with_versions(self) -> None:
-        Document.objects.create(
-            checksum="D",
-            title="D",
-            root_document=self.doc1,
-            version_index=1,
-        )
-        serializer = MergeDocumentsAsVersionsSerializer(
-            data={
-                "documents": [self.doc1.id, self.doc2.id],
-                "root_document_id": self.doc2.id,
-            },
-        )
-
-        self.assertFalse(serializer.is_valid())
-        self.assertEqual(
-            serializer.errors["non_field_errors"][0],
-            "Documents with existing versions cannot be merged into another document.",
-        )
-
-    def test_rejects_source_document_with_trashed_versions(self) -> None:
-        version = Document.objects.create(
-            checksum="D",
-            title="D",
-            root_document=self.doc1,
-            version_index=1,
-        )
-        version.delete()  # trashed, but still points at doc1
-        serializer = MergeDocumentsAsVersionsSerializer(
-            data={
-                "documents": [self.doc1.id, self.doc2.id],
-                "root_document_id": self.doc2.id,
-            },
-        )
-
-        self.assertFalse(serializer.is_valid())
-        self.assertEqual(
-            serializer.errors["non_field_errors"][0],
-            "Documents with existing versions cannot be merged into another document.",
-        )
-
     def test_allows_root_document_with_versions(self) -> None:
         Document.objects.create(
             checksum="D",
@@ -184,6 +123,95 @@ class TestMergeDocumentsAsVersionsSerializer(TestCase):
 
 
 class TestMergeDocumentsAsVersions(TestCase):
+    def setUp(self) -> None:
+        self.doc1 = Document.objects.create(checksum="test-A", title="A")
+        self.doc2 = Document.objects.create(checksum="test-B", title="B")
+
+    def test_rejects_selected_version(self) -> None:
+        version = Document.objects.create(
+            checksum="D",
+            title="D",
+            root_document=self.doc1,
+            version_index=1,
+        )
+        with self.assertRaisesMessage(
+            ValueError,
+            "Only top-level documents can be merged as versions.",
+        ):
+            merge_as_versions(
+                [version.id, self.doc2.id],
+                root_document_id=self.doc2.id,
+            )
+
+    def test_rejects_source_document_with_versions(self) -> None:
+        Document.objects.create(
+            checksum="D",
+            title="D",
+            root_document=self.doc1,
+            version_index=1,
+        )
+        with self.assertRaisesMessage(
+            ValueError,
+            "Documents with existing versions cannot be merged into another document.",
+        ):
+            merge_as_versions(
+                [self.doc1.id, self.doc2.id],
+                root_document_id=self.doc2.id,
+            )
+
+    def test_rejects_source_document_with_trashed_versions(self) -> None:
+        version = Document.objects.create(
+            checksum="D",
+            title="D",
+            root_document=self.doc1,
+            version_index=1,
+        )
+        version.delete()  # trashed, but still points at doc1
+        with self.assertRaisesMessage(
+            ValueError,
+            "Documents with existing versions cannot be merged into another document.",
+        ):
+            merge_as_versions(
+                [self.doc1.id, self.doc2.id],
+                root_document_id=self.doc2.id,
+            )
+
+    @mock.patch("documents.bulk_edit.DocumentsStatusManager")
+    @mock.patch("documents.bulk_edit.bulk_update_documents.apply_async")
+    @mock.patch("documents.search.get_backend")
+    def test_rejects_source_that_gained_versions_after_validation(
+        self,
+        _get_backend_mock,
+        _bulk_update_mock,
+        _status_manager_mock,
+    ) -> None:
+        destination = Document.objects.create(checksum="destination")
+        serializer = MergeDocumentsAsVersionsSerializer(
+            data={
+                "documents": [self.doc1.id, destination.id],
+                "root_document_id": destination.id,
+            },
+        )
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+
+        merge_as_versions(
+            [self.doc1.id, self.doc2.id],
+            root_document_id=self.doc1.id,
+        )
+        with self.assertRaisesMessage(
+            ValueError,
+            "Documents with existing versions cannot be merged into another document.",
+        ):
+            merge_as_versions(
+                serializer.validated_data["documents"],
+                root_document_id=serializer.validated_data["root_document_id"],
+            )
+
+        self.doc1.refresh_from_db()
+        self.doc2.refresh_from_db()
+        self.assertIsNone(self.doc1.root_document_id)
+        self.assertEqual(self.doc2.root_document_id, self.doc1.id)
+
     @mock.patch("documents.bulk_edit.DocumentsStatusManager")
     @mock.patch("documents.bulk_edit.bulk_update_documents.apply_async")
     @mock.patch("documents.search.get_backend")
@@ -456,8 +484,9 @@ class TestMergeDocumentsAsVersionsAPI(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         merge_mock.assert_not_called()
 
-    @mock.patch("documents.views.bulk_edit.merge_as_versions")
-    def test_rejects_source_document_with_versions(self, merge_mock) -> None:
+    @mock.patch("documents.views.execute_bulk_operation.apply_async")
+    def test_queues_source_document_with_versions(self, enqueue_mock) -> None:
+        enqueue_mock.return_value.id = "queued-merge"
         Document.objects.create(
             checksum="C",
             title="C",
@@ -475,8 +504,9 @@ class TestMergeDocumentsAsVersionsAPI(APITestCase):
             format="json",
         )
 
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        merge_mock.assert_not_called()
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        enqueue_mock.assert_called_once()
+        self.assertEqual(response.data["task_id"], "queued-merge")
         self.doc1.refresh_from_db()
         self.assertIsNone(self.doc1.root_document_id)
 

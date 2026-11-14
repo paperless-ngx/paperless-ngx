@@ -1717,19 +1717,8 @@ class MergeDocumentsAsVersionsSerializer(DocumentListSerializer):
                 "root_document_id must be one of the selected documents.",
             )
 
-        selected_documents = Document.objects.filter(id__in=documents)
-        if selected_documents.filter(root_document__isnull=False).exists():
-            raise serializers.ValidationError(
-                "Only top-level documents can be merged as versions.",
-            )
-
-        source_document_ids = set(documents) - {attrs["root_document_id"]}
-        if Document.global_objects.filter(
-            root_document_id__in=source_document_ids,
-        ).exists():
-            raise serializers.ValidationError(
-                "Documents with existing versions cannot be merged into another document.",
-            )
+        # Version state checks (e.g., whether a document is already part of a version chain)
+        # moved to merge_as_versions() under row locks, since it could change between queueing and execution
         return attrs
 
 
