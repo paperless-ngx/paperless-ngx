@@ -83,11 +83,12 @@ export class TaskNotificationService implements OnDestroy {
     const operation = getDocumentOperationLabel(result.operation)
     let content: string
     if (succeeded) {
-      content = documentOperationHasFollowUpTasks(result.operation)
-        ? $localize`Operation '${operation}' submitted for processing.`
-        : operation
-          ? $localize`Operation '${operation}' completed.`
-          : $localize`Operation completed.`
+      let operationText = $localize`Operation`
+      if (operation) operationText += ` '${operation}'`
+      const resultText = documentOperationHasFollowUpTasks(result.operation)
+        ? $localize`submitted for processing`
+        : $localize`completed`
+      content = `${operationText} ${resultText}.`
     } else if (result.status === PaperlessTaskStatus.Revoked) {
       content = operation
         ? $localize`Operation '${operation}' revoked.`

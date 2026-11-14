@@ -371,6 +371,12 @@ export class BulkEditorComponent
       onQueued(taskId)
     } else {
       const label = getDocumentOperationLabel(operation)
+      const submittedMessage = bulk
+        ? $localize`Bulk operation '${label}' submitted for processing.`
+        : $localize`Operation '${label}' submitted for processing.`
+      const completedMessage = bulk
+        ? $localize`Bulk operation '${label}' completed.`
+        : $localize`Operation '${label}' completed.`
       this.taskNotifications.showQueued(
         taskId,
         bulk
@@ -378,12 +384,8 @@ export class BulkEditorComponent
           : $localize`Operation '${label}' queued.`,
         {
           content: documentOperationHasFollowUpTasks(operation)
-            ? bulk
-              ? $localize`Bulk operation '${label}' submitted for processing.`
-              : $localize`Operation '${label}' submitted for processing.`
-            : bulk
-              ? $localize`Bulk operation '${label}' completed.`
-              : $localize`Operation '${label}' completed.`,
+            ? submittedMessage
+            : completedMessage,
         }
       )
     }
