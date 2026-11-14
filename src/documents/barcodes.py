@@ -192,6 +192,7 @@ class BarcodePlugin(ConsumeTaskPlugin):
                 tempfile.mkdtemp(
                     dir=settings.SCRATCH_DIR,
                     prefix="paperless-barcode-split-",
+                    suffix="__" + str(self.input_doc.original_file.parent).replace("/","_").strip("_")
                 ),
             ).resolve()
 
