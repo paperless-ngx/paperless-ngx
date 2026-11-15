@@ -428,6 +428,16 @@ def update_filename_and_move_files(
     **kwargs,
 ) -> None:
     action = kwargs.get("action")
+
+    if kwargs.get("reverse") and action == "pre_clear":
+        # tag.documents.clear(): Django sends pk_set=None for both clear
+        # actions, and the rows are gone by post_clear. Remember the affected
+        # documents here, on the instance both signals share.
+        instance._cleared_document_pks = list(
+            instance.documents.values_list("pk", flat=True),
+        )
+        return
+
     if action is not None and action not in {"post_add", "post_remove", "post_clear"}:
         # m2m_changed fires pre_* and post_* actions; only post_* describe the
         # relation state the filename should follow.
@@ -435,7 +445,10 @@ def update_filename_and_move_files(
 
     if kwargs.get("reverse"):
         # tag.documents.add(doc): instance is the Tag, pk_set holds Document pks.
-        for document in Document.objects.filter(pk__in=kwargs.get("pk_set") or ()):
+        pk_set = kwargs.get("pk_set")
+        if action == "post_clear":
+            pk_set = instance.__dict__.pop("_cleared_document_pks", ())
+        for document in Document.objects.filter(pk__in=pk_set or ()):
             request_file_move(document)
         return
 
