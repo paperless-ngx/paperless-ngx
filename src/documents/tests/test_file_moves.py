@@ -3,6 +3,7 @@ from __future__ import annotations
 import datetime
 import hashlib
 import logging
+import shutil
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -10,6 +11,7 @@ import pytest
 from asgiref.sync import async_to_sync
 from asgiref.sync import sync_to_async
 from celery.contrib.django.task import DjangoTask
+from django.db import DatabaseError
 from django.db import transaction
 from django.http import HttpRequest
 from django.http import HttpResponse
@@ -20,6 +22,8 @@ from filelock import Timeout
 from rest_framework import status
 
 from documents.file_moves import _active_collector
+from documents.file_moves import _path_matches_checksum
+from documents.file_moves import adefer_file_moves
 from documents.file_moves import defer_file_moves
 from documents.file_moves import flush_pending_file_moves
 from documents.file_moves import move_files_for_document
@@ -222,6 +226,414 @@ class TestMoveFilesForDocument:
         document.refresh_from_db()
         assert document.filename == "original.pdf"
         assert (paperless_dirs.originals_dir / "original.pdf").is_file()
+
+    def test_document_deleted_while_waiting_for_lock(
+        self,
+        document: Document,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A document that passes the lock-free filename check
+            - The row is gone by the time the lock is held
+        WHEN:
+            - move_files_for_document is called
+        THEN:
+            - It returns None without raising
+        """
+        mocker.patch.object(
+            Document.global_objects,
+            "get",
+            side_effect=Document.DoesNotExist,
+        )
+
+        assert move_files_for_document(document.pk) is None
+
+    def test_target_outside_root_is_refused(
+        self,
+        document: Document,
+        paperless_dirs: PaperlessDirs,
+        mocker: MockerFixture,
+        caplog: pytest.LogCaptureFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A generated filename that resolves outside the originals dir
+        WHEN:
+            - move_files_for_document is called
+        THEN:
+            - The move is refused and logged
+            - The file and the DB filename are unchanged
+        """
+        mocker.patch(
+            "documents.file_moves.generate_filename",
+            return_value=Path("../escaped.pdf"),
+        )
+
+        with caplog.at_level(logging.WARNING, logger="paperless.handlers"):
+            move_files_for_document(document.pk)
+
+        assert "Refusing to move file outside root" in caplog.text
+        assert (paperless_dirs.originals_dir / "original.pdf").is_file()
+        assert not (paperless_dirs.originals_dir.parent / "escaped.pdf").exists()
+        document.refresh_from_db()
+        assert document.filename == "original.pdf"
+
+    def test_target_appearing_before_move_is_never_overwritten(
+        self,
+        document: Document,
+        paperless_dirs: PaperlessDirs,
+        mocker: MockerFixture,
+        caplog: pytest.LogCaptureFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A rename whose unique target name turns out to be taken
+              (another file appeared after the name was chosen)
+        WHEN:
+            - move_files_for_document is called
+        THEN:
+            - Neither file is touched and the DB filename is unchanged
+        """
+        Document.objects.filter(pk=document.pk).update(title="renamed")
+        (paperless_dirs.originals_dir / "renamed.pdf").write_bytes(b"someone else")
+        mocker.patch(
+            "documents.file_moves.generate_unique_filename",
+            return_value=Path("renamed.pdf"),
+        )
+
+        with caplog.at_level(logging.WARNING, logger="paperless.handlers"):
+            move_files_for_document(document.pk)
+
+        assert "already exists" in caplog.text
+        assert (paperless_dirs.originals_dir / "original.pdf").read_bytes() == CONTENT
+        assert (paperless_dirs.originals_dir / "renamed.pdf").read_bytes() == (
+            b"someone else"
+        )
+        document.refresh_from_db()
+        assert document.filename == "original.pdf"
+
+    def test_archive_filename_too_long_is_refused(
+        self,
+        document: Document,
+        paperless_dirs: PaperlessDirs,
+        mocker: MockerFixture,
+        caplog: pytest.LogCaptureFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A document with an archive version whose generated archive
+              filename exceeds the stored filename limit
+        WHEN:
+            - move_files_for_document is called
+        THEN:
+            - The move is refused and logged
+            - Both filenames in the DB are unchanged
+        """
+        (paperless_dirs.archive_dir / "original.pdf").write_bytes(CONTENT)
+        Document.objects.filter(pk=document.pk).update(archive_filename="original.pdf")
+        too_long = Path("a" * (Document.MAX_STORED_FILENAME_LENGTH + 1))
+        mocker.patch(
+            "documents.file_moves.generate_filename",
+            side_effect=lambda doc, archive_filename=False: (
+                too_long if archive_filename else Path("original.pdf")
+            ),
+        )
+
+        with caplog.at_level(logging.WARNING, logger="paperless.handlers"):
+            move_files_for_document(document.pk)
+
+        assert "Generated archive filename exceeds" in caplog.text
+        document.refresh_from_db()
+        assert document.filename == "original.pdf"
+        assert document.archive_filename == "original.pdf"
+
+    def test_archive_already_at_generated_path_gets_db_path_fixed(
+        self,
+        document: Document,
+        paperless_dirs: PaperlessDirs,
+    ) -> None:
+        """
+        GIVEN:
+            - A document whose DB archive_filename is stale
+            - Its archive already sits at the generated path (checksum matches)
+            - The original is already correct
+        WHEN:
+            - move_files_for_document is called
+        THEN:
+            - Only archive_filename is updated, to where the archive is
+            - The original is untouched
+        """
+        archive_content = b"archive content"
+        (paperless_dirs.archive_dir / "original.pdf").write_bytes(archive_content)
+        Document.objects.filter(pk=document.pk).update(
+            archive_filename="stale.pdf",
+            archive_checksum=hashlib.sha256(archive_content).hexdigest(),
+        )
+
+        move_files_for_document(document.pk)
+
+        document.refresh_from_db()
+        assert document.archive_filename == "original.pdf"
+        assert document.filename == "original.pdf"
+        assert (paperless_dirs.originals_dir / "original.pdf").read_bytes() == CONTENT
+        assert (paperless_dirs.archive_dir / "original.pdf").read_bytes() == (
+            archive_content
+        )
+
+    def test_failed_restore_after_partial_move_leaves_db_untouched(
+        self,
+        document: Document,
+        paperless_dirs: PaperlessDirs,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A rename that moves the original, then fails moving the archive
+            - Moving the original back also fails
+        WHEN:
+            - move_files_for_document is called
+        THEN:
+            - Nothing raises
+            - The DB still holds the old filenames, so nothing is claimed
+              about files that did not move
+            - Nothing is overwritten or deleted
+        """
+        (paperless_dirs.archive_dir / "original.pdf").write_bytes(b"archive")
+        Document.objects.filter(pk=document.pk).update(
+            title="renamed",
+            archive_filename="original.pdf",
+        )
+        real_move = shutil.move
+        calls = 0
+
+        def flaky_move(src: Path, dst: Path) -> object:
+            nonlocal calls
+            calls += 1
+            if calls == 1:
+                return real_move(src, dst)
+            raise OSError("disk went away")
+
+        mocker.patch("documents.file_moves.shutil.move", side_effect=flaky_move)
+
+        move_files_for_document(document.pk)
+
+        assert calls == 3
+        document.refresh_from_db()
+        assert document.filename == "original.pdf"
+        assert document.archive_filename == "original.pdf"
+        assert (paperless_dirs.originals_dir / "renamed.pdf").is_file()
+        assert (paperless_dirs.archive_dir / "original.pdf").is_file()
+
+    def test_original_filename_too_long_is_refused(
+        self,
+        document: Document,
+        paperless_dirs: PaperlessDirs,
+        mocker: MockerFixture,
+        caplog: pytest.LogCaptureFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A generated original filename over the stored filename limit
+        WHEN:
+            - move_files_for_document is called
+        THEN:
+            - The move is refused and logged
+            - The file and the DB filename are unchanged
+        """
+        mocker.patch(
+            "documents.file_moves.generate_filename",
+            return_value=Path("a" * (Document.MAX_STORED_FILENAME_LENGTH + 1)),
+        )
+
+        with caplog.at_level(logging.WARNING, logger="paperless.handlers"):
+            move_files_for_document(document.pk)
+
+        assert "Generated filename exceeds db path limit" in caplog.text
+        assert (paperless_dirs.originals_dir / "original.pdf").is_file()
+        document.refresh_from_db()
+        assert document.filename == "original.pdf"
+
+    def test_archive_at_generated_path_is_left_alone(
+        self,
+        document: Document,
+        paperless_dirs: PaperlessDirs,
+    ) -> None:
+        """
+        GIVEN:
+            - A document whose original and archive are both at their
+              generated paths, modified in the past
+        WHEN:
+            - move_files_for_document is called
+        THEN:
+            - Nothing moves and modified is not written
+        """
+        (paperless_dirs.archive_dir / "original.pdf").write_bytes(b"archive")
+        past = timezone.now() - datetime.timedelta(days=1)
+        Document.objects.filter(pk=document.pk).update(
+            archive_filename="original.pdf",
+            modified=past,
+        )
+
+        move_files_for_document(document.pk)
+
+        document.refresh_from_db()
+        assert document.modified == past
+        assert (paperless_dirs.archive_dir / "original.pdf").read_bytes() == b"archive"
+
+    def test_archive_name_conflict_gets_unique_name(
+        self,
+        document: Document,
+        paperless_dirs: PaperlessDirs,
+    ) -> None:
+        """
+        GIVEN:
+            - A rename whose archive name is already used by another file
+        WHEN:
+            - move_files_for_document is called
+        THEN:
+            - The original takes the plain new name
+            - The archive takes a unique name and the other file is untouched
+        """
+        (paperless_dirs.archive_dir / "original.pdf").write_bytes(b"archive")
+        (paperless_dirs.archive_dir / "renamed.pdf").write_bytes(b"someone else")
+        Document.objects.filter(pk=document.pk).update(
+            title="renamed",
+            archive_filename="original.pdf",
+        )
+
+        move_files_for_document(document.pk)
+
+        document.refresh_from_db()
+        assert document.filename == "renamed.pdf"
+        assert document.archive_filename == "renamed_01.pdf"
+        assert (paperless_dirs.archive_dir / "renamed_01.pdf").read_bytes() == (
+            b"archive"
+        )
+        assert (paperless_dirs.archive_dir / "renamed.pdf").read_bytes() == (
+            b"someone else"
+        )
+
+    def test_archive_only_move_cleans_up_empty_directory(
+        self,
+        document: Document,
+        paperless_dirs: PaperlessDirs,
+    ) -> None:
+        """
+        GIVEN:
+            - An original at its generated path
+            - An archive in a subfolder, away from its generated path
+        WHEN:
+            - move_files_for_document is called
+        THEN:
+            - Only the archive moves, to its generated path
+            - The now empty archive subfolder is removed
+        """
+        (paperless_dirs.archive_dir / "sub").mkdir()
+        (paperless_dirs.archive_dir / "sub" / "old.pdf").write_bytes(b"archive")
+        Document.objects.filter(pk=document.pk).update(
+            archive_filename="sub/old.pdf",
+        )
+
+        move_files_for_document(document.pk)
+
+        document.refresh_from_db()
+        assert document.filename == "original.pdf"
+        assert document.archive_filename == "original.pdf"
+        assert (paperless_dirs.archive_dir / "original.pdf").read_bytes() == b"archive"
+        assert not (paperless_dirs.archive_dir / "sub").exists()
+
+    def test_database_error_restores_both_files(
+        self,
+        document: Document,
+        paperless_dirs: PaperlessDirs,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A rename that moves the original and the archive
+            - The DB update afterwards fails
+        WHEN:
+            - move_files_for_document is called
+        THEN:
+            - Both files are moved back to where the DB says they are
+        """
+        (paperless_dirs.archive_dir / "original.pdf").write_bytes(b"archive")
+        Document.objects.filter(pk=document.pk).update(
+            title="renamed",
+            archive_filename="original.pdf",
+        )
+        mocker.patch.object(
+            Document.global_objects,
+            "filter",
+            side_effect=DatabaseError("write failed"),
+        )
+
+        move_files_for_document(document.pk)
+
+        assert (paperless_dirs.originals_dir / "original.pdf").read_bytes() == CONTENT
+        assert (paperless_dirs.archive_dir / "original.pdf").read_bytes() == b"archive"
+        assert not (paperless_dirs.originals_dir / "renamed.pdf").exists()
+        assert not (paperless_dirs.archive_dir / "renamed.pdf").exists()
+
+
+class TestFlushWithoutScope:
+    def test_flush_pending_file_moves_without_scope_is_noop(self) -> None:
+        """
+        GIVEN:
+            - No file move scope is open
+        WHEN:
+            - flush_pending_file_moves is called
+        THEN:
+            - It returns without error
+        """
+        assert _active_collector.get() is None
+
+        flush_pending_file_moves()
+
+
+class TestPathMatchesChecksum:
+    @pytest.mark.parametrize(
+        ("checksum", "expected"),
+        [
+            pytest.param(hashlib.sha256(CONTENT).hexdigest(), True, id="match"),
+            pytest.param("0" * 64, False, id="mismatch"),
+            pytest.param(None, False, id="no-checksum"),
+        ],
+    )
+    def test_file_checksum(
+        self,
+        tmp_path: Path,
+        *,
+        checksum: str | None,
+        expected: bool,
+    ) -> None:
+        """
+        GIVEN:
+            - A file with known content
+        WHEN:
+            - Its checksum is compared against a stored value
+        THEN:
+            - Only a matching checksum is accepted
+        """
+        path = tmp_path / "file.pdf"
+        path.write_bytes(CONTENT)
+
+        assert _path_matches_checksum(path, checksum) is expected
+
+    def test_missing_file_never_matches(self, tmp_path: Path) -> None:
+        """
+        GIVEN:
+            - A path that is not a file
+        WHEN:
+            - Its checksum is compared
+        THEN:
+            - It does not match, whatever the stored checksum
+        """
+        checksum = hashlib.sha256(CONTENT).hexdigest()
+
+        assert _path_matches_checksum(tmp_path / "missing.pdf", checksum) is False
+        assert _path_matches_checksum(tmp_path, checksum) is False
 
 
 @pytest.mark.django_db
@@ -522,6 +934,60 @@ class TestDeferFileMoves:
 
         assert (paperless_dirs.originals_dir / "b2.pdf").is_file()
         assert (paperless_dirs.originals_dir / "a.pdf").is_file()
+
+
+@pytest.mark.django_db
+class TestAsyncDeferFileMoves:
+    def test_nested_async_scope_defers_to_outer(
+        self,
+        document: Document,
+        paperless_dirs: PaperlessDirs,
+    ) -> None:
+        """
+        GIVEN:
+            - An async scope nested inside another async scope
+        WHEN:
+            - The document is renamed inside the inner scope
+        THEN:
+            - Nothing moves when the inner scope exits
+            - The file moves once the outer scope exits
+        """
+
+        def rename() -> None:
+            document.title = "renamed"
+            document.save()
+
+        async def run() -> None:
+            async with adefer_file_moves():
+                async with adefer_file_moves():
+                    await sync_to_async(rename)()
+                assert (paperless_dirs.originals_dir / "original.pdf").is_file()
+            assert (paperless_dirs.originals_dir / "renamed.pdf").is_file()
+
+        async_to_sync(run)()
+
+    def test_empty_async_scope_skips_the_flush(
+        self,
+        document: Document,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - An async scope in which no move was requested
+        WHEN:
+            - The scope exits
+        THEN:
+            - No flush is attempted, so no thread hop is paid
+        """
+        flush = mocker.patch("documents.file_moves._flush_after_commit")
+
+        async def run() -> None:
+            async with adefer_file_moves():
+                pass
+
+        async_to_sync(run)()
+
+        flush.assert_not_called()
 
 
 @pytest.mark.django_db
