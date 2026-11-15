@@ -251,11 +251,13 @@ def _move_document_files(document: Document) -> None:
         old_source_path = document.source_path
         move_original = False
         original_already_moved = False
+        original_moved = False
 
         old_archive_filename = document.archive_filename
         old_archive_path = document.archive_path
         move_archive = False
         archive_already_moved = False
+        archive_moved = False
 
         candidate_filename = generate_filename(document)
         if len(str(candidate_filename)) > Document.MAX_STORED_FILENAME_LENGTH:
@@ -353,6 +355,7 @@ def _move_document_files(document: Document) -> None:
             )
             create_source_path_directory(document.source_path)
             shutil.move(old_source_path, document.source_path)
+            original_moved = True
 
         if move_archive:
             _validate_move(
@@ -363,6 +366,7 @@ def _move_document_files(document: Document) -> None:
             )
             create_source_path_directory(document.archive_path)
             shutil.move(old_archive_path, document.archive_path)
+            archive_moved = True
 
         # Don't save() here to prevent infinite recursion.
         Document.global_objects.filter(pk=document.pk).update(
@@ -382,11 +386,14 @@ def _move_document_files(document: Document) -> None:
 
         # Try to move files to their original location.
         try:
-            if move_original and document.source_path.is_file():
+            # Only undo moves this call made. A refused move leaves a file at
+            # the target that is not ours, and moving it back would overwrite
+            # the original.
+            if original_moved and document.source_path.is_file():
                 logger.info("Restoring previous original path")
                 shutil.move(document.source_path, old_source_path)
 
-            if move_archive and document.archive_path.is_file():
+            if archive_moved and document.archive_path.is_file():
                 logger.info("Restoring previous archive path")
                 shutil.move(document.archive_path, old_archive_path)
 
