@@ -32,6 +32,7 @@ from documents.models import CustomField
 from documents.models import Document
 from documents.models import Workflow
 from documents.models import WorkflowAction
+from documents.models import WorkflowActionWebhook
 from documents.models import WorkflowTrigger
 from documents.tasks import bulk_update_documents
 from documents.tasks import check_scheduled_workflows
@@ -1479,6 +1480,82 @@ class TestCeleryTaskScope:
         check_scheduled_workflows.apply()
 
         assert state == {"moved": True, "filename": "renamed.pdf"}
+
+
+@pytest.mark.django_db
+class TestBulkUpdateNotification:
+    def test_websocket_notification_sent_after_move(
+        self,
+        document: Document,
+        paperless_dirs: PaperlessDirs,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A document whose title changed in the DB without any signal, as
+              bulk edits do through querysets and relation tables
+        WHEN:
+            - bulk_update_documents runs for it
+        THEN:
+            - The websocket notification is sent after the file has moved and
+              the filename column is updated, so clients see the final state
+        """
+        Document.objects.filter(pk=document.pk).update(title="renamed")
+        state: dict[str, object] = {}
+
+        def notify(**kwargs: object) -> None:
+            state["moved"] = (paperless_dirs.originals_dir / "renamed.pdf").is_file()
+            state["filename"] = Document.objects.get(pk=document.pk).filename
+
+        status_manager = mocker.patch(
+            "documents.signals.handlers.DocumentsStatusManager",
+        )
+        status_manager.return_value.__enter__.return_value.send_document_updated.side_effect = notify
+
+        bulk_update_documents.apply(args=([document.pk],))
+
+        assert state == {"moved": True, "filename": "renamed.pdf"}
+
+    def test_webhook_workflow_attaches_document_at_moved_path(
+        self,
+        document: Document,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A document updated workflow with a webhook that includes the
+              document
+            - A document whose title changed in the DB without any signal
+        WHEN:
+            - bulk_update_documents runs for it
+        THEN:
+            - The file moved before the workflow ran, and the webhook still
+              reads it from its new path
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.DOCUMENT_UPDATED,
+        )
+        webhook = WorkflowActionWebhook.objects.create(
+            use_params=False,
+            body="body",
+            url="http://paperless-ngx.com",
+            include_document=True,
+        )
+        workflow = Workflow.objects.create(name="webhook", order=0)
+        workflow.triggers.add(trigger)
+        workflow.actions.add(
+            WorkflowAction.objects.create(
+                type=WorkflowAction.WorkflowActionType.WEBHOOK,
+                webhook=webhook,
+            ),
+        )
+        send = mocker.patch("documents.workflows.webhooks.send_webhook.apply_async")
+        Document.objects.filter(pk=document.pk).update(title="renamed")
+
+        bulk_update_documents.apply(args=([document.pk],))
+
+        send.assert_called_once()
+        assert send.call_args.kwargs["kwargs"]["files"]["file"][1] == CONTENT
 
 
 @pytest.mark.django_db
