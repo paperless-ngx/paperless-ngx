@@ -324,15 +324,31 @@ def bulk_update_documents(document_ids) -> None:
 
     for doc in documents:
         clear_document_caches(doc.pk)
+        # The bulk edit wrote through querysets and relation tables, so this
+        # post_save is what requests the move. Move before document_updated,
+        # whose websocket notification must carry the final filename and
+        # modified timestamp.
+        post_save.send(Document, instance=doc, created=False)
+        flush_pending_file_moves()
+        # The move changed the stored paths. Workflows read source_path from
+        # this instance, so bring it up to date. Not refresh_from_db(), which
+        # would drop the effective content annotation.
+        paths = (
+            Document.global_objects.filter(pk=doc.pk)
+            .values_list("filename", "archive_filename")
+            .first()
+        )
+        if paths is not None:
+            doc.filename, doc.archive_filename = paths
         document_updated.send(
             sender=None,
             document=doc,
             logging_group=uuid.uuid4(),
             skip_ai_index=True,  # bulk path calls update_llm_index once below
         )
-        post_save.send(Document, instance=doc, created=False)
-        # Move this document's files now rather than at the end of the task,
-        # so a long bulk edit makes steady progress.
+        # Moves requested by workflows that document_updated ran. Moving per
+        # document, rather than at the end of the task, keeps a long bulk
+        # edit making steady progress.
         flush_pending_file_moves()
 
     with get_backend().batch_update() as batch:
