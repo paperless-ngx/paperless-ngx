@@ -1439,6 +1439,47 @@ class TestCeleryTaskScope:
         assert seen[first_pk] is False
         assert seen[second_pk] is True
 
+    def test_websocket_notification_sent_after_move(
+        self,
+        document: Document,
+        paperless_dirs: PaperlessDirs,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A document matched by a scheduled workflow that renames it
+        WHEN:
+            - check_scheduled_workflows runs
+        THEN:
+            - The websocket notification is sent after the file has moved and
+              the filename column is updated, so clients see the final state
+        """
+        trigger = WorkflowTrigger.objects.create(
+            type=WorkflowTrigger.WorkflowTriggerType.SCHEDULED,
+            schedule_offset_days=0,
+            schedule_date_field=WorkflowTrigger.ScheduleDateField.ADDED,
+        )
+        workflow = Workflow.objects.create(name="scheduled", order=0)
+        workflow.triggers.add(trigger)
+        workflow.actions.add(WorkflowAction.objects.create(assign_title="unused"))
+
+        def rename(*, document: Document, **kwargs: object) -> None:
+            document.title = "renamed"
+            document.save()
+
+        state: dict[str, object] = {}
+
+        def notify(*, document: Document, **kwargs: object) -> None:
+            state["moved"] = (paperless_dirs.originals_dir / "renamed.pdf").is_file()
+            state["filename"] = Document.objects.get(pk=document.pk).filename
+
+        mocker.patch("documents.tasks.run_workflows", side_effect=rename)
+        mocker.patch("documents.tasks.send_websocket_document_updated", notify)
+
+        check_scheduled_workflows.apply()
+
+        assert state == {"moved": True, "filename": "renamed.pdf"}
+
 
 @pytest.mark.django_db
 class TestEmptyTrashLockOrdering:

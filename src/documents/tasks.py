@@ -700,14 +700,16 @@ def check_scheduled_workflows() -> None:
                             workflow_to_run=workflow,
                             document=document,
                         )
+                        # Move this document's files now rather than at the end
+                        # of the task, so a long run makes steady progress and
+                        # the notification below carries the final filename and
+                        # modified timestamp.
+                        flush_pending_file_moves()
                         # Scheduled workflows dont send document_updated signal, so send a websocket update here to ensure clients are updated
                         send_websocket_document_updated(
                             sender=None,
                             document=document,
                         )
-                        # Move this document's files now rather than at the end
-                        # of the task, so a long run makes steady progress.
-                        flush_pending_file_moves()
 
 
 @shared_task
