@@ -316,6 +316,10 @@ def bulk_update_documents(document_ids) -> None:
     from documents.search import get_backend
 
     document_ids = list(document_ids)
+    # Bulk edits write through querysets and relation tables, which skip
+    # auto_now, and the file mover only writes when a path changes. Record the
+    # edit here, before the signals and notifications below read the documents.
+    Document.objects.filter(id__in=document_ids).update(modified=timezone.now())
     # Annotated so the signal handlers below (e.g. matching) don't query the
     # versions of each document. Indexing re-queries and re-annotates its own
     # copy via add_or_update_ids() below, after these signals (and any

@@ -21,6 +21,7 @@ from django.utils.dateparse import parse_datetime
 from filelock import Timeout
 from rest_framework import status
 
+from documents import bulk_edit
 from documents.file_moves import _active_collector
 from documents.file_moves import _path_matches_checksum
 from documents.file_moves import adefer_file_moves
@@ -1556,6 +1557,41 @@ class TestBulkUpdateNotification:
 
         send.assert_called_once()
         assert send.call_args.kwargs["kwargs"]["files"]["file"][1] == CONTENT
+
+
+@pytest.mark.django_db
+class TestBulkEditModified:
+    def test_modified_bumped_when_filename_unchanged(
+        self,
+        document: Document,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A document whose filename does not depend on its correspondent
+        WHEN:
+            - The correspondent is changed by a bulk edit, which writes through
+              a queryset and so does not touch modified itself
+        THEN:
+            - modified is bumped, so modified-time filters and scheduled
+              workflows see the edit even though no file moved
+        """
+        correspondent = CorrespondentFactory()
+        mocker.patch(
+            "documents.bulk_edit.bulk_update_documents.apply_async",
+            side_effect=lambda kwargs, headers=None: bulk_update_documents.apply(
+                kwargs=kwargs,
+            ),
+        )
+        before = timezone.now() - datetime.timedelta(days=1)
+        Document.objects.filter(pk=document.pk).update(modified=before)
+
+        bulk_edit.set_correspondent([document.pk], correspondent.pk)
+
+        document.refresh_from_db()
+        assert document.correspondent_id == correspondent.pk
+        assert document.filename == "original.pdf"
+        assert document.modified > before
 
 
 @pytest.mark.django_db
