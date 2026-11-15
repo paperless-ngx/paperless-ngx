@@ -689,6 +689,62 @@ class TestReceiver:
         request.assert_called_once()
         assert request.call_args.args[0].pk == document.pk
 
+    def test_reverse_clear_requests_a_move_per_cleared_document(
+        self,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A tag on two documents, and one document without it
+        WHEN:
+            - The tag's reverse relation is cleared
+        THEN:
+            - A move is requested for each cleared document, and no other
+        """
+        tag = TagFactory()
+        first = DocumentFactory.create()
+        second = DocumentFactory.create()
+        other = DocumentFactory.create()
+        first.tags.add(tag)
+        second.tags.add(tag)
+        request = mocker.patch("documents.signals.handlers.request_file_move")
+
+        tag.documents.clear()
+
+        assert {call.args[0].pk for call in request.call_args_list} == {
+            first.pk,
+            second.pk,
+        }
+        assert other.pk not in {call.args[0].pk for call in request.call_args_list}
+
+    def test_reverse_clear_moves_file_for_tag_in_template(
+        self,
+        document: Document,
+        paperless_dirs: PaperlessDirs,
+        settings: Settings,
+    ) -> None:
+        """
+        GIVEN:
+            - A document whose filename depends on its tag
+        WHEN:
+            - The tag is removed through the reverse relation's clear()
+        THEN:
+            - The file and filename follow the document's new state
+        """
+        settings.FILENAME_FORMAT = "{tag_list}/{title}"
+        tag = TagFactory(name="clearme")
+        with defer_file_moves():
+            document.tags.add(tag)
+        document.refresh_from_db()
+        assert document.filename == "clearme/original.pdf"
+
+        with defer_file_moves():
+            tag.documents.clear()
+
+        document.refresh_from_db()
+        assert document.filename == "original.pdf"
+        assert (paperless_dirs.originals_dir / "original.pdf").is_file()
+
 
 @pytest.mark.django_db
 class TestDeferFileMoves:
