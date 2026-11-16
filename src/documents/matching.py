@@ -3,7 +3,6 @@ from __future__ import annotations
 import logging
 import re
 from fnmatch import fnmatch
-from fnmatch import translate as fnmatch_translate
 from typing import TYPE_CHECKING
 
 from rest_framework import serializers
@@ -548,6 +547,48 @@ def existing_document_matches_workflow(
     return (True, None)
 
 
+def _glob_to_portable_regex(pattern: str) -> str:
+    """
+    Translate an fnmatch-style glob into an anchored regex which is accepted by
+    Python, PostgreSQL (ARE), and MariaDB (PCRE).
+
+    fnmatch.translate() can't be used, as its output (`(?s:...)\\Z`) uses syntax
+    PostgreSQL rejects. Supports `*`, `?`, `[seq]` and `[!seq]`.
+    """
+    out: list[str] = []
+    i = 0
+    n = len(pattern)
+    while i < n:
+        c = pattern[i]
+        i += 1
+        if c == "*":
+            out.append(".*")
+        elif c == "?":
+            out.append(".")
+        elif c == "[":
+            j = i
+            if j < n and pattern[j] == "!":
+                j += 1
+            if j < n and pattern[j] == "]":
+                j += 1
+            while j < n and pattern[j] != "]":
+                j += 1
+            if j >= n:
+                # No closing bracket, treat as a literal
+                out.append(r"\[")
+            else:
+                body = pattern[i:j]
+                i = j + 1
+                negate = body.startswith("!")
+                if negate:
+                    body = body[1:]
+                body = "".join(f"\\{ch}" if ch in "\\[^" else ch for ch in body)
+                out.append(f"[{'^' if negate else ''}{body}]")
+        else:
+            out.append(re.escape(c))
+    return f"^{''.join(out)}$"
+
+
 def prefilter_documents_by_workflowtrigger(
     documents: QuerySet[Document],
     trigger: WorkflowTrigger,
@@ -628,8 +669,9 @@ def prefilter_documents_by_workflowtrigger(
         documents = documents.annotate(**annotations).filter(custom_field_q)
 
     if trigger.filter_filename:
-        regex = fnmatch_translate(trigger.filter_filename).lstrip("^").rstrip("$")
-        documents = documents.filter(original_filename__iregex=regex)
+        documents = documents.filter(
+            original_filename__iregex=_glob_to_portable_regex(trigger.filter_filename),
+        )
 
     return documents
 
