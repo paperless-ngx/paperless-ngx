@@ -44,17 +44,6 @@ def get_default_file_extension(mime_type: str) -> str:
     return ext if ext else ""
 
 
-def is_file_ext_supported(ext: str) -> bool:
-    """
-    Returns True if the file extension is supported, False otherwise
-    TODO: Investigate why this really exists, why not use mimetype
-    """
-    if ext:
-        return ext.lower() in get_supported_file_extensions()
-    else:
-        return False
-
-
 def get_supported_file_extensions() -> set[str]:
     extensions = set()
     for parser_class in get_parser_registry().all_parsers():
