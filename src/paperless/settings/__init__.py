@@ -995,9 +995,6 @@ MAX_IMAGE_PIXELS: Final[int | None] = get_int_from_env(
     "PAPERLESS_MAX_IMAGE_PIXELS",
 )
 
-# GNUPG needs a home directory for some reason
-GNUPG_HOME = os.getenv("HOME", "/tmp")
-
 # Fallback layout for .eml consumption
 EMAIL_PARSE_DEFAULT_LAYOUT = get_int_from_env(
     "PAPERLESS_EMAIL_PARSE_DEFAULT_LAYOUT",
