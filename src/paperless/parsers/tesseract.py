@@ -65,10 +65,6 @@ class NoTextFoundException(Exception):
     pass
 
 
-class RtlLanguageException(Exception):
-    pass
-
-
 class RasterisedDocumentParser:
     """
     This parser uses Tesseract to try and get some text out of a rasterised
