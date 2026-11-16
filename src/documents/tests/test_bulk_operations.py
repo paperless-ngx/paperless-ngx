@@ -209,7 +209,10 @@ def test_preparation_failure_propagates_from_worker(
         ),
         mock.patch("documents.bulk_edit.consume_file.apply_async") as consume,
         mock.patch("documents.bulk_edit.consume_file.s") as consume_signature,
-        pytest.raises(RuntimeError, match="preparation failed"),
+        pytest.raises(
+            RuntimeError,
+            match="Rotation failed" if operation == "rotate" else "preparation failed",
+        ),
     ):
         execute_bulk_operation(operation, [doc.pk], parameters, user.pk)
     consume.assert_not_called()

@@ -539,6 +539,7 @@ def rotate(
         pair = _resolve_root_and_source_doc(doc, source_mode=source_mode)
         docs_by_root_id.setdefault(pair.root_doc.id, pair)
 
+    failed_ids = []
     for pair in docs_by_root_id.values():
         if pair.source_doc.mime_type != "application/pdf":
             logger.warning(
@@ -573,8 +574,13 @@ def rotate(
                 f"Queued new rotated version for document {pair.root_doc.id} by {degrees} degrees",
             )
         except Exception as e:
+            failed_ids.append(pair.root_doc.id)
             logger.exception(f"Error rotating document {pair.root_doc.id}: {e}")
-            raise
+
+    if failed_ids:
+        raise RuntimeError(
+            f"Rotation failed for document(s): {failed_ids}. Check logs for details.",
+        )
 
     return "OK"
 

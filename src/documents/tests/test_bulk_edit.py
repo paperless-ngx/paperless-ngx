@@ -1243,12 +1243,67 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         doc_ids = [self.doc2.id, self.doc3.id]
 
         with self.assertLogs("paperless.bulk_edit", level="ERROR") as cm:
-            with self.assertRaisesMessage(Exception, "Error rotating PDF"):
+            with self.assertRaisesMessage(
+                RuntimeError,
+                f"Rotation failed for document(s): {doc_ids}",
+            ):
                 bulk_edit.rotate(doc_ids, 90)
             error_str = cm.output[0]
             expected_str = "Error rotating document"
             self.assertIn(expected_str, error_str)
+            self.assertEqual(mock_rotate_pdf.call_count, 2)
             mock_consume_delay.assert_not_called()
+
+    @mock.patch("documents.tasks.consume_file.apply_async")
+    @mock.patch("documents.pdf_ops.rotate_pdf")
+    def test_rotate_continues_after_preparation_failure(
+        self,
+        mock_rotate_pdf,
+        mock_consume,
+    ) -> None:
+        def rotate(source, destination, degrees):
+            if source == self.doc2.source_path:
+                raise RuntimeError("Invalid PDF")
+            shutil.copy(source, destination)
+
+        mock_rotate_pdf.side_effect = rotate
+        with self.assertRaisesMessage(
+            RuntimeError,
+            f"Rotation failed for document(s): [{self.doc2.id}]",
+        ):
+            bulk_edit.rotate([self.doc2.id, self.doc3.id], 90)
+
+        self.assertEqual(mock_rotate_pdf.call_count, 2)
+        mock_consume.assert_called_once()
+        self.assertEqual(
+            mock_consume.call_args.kwargs["kwargs"]["input_doc"].root_document_id,
+            self.doc3.id,
+        )
+
+    @mock.patch("documents.tasks.consume_file.apply_async")
+    @mock.patch("documents.pdf_ops.rotate_pdf")
+    def test_rotate_continues_after_queue_failure(
+        self,
+        mock_rotate_pdf,
+        mock_consume,
+    ) -> None:
+        mock_rotate_pdf.side_effect = lambda source, destination, degrees: shutil.copy(
+            source,
+            destination,
+        )
+        mock_consume.side_effect = [RuntimeError("Broker unavailable"), None]
+        with self.assertRaisesMessage(
+            RuntimeError,
+            f"Rotation failed for document(s): [{self.doc2.id}]",
+        ):
+            bulk_edit.rotate([self.doc2.id, self.doc3.id], 90)
+
+        self.assertEqual(mock_rotate_pdf.call_count, 2)
+        self.assertEqual(mock_consume.call_count, 2)
+        self.assertEqual(
+            mock_consume.call_args.kwargs["kwargs"]["input_doc"].root_document_id,
+            self.doc3.id,
+        )
 
     @mock.patch("documents.tasks.consume_file.apply_async")
     def test_rotate_non_pdf(
