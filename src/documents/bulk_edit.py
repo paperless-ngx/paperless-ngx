@@ -692,6 +692,22 @@ def merge(
     return "OK"
 
 
+def validate_merge_as_versions_state(
+    documents: list[Document],
+    root_document_id: int,
+) -> None:
+    if any(document.root_document_id is not None for document in documents):
+        raise ValueError("Only top-level documents can be merged as versions.")
+
+    source_ids = [
+        document.pk for document in documents if document.pk != root_document_id
+    ]
+    if Document.global_objects.filter(root_document_id__in=source_ids).exists():
+        raise ValueError(
+            "Documents with existing versions cannot be merged into another document.",
+        )
+
+
 def merge_as_versions(
     doc_ids: list[int],
     *,
@@ -709,15 +725,8 @@ def merge_as_versions(
         )
         documents_by_id = {document.id: document for document in documents}
 
-        if any(document.root_document_id is not None for document in documents):
-            raise ValueError("Only top-level documents can be merged as versions.")
-
+        validate_merge_as_versions_state(documents, root_document_id)
         source_ids = [doc_id for doc_id in doc_ids if doc_id != root_document_id]
-        if Document.global_objects.filter(root_document_id__in=source_ids).exists():
-            raise ValueError(
-                "Documents with existing versions cannot be merged into another document.",
-            )
-
         root_document = documents_by_id[root_document_id]
         next_version_index = (
             Document.global_objects.filter(

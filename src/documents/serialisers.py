@@ -1717,8 +1717,17 @@ class MergeDocumentsAsVersionsSerializer(DocumentListSerializer):
                 "root_document_id must be one of the selected documents.",
             )
 
-        # Version state checks (e.g., whether a document is already part of a version chain)
-        # moved to merge_as_versions() under row locks, since it could change between queueing and execution
+        # Rechecked under row locks during execution in case document state changes.
+        selected_documents = list(
+            Document.objects.filter(id__in=documents).only("id", "root_document"),
+        )
+        try:
+            bulk_edit.validate_merge_as_versions_state(
+                selected_documents,
+                attrs["root_document_id"],
+            )
+        except ValueError as error:
+            raise serializers.ValidationError(str(error)) from error
         return attrs
 
 

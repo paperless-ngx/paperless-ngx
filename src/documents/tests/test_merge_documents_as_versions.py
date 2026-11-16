@@ -105,6 +105,24 @@ class TestMergeDocumentsAsVersionsSerializer(TestCase):
         self.assertFalse(serializer.is_valid())
         self.assertIn("documents", serializer.errors)
 
+    def test_rejects_selected_version(self) -> None:
+        version = Document.objects.create(
+            checksum="D",
+            root_document=self.doc1,
+            version_index=1,
+        )
+        serializer = MergeDocumentsAsVersionsSerializer(
+            data={
+                "documents": [version.id, self.doc2.id],
+                "root_document_id": self.doc2.id,
+            },
+        )
+        self.assertFalse(serializer.is_valid())
+        self.assertEqual(
+            serializer.errors["non_field_errors"][0],
+            "Only top-level documents can be merged as versions.",
+        )
+
     def test_allows_root_document_with_versions(self) -> None:
         Document.objects.create(
             checksum="D",
@@ -485,28 +503,35 @@ class TestMergeDocumentsAsVersionsAPI(APITestCase):
         merge_mock.assert_not_called()
 
     @mock.patch("documents.views.execute_bulk_operation.apply_async")
-    def test_queues_source_document_with_versions(self, enqueue_mock) -> None:
-        enqueue_mock.return_value.id = "queued-merge"
-        Document.objects.create(
+    def test_rejects_source_document_with_versions_before_queueing(
+        self,
+        enqueue_mock,
+    ) -> None:
+        version = Document.objects.create(
             checksum="C",
             title="C",
             root_document=self.doc1,
             version_index=1,
             owner=self.user,
         )
-
-        response = self.client.post(
-            "/api/documents/merge_as_versions/",
-            {
-                "documents": [self.doc1.id, self.doc2.id],
-                "root_document_id": self.doc2.id,
-            },
-            format="json",
-        )
-
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        enqueue_mock.assert_called_once()
-        self.assertEqual(response.data["task_id"], "queued-merge")
+        for trashed in (False, True):
+            with self.subTest(trashed=trashed):
+                if trashed:
+                    version.delete()
+                response = self.client.post(
+                    "/api/documents/merge_as_versions/",
+                    {
+                        "documents": [self.doc1.id, self.doc2.id],
+                        "root_document_id": self.doc2.id,
+                    },
+                    format="json",
+                )
+                self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+                self.assertEqual(
+                    response.data["non_field_errors"][0],
+                    "Documents with existing versions cannot be merged into another document.",
+                )
+                enqueue_mock.assert_not_called()
         self.doc1.refresh_from_db()
         self.assertIsNone(self.doc1.root_document_id)
 
