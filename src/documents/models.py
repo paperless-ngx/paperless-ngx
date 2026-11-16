@@ -138,10 +138,6 @@ class Tag(MatchingModel):
 
         return TagHierarchy(cls.objects.values_list("pk", "tn_parent_id"))
 
-    @property
-    def parent_pk(self) -> int | None:
-        return self.tn_parent_id
-
     def get_parent(self) -> "Tag | None":
         return self.tn_parent
 
