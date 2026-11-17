@@ -5,8 +5,10 @@ import {
   HttpTestingController,
 } from '@angular/common/http/testing'
 import { environment } from 'src/environments/environment'
+import { PaperlessTaskStatus } from '../data/paperless-task'
 import { DocumentListViewService } from './document-list-view.service'
-import { Toast, ToastService } from './toast.service'
+import { TaskNotificationService } from './task-notification.service'
+import { Toast, ToastLevel, ToastService } from './toast.service'
 import { TrashService } from './trash.service'
 
 describe('TrashService', () => {
@@ -104,5 +106,53 @@ describe('TrashService', () => {
     service.notifyMovedToTrash('Moved 500 document(s) to the trash')
     expect(toast.content).toEqual('Moved 500 document(s) to the trash')
     expect(toast.action).toBeUndefined()
+  })
+
+  it('offers Undo only after the matching delete task succeeds', () => {
+    let toasts: Toast[] = []
+    toastService.getToasts().subscribe((t) => (toasts = [...t]))
+    service.trackMovedToTrash('delete-1', 2, [1, 2])
+    expect(toasts).toHaveLength(0)
+    const notifications = TestBed.inject(TaskNotificationService)
+    notifications.complete({
+      task_id: 'other-delete',
+      operation: 'delete',
+      status: PaperlessTaskStatus.Success,
+    })
+    expect(toasts).toHaveLength(0)
+    notifications.complete({
+      task_id: 'delete-1',
+      operation: 'delete',
+      status: PaperlessTaskStatus.Success,
+    })
+    expect(toasts).toHaveLength(1)
+    expect(toasts[0].actionName).toBe('Undo')
+    toasts[0].action()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}trash/`
+    )
+    expect(req.request.body).toEqual({ action: 'restore', documents: [1, 2] })
+  })
+
+  it('handles completion before the queue response and does not offer Undo on failure', () => {
+    let toasts: Toast[] = []
+    toastService.getToasts().subscribe((t) => (toasts = [...t]))
+    const notifications = TestBed.inject(TaskNotificationService)
+    notifications.complete({
+      task_id: 'delete-1',
+      operation: 'delete',
+      status: PaperlessTaskStatus.Success,
+    })
+    service.trackMovedToTrash('delete-1', 1, [1])
+    expect(toasts[0].actionName).toBe('Undo')
+    service.trackMovedToTrash('delete-2', 1, [2])
+    notifications.complete({
+      task_id: 'delete-2',
+      operation: 'delete',
+      status: PaperlessTaskStatus.Failure,
+    })
+    expect(toasts).toHaveLength(2)
+    expect(toasts[0].level).toBe(ToastLevel.Error)
+    expect(toasts[0].actionName).not.toBe('Undo')
   })
 })

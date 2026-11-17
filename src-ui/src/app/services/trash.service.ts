@@ -5,7 +5,8 @@ import { environment } from 'src/environments/environment'
 import { Document } from '../data/document'
 import { Results } from '../data/results'
 import { DocumentListViewService } from './document-list-view.service'
-import { ToastLevel, ToastService } from './toast.service'
+import { TaskNotificationService } from './task-notification.service'
+import { Toast, ToastLevel, ToastService } from './toast.service'
 
 @Injectable({
   providedIn: 'root',
@@ -14,6 +15,24 @@ export class TrashService {
   private http = inject(HttpClient)
   private toastService = inject(ToastService)
   private documentListViewService = inject(DocumentListViewService)
+  private taskNotifications = inject(TaskNotificationService)
+
+  public trackMovedToTrash(
+    taskId: string,
+    count: number,
+    documents?: number[]
+  ) {
+    this.taskNotifications.showQueued(
+      taskId,
+      count > 1
+        ? $localize`Bulk move to trash queued.`
+        : $localize`Move to trash queued.`,
+      this.movedToTrashToast(
+        $localize`Moved ${count} document(s) to the trash`,
+        documents
+      )
+    )
+  }
 
   public getTrash(page: number = 1): Observable<Results<Document>> {
     const httpParams = new HttpParams().set('page', page.toString())
@@ -43,14 +62,22 @@ export class TrashService {
    * Shows a toast with an Undo action when possible
    */
   public notifyMovedToTrash(content: string, documents?: number[]) {
+    this.toastService.show(this.movedToTrashToast(content, documents))
+  }
+
+  private movedToTrashToast(content: string, documents?: number[]): Toast {
     const canUndo = documents?.length > 0
-    this.toastService.show({
+    return {
       content,
       delay: 10000,
       level: ToastLevel.Success,
-      actionName: canUndo ? $localize`Undo` : undefined,
-      action: canUndo ? () => this.undoMoveToTrash(documents) : undefined,
-    })
+      ...(canUndo
+        ? {
+            actionName: $localize`Undo`,
+            action: () => this.undoMoveToTrash(documents),
+          }
+        : {}),
+    }
   }
 
   private undoMoveToTrash(documents: number[]) {

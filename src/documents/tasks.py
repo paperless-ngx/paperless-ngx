@@ -713,8 +713,9 @@ def run_workflows_for_documents(
         logger.warning(
             f"Manual workflow run requested for missing workflow {workflow_id}",
         )
-        return
+        raise
 
+    failed_ids = []
     for document in Document.objects.filter(
         id__in=document_ids,
         root_document__isnull=True,
@@ -732,9 +733,15 @@ def run_workflows_for_documents(
                 document=document,
             )
         except Exception:
+            failed_ids.append(document.pk)
             logger.exception(
                 f"Error running workflow {workflow} on document {document.pk}",
             )
+
+    if failed_ids:
+        raise RuntimeError(
+            f"Workflow {workflow_id} failed for document(s): {failed_ids}. Check logs for details.",
+        )
 
 
 def update_document_parent_tags(tag: Tag, new_parent: Tag) -> None:

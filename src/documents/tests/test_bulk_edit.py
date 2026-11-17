@@ -698,10 +698,10 @@ class TestBulkEdit(DirectoriesMixin, TestCase):
     def test_delete_documents_old_uuid_field(self, m) -> None:
         m.side_effect = Exception("Data too long for column 'transaction_id' at row 1")
         doc_ids = [self.doc1.id, self.doc2.id, self.doc3.id]
-        bulk_edit.delete(doc_ids)
         with self.assertLogs(level="WARNING") as cm:
-            bulk_edit.delete(doc_ids)
-            self.assertIn("possible incompatible database column", cm.output[0])
+            with self.assertRaisesRegex(Exception, "Data too long for column"):
+                bulk_edit.delete(doc_ids)
+        self.assertIn("possible incompatible database column", cm.output[0])
 
 
 class TestPDFActions(DirectoriesMixin, TestCase):
@@ -1038,8 +1038,9 @@ class TestPDFActions(DirectoriesMixin, TestCase):
 
         mock_consume_file.assert_not_called()
 
+    @mock.patch("documents.bulk_edit.group")
     @mock.patch("documents.tasks.consume_file.s")
-    def test_split(self, mock_consume_file) -> None:
+    def test_split(self, mock_consume_file, mock_group) -> None:
         """
         GIVEN:
             - Existing documents
@@ -1060,6 +1061,7 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         self.assertIsNone(mock_consume_file.call_args.kwargs["overrides"].asn)
 
         self.assertEqual(result, "OK")
+        mock_group.return_value.delay.assert_called_once()
 
     @mock.patch("documents.bulk_edit.group")
     @mock.patch("documents.pdf_ops.build_pdfs")
@@ -1168,8 +1170,8 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         sig.apply_async.side_effect = Exception("boom")
         mock_chord.return_value = sig
 
-        result = bulk_edit.split(doc_ids, pages, delete_originals=True)
-        self.assertEqual(result, "OK")
+        with self.assertRaisesMessage(Exception, "boom"):
+            bulk_edit.split(doc_ids, pages, delete_originals=True)
 
         self.doc2.refresh_from_db()
         self.assertEqual(self.doc2.archive_serial_number, 222)
@@ -1191,7 +1193,8 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         pages = [[1, 2], [3]]
 
         with self.assertLogs("paperless.bulk_edit", level="ERROR") as cm:
-            bulk_edit.split(doc_ids, pages)
+            with self.assertRaisesMessage(Exception, "Error building PDFs"):
+                bulk_edit.split(doc_ids, pages)
             error_str = cm.output[0]
             expected_str = "Error splitting document 2"
             self.assertIn(expected_str, error_str)
@@ -1240,11 +1243,67 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         doc_ids = [self.doc2.id, self.doc3.id]
 
         with self.assertLogs("paperless.bulk_edit", level="ERROR") as cm:
-            bulk_edit.rotate(doc_ids, 90)
+            with self.assertRaisesMessage(
+                RuntimeError,
+                f"Rotation failed for document(s): {doc_ids}",
+            ):
+                bulk_edit.rotate(doc_ids, 90)
             error_str = cm.output[0]
             expected_str = "Error rotating document"
             self.assertIn(expected_str, error_str)
+            self.assertEqual(mock_rotate_pdf.call_count, 2)
             mock_consume_delay.assert_not_called()
+
+    @mock.patch("documents.tasks.consume_file.apply_async")
+    @mock.patch("documents.pdf_ops.rotate_pdf")
+    def test_rotate_continues_after_preparation_failure(
+        self,
+        mock_rotate_pdf,
+        mock_consume,
+    ) -> None:
+        def rotate(source, destination, degrees):
+            if source == self.doc2.source_path:
+                raise RuntimeError("Invalid PDF")
+            shutil.copy(source, destination)
+
+        mock_rotate_pdf.side_effect = rotate
+        with self.assertRaisesMessage(
+            RuntimeError,
+            f"Rotation failed for document(s): [{self.doc2.id}]",
+        ):
+            bulk_edit.rotate([self.doc2.id, self.doc3.id], 90)
+
+        self.assertEqual(mock_rotate_pdf.call_count, 2)
+        mock_consume.assert_called_once()
+        self.assertEqual(
+            mock_consume.call_args.kwargs["kwargs"]["input_doc"].root_document_id,
+            self.doc3.id,
+        )
+
+    @mock.patch("documents.tasks.consume_file.apply_async")
+    @mock.patch("documents.pdf_ops.rotate_pdf")
+    def test_rotate_continues_after_queue_failure(
+        self,
+        mock_rotate_pdf,
+        mock_consume,
+    ) -> None:
+        mock_rotate_pdf.side_effect = lambda source, destination, degrees: shutil.copy(
+            source,
+            destination,
+        )
+        mock_consume.side_effect = [RuntimeError("Broker unavailable"), None]
+        with self.assertRaisesMessage(
+            RuntimeError,
+            f"Rotation failed for document(s): [{self.doc2.id}]",
+        ):
+            bulk_edit.rotate([self.doc2.id, self.doc3.id], 90)
+
+        self.assertEqual(mock_rotate_pdf.call_count, 2)
+        self.assertEqual(mock_consume.call_count, 2)
+        self.assertEqual(
+            mock_consume.call_args.kwargs["kwargs"]["input_doc"].root_document_id,
+            self.doc3.id,
+        )
 
     @mock.patch("documents.tasks.consume_file.apply_async")
     def test_rotate_non_pdf(
@@ -1375,7 +1434,8 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         pages = [1, 3]
 
         with self.assertLogs("paperless.bulk_edit", level="ERROR") as cm:
-            bulk_edit.delete_pages(doc_ids, pages)
+            with self.assertRaisesMessage(Exception, "Error removing pages"):
+                bulk_edit.delete_pages(doc_ids, pages)
             error_str = cm.output[0]
             expected_str = "Error deleting pages from document"
             self.assertIn(expected_str, error_str)

@@ -28,6 +28,7 @@ import { DocumentVersionInfo } from 'src/app/data/document'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { DocumentService } from 'src/app/services/rest/document.service'
+import { TaskNotificationService } from 'src/app/services/task-notification.service'
 import { ToastService } from 'src/app/services/toast.service'
 import {
   UploadState,
@@ -77,6 +78,7 @@ export class DocumentVersionDropdownComponent
   private readonly toastService = inject(ToastService)
   private readonly websocketStatusService = inject(WebsocketStatusService)
   private readonly modalService = inject(NgbModal)
+  private readonly taskNotifications = inject(TaskNotificationService)
   private readonly destroy$ = new Subject<void>()
   private readonly documentChange$ = new Subject<void>()
 
@@ -305,23 +307,19 @@ export class DocumentVersionDropdownComponent
             versionLabel
           )
           .pipe(
-            switchMap(() => this.documentsService.getVersions(this.documentId)),
             first(),
             finalize(() => dialog.buttonsEnabled.set(true)),
             takeUntil(this.destroy$),
             takeUntil(this.documentChange$)
           )
           .subscribe({
-            next: (document) => {
-              if (document?.versions?.length) {
-                this.versionsUpdated.emit(document.versions)
-                // The API returns versions newest first
-                this.versionSelected.emit(document.versions[0].id)
-              }
+            next: ({ task_id }) => {
               this.newVersionLabel = ''
               modal.close()
-              this.toastService.showSuccess(
-                $localize`Existing document added as a version.`
+              this.taskNotifications.showQueued(
+                task_id,
+                $localize`Existing document queued to be added as a version.`,
+                { content: $localize`Existing document added as a version.` }
               )
             },
             error: (error) => {

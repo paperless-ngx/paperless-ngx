@@ -7,6 +7,7 @@
     background-color: var(--pngx-toast-bg);
     color: var(--bs-body-color);
     overflow: hidden;
+    transition: background-color .18s ease, border-color .18s ease;
 
     &.toast-success {
         --pngx-toast-accent: var(--pngx-toast-success);
@@ -23,6 +24,13 @@
 
 .toast-icon {
     color: var(--pngx-toast-accent);
+    transition: color .18s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .toast, .toast-icon {
+        transition: none;
+    }
 }
 
 .toast-content {

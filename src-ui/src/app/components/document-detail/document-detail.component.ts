@@ -97,6 +97,7 @@ import { TagService } from 'src/app/services/rest/tag.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { WorkflowService } from 'src/app/services/rest/workflow.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { TaskNotificationService } from 'src/app/services/task-notification.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { TrashService } from 'src/app/services/trash.service'
 import { WebsocketStatusService } from 'src/app/services/websocket-status.service'
@@ -226,6 +227,7 @@ export class DocumentDetailComponent
   private documentListViewService = inject(DocumentListViewService)
   private documentTitlePipe = inject(DocumentTitlePipe)
   private toastService = inject(ToastService)
+  private taskNotifications = inject(TaskNotificationService)
   private trashService = inject(TrashService)
   private settings = inject(SettingsService)
   private storagePathService = inject(StoragePathService)
@@ -1558,9 +1560,11 @@ export class DocumentDetailComponent
           modal.componentInstance.remoteOcr
         )
         .subscribe({
-          next: () => {
-            this.toastService.showInfo(
-              $localize`Reprocess operation for "${this.document().title}" will begin in the background.`
+          next: ({ task_id }) => {
+            this.taskNotifications.showQueued(
+              task_id,
+              $localize`Document reprocessing queued.`,
+              { content: $localize`Document submitted for reprocessing.` }
             )
             if (modal) {
               modal.close()
@@ -1597,9 +1601,13 @@ export class DocumentDetailComponent
           filter_documents: !modal.componentInstance.force,
         })
         .subscribe({
-          next: () => {
-            this.toastService.showInfo(
-              $localize`Workflow will run on "${this.document().title}" in the background.`
+          next: ({ task_id }) => {
+            this.taskNotifications.showQueued(
+              task_id,
+              $localize`Workflow queued.`,
+              {
+                content: $localize`Workflow completed.`,
+              }
             )
             modal.close()
           },
@@ -1989,14 +1997,15 @@ export class DocumentDetailComponent
           })
           .pipe(first(), takeUntil(this.unsubscribeNotifier))
           .subscribe({
-            next: () => {
-              this.toastService.showInfo(
-                $localize`PDF edit operation for "${this.document().title}" will begin in the background.`
+            next: ({ task_id }) => {
+              this.taskNotifications.showQueued(
+                task_id,
+                $localize`PDF edit queued.`,
+                {
+                  content: $localize`PDF edit submitted for processing.`,
+                }
               )
               modal.close()
-              if (modal.componentInstance.deleteOriginal) {
-                this.openDocumentService.closeDocument(this.document())
-              }
             },
             error: (error) => {
               if (modal) {
@@ -2046,17 +2055,16 @@ export class DocumentDetailComponent
           })
           .pipe(first(), takeUntil(this.unsubscribeNotifier))
           .subscribe({
-            next: () => {
-              this.toastService.showInfo(
-                $localize`Password removal operation for "${this.document().title}" will begin in the background.`
+            next: ({ task_id }) => {
+              this.taskNotifications.showQueued(
+                task_id,
+                $localize`Password removal queued.`,
+                {
+                  content: $localize`Password removal submitted for processing.`,
+                }
               )
               this.networkActive.set(false)
               modal.close()
-              if (!dialog.updateDocument && dialog.deleteOriginal) {
-                this.openDocumentService.closeDocument(this.document())
-              } else if (dialog.updateDocument) {
-                this.openDocumentService.refreshDocument(this.documentId())
-              }
             },
             error: (error) => {
               dialog.buttonsEnabled.set(true)

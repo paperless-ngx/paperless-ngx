@@ -32,10 +32,11 @@ export class ToastsComponent {
           return
         }
         this.toasts.update((toasts) =>
-          [toast, ...toasts.filter((t) => t.id !== toast.id)].slice(
-            0,
-            MAX_VISIBLE_TOASTS
-          )
+          toasts.some((existing) => existing.id === toast.id)
+            ? toasts.map((existing) =>
+                existing.id === toast.id ? toast : existing
+              )
+            : [toast, ...toasts].slice(0, MAX_VISIBLE_TOASTS)
         )
       })
   }

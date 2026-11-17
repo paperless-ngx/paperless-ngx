@@ -1688,6 +1688,7 @@ class MergeDocumentsSerializer(DocumentListSerializer, SourceModeValidationMixin
 
 class MergeDocumentsAsVersionsSerializer(DocumentListSerializer):
     root_document_id = serializers.IntegerField(required=True)
+    from_webui = serializers.BooleanField(required=False, default=False)
     version_label = serializers.CharField(
         required=False,
         allow_blank=True,
@@ -1716,19 +1717,17 @@ class MergeDocumentsAsVersionsSerializer(DocumentListSerializer):
                 "root_document_id must be one of the selected documents.",
             )
 
-        selected_documents = Document.objects.filter(id__in=documents)
-        if selected_documents.filter(root_document__isnull=False).exists():
-            raise serializers.ValidationError(
-                "Only top-level documents can be merged as versions.",
+        # Rechecked under row locks during execution in case document state changes.
+        selected_documents = list(
+            Document.objects.filter(id__in=documents).only("id", "root_document"),
+        )
+        try:
+            bulk_edit.validate_merge_as_versions_state(
+                selected_documents,
+                attrs["root_document_id"],
             )
-
-        source_document_ids = set(documents) - {attrs["root_document_id"]}
-        if Document.global_objects.filter(
-            root_document_id__in=source_document_ids,
-        ).exists():
-            raise serializers.ValidationError(
-                "Documents with existing versions cannot be merged into another document.",
-            )
+        except ValueError as error:
+            raise serializers.ValidationError(str(error)) from error
         return attrs
 
 
@@ -1801,11 +1800,12 @@ class RemovePasswordDocumentsSerializer(
 
 
 class DeleteDocumentsSerializer(DocumentSelectionSerializer):
-    pass
+    from_webui = serializers.BooleanField(required=False, default=False)
 
 
 class ReprocessDocumentsSerializer(DocumentSelectionSerializer):
     remote_ocr = serializers.BooleanField(required=False, default=False)
+    from_webui = serializers.BooleanField(required=False, default=False)
 
 
 class BulkEditSerializer(

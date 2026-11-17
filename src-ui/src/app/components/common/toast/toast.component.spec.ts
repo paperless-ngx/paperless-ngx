@@ -65,6 +65,36 @@ describe('ToastComponent', () => {
     expect(component.delayRemaining()).toEqual(3000)
   })
 
+  it('updates its color and icon in place and restarts the countdown', () => {
+    jest.useFakeTimers()
+    fixture.componentRef.setInput('toast', {
+      id: 'task-1',
+      content: 'Queued',
+      delay: 5000,
+    })
+    fixture.detectChanges()
+    component.onShown(component.toast)
+    jest.advanceTimersByTime(4500)
+    const element = fixture.nativeElement.querySelector('ngb-toast')
+    fixture.componentRef.setInput('toast', {
+      id: 'task-1',
+      content: 'Completed',
+      delay: 5000,
+      level: ToastLevel.Success,
+    })
+    fixture.detectChanges()
+    expect(fixture.nativeElement.querySelector('ngb-toast')).toBe(element)
+    expect(element.classList).toContain('toast-success')
+    expect(element.querySelector('[name="check-circle"]')).not.toBeNull()
+    expect(component.delayRemaining()).toBe(5000)
+    const hide = jest.spyOn(component.ngbToast, 'hide')
+    jest.advanceTimersByTime(1000)
+    expect(hide).not.toHaveBeenCalled()
+    jest.advanceTimersByTime(4200)
+    expect(hide).toHaveBeenCalled()
+    jest.useRealTimers()
+  })
+
   it('should hide the toast when the countdown ends', () => {
     jest.useFakeTimers()
     const toast = { content: 'Info', delay: 3000 }

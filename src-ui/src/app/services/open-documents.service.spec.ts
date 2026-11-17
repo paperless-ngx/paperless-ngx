@@ -240,7 +240,7 @@ describe('OpenDocumentsService', () => {
     expect(refreshed.tags).toEqual([4])
   })
 
-  it('should handle error on refresh documents', () => {
+  it('keeps documents open after a network error during refresh', () => {
     subscriptions.push(
       openDocumentsService.openDocument(documents[1]).subscribe()
     )
@@ -250,7 +250,63 @@ describe('OpenDocumentsService', () => {
     )
     expect(req.request.method).toEqual('GET')
     req.error(new ErrorEvent('timeout'))
+    expect(openDocumentsService.getOpenDocument(documents[1].id)).toBe(
+      documents[1]
+    )
+  })
+
+  it.each([500, 403])(
+    'keeps documents open after HTTP %s during refresh',
+    (status) => {
+      const doc = { ...documents[0] }
+      openDocumentsService.openDocument(doc).subscribe()
+      openDocumentsService.refreshDocument(doc.id)
+      httpTestingController
+        .expectOne(
+          `${environment.apiBaseUrl}documents/${doc.id}/?full_perms=true`
+        )
+        .flush({}, { status, statusText: 'Error' })
+      expect(openDocumentsService.getOpenDocument(doc.id)).toBe(doc)
+    }
+  )
+
+  it('preserves unsaved edits when a refreshed document no longer exists', () => {
+    const doc = { ...documents[0], title: 'Unsaved title' }
+    openDocumentsService.openDocument(doc).subscribe()
+    openDocumentsService.setDirty(doc, true, { title: doc.title })
+    openDocumentsService.refreshDocument(doc.id)
+    httpTestingController
+      .expectOne(
+        `${environment.apiBaseUrl}documents/${doc.id}/?full_perms=true`
+      )
+      .flush({}, { status: 404, statusText: 'Not Found' })
+    expect(openDocumentsService.getOpenDocument(doc.id)).toBe(doc)
+    expect(openDocumentsService.isDirty(doc)).toBe(true)
+    expect(
+      JSON.parse(sessionStorage.getItem(OPEN_DOCUMENT_SERVICE.DOCUMENTS))[0]
+        .title
+    ).toBe('Unsaved title')
+  })
+
+  it('removes only the missing document when tab positions change during refresh', () => {
+    const first = { ...documents[0] }
+    const second = { ...documents[1] }
+    openDocumentsService.openDocument(first).subscribe()
+    openDocumentsService.openDocument(second).subscribe()
+    openDocumentsService.refreshDocument(first.id)
+    openDocumentsService.refreshDocument(second.id)
+    const firstRequest = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/${first.id}/?full_perms=true`
+    )
+    const secondRequest = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/${second.id}/?full_perms=true`
+    )
+    openDocumentsService.closeDocument(second).subscribe()
+    firstRequest.flush({}, { status: 404, statusText: 'Not Found' })
     expect(openDocumentsService.getOpenDocuments()).toHaveLength(0)
+    openDocumentsService.openDocument(first).subscribe()
+    secondRequest.flush({}, { status: 404, statusText: 'Not Found' })
+    expect(openDocumentsService.getOpenDocuments()).toEqual([first])
   })
 
   it('should log error on sessionStorage save', () => {

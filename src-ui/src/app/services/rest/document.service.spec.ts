@@ -290,6 +290,7 @@ describe(`DocumentService`, () => {
     expect(req.request.method).toEqual('POST')
     expect(req.request.body).toEqual({
       documents: ids,
+      from_webui: true,
     })
   })
 
@@ -303,6 +304,7 @@ describe(`DocumentService`, () => {
     expect(req.request.body).toEqual({
       documents: ids,
       remote_ocr: false,
+      from_webui: true,
     })
   })
 
@@ -317,6 +319,7 @@ describe(`DocumentService`, () => {
     expect(req.request.body).toEqual({
       documents: ids,
       remote_ocr: true,
+      from_webui: true,
     })
   })
 
@@ -331,6 +334,7 @@ describe(`DocumentService`, () => {
       documents: ids,
       degrees: 90,
       source_mode: 'latest_version',
+      from_webui: true,
     })
   })
 
@@ -346,6 +350,7 @@ describe(`DocumentService`, () => {
       documents: ids,
       metadata_document_id: 1,
       delete_originals: true,
+      from_webui: true,
     })
   })
 
@@ -359,6 +364,7 @@ describe(`DocumentService`, () => {
     expect(req.request.body).toEqual({
       documents: ids,
       root_document_id: 2,
+      from_webui: true,
     })
   })
 
@@ -374,6 +380,7 @@ describe(`DocumentService`, () => {
       documents: ids,
       root_document_id: 2,
       version_label: 'Imported',
+      from_webui: true,
     })
   })
 
@@ -388,6 +395,7 @@ describe(`DocumentService`, () => {
     expect(req.request.body).toEqual({
       documents: ids,
       operations: [{ page: 1, rotate: 90, doc: 0 }],
+      from_webui: true,
     })
   })
 
@@ -403,6 +411,7 @@ describe(`DocumentService`, () => {
       documents: ids,
       password: 'secret',
       update_document: true,
+      from_webui: true,
     })
   })
 

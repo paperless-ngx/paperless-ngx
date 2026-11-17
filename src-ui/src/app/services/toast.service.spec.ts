@@ -38,6 +38,29 @@ describe('ToastService', () => {
     })
   })
 
+  it('updates a notification by ID without duplicating or moving it', () => {
+    let notifications: Toast[] = []
+    toastService
+      .getToasts()
+      .subscribe((toasts) => (notifications = [...toasts]))
+    toastService.show({ id: 'task-1', content: 'Queued', delay: 5000 })
+    toastService.show({
+      id: 'other',
+      content: 'Another notification',
+      delay: 5000,
+    })
+    toastService.show({
+      id: 'task-1',
+      content: 'Completed',
+      delay: 5000,
+      level: ToastLevel.Success,
+    })
+    expect(notifications.map((toast) => toast.content)).toEqual([
+      'Another notification',
+      'Completed',
+    ])
+  })
+
   it('parses error string to object on show', () => {
     const toast = {
       title: 'Title',
