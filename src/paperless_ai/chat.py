@@ -1,7 +1,10 @@
 import json
 import logging
-import sys
+from collections.abc import AsyncIterator
+from typing import TYPE_CHECKING
 
+from asgiref.sync import sync_to_async
+from django.db import connections
 from django.db.models import QuerySet
 
 from documents.models import Document
@@ -16,6 +19,10 @@ from paperless_ai.indexing import read_store
 from paperless_ai.prompts.context import ChatQaPromptContext
 from paperless_ai.prompts.context import ChatRefinePromptContext
 from paperless_ai.prompts.render import render_prompt
+
+if TYPE_CHECKING:
+    from llama_index.core.response_synthesizers import BaseSynthesizer
+    from llama_index.core.schema import NodeWithScore
 
 logger = logging.getLogger("paperless_ai.chat")
 
@@ -103,35 +110,67 @@ def _format_chat_metadata_trailer(references: list[dict[str, int | str]]) -> str
     )
 
 
-def stream_chat_with_documents(
+async def stream_chat_with_documents(
     query_str: str,
     documents: QuerySet[Document],
     *,
     unrestricted: bool = False,
     output_language: str | None = None,
-):
+) -> AsyncIterator[str]:
     try:
-        yield from _stream_chat_with_documents(
+        async for chunk in _stream_chat_with_documents(
             query_str,
             documents,
             unrestricted=unrestricted,
             output_language=output_language,
-        )
+        ):
+            yield chunk
     except Exception as e:
         logger.exception("Failed to stream document chat response: %s", e)
         yield CHAT_ERROR_MESSAGE
 
 
-def _stream_chat_with_documents(
+async def _stream_chat_with_documents(
     query_str: str,
     documents: QuerySet[Document],
     *,
     unrestricted: bool = False,
     output_language: str | None = None,
-):
-    if not documents.exists():
+) -> AsyncIterator[str]:
+    prepared = await sync_to_async(_prepare_chat)(
+        query_str,
+        documents,
+        unrestricted=unrestricted,
+        output_language=output_language,
+    )
+    if prepared is None:
         yield CHAT_NO_CONTENT_MESSAGE
         return
+    response_synthesizer, top_nodes, references = prepared
+
+    logger.debug("Document chat query: %s", query_str)
+    response_stream = await response_synthesizer.asynthesize(query_str, top_nodes)
+    async for chunk in response_stream.async_response_gen():
+        yield chunk
+
+    if references:
+        yield _format_chat_metadata_trailer(references)
+
+
+def _prepare_chat(
+    query_str: str,
+    documents: QuerySet[Document],
+    *,
+    unrestricted: bool,
+    output_language: str | None,
+) -> tuple["BaseSynthesizer", list["NodeWithScore"], list[dict[str, int | str]]] | None:
+    """Everything before the answer streams, all of it blocking: ORM queries,
+    the index read lock and its thread-bound sqlite connection, the query
+    embedding, and building the LLM client. Returns None when there is no
+    content to answer from.
+    """
+    if not documents.exists():
+        return None
 
     from llama_index.core.prompts import PromptTemplate
     from llama_index.core.response_synthesizers import get_response_synthesizer
@@ -150,8 +189,6 @@ def _stream_chat_with_documents(
 
     # Hold the shared read lock only while reading the index, so the compaction
     # swap cannot replace the database file while this connection is open.
-    # Everything after retrieval works on the nodes already in memory, so a slow
-    # LLM stream never holds the lock.
     with read_store() as store:
         if permitted_ids is not None:
             filters = _permitted_documents_filter(store, permitted_ids)
@@ -179,35 +216,26 @@ def _stream_chat_with_documents(
 
     if not top_nodes:
         logger.warning("No nodes found for the given documents.")
-        yield CHAT_NO_CONTENT_MESSAGE
-        return
-
-    client = AIClient()
+        return None
 
     references = _get_document_references(documents, top_nodes)
 
-    prompt_template = PromptTemplate(template=_build_chat_prompt(output_language))
-    refine_template = PromptTemplate(template=_build_refine_prompt(output_language))
+    client = AIClient()
     response_synthesizer = get_response_synthesizer(
         llm=client.llm,
         prompt_helper=get_rag_prompt_helper(
             chunk_size=config.llm_embedding_chunk_size,
             context_size=config.llm_context_size,
         ),
-        text_qa_template=prompt_template,
-        refine_template=refine_template,
+        text_qa_template=PromptTemplate(template=_build_chat_prompt(output_language)),
+        refine_template=PromptTemplate(
+            template=_build_refine_prompt(output_language),
+        ),
         streaming=True,
     )
 
-    logger.debug("Document chat query: %s", query_str)
-    # Release the pooled DB connection for the slow streaming LLM response
-    # so it is not pinned for the whole stream; see paperless_ai.db and
-    # #12976.
-    with db_connection_released():
-        response_stream = response_synthesizer.synthesize(query_str, top_nodes)
-        for chunk in response_stream.response_gen:
-            yield chunk
-            sys.stdout.flush()
+    # No ORM access happens while the answer streams, so hand the pooled DB
+    # connection back now rather than pin it for the whole stream. See #12976.
+    connections.close_all()
 
-        if references:
-            yield _format_chat_metadata_trailer(references)
+    return response_synthesizer, top_nodes, references
