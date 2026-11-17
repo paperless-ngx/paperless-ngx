@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-13 17:09+0000\n"
-"PO-Revision-Date: 2026-11-13 17:12\n"
+"POT-Creation-Date: 2026-11-17 00:24+0000\n"
+"PO-Revision-Date: 2026-11-17 00:26\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -1653,7 +1653,7 @@ msgstr "工作流运行"
 
 #: documents/serialisers.py:483 documents/serialisers.py:844
 #: documents/serialisers.py:2893 documents/views.py:356 documents/views.py:622
-#: documents/views.py:2761 paperless_mail/serialisers.py:156
+#: documents/views.py:2761 paperless_mail/serialisers.py:145
 msgid "Insufficient permissions."
 msgstr "权限不足。"
 
@@ -1692,7 +1692,7 @@ msgstr "检测到无效变量。"
 msgid "Duplicate document identifiers are not allowed."
 msgstr "不允许重复文档标识符。"
 
-#: documents/serialisers.py:2979 documents/views.py:4794
+#: documents/serialisers.py:2979 documents/views.py:4748
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr "未找到文档：%(ids)s"
@@ -1953,20 +1953,20 @@ msgstr "AI 后端请求超时。"
 msgid "AI backend rejected the request. Check logs for details."
 msgstr "AI 后端拒绝了请求。请检查日志的详细信息。"
 
-#: documents/views.py:4810
+#: documents/views.py:4764
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr "权限不足以分享文件：%(id)s。"
 
-#: documents/views.py:4857
+#: documents/views.py:4811
 msgid "Bundle is already being processed."
 msgstr "捆绑包已在处理中。"
 
-#: documents/views.py:4923
+#: documents/views.py:4877
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr "分享链接包仍在准备中，请稍后再试。"
 
-#: documents/views.py:4937
+#: documents/views.py:4891
 msgid "The share link bundle is unavailable."
 msgstr "分享链接包不可用。"
 

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-13 17:09+0000\n"
-"PO-Revision-Date: 2026-11-13 17:12\n"
+"POT-Creation-Date: 2026-11-17 00:24+0000\n"
+"PO-Revision-Date: 2026-11-17 00:26\n"
 "Last-Translator: \n"
 "Language-Team: Slovenian\n"
 "Language: sl_SI\n"
@@ -23,7 +23,7 @@ msgstr "Dokumenti"
 
 #: documents/filters.py:349
 msgid "Expected a date or a relative date such as \"today\" or \"in 30 days\"."
-msgstr ""
+msgstr "Pričakovan je datum ali relativni datum, na primer \"danas\" ali \"čez 30 dni\"."
 
 #: documents/filters.py:527
 msgid "Value must be valid JSON."
@@ -120,7 +120,7 @@ msgstr "dopisniki"
 
 #: documents/models.py:114
 msgid "Parent"
-msgstr ""
+msgstr "Nadrejeno"
 
 #: documents/models.py:117
 msgid "color"
@@ -998,11 +998,11 @@ msgstr "Opravila"
 
 #: documents/models.py:1010
 msgid "Plain"
-msgstr ""
+msgstr "Osnovno"
 
 #: documents/models.py:1011
 msgid "Markdown"
-msgstr ""
+msgstr "Popust"
 
 #: documents/models.py:1016
 msgid "Note for the document"
@@ -1653,7 +1653,7 @@ msgstr "poteka dela"
 
 #: documents/serialisers.py:483 documents/serialisers.py:844
 #: documents/serialisers.py:2893 documents/views.py:356 documents/views.py:622
-#: documents/views.py:2761 paperless_mail/serialisers.py:156
+#: documents/views.py:2761 paperless_mail/serialisers.py:145
 msgid "Insufficient permissions."
 msgstr "Nezadostna dovoljenja."
 
@@ -1692,7 +1692,7 @@ msgstr "Zaznani neveljavni znaki."
 msgid "Duplicate document identifiers are not allowed."
 msgstr "Podvojeni identifikatorji dokumentov niso dovoljeni."
 
-#: documents/serialisers.py:2979 documents/views.py:4794
+#: documents/serialisers.py:2979 documents/views.py:4748
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr "Dokumentov ni bilo mogoče najti: %(ids)s"
@@ -1953,20 +1953,20 @@ msgstr "Časovna omejitev zahteve za umetno inteligenco je potekla."
 msgid "AI backend rejected the request. Check logs for details."
 msgstr "Zaledni sistem umetne inteligence je zavrnil zahtevo. Za podrobnosti preverite dnevnike."
 
-#: documents/views.py:4810
+#: documents/views.py:4764
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr "Nezadostna dovoljenja za skupno rabo dokumenta %(id)s."
 
-#: documents/views.py:4857
+#: documents/views.py:4811
 msgid "Bundle is already being processed."
 msgstr "Paket se že obdeluje."
 
-#: documents/views.py:4923
+#: documents/views.py:4877
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr "Paket povezav za deljenje je še vedno v pripravi. Poskusite znova pozneje."
 
-#: documents/views.py:4937
+#: documents/views.py:4891
 msgid "The share link bundle is unavailable."
 msgstr "Paket povezav za deljenje ni na voljo."
 

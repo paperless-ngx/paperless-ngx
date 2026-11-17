@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-13 17:09+0000\n"
-"PO-Revision-Date: 2026-11-13 17:12\n"
+"POT-Creation-Date: 2026-11-17 00:24+0000\n"
+"PO-Revision-Date: 2026-11-17 00:26\n"
 "Last-Translator: \n"
 "Language-Team: Slovak\n"
 "Language: sk_SK\n"
@@ -1653,7 +1653,7 @@ msgstr "spustenia pracovných postupov"
 
 #: documents/serialisers.py:483 documents/serialisers.py:844
 #: documents/serialisers.py:2893 documents/views.py:356 documents/views.py:622
-#: documents/views.py:2761 paperless_mail/serialisers.py:156
+#: documents/views.py:2761 paperless_mail/serialisers.py:145
 msgid "Insufficient permissions."
 msgstr "Nedostatočné oprávnenia."
 
@@ -1692,7 +1692,7 @@ msgstr "Zistená neplatná premenná."
 msgid "Duplicate document identifiers are not allowed."
 msgstr "Duplicitné identifikátory dokumentov nie sú povolené."
 
-#: documents/serialisers.py:2979 documents/views.py:4794
+#: documents/serialisers.py:2979 documents/views.py:4748
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr "Dokumenty sa nenašli: %(ids)s"
@@ -1953,20 +1953,20 @@ msgstr "Vypršal časový limit požiadavky na backend umelej inteligencie."
 msgid "AI backend rejected the request. Check logs for details."
 msgstr "Backend umelej inteligencie zamietol požiadavku. Podrobnosti nájdete v záznamoch."
 
-#: documents/views.py:4810
+#: documents/views.py:4764
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr "Nedostatočné oprávnenia na zdieľanie dokumentu %(id)s."
 
-#: documents/views.py:4857
+#: documents/views.py:4811
 msgid "Bundle is already being processed."
 msgstr "Balík sa už spracúva."
 
-#: documents/views.py:4923
+#: documents/views.py:4877
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr "Balík odkazov na zdieľanie sa stále pripravuje. Skúste to znova neskôr."
 
-#: documents/views.py:4937
+#: documents/views.py:4891
 msgid "The share link bundle is unavailable."
 msgstr "Balík odkazov na zdieľanie nie je k dispozícii."
 
