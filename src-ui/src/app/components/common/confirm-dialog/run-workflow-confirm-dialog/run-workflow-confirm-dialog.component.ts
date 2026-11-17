@@ -13,6 +13,8 @@ export class RunWorkflowConfirmDialogComponent extends ConfirmDialogComponent {
 
   public workflowId: number = null
 
+  public singleDocument: boolean = false
+
   // i.e. ignore the workflow's trigger filters
   public force: boolean = false
 

@@ -57,6 +57,7 @@ import {
 } from 'src/app/services/rest/remote-version.service'
 import { SavedViewService } from 'src/app/services/rest/saved-view.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { TaskNotificationService } from 'src/app/services/task-notification.service'
 import { TasksService } from 'src/app/services/tasks.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { UploadDocumentsService } from 'src/app/services/upload-documents.service'
@@ -115,6 +116,7 @@ export class AppFrameComponent
   settingsService = inject(SettingsService)
   tasksService = inject(TasksService)
   private readonly toastService = inject(ToastService)
+  private readonly taskNotifications = inject(TaskNotificationService)
   private modalService = inject(NgbModal)
   permissionsService = inject(PermissionsService)
   private djangoMessagesService = inject(DjangoMessagesService)
@@ -182,9 +184,11 @@ export class AppFrameComponent
         ),
         takeUntilDestroyed(this.destroyRef)
       )
-      .subscribe(({ status, error }) => {
+      .subscribe((result) => {
         this.documentList.reload(null, false)
-        this.documentList.reduceSelectionToFilter()
+        if (!this.documentList.allSelected) {
+          this.documentList.reduceSelectionToFilter()
+        }
         // maybe someday we can optimize to only refresh affected documents
         this.openDocumentsService.getOpenDocuments().forEach((doc) => {
           this.openDocumentsService.refreshDocument(doc.id)
@@ -198,16 +202,7 @@ export class AppFrameComponent
         ) {
           this.tasksService.reload()
         }
-        if (status === PaperlessTaskStatus.Success) {
-          this.toastService.showSuccess($localize`Bulk operation completed.`)
-        } else if (status === PaperlessTaskStatus.Revoked) {
-          this.toastService.showError($localize`Bulk operation revoked.`, error)
-        } else {
-          this.toastService.showError(
-            $localize`Bulk operation failed. Some changes may already have been applied.`,
-            error
-          )
-        }
+        this.taskNotifications.complete(result)
       })
 
     this.lastScrollY = window.scrollY

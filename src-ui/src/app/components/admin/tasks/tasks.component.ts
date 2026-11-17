@@ -33,6 +33,10 @@ import { IfPermissionsDirective } from 'src/app/directives/if-permissions.direct
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { TasksService } from 'src/app/services/tasks.service'
 import { ToastService } from 'src/app/services/toast.service'
+import {
+  documentOperationHasFollowUpTasks,
+  getDocumentOperationLabel,
+} from 'src/app/utils/document-operation'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { PageHeaderComponent } from '../../common/page-header/page-header.component'
 import { LoadingComponentWithPermissions } from '../../loading-component/loading.component'
@@ -414,11 +418,30 @@ export class TasksComponent
   }
 
   taskDisplayName(task: PaperlessTask): string {
-    return task.input_data?.filename?.toString() || task.task_type_display
+    const filename = task.input_data?.filename?.toString()
+    if (filename) return filename
+    const operation = this.taskOperationLabel(task)
+    const count = this.taskDocumentCount(task)
+    if (operation && count !== null && count > 1) {
+      return $localize`Bulk operation: ${operation}`
+    }
+    return operation || task.task_type_display
   }
 
   taskShowsSeparateTypeLabel(task: PaperlessTask): boolean {
-    return this.taskDisplayName(task) !== task.task_type_display
+    return (
+      !this.taskOperationLabel(task) &&
+      this.taskDisplayName(task) !== task.task_type_display
+    )
+  }
+
+  private taskOperationLabel(task: PaperlessTask): string | null {
+    return getDocumentOperationLabel(task.input_data?.operation)
+  }
+
+  taskDocumentCount(task: PaperlessTask): number | null {
+    const count = task.input_data?.document_count
+    return Number.isInteger(count) && count >= 0 ? count : null
   }
 
   taskResultMessage(task: PaperlessTask): string | null {
@@ -444,6 +467,15 @@ export class TasksComponent
     const errorMessage = task.result_data?.['error_message']
     if (typeof errorMessage === 'string') {
       return errorMessage
+    }
+
+    if (
+      task.status === PaperlessTaskStatus.Success &&
+      this.taskOperationLabel(task)
+    ) {
+      return documentOperationHasFollowUpTasks(task.input_data?.operation)
+        ? $localize`Submitted for processing`
+        : $localize`Completed`
     }
 
     return null

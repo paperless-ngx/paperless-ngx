@@ -75,7 +75,14 @@ export class ToastService {
     if (persistent) {
       // the dropdown is open, so it's seen as it arrives
       toast.read = !!this._suppressPopupToasts
-      this.toasts.unshift(toast)
+      const index = this.toasts.findIndex(
+        (existing) => existing.id === toast.id
+      )
+      if (index === -1) {
+        this.toasts.unshift(toast)
+      } else {
+        this.toasts[index] = toast
+      }
       this.toastsSubject.next(this.toasts)
     }
     // Popups are suppressed while the dropdown is open

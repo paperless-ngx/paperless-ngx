@@ -587,9 +587,10 @@ documents from the web UI:
 - From the document list, select one or more documents and choose **Run workflow** from the "Actions" menu.
 - From an individual document, choose **Run workflow** from the "Actions" menu.
 
-You will be asked which workflow to run. By default the workflow's trigger filters still apply, so documents that do
-not match are skipped. You can instead choose to **run on all selected documents**, which ignores the trigger filters
-and runs the workflow's actions on every selected document.
+You will be asked which workflow to run. From the document list, the workflow's trigger filters apply by default, so
+documents that do not match are skipped. You can choose to **run on all selected documents** to ignore the filters.
+From an individual document, the option to ignore trigger filters is selected by default. Clear it to run the workflow
+only if the document matches its trigger filters.
 
 Manual runs happen in the background. As with scheduled workflows, the document list is not refreshed automatically when
 they finish, so you may need to reload the list to see the results.

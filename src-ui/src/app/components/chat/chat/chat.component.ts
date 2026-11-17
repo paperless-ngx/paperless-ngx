@@ -21,6 +21,9 @@ import {
 import { pngxPopperOptions } from 'src/app/utils/popper-options'
 
 const SLOW_RESPONSE_DELAY_MS = 8000
+const TYPEWRITER_MIN_DURATION_MS = 750
+const TYPEWRITER_MAX_DURATION_MS = 3000
+const TYPEWRITER_INTERVAL_MS = 16
 
 @Component({
   selector: 'pngx-chat',
@@ -73,6 +76,7 @@ export class ChatComponent implements OnInit {
   private typewriterBuffer: string[] = []
   private typewriterActive = false
   private typewriterTimeout: ReturnType<typeof setTimeout>
+  private typewriterDeadline = 0
   private streamSubscription: Subscription
   private streamingMessage: ChatMessage
   private streamFinished = false
@@ -134,7 +138,7 @@ export class ChatComponent implements OnInit {
           if (nextResponse.content.length < lastVisibleContent.length) {
             this.resetTypewriter(assistantMessage, nextResponse.content)
             lastVisibleContent = nextResponse.content
-          } else {
+          } else if (nextResponse.content.length > lastVisibleContent.length) {
             const visibleDelta = nextResponse.content.substring(
               lastVisibleContent.length
             )
@@ -214,6 +218,12 @@ export class ChatComponent implements OnInit {
     if (!chunk) return
 
     this.typewriterBuffer.push(...chunk.split(''))
+    // Longer bursts need more time to remain readable as the chat scrolls.
+    const revealDuration = Math.min(
+      TYPEWRITER_MAX_DURATION_MS,
+      Math.max(TYPEWRITER_MIN_DURATION_MS, this.typewriterBuffer.length)
+    )
+    this.typewriterDeadline = Date.now() + revealDuration
 
     if (!this.typewriterActive) {
       this.typewriterActive = true
@@ -222,19 +232,29 @@ export class ChatComponent implements OnInit {
   }
 
   playTypewriter(message: ChatMessage): void {
-    if (this.typewriterBuffer.length === 0) {
-      this.typewriterActive = false
-      if (this.streamFinished) this.finishStreaming(message)
-      return
-    }
-
-    const nextChar = this.typewriterBuffer.shift()
-    message.content += nextChar
+    // Spread the queued text across the updates left before the deadline
+    const remainingUpdates = Math.max(
+      1,
+      Math.ceil((this.typewriterDeadline - Date.now()) / TYPEWRITER_INTERVAL_MS)
+    )
+    const charactersToShow = Math.ceil(
+      this.typewriterBuffer.length / remainingUpdates
+    )
+    message.content += this.typewriterBuffer
+      .splice(0, charactersToShow)
+      .join('')
     this.notifyMessagesChanged()
     this.scrollToBottom()
 
-    // 10ms per character
-    this.typewriterTimeout = setTimeout(() => this.playTypewriter(message), 10)
+    if (this.typewriterBuffer.length === 0) {
+      this.typewriterActive = false
+      if (this.streamFinished) this.finishStreaming(message)
+    } else {
+      this.typewriterTimeout = setTimeout(
+        () => this.playTypewriter(message),
+        TYPEWRITER_INTERVAL_MS
+      )
+    }
   }
 
   private notifyMessagesChanged(): void {

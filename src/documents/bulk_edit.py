@@ -429,6 +429,7 @@ def delete(doc_ids: list[int]) -> Literal["OK"]:
                 "Detected a possible incompatible database column. See https://docs.paperless-ngx.com/troubleshooting/#convert-uuid-field",
             )
         logger.error(f"Error deleting documents: {e!s}")
+        raise
 
     return "OK"
 
@@ -476,9 +477,9 @@ def run_workflow(
     """
     Manually run a single workflow against the given documents.
 
-    Done asynchronously via a Celery task.
+    Called from the tracked bulk operation task.
     """
-    run_workflows_for_documents.delay(
+    run_workflows_for_documents(
         document_ids=doc_ids,
         workflow_id=workflow,
         filter_documents=filter_documents,
@@ -540,6 +541,7 @@ def rotate(
         pair = _resolve_root_and_source_doc(doc, source_mode=source_mode)
         docs_by_root_id.setdefault(pair.root_doc.id, pair)
 
+    failed_ids = []
     for pair in docs_by_root_id.values():
         if pair.source_doc.mime_type != "application/pdf":
             logger.warning(
@@ -574,7 +576,13 @@ def rotate(
                 f"Queued new rotated version for document {pair.root_doc.id} by {degrees} degrees",
             )
         except Exception as e:
+            failed_ids.append(pair.root_doc.id)
             logger.exception(f"Error rotating document {pair.root_doc.id}: {e}")
+
+    if failed_ids:
+        raise RuntimeError(
+            f"Rotation failed for document(s): {failed_ids}. Check logs for details.",
+        )
 
     return "OK"
 
@@ -686,6 +694,22 @@ def merge(
     return "OK"
 
 
+def validate_merge_as_versions_state(
+    documents: list[Document],
+    root_document_id: int,
+) -> None:
+    if any(document.root_document_id is not None for document in documents):
+        raise ValueError("Only top-level documents can be merged as versions.")
+
+    source_ids = [
+        document.pk for document in documents if document.pk != root_document_id
+    ]
+    if Document.global_objects.filter(root_document_id__in=source_ids).exists():
+        raise ValueError(
+            "Documents with existing versions cannot be merged into another document.",
+        )
+
+
 def merge_as_versions(
     doc_ids: list[int],
     *,
@@ -703,6 +727,7 @@ def merge_as_versions(
         )
         documents_by_id = {document.id: document for document in documents}
 
+        validate_merge_as_versions_state(documents, root_document_id)
         source_ids = [doc_id for doc_id in doc_ids if doc_id != root_document_id]
         root_document = documents_by_id[root_document_id]
         next_version_index = (
@@ -866,6 +891,7 @@ def split(
 
     except Exception as e:
         logger.exception(f"Error splitting document {doc.id}: {e}")
+        raise
 
     return "OK"
 
@@ -911,6 +937,7 @@ def delete_pages(
         )
     except Exception as e:
         logger.exception(f"Error deleting pages from document {pair.root_doc.id}: {e}")
+        raise
 
     return "OK"
 

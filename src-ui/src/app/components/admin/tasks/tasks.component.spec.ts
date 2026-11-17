@@ -895,6 +895,117 @@ describe('TasksComponent', () => {
     expect(sanityTaskRow.nativeElement.textContent).toContain('System')
   })
 
+  it.each([
+    ['modify_tags', 12, 'Bulk operation: Update tags', '(12 documents)'],
+    ['run_workflow', 1, 'Run workflow', null],
+    ['delete', 3, 'Bulk operation: Move to trash', '(3 documents)'],
+    ['reprocess', 2, 'Bulk operation: Document reprocessing', '(2 documents)'],
+  ])(
+    'shows the operation, document count and outcome for %s',
+    (operation, count, label, summary) => {
+      const task: PaperlessTask = {
+        ...tasks[4],
+        task_type:
+          operation === 'delete'
+            ? PaperlessTaskType.BulkDelete
+            : PaperlessTaskType.BulkUpdate,
+        task_type_display:
+          operation === 'delete' ? 'Bulk Delete' : 'Bulk Update',
+        trigger_source: PaperlessTaskTriggerSource.WebUI,
+        trigger_source_display: 'Web UI',
+        input_data: { operation, document_count: count },
+        result_data: { operation, document_count: count },
+      }
+      component.setSection(TaskSection.Completed)
+      flushTaskLists(25, 1, [task])
+      fixture.detectChanges()
+
+      const name = fixture.nativeElement.querySelector('tbody .name-col')
+      expect(name.textContent).toContain(label)
+      const countLabel = name.querySelector('small.text-muted')
+      if (summary) {
+        expect(countLabel.textContent).toContain(summary)
+      } else {
+        expect(countLabel).toBeNull()
+        expect(name.textContent).not.toContain('Bulk operation:')
+      }
+      expect(name.textContent).not.toContain('·')
+      expect(name.textContent).toContain('Web UI')
+      expect(name.textContent).not.toContain(task.task_type_display)
+      expect(
+        name.closest('tr').querySelector('.results-col').textContent
+      ).toContain(
+        [
+          'reprocess',
+          'rotate',
+          'merge',
+          'split',
+          'delete_pages',
+          'edit_pdf',
+          'remove_password',
+        ].includes(operation)
+          ? 'Submitted for processing'
+          : 'Completed'
+      )
+    }
+  )
+
+  it('shows operation context while work is pending without reporting completion', () => {
+    const task = {
+      ...tasks[2],
+      task_type: PaperlessTaskType.BulkUpdate,
+      task_type_display: 'Bulk Update',
+      input_data: { operation: 'reprocess', document_count: 1 },
+    }
+    component.setSection(TaskSection.InProgress)
+    flushTaskLists(25, 1, [task])
+    fixture.detectChanges()
+
+    const name = fixture.nativeElement.querySelector('tbody .name-col')
+    expect(name.textContent).toContain('Document reprocessing')
+    expect(name.textContent).not.toContain('Bulk operation:')
+    expect(name.querySelector('small')).toBeNull()
+    expect(component.taskResultMessage(task)).toBeNull()
+  })
+
+  it.each([{}, { operation: 'future_operation' }])(
+    'preserves the fallback for legacy or unknown operation data: %j',
+    (input_data) => {
+      const task = {
+        ...tasks[4],
+        task_type: PaperlessTaskType.BulkUpdate,
+        task_type_display: 'Bulk Update',
+        input_data,
+        result_data: {},
+      }
+      expect(component.taskDisplayName(task)).toBe('Bulk Update')
+      expect(component.taskDocumentCount(task)).toBeNull()
+      expect(component.taskResultMessage(task)).toBeNull()
+    }
+  )
+
+  it.each([-1, 1.5, '2', null, undefined])(
+    'does not display an invalid document count: %s',
+    (document_count) => {
+      expect(
+        component.taskDocumentCount({
+          ...tasks[4],
+          input_data: { operation: 'modify_tags', document_count },
+        })
+      ).toBeNull()
+    }
+  )
+
+  it('retains error details for failed operation tasks', () => {
+    expect(
+      component.taskResultMessage({
+        ...tasks[0],
+        input_data: { operation: 'modify_tags', document_count: 12 },
+        result_data: { error_message: 'Insufficient permissions' },
+      })
+    ).toBe('Insufficient permissions')
+  })
+
   it('should filter tasks by result', () => {
     component.setSection(TaskSection.NeedsAttention)
     component.filterTargetID = 1

@@ -8,7 +8,9 @@ import tempfile
 import zipfile
 from collections import Counter
 from collections import deque
+from collections.abc import AsyncIterator
 from collections.abc import Callable
+from collections.abc import Generator
 from dataclasses import asdict
 from datetime import datetime
 from datetime import timedelta
@@ -29,6 +31,7 @@ from urllib.parse import urlparse
 import httpx
 import magic
 import pathvalidate
+from asgiref.sync import sync_to_async
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
@@ -109,9 +112,9 @@ from documents import bulk_edit
 from documents.bulk_download import ArchiveOnlyStrategy
 from documents.bulk_download import OriginalAndArchiveStrategy
 from documents.bulk_download import OriginalsOnlyStrategy
-from documents.bulk_operations import QUEUED_OPERATIONS
+from documents.bulk_operations import TRIGGER_SOURCE_OPERATIONS
+from documents.bulk_operations import USER_OPERATIONS
 from documents.bulk_operations import execute_bulk_operation
-from documents.bulk_operations import snapshot_field
 from documents.caching import get_llm_suggestion_cache
 from documents.caching import get_metadata_cache
 from documents.caching import get_suggestion_cache
@@ -2512,6 +2515,24 @@ class DocumentViewSet(
         )
 
 
+async def _iterate_in_sync_thread(
+    chunks: Generator[str, None, None],
+) -> AsyncIterator[str]:
+    """Serve a blocking sync generator to an ASGI server chunk by chunk.
+
+    Under ASGI, Django drains a sync iterator with ``sync_to_async(list)``
+    before sending anything. Pull each chunk in the request's sync thread
+    instead, where the generator's ORM access belongs.
+    """
+    sentinel = object()  # StopIteration can't cross an asyncio Future
+    next_chunk = sync_to_async(next)
+    try:
+        while (chunk := await next_chunk(chunks, sentinel)) is not sentinel:
+            yield chunk
+    finally:
+        await sync_to_async(chunks.close)()
+
+
 class ChatStreamingSerializer(serializers.Serializer[dict[str, Any]]):
     q = serializers.CharField(required=True, max_length=4000)
     document_id = serializers.IntegerField(required=False, allow_null=True)
@@ -2570,16 +2591,17 @@ class ChatStreamingView(GenericAPIView[Any]):
             user=request.user,
         )
 
-        response = StreamingHttpResponse(
-            stream_chat_with_documents(
-                query_str=question,
-                documents=documents,
-                unrestricted=unrestricted,
-                output_language=output_language,
+        return StreamingHttpResponse(
+            _iterate_in_sync_thread(
+                stream_chat_with_documents(
+                    query_str=question,
+                    documents=documents,
+                    unrestricted=unrestricted,
+                    output_language=output_language,
+                ),
             ),
             content_type="text/event-stream",
         )
-        return response
 
 
 @extend_schema_view(
@@ -3070,38 +3092,30 @@ class DocumentSelectionMixin:
 class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
     permission_classes = (IsAuthenticated,)
     parser_classes = (parsers.JSONParser,)
-    METHOD_NAMES_REQUIRING_USER = {
-        "split",
-        "merge",
-        "rotate",
-        "delete_pages",
-        "edit_pdf",
-        "remove_password",
-        "merge_as_versions",
-    }
-    # merge_as_versions doesn't queue any consume tasks
-    METHOD_NAMES_REQUIRING_TRIGGER_SOURCE = METHOD_NAMES_REQUIRING_USER - {
-        "merge_as_versions",
-    }
 
     def _queue_bulk_operation(self, method, documents, parameters, from_webui):
         if "update_callback" in parameters:
             raise ValueError("Unsupported bulk operation parameter: update_callback")
-        signature(method).bind(documents, **parameters)
+        trigger_source = (
+            PaperlessTask.TriggerSource.WEB_UI
+            if from_webui
+            else PaperlessTask.TriggerSource.API_UPLOAD
+        )
+        final_parameters = parameters.copy()
+        if method.__name__ in USER_OPERATIONS:
+            final_parameters["user"] = self.request.user
+        if method.__name__ in TRIGGER_SOURCE_OPERATIONS:
+            final_parameters["trigger_source"] = trigger_source
+        signature(method).bind(documents, **final_parameters)
         task = execute_bulk_operation.apply_async(
             kwargs={
                 "operation": method.__name__,
                 "document_ids": documents,
                 "parameters": parameters,
                 "user_id": self.request.user.pk,
+                "trigger_source": trigger_source,
             },
-            headers={
-                "trigger_source": (
-                    PaperlessTask.TriggerSource.WEB_UI
-                    if from_webui
-                    else PaperlessTask.TriggerSource.API_UPLOAD
-                ),
-            },
+            headers={"trigger_source": trigger_source},
         )
         return Response({"result": "OK", "task_id": task.id})
 
@@ -3225,15 +3239,6 @@ class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
         user = self.request.user
         from_webui = validated_data.get("from_webui", False)
 
-        if method.__name__ in self.METHOD_NAMES_REQUIRING_USER:
-            parameters["user"] = user
-        if method.__name__ in self.METHOD_NAMES_REQUIRING_TRIGGER_SOURCE:
-            parameters["trigger_source"] = (
-                PaperlessTask.TriggerSource.WEB_UI
-                if from_webui
-                else PaperlessTask.TriggerSource.API_UPLOAD
-            )
-
         if not has_document_operation_permissions(
             user=user,
             documents=documents,
@@ -3243,8 +3248,12 @@ class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
             return HttpResponseForbidden("Insufficient permissions")
 
         try:
-            result = method(documents, **parameters)
-            return Response({"result": result})
+            return self._queue_bulk_operation(
+                method,
+                documents,
+                parameters,
+                from_webui,
+            )
         except Exception as e:
             logger.warning(f"An error occurred performing {operation_label}: {e!s}")
             return HttpResponseBadRequest(
@@ -3265,19 +3274,13 @@ class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
                 name="BulkEditDocumentsResult",
                 fields={
                     "result": serializers.CharField(),
-                    "task_id": serializers.CharField(required=False),
+                    "task_id": serializers.CharField(),
                 },
             ),
         },
     ),
 )
 class BulkEditView(DocumentOperationPermissionMixin):
-    LEGACY_MODIFIED_FIELDS = {
-        "delete": "deleted_at",
-        "reprocess": "checksum",
-        "remove_password": None,
-    }
-
     serializer_class = BulkEditSerializer
 
     def post(self, request, *args, **kwargs):
@@ -3307,14 +3310,6 @@ class BulkEditView(DocumentOperationPermissionMixin):
             user=user,
             validated_data=serializer.validated_data,
         )
-        if method.__name__ in self.METHOD_NAMES_REQUIRING_USER:
-            parameters["user"] = user
-        if method.__name__ in self.METHOD_NAMES_REQUIRING_TRIGGER_SOURCE:
-            parameters["trigger_source"] = (
-                PaperlessTask.TriggerSource.WEB_UI
-                if from_webui
-                else PaperlessTask.TriggerSource.API_UPLOAD
-            )
         if not has_document_operation_permissions(
             user=user,
             documents=documents,
@@ -3324,38 +3319,12 @@ class BulkEditView(DocumentOperationPermissionMixin):
             return HttpResponseForbidden("Insufficient permissions")
 
         try:
-            if method.__name__ in QUEUED_OPERATIONS:
-                return self._queue_bulk_operation(
-                    method,
-                    documents,
-                    parameters,
-                    from_webui,
-                )
-            modified_field = self.LEGACY_MODIFIED_FIELDS.get(method.__name__)
-            if settings.AUDIT_LOG_ENABLED and modified_field:
-                old_values = snapshot_field(documents, modified_field)
-
-            result = method(documents, **parameters)
-
-            if settings.AUDIT_LOG_ENABLED and modified_field:
-                new_values = snapshot_field(documents, modified_field)
-                for doc in Document.objects.filter(pk__in=documents):
-                    LogEntry.objects.log_create(
-                        instance=doc,
-                        changes={
-                            modified_field: [
-                                old_values[doc.pk],
-                                new_values[doc.pk],
-                            ],
-                        },
-                        action=LogEntry.Action.UPDATE,
-                        actor=user,
-                        additional_data={
-                            "reason": f"Bulk edit: {method.__name__}",
-                        },
-                    )
-
-            return Response({"result": result})
+            return self._queue_bulk_operation(
+                method,
+                documents,
+                parameters,
+                from_webui,
+            )
         except Exception as e:
             logger.warning(f"An error occurred performing bulk edit: {e!s}")
             return HttpResponseBadRequest(
@@ -3372,6 +3341,7 @@ class BulkEditView(DocumentOperationPermissionMixin):
                 name="RotateDocumentsResult",
                 fields={
                     "result": serializers.CharField(),
+                    "task_id": serializers.CharField(),
                 },
             ),
         },
@@ -3399,6 +3369,7 @@ class RotateDocumentsView(DocumentOperationPermissionMixin):
                 name="MergeDocumentsResult",
                 fields={
                     "result": serializers.CharField(),
+                    "task_id": serializers.CharField(),
                 },
             ),
         },
@@ -3426,6 +3397,7 @@ class MergeDocumentsView(DocumentOperationPermissionMixin):
                 name="MergeDocumentsAsVersionsResult",
                 fields={
                     "result": serializers.CharField(),
+                    "task_id": serializers.CharField(),
                 },
             ),
         },
@@ -3453,6 +3425,7 @@ class MergeDocumentsAsVersionsView(DocumentOperationPermissionMixin):
                 name="DeleteDocumentsResult",
                 fields={
                     "result": serializers.CharField(),
+                    "task_id": serializers.CharField(),
                 },
             ),
         },
@@ -3480,6 +3453,7 @@ class DeleteDocumentsView(DocumentOperationPermissionMixin):
                 name="ReprocessDocumentsResult",
                 fields={
                     "result": serializers.CharField(),
+                    "task_id": serializers.CharField(),
                 },
             ),
         },
@@ -3541,6 +3515,7 @@ class RunZoneOcrDocumentsView(DocumentOperationPermissionMixin):
                 name="EditPdfDocumentsResult",
                 fields={
                     "result": serializers.CharField(),
+                    "task_id": serializers.CharField(),
                 },
             ),
         },
@@ -3568,6 +3543,7 @@ class EditPdfDocumentsView(DocumentOperationPermissionMixin):
                 name="RemovePasswordDocumentsResult",
                 fields={
                     "result": serializers.CharField(),
+                    "task_id": serializers.CharField(),
                 },
             ),
         },

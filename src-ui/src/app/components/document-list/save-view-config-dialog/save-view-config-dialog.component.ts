@@ -6,6 +6,7 @@ import {
   inject,
   signal,
 } from '@angular/core'
+import { toSignal } from '@angular/core/rxjs-interop'
 import {
   FormControl,
   FormGroup,
@@ -13,11 +14,14 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
+import { catchError, map, of } from 'rxjs'
 import {
   DEFAULT_SAVED_VIEW_ICON,
   SAVED_VIEW_ICONS,
 } from 'src/app/data/saved-view-icons'
 import { User } from 'src/app/data/user'
+import { UserService } from 'src/app/services/rest/user.service'
+import { ToastService } from 'src/app/services/toast.service'
 import { CheckComponent } from '../../common/input/check/check.component'
 import { PermissionsFormComponent } from '../../common/input/permissions/permissions-form/permissions-form.component'
 import { SelectComponent } from '../../common/input/select/select.component'
@@ -38,6 +42,8 @@ import { TextComponent } from '../../common/input/text/text.component'
 })
 export class SaveViewConfigDialogComponent implements OnInit {
   private modal = inject(NgbActiveModal)
+  private userService = inject(UserService)
+  private toastService = inject(ToastService)
   readonly error = signal(undefined)
   readonly buttonsEnabled = signal(true)
   readonly defaultName = signal('')
@@ -46,7 +52,16 @@ export class SaveViewConfigDialogComponent implements OnInit {
   @Output()
   public saveClicked = new EventEmitter()
 
-  users: User[]
+  readonly users = toSignal(
+    this.userService.listAll().pipe(
+      map((result) => result.results),
+      catchError((error) => {
+        this.toastService.showError($localize`Error retrieving users`, error)
+        return of([])
+      })
+    ),
+    { initialValue: undefined as User[] }
+  )
   readonly savedViewIcons = SAVED_VIEW_ICONS
 
   setDefaultName(value: string) {

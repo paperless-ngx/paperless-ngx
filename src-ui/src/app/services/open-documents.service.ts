@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http'
 import { Injectable, inject, signal } from '@angular/core'
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { Observable, Subject, of } from 'rxjs'
@@ -61,7 +62,12 @@ export class OpenDocumentsService {
           Object.assign(openDoc, doc, unsavedEdits)
           this.save()
         },
-        error: () => {
+        error: (error: HttpErrorResponse) => {
+          if (error.status !== 404) return
+
+          const index = this.openDocuments.findIndex((doc) => doc.id === id)
+          if (index === -1 || this.isDirty(this.openDocuments[index])) return
+
           this.openDocuments.splice(index, 1)
           this.save()
         },

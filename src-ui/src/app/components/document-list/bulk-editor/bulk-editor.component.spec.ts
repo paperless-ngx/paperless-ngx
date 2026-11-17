@@ -14,7 +14,8 @@ import { Correspondent } from 'src/app/data/correspondent'
 import { CustomField, CustomFieldDataType } from 'src/app/data/custom-field'
 import { DocumentType } from 'src/app/data/document-type'
 import { FILTER_TITLE } from 'src/app/data/filter-rule-type'
-import { Results } from 'src/app/data/results'
+import { PaperlessTaskStatus } from 'src/app/data/paperless-task'
+import { Results, SelectionData } from 'src/app/data/results'
 import { StoragePath } from 'src/app/data/storage-path'
 import { Tag } from 'src/app/data/tag'
 import { WorkflowTriggerType } from 'src/app/data/workflow-trigger'
@@ -28,10 +29,7 @@ import {
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
 import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
-import {
-  DocumentService,
-  SelectionData,
-} from 'src/app/services/rest/document.service'
+import { DocumentService } from 'src/app/services/rest/document.service'
 import { GroupService } from 'src/app/services/rest/group.service'
 import { ShareLinkBundleService } from 'src/app/services/rest/share-link-bundle.service'
 import { StoragePathService } from 'src/app/services/rest/storage-path.service'
@@ -39,6 +37,7 @@ import { TagService } from 'src/app/services/rest/tag.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { WorkflowService } from 'src/app/services/rest/workflow.service'
 import { SettingsService } from 'src/app/services/settings.service'
+import { TaskNotificationService } from 'src/app/services/task-notification.service'
 import { ToastService } from 'src/app/services/toast.service'
 import { TrashService } from 'src/app/services/trash.service'
 import { environment } from 'src/environments/environment'
@@ -686,6 +685,8 @@ describe('BulkEditorComponent', () => {
   })
 
   it('should run a workflow on the selection via the run workflow dialog', () => {
+    const toast = jest.spyOn(toastService, 'show')
+    const infoToast = jest.spyOn(toastService, 'showInfo')
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((m) => (modal = m[0]))
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
@@ -699,6 +700,8 @@ describe('BulkEditorComponent', () => {
     component.runWorkflowSelected()
     expect(modal).not.toBeUndefined()
     expect(modal.componentInstance.workflows).toEqual(component.manualWorkflows)
+    expect(modal.componentInstance.singleDocument).toBe(false)
+    expect(modal.componentInstance.force).toBe(false)
     modal.componentInstance.workflowId = 5
     modal.componentInstance.force = true
     modal.componentInstance.confirm()
@@ -710,13 +713,38 @@ describe('BulkEditorComponent', () => {
       workflow: 5,
       filter_documents: false,
     })
-    req.flush(true)
+    req.flush({ result: 'OK' })
+    expect(infoToast).toHaveBeenCalledWith(
+      'Workflow will run on the selected documents in the background.'
+    )
+    expect(toast.mock.calls.at(-1)[0].actionName).toBeUndefined()
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
     ) // list reload
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
     ) // listAllFilteredIds
+  })
+
+  it('should require ownership of selected documents to run a workflow', () => {
+    component.manualWorkflows = [{ id: 5 }] as any
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
+    jest
+      .spyOn(permissionsService, 'currentUserHasObjectPermissions')
+      .mockReturnValue(true)
+    const ownsDocument = jest
+      .spyOn(permissionsService, 'currentUserOwnsObject')
+      .mockReturnValue(false)
+    jest
+      .spyOn(documentListViewService, 'documents', 'get')
+      .mockReturnValue([{ id: 3 }])
+    jest
+      .spyOn(documentListViewService, 'selected', 'get')
+      .mockReturnValue(new Set([3]))
+
+    expect(component.canRunWorkflow).toBe(false)
+    ownsDocument.mockReturnValue(true)
+    expect(component.canRunWorkflow).toBe(true)
   })
 
   it('should set modal dialog text accordingly for tag edit confirmation', () => {
@@ -1237,14 +1265,15 @@ describe('BulkEditorComponent', () => {
     let req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}documents/delete/`
     )
-    const notifySpy = jest
-      .spyOn(trashService, 'notifyMovedToTrash')
+    const trackSpy = jest
+      .spyOn(trashService, 'trackMovedToTrash')
       .mockImplementation(() => {})
-    req.flush(true)
+    req.flush({ result: 'OK', task_id: 'delete-1' })
     expect(req.request.body).toEqual({
       documents: [3, 4],
+      from_webui: true,
     })
-    expect(notifySpy).toHaveBeenCalledWith(expect.any(String), [3, 4])
+    expect(trackSpy).toHaveBeenCalledWith('delete-1', 2, [3, 4])
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
     ) // list reload
@@ -1261,9 +1290,9 @@ describe('BulkEditorComponent', () => {
     req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}documents/delete/`
     )
-    req.flush(true)
+    req.flush({ result: 'OK', task_id: 'delete-2' })
     // ids aren't known when all matching documents are selected, so no undo
-    expect(notifySpy).toHaveBeenLastCalledWith(expect.any(String), null)
+    expect(trackSpy).toHaveBeenLastCalledWith('delete-2', 2, null)
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
     ) // list reload
@@ -1343,10 +1372,11 @@ describe('BulkEditorComponent', () => {
     let req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}documents/reprocess/`
     )
-    req.flush(true)
+    req.flush({ result: 'OK', task_id: 'reprocess-1' })
     expect(req.request.body).toEqual({
       documents: [3, 4],
       remote_ocr: false,
+      from_webui: true,
     })
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
@@ -1404,6 +1434,7 @@ describe('BulkEditorComponent', () => {
   })
 
   it('should support rotate', () => {
+    const toast = jest.spyOn(toastService, 'show')
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((m) => (modal = m[0]))
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
@@ -1424,11 +1455,20 @@ describe('BulkEditorComponent', () => {
     let req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}documents/rotate/`
     )
-    req.flush(true)
+    req.flush({ result: 'OK', task_id: 'rotate-1' })
+    TestBed.inject(TaskNotificationService).complete({
+      task_id: 'rotate-1',
+      operation: 'rotate',
+      status: PaperlessTaskStatus.Success,
+    })
+    expect(toast.mock.calls.at(-1)[0].content).toBe(
+      "Bulk operation 'Rotate documents' submitted for processing."
+    )
     expect(req.request.body).toEqual({
       documents: [3, 4],
       degrees: 90,
       source_mode: 'latest_version',
+      from_webui: true,
     })
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
@@ -1466,10 +1506,11 @@ describe('BulkEditorComponent', () => {
     let req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}documents/merge/`
     )
-    req.flush(true)
+    req.flush({ result: 'OK', task_id: 'merge-1' })
     expect(req.request.body).toEqual({
       documents: [3, 4],
       metadata_document_id: 3,
+      from_webui: true,
     })
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
@@ -1484,11 +1525,12 @@ describe('BulkEditorComponent', () => {
     req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}documents/merge/`
     )
-    req.flush(true)
+    req.flush({ result: 'OK', task_id: 'merge-2' })
     expect(req.request.body).toEqual({
       documents: [3, 4],
       metadata_document_id: 3,
       delete_originals: true,
+      from_webui: true,
     })
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
@@ -1496,7 +1538,6 @@ describe('BulkEditorComponent', () => {
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
     ) // listAllFilteredIds
-    expect(documentListViewService.selected.size).toEqual(0)
 
     // Test with archiveFallback enabled
     modal.componentInstance.deleteOriginals.set(false)
@@ -1505,11 +1546,12 @@ describe('BulkEditorComponent', () => {
     req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}documents/merge/`
     )
-    req.flush(true)
+    req.flush({ result: 'OK', task_id: 'merge-3' })
     expect(req.request.body).toEqual({
       documents: [3, 4],
       metadata_document_id: 3,
       archive_fallback: true,
+      from_webui: true,
     })
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
@@ -1517,10 +1559,10 @@ describe('BulkEditorComponent', () => {
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
     ) // listAllFilteredIds
-    expect(documentListViewService.selected.size).toEqual(0)
   })
 
   it('should support merging documents as versions', () => {
+    jest.useFakeTimers()
     let modal: NgbModalRef
     modalService.activeInstances.subscribe((m) => (modal = m[0]))
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
@@ -1548,8 +1590,8 @@ describe('BulkEditorComponent', () => {
       .mockReturnValue(true)
     const mergeAsVersionsSpy = jest
       .spyOn(documentService, 'mergeDocumentsAsVersions')
-      .mockReturnValue(of(true))
-    const toastSuccessSpy = jest.spyOn(toastService, 'showSuccess')
+      .mockReturnValue(of({ result: 'OK', task_id: 'versions-1' }))
+    const toastSpy = jest.spyOn(toastService, 'show')
     fixture.detectChanges()
 
     component.mergeSelectedAsVersions()
@@ -1564,10 +1606,21 @@ describe('BulkEditorComponent', () => {
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
     )
-    expect(documentListViewService.selected.size).toEqual(0)
-    expect(toastSuccessSpy).toHaveBeenCalledWith(
-      'Documents merged as versions.'
+    jest.advanceTimersByTime(400)
+    expect(toastSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        content: "Bulk operation 'Merge as versions' queued.",
+      })
     )
+    TestBed.inject(TaskNotificationService).complete({
+      task_id: 'versions-1',
+      operation: 'merge_as_versions',
+      status: PaperlessTaskStatus.Success,
+    })
+    expect(toastSpy.mock.calls.at(-1)[0].content).toBe(
+      "Bulk operation 'Merge as versions' completed."
+    )
+    jest.useRealTimers()
   })
 
   it('should not report success when merging documents as versions fails', () => {
@@ -1658,12 +1711,22 @@ describe('BulkEditorComponent', () => {
     )
   })
 
-  it.each([true, false])(
-    'shows queued feedback and gates the task link on permission (%s)',
-    (canViewTasks) => {
+  it.each<[boolean, number]>([
+    [true, 2],
+    [false, 2],
+    [true, 1],
+  ])(
+    'names queued work and gates the task link (permission %s, documents %s)',
+    (canViewTasks, count) => {
+      jest.useFakeTimers()
       jest
         .spyOn(permissionsService, 'currentUserCan')
         .mockReturnValue(canViewTasks)
+      jest
+        .spyOn(documentListViewService, 'selected', 'get')
+        .mockReturnValue(
+          new Set(Array.from({ length: count }, (_, index) => index + 3))
+        )
       const queued = jest.spyOn(toastService, 'show')
       let modal: NgbModalRef
       modalService.activeInstances.subscribe((instances) => {
@@ -1681,8 +1744,11 @@ describe('BulkEditorComponent', () => {
       )
       req.flush({ result: 'OK', task_id: 'queued-operation' })
       expect(close).toHaveBeenCalledTimes(1)
+      expect(queued).not.toHaveBeenCalled()
+      jest.advanceTimersByTime(400)
       const notification = queued.mock.calls.at(-1)[0]
-      expect(notification.content).toBe('Bulk operation queued.')
+      const prefix = count > 1 ? 'Bulk operation' : 'Operation'
+      expect(notification.content).toBe(`${prefix} \'Set permissions\' queued.`)
       if (canViewTasks) {
         expect(notification.actionName).toBe('View task')
         notification.action()
@@ -1694,8 +1760,16 @@ describe('BulkEditorComponent', () => {
         expect(notification.actionName).toBeUndefined()
       }
       expect(reload).not.toHaveBeenCalled()
-      expect(documentListViewService.selected.size).toBe(0)
       expect(documentListViewService.allSelected).toBe(false)
+      TestBed.inject(TaskNotificationService).complete({
+        task_id: 'queued-operation',
+        operation: 'set_permissions',
+        status: PaperlessTaskStatus.Success,
+      })
+      const completed = queued.mock.calls.at(-1)[0]
+      expect(completed.content).toBe(`${prefix} \'Set permissions\' completed.`)
+      expect(completed.action).toBeUndefined()
+      jest.useRealTimers()
     }
   )
 
@@ -1776,7 +1850,6 @@ describe('BulkEditorComponent', () => {
         { id: 2, name: 'Tag 2' },
       ],
       count: 2,
-      all: [1, 2],
     }
 
     const modalInstance = {
@@ -1819,7 +1892,6 @@ describe('BulkEditorComponent', () => {
         { id: 2, name: 'Correspondent 2' },
       ],
       count: 2,
-      all: [1, 2],
     }
 
     const modalInstance = {
@@ -1868,7 +1940,6 @@ describe('BulkEditorComponent', () => {
         { id: 2, name: 'Document Type 2' },
       ],
       count: 2,
-      all: [1, 2],
     }
 
     const modalInstance = {
@@ -1914,7 +1985,6 @@ describe('BulkEditorComponent', () => {
         { id: 2, name: 'Storage Path 2' },
       ],
       count: 2,
-      all: [1, 2],
     }
 
     const modalInstance = {
@@ -1968,7 +2038,6 @@ describe('BulkEditorComponent', () => {
         },
       ],
       count: 2,
-      all: [1, 2],
     }
 
     const modalInstance = {

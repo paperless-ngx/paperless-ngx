@@ -1,5 +1,6 @@
-"""Queued document metadata edits."""
+"""Queued document bulk operations."""
 
+from contextlib import nullcontext
 from typing import Any
 
 from auditlog.context import set_actor
@@ -12,6 +13,7 @@ from rest_framework.exceptions import PermissionDenied
 from documents import bulk_edit
 from documents.models import CustomFieldInstance
 from documents.models import Document
+from documents.models import PaperlessTask
 from documents.permissions import has_document_operation_permissions
 from documents.tasks import bulk_update_documents
 
@@ -25,7 +27,35 @@ MODIFIED_FIELDS = {
     "modify_custom_fields": "custom_fields",
     "set_permissions": None,
 }
-QUEUED_OPERATIONS = frozenset(MODIFIED_FIELDS)
+LEGACY_MODIFIED_FIELDS = {"delete": "deleted_at", "reprocess": "checksum"}
+QUEUED_OPERATIONS = frozenset(
+    (
+        *MODIFIED_FIELDS,
+        "delete",
+        "reprocess",
+        "run_workflow",
+        "rotate",
+        "merge",
+        "merge_as_versions",
+        "split",
+        "delete_pages",
+        "edit_pdf",
+        "remove_password",
+    ),
+)
+USER_OPERATIONS = frozenset(
+    {
+        "split",
+        "merge",
+        "rotate",
+        "delete_pages",
+        "edit_pdf",
+        "remove_password",
+        "merge_as_versions",
+    },
+)
+# merge_as_versions doesn't queue any consume tasks
+TRIGGER_SOURCE_OPERATIONS = USER_OPERATIONS - {"merge_as_versions"}
 
 
 def snapshot_field(doc_ids: list[int], field: str) -> dict[int, Any]:
@@ -66,6 +96,7 @@ def execute_bulk_operation(
     document_ids: list[int],
     parameters: dict,
     user_id: int,
+    trigger_source: str = PaperlessTask.TriggerSource.API_UPLOAD,
 ) -> dict:
     if operation not in QUEUED_OPERATIONS:
         raise ValueError(f"Unsupported bulk operation: {operation}")
@@ -79,11 +110,46 @@ def execute_bulk_operation(
     ):
         raise PermissionDenied("Insufficient permissions to execute bulk operation")
 
+    if operation == "run_workflow" and not user.has_perm("documents.view_workflow"):
+        raise PermissionDenied("Insufficient permissions to run this workflow")
+
+    actor_context = set_actor(user) if settings.AUDIT_LOG_ENABLED else nullcontext()
+
+    if operation not in MODIFIED_FIELDS:
+        execution_parameters = parameters.copy()
+        if operation in USER_OPERATIONS:
+            execution_parameters["user"] = user
+        if operation in TRIGGER_SOURCE_OPERATIONS:
+            execution_parameters["trigger_source"] = trigger_source
+        modified_field = LEGACY_MODIFIED_FIELDS.get(operation)
+        with actor_context:
+            old_values = (
+                snapshot_field(document_ids, modified_field)
+                if settings.AUDIT_LOG_ENABLED and modified_field
+                else {}
+            )
+            method(document_ids, **execution_parameters)
+            if settings.AUDIT_LOG_ENABLED and modified_field:
+                from auditlog.models import LogEntry
+
+                new_values = snapshot_field(document_ids, modified_field)
+                for doc in Document.objects.filter(pk__in=document_ids):
+                    LogEntry.objects.log_create(
+                        instance=doc,
+                        changes={
+                            modified_field: [old_values[doc.pk], new_values[doc.pk]],
+                        },
+                        action=LogEntry.Action.UPDATE,
+                        actor=user,
+                        additional_data={"reason": f"Bulk edit: {operation}"},
+                    )
+        return {"operation": operation, "document_count": len(document_ids)}
+
     affected_ids: list[int] = []
     modified_field = MODIFIED_FIELDS[operation]
     # Keep metadata writes and their audit entries together. Follow-up processing
     # runs after commit, within this same tracked task.
-    with set_actor(user), transaction.atomic():
+    with actor_context, transaction.atomic():
         old_values = (
             snapshot_field(document_ids, modified_field)
             if settings.AUDIT_LOG_ENABLED and modified_field
