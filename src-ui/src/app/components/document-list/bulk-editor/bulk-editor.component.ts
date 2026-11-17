@@ -329,7 +329,6 @@ export class BulkEditorComponent
           .subscribe({
             next: () => {
               modal.close()
-              this.list.selectNone()
               this.toastService.showInfo(
                 $localize`Workflow will run on the selected documents in the background.`
               )
@@ -366,7 +365,6 @@ export class BulkEditorComponent
   ) {
     const bulk = this.getSelectionSize() > 1
     modal?.close()
-    this.list.selectNone()
     if (onQueued) {
       onQueued(taskId)
     } else {

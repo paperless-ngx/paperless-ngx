@@ -718,7 +718,6 @@ describe('BulkEditorComponent', () => {
       'Workflow will run on the selected documents in the background.'
     )
     expect(toast.mock.calls.at(-1)[0].actionName).toBeUndefined()
-    expect(documentListViewService.selected.size).toBe(0)
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
     ) // list reload
@@ -1293,7 +1292,7 @@ describe('BulkEditorComponent', () => {
     )
     req.flush({ result: 'OK', task_id: 'delete-2' })
     // ids aren't known when all matching documents are selected, so no undo
-    expect(trackSpy).toHaveBeenLastCalledWith('delete-2', 0, null)
+    expect(trackSpy).toHaveBeenLastCalledWith('delete-2', 2, null)
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
     ) // list reload
@@ -1492,7 +1491,6 @@ describe('BulkEditorComponent', () => {
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
     ) // listAllFilteredIds
-    expect(documentListViewService.selected.size).toEqual(0)
 
     // Test with archiveFallback enabled
     modal.componentInstance.deleteOriginals.set(false)
@@ -1514,7 +1512,6 @@ describe('BulkEditorComponent', () => {
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
     ) // listAllFilteredIds
-    expect(documentListViewService.selected.size).toEqual(0)
   })
 
   it('should support merging documents as versions', () => {
@@ -1562,7 +1559,6 @@ describe('BulkEditorComponent', () => {
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
     )
-    expect(documentListViewService.selected.size).toEqual(0)
     jest.advanceTimersByTime(400)
     expect(toastSpy).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -1717,7 +1713,6 @@ describe('BulkEditorComponent', () => {
         expect(notification.actionName).toBeUndefined()
       }
       expect(reload).not.toHaveBeenCalled()
-      expect(documentListViewService.selected.size).toBe(0)
       expect(documentListViewService.allSelected).toBe(false)
       TestBed.inject(TaskNotificationService).complete({
         task_id: 'queued-operation',
