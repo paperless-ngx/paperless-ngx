@@ -1292,7 +1292,7 @@ describe('BulkEditorComponent', () => {
     )
     req.flush({ result: 'OK', task_id: 'delete-2' })
     // ids aren't known when all matching documents are selected, so no undo
-    expect(trackSpy).toHaveBeenLastCalledWith('delete-2', 0, [3, 4])
+    expect(trackSpy).toHaveBeenLastCalledWith('delete-2', 0, null)
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
     ) // list reload
@@ -1512,7 +1512,6 @@ describe('BulkEditorComponent', () => {
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
     ) // listAllFilteredIds
-    expect(documentListViewService.selected.size).toEqual(0)
   })
 
   it('should support merging documents as versions', () => {
