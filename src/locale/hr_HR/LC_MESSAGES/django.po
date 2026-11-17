@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-13 17:09+0000\n"
-"PO-Revision-Date: 2026-11-13 17:12\n"
+"POT-Creation-Date: 2026-11-17 00:24+0000\n"
+"PO-Revision-Date: 2026-11-17 00:26\n"
 "Last-Translator: \n"
 "Language-Team: Croatian\n"
 "Language: hr_HR\n"
@@ -1653,7 +1653,7 @@ msgstr "tijek rada pokrenut"
 
 #: documents/serialisers.py:483 documents/serialisers.py:844
 #: documents/serialisers.py:2893 documents/views.py:356 documents/views.py:622
-#: documents/views.py:2761 paperless_mail/serialisers.py:156
+#: documents/views.py:2761 paperless_mail/serialisers.py:145
 msgid "Insufficient permissions."
 msgstr "Nedovoljne ovlasti."
 
@@ -1692,7 +1692,7 @@ msgstr "Otkrivena je nevaljana vrsta datoteke."
 msgid "Duplicate document identifiers are not allowed."
 msgstr "Duplicirani identifikatori dokumenata nisu dopušteni."
 
-#: documents/serialisers.py:2979 documents/views.py:4794
+#: documents/serialisers.py:2979 documents/views.py:4748
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr "Dokumenti nisu pronađeni: %(ids)s"
@@ -1953,20 +1953,20 @@ msgstr "Zahtjev prema AI pozadinskom sustavu je istekao."
 msgid "AI backend rejected the request. Check logs for details."
 msgstr "AI pozadinski sustav je odbio zahtjev. Provjerite zapise (logs) za više detalja."
 
-#: documents/views.py:4810
+#: documents/views.py:4764
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr "Nedovoljne ovlasti za dijeljenje dokumenta %(id)s."
 
-#: documents/views.py:4857
+#: documents/views.py:4811
 msgid "Bundle is already being processed."
 msgstr "Paket se već obrađuje."
 
-#: documents/views.py:4923
+#: documents/views.py:4877
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr "Paket linka za dijeljenje se još priprema. Pokušajte ponovo kasnije."
 
-#: documents/views.py:4937
+#: documents/views.py:4891
 msgid "The share link bundle is unavailable."
 msgstr "Paket linka za dijeljenje nije dostupan."
 

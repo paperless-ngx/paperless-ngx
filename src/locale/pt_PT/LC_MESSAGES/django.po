@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-13 17:09+0000\n"
-"PO-Revision-Date: 2026-11-13 17:12\n"
+"POT-Creation-Date: 2026-11-17 00:24+0000\n"
+"PO-Revision-Date: 2026-11-17 00:26\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
 "Language: pt_PT\n"
@@ -998,11 +998,11 @@ msgstr "Tarefas"
 
 #: documents/models.py:1010
 msgid "Plain"
-msgstr ""
+msgstr "Simples"
 
 #: documents/models.py:1011
 msgid "Markdown"
-msgstr ""
+msgstr "Markdown"
 
 #: documents/models.py:1016
 msgid "Note for the document"
@@ -1589,27 +1589,27 @@ msgstr "Senhas para tentar ao remover a proteção de PDF. Separe com vírgulas 
 
 #: documents/models.py:2126
 msgid "AI suggestion fields"
-msgstr ""
+msgstr "Campos de sugestão de IA"
 
 #: documents/models.py:2130
 msgid "Which of the AI-suggested fields to apply to the document."
-msgstr ""
+msgstr "Quais os campos sugeridos pela IA a aplicar ao documento."
 
 #: documents/models.py:2135
 msgid "create missing objects"
-msgstr ""
+msgstr "criar objetos em falta"
 
 #: documents/models.py:2138
 msgid "Create suggested tags, correspondents, document types and storage paths that do not already exist instead of skipping them."
-msgstr ""
+msgstr "Criar etiquetas sugeridas, correspondentes, tipos de documento e caminhos de armazenamento que ainda não existem em vez de os ignorar."
 
 #: documents/models.py:2144
 msgid "overwrite existing values"
-msgstr ""
+msgstr "sobrescrever valores existentes"
 
 #: documents/models.py:2147
 msgid "Apply suggestions even if the document already has a value for that field. Tags are always added to, never replaced."
-msgstr ""
+msgstr "Aplicar sugestões mesmo se o documento já tiver um valor para esse campo. As etiquetas são sempre adicionadas, nunca substituídas."
 
 #: documents/models.py:2153
 msgid "workflow action"
@@ -1653,7 +1653,7 @@ msgstr "execuções do fluxo de trabalho"
 
 #: documents/serialisers.py:483 documents/serialisers.py:844
 #: documents/serialisers.py:2893 documents/views.py:356 documents/views.py:622
-#: documents/views.py:2761 paperless_mail/serialisers.py:156
+#: documents/views.py:2761 paperless_mail/serialisers.py:145
 msgid "Insufficient permissions."
 msgstr "Permissões insuficientes."
 
@@ -1692,7 +1692,7 @@ msgstr "Variável inválida detetada."
 msgid "Duplicate document identifiers are not allowed."
 msgstr "Identificadores de documento duplicados não são permitidos."
 
-#: documents/serialisers.py:2979 documents/views.py:4794
+#: documents/serialisers.py:2979 documents/views.py:4748
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr "Documentos não encontrados: %(ids)s"
@@ -1931,7 +1931,7 @@ msgstr "Como passo final, por favor preencha o seguinte formulário:"
 
 #: documents/validators.py:36
 msgid ", "
-msgstr ""
+msgstr ", "
 
 #: documents/views.py:311
 msgid "Specify only one of text, title_search, query, or more_like_id."
@@ -1953,20 +1953,20 @@ msgstr "O pedido do backend de IA expirou."
 msgid "AI backend rejected the request. Check logs for details."
 msgstr "O backend de IA rejeitou o pedido. Verifique os registos para detalhes."
 
-#: documents/views.py:4810
+#: documents/views.py:4764
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr "Permissões insuficientes para partilhar o documento %(id)s."
 
-#: documents/views.py:4857
+#: documents/views.py:4811
 msgid "Bundle is already being processed."
 msgstr "O pacote já está a ser processado."
 
-#: documents/views.py:4923
+#: documents/views.py:4877
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr "O pacote do link de partilha ainda está a ser preparado. Por favor, tente novamente mais tarde."
 
-#: documents/views.py:4937
+#: documents/views.py:4891
 msgid "The share link bundle is unavailable."
 msgstr "O conjunto de links de partilha não está disponível."
 
@@ -2185,7 +2185,7 @@ msgstr "Ativa a divisão por etiquetas de códigos de barras"
 
 #: paperless/models.py:308
 msgid "Stores the values of detected barcodes"
-msgstr ""
+msgstr "Guarda os valores dos códigos de barras detetados"
 
 #: paperless/models.py:318
 msgid "Sets the remote OCR engine"
@@ -2201,7 +2201,7 @@ msgstr "Define o endpoint do motor remoto de OCR"
 
 #: paperless/models.py:343
 msgid "Sets which documents are sent to the remote OCR engine"
-msgstr ""
+msgstr "Define quais os documentos que são enviados para o motor OCR remoto"
 
 #: paperless/models.py:355
 msgid "Enables AI features"
@@ -2217,7 +2217,7 @@ msgstr "Define o modelo de embedding da LLM"
 
 #: paperless/models.py:375
 msgid "Sets the LLM embedding API key"
-msgstr ""
+msgstr "Define a chave de API de embedding LLM"
 
 #: paperless/models.py:382
 msgid "Sets the LLM embedding endpoint, optional"
