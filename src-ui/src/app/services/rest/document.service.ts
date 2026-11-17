@@ -376,10 +376,14 @@ export class DocumentService extends AbstractPaperlessService<Document> {
     selection: DocumentSelectionQuery,
     templateId: number | null = null
   ) {
-    return this.http.post(this.getResourceUrl(null, 'run_zone_ocr'), {
-      ...selection,
-      ...(templateId ? { template: templateId } : {}),
-    })
+    return this.http.post<BulkOperationResponse>(
+      this.getResourceUrl(null, 'run_zone_ocr'),
+      {
+        ...selection,
+        ...(templateId ? { template: templateId } : {}),
+        from_webui: true,
+      }
+    )
   }
 
   runZoneOcr(

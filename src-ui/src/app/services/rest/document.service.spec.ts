@@ -323,6 +323,27 @@ describe(`DocumentService`, () => {
     })
   })
 
+  it.each([null, 3])('should queue zone OCR with template %s', (template) => {
+    const queued = jest.fn()
+    subscription = service
+      .runZoneOcrDocuments({ documents: [1, 2] }, template)
+      .subscribe(queued)
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}${endpoint}/run_zone_ocr/`
+    )
+    expect(req.request.method).toBe('POST')
+    expect(req.request.body).toEqual({
+      documents: [1, 2],
+      ...(template ? { template } : {}),
+      from_webui: true,
+    })
+    req.flush({ result: 'OK', task_id: 'zone-ocr-task' })
+    expect(queued).toHaveBeenCalledWith({
+      result: 'OK',
+      task_id: 'zone-ocr-task',
+    })
+  })
+
   it('should call appropriate api endpoint for rotate documents', () => {
     const ids = [1, 2, 3]
     subscription = service.rotateDocuments({ documents: ids }, 90).subscribe()

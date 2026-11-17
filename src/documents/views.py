@@ -3481,6 +3481,7 @@ class ReprocessDocumentsView(DocumentOperationPermissionMixin):
                 name="RunZoneOcrDocumentsResult",
                 fields={
                     "result": serializers.CharField(),
+                    "task_id": serializers.CharField(),
                 },
             ),
         },
@@ -3499,6 +3500,8 @@ class RunZoneOcrDocumentsView(DocumentOperationPermissionMixin):
             template,
         ):
             return HttpResponseForbidden("Insufficient permissions")
+        if template is not None:
+            serializer.validated_data["template"] = template.pk
         return self._execute_document_action(
             method=bulk_edit.run_zone_ocr,
             validated_data=serializer.validated_data,

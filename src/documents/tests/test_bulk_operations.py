@@ -1,5 +1,6 @@
 """Request acceptance, worker execution, and task tracking."""
 
+import json
 import uuid
 from unittest import mock
 
@@ -12,12 +13,14 @@ from rest_framework.test import APIClient
 from documents.bulk_operations import execute_bulk_operation
 from documents.models import Correspondent
 from documents.models import Document
+from documents.models import OcrTemplate
 from documents.models import PaperlessTask
 from documents.signals.handlers import before_task_publish_handler
 from documents.signals.handlers import task_failure_handler
 from documents.signals.handlers import task_postrun_handler
 from documents.signals.handlers import task_revoked_handler
 from paperless_testing.factories import UserFactory
+from paperless_testing.permissions import grant_global
 
 
 @pytest.fixture
@@ -35,6 +38,7 @@ def bulk_setup(paperless_dirs):
     "endpoint,operation,parameters",
     [
         ("bulk_edit", "set_correspondent", {"correspondent": None}),
+        ("run_zone_ocr", "run_zone_ocr", {}),
     ],
 )
 def test_request_only_queues(bulk_setup, endpoint, operation, parameters):
@@ -43,6 +47,8 @@ def test_request_only_queues(bulk_setup, endpoint, operation, parameters):
     data = {"documents": [doc.pk], "from_webui": True}
     if endpoint == "bulk_edit":
         data.update(method=operation, parameters=parameters)
+    else:
+        data.update(parameters)
     with mock.patch("documents.views.execute_bulk_operation.apply_async") as enqueue:
         enqueue.return_value.id = task_id
         response = client.post(f"/api/documents/{endpoint}/", data, format="json")
@@ -57,6 +63,110 @@ def test_request_only_queues(bulk_setup, endpoint, operation, parameters):
         "trigger_source": "web_ui",
     }
     assert enqueue.call_args.kwargs["headers"]["trigger_source"] == "web_ui"
+
+
+@pytest.mark.django_db
+def test_zone_ocr_queues_only_template_id_and_returns_tracked_task(bulk_setup):
+    user, client, doc, _ = bulk_setup
+    template = OcrTemplate.objects.create(
+        name="Template",
+        source_width=100,
+        source_height=100,
+    )
+    with (
+        mock.patch("documents.views.execute_bulk_operation.apply_async") as enqueue,
+        mock.patch("documents.bulk_edit.extract_zones") as extract,
+    ):
+        enqueue.return_value.id = "zone-ocr-task"
+        response = client.post(
+            "/api/documents/run_zone_ocr/",
+            {
+                "documents": [doc.pk],
+                "template": template.pk,
+                "from_webui": True,
+            },
+            format="json",
+        )
+    assert response.status_code == 200
+    assert response.data == {"result": "OK", "task_id": "zone-ocr-task"}
+    kwargs = enqueue.call_args.kwargs["kwargs"]
+    assert json.loads(json.dumps(kwargs)) == {
+        "operation": "run_zone_ocr",
+        "document_ids": [doc.pk],
+        "parameters": {"template": template.pk},
+        "user_id": user.pk,
+        "trigger_source": "web_ui",
+    }
+    extract.assert_not_called()
+
+
+@pytest.mark.django_db
+def test_zone_ocr_finishes_extraction_within_the_tracked_task(bulk_setup):
+    user, _, doc, _ = bulk_setup
+    template = OcrTemplate.objects.create(
+        name="Template",
+        source_width=100,
+        source_height=100,
+    )
+    with mock.patch("documents.bulk_edit.extract_zones") as extract:
+        result = execute_bulk_operation(
+            "run_zone_ocr",
+            [doc.pk],
+            {"template": template.pk},
+            user.pk,
+        )
+    extract.assert_called_once_with(document_id=doc.pk, template_id=template.pk)
+    extract.apply_async.assert_not_called()
+    assert result == {"operation": "run_zone_ocr", "document_count": 1}
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("revoked", ["document", "template", "user"])
+def test_zone_ocr_rechecks_access_before_extraction(bulk_setup, revoked):
+    _, client, doc, _ = bulk_setup
+    user = UserFactory()
+    grant_global(user, "change_document")
+    template = OcrTemplate.objects.create(
+        name="Template",
+        owner=user,
+        source_width=100,
+        source_height=100,
+    )
+    client.force_authenticate(user)
+    with mock.patch("documents.views.execute_bulk_operation.apply_async") as enqueue:
+        enqueue.return_value.id = "zone-ocr-task"
+        response = client.post(
+            "/api/documents/run_zone_ocr/",
+            {
+                "documents": [doc.pk],
+                "template": template.pk,
+            },
+            format="json",
+        )
+    assert response.status_code == 200
+    if revoked == "document":
+        doc.owner = UserFactory()
+        doc.save(update_fields=["owner"])
+    elif revoked == "template":
+        template.owner = UserFactory()
+        template.save(update_fields=["owner"])
+    else:
+        User.objects.filter(pk=user.pk).update(is_active=False)
+    with mock.patch("documents.bulk_edit.extract_zones") as extract:
+        with pytest.raises(PermissionDenied):
+            execute_bulk_operation(**enqueue.call_args.kwargs["kwargs"])
+    extract.assert_not_called()
+
+
+@pytest.mark.django_db
+def test_zone_ocr_cannot_fall_back_to_matching_if_chosen_template_is_deleted(
+    bulk_setup,
+):
+    user, _, doc, _ = bulk_setup
+    with mock.patch("documents.bulk_edit.extract_zones") as extract:
+        with pytest.raises(OcrTemplate.DoesNotExist):
+            execute_bulk_operation("run_zone_ocr", [doc.pk], {"template": 999}, user.pk)
+    extract.assert_not_called()
 
 
 @pytest.mark.django_db

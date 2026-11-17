@@ -1942,37 +1942,21 @@ class TestBulkEditRunZoneOcr:
     def mock_task(self, mocker: MockerFixture) -> mock.MagicMock:
         return mocker.patch("documents.bulk_edit.extract_zones")
 
-    def test_queues_every_selected_document(
+    def test_runs_every_selected_document_in_the_current_task(
         self,
         mock_task: mock.MagicMock,
     ) -> None:
-        """
-        GIVEN:
-            - Selected documents
-        WHEN:
-            - run_zone_ocr is called with them
-        THEN:
-            - Each document is queued once, templates are matched when its
-              task runs
-        """
         docs = DocumentFactory.create_batch(2)
 
         result = bulk_edit.run_zone_ocr([doc.id for doc in docs])
 
         assert result == "OK"
-        assert [
-            call.kwargs["kwargs"] for call in mock_task.apply_async.call_args_list
-        ] == [{"document_id": doc.id, "template_id": None} for doc in docs]
+        assert mock_task.call_args_list == [
+            mock.call(document_id=doc.id, template_id=None) for doc in docs
+        ]
+        mock_task.apply_async.assert_not_called()
 
-    def test_queues_the_chosen_template(self, mock_task: mock.MagicMock) -> None:
-        """
-        GIVEN:
-            - A chosen OCR template
-        WHEN:
-            - run_zone_ocr is called with it
-        THEN:
-            - The template is queued with the document
-        """
+    def test_runs_the_chosen_template(self, mock_task: mock.MagicMock) -> None:
         doc = DocumentFactory()
         template = OcrTemplate.objects.create(
             name="Bills",
@@ -1980,12 +1964,10 @@ class TestBulkEditRunZoneOcr:
             source_height=100,
         )
 
-        bulk_edit.run_zone_ocr([doc.id], template=template)
+        bulk_edit.run_zone_ocr([doc.id], template=template.pk)
 
-        assert mock_task.apply_async.call_args.kwargs["kwargs"] == {
-            "document_id": doc.id,
-            "template_id": template.pk,
-        }
+        mock_task.assert_called_once_with(document_id=doc.id, template_id=template.pk)
+        mock_task.apply_async.assert_not_called()
 
     def test_task_runs_extraction(self, mocker: MockerFixture) -> None:
         """

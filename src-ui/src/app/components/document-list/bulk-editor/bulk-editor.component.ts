@@ -1042,6 +1042,7 @@ export class BulkEditorComponent
         dialog.buttonsEnabled.set(false)
         this.executeDocumentAction(
           modal,
+          'run_zone_ocr',
           this.documentService.runZoneOcrDocuments(
             this.getSelectionQuery(),
             dialog.template

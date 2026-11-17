@@ -10,6 +10,7 @@ const OPERATION_LABELS: Record<string, string> = {
   delete: $localize`Move to trash`,
   reprocess: $localize`Document reprocessing`,
   run_workflow: $localize`Run workflow`,
+  run_zone_ocr: $localize`Run zone OCR`,
   rotate: $localize`Rotate documents`,
   merge: $localize`Merge documents`,
   merge_as_versions: $localize`Merge as versions`,

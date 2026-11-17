@@ -1821,7 +1821,7 @@ class RunZoneOcrSerializer(serializers.Serializer):
 
 
 class RunZoneOcrDocumentsSerializer(DocumentSelectionSerializer, RunZoneOcrSerializer):
-    pass
+    from_webui = serializers.BooleanField(required=False, default=False)
 
 
 class BulkEditSerializer(

@@ -780,7 +780,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         m.assert_called_once()
         args, kwargs = m.call_args
         self.assertEqual(args[0], [self.doc1.id])
-        self.assertEqual(kwargs, {"template": template})
+        self.assertEqual(kwargs, {"template": template.pk})
 
     @mock.patch("documents.views.bulk_edit.run_zone_ocr")
     def test_run_zone_ocr_documents_endpoint_rejects_private_template(
