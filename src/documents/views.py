@@ -7,7 +7,9 @@ import tempfile
 import zipfile
 from collections import Counter
 from collections import deque
+from collections.abc import AsyncIterator
 from collections.abc import Callable
+from collections.abc import Generator
 from datetime import datetime
 from datetime import timedelta
 from http import HTTPStatus
@@ -27,6 +29,7 @@ from urllib.parse import urlparse
 import httpx
 import magic
 import pathvalidate
+from asgiref.sync import sync_to_async
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
@@ -2416,6 +2419,24 @@ class DocumentViewSet(
         )
 
 
+async def _iterate_in_sync_thread(
+    chunks: Generator[str, None, None],
+) -> AsyncIterator[str]:
+    """Serve a blocking sync generator to an ASGI server chunk by chunk.
+
+    Under ASGI, Django drains a sync iterator with ``sync_to_async(list)``
+    before sending anything. Pull each chunk in the request's sync thread
+    instead, where the generator's ORM access belongs.
+    """
+    sentinel = object()  # StopIteration can't cross an asyncio Future
+    next_chunk = sync_to_async(next)
+    try:
+        while (chunk := await next_chunk(chunks, sentinel)) is not sentinel:
+            yield chunk
+    finally:
+        await sync_to_async(chunks.close)()
+
+
 class ChatStreamingSerializer(serializers.Serializer[dict[str, Any]]):
     q = serializers.CharField(required=True, max_length=4000)
     document_id = serializers.IntegerField(required=False, allow_null=True)
@@ -2474,16 +2495,17 @@ class ChatStreamingView(GenericAPIView[Any]):
             user=request.user,
         )
 
-        response = StreamingHttpResponse(
-            stream_chat_with_documents(
-                query_str=question,
-                documents=documents,
-                unrestricted=unrestricted,
-                output_language=output_language,
+        return StreamingHttpResponse(
+            _iterate_in_sync_thread(
+                stream_chat_with_documents(
+                    query_str=question,
+                    documents=documents,
+                    unrestricted=unrestricted,
+                    output_language=output_language,
+                ),
             ),
             content_type="text/event-stream",
         )
-        return response
 
 
 @extend_schema_view(
