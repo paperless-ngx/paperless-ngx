@@ -1282,7 +1282,6 @@ describe('BulkEditorComponent', () => {
     ) // listAllFilteredIds
 
     component.showConfirmationDialogs = false
-    documentListViewService.collectionSize = 2
     fixture.detectChanges()
     jest
       .spyOn(documentListViewService, 'allSelected', 'get')
@@ -1293,7 +1292,7 @@ describe('BulkEditorComponent', () => {
     )
     req.flush({ result: 'OK', task_id: 'delete-2' })
     // ids aren't known when all matching documents are selected, so no undo
-    expect(trackSpy).toHaveBeenLastCalledWith("delete-2", 2, null)
+    expect(trackSpy).toHaveBeenLastCalledWith("delete-1", 2, [3,4])
     httpTestingController.match(
       `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
     ) // list reload
