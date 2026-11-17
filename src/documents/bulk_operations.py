@@ -1,5 +1,6 @@
 """Queued document bulk operations."""
 
+from contextlib import nullcontext
 from typing import Any
 
 from auditlog.context import set_actor
@@ -112,6 +113,8 @@ def execute_bulk_operation(
     if operation == "run_workflow" and not user.has_perm("documents.view_workflow"):
         raise PermissionDenied("Insufficient permissions to run this workflow")
 
+    actor_context = set_actor(user) if settings.AUDIT_LOG_ENABLED else nullcontext()
+
     if operation not in MODIFIED_FIELDS:
         execution_parameters = parameters.copy()
         if operation in USER_OPERATIONS:
@@ -119,7 +122,7 @@ def execute_bulk_operation(
         if operation in TRIGGER_SOURCE_OPERATIONS:
             execution_parameters["trigger_source"] = trigger_source
         modified_field = LEGACY_MODIFIED_FIELDS.get(operation)
-        with set_actor(user):
+        with actor_context:
             old_values = (
                 snapshot_field(document_ids, modified_field)
                 if settings.AUDIT_LOG_ENABLED and modified_field
@@ -146,7 +149,7 @@ def execute_bulk_operation(
     modified_field = MODIFIED_FIELDS[operation]
     # Keep metadata writes and their audit entries together. Follow-up processing
     # runs after commit, within this same tracked task.
-    with set_actor(user), transaction.atomic():
+    with actor_context, transaction.atomic():
         old_values = (
             snapshot_field(document_ids, modified_field)
             if settings.AUDIT_LOG_ENABLED and modified_field

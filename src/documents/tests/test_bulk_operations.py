@@ -124,6 +124,41 @@ def test_document_action_runs_with_user_in_worker(bulk_setup):
 
 
 @pytest.mark.django_db
+def test_delete_task_without_audit_log(bulk_setup, settings):
+    user, _, doc, _ = bulk_setup
+    settings.AUDIT_LOG_ENABLED = False
+    with mock.patch(
+        "documents.bulk_operations.set_actor",
+        side_effect=AssertionError("audit context must not be entered"),
+    ):
+        result = execute_bulk_operation("delete", [doc.pk], {}, user.pk)
+    assert result == {"operation": "delete", "document_count": 1}
+    assert not Document.objects.filter(pk=doc.pk).exists()
+
+
+@pytest.mark.django_db
+def test_metadata_task_without_audit_log(bulk_setup, settings):
+    user, _, doc, correspondent = bulk_setup
+    settings.AUDIT_LOG_ENABLED = False
+    with (
+        mock.patch(
+            "documents.bulk_operations.set_actor",
+            side_effect=AssertionError("audit context must not be entered"),
+        ),
+        mock.patch("documents.bulk_operations.bulk_update_documents"),
+    ):
+        result = execute_bulk_operation(
+            "set_correspondent",
+            [doc.pk],
+            {"correspondent": correspondent.pk},
+            user.pk,
+        )
+    doc.refresh_from_db()
+    assert doc.correspondent_id == correspondent.pk
+    assert result == {"operation": "set_correspondent", "document_count": 1}
+
+
+@pytest.mark.django_db
 def test_document_action_queue_contains_only_serializable_parameters(bulk_setup):
     user, client, doc, _ = bulk_setup
     with mock.patch("documents.views.execute_bulk_operation.apply_async") as enqueue:
