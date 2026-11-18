@@ -5,7 +5,13 @@
       <p class="text-muted small mb-0" i18n>Updated from {{ since() }} to {{ version }}</p>
     }
   </div>
-  <button type="button" class="btn-close" aria-label="Close" i18n-aria-label (click)="close()"></button>
+  <div class="d-flex align-items-center gap-3 ms-auto">
+    <a class="btn btn-sm btn-outline-secondary d-flex align-items-center" [href]="repoUrl" target="_blank" rel="noopener noreferrer"
+      title="Star Paperless-ngx on GitHub" i18n-title>
+      <pngx-bs-icon name="star" class="me-1"></pngx-bs-icon><ng-container i18n>Star on GitHub</ng-container>
+    </a>
+    <button type="button" class="btn-close m-0" aria-label="Close" i18n-aria-label (click)="close()"></button>
+  </div>
 </div>
 <div class="modal-body">
   @if (!updateCheckingEnabled) {
