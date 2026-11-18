@@ -77,10 +77,6 @@ class TestZoneExtraction:
     def scratch_dir(self, settings: SettingsWrapper, tmp_path: Path) -> None:
         settings.SCRATCH_DIR = tmp_path
 
-    @pytest.fixture
-    def mock_run(self, mocker: MockerFixture) -> MagicMock:
-        return mocker.patch("documents.zone_ocr.subprocess.run")
-
     def test_crop_scales_coordinates(
         self,
         page: Path,
@@ -138,7 +134,7 @@ class TestZoneExtraction:
         page: Path,
         zone: OcrTemplateZone,
         tmp_path: Path,
-        mock_run: MagicMock,
+        mock_zone_ocr_run: MagicMock,
     ) -> None:
         """
         GIVEN:
@@ -152,14 +148,14 @@ class TestZoneExtraction:
         result = _extract_zone(page, zone, 100, 50, tmp_path)
         assert result.raw_text is None
         assert result.value is None
-        mock_run.assert_not_called()
+        mock_zone_ocr_run.assert_not_called()
 
     def test_unreadable_image_skips_reader(
         self,
         page: Path,
         zone: OcrTemplateZone,
         tmp_path: Path,
-        mock_run: MagicMock,
+        mock_zone_ocr_run: MagicMock,
     ) -> None:
         """
         GIVEN:
@@ -173,15 +169,14 @@ class TestZoneExtraction:
         result = _extract_zone(page, zone, 100, 50, tmp_path)
         assert result.raw_text is None
         assert result.value is None
-        mock_run.assert_not_called()
+        mock_zone_ocr_run.assert_not_called()
 
     def test_text_extraction_retains_raw_text_and_transforms(
         self,
-        mocker: MockerFixture,
         page: Path,
         zone: OcrTemplateZone,
         tmp_path: Path,
-        mock_run: MagicMock,
+        mock_zone_ocr_run: MagicMock,
     ) -> None:
         """
         GIVEN:
@@ -193,25 +188,33 @@ class TestZoneExtraction:
             - The stripped raw text is retained and the transformed value returned
         """
 
-        def read_crop(args: list[str], **kwargs: object) -> MagicMock:
+        def read_crop(
+            args: list[str],
+            **kwargs: object,
+        ) -> subprocess.CompletedProcess:
             with Image.open(args[1]) as crop:
                 assert crop.size == (40, 20)
                 assert crop.getpixel((0, 0)) == (0, 0, 0)
-            return mocker.MagicMock(stdout="  account abc\n")
+            return subprocess.CompletedProcess(
+                args=[],
+                returncode=0,
+                stdout="  account abc\n",
+                stderr="",
+            )
 
-        mock_run.side_effect = read_crop
+        mock_zone_ocr_run.side_effect = read_crop
         result = _extract_zone(page, zone, 100, 50, tmp_path)
         assert result.raw_text == "account abc"
         assert result.value == "ACCOUNT ABC"
-        assert mock_run.call_args.args[0][-4:] == ["-l", "eng", "--psm", "6"]
-        assert mock_run.call_args.kwargs["timeout"] == 30
+        assert mock_zone_ocr_run.call_args.args[0][-4:] == ["-l", "eng", "--psm", "6"]
+        assert mock_zone_ocr_run.call_args.kwargs["timeout"] == 30
 
     def test_no_text_returns_no_value(
         self,
         page: Path,
         zone: OcrTemplateZone,
         tmp_path: Path,
-        mock_run: MagicMock,
+        mock_zone_ocr_run: MagicMock,
     ) -> None:
         """
         GIVEN:
@@ -221,7 +224,7 @@ class TestZoneExtraction:
         THEN:
             - No text or value is returned
         """
-        mock_run.return_value.stdout = " \n"
+        mock_zone_ocr_run.return_value.stdout = " \n"
         result = _extract_zone(page, zone, 100, 50, tmp_path)
         assert result.raw_text is None
         assert result.value is None
@@ -246,7 +249,7 @@ class TestZoneExtraction:
         page: Path,
         zone: OcrTemplateZone,
         tmp_path: Path,
-        mock_run: MagicMock,
+        mock_zone_ocr_run: MagicMock,
         error: Exception,
     ) -> None:
         """
@@ -257,7 +260,7 @@ class TestZoneExtraction:
         THEN:
             - No text or value is returned
         """
-        mock_run.side_effect = error
+        mock_zone_ocr_run.side_effect = error
         result = _extract_zone(page, zone, 100, 50, tmp_path)
         assert result.raw_text is None
         assert result.value is None
@@ -290,7 +293,7 @@ class TestZoneExtraction:
         self,
         page: Path,
         zone: OcrTemplateZone,
-        mock_run: MagicMock,
+        mock_zone_ocr_run: MagicMock,
     ) -> None:
         """
         GIVEN:
@@ -305,14 +308,14 @@ class TestZoneExtraction:
             "raw_text": None,
             "value": None,
         }
-        mock_run.assert_not_called()
+        mock_zone_ocr_run.assert_not_called()
 
     def test_date_transform_uses_zone_format(
         self,
         page: Path,
         zone: OcrTemplateZone,
         tmp_path: Path,
-        mock_run: MagicMock,
+        mock_zone_ocr_run: MagicMock,
     ) -> None:
         """
         GIVEN:
@@ -324,7 +327,7 @@ class TestZoneExtraction:
         """
         zone.transform = "date"
         zone.date_format = "%d/%m/%Y"
-        mock_run.return_value.stdout = "25/12/2025"
+        mock_zone_ocr_run.return_value.stdout = "25/12/2025"
         result = _extract_zone(page, zone, 100, 50, tmp_path)
         assert result.raw_text == "25/12/2025"
         assert result.value == "2025-12-25"
@@ -335,7 +338,7 @@ class TestZoneExtraction:
         page: Path,
         zone: OcrTemplateZone,
         tmp_path: Path,
-        mock_run: MagicMock,
+        mock_zone_ocr_run: MagicMock,
     ) -> None:
         """
         GIVEN:
@@ -359,7 +362,7 @@ class TestZoneExtraction:
         result = _extract_zone(page, zone, 100, 50, tmp_path)
         assert result.raw_text == "  https://example.com  "
         assert result.value == "https://example.com"
-        mock_run.assert_not_called()
+        mock_zone_ocr_run.assert_not_called()
         with pytest.raises(ValueError):
             read_barcodes.call_args.args[0].getpixel((0, 0))
 
@@ -388,7 +391,7 @@ class TestZoneExtraction:
         self,
         page: Path,
         zone: OcrTemplateZone,
-        mock_run: MagicMock,
+        mock_zone_ocr_run: MagicMock,
     ) -> None:
         """
         GIVEN:
@@ -398,7 +401,7 @@ class TestZoneExtraction:
         THEN:
             - The raw text and transformed value are returned
         """
-        mock_run.return_value.stdout = "account abc"
+        mock_zone_ocr_run.return_value.stdout = "account abc"
         assert extract_zone_preview(page, zone, 0, 0, 1) == {
             "raw_text": "account abc",
             "value": "ACCOUNT ABC",
@@ -408,7 +411,7 @@ class TestZoneExtraction:
         self,
         page: Path,
         zone: OcrTemplateZone,
-        mock_run: MagicMock,
+        mock_zone_ocr_run: MagicMock,
     ) -> None:
         """
         GIVEN:
@@ -423,7 +426,7 @@ class TestZoneExtraction:
             "raw_text": None,
             "value": None,
         }
-        mock_run.assert_not_called()
+        mock_zone_ocr_run.assert_not_called()
 
 
 def make_template(name: str, **kwargs: Any) -> OcrTemplate:
@@ -470,14 +473,10 @@ class TestSavedZoneExtraction:
     def template(self) -> OcrTemplate:
         return make_template("Account")
 
-    @pytest.fixture
-    def mock_run(self, mocker: MockerFixture) -> MagicMock:
-        return mocker.patch("documents.zone_ocr.subprocess.run")
-
     def test_combines_zones_and_writes_each_field_once(
         self,
         mocker: MockerFixture,
-        mock_run: MagicMock,
+        mock_zone_ocr_run: MagicMock,
         paperless_dirs: PaperlessDirs,
         page: Path,
         document: Document,
@@ -493,9 +492,9 @@ class TestSavedZoneExtraction:
         """
         zones = [make_zone(template, "First"), make_zone(template, "Second")]
         template.combine_formats = {"title": "{Second} / {First}"}
-        mock_run.side_effect = [
-            mocker.MagicMock(stdout="one"),
-            mocker.MagicMock(stdout="two"),
+        mock_zone_ocr_run.side_effect = [
+            subprocess.CompletedProcess(args=[], returncode=0, stdout="one", stderr=""),
+            subprocess.CompletedProcess(args=[], returncode=0, stdout="two", stderr=""),
         ]
         save = mocker.patch.object(document, "save", wraps=document.save)
 
@@ -513,8 +512,7 @@ class TestSavedZoneExtraction:
 
     def test_converts_custom_and_builtin_fields_before_saving(
         self,
-        mocker: MockerFixture,
-        mock_run: MagicMock,
+        mock_zone_ocr_run: MagicMock,
         paperless_dirs: PaperlessDirs,
         page: Path,
         document: Document,
@@ -535,8 +533,8 @@ class TestSavedZoneExtraction:
             make_zone(template, "Created", "created"),
             make_zone(template, "Paid", "custom_field", custom_field=field),
         ]
-        mock_run.side_effect = [
-            mocker.MagicMock(stdout=value)
+        mock_zone_ocr_run.side_effect = [
+            subprocess.CompletedProcess(args=[], returncode=0, stdout=value, stderr="")
             for value in ["New title", "ASN 42", "2026-04-13", "no"]
         ]
 
@@ -556,8 +554,7 @@ class TestSavedZoneExtraction:
 
     def test_invalid_field_values_preserve_existing_values(
         self,
-        mocker: MockerFixture,
-        mock_run: MagicMock,
+        mock_zone_ocr_run: MagicMock,
         paperless_dirs: PaperlessDirs,
         page: Path,
         document: Document,
@@ -587,8 +584,8 @@ class TestSavedZoneExtraction:
             make_zone(template, "Unassigned", "custom_field"),
         ]
         original_created = document.created
-        mock_run.side_effect = [
-            mocker.MagicMock(stdout=value)
+        mock_zone_ocr_run.side_effect = [
+            subprocess.CompletedProcess(args=[], returncode=0, stdout=value, stderr="")
             for value in [
                 "Valid",
                 "9999999999999999999999999999999",
@@ -615,7 +612,7 @@ class TestSavedZoneExtraction:
     def test_write_failure_rolls_back_template_and_restores_document(
         self,
         mocker: MockerFixture,
-        mock_run: MagicMock,
+        mock_zone_ocr_run: MagicMock,
         paperless_dirs: PaperlessDirs,
         page: Path,
         document: Document,
@@ -636,9 +633,14 @@ class TestSavedZoneExtraction:
             make_zone(template, "Title"),
             make_zone(template, "Number", "custom_field", custom_field=field),
         ]
-        mock_run.side_effect = [
-            mocker.MagicMock(stdout="New title"),
-            mocker.MagicMock(stdout="42"),
+        mock_zone_ocr_run.side_effect = [
+            subprocess.CompletedProcess(
+                args=[],
+                returncode=0,
+                stdout="New title",
+                stderr="",
+            ),
+            subprocess.CompletedProcess(args=[], returncode=0, stdout="42", stderr=""),
         ]
         save = document.save
 
@@ -664,8 +666,7 @@ class TestSavedZoneExtraction:
 
     def test_last_successful_template_wins(
         self,
-        mocker: MockerFixture,
-        mock_run: MagicMock,
+        mock_zone_ocr_run: MagicMock,
         page: Path,
         document: Document,
         template: OcrTemplate,
@@ -684,8 +685,9 @@ class TestSavedZoneExtraction:
         third = make_template("Third")
         make_zone(third, "Third", validation_regex="accepted")
         templates = list(OcrTemplate.objects.order_by("pk"))
-        mock_run.side_effect = [
-            mocker.MagicMock(stdout=value) for value in ["First", "Second", "rejected"]
+        mock_zone_ocr_run.side_effect = [
+            subprocess.CompletedProcess(args=[], returncode=0, stdout=value, stderr="")
+            for value in ["First", "Second", "rejected"]
         ]
 
         run_zone_extraction(document, page, templates=templates)
@@ -695,7 +697,7 @@ class TestSavedZoneExtraction:
 
     def test_document_run_renders_each_page_once_across_templates(
         self,
-        mock_run: MagicMock,
+        mock_zone_ocr_run: MagicMock,
         paperless_dirs: PaperlessDirs,
         document: Document,
         template: OcrTemplate,
@@ -727,12 +729,14 @@ class TestSavedZoneExtraction:
                 return subprocess.CompletedProcess(args, 0)
             return subprocess.CompletedProcess(args, 0, stdout="extracted")
 
-        mock_run.side_effect = execute
+        mock_zone_ocr_run.side_effect = execute
 
         results = run_zone_extraction(document, pdf, templates=[template, second])
 
         render_calls = [
-            call for call in mock_run.call_args_list if call.args[0][0] == "pdftoppm"
+            call
+            for call in mock_zone_ocr_run.call_args_list
+            if call.args[0][0] == "pdftoppm"
         ]
         assert len(render_calls) == 2
         assert [
@@ -743,7 +747,7 @@ class TestSavedZoneExtraction:
 
     def test_zone_dimensions_override_template_dimensions(
         self,
-        mock_run: MagicMock,
+        mock_zone_ocr_run: MagicMock,
         paperless_dirs: PaperlessDirs,
         page: Path,
         document: Document,
@@ -769,7 +773,7 @@ class TestSavedZoneExtraction:
                 assert crop.size == (20, 10)
             return subprocess.CompletedProcess(args, 0, stdout="extracted")
 
-        mock_run.side_effect = read_crop
+        mock_zone_ocr_run.side_effect = read_crop
 
         _process_template(
             document,
@@ -831,7 +835,7 @@ class TestSavedZoneExtraction:
 
     def test_empty_combination_cannot_clear_a_field(
         self,
-        mock_run: MagicMock,
+        mock_zone_ocr_run: MagicMock,
         paperless_dirs: PaperlessDirs,
         page: Path,
         document: Document,
@@ -847,7 +851,7 @@ class TestSavedZoneExtraction:
         """
         zone = make_zone(template, "Title")
         template.combine_formats = {"title": "{Unknown}"}
-        mock_run.return_value.stdout = "extracted"
+        mock_zone_ocr_run.return_value.stdout = "extracted"
 
         results = _process_template(
             document,
@@ -863,8 +867,7 @@ class TestSavedZoneExtraction:
 
     def test_skipped_results_never_report_existing_document_values(
         self,
-        mocker: MockerFixture,
-        mock_run: MagicMock,
+        mock_zone_ocr_run: MagicMock,
         paperless_dirs: PaperlessDirs,
         page: Path,
         document: Document,
@@ -885,8 +888,8 @@ class TestSavedZoneExtraction:
             make_zone(template, "Invalid", "asn"),
             make_zone(template, "Unassigned", "custom_field"),
         ]
-        mock_run.side_effect = [
-            mocker.MagicMock(stdout=value)
+        mock_zone_ocr_run.side_effect = [
+            subprocess.CompletedProcess(args=[], returncode=0, stdout=value, stderr="")
             for value in ["", "rejected", "abc", "orphan"]
         ]
 
@@ -909,8 +912,7 @@ class TestSavedZoneExtraction:
 
     def test_failed_template_reports_rollback_and_next_template_still_runs(
         self,
-        mocker: MockerFixture,
-        mock_run: MagicMock,
+        mock_zone_ocr_run: MagicMock,
         page: Path,
         document: Document,
         template: OcrTemplate,
@@ -930,8 +932,9 @@ class TestSavedZoneExtraction:
         make_zone(template, "Conflict", "asn")
         second = make_template("Second")
         make_zone(second, "Second")
-        mock_run.side_effect = [
-            mocker.MagicMock(stdout=value) for value in ["Rolled back", "42", "Applied"]
+        mock_zone_ocr_run.side_effect = [
+            subprocess.CompletedProcess(args=[], returncode=0, stdout=value, stderr="")
+            for value in ["Rolled back", "42", "Applied"]
         ]
 
         results = run_zone_extraction(document, page, templates=[template, second])
@@ -948,7 +951,7 @@ class TestSavedZoneExtraction:
 
     def test_literal_format_does_not_write_when_every_zone_failed(
         self,
-        mock_run: MagicMock,
+        mock_zone_ocr_run: MagicMock,
         paperless_dirs: PaperlessDirs,
         page: Path,
         document: Document,
@@ -964,7 +967,7 @@ class TestSavedZoneExtraction:
         """
         zone = make_zone(template, "Title")
         template.combine_formats = {"title": "Invoice {Title}"}
-        mock_run.return_value.stdout = ""
+        mock_zone_ocr_run.return_value.stdout = ""
 
         results = _process_template(
             document,
@@ -980,7 +983,7 @@ class TestSavedZoneExtraction:
 
     def test_saved_extraction_matches_preview_and_rejects_invalid_value(
         self,
-        mock_run: MagicMock,
+        mock_zone_ocr_run: MagicMock,
         paperless_dirs: PaperlessDirs,
         page: Path,
         document: Document,
@@ -1004,7 +1007,7 @@ class TestSavedZoneExtraction:
         )
 
         def preview_and_save(raw_text: str) -> None:
-            mock_run.return_value.stdout = raw_text
+            mock_zone_ocr_run.return_value.stdout = raw_text
             preview = extract_zone_preview(page, zone, 100, 50, 1)
             assert preview["raw_text"] == raw_text
             assert preview["value"] == raw_text.upper()
@@ -1772,15 +1775,11 @@ class TestRenderPages:
         pdf.write_bytes(b"%PDF-1.4")
         return pdf
 
-    @pytest.fixture
-    def mock_run(self, mocker: MockerFixture) -> MagicMock:
-        return mocker.patch("documents.zone_ocr.subprocess.run")
-
     def test_renders_requested_pages_in_order_and_skips_out_of_range(
         self,
         pdf: Path,
         tmp_path: Path,
-        mock_run: MagicMock,
+        mock_zone_ocr_run: MagicMock,
     ) -> None:
         """
         GIVEN:
@@ -1795,11 +1794,11 @@ class TestRenderPages:
         def render(args: list[str], **kwargs: object) -> None:
             Path(args[-1]).with_suffix(".png").write_bytes(b"rendered")
 
-        mock_run.side_effect = render
+        mock_zone_ocr_run.side_effect = render
         pages = _render_pages(pdf, {-1, 0, 2, 3}, tmp_path, 3)
         assert list(pages) == [0, 2]
-        assert mock_run.call_count == 2
-        for page, call in zip([1, 3], mock_run.call_args_list, strict=True):
+        assert mock_zone_ocr_run.call_count == 2
+        for page, call in zip([1, 3], mock_zone_ocr_run.call_args_list, strict=True):
             args = call.args[0]
             assert "-singlefile" in args
             assert args[args.index("-f") + 1] == str(page)
@@ -1807,7 +1806,7 @@ class TestRenderPages:
             assert call.kwargs["timeout"] == 60
             assert call.kwargs["check"]
 
-    @pytest.mark.usefixtures("mock_run")
+    @pytest.mark.usefixtures("mock_zone_ocr_run")
     def test_missing_render_output_is_not_a_page(
         self,
         pdf: Path,
@@ -1841,7 +1840,7 @@ class TestRenderPages:
         self,
         pdf: Path,
         tmp_path: Path,
-        mock_run: MagicMock,
+        mock_zone_ocr_run: MagicMock,
         error: Exception,
     ) -> None:
         """
@@ -1858,14 +1857,14 @@ class TestRenderPages:
                 raise error
             Path(args[-1]).with_suffix(".png").write_bytes(b"rendered")
 
-        mock_run.side_effect = render
+        mock_zone_ocr_run.side_effect = render
         assert list(_render_pages(pdf, {0, 1}, tmp_path, 2)) == [1]
 
     def test_missing_renderer_stops_without_retrying_every_page(
         self,
         pdf: Path,
         tmp_path: Path,
-        mock_run: MagicMock,
+        mock_zone_ocr_run: MagicMock,
     ) -> None:
         """
         GIVEN:
@@ -1875,14 +1874,14 @@ class TestRenderPages:
         THEN:
             - No pages are returned and the renderer is only attempted once
         """
-        mock_run.side_effect = FileNotFoundError("pdftoppm")
+        mock_zone_ocr_run.side_effect = FileNotFoundError("pdftoppm")
         assert _render_pages(pdf, {0, 1}, tmp_path, 2) == {}
-        mock_run.assert_called_once()
+        mock_zone_ocr_run.assert_called_once()
 
     def test_image_is_used_directly_only_for_first_page(
         self,
         tmp_path: Path,
-        mock_run: MagicMock,
+        mock_zone_ocr_run: MagicMock,
     ) -> None:
         """
         GIVEN:
@@ -1898,7 +1897,7 @@ class TestRenderPages:
             image.save(image_path)
         assert _render_pages(image_path, {0}, tmp_path, 1) == {0: image_path}
         assert _render_pages(image_path, {1}, tmp_path, 1) == {}
-        mock_run.assert_not_called()
+        mock_zone_ocr_run.assert_not_called()
 
 
 class TestDetectMime:
@@ -2009,13 +2008,6 @@ class TestRunZoneExtraction:
     """Tests for the full extraction pipeline."""
 
     @pytest.fixture
-    def custom_field(self) -> CustomField:
-        return CustomFieldFactory(
-            name="Invoice Number",
-            data_type=CustomField.FieldDataType.STRING,
-        )
-
-    @pytest.fixture
     def document(self) -> Document:
         return DocumentFactory(
             title="Test",
@@ -2034,24 +2026,13 @@ class TestRunZoneExtraction:
         return mocker.patch("documents.zone_ocr._process_template")
 
     @pytest.fixture
-    def template_with_zone(
-        self,
-        custom_field: CustomField,
-    ) -> Callable[..., OcrTemplate]:
-        """Build a template with one custom field zone, matching "test" by default."""
+    def template_with_zone(self) -> Callable[..., OcrTemplate]:
+        """Build a template with one default zone, matching "test" by default."""
 
         def _make(name: str, **kwargs: Any) -> OcrTemplate:
             kwargs.setdefault("match", "test")
-            template = OcrTemplateFactory(
-                name=name,
-                **kwargs,
-            )
-            OcrTemplateZoneFactory(
-                template=template,
-                name="Zone",
-                target=OcrTemplateZone.TargetType.CUSTOM_FIELD,
-                custom_field=custom_field,
-            )
+            template = OcrTemplateFactory(name=name, **kwargs)
+            OcrTemplateZoneFactory(template=template)
             return template
 
         return _make
@@ -2081,6 +2062,8 @@ class TestRunZoneExtraction:
         self,
         template_with_zone: Callable[..., OcrTemplate],
         document: Document,
+        pdf: Path,
+        mock_process: MagicMock,
     ) -> None:
         """
         GIVEN:
@@ -2088,13 +2071,13 @@ class TestRunZoneExtraction:
         WHEN:
             - Zone extraction runs
         THEN:
-            - No custom field instances are created
+            - The template is not processed
         """
         template_with_zone("Disabled", enabled=False)
 
-        run_zone_extraction(document, Path("/nonexistent"))
+        run_zone_extraction(document, pdf)
 
-        assert CustomFieldInstance.objects.count() == 0
+        mock_process.assert_not_called()
 
     def test_skips_template_with_no_zones(
         self,

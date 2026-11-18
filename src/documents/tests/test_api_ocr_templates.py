@@ -34,6 +34,7 @@ from paperless_testing.permissions import grant_object
 
 if TYPE_CHECKING:
     from collections.abc import Callable
+    from unittest.mock import MagicMock
 
     from django.contrib.auth.models import User
     from pytest_django.fixtures import DjangoCaptureOnCommitCallbacks
@@ -48,6 +49,7 @@ CONTENT = "Northwind Power & Light statement"
 ENDPOINT = "/api/ocr_templates/"
 RUN_ZONE_OCR_URL = "/api/documents/{pk}/run-zone-ocr/"
 PREVIEW_ZONE_URL = f"{ENDPOINT}test-zone/"
+SKIPPED_NO_TEMPLATE = {"status": "skipped", "reason": "no_template", "results": []}
 
 
 def make_template_data(**overrides: Any) -> dict[str, Any]:
@@ -109,6 +111,48 @@ def doclink_field(db: None) -> CustomField:
 def make_zone(text_field: CustomField) -> Callable[..., dict[str, Any]]:
     """Zone payload builder whose custom field defaults to the text field."""
     return functools.partial(make_zone_data, text_field.pk)
+
+
+def write_blank_png(path: Path) -> None:
+    """Write a blank 100x100 white PNG to the given path."""
+    with Image.new("RGB", (100, 100), "white") as image:
+        image.save(path, format="PNG")
+
+
+def title_template(
+    name: str,
+    owner: User | None = None,
+    **kwargs: Any,
+) -> OcrTemplate:
+    """Build a template matching "Northwind" with one 20x20 title zone."""
+    template = OcrTemplateFactory(
+        name=name,
+        owner=owner,
+        match="Northwind",
+        **kwargs,
+    )
+    OcrTemplateZoneFactory(
+        template=template,
+        name=name,
+        width=20,
+        height=20,
+    )
+    return template
+
+
+@pytest.fixture
+def mock_extract(mocker: MockerFixture) -> MagicMock:
+    return mocker.patch("documents.zone_ocr.run_zone_extraction")
+
+
+@pytest.fixture
+def mock_preview(mocker: MockerFixture) -> MagicMock:
+    return mocker.patch("documents.zone_ocr.extract_zone_preview")
+
+
+@pytest.fixture
+def mock_render(mocker: MockerFixture) -> MagicMock:
+    return mocker.patch("documents.views.subprocess.run")
 
 
 def preview_url(document: Document, page: int = 0) -> str:
@@ -178,7 +222,7 @@ class TestZoneOcrIndexing:
         versioned: bool,  # noqa: FBT001
         admin_client: APIClient,
         django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks,
-        mocker: MockerFixture,
+        mock_zone_ocr_run: MagicMock,
     ) -> None:
         """
         GIVEN:
@@ -208,8 +252,7 @@ class TestZoneOcrIndexing:
                 mime_type="image/png",
                 page_count=1,
             )
-        with Image.new("RGB", (100, 100), "white") as image:
-            image.save(file_document.source_path, format="PNG")
+        write_blank_png(file_document.source_path)
         template = OcrTemplateFactory(
             name="Invoice template",
             match="Northwind",
@@ -233,10 +276,20 @@ class TestZoneOcrIndexing:
             width=50,
             order=1,
         )
-        mocker.patch(
-            "documents.zone_ocr.subprocess.run",
-            side_effect=[mocker.Mock(stdout="After OCR"), mocker.Mock(stdout="INV42")],
-        )
+        mock_zone_ocr_run.side_effect = [
+            subprocess.CompletedProcess(
+                args=[],
+                returncode=0,
+                stdout="After OCR",
+                stderr="",
+            ),
+            subprocess.CompletedProcess(
+                args=[],
+                returncode=0,
+                stdout="INV42",
+                stderr="",
+            ),
+        ]
 
         backend = get_backend()
         if entry_point != "ingestion":
@@ -442,17 +495,10 @@ class TestOcrTemplatePermissions:
         user = UserFactory()
         grant_global(user, "view_ocrtemplate")
 
-        def template(name: str, owner: User | None = None) -> OcrTemplate:
-            return OcrTemplateFactory(
-                name=name,
-                match="Northwind",
-                owner=owner,
-            )
-
-        template("Unowned")
-        template("Mine", owner=user)
-        template("Private", owner=other)
-        grant_object(user, template("Shared", owner=other), "view_ocrtemplate")
+        title_template("Unowned")
+        title_template("Mine", owner=user)
+        title_template("Private", owner=other)
+        grant_object(user, title_template("Shared", owner=other), "view_ocrtemplate")
         rest_api_client.force_authenticate(user=user)
 
         response = rest_api_client.get(ENDPOINT)
@@ -545,7 +591,7 @@ class TestOcrTemplatePermissions:
     def test_test_zone_requires_view_permission_on_the_document(
         self,
         rest_api_client: APIClient,
-        mocker: MockerFixture,
+        mock_preview: MagicMock,
     ) -> None:
         """
         GIVEN:
@@ -558,7 +604,6 @@ class TestOcrTemplatePermissions:
             - Afterwards it passes the permission check and reaches the missing file
             - No preview extraction runs
         """
-        preview = mocker.patch("documents.zone_ocr.extract_zone_preview")
         owner = UserFactory()
         user = UserFactory()
         grant_global(user, "add_ocrtemplate", "view_document")
@@ -576,7 +621,7 @@ class TestOcrTemplatePermissions:
         response = rest_api_client.post(PREVIEW_ZONE_URL, data, format="json")
         # Past the permission check; the factory document has no file on disk.
         assert response.status_code == status.HTTP_404_NOT_FOUND
-        preview.assert_not_called()
+        mock_preview.assert_not_called()
 
     @pytest.mark.parametrize(
         "make_data",
@@ -1208,7 +1253,7 @@ class TestRunZoneOcr:
     def test_without_matching_template_is_skipped(
         self,
         admin_client: APIClient,
-        mocker: MockerFixture,
+        mock_extract: MagicMock,
     ) -> None:
         """
         GIVEN:
@@ -1218,7 +1263,6 @@ class TestRunZoneOcr:
         THEN:
             - The run is skipped with reason no_template and nothing is extracted
         """
-        extract = mocker.patch("documents.zone_ocr.run_zone_extraction")
         document = DocumentFactory(content=CONTENT)
         OcrTemplateFactory(
             name="Other sender",
@@ -1228,12 +1272,8 @@ class TestRunZoneOcr:
         response = admin_client.post(RUN_ZONE_OCR_URL.format(pk=document.pk))
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.json() == {
-            "status": "skipped",
-            "reason": "no_template",
-            "results": [],
-        }
-        extract.assert_not_called()
+        assert response.json() == SKIPPED_NO_TEMPLATE
+        mock_extract.assert_not_called()
 
     @pytest.mark.parametrize(
         "with_disabled_template",
@@ -1245,7 +1285,7 @@ class TestRunZoneOcr:
     def test_without_enabled_template_is_skipped(
         self,
         admin_client: APIClient,
-        mocker: MockerFixture,
+        mock_extract: MagicMock,
         with_disabled_template: bool,  # noqa: FBT001
     ) -> None:
         """
@@ -1256,7 +1296,6 @@ class TestRunZoneOcr:
         THEN:
             - The run is skipped with reason no_template and nothing is extracted
         """
-        extract = mocker.patch("documents.zone_ocr.run_zone_extraction")
         document = DocumentFactory(content=CONTENT)
         if with_disabled_template:
             OcrTemplateFactory(
@@ -1268,17 +1307,13 @@ class TestRunZoneOcr:
         response = admin_client.post(RUN_ZONE_OCR_URL.format(pk=document.pk))
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.json() == {
-            "status": "skipped",
-            "reason": "no_template",
-            "results": [],
-        }
-        extract.assert_not_called()
+        assert response.json() == SKIPPED_NO_TEMPLATE
+        mock_extract.assert_not_called()
 
     def test_applies_a_chosen_template(
         self,
         admin_client: APIClient,
-        mocker: MockerFixture,
+        mock_extract: MagicMock,
     ) -> None:
         """
         GIVEN:
@@ -1288,7 +1323,6 @@ class TestRunZoneOcr:
         THEN:
             - The template is applied anyway, since it was chosen explicitly
         """
-        extract = mocker.patch("documents.zone_ocr.run_zone_extraction")
         document = DocumentFactory(content=CONTENT, mime_type="application/pdf")
         document.source_path.write_bytes(b"test PDF")
         template = OcrTemplateFactory(
@@ -1305,7 +1339,11 @@ class TestRunZoneOcr:
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json()["status"] == "completed"
-        extract.assert_called_once_with(document, templates=[template], reindex=True)
+        mock_extract.assert_called_once_with(
+            document,
+            templates=[template],
+            reindex=True,
+        )
 
     @pytest.mark.parametrize(
         "version",
@@ -1317,7 +1355,7 @@ class TestRunZoneOcr:
     def test_matches_the_requested_file_version(
         self,
         admin_client: APIClient,
-        mocker: MockerFixture,
+        mock_extract: MagicMock,
         version: str,
     ) -> None:
         """
@@ -1328,10 +1366,7 @@ class TestRunZoneOcr:
         THEN:
             - The template is applied to the requested file document
         """
-        extract = mocker.patch(
-            "documents.zone_ocr.run_zone_extraction",
-            return_value=[],
-        )
+        mock_extract.return_value = []
         document = DocumentFactory(content=CONTENT)
         older = DocumentFactory(
             root_document=document,
@@ -1354,7 +1389,7 @@ class TestRunZoneOcr:
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json()["status"] == "completed"
-        extract.assert_called_once_with(
+        mock_extract.assert_called_once_with(
             file_document,
             templates=[template],
             reindex=True,
@@ -1371,7 +1406,7 @@ class TestRunZoneOcr:
     def test_rejects_invalid_or_unavailable_versions(
         self,
         admin_client: APIClient,
-        mocker: MockerFixture,
+        mock_extract: MagicMock,
         version: str,
     ) -> None:
         """
@@ -1382,7 +1417,6 @@ class TestRunZoneOcr:
         THEN:
             - 404 is returned and nothing is extracted
         """
-        extract = mocker.patch("documents.zone_ocr.run_zone_extraction")
         document = DocumentFactory()
         unrelated = DocumentFactory()
         deleted = DocumentFactory(
@@ -1401,7 +1435,7 @@ class TestRunZoneOcr:
         )
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
-        extract.assert_not_called()
+        mock_extract.assert_not_called()
 
     def test_rejects_an_unknown_template(self, admin_client: APIClient) -> None:
         """
@@ -1438,7 +1472,7 @@ class TestRunZoneOcr:
     def test_missing_file_is_an_error(
         self,
         admin_client: APIClient,
-        mocker: MockerFixture,
+        mock_extract: MagicMock,
     ) -> None:
         """
         GIVEN:
@@ -1448,7 +1482,6 @@ class TestRunZoneOcr:
         THEN:
             - 404 is returned with a file not found error and nothing is extracted
         """
-        extract = mocker.patch("documents.zone_ocr.run_zone_extraction")
         document = DocumentFactory(content=CONTENT)
         OcrTemplateFactory(
             name="Template",
@@ -1459,12 +1492,12 @@ class TestRunZoneOcr:
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
         assert response.json() == {"error": "Document file not found"}
-        extract.assert_not_called()
+        mock_extract.assert_not_called()
 
     def test_reports_completed_results(
         self,
         admin_client: APIClient,
-        mocker: MockerFixture,
+        mock_zone_ocr_run: MagicMock,
     ) -> None:
         """
         GIVEN:
@@ -1474,14 +1507,12 @@ class TestRunZoneOcr:
         THEN:
             - The completed result lists the extracted title value
         """
-        run = mocker.patch("documents.zone_ocr.subprocess.run")
         document = DocumentFactory(
             content=CONTENT,
             mime_type="application/pdf",
         )
-        with Image.new("RGB", (100, 100), "white") as image:
-            image.save(document.source_path, format="PNG")
-        run.return_value.stdout = "Extracted title"
+        write_blank_png(document.source_path)
+        mock_zone_ocr_run.return_value.stdout = "Extracted title"
         template = OcrTemplateFactory(
             name="Template",
             match="Northwind",
@@ -1507,12 +1538,12 @@ class TestRunZoneOcr:
                 },
             ],
         }
-        run.assert_called_once()
+        mock_zone_ocr_run.assert_called_once()
 
     def test_does_not_report_an_old_title_when_extraction_is_empty(
         self,
         admin_client: APIClient,
-        mocker: MockerFixture,
+        mock_zone_ocr_run: MagicMock,
     ) -> None:
         """
         GIVEN:
@@ -1524,10 +1555,8 @@ class TestRunZoneOcr:
             - The result has reason no_value and no value
             - The document title is unchanged
         """
-        run = mocker.patch("documents.zone_ocr.subprocess.run")
         document = DocumentFactory(title="Existing title", content=CONTENT)
-        with Image.new("RGB", (100, 100), "white") as image:
-            image.save(document.source_path, format="PNG")
+        write_blank_png(document.source_path)
         template = OcrTemplateFactory(
             name="Template",
             match="Northwind",
@@ -1540,7 +1569,7 @@ class TestRunZoneOcr:
             width=20,
             height=20,
         )
-        run.return_value.stdout = ""
+        mock_zone_ocr_run.return_value.stdout = ""
 
         response = admin_client.post(RUN_ZONE_OCR_URL.format(pk=document.pk))
 
@@ -1553,7 +1582,7 @@ class TestRunZoneOcr:
     def test_reports_all_target_types_and_missing_values(
         self,
         admin_client: APIClient,
-        mocker: MockerFixture,
+        mock_zone_ocr_run: MagicMock,
         text_field: CustomField,
         date_field: CustomField,
     ) -> None:
@@ -1566,12 +1595,10 @@ class TestRunZoneOcr:
         THEN:
             - Each zone reports the value for its target, or None when missing
         """
-        run = mocker.patch("documents.zone_ocr.subprocess.run")
         document = DocumentFactory(content=CONTENT, archive_serial_number=123)
-        with Image.new("RGB", (100, 100), "white") as image:
-            image.save(document.source_path, format="PNG")
-        run.side_effect = [
-            subprocess.CompletedProcess([], 0, stdout=value)
+        write_blank_png(document.source_path)
+        mock_zone_ocr_run.side_effect = [
+            subprocess.CompletedProcess(args=[], returncode=0, stdout=value, stderr="")
             for value in [
                 "New invoice",
                 "",
@@ -1634,7 +1661,7 @@ class TestRunZoneOcrPermissions:
     def test_rejects_a_template_the_user_cannot_view(
         self,
         rest_api_client: APIClient,
-        mocker: MockerFixture,
+        mock_extract: MagicMock,
     ) -> None:
         """
         GIVEN:
@@ -1645,7 +1672,6 @@ class TestRunZoneOcrPermissions:
         THEN:
             - 403 is returned and nothing is extracted
         """
-        extract = mocker.patch("documents.zone_ocr.run_zone_extraction")
         user = UserFactory()
         grant_global(user, "view_document", "change_document")
         document = DocumentFactory(content=CONTENT, owner=user)
@@ -1662,12 +1688,12 @@ class TestRunZoneOcrPermissions:
         )
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
-        extract.assert_not_called()
+        mock_extract.assert_not_called()
 
     def test_requires_change_permission_on_the_document(
         self,
         rest_api_client: APIClient,
-        mocker: MockerFixture,
+        mock_extract: MagicMock,
     ) -> None:
         """
         GIVEN:
@@ -1678,7 +1704,6 @@ class TestRunZoneOcrPermissions:
         THEN:
             - 403 is returned and nothing is extracted
         """
-        extract = mocker.patch("documents.zone_ocr.run_zone_extraction")
         owner = UserFactory()
         user = UserFactory()
         grant_global(user, "view_document", "change_document")
@@ -1688,12 +1713,12 @@ class TestRunZoneOcrPermissions:
         response = rest_api_client.post(RUN_ZONE_OCR_URL.format(pk=document.pk))
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
-        extract.assert_not_called()
+        mock_extract.assert_not_called()
 
     def test_requires_global_change_permission(
         self,
         rest_api_client: APIClient,
-        mocker: MockerFixture,
+        mock_extract: MagicMock,
     ) -> None:
         """
         GIVEN:
@@ -1704,7 +1729,6 @@ class TestRunZoneOcrPermissions:
         THEN:
             - 403 is returned and nothing is extracted
         """
-        extract = mocker.patch("documents.zone_ocr.run_zone_extraction")
         user = UserFactory()
         grant_global(user, "view_document", "add_document")
         document = DocumentFactory(content=CONTENT, owner=user)
@@ -1713,12 +1737,12 @@ class TestRunZoneOcrPermissions:
         response = rest_api_client.post(RUN_ZONE_OCR_URL.format(pk=document.pk))
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
-        extract.assert_not_called()
+        mock_extract.assert_not_called()
 
     def test_does_not_require_document_upload_permission(
         self,
         rest_api_client: APIClient,
-        mocker: MockerFixture,
+        mock_extract: MagicMock,
     ) -> None:
         """
         GIVEN:
@@ -1729,7 +1753,6 @@ class TestRunZoneOcrPermissions:
         THEN:
             - The request succeeds and extraction runs
         """
-        extract = mocker.patch("documents.zone_ocr.run_zone_extraction")
         user = UserFactory()
         grant_global(user, "change_document")
         document = DocumentFactory(owner=user, content=CONTENT)
@@ -1746,13 +1769,13 @@ class TestRunZoneOcrPermissions:
         response = rest_api_client.post(RUN_ZONE_OCR_URL.format(pk=document.pk))
 
         assert response.status_code == 200
-        extract.assert_called_once()
+        mock_extract.assert_called_once()
 
     def test_skips_templates_private_to_the_requester(
         self,
         admin_client: APIClient,
         admin_user: User,
-        mocker: MockerFixture,
+        mock_extract: MagicMock,
     ) -> None:
         """
         GIVEN:
@@ -1763,7 +1786,6 @@ class TestRunZoneOcrPermissions:
         THEN:
             - The run is skipped with reason no_template and nothing is extracted
         """
-        extract = mocker.patch("documents.zone_ocr.run_zone_extraction")
         owner = UserFactory()
         document = DocumentFactory(content=CONTENT, owner=owner)
         OcrTemplateFactory(
@@ -1777,18 +1799,14 @@ class TestRunZoneOcrPermissions:
         response = admin_client.post(RUN_ZONE_OCR_URL.format(pk=document.pk))
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.json() == {
-            "status": "skipped",
-            "reason": "no_template",
-            "results": [],
-        }
-        extract.assert_not_called()
+        assert response.json() == SKIPPED_NO_TEMPLATE
+        mock_extract.assert_not_called()
 
     def test_reports_only_templates_visible_to_the_document_owner(
         self,
         admin_client: APIClient,
         admin_user: User,
-        mocker: MockerFixture,
+        mock_zone_ocr_run: MagicMock,
     ) -> None:
         """
         GIVEN:
@@ -1800,30 +1818,21 @@ class TestRunZoneOcrPermissions:
         THEN:
             - Only templates visible to the document owner run and are reported
         """
-        run = mocker.patch("documents.zone_ocr.subprocess.run")
         owner = UserFactory()
         document = DocumentFactory(content=CONTENT, owner=owner)
-        with Image.new("RGB", (100, 100), "white") as image:
-            image.save(document.source_path, format="PNG")
-        run.return_value.stdout = "extracted"
+        write_blank_png(document.source_path)
+        mock_zone_ocr_run.return_value.stdout = "extracted"
         for name, template_owner in [
             ("Owned", owner),
             ("Unowned", None),
             ("Shared", admin_user),
             ("Private", admin_user),
         ]:
-            template = OcrTemplateFactory(
-                name=name,
-                owner=template_owner,
-                match="Northwind",
+            template = title_template(
+                name,
+                template_owner,
                 source_width=100,
                 source_height=100,
-            )
-            OcrTemplateZoneFactory(
-                template=template,
-                name=name,
-                width=20,
-                height=20,
             )
             if name == "Shared":
                 grant_object(owner, template, "view_ocrtemplate")
@@ -1836,12 +1845,12 @@ class TestRunZoneOcrPermissions:
             "Shared",
             "Unowned",
         ]
-        assert run.call_count == 3
+        assert mock_zone_ocr_run.call_count == 3
 
     def test_hides_the_owners_private_templates_from_an_editor(
         self,
         rest_api_client: APIClient,
-        mocker: MockerFixture,
+        mock_zone_ocr_run: MagicMock,
     ) -> None:
         """
         GIVEN:
@@ -1852,32 +1861,23 @@ class TestRunZoneOcrPermissions:
         THEN:
             - Only templates the editor can also view run and are reported
         """
-        run = mocker.patch("documents.zone_ocr.subprocess.run")
         owner = UserFactory()
         editor = UserFactory()
         grant_global(editor, "view_document", "change_document")
         document = DocumentFactory(content=CONTENT, owner=owner)
         grant_object(editor, document, "view_document", "change_document")
-        with Image.new("RGB", (100, 100), "white") as image:
-            image.save(document.source_path, format="PNG")
-        run.return_value.stdout = "extracted"
+        write_blank_png(document.source_path)
+        mock_zone_ocr_run.return_value.stdout = "extracted"
         for name, template_owner in [
             ("Owner private", owner),
             ("Unowned", None),
             ("Shared", owner),
         ]:
-            template = OcrTemplateFactory(
-                name=name,
-                owner=template_owner,
-                match="Northwind",
+            template = title_template(
+                name,
+                template_owner,
                 source_width=100,
                 source_height=100,
-            )
-            OcrTemplateZoneFactory(
-                template=template,
-                name=name,
-                width=20,
-                height=20,
             )
             if name == "Shared":
                 grant_object(editor, template, "view_ocrtemplate")
@@ -1890,7 +1890,7 @@ class TestRunZoneOcrPermissions:
             "Shared",
             "Unowned",
         ]
-        assert run.call_count == 2
+        assert mock_zone_ocr_run.call_count == 2
 
 
 @pytest.mark.django_db
@@ -1917,7 +1917,7 @@ class TestDocumentPageImage:
         self,
         preview_client: APIClient,
         preview_user: User,
-        mocker: MockerFixture,
+        mock_render: MagicMock,
     ) -> None:
         """
         GIVEN:
@@ -1927,7 +1927,6 @@ class TestDocumentPageImage:
         THEN:
             - The original file is served and no render subprocess runs
         """
-        render = mocker.patch("documents.views.subprocess.run")
         document = DocumentFactory(owner=preview_user, mime_type="image/png")
         document.source_path.write_bytes(b"image contents")
 
@@ -1936,7 +1935,7 @@ class TestDocumentPageImage:
         assert response.status_code == 200
         assert response["Content-Type"] == "image/png"
         assert response.content == b"image contents"
-        render.assert_not_called()
+        mock_render.assert_not_called()
 
     def test_renders_pdf_archive_for_an_image_upload(
         self,
@@ -1974,7 +1973,7 @@ class TestDocumentPageImage:
         self,
         preview_client: APIClient,
         preview_document: Document,
-        mocker: MockerFixture,
+        mock_render: MagicMock,
     ) -> None:
         """
         GIVEN:
@@ -1985,19 +1984,18 @@ class TestDocumentPageImage:
             - pdftoppm is invoked for page 2 with the expected arguments
             - The rendered page is served and the temporary directory removed
         """
-        render = mocker.patch("documents.views.subprocess.run")
 
         def render_page(command: list[str], **kwargs: Any) -> None:
             Path(command[-1] + "-2.png").write_bytes(b"rendered page")
 
-        render.side_effect = render_page
+        mock_render.side_effect = render_page
 
         response = preview_client.get(preview_url(preview_document, 1))
 
         assert response.status_code == 200
         assert response["Content-Type"] == "image/png"
         assert response.content == b"rendered page"
-        command = render.call_args.args[0]
+        command = mock_render.call_args.args[0]
         assert command[:9] == [
             "pdftoppm",
             "-png",
@@ -2009,7 +2007,7 @@ class TestDocumentPageImage:
             "2",
             str(preview_document.source_path),
         ]
-        assert render.call_args.kwargs == {
+        assert mock_render.call_args.kwargs == {
             "check": True,
             "capture_output": True,
             "timeout": 30,
@@ -2035,7 +2033,7 @@ class TestDocumentPageImage:
         self,
         preview_client: APIClient,
         preview_document: Document,
-        mocker: MockerFixture,
+        mock_render: MagicMock,
         error: Exception,
     ) -> None:
         """
@@ -2046,19 +2044,18 @@ class TestDocumentPageImage:
         THEN:
             - 404 is returned without leaking the subprocess error output
         """
-        render = mocker.patch("documents.views.subprocess.run")
-        render.side_effect = error
+        mock_render.side_effect = error
 
         response = preview_client.get(preview_url(preview_document))
 
         assert response.status_code == 404
         assert "sensitive server path" not in str(response.content)
 
+    @pytest.mark.usefixtures("mock_render")
     def test_missing_render_output_returns_not_found(
         self,
         preview_client: APIClient,
         preview_document: Document,
-        mocker: MockerFixture,
     ) -> None:
         """
         GIVEN:
@@ -2068,7 +2065,6 @@ class TestDocumentPageImage:
         THEN:
             - 404 is returned
         """
-        mocker.patch("documents.views.subprocess.run")
 
         assert preview_client.get(preview_url(preview_document)).status_code == 404
 
@@ -2080,7 +2076,7 @@ class TestZonePreview:
         self,
         preview_client: APIClient,
         preview_document: Document,
-        mocker: MockerFixture,
+        mock_preview: MagicMock,
     ) -> None:
         """
         GIVEN:
@@ -2092,8 +2088,7 @@ class TestZonePreview:
             - The result includes the regex match
             - No zone is saved
         """
-        extract = mocker.patch("documents.zone_ocr.extract_zone_preview")
-        extract.return_value = {"raw_text": " 123 ", "value": "123"}
+        mock_preview.return_value = {"raw_text": " 123 ", "value": "123"}
 
         response = preview_zone(
             preview_client,
@@ -2115,7 +2110,7 @@ class TestZonePreview:
             "regex": r"\d+",
             "regex_match": True,
         }
-        path, zone, width, height, page_count = extract.call_args.args
+        path, zone, width, height, page_count = mock_preview.call_args.args
         assert path == preview_document.source_path
         assert (zone.x, zone.y, zone.width, zone.height, zone.page) == (
             10,
@@ -2143,7 +2138,7 @@ class TestZonePreview:
         self,
         preview_client: APIClient,
         preview_document: Document,
-        mocker: MockerFixture,
+        mock_preview: MagicMock,
         regex: str,
         value: str | None,
         expected: bool | None,  # noqa: FBT001
@@ -2158,8 +2153,7 @@ class TestZonePreview:
             - regex_match reflects the outcome
             - Source dimensions default to 0
         """
-        extract = mocker.patch("documents.zone_ocr.extract_zone_preview")
-        extract.return_value = {"raw_text": value, "value": value}
+        mock_preview.return_value = {"raw_text": value, "value": value}
 
         response = preview_zone(
             preview_client,
@@ -2169,7 +2163,7 @@ class TestZonePreview:
 
         assert response.status_code == 200
         assert response.json()["regex_match"] == expected
-        assert extract.call_args.args[2:4] == (0, 0)
+        assert mock_preview.call_args.args[2:4] == (0, 0)
 
     @pytest.mark.parametrize(
         "zone",
@@ -2195,7 +2189,7 @@ class TestZonePreview:
         self,
         preview_client: APIClient,
         preview_document: Document,
-        mocker: MockerFixture,
+        mock_preview: MagicMock,
         zone: dict[str, Any],
     ) -> None:
         """
@@ -2206,10 +2200,9 @@ class TestZonePreview:
         THEN:
             - 400 is returned and extraction does not run
         """
-        extract = mocker.patch("documents.zone_ocr.extract_zone_preview")
 
         assert preview_zone(preview_client, preview_document, **zone).status_code == 400
-        extract.assert_not_called()
+        mock_preview.assert_not_called()
 
     @pytest.mark.parametrize(
         "make_data",
@@ -2237,7 +2230,7 @@ class TestZonePreview:
         self,
         preview_client: APIClient,
         preview_document: Document,
-        mocker: MockerFixture,
+        mock_preview: MagicMock,
         make_data: Callable[[Document], dict[str, Any]],
     ) -> None:
         """
@@ -2248,7 +2241,6 @@ class TestZonePreview:
         THEN:
             - 400 is returned and extraction does not run
         """
-        extract = mocker.patch("documents.zone_ocr.extract_zone_preview")
 
         response = preview_client.post(
             PREVIEW_ZONE_URL,
@@ -2257,7 +2249,7 @@ class TestZonePreview:
         )
 
         assert response.status_code == 400
-        extract.assert_not_called()
+        mock_preview.assert_not_called()
 
 
 @pytest.mark.django_db
@@ -2273,7 +2265,7 @@ class TestOcrTemplatePreviewPermissions:
     def test_previews_require_global_document_view_permission(
         self,
         rest_api_client: APIClient,
-        mocker: MockerFixture,
+        mock_preview: MagicMock,
         action: str,
     ) -> None:
         """
@@ -2286,13 +2278,12 @@ class TestOcrTemplatePreviewPermissions:
         THEN:
             - 403 is returned and no extraction runs
         """
-        extract = mocker.patch("documents.zone_ocr.extract_zone_preview")
         user = UserFactory()
         grant_global(user, "view_ocrtemplate", "add_ocrtemplate")
         rest_api_client.force_authenticate(user)
         document = DocumentFactory(owner=None, mime_type="image/png")
         document.source_path.write_bytes(b"document contents")
-        extract.return_value = {"raw_text": "document contents", "value": None}
+        mock_preview.return_value = {"raw_text": "document contents", "value": None}
 
         if action == "document-page-image":
             response = rest_api_client.get(preview_url(document))
@@ -2304,13 +2295,14 @@ class TestOcrTemplatePreviewPermissions:
             )
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
-        extract.assert_not_called()
+        mock_preview.assert_not_called()
 
     def test_versions_are_authorized_through_the_root_document(
         self,
         preview_client: APIClient,
         preview_user: User,
-        mocker: MockerFixture,
+        mock_preview: MagicMock,
+        mock_render: MagicMock,
     ) -> None:
         """
         GIVEN:
@@ -2322,8 +2314,6 @@ class TestOcrTemplatePreviewPermissions:
             - Both are refused until the user is granted view on the root
             - Afterwards both succeed
         """
-        extract = mocker.patch("documents.zone_ocr.extract_zone_preview")
-        render = mocker.patch("documents.views.subprocess.run")
         other = UserFactory()
         root = DocumentFactory(owner=other)
         version = DocumentFactory(
@@ -2339,11 +2329,11 @@ class TestOcrTemplatePreviewPermissions:
             preview_client.post(PREVIEW_ZONE_URL, data, format="json").status_code
             == 403
         )
-        render.assert_not_called()
-        extract.assert_not_called()
+        mock_render.assert_not_called()
+        mock_preview.assert_not_called()
 
         grant_object(preview_user, root, "view_document")
-        extract.return_value = {"raw_text": None, "value": None}
+        mock_preview.return_value = {"raw_text": None, "value": None}
         assert preview_client.get(preview_url(version)).status_code == 200
         assert (
             preview_client.post(PREVIEW_ZONE_URL, data, format="json").status_code
