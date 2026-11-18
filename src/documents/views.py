@@ -4359,7 +4359,7 @@ def get_github_releases(
     except httpx.HTTPError as e:
         logger.debug(f"An error occurred fetching GitHub releases: {e}")
         return None
-    cache.set(GITHUB_RELEASES_CACHE_KEY % current_version, releases, 60 * 60 * 4)
+    cache.set(GITHUB_RELEASES_CACHE_KEY % current_version, releases, 60 * 60)
     return releases
 
 
