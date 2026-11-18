@@ -7,6 +7,7 @@ from unittest import mock
 import pytest
 from auditlog.models import LogEntry
 from django.contrib.auth.models import User
+from pytest_mock import MockerFixture
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.test import APIClient
 
@@ -19,6 +20,7 @@ from documents.signals.handlers import before_task_publish_handler
 from documents.signals.handlers import task_failure_handler
 from documents.signals.handlers import task_postrun_handler
 from documents.signals.handlers import task_revoked_handler
+from paperless_testing.factories import OcrTemplateFactory
 from paperless_testing.factories import UserFactory
 from paperless_testing.permissions import grant_global
 
@@ -66,17 +68,27 @@ def test_request_only_queues(bulk_setup, endpoint, operation, parameters):
 
 
 @pytest.mark.django_db
-def test_zone_ocr_queues_only_template_id_and_returns_tracked_task(bulk_setup):
-    user, client, doc, _ = bulk_setup
-    template = OcrTemplate.objects.create(
-        name="Template",
-        source_width=100,
-        source_height=100,
-    )
-    with (
-        mock.patch("documents.views.execute_bulk_operation.apply_async") as enqueue,
-        mock.patch("documents.bulk_edit.extract_zones") as extract,
-    ):
+class TestRunZoneOcrBulkOperation:
+    """Zone OCR runs as a tracked bulk operation."""
+
+    def test_queues_only_template_id_and_returns_tracked_task(
+        self,
+        mocker: MockerFixture,
+        bulk_setup: tuple[User, APIClient, Document, Correspondent],
+    ) -> None:
+        """
+        GIVEN:
+            - A zone OCR run request naming a template
+        WHEN:
+            - The request is posted to the API
+        THEN:
+            - Only the template id is queued, with a tracked task id returned
+            - Extraction does not run in the request
+        """
+        user, client, doc, _ = bulk_setup
+        template = OcrTemplateFactory(source_width=100, source_height=100)
+        enqueue = mocker.patch("documents.views.execute_bulk_operation.apply_async")
+        extract = mocker.patch("documents.bulk_edit.extract_zones")
         enqueue.return_value.id = "zone-ocr-task"
         response = client.post(
             "/api/documents/run_zone_ocr/",
@@ -87,78 +99,108 @@ def test_zone_ocr_queues_only_template_id_and_returns_tracked_task(bulk_setup):
             },
             format="json",
         )
-    assert response.status_code == 200
-    assert response.data == {"result": "OK", "task_id": "zone-ocr-task"}
-    kwargs = enqueue.call_args.kwargs["kwargs"]
-    assert json.loads(json.dumps(kwargs)) == {
-        "operation": "run_zone_ocr",
-        "document_ids": [doc.pk],
-        "parameters": {"template": template.pk},
-        "user_id": user.pk,
-        "trigger_source": "web_ui",
-    }
-    extract.assert_not_called()
+        assert response.status_code == 200
+        assert response.data == {"result": "OK", "task_id": "zone-ocr-task"}
+        kwargs = enqueue.call_args.kwargs["kwargs"]
+        assert json.loads(json.dumps(kwargs)) == {
+            "operation": "run_zone_ocr",
+            "document_ids": [doc.pk],
+            "parameters": {"template": template.pk},
+            "user_id": user.pk,
+            "trigger_source": "web_ui",
+        }
+        extract.assert_not_called()
 
-
-@pytest.mark.django_db
-def test_zone_ocr_finishes_extraction_within_the_tracked_task(bulk_setup):
-    user, _, doc, _ = bulk_setup
-    template = OcrTemplate.objects.create(
-        name="Template",
-        source_width=100,
-        source_height=100,
-    )
-    with mock.patch("documents.bulk_edit.extract_zones") as extract:
+    def test_finishes_extraction_within_the_tracked_task(
+        self,
+        mocker: MockerFixture,
+        bulk_setup: tuple[User, APIClient, Document, Correspondent],
+    ) -> None:
+        """
+        GIVEN:
+            - A queued zone OCR run naming a template
+        WHEN:
+            - The tracked task executes it
+        THEN:
+            - Extraction is called synchronously with the requester
+            - No further extraction task is enqueued
+            - The result reports the operation and document count
+        """
+        user, _, doc, _ = bulk_setup
+        template = OcrTemplateFactory(source_width=100, source_height=100)
+        extract = mocker.patch("documents.bulk_edit.extract_zones")
         result = execute_bulk_operation(
             "run_zone_ocr",
             [doc.pk],
             {"template": template.pk},
             user.pk,
         )
-    extract.assert_called_once_with(
-        document_id=doc.pk,
-        template_id=template.pk,
-        requester=user,
-    )
-    extract.apply_async.assert_not_called()
-    assert result == {"operation": "run_zone_ocr", "document_count": 1}
+        extract.assert_called_once_with(
+            document_id=doc.pk,
+            template_id=template.pk,
+            requester=user,
+        )
+        extract.apply_async.assert_not_called()
+        assert result == {"operation": "run_zone_ocr", "document_count": 1}
 
-
-@pytest.mark.django_db
-def test_zone_ocr_without_template_selects_for_the_requester(bulk_setup):
-    """
-    GIVEN:
-        - A queued zone OCR run without a chosen template
-    WHEN:
-        - The tracked task executes it
-    THEN:
-        - Extraction receives the requesting user so templates are limited to
-          those they can view
-    """
-    user, _, doc, _ = bulk_setup
-    with mock.patch("documents.bulk_edit.extract_zones") as extract:
+    def test_without_template_selects_for_the_requester(
+        self,
+        mocker: MockerFixture,
+        bulk_setup: tuple[User, APIClient, Document, Correspondent],
+    ) -> None:
+        """
+        GIVEN:
+            - A queued zone OCR run without a chosen template
+        WHEN:
+            - The tracked task executes it
+        THEN:
+            - Extraction receives the requesting user so templates are limited to
+              those they can view
+        """
+        user, _, doc, _ = bulk_setup
+        extract = mocker.patch("documents.bulk_edit.extract_zones")
         execute_bulk_operation("run_zone_ocr", [doc.pk], {}, user.pk)
-    extract.assert_called_once_with(
-        document_id=doc.pk,
-        template_id=None,
-        requester=user,
-    )
+        extract.assert_called_once_with(
+            document_id=doc.pk,
+            template_id=None,
+            requester=user,
+        )
 
-
-@pytest.mark.django_db
-@pytest.mark.parametrize("revoked", ["document", "template", "user"])
-def test_zone_ocr_rechecks_access_before_extraction(bulk_setup, revoked):
-    _, client, doc, _ = bulk_setup
-    user = UserFactory()
-    grant_global(user, "change_document")
-    template = OcrTemplate.objects.create(
-        name="Template",
-        owner=user,
-        source_width=100,
-        source_height=100,
+    @pytest.mark.parametrize(
+        "revoked",
+        [
+            pytest.param("document", id="document"),
+            pytest.param("template", id="template"),
+            pytest.param("user", id="user"),
+        ],
     )
-    client.force_authenticate(user)
-    with mock.patch("documents.views.execute_bulk_operation.apply_async") as enqueue:
+    def test_rechecks_access_before_extraction(
+        self,
+        mocker: MockerFixture,
+        bulk_setup: tuple[User, APIClient, Document, Correspondent],
+        revoked: str,
+    ) -> None:
+        """
+        GIVEN:
+            - A zone OCR run accepted for a user with access to the document
+              and template
+        WHEN:
+            - Access to the document, the template, or the user is revoked before
+              the tracked task executes
+        THEN:
+            - Execution raises PermissionDenied
+            - Extraction never runs
+        """
+        _, client, doc, _ = bulk_setup
+        user = UserFactory()
+        grant_global(user, "change_document")
+        template = OcrTemplateFactory(
+            owner=user,
+            source_width=100,
+            source_height=100,
+        )
+        client.force_authenticate(user)
+        enqueue = mocker.patch("documents.views.execute_bulk_operation.apply_async")
         enqueue.return_value.id = "zone-ocr-task"
         response = client.post(
             "/api/documents/run_zone_ocr/",
@@ -168,30 +210,40 @@ def test_zone_ocr_rechecks_access_before_extraction(bulk_setup, revoked):
             },
             format="json",
         )
-    assert response.status_code == 200
-    if revoked == "document":
-        doc.owner = UserFactory()
-        doc.save(update_fields=["owner"])
-    elif revoked == "template":
-        template.owner = UserFactory()
-        template.save(update_fields=["owner"])
-    else:
-        User.objects.filter(pk=user.pk).update(is_active=False)
-    with mock.patch("documents.bulk_edit.extract_zones") as extract:
+        assert response.status_code == 200
+        if revoked == "document":
+            doc.owner = UserFactory()
+            doc.save(update_fields=["owner"])
+        elif revoked == "template":
+            template.owner = UserFactory()
+            template.save(update_fields=["owner"])
+        else:
+            User.objects.filter(pk=user.pk).update(is_active=False)
+        extract = mocker.patch("documents.bulk_edit.extract_zones")
         with pytest.raises(PermissionDenied):
             execute_bulk_operation(**enqueue.call_args.kwargs["kwargs"])
-    extract.assert_not_called()
+        extract.assert_not_called()
 
-
-@pytest.mark.django_db
-def test_zone_ocr_cannot_fall_back_to_matching_if_chosen_template_is_deleted(
-    bulk_setup,
-):
-    user, _, doc, _ = bulk_setup
-    with mock.patch("documents.bulk_edit.extract_zones") as extract:
+    def test_cannot_fall_back_to_matching_if_chosen_template_is_deleted(
+        self,
+        mocker: MockerFixture,
+        bulk_setup: tuple[User, APIClient, Document, Correspondent],
+    ) -> None:
+        """
+        GIVEN:
+            - A queued zone OCR run naming a template that no longer exists
+        WHEN:
+            - The tracked task executes it
+        THEN:
+            - OcrTemplate.DoesNotExist is raised instead of falling back to
+              template matching
+            - Extraction never runs
+        """
+        user, _, doc, _ = bulk_setup
+        extract = mocker.patch("documents.bulk_edit.extract_zones")
         with pytest.raises(OcrTemplate.DoesNotExist):
             execute_bulk_operation("run_zone_ocr", [doc.pk], {"template": 999}, user.pk)
-    extract.assert_not_called()
+        extract.assert_not_called()
 
 
 @pytest.mark.django_db
