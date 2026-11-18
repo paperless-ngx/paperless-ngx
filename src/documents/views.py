@@ -4369,19 +4369,20 @@ def get_github_stars() -> int | None:
     Fetch the number of stars for the Paperless-NGX repository from GitHub.
     """
     count = cache.get(GITHUB_CACHE_KEY % "stars")
+    if count is not None:
+        return count
     try:
         resp = httpx.get(
             "https://api.github.com/repos/paperless-ngx/paperless-ngx",
-            headers={"Accept": "application/vnd.github.v3+json"},
+            headers={"Accept": "application/vnd.github+json"},
         )
         resp.raise_for_status()
-        data = resp.json()
-        count = data.get("stargazers_count")
-        cache.set(GITHUB_CACHE_KEY % "stars", count, 60 * 60)
-        return count
+        count = resp.json()["stargazers_count"]
     except Exception as e:
         logger.debug(f"An error occurred fetching GitHub stars: {e}")
         return None
+    cache.set(GITHUB_CACHE_KEY % "stars", count, 60 * 60)
+    return count
 
 
 @extend_schema_view(
