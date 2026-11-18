@@ -4314,7 +4314,7 @@ class UiSettingsView(GenericAPIView[Any]):
         )
 
 
-GITHUB_RELEASES_CACHE_KEY = "github_releases:%s"
+GITHUB_CACHE_KEY = "github_releases:%s"
 
 
 def get_github_releases(
@@ -4323,7 +4323,7 @@ def get_github_releases(
     """
     Fetch recent pngx releases from GitHub, newest first.
     """
-    releases = cache.get(GITHUB_RELEASES_CACHE_KEY % current_version)
+    releases = cache.get(GITHUB_CACHE_KEY % current_version)
     if releases is not None:
         return releases
     try:
@@ -4360,8 +4360,28 @@ def get_github_releases(
     except httpx.HTTPError as e:
         logger.debug(f"An error occurred fetching GitHub releases: {e}")
         return None
-    cache.set(GITHUB_RELEASES_CACHE_KEY % current_version, releases, 60 * 60)
+    cache.set(GITHUB_CACHE_KEY % current_version, releases, 60 * 60)
     return releases
+
+
+def get_github_stars() -> int | None:
+    """
+    Fetch the number of stars for the Paperless-NGX repository from GitHub.
+    """
+    count = cache.get(GITHUB_CACHE_KEY % "stars")
+    try:
+        resp = httpx.get(
+            "https://api.github.com/repos/paperless-ngx/paperless-ngx",
+            headers={"Accept": "application/vnd.github.v3+json"},
+        )
+        resp.raise_for_status()
+        data = resp.json()
+        count = data.get("stargazers_count")
+        cache.set(GITHUB_CACHE_KEY % "stars", count, 60 * 60)
+        return count
+    except Exception as e:
+        logger.debug(f"An error occurred fetching GitHub stars: {e}")
+        return None
 
 
 @extend_schema_view(
