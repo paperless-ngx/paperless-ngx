@@ -4314,14 +4314,16 @@ class UiSettingsView(GenericAPIView[Any]):
         )
 
 
-GITHUB_RELEASES_CACHE_KEY = "github_releases"
+GITHUB_RELEASES_CACHE_KEY = "github_releases:%s"
 
 
-def get_github_releases() -> list[dict[str, Any]] | None:
+def get_github_releases(
+    current_version: packaging_version.Version,
+) -> list[dict[str, Any]] | None:
     """
     Fetch recent pngx releases from GitHub, newest first.
     """
-    releases = cache.get(GITHUB_RELEASES_CACHE_KEY)
+    releases = cache.get(GITHUB_RELEASES_CACHE_KEY % current_version)
     if releases is not None:
         return releases
     try:
@@ -4357,7 +4359,7 @@ def get_github_releases() -> list[dict[str, Any]] | None:
     except httpx.HTTPError as e:
         logger.debug(f"An error occurred fetching GitHub releases: {e}")
         return None
-    cache.set(GITHUB_RELEASES_CACHE_KEY, releases, 60 * 15)
+    cache.set(GITHUB_RELEASES_CACHE_KEY % current_version, releases, 60 * 60 * 4)
     return releases
 
 
@@ -4372,7 +4374,7 @@ def get_github_releases() -> list[dict[str, Any]] | None:
 class RemoteVersionView(GenericAPIView[Any]):
     def get(self, request, format=None):
         current_version = packaging_version.parse(version.__full_version_str__)
-        releases = get_github_releases()
+        releases = get_github_releases(current_version)
         remote_version = (
             max(releases, key=lambda r: packaging_version.parse(r["version"]))[
                 "version"
