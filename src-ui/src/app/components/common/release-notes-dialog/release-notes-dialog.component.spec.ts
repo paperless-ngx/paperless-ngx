@@ -8,10 +8,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { SettingsService } from 'src/app/services/settings.service'
 import { environment } from 'src/environments/environment'
-import {
-  cleanReleaseBody,
-  ReleaseNotesDialogComponent,
-} from './release-notes-dialog.component'
+import { ReleaseNotesDialogComponent } from './release-notes-dialog.component'
 
 describe('ReleaseNotesDialogComponent', () => {
   let component: ReleaseNotesDialogComponent
@@ -58,7 +55,9 @@ describe('ReleaseNotesDialogComponent', () => {
         {
           version: '3.5.1',
           name: 'Paperless-ngx v3.5.1',
-          body: '## paperless-ngx 3.5.1\r\n\r\n### Bug Fixes\r\n\r\n- Fix: a thing ([#1](https://github.com/paperless-ngx/paperless-ngx/pull/1))',
+          body_html:
+            '<h2>paperless-ngx 3.5.1</h2><h3>Bug Fixes</h3><ul><li>Fix: a thing</li></ul>' +
+            '<h3>All App Changes</h3><details><summary>1 change</summary><ul><li>Fix: a thing</li></ul></details>',
           html_url: '',
           published_at: '',
         },
@@ -69,35 +68,10 @@ describe('ReleaseNotesDialogComponent', () => {
     const text = fixture.nativeElement.textContent
     expect(text).toContain('Updated from 3.4.2 to 3.5.1')
     expect(text).toContain('Bug Fixes')
-    expect(text).not.toContain('paperless-ngx 3.5.1')
-    expect(text).not.toContain('(github.com)')
-  })
-
-  it('should drop the duplicate All App Changes section and details markup', () => {
-    const body = [
-      '## paperless-ngx 3.5.1',
-      '### Bug Fixes',
-      '- Fix: a thing',
-      '### Dependencies',
-      '<details>',
-      '<summary>1 change</summary>',
-      '',
-      '- Chore(deps): bump a thing',
-      '</details>',
-      '### All App Changes',
-      '<details>',
-      '<summary>2 changes</summary>',
-      '',
-      '- Fix: a thing',
-      '- Chore(deps): bump a thing',
-      '</details>',
-    ].join('\r\n')
-    const cleaned = cleanReleaseBody(body)
-    expect(cleaned).toContain('### Dependencies')
-    expect(cleaned).toContain('- Chore(deps): bump a thing')
-    expect(cleaned).not.toContain('All App Changes')
-    expect(cleaned).not.toContain('details>')
-    expect(cleaned).not.toContain('summary>')
+    expect(
+      fixture.nativeElement.querySelector('.release-notes-body details summary')
+        .textContent
+    ).toEqual('1 change')
   })
 
   it('should show a message if release notes could not be loaded', () => {

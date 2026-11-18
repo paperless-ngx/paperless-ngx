@@ -1,6 +1,39 @@
-:host ::ng-deep .release-notes-body > h3 {
-  font-size: 1rem;
-  font-weight: 600;
-  margin-top: 1rem;
-  margin-bottom: 0.5rem;
+// Styles for GitHub-rendered release notes (body_html)
+:host ::ng-deep .release-notes-body {
+  // Repeats the version heading
+  > h2:first-child {
+    display: none;
+  }
+
+  > h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  details {
+    margin-bottom: 1rem;
+
+    > summary {
+      color: var(--bs-secondary-color);
+      cursor: pointer;
+      margin-bottom: 0.5rem;
+    }
+  }
+
+  .markdown-alert {
+    border-left: 0.25rem solid var(--bs-info);
+    padding: 0.5rem 1rem;
+    margin-bottom: 1rem;
+
+    > :last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .markdown-alert-title {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+  }
 }

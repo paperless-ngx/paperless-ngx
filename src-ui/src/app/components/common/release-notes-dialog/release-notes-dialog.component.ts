@@ -3,7 +3,6 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { first } from 'rxjs'
 import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
-import { MarkdownPipe } from 'src/app/pipes/markdown.pipe'
 import {
   AppRelease,
   RemoteVersionService,
@@ -12,25 +11,11 @@ import { SettingsService } from 'src/app/services/settings.service'
 
 const RELEASES_URL = 'https://github.com/paperless-ngx/paperless-ngx/releases'
 
-const RELEASE_TITLE = /^\s*##\s+paperless-ngx[^\n]*\n+/i
-const ALL_CHANGES_SECTION = /^###\s+All App Changes\s*$[\s\S]*/im
-const DETAILS_MARKUP = /^\s*(<\/?details>|<summary>.*<\/summary>)\s*$/gim
-
-/**
- * Drops the "## paperless-ngx x.y.z" title, the "All App Changes"
- * section and `<details>` / `<summary>` wrappers.
- */
-export function cleanReleaseBody(body: string): string {
-  body = body.replace(RELEASE_TITLE, '')
-  body = body.replace(ALL_CHANGES_SECTION, '')
-  return body.replace(DETAILS_MARKUP, '').trim()
-}
-
 @Component({
   selector: 'pngx-release-notes-dialog',
   templateUrl: './release-notes-dialog.component.html',
   styleUrls: ['./release-notes-dialog.component.scss'],
-  imports: [BootstrapIconComponent, MarkdownPipe],
+  imports: [BootstrapIconComponent],
 })
 export class ReleaseNotesDialogComponent {
   readonly activeModal = inject(NgbActiveModal)
@@ -63,12 +48,7 @@ export class ReleaseNotesDialogComponent {
       .pipe(first())
       .subscribe({
         next: (notes) => {
-          this.releases.set(
-            notes.releases.map((release) => ({
-              ...release,
-              body: cleanReleaseBody(release.body),
-            }))
-          )
+          this.releases.set(notes.releases)
           this.loading.set(false)
         },
         error: () => {

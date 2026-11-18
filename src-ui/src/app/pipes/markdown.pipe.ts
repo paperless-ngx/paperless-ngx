@@ -12,59 +12,41 @@ function allowedUrl(href: string): URL | null {
   }
 }
 
-/**
- * Treat content as untrusted: no raw HTML, no images, and only
- * absolute links. All escaping is done by marked's default renderer, and
- * Angular's sanitizer should run on top of this as well.
- */
-function buildRenderer(showLinkHosts: boolean): Partial<Renderer> {
-  return {
-    html(this: Renderer, { raw, text }: Tokens.HTML | Tokens.Tag): string {
-      return this.text({ type: 'text', raw, text })
-    },
-    image(this: Renderer, { raw, text }: Tokens.Image): string {
-      return this.text({ type: 'text', raw, text })
-    },
-    link(this: Renderer, token: Tokens.Link): string {
-      const url = allowedUrl(token.href)
-      if (!url) return this.parser.parseInline(token.tokens)
-      const anchor = Renderer.prototype.link
-        .call(this, token)
-        .replace(
-          '<a ',
-          '<a target="_blank" rel="noopener noreferrer nofollow" '
-        )
-      if (!showLinkHosts || !url.hostname) return anchor
-      const hostname = this.text({ type: 'text', raw: '', text: url.hostname })
-      return `${anchor} <span class="text-muted small">(${hostname})</span>`
-    },
-  }
+// Treat chat content as untrusted: no raw HTML, no images, and only
+// absolute links. All escaping is done by marked's default renderer, and
+// Angular's sanitizer runs on top of this as well.
+const renderer: Partial<Renderer> = {
+  html(this: Renderer, { raw, text }: Tokens.HTML | Tokens.Tag): string {
+    return this.text({ type: 'text', raw, text })
+  },
+  image(this: Renderer, { raw, text }: Tokens.Image): string {
+    return this.text({ type: 'text', raw, text })
+  },
+  link(this: Renderer, token: Tokens.Link): string {
+    const url = allowedUrl(token.href)
+    if (!url) return this.parser.parseInline(token.tokens)
+    const anchor = Renderer.prototype.link
+      .call(this, token)
+      .replace('<a ', '<a target="_blank" rel="noopener noreferrer nofollow" ')
+    if (!url.hostname) return anchor
+    const hostname = this.text({ type: 'text', raw: '', text: url.hostname })
+    return `${anchor} <span class="text-muted small">(${hostname})</span>`
+  },
 }
 
-function buildMarked(showLinkHosts: boolean): Marked {
-  return new Marked({
-    async: false,
-    gfm: true,
-    breaks: true,
-    renderer: buildRenderer(showLinkHosts),
-  })
-}
-
-const markdown = buildMarked(true)
-const markdownWithoutLinkHosts = buildMarked(false)
+const markdown = new Marked({
+  async: false,
+  gfm: true,
+  breaks: true,
+  renderer,
+})
 
 @Pipe({
   name: 'markdown',
 })
 export class MarkdownPipe implements PipeTransform {
-  /**
-   * @param showLinkHosts append each link's hostname, e.g. "(example.com)".
-   * Can be disabled for trusted content where every link points to the same host.
-   */
-  transform(value: string | null | undefined, showLinkHosts = true): string {
+  transform(value: string | null | undefined): string {
     if (!value) return ''
-    return (showLinkHosts ? markdown : markdownWithoutLinkHosts).parse(
-      value
-    ) as string
+    return markdown.parse(value) as string
   }
 }

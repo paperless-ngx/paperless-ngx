@@ -25,7 +25,7 @@
     @for (release of releases(); track release.version) {
       <section class="release-notes" [class.mt-4]="!$first">
         <h5>{{ release.version }}</h5>
-        <div class="release-notes-body" [innerHTML]="release.body | markdown: false"></div>
+        <div class="release-notes-body" [innerHTML]="release.body_html"></div>
       </section>
     }
   }

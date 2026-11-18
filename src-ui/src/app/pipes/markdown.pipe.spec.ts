@@ -87,10 +87,4 @@ describe('MarkdownPipe', () => {
     )
     expect(html).not.toMatch(/"\s*onmouseover=/)
   })
-
-  it('should omit link hostnames when requested', () => {
-    const html = pipe.transform('[PR](https://github.com/x/y/pull/1)', false)
-    expect(html).toContain('href="https://github.com/x/y/pull/1"')
-    expect(html).not.toContain('(github.com)')
-  })
 })

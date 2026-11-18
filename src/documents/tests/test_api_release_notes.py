@@ -15,7 +15,7 @@ def _release(tag: str, **kwargs) -> dict:
     return {
         "tag_name": tag,
         "name": f"Paperless-ngx {tag}",
-        "body": f"## paperless-ngx {tag}",
+        "body_html": f"<h2>paperless-ngx {tag}</h2>",
         "html_url": f"https://github.com/paperless-ngx/paperless-ngx/releases/tag/{tag}",
         "published_at": "2026-11-17T03:36:20Z",
         "draft": False,
@@ -44,6 +44,7 @@ class TestApiReleaseNotes:
     def releases(self, httpx_mock: HTTPXMock) -> HTTPXMock:
         httpx_mock.add_response(
             url=RELEASES_URL,
+            match_headers={"Accept": "application/vnd.github.html+json"},
             json=[
                 _release(f"v{_bump(patch=1)}"),
                 _release(f"v{_bump(minor=1)}-beta.1", prerelease=True),
@@ -77,7 +78,10 @@ class TestApiReleaseNotes:
             PREVIOUS,
         ]
         assert response.data["releases"][0]["html_url"].endswith(f"v{CURRENT}")
-        assert response.data["releases"][0]["body"] == f"## paperless-ngx v{CURRENT}"
+        assert (
+            response.data["releases"][0]["body_html"]
+            == f"<h2>paperless-ngx v{CURRENT}</h2>"
+        )
 
     def test_without_since_returns_current_only(
         self,

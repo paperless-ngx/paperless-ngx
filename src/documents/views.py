@@ -4330,7 +4330,8 @@ def get_github_releases(
         resp = httpx.get(
             "https://api.github.com/repos/paperless-ngx/paperless-ngx/releases",
             params={"per_page": 10},
-            headers={"Accept": "application/json"},
+            # GitHub renders release bodies as HTML
+            headers={"Accept": "application/vnd.github.html+json"},
         )
         resp.raise_for_status()
         releases = []
@@ -4348,7 +4349,7 @@ def get_github_releases(
                 {
                     "version": str(release_version),
                     "name": release.get("name") or release["tag_name"],
-                    "body": release.get("body") or "",
+                    "body_html": release.get("body_html") or "",
                     "html_url": release["html_url"],
                     "published_at": release.get("published_at"),
                 },

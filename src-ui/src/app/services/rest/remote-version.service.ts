@@ -11,7 +11,7 @@ export interface AppRemoteVersion {
 export interface AppRelease {
   version: string
   name: string
-  body: string
+  body_html: string
   html_url: string
   published_at: string
 }
