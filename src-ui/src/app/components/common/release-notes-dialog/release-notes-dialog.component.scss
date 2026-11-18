@@ -22,6 +22,12 @@
     }
   }
 
+  // Keep the link underline off code, where it hides underscores
+  // e.g. PAPERLESS_ALLOWED_HOSTS
+  a code {
+    display: inline-block;
+  }
+
   .markdown-alert {
     border-left: 0.25rem solid var(--bs-info);
     padding: 0.5rem 1rem;

@@ -11,6 +11,25 @@ import { SettingsService } from 'src/app/services/settings.service'
 
 const RELEASES_URL = 'https://github.com/paperless-ngx/paperless-ngx/releases'
 
+/**
+ * Tweak GitHub release HTML: open links in a new tab, add no referrer etc,
+ * drop inline svgs and GH `data-*` attributes. Angular sanitizes all of this anyway.
+ */
+export function prepareReleaseHtml(html: string): string {
+  const doc = new DOMParser().parseFromString(html, 'text/html')
+  doc.querySelectorAll('svg').forEach((svg) => svg.remove())
+  doc.body.querySelectorAll('*').forEach((el) => {
+    for (const attr of Array.from(el.attributes)) {
+      if (attr.name.startsWith('data-')) el.removeAttribute(attr.name)
+    }
+  })
+  doc.querySelectorAll('a').forEach((a) => {
+    a.setAttribute('target', '_blank')
+    a.setAttribute('rel', 'noopener noreferrer nofollow')
+  })
+  return doc.body.innerHTML
+}
+
 @Component({
   selector: 'pngx-release-notes-dialog',
   templateUrl: './release-notes-dialog.component.html',
@@ -48,7 +67,12 @@ export class ReleaseNotesDialogComponent {
       .pipe(first())
       .subscribe({
         next: (notes) => {
-          this.releases.set(notes.releases)
+          this.releases.set(
+            notes.releases.map((release) => ({
+              ...release,
+              body_html: prepareReleaseHtml(release.body_html),
+            }))
+          )
           this.loading.set(false)
         },
         error: () => {

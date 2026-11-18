@@ -8,7 +8,10 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { SettingsService } from 'src/app/services/settings.service'
 import { environment } from 'src/environments/environment'
-import { ReleaseNotesDialogComponent } from './release-notes-dialog.component'
+import {
+  prepareReleaseHtml,
+  ReleaseNotesDialogComponent,
+} from './release-notes-dialog.component'
 
 describe('ReleaseNotesDialogComponent', () => {
   let component: ReleaseNotesDialogComponent
@@ -72,6 +75,22 @@ describe('ReleaseNotesDialogComponent', () => {
       fixture.nativeElement.querySelector('.release-notes-body details summary')
         .textContent
     ).toEqual('1 change')
+  })
+
+  it('should open release note links safely and drop svg icons', () => {
+    const html = prepareReleaseHtml(
+      '<div class="markdown-alert"><p class="markdown-alert-title"><svg><path d="M0"></path></svg>Note</p></div>' +
+        '<p><a href="https://github.com/paperless-ngx/paperless-ngx/pull/1" data-hovercard-type="pull_request">#1</a></p>'
+    )
+    const doc = new DOMParser().parseFromString(html, 'text/html')
+    expect(doc.querySelector('svg')).toBeNull()
+    expect(doc.querySelector('.markdown-alert-title').textContent).toEqual(
+      'Note'
+    )
+    const link = doc.querySelector('a')
+    expect(link.getAttribute('target')).toEqual('_blank')
+    expect(link.getAttribute('rel')).toEqual('noopener noreferrer nofollow')
+    expect(link.hasAttribute('data-hovercard-type')).toBe(false)
   })
 
   it('should show a message if release notes could not be loaded', () => {
