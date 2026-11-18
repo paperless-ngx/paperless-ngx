@@ -1,10 +1,15 @@
 import { DecimalPipe, NgTemplateOutlet } from '@angular/common'
-import { Component, inject, signal } from '@angular/core'
+import { Component, inject, output, signal } from '@angular/core'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { first } from 'rxjs'
 import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
+import {
+  PermissionAction,
+  PermissionsService,
+  PermissionType,
+} from 'src/app/services/permissions.service'
 import {
   AppRelease,
   RemoteVersionService,
@@ -49,6 +54,7 @@ export class ReleaseNotesDialogComponent {
   readonly activeModal = inject(NgbActiveModal)
   private readonly remoteVersionService = inject(RemoteVersionService)
   private readonly settingsService = inject(SettingsService)
+  private readonly permissionsService = inject(PermissionsService)
 
   readonly since = signal<string | null>(null)
   readonly releases = signal<AppRelease[] | null>(null)
@@ -56,9 +62,18 @@ export class ReleaseNotesDialogComponent {
   readonly loading = signal(false)
 
   readonly version: string = this.settingsService.get(SETTINGS_KEYS.VERSION)
-  readonly updateCheckingEnabled: boolean = this.settingsService.get(
-    SETTINGS_KEYS.UPDATE_CHECKING_ENABLED
+  readonly updateCheckingEnabled = signal<boolean>(
+    this.settingsService.get(SETTINGS_KEYS.UPDATE_CHECKING_ENABLED)
   )
+  readonly updateCheckingIsSet = signal(
+    this.settingsService.updateCheckingIsSet
+  )
+  readonly canChangeUpdateChecking = this.permissionsService.currentUserCan(
+    PermissionAction.Change,
+    PermissionType.UISettings
+  )
+
+  readonly updateCheckingChosen = output<boolean>()
 
   readonly repoUrl = REPO_URL
   readonly releasesUrl = RELEASES_URL
@@ -74,7 +89,7 @@ export class ReleaseNotesDialogComponent {
    */
   load(since: string | null): void {
     this.since.set(since)
-    if (!this.updateCheckingEnabled) return
+    if (!this.updateCheckingEnabled()) return
     this.loading.set(true)
     this.remoteVersionService
       .getReleaseNotes(since ?? undefined)
@@ -95,6 +110,13 @@ export class ReleaseNotesDialogComponent {
           this.loading.set(false)
         },
       })
+  }
+
+  setUpdateChecking(enable: boolean): void {
+    this.updateCheckingIsSet.set(true)
+    this.updateCheckingEnabled.set(enable)
+    this.updateCheckingChosen.emit(enable)
+    if (enable) this.load(this.since())
   }
 
   close(): void {

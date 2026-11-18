@@ -22,9 +22,17 @@
   </div>
 </div>
 <div class="modal-body">
-  @if (!updateCheckingEnabled) {
-    <p class="mb-0" i18n>Release notes are fetched from GitHub when update checking is enabled.</p>
-    <ng-container *ngTemplateOutlet="githubLink"></ng-container>
+  @if (!updateCheckingEnabled()) {
+    @if (!updateCheckingIsSet() && canChangeUpdateChecking) {
+      <p class="mb-2" i18n>Paperless-ngx can automatically check for updates and show release notes here, fetched from GitHub.</p>
+      <div class="btn-group btn-group-sm">
+        <button type="button" class="btn btn-outline-primary" (click)="setUpdateChecking(true)" i18n>Enable</button>
+        <button type="button" class="btn btn-outline-secondary" (click)="setUpdateChecking(false)" i18n>Disable</button>
+      </div>
+    } @else {
+      <p class="mb-0" i18n>Release notes are fetched from GitHub when update checking is enabled.</p>
+      <ng-container *ngTemplateOutlet="githubLink"></ng-container>
+    }
   } @else if (loading()) {
     <div class="d-flex align-items-center gap-2 text-muted">
       <output class="spinner-border spinner-border-sm"></output>

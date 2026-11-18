@@ -7,6 +7,7 @@ import {
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { PermissionsService } from 'src/app/services/permissions.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { environment } from 'src/environments/environment'
 import {
@@ -20,13 +21,18 @@ describe('ReleaseNotesDialogComponent', () => {
   let httpTestingController: HttpTestingController
   let settingsService: SettingsService
 
-  function create(updateCheckingEnabled: boolean) {
+  function create(updateCheckingEnabled?: boolean, canChangeSettings = true) {
     settingsService = TestBed.inject(SettingsService)
     settingsService.set(SETTINGS_KEYS.VERSION, '3.5.1')
-    settingsService.set(
-      SETTINGS_KEYS.UPDATE_CHECKING_ENABLED,
-      updateCheckingEnabled
-    )
+    if (updateCheckingEnabled !== undefined) {
+      settingsService.set(
+        SETTINGS_KEYS.UPDATE_CHECKING_ENABLED,
+        updateCheckingEnabled
+      )
+    }
+    jest
+      .spyOn(TestBed.inject(PermissionsService), 'currentUserCan')
+      .mockReturnValue(canChangeSettings)
     fixture = TestBed.createComponent(ReleaseNotesDialogComponent)
     component = fixture.componentInstance
   }
@@ -119,6 +125,53 @@ describe('ReleaseNotesDialogComponent', () => {
     )
     expect(component.releaseUrl).toEqual(
       'https://github.com/paperless-ngx/paperless-ngx/releases/tag/v3.5.1'
+    )
+  })
+
+  it('should offer to enable update checking if never chosen', () => {
+    create()
+    const chosen = jest.fn()
+    component.updateCheckingChosen.subscribe(chosen)
+    component.load('3.4.2')
+    fixture.detectChanges()
+
+    const enable = Array.from(
+      fixture.nativeElement.querySelectorAll('.modal-body button')
+    ).find((b: HTMLButtonElement) => b.textContent.trim() === 'Enable') as
+      HTMLButtonElement | undefined
+    expect(enable).toBeTruthy()
+    httpTestingController.expectNone(`${environment.apiBaseUrl}release_notes/`)
+
+    enable.click()
+    expect(chosen).toHaveBeenCalledWith(true)
+    httpTestingController
+      .expectOne(`${environment.apiBaseUrl}release_notes/?since=3.4.2`)
+      .flush({ version: '3.5.1', releases: [] })
+  })
+
+  it('should show the disabled message after choosing disable', () => {
+    create()
+    const chosen = jest.fn()
+    component.updateCheckingChosen.subscribe(chosen)
+    component.load(null)
+    component.setUpdateChecking(false)
+    fixture.detectChanges()
+
+    expect(chosen).toHaveBeenCalledWith(false)
+    httpTestingController.expectNone(`${environment.apiBaseUrl}release_notes/`)
+    expect(fixture.nativeElement.textContent).toContain(
+      'when update checking is enabled'
+    )
+  })
+
+  it('should not offer to enable update checking without permission', () => {
+    create(undefined, false)
+    component.load(null)
+    fixture.detectChanges()
+
+    expect(fixture.nativeElement.textContent).not.toContain('Enable')
+    expect(fixture.nativeElement.textContent).toContain(
+      'when update checking is enabled'
     )
   })
 

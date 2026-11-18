@@ -741,6 +741,19 @@ describe('AppFrameComponent', () => {
     httpTestingController.expectNone(`${environment.apiBaseUrl}ui_settings/`)
   })
 
+  it('should save update checking chosen in the release notes dialog', () => {
+    const setUpdateCheckingSpy = jest
+      .spyOn(component, 'setUpdateChecking')
+      .mockImplementation(() => {})
+    const modalSpy = jest.spyOn(modalService, 'open')
+    component.showReleaseNotes()
+
+    const dialog = modalSpy.mock.results[0].value
+      .componentInstance as ReleaseNotesDialogComponent
+    dialog.updateCheckingChosen.emit(true)
+    expect(setUpdateCheckingSpy).toHaveBeenCalledWith(true)
+  })
+
   it('should show new release dot instead of documentation in slim sidebar', () => {
     settingsService.set(SETTINGS_KEYS.SLIM_SIDEBAR, true)
     settingsService.set(SETTINGS_KEYS.VERSION, '3.5.1')

@@ -559,6 +559,9 @@ export class AppFrameComponent
       scrollable: true,
     })
     modal.componentInstance.load(since)
+    modal.componentInstance.updateCheckingChosen.subscribe((enable: boolean) =>
+      this.setUpdateChecking(enable)
+    )
     if (since) {
       this.settingsService
         .markReleasesSeen()
