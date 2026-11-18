@@ -3,6 +3,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { first } from 'rxjs'
 import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import {
   AppRelease,
   RemoteVersionService,
@@ -34,7 +35,7 @@ export function prepareReleaseHtml(html: string): string {
   selector: 'pngx-release-notes-dialog',
   templateUrl: './release-notes-dialog.component.html',
   styleUrls: ['./release-notes-dialog.component.scss'],
-  imports: [BootstrapIconComponent],
+  imports: [BootstrapIconComponent, CustomDatePipe],
 })
 export class ReleaseNotesDialogComponent {
   readonly activeModal = inject(NgbActiveModal)

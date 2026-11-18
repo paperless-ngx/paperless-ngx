@@ -1,3 +1,4 @@
+import { DatePipe } from '@angular/common'
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import {
   HttpTestingController,
@@ -34,6 +35,7 @@ describe('ReleaseNotesDialogComponent', () => {
     TestBed.configureTestingModule({
       imports: [ReleaseNotesDialogComponent],
       providers: [
+        DatePipe,
         NgbActiveModal,
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
@@ -62,7 +64,7 @@ describe('ReleaseNotesDialogComponent', () => {
             '<h2>paperless-ngx 3.5.1</h2><h3>Bug Fixes</h3><ul><li>Fix: a thing</li></ul>' +
             '<h3>All App Changes</h3><details><summary>1 change</summary><ul><li>Fix: a thing</li></ul></details>',
           html_url: '',
-          published_at: '',
+          published_at: '2026-11-18T05:22:01Z',
         },
       ],
     })

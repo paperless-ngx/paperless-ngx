@@ -23,8 +23,17 @@
     <p class="mb-0" i18n>Release notes could not be loaded.</p>
   } @else {
     @for (release of releases(); track release.version) {
-      <section class="release-notes" [class.mt-4]="!$first">
-        <h4>{{ release.version }} <a class="btn btn-link btn-sm text-secondary d-inline-flex p-0" [href]="release.html_url" aria-label="View on GitHub" target="_blank" rel="noopener noreferrer"><pngx-bs-icon name="box-arrow-up-right" class="ms-2 mt-n1"></pngx-bs-icon></a></h4>
+      <section class="release-notes" [class.border-top]="!$first" [class.pt-3]="!$first" [class.mt-3]="!$first">
+        <div class="d-flex align-items-baseline gap-2 mb-2">
+          <h5 class="mb-0">{{ release.version }}</h5>
+          <a class="d-flex flex-row align-items-center text-secondary btn-link" [href]="release.html_url" target="_blank" rel="noopener noreferrer"
+            title="View on GitHub" i18n-title>
+            @if (release.published_at) {
+              <span class="text-muted small me-2">{{ release.published_at | customDate }}</span>
+            }
+            <pngx-bs-icon name="box-arrow-up-right" class="mt-n1" width=".7rem"></pngx-bs-icon>
+          </a>
+        </div>
         <div class="release-notes-body" [innerHTML]="release.body_html"></div>
       </section>
     }
