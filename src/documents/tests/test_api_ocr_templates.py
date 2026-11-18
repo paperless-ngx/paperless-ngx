@@ -480,7 +480,8 @@ class TestOcrTemplateCreate:
 class TestOcrTemplatePermissions:
     def test_list_only_shows_permitted_templates(
         self,
-        rest_api_client: APIClient,
+        regular_user: User,
+        user_client: APIClient,
     ) -> None:
         """
         GIVEN:
@@ -492,16 +493,18 @@ class TestOcrTemplatePermissions:
             - Only the unowned, owned and shared templates are returned
         """
         other = UserFactory()
-        user = UserFactory()
-        grant_global(user, "view_ocrtemplate")
+        grant_global(regular_user, "view_ocrtemplate")
 
         title_template("Unowned")
-        title_template("Mine", owner=user)
+        title_template("Mine", owner=regular_user)
         title_template("Private", owner=other)
-        grant_object(user, title_template("Shared", owner=other), "view_ocrtemplate")
-        rest_api_client.force_authenticate(user=user)
+        grant_object(
+            regular_user,
+            title_template("Shared", owner=other),
+            "view_ocrtemplate",
+        )
 
-        response = rest_api_client.get(ENDPOINT)
+        response = user_client.get(ENDPOINT)
 
         assert response.status_code == status.HTTP_200_OK
         assert sorted(t["name"] for t in response.json()["results"]) == [
@@ -512,7 +515,8 @@ class TestOcrTemplatePermissions:
 
     def test_cannot_change_another_users_template(
         self,
-        rest_api_client: APIClient,
+        regular_user: User,
+        user_client: APIClient,
     ) -> None:
         """
         GIVEN:
@@ -523,22 +527,20 @@ class TestOcrTemplatePermissions:
             - The update is refused until the user is granted change on it
         """
         other = UserFactory()
-        user = UserFactory()
-        grant_global(user, "view_ocrtemplate", "change_ocrtemplate")
+        grant_global(regular_user, "view_ocrtemplate", "change_ocrtemplate")
         template = OcrTemplateFactory(
             name="Private",
             match="Northwind",
             owner=other,
         )
-        grant_object(user, template, "view_ocrtemplate")
-        rest_api_client.force_authenticate(user=user)
+        grant_object(regular_user, template, "view_ocrtemplate")
         url = f"{ENDPOINT}{template.pk}/"
 
-        response = rest_api_client.patch(url, {"name": "Renamed"}, format="json")
+        response = user_client.patch(url, {"name": "Renamed"}, format="json")
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
-        grant_object(user, template, "change_ocrtemplate")
-        response = rest_api_client.patch(url, {"name": "Renamed"}, format="json")
+        grant_object(regular_user, template, "change_ocrtemplate")
+        response = user_client.patch(url, {"name": "Renamed"}, format="json")
         assert response.status_code == status.HTTP_200_OK
         template.refresh_from_db()
         assert template.name == "Renamed"
@@ -561,7 +563,8 @@ class TestOcrTemplatePermissions:
 
     def test_document_page_image_requires_view_permission_on_the_document(
         self,
-        rest_api_client: APIClient,
+        regular_user: User,
+        user_client: APIClient,
     ) -> None:
         """
         GIVEN:
@@ -574,23 +577,22 @@ class TestOcrTemplatePermissions:
             - Afterwards it passes the permission check and reaches the missing file
         """
         owner = UserFactory()
-        user = UserFactory()
-        grant_global(user, "view_ocrtemplate", "view_document")
+        grant_global(regular_user, "view_ocrtemplate", "view_document")
         document = DocumentFactory(owner=owner)
-        rest_api_client.force_authenticate(user=user)
         url = f"{ENDPOINT}document-page-image/{document.pk}/0/"
 
-        response = rest_api_client.get(url)
+        response = user_client.get(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
-        grant_object(user, document, "view_document")
-        response = rest_api_client.get(url)
+        grant_object(regular_user, document, "view_document")
+        response = user_client.get(url)
         # Past the permission check; the factory document has no file on disk.
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     def test_test_zone_requires_view_permission_on_the_document(
         self,
-        rest_api_client: APIClient,
+        regular_user: User,
+        user_client: APIClient,
         mock_preview: MagicMock,
     ) -> None:
         """
@@ -605,20 +607,18 @@ class TestOcrTemplatePermissions:
             - No preview extraction runs
         """
         owner = UserFactory()
-        user = UserFactory()
-        grant_global(user, "add_ocrtemplate", "view_document")
+        grant_global(regular_user, "add_ocrtemplate", "view_document")
         document = DocumentFactory(owner=owner)
-        rest_api_client.force_authenticate(user=user)
         data = {
             "document": document.pk,
             "zone": {"x": 0, "y": 0, "width": 100, "height": 100, "page": 1},
         }
 
-        response = rest_api_client.post(PREVIEW_ZONE_URL, data, format="json")
+        response = user_client.post(PREVIEW_ZONE_URL, data, format="json")
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
-        grant_object(user, document, "view_document")
-        response = rest_api_client.post(PREVIEW_ZONE_URL, data, format="json")
+        grant_object(regular_user, document, "view_document")
+        response = user_client.post(PREVIEW_ZONE_URL, data, format="json")
         # Past the permission check; the factory document has no file on disk.
         assert response.status_code == status.HTTP_404_NOT_FOUND
         mock_preview.assert_not_called()
@@ -635,7 +635,8 @@ class TestOcrTemplatePermissions:
     )
     def test_shared_editor_cannot_transfer_ownership_or_change_sharing(
         self,
-        rest_api_client: APIClient,
+        regular_user: User,
+        user_client: APIClient,
         admin_user: User,
         make_data: Callable[[User], dict[str, Any]],
     ) -> None:
@@ -647,8 +648,7 @@ class TestOcrTemplatePermissions:
         THEN:
             - The request is refused and the owner is unchanged
         """
-        editor = UserFactory()
-        grant_global(editor, "view_ocrtemplate", "change_ocrtemplate")
+        grant_global(regular_user, "view_ocrtemplate", "change_ocrtemplate")
         template = OcrTemplateFactory(
             name="Shared",
             owner=admin_user,
@@ -656,12 +656,11 @@ class TestOcrTemplatePermissions:
             source_width=100,
             source_height=100,
         )
-        grant_object(editor, template, "view_ocrtemplate", "change_ocrtemplate")
-        rest_api_client.force_authenticate(editor)
+        grant_object(regular_user, template, "view_ocrtemplate", "change_ocrtemplate")
 
-        response = rest_api_client.patch(
+        response = user_client.patch(
             f"{ENDPOINT}{template.pk}/",
-            make_data(editor),
+            make_data(regular_user),
             format="json",
         )
 
@@ -1660,7 +1659,8 @@ class TestRunZoneOcr:
 class TestRunZoneOcrPermissions:
     def test_rejects_a_template_the_user_cannot_view(
         self,
-        rest_api_client: APIClient,
+        regular_user: User,
+        user_client: APIClient,
         mock_extract: MagicMock,
     ) -> None:
         """
@@ -1672,16 +1672,14 @@ class TestRunZoneOcrPermissions:
         THEN:
             - 403 is returned and nothing is extracted
         """
-        user = UserFactory()
-        grant_global(user, "view_document", "change_document")
-        document = DocumentFactory(content=CONTENT, owner=user)
+        grant_global(regular_user, "view_document", "change_document")
+        document = DocumentFactory(content=CONTENT, owner=regular_user)
         template = OcrTemplateFactory(
             name="Private",
             owner=UserFactory(),
         )
-        rest_api_client.force_authenticate(user=user)
 
-        response = rest_api_client.post(
+        response = user_client.post(
             RUN_ZONE_OCR_URL.format(pk=document.pk),
             {"template": template.pk},
             format="json",
@@ -1692,7 +1690,8 @@ class TestRunZoneOcrPermissions:
 
     def test_requires_change_permission_on_the_document(
         self,
-        rest_api_client: APIClient,
+        regular_user: User,
+        user_client: APIClient,
         mock_extract: MagicMock,
     ) -> None:
         """
@@ -1705,19 +1704,18 @@ class TestRunZoneOcrPermissions:
             - 403 is returned and nothing is extracted
         """
         owner = UserFactory()
-        user = UserFactory()
-        grant_global(user, "view_document", "change_document")
+        grant_global(regular_user, "view_document", "change_document")
         document = DocumentFactory(content=CONTENT, owner=owner)
-        rest_api_client.force_authenticate(user=user)
 
-        response = rest_api_client.post(RUN_ZONE_OCR_URL.format(pk=document.pk))
+        response = user_client.post(RUN_ZONE_OCR_URL.format(pk=document.pk))
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
         mock_extract.assert_not_called()
 
     def test_requires_global_change_permission(
         self,
-        rest_api_client: APIClient,
+        regular_user: User,
+        user_client: APIClient,
         mock_extract: MagicMock,
     ) -> None:
         """
@@ -1729,19 +1727,18 @@ class TestRunZoneOcrPermissions:
         THEN:
             - 403 is returned and nothing is extracted
         """
-        user = UserFactory()
-        grant_global(user, "view_document", "add_document")
-        document = DocumentFactory(content=CONTENT, owner=user)
-        rest_api_client.force_authenticate(user=user)
+        grant_global(regular_user, "view_document", "add_document")
+        document = DocumentFactory(content=CONTENT, owner=regular_user)
 
-        response = rest_api_client.post(RUN_ZONE_OCR_URL.format(pk=document.pk))
+        response = user_client.post(RUN_ZONE_OCR_URL.format(pk=document.pk))
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
         mock_extract.assert_not_called()
 
     def test_does_not_require_document_upload_permission(
         self,
-        rest_api_client: APIClient,
+        regular_user: User,
+        user_client: APIClient,
         mock_extract: MagicMock,
     ) -> None:
         """
@@ -1753,20 +1750,18 @@ class TestRunZoneOcrPermissions:
         THEN:
             - The request succeeds and extraction runs
         """
-        user = UserFactory()
-        grant_global(user, "change_document")
-        document = DocumentFactory(owner=user, content=CONTENT)
+        grant_global(regular_user, "change_document")
+        document = DocumentFactory(owner=regular_user, content=CONTENT)
         document.source_path.write_bytes(b"test PDF")
         OcrTemplateFactory(
             name="Matching",
-            owner=user,
+            owner=regular_user,
             source_width=100,
             source_height=100,
             match="Northwind",
         )
-        rest_api_client.force_authenticate(user)
 
-        response = rest_api_client.post(RUN_ZONE_OCR_URL.format(pk=document.pk))
+        response = user_client.post(RUN_ZONE_OCR_URL.format(pk=document.pk))
 
         assert response.status_code == 200
         mock_extract.assert_called_once()
@@ -1849,7 +1844,8 @@ class TestRunZoneOcrPermissions:
 
     def test_hides_the_owners_private_templates_from_an_editor(
         self,
-        rest_api_client: APIClient,
+        regular_user: User,
+        user_client: APIClient,
         mock_zone_ocr_run: MagicMock,
     ) -> None:
         """
@@ -1862,10 +1858,9 @@ class TestRunZoneOcrPermissions:
             - Only templates the editor can also view run and are reported
         """
         owner = UserFactory()
-        editor = UserFactory()
-        grant_global(editor, "view_document", "change_document")
+        grant_global(regular_user, "view_document", "change_document")
         document = DocumentFactory(content=CONTENT, owner=owner)
-        grant_object(editor, document, "view_document", "change_document")
+        grant_object(regular_user, document, "view_document", "change_document")
         write_blank_png(document.source_path)
         mock_zone_ocr_run.return_value.stdout = "extracted"
         for name, template_owner in [
@@ -1880,10 +1875,9 @@ class TestRunZoneOcrPermissions:
                 source_height=100,
             )
             if name == "Shared":
-                grant_object(editor, template, "view_ocrtemplate")
-        rest_api_client.force_authenticate(editor)
+                grant_object(regular_user, template, "view_ocrtemplate")
 
-        response = rest_api_client.post(RUN_ZONE_OCR_URL.format(pk=document.pk))
+        response = user_client.post(RUN_ZONE_OCR_URL.format(pk=document.pk))
 
         assert response.status_code == status.HTTP_200_OK
         assert sorted(result["template"] for result in response.json()["results"]) == [
@@ -2264,7 +2258,8 @@ class TestOcrTemplatePreviewPermissions:
     )
     def test_previews_require_global_document_view_permission(
         self,
-        rest_api_client: APIClient,
+        regular_user: User,
+        user_client: APIClient,
         mock_preview: MagicMock,
         action: str,
     ) -> None:
@@ -2278,17 +2273,15 @@ class TestOcrTemplatePreviewPermissions:
         THEN:
             - 403 is returned and no extraction runs
         """
-        user = UserFactory()
-        grant_global(user, "view_ocrtemplate", "add_ocrtemplate")
-        rest_api_client.force_authenticate(user)
+        grant_global(regular_user, "view_ocrtemplate", "add_ocrtemplate")
         document = DocumentFactory(owner=None, mime_type="image/png")
         document.source_path.write_bytes(b"document contents")
         mock_preview.return_value = {"raw_text": "document contents", "value": None}
 
         if action == "document-page-image":
-            response = rest_api_client.get(preview_url(document))
+            response = user_client.get(preview_url(document))
         else:
-            response = rest_api_client.post(
+            response = user_client.post(
                 PREVIEW_ZONE_URL,
                 {"document": document.pk, "zone": {"width": 100, "height": 50}},
                 format="json",

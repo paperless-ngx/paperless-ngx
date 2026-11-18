@@ -2877,15 +2877,6 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
 @pytest.mark.usefixtures("paperless_dirs")
 class TestRunZoneOcrBulkEditAPI:
     @pytest.fixture
-    def superuser(self) -> User:
-        return UserFactory(username="temp_admin", superuser=True)
-
-    @pytest.fixture
-    def api_client(self, rest_api_client: APIClient, superuser: User) -> APIClient:
-        rest_api_client.force_authenticate(user=superuser)
-        return rest_api_client
-
-    @pytest.fixture
     def run_zone_ocr_mock(self, mocker: MockerFixture) -> mock.MagicMock:
         """
         Mocks the bulk method and runs accepted requests through the worker
@@ -2907,14 +2898,14 @@ class TestRunZoneOcrBulkEditAPI:
         return method
 
     @pytest.fixture
-    def doc1(self) -> Document:
+    def document(self) -> Document:
         return DocumentFactory()
 
     def test_run_zone_ocr_documents_endpoint(
         self,
-        api_client: APIClient,
-        superuser: User,
-        doc1: Document,
+        admin_client: APIClient,
+        admin_user: User,
+        document: Document,
         run_zone_ocr_mock: mock.MagicMock,
     ) -> None:
         """
@@ -2925,22 +2916,22 @@ class TestRunZoneOcrBulkEditAPI:
         THEN:
             - run_zone_ocr is called with the document
         """
-        response = api_client.post(
+        response = admin_client.post(
             "/api/documents/run_zone_ocr/",
-            json.dumps({"documents": [doc1.id]}),
+            json.dumps({"documents": [document.id]}),
             content_type="application/json",
         )
         assert response.status_code == status.HTTP_200_OK
         run_zone_ocr_mock.assert_called_once()
         args, kwargs = run_zone_ocr_mock.call_args
-        assert args[0] == [doc1.id]
-        assert kwargs == {"user": superuser}
+        assert args[0] == [document.id]
+        assert kwargs == {"user": admin_user}
 
     def test_run_zone_ocr_documents_endpoint_with_template(
         self,
-        api_client: APIClient,
-        superuser: User,
-        doc1: Document,
+        admin_client: APIClient,
+        admin_user: User,
+        document: Document,
         run_zone_ocr_mock: mock.MagicMock,
     ) -> None:
         """
@@ -2952,21 +2943,21 @@ class TestRunZoneOcrBulkEditAPI:
             - run_zone_ocr is called with the template
         """
         template = OcrTemplateFactory()
-        response = api_client.post(
+        response = admin_client.post(
             "/api/documents/run_zone_ocr/",
-            json.dumps({"documents": [doc1.id], "template": template.pk}),
+            json.dumps({"documents": [document.id], "template": template.pk}),
             content_type="application/json",
         )
         assert response.status_code == status.HTTP_200_OK
         run_zone_ocr_mock.assert_called_once()
         args, kwargs = run_zone_ocr_mock.call_args
-        assert args[0] == [doc1.id]
-        assert kwargs == {"template": template.pk, "user": superuser}
+        assert args[0] == [document.id]
+        assert kwargs == {"template": template.pk, "user": admin_user}
 
     def test_run_zone_ocr_documents_endpoint_rejects_private_template(
         self,
-        api_client: APIClient,
-        doc1: Document,
+        rest_api_client: APIClient,
+        document: Document,
         run_zone_ocr_mock: mock.MagicMock,
     ) -> None:
         """
@@ -2983,11 +2974,11 @@ class TestRunZoneOcrBulkEditAPI:
             name="Private",
             owner=UserFactory(username="other"),
         )
-        api_client.force_authenticate(user=user)
+        rest_api_client.force_authenticate(user=user)
 
-        response = api_client.post(
+        response = rest_api_client.post(
             "/api/documents/run_zone_ocr/",
-            json.dumps({"documents": [doc1.id], "template": template.pk}),
+            json.dumps({"documents": [document.id], "template": template.pk}),
             content_type="application/json",
         )
 

@@ -20,6 +20,7 @@ from documents.signals.handlers import before_task_publish_handler
 from documents.signals.handlers import task_failure_handler
 from documents.signals.handlers import task_postrun_handler
 from documents.signals.handlers import task_revoked_handler
+from paperless_testing.factories import DocumentFactory
 from paperless_testing.factories import OcrTemplateFactory
 from paperless_testing.factories import UserFactory
 from paperless_testing.permissions import grant_global
@@ -68,13 +69,20 @@ def test_request_only_queues(bulk_setup, endpoint, operation, parameters):
 
 
 @pytest.mark.django_db
+@pytest.mark.usefixtures("paperless_dirs")
 class TestRunZoneOcrBulkOperation:
     """Zone OCR runs as a tracked bulk operation."""
+
+    @pytest.fixture
+    def document(self) -> Document:
+        return DocumentFactory()
 
     def test_queues_only_template_id_and_returns_tracked_task(
         self,
         mocker: MockerFixture,
-        bulk_setup: tuple[User, APIClient, Document, Correspondent],
+        admin_client: APIClient,
+        admin_user: User,
+        document: Document,
     ) -> None:
         """
         GIVEN:
@@ -85,15 +93,14 @@ class TestRunZoneOcrBulkOperation:
             - Only the template id is queued, with a tracked task id returned
             - Extraction does not run in the request
         """
-        user, client, doc, _ = bulk_setup
         template = OcrTemplateFactory()
         enqueue = mocker.patch("documents.views.execute_bulk_operation.apply_async")
         extract = mocker.patch("documents.bulk_edit.extract_zones")
         enqueue.return_value.id = "zone-ocr-task"
-        response = client.post(
+        response = admin_client.post(
             "/api/documents/run_zone_ocr/",
             {
-                "documents": [doc.pk],
+                "documents": [document.pk],
                 "template": template.pk,
                 "from_webui": True,
             },
@@ -104,9 +111,9 @@ class TestRunZoneOcrBulkOperation:
         kwargs = enqueue.call_args.kwargs["kwargs"]
         assert json.loads(json.dumps(kwargs)) == {
             "operation": "run_zone_ocr",
-            "document_ids": [doc.pk],
+            "document_ids": [document.pk],
             "parameters": {"template": template.pk},
-            "user_id": user.pk,
+            "user_id": admin_user.pk,
             "trigger_source": "web_ui",
         }
         extract.assert_not_called()
@@ -114,7 +121,8 @@ class TestRunZoneOcrBulkOperation:
     def test_finishes_extraction_within_the_tracked_task(
         self,
         mocker: MockerFixture,
-        bulk_setup: tuple[User, APIClient, Document, Correspondent],
+        admin_user: User,
+        document: Document,
     ) -> None:
         """
         GIVEN:
@@ -126,19 +134,18 @@ class TestRunZoneOcrBulkOperation:
             - No further extraction task is enqueued
             - The result reports the operation and document count
         """
-        user, _, doc, _ = bulk_setup
         template = OcrTemplateFactory()
         extract = mocker.patch("documents.bulk_edit.extract_zones")
         result = execute_bulk_operation(
             "run_zone_ocr",
-            [doc.pk],
+            [document.pk],
             {"template": template.pk},
-            user.pk,
+            admin_user.pk,
         )
         extract.assert_called_once_with(
-            document_id=doc.pk,
+            document_id=document.pk,
             template_id=template.pk,
-            requester=user,
+            requester=admin_user,
         )
         extract.apply_async.assert_not_called()
         assert result == {"operation": "run_zone_ocr", "document_count": 1}
@@ -146,7 +153,8 @@ class TestRunZoneOcrBulkOperation:
     def test_without_template_selects_for_the_requester(
         self,
         mocker: MockerFixture,
-        bulk_setup: tuple[User, APIClient, Document, Correspondent],
+        admin_user: User,
+        document: Document,
     ) -> None:
         """
         GIVEN:
@@ -157,13 +165,12 @@ class TestRunZoneOcrBulkOperation:
             - Extraction receives the requesting user so templates are limited to
               those they can view
         """
-        user, _, doc, _ = bulk_setup
         extract = mocker.patch("documents.bulk_edit.extract_zones")
-        execute_bulk_operation("run_zone_ocr", [doc.pk], {}, user.pk)
+        execute_bulk_operation("run_zone_ocr", [document.pk], {}, admin_user.pk)
         extract.assert_called_once_with(
-            document_id=doc.pk,
+            document_id=document.pk,
             template_id=None,
-            requester=user,
+            requester=admin_user,
         )
 
     @pytest.mark.parametrize(
@@ -177,7 +184,9 @@ class TestRunZoneOcrBulkOperation:
     def test_rechecks_access_before_extraction(
         self,
         mocker: MockerFixture,
-        bulk_setup: tuple[User, APIClient, Document, Correspondent],
+        user_client: APIClient,
+        regular_user: User,
+        document: Document,
         revoked: str,
     ) -> None:
         """
@@ -191,30 +200,27 @@ class TestRunZoneOcrBulkOperation:
             - Execution raises PermissionDenied
             - Extraction never runs
         """
-        _, client, doc, _ = bulk_setup
-        user = UserFactory()
-        grant_global(user, "change_document")
-        template = OcrTemplateFactory(owner=user)
-        client.force_authenticate(user)
+        grant_global(regular_user, "change_document")
+        template = OcrTemplateFactory(owner=regular_user)
         enqueue = mocker.patch("documents.views.execute_bulk_operation.apply_async")
         enqueue.return_value.id = "zone-ocr-task"
-        response = client.post(
+        response = user_client.post(
             "/api/documents/run_zone_ocr/",
             {
-                "documents": [doc.pk],
+                "documents": [document.pk],
                 "template": template.pk,
             },
             format="json",
         )
         assert response.status_code == 200
         if revoked == "document":
-            doc.owner = UserFactory()
-            doc.save(update_fields=["owner"])
+            document.owner = UserFactory()
+            document.save(update_fields=["owner"])
         elif revoked == "template":
             template.owner = UserFactory()
             template.save(update_fields=["owner"])
         else:
-            User.objects.filter(pk=user.pk).update(is_active=False)
+            User.objects.filter(pk=regular_user.pk).update(is_active=False)
         extract = mocker.patch("documents.bulk_edit.extract_zones")
         with pytest.raises(PermissionDenied):
             execute_bulk_operation(**enqueue.call_args.kwargs["kwargs"])
@@ -223,7 +229,8 @@ class TestRunZoneOcrBulkOperation:
     def test_cannot_fall_back_to_matching_if_chosen_template_is_deleted(
         self,
         mocker: MockerFixture,
-        bulk_setup: tuple[User, APIClient, Document, Correspondent],
+        admin_user: User,
+        document: Document,
     ) -> None:
         """
         GIVEN:
@@ -235,10 +242,14 @@ class TestRunZoneOcrBulkOperation:
               template matching
             - Extraction never runs
         """
-        user, _, doc, _ = bulk_setup
         extract = mocker.patch("documents.bulk_edit.extract_zones")
         with pytest.raises(OcrTemplate.DoesNotExist):
-            execute_bulk_operation("run_zone_ocr", [doc.pk], {"template": 999}, user.pk)
+            execute_bulk_operation(
+                "run_zone_ocr",
+                [document.pk],
+                {"template": 999},
+                admin_user.pk,
+            )
         extract.assert_not_called()
 
 
