@@ -24,39 +24,66 @@ from paperless_testing.factories import UserFactory
 
 
 @pytest.mark.django_db
-@pytest.mark.parametrize(
-    "original_file",
-    [None, "/tmp/original.pdf", Path("/tmp/original.pdf")],
-)
-def test_consumption_runs_zone_extraction(
-    original_file,
-    mocker: pytest_mock.MockerFixture,
-):
-    extract = mocker.patch("documents.zone_ocr.run_zone_extraction")
-    document = DocumentFactory()
-
-    run_zone_ocr_extraction(sender=None, document=document, original_file=original_file)
-
-    extract.assert_called_once_with(
-        document,
-        Path(original_file) if original_file else None,
+class TestRunZoneOcrExtraction:
+    @pytest.mark.parametrize(
+        "original_file",
+        [
+            pytest.param(None, id="no-original-file"),
+            pytest.param("/tmp/original.pdf", id="str-path"),
+            pytest.param(Path("/tmp/original.pdf"), id="path-object"),
+        ],
     )
+    def test_consumption_runs_zone_extraction(
+        self,
+        original_file: str | Path | None,
+        mocker: pytest_mock.MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A consumed document and an original file given as None, a str, or a Path
+        WHEN:
+            - The consumption finished handler runs zone OCR extraction
+        THEN:
+            - Zone extraction is called once with the document and the
+              original file normalised to a Path (or None)
+        """
+        extract = mocker.patch("documents.zone_ocr.run_zone_extraction")
+        document = DocumentFactory()
 
+        run_zone_ocr_extraction(
+            sender=None,
+            document=document,
+            original_file=original_file,
+        )
 
-@pytest.mark.django_db
-def test_zone_extraction_failure_does_not_fail_consumption(
-    mocker: pytest_mock.MockerFixture,
-    caplog,
-):
-    mocker.patch(
-        "documents.zone_ocr.run_zone_extraction",
-        side_effect=RuntimeError("OCR failed"),
-    )
-    document = DocumentFactory()
+        extract.assert_called_once_with(
+            document,
+            Path(original_file) if original_file else None,
+        )
 
-    run_zone_ocr_extraction(sender=None, document=document)
+    def test_zone_extraction_failure_does_not_fail_consumption(
+        self,
+        mocker: pytest_mock.MockerFixture,
+        caplog: pytest.LogCaptureFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A consumed document whose zone extraction raises an error
+        WHEN:
+            - The consumption finished handler runs zone OCR extraction
+        THEN:
+            - The error is not propagated
+            - The failure is logged with the document id
+        """
+        mocker.patch(
+            "documents.zone_ocr.run_zone_extraction",
+            side_effect=RuntimeError("OCR failed"),
+        )
+        document = DocumentFactory()
 
-    assert f"Zone OCR extraction failed for document {document.pk}" in caplog.text
+        run_zone_ocr_extraction(sender=None, document=document)
+
+        assert f"Zone OCR extraction failed for document {document.pk}" in caplog.text
 
 
 @pytest.fixture
