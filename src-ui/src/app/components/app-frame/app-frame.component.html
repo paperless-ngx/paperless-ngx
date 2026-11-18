@@ -385,12 +385,9 @@
             <li class="nav-item" [class.visually-hidden]="slimSidebarEnabled">
               <div class="text-muted small d-flex align-items-center flex-wrap nav-label">
                 <div class="me-2">
-                  <a class="text-muted text-decoration-none" target="_blank" rel="noopener noreferrer"
-                    href="https://github.com/paperless-ngx/paperless-ngx" ngbPopover="GitHub" i18n-ngbPopover
-                    [disablePopover]="!slimSidebarPopoversEnabled" placement="end" container="body"
-                    triggers="mouseenter:mouseleave" popoverClass="popover-slim">
+                  <button type="button" class="bg-transparent border-0 p-0 text-muted" (click)="showReleaseNotes()" title="See what's new in this version" i18n-title>
                     {{ versionString }}
-                  </a>
+                  </button>
                   @if (settingsService.unseenReleasesSince()) {
                     <button type="button" class="btn btn-whats-new rounded-pill smaller ms-1 py-1 px-2 fw-bold lh-sm align-baseline" (click)="showReleaseNotes()"
                       title="See what's new in this version" i18n-title i18n>New</button>

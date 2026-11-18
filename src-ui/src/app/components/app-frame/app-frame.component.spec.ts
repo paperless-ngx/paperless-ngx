@@ -42,6 +42,7 @@ import { environment } from 'src/environments/environment'
 import { ProfileEditDialogComponent } from '../common/profile-edit-dialog/profile-edit-dialog.component'
 import { UploadStatusTrayComponent } from '../common/upload-status-tray/upload-status-tray.component'
 import { DocumentDetailComponent } from '../document-detail/document-detail.component'
+import { ReleaseNotesDialogComponent } from '../common/release-notes-dialog/release-notes-dialog.component'
 import { AppFrameComponent } from './app-frame.component'
 import { GlobalSearchComponent } from './global-search/global-search.component'
 
@@ -720,6 +721,24 @@ describe('AppFrameComponent', () => {
         .queryAll(By.css('button'))
         .find((b) => b.nativeElement.textContent.trim() === 'New')
     ).toBeUndefined()
+  })
+
+  it('should open current release notes from the version without marking seen', () => {
+    settingsService.set(SETTINGS_KEYS.VERSION, '3.5.1')
+    settingsService.set(SETTINGS_KEYS.WHATS_NEW_LAST_SEEN_VERSION, '3.5.1')
+    fixture.detectChanges()
+    const modalSpy = jest.spyOn(modalService, 'open')
+
+    const versionButton = fixture.debugElement
+      .queryAll(By.css('button'))
+      .find((b) => b.nativeElement.textContent.includes('3.5.1'))
+    versionButton.nativeElement.click()
+
+    expect(modalSpy).toHaveBeenCalledWith(
+      ReleaseNotesDialogComponent,
+      expect.anything()
+    )
+    httpTestingController.expectNone(`${environment.apiBaseUrl}ui_settings/`)
   })
 
   it('should show new release dot instead of documentation in slim sidebar', () => {
