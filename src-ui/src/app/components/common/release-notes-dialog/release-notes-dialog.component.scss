@@ -5,20 +5,48 @@
     display: none;
   }
 
+  // Section labels e.g. "Bug Fixes"
   > h3 {
-    font-size: 1rem;
+    color: var(--bs-secondary-color);
+    font-size: 0.875rem;
     font-weight: 600;
     margin-top: 1rem;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.375rem;
+  }
+
+  ul {
+    padding-left: 1.25rem;
+    margin-bottom: 0.75rem;
+  }
+
+  li {
+    margin-bottom: 0.25rem;
+
+    &::marker {
+      color: var(--bs-secondary-color);
+    }
+  }
+
+  a {
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  a.user-mention {
+    color: var(--bs-secondary-color);
   }
 
   details {
-    margin-bottom: 1rem;
+    margin-bottom: 0.75rem;
 
     > summary {
       color: var(--bs-secondary-color);
+      font-size: 0.875rem;
       cursor: pointer;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.375rem;
     }
   }
 
@@ -28,9 +56,12 @@
     display: inline-block;
   }
 
+  // GitHub alerts, e.g. > [!NOTE]
   .markdown-alert {
-    border-left: 0.25rem solid var(--bs-info);
-    padding: 0.5rem 1rem;
+    background-color: color-mix(in srgb, var(--bs-primary) 8%, transparent);
+    border-left: 0.25rem solid var(--bs-primary);
+    border-radius: var(--bs-border-radius);
+    padding: 0.75rem 1rem;
     margin-bottom: 1rem;
 
     > :last-child {
@@ -39,6 +70,7 @@
   }
 
   .markdown-alert-title {
+    color: var(--bs-primary);
     font-weight: 600;
     margin-bottom: 0.25rem;
   }
