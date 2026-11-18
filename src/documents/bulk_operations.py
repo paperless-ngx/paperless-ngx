@@ -3,12 +3,14 @@
 from contextlib import nullcontext
 from typing import Any
 
-from auditlog.context import set_actor
 from celery import shared_task
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import transaction
 from rest_framework.exceptions import PermissionDenied
+
+if settings.AUDIT_LOG_ENABLED:
+    from auditlog.context import set_actor
 
 from documents import bulk_edit
 from documents.models import CustomFieldInstance
