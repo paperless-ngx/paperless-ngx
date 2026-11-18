@@ -1,0 +1,39 @@
+<div class="modal-header">
+  <div>
+    <h4 class="modal-title" i18n>What's new in Paperless-ngx</h4>
+    @if (since()) {
+      <p class="text-muted small mb-0" i18n>Updated from {{ since() }} to {{ version }}</p>
+    }
+  </div>
+  <button type="button" class="btn-close" aria-label="Close" i18n-aria-label (click)="close()"></button>
+</div>
+<div class="modal-body">
+  @if (!updateCheckingEnabled) {
+    <p class="mb-0" i18n>Release notes are fetched from GitHub when update checking is enabled.</p>
+    <a class="small" [href]="releaseUrl" target="_blank" rel="noopener noreferrer">
+      <ng-container i18n>View on GitHub</ng-container>
+      <pngx-bs-icon name="box-arrow-up-right" class="ms-1"></pngx-bs-icon>
+    </a>
+  } @else if (loading()) {
+    <div class="d-flex align-items-center gap-2 text-muted">
+      <div class="spinner-border spinner-border-sm" role="status"></div>
+      <ng-container i18n>Loading release notes...</ng-container>
+    </div>
+  } @else if (!releases()?.length) {
+    <p class="mb-0" i18n>Release notes could not be loaded.</p>
+  } @else {
+    @for (release of releases(); track release.version) {
+      <section class="release-notes" [class.mt-4]="!$first">
+        <h5>{{ release.version }}</h5>
+        <div class="release-notes-body" [innerHTML]="release.body | markdown: false"></div>
+      </section>
+    }
+  }
+</div>
+<div class="modal-footer justify-content-between">
+  <a class="btn btn-primary d-flex align-items-center" [href]="releaseUrl" target="_blank" rel="noopener noreferrer">
+    <ng-container i18n>View on GitHub</ng-container>
+    <pngx-bs-icon name="box-arrow-up-right" class="ms-2 mt-n1"></pngx-bs-icon>
+  </a>
+  <button type="button" class="btn btn-outline-secondary" (click)="close()" i18n>Close</button>
+</div>

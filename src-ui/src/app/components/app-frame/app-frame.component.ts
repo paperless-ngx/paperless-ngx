@@ -68,6 +68,7 @@ import { SwitchComponent } from '../common/input/switch/switch.component'
 import { BrandMarkComponent } from '../common/logo/brand-mark/brand-mark.component'
 import { LogoComponent } from '../common/logo/logo.component'
 import { ProfileEditDialogComponent } from '../common/profile-edit-dialog/profile-edit-dialog.component'
+import { ReleaseNotesDialogComponent } from '../common/release-notes-dialog/release-notes-dialog.component'
 import { UploadStatusTrayComponent } from '../common/upload-status-tray/upload-status-tray.component'
 import { DocumentDetailComponent } from '../document-detail/document-detail.component'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
@@ -552,8 +553,18 @@ export class AppFrameComponent
   }
 
   showReleaseNotes() {
-    // TODO: open release notes modal
-    this.settingsService.markReleasesSeen().pipe(first()).subscribe()
+    const since = this.settingsService.unseenReleasesSince()
+    const modal = this.modalService.open(ReleaseNotesDialogComponent, {
+      size: 'lg',
+      scrollable: true,
+    })
+    modal.componentInstance.load(since)
+    if (since) {
+      this.settingsService
+        .markReleasesSeen()
+        .pipe(first())
+        .subscribe({ error: () => {} })
+    }
   }
 
   setUpdateChecking(enable: boolean) {
