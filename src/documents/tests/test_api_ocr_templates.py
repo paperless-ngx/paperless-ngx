@@ -2276,7 +2276,6 @@ class TestOcrTemplatePreviewPermissions:
         grant_global(regular_user, "view_ocrtemplate", "add_ocrtemplate")
         document = DocumentFactory(owner=None, mime_type="image/png")
         document.source_path.write_bytes(b"document contents")
-        mock_preview.return_value = {"raw_text": "document contents", "value": None}
 
         if action == "document-page-image":
             response = user_client.get(preview_url(document))

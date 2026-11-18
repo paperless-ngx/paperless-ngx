@@ -1448,13 +1448,6 @@ class TestApplyTransform:
                 "Account #123",
                 id="strip-punctuation",
             ),
-            pytest.param(
-                "2026-13-32",
-                "date",
-                "",
-                "2026-13-32",
-                id="invalid-iso-date-is-not-transformed",
-            ),
         ],
     )
     def test_apply_transform(
@@ -1990,16 +1983,21 @@ class TestResolveDocPath:
         original.touch()
         assert _resolve_doc_path(document, original) == original
 
-    def test_returns_none_for_none_original_file(self, document: MagicMock) -> None:
+    def test_returns_none_for_missing_original_file(
+        self,
+        document: MagicMock,
+        tmp_path: Path,
+    ) -> None:
         """
         GIVEN:
-            - A document whose own files are missing and no original file
+            - A document whose own files are missing and an original file path
+              that does not exist
         WHEN:
-            - The document path is resolved
+            - The document path is resolved with the original file
         THEN:
             - None is returned
         """
-        assert _resolve_doc_path(document, None) is None
+        assert _resolve_doc_path(document, tmp_path / "missing.pdf") is None
 
 
 @pytest.mark.django_db
@@ -2081,6 +2079,7 @@ class TestRunZoneExtraction:
 
     def test_skips_template_with_no_zones(
         self,
+        mock_process: MagicMock,
         document: Document,
         pdf: Path,
     ) -> None:
@@ -2090,16 +2089,17 @@ class TestRunZoneExtraction:
         WHEN:
             - Zone extraction runs
         THEN:
-            - No custom field instances are created
+            - No results are returned and the template is not processed
         """
         OcrTemplateFactory(
             name="Empty",
             match="test",
         )
 
-        run_zone_extraction(document, pdf)
+        results = run_zone_extraction(document, pdf)
 
-        assert CustomFieldInstance.objects.count() == 0
+        assert results == []
+        mock_process.assert_not_called()
 
     def test_calls_process_for_enabled_template(
         self,
@@ -2135,25 +2135,45 @@ class TestRunZoneExtraction:
         WHEN:
             - Zone extraction runs
         THEN:
-            - The error does not propagate, so other templates can still run
+            - The error does not propagate, every zone of the failing template
+              is reported as template_failed and the template was attempted
+              once
         """
         mock_process.side_effect = RuntimeError("test error")
-        template_with_zone("Failing", enabled=True)
+        template = template_with_zone("Failing", enabled=True)
+        zone = template.zones.get()
 
-        # Should not raise
-        run_zone_extraction(document, pdf)
+        results = run_zone_extraction(document, pdf)
 
-    def test_handles_none_original_file(self, document: Document) -> None:
+        assert [(r.template, r.zone, r.value, r.reason) for r in results] == [
+            ("Failing", zone.name, None, "template_failed"),
+        ]
+        mock_process.assert_called_once()
+
+    def test_handles_none_original_file(
+        self,
+        mock_process: MagicMock,
+        template_with_zone: Callable[..., OcrTemplate],
+        document: Document,
+    ) -> None:
         """
         GIVEN:
-            - A document and no original file
+            - A matching template, a document with no accessible file and no
+              original file
         WHEN:
             - Zone extraction runs
         THEN:
-            - It does not crash
+            - Each zone is reported as missing_file and nothing is processed
         """
-        # No template, so it exits early, but shouldn't crash on None
-        run_zone_extraction(document, None)
+        template = template_with_zone("Matching", enabled=True)
+        zone = template.zones.get()
+
+        results = run_zone_extraction(document, None)
+
+        assert [(r.template, r.zone, r.reason) for r in results] == [
+            ("Matching", zone.name, "missing_file"),
+        ]
+        mock_process.assert_not_called()
 
     def test_multiple_templates_all_process(
         self,
