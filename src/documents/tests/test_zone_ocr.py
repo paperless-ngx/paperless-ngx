@@ -265,45 +265,64 @@ class TestZoneExtraction:
         assert result.raw_text is None
         assert result.value is None
 
-    def test_barcode_failure_returns_no_value(
+    @pytest.mark.parametrize(
+        "reader_kwargs",
+        [
+            pytest.param(
+                {"side_effect": RuntimeError("reader failed")},
+                id="reader-raises",
+            ),
+            pytest.param({"return_value": []}, id="nothing-found"),
+        ],
+    )
+    def test_barcode_without_value_returns_no_value(
         self,
         mocker: MockerFixture,
         page: Path,
         zone: OcrTemplateZone,
         tmp_path: Path,
+        reader_kwargs: dict[str, Any],
     ) -> None:
         """
         GIVEN:
-            - A QR code zone and a barcode reader that raises
+            - A QR code zone and a barcode reader that either raises or finds
+              no barcode
         WHEN:
             - The zone is extracted
         THEN:
             - No text or value is returned
         """
-        mocker.patch(
-            "zxingcpp.read_barcodes",
-            side_effect=RuntimeError("reader failed"),
-        )
+        mocker.patch("zxingcpp.read_barcodes", **reader_kwargs)
         zone.transform = "qr_code"
         result = _extract_zone(page, zone, 100, 50, tmp_path)
         assert result.raw_text is None
         assert result.value is None
 
-    def test_preview_tiny_crop_returns_empty_result(
+    @pytest.mark.parametrize(
+        ("attribute", "value"),
+        [
+            pytest.param("width", 0, id="zero-width"),
+            pytest.param("page", 2, id="unavailable-page"),
+        ],
+    )
+    def test_preview_unreadable_zone_returns_empty_result(
         self,
         page: Path,
         zone: OcrTemplateZone,
         mock_zone_ocr_run: MagicMock,
+        attribute: str,
+        value: int,
     ) -> None:
         """
         GIVEN:
-            - A zone with zero width
+            - A zone that cannot be read, either because its crop has zero
+              width or because it targets a page that is not available
         WHEN:
             - A preview is requested
         THEN:
             - An empty result is returned and the reader is never run
         """
-        zone.width = 0
+        setattr(zone, attribute, value)
         assert extract_zone_preview(page, zone, 100, 50, 1) == {
             "raw_text": None,
             "value": None,
@@ -366,27 +385,6 @@ class TestZoneExtraction:
         with pytest.raises(ValueError):
             read_barcodes.call_args.args[0].getpixel((0, 0))
 
-    def test_missing_barcode_returns_no_value(
-        self,
-        mocker: MockerFixture,
-        page: Path,
-        zone: OcrTemplateZone,
-        tmp_path: Path,
-    ) -> None:
-        """
-        GIVEN:
-            - A QR code zone and a barcode reader that finds nothing
-        WHEN:
-            - The zone is extracted
-        THEN:
-            - No text or value is returned
-        """
-        mocker.patch("zxingcpp.read_barcodes", return_value=[])
-        zone.transform = "qr_code"
-        result = _extract_zone(page, zone, 100, 50, tmp_path)
-        assert result.raw_text is None
-        assert result.value is None
-
     def test_preview_uses_image_dimensions_without_writing(
         self,
         page: Path,
@@ -406,27 +404,6 @@ class TestZoneExtraction:
             "raw_text": "account abc",
             "value": "ACCOUNT ABC",
         }
-
-    def test_preview_unavailable_page_skips_reader(
-        self,
-        page: Path,
-        zone: OcrTemplateZone,
-        mock_zone_ocr_run: MagicMock,
-    ) -> None:
-        """
-        GIVEN:
-            - A zone targeting a page that is not available
-        WHEN:
-            - A preview is requested
-        THEN:
-            - An empty result is returned and the reader is never run
-        """
-        zone.page = 2
-        assert extract_zone_preview(page, zone, 100, 50, 1) == {
-            "raw_text": None,
-            "value": None,
-        }
-        mock_zone_ocr_run.assert_not_called()
 
 
 def make_template(name: str, **kwargs: Any) -> OcrTemplate:
@@ -2035,43 +2012,32 @@ class TestRunZoneExtraction:
 
         return _make
 
-    def test_skips_template_that_does_not_match(
+    @pytest.mark.parametrize(
+        ("template_name", "template_kwargs"),
+        [
+            pytest.param("Other sender", {"match": "Contoso"}, id="non-matching"),
+            pytest.param("Disabled", {"enabled": False}, id="disabled"),
+        ],
+    )
+    def test_skips_ineligible_template(
         self,
         mock_process: MagicMock,
         template_with_zone: Callable[..., OcrTemplate],
         document: Document,
         pdf: Path,
+        template_name: str,
+        template_kwargs: dict[str, Any],
     ) -> None:
         """
         GIVEN:
-            - A template whose match text is not in the document content
+            - A template whose match text is not in the document content, or a
+              disabled template that would otherwise match
         WHEN:
-            - Zone extraction runs
+            - Zone extraction runs against a real document file
         THEN:
             - The template is not processed
         """
-        template_with_zone("Other sender", match="Contoso")
-
-        run_zone_extraction(document, pdf)
-
-        mock_process.assert_not_called()
-
-    def test_skips_disabled_template(
-        self,
-        template_with_zone: Callable[..., OcrTemplate],
-        document: Document,
-        pdf: Path,
-        mock_process: MagicMock,
-    ) -> None:
-        """
-        GIVEN:
-            - A disabled template matching the document
-        WHEN:
-            - Zone extraction runs
-        THEN:
-            - The template is not processed
-        """
-        template_with_zone("Disabled", enabled=False)
+        template_with_zone(template_name, **template_kwargs)
 
         run_zone_extraction(document, pdf)
 
@@ -2100,27 +2066,6 @@ class TestRunZoneExtraction:
 
         assert results == []
         mock_process.assert_not_called()
-
-    def test_calls_process_for_enabled_template(
-        self,
-        mock_process: MagicMock,
-        template_with_zone: Callable[..., OcrTemplate],
-        document: Document,
-        pdf: Path,
-    ) -> None:
-        """
-        GIVEN:
-            - An enabled matching template with a zone
-        WHEN:
-            - Zone extraction runs
-        THEN:
-            - The template is processed
-        """
-        template_with_zone("Active", enabled=True)
-
-        run_zone_extraction(document, pdf)
-
-        assert mock_process.called
 
     def test_handles_process_exception_gracefully(
         self,
@@ -2175,24 +2120,37 @@ class TestRunZoneExtraction:
         ]
         mock_process.assert_not_called()
 
-    def test_multiple_templates_all_process(
+    @pytest.mark.parametrize(
+        "template_names",
+        [
+            pytest.param(["Active"], id="one-template"),
+            pytest.param(
+                ["Template 0", "Template 1", "Template 2"],
+                id="three-templates",
+            ),
+        ],
+    )
+    def test_processes_every_enabled_template(
         self,
         mock_process: MagicMock,
         template_with_zone: Callable[..., OcrTemplate],
         document: Document,
         pdf: Path,
+        template_names: list[str],
     ) -> None:
         """
         GIVEN:
-            - Three enabled matching templates, each with a zone
+            - One or more enabled matching templates, each with a zone
         WHEN:
             - Zone extraction runs
         THEN:
-            - All three templates are processed
+            - Each template is processed exactly once
         """
-        for i in range(3):
-            template_with_zone(f"Template {i}", enabled=True)
+        for name in template_names:
+            template_with_zone(name, enabled=True)
 
         run_zone_extraction(document, pdf)
 
-        assert mock_process.call_count == 3
+        processed = [call.args[2].name for call in mock_process.call_args_list]
+        assert mock_process.call_count == len(template_names)
+        assert sorted(processed) == sorted(template_names)

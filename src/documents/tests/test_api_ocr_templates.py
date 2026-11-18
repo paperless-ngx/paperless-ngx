@@ -813,27 +813,30 @@ class TestOcrTemplateValidation:
         assert response.status_code == 200
 
     @pytest.mark.parametrize(
-        "changes",
+        ("changes", "expected_status"),
         [
-            pytest.param({"x": 900, "width": 200}, id="exceeds-width"),
-            pytest.param({"y": 990, "height": 50}, id="exceeds-height"),
+            pytest.param({"x": 900, "width": 200}, 400, id="exceeds-width"),
+            pytest.param({"y": 990, "height": 50}, 400, id="exceeds-height"),
+            pytest.param({}, 200, id="within-bounds"),
         ],
     )
-    def test_partial_zone_replacement_uses_saved_dimensions(
+    def test_partial_zone_replacement_checks_saved_dimensions(
         self,
         admin_client: APIClient,
         admin_user: User,
         make_zone: Callable[..., dict[str, Any]],
         changes: dict[str, int],
+        expected_status: int,
     ) -> None:
         """
         GIVEN:
             - A saved 1000x1000 template
         WHEN:
-            - A PATCH replaces zones with one extending beyond the saved
-              source dimensions
+            - A PATCH replaces zones with one that either extends beyond the
+              saved source dimensions or lies within them
         THEN:
-            - The request is rejected
+            - The request is rejected when the zone is out of bounds and
+              succeeds when it is within them
         """
         template = OcrTemplateFactory(
             name="Test",
@@ -844,32 +847,7 @@ class TestOcrTemplateValidation:
             {"zones": [make_zone(**changes)]},
             format="json",
         )
-        assert response.status_code == 400
-
-    def test_partial_zone_replacement_within_saved_dimensions_accepted(
-        self,
-        admin_client: APIClient,
-        admin_user: User,
-        make_zone: Callable[..., dict[str, Any]],
-    ) -> None:
-        """
-        GIVEN:
-            - A saved 1000x1000 template
-        WHEN:
-            - A PATCH replaces zones with one inside the saved dimensions
-        THEN:
-            - The request succeeds
-        """
-        template = OcrTemplateFactory(
-            name="Test",
-            owner=admin_user,
-        )
-        response = admin_client.patch(
-            f"{ENDPOINT}{template.pk}/",
-            {"zones": [make_zone()]},
-            format="json",
-        )
-        assert response.status_code == 200
+        assert response.status_code == expected_status
 
     def test_partial_zone_replacement_requires_complete_zones(
         self,
@@ -1249,59 +1227,38 @@ class TestOcrTemplateDelete:
 @pytest.mark.django_db
 @pytest.mark.usefixtures("paperless_dirs")
 class TestRunZoneOcr:
-    def test_without_matching_template_is_skipped(
-        self,
-        admin_client: APIClient,
-        mock_extract: MagicMock,
-    ) -> None:
-        """
-        GIVEN:
-            - A document and a template that does not match it
-        WHEN:
-            - Zone OCR is run on the document
-        THEN:
-            - The run is skipped with reason no_template and nothing is extracted
-        """
-        document = DocumentFactory(content=CONTENT)
-        OcrTemplateFactory(
-            name="Other sender",
-            match="Contoso",
-        )
-
-        response = admin_client.post(RUN_ZONE_OCR_URL.format(pk=document.pk))
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.json() == SKIPPED_NO_TEMPLATE
-        mock_extract.assert_not_called()
-
     @pytest.mark.parametrize(
-        "with_disabled_template",
+        "template_kwargs_list",
         [
-            pytest.param(False, id="no-templates"),
-            pytest.param(True, id="disabled-template"),
+            pytest.param([], id="no-templates"),
+            pytest.param(
+                [{"name": "Disabled template", "match": "Northwind", "enabled": False}],
+                id="disabled-template",
+            ),
+            pytest.param(
+                [{"name": "Other sender", "match": "Contoso"}],
+                id="non-matching-template",
+            ),
         ],
     )
-    def test_without_enabled_template_is_skipped(
+    def test_without_enabled_matching_template_is_skipped(
         self,
         admin_client: APIClient,
         mock_extract: MagicMock,
-        with_disabled_template: bool,  # noqa: FBT001
+        template_kwargs_list: list[dict[str, Any]],
     ) -> None:
         """
         GIVEN:
-            - A document and either no templates or a matching disabled template
+            - A document and either no templates, only a matching disabled
+              template, or only a template that does not match the document
         WHEN:
             - Zone OCR is run on the document
         THEN:
             - The run is skipped with reason no_template and nothing is extracted
         """
         document = DocumentFactory(content=CONTENT)
-        if with_disabled_template:
-            OcrTemplateFactory(
-                name="Disabled template",
-                match="Northwind",
-                enabled=False,
-            )
+        for template_kwargs in template_kwargs_list:
+            OcrTemplateFactory(**template_kwargs)
 
         response = admin_client.post(RUN_ZONE_OCR_URL.format(pk=document.pk))
 
