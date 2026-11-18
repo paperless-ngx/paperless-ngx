@@ -10,10 +10,7 @@
 <div class="modal-body">
   @if (!updateCheckingEnabled) {
     <p class="mb-0" i18n>Release notes are fetched from GitHub when update checking is enabled.</p>
-    <a class="small" [href]="releaseUrl" target="_blank" rel="noopener noreferrer">
-      <ng-container i18n>View on GitHub</ng-container>
-      <pngx-bs-icon name="box-arrow-up-right" class="ms-1"></pngx-bs-icon>
-    </a>
+    <ng-container *ngTemplateOutlet="githubLink"></ng-container>
   } @else if (loading()) {
     <div class="d-flex align-items-center gap-2 text-muted">
       <div class="spinner-border spinner-border-sm" role="status"></div>
@@ -21,6 +18,7 @@
     </div>
   } @else if (!releases()?.length) {
     <p class="mb-0" i18n>Release notes could not be loaded.</p>
+    <ng-container *ngTemplateOutlet="githubLink"></ng-container>
   } @else {
     @for (release of releases(); track release.version) {
       <section class="release-notes" [class.border-top]="!$first" [class.pt-3]="!$first" [class.mt-3]="!$first">
@@ -39,10 +37,13 @@
     }
   }
 </div>
-<div class="modal-footer justify-content-between">
-  <a class="btn btn-primary d-flex align-items-center" [href]="releaseUrl" target="_blank" rel="noopener noreferrer">
-    <ng-container i18n>View on GitHub</ng-container>
-    <pngx-bs-icon name="box-arrow-up-right" class="ms-2 mt-n1"></pngx-bs-icon>
-  </a>
+<div class="modal-footer">
   <button type="button" class="btn btn-outline-secondary" (click)="close()" i18n>Close</button>
 </div>
+
+<ng-template #githubLink>
+  <a class="small" [href]="releaseUrl" target="_blank" rel="noopener noreferrer">
+    <ng-container i18n>View on GitHub</ng-container>
+    <pngx-bs-icon name="box-arrow-up-right" class="ms-1"></pngx-bs-icon>
+  </a>
+</ng-template>

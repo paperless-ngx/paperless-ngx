@@ -1,3 +1,4 @@
+import { NgTemplateOutlet } from '@angular/common'
 import { Component, inject, signal } from '@angular/core'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { first } from 'rxjs'
@@ -35,7 +36,7 @@ export function prepareReleaseHtml(html: string): string {
   selector: 'pngx-release-notes-dialog',
   templateUrl: './release-notes-dialog.component.html',
   styleUrls: ['./release-notes-dialog.component.scss'],
-  imports: [BootstrapIconComponent, CustomDatePipe],
+  imports: [BootstrapIconComponent, CustomDatePipe, NgTemplateOutlet],
 })
 export class ReleaseNotesDialogComponent {
   readonly activeModal = inject(NgbActiveModal)
