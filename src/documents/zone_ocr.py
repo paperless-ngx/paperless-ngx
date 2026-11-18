@@ -37,6 +37,8 @@ from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import OcrTemplate
 from documents.models import OcrTemplateZone
+from documents.parsers import ParseError
+from documents.parsers import rasterize_pdf_page_to_png
 from documents.permissions import permitted_object_ids
 from documents.regex import safe_regex_fullmatch
 from documents.signals.handlers import add_to_index
@@ -400,41 +402,23 @@ def _render_pages(
         if actual_page < 0 or (page_count and actual_page >= page_count):
             continue
 
-        output_prefix = tmp_dir / f"page_{actual_page}"
+        rendered = tmp_dir / f"page_{actual_page}.png"
         try:
-            subprocess.run(
-                [
-                    "pdftoppm",
-                    "-png",
-                    "-singlefile",
-                    "-r",
-                    "300",
-                    "-f",
-                    str(actual_page + 1),  # pdftoppm is 1-indexed
-                    "-l",
-                    str(actual_page + 1),
-                    str(doc_path),
-                    str(output_prefix),
-                ],
-                check=True,
-                capture_output=True,
+            rasterize_pdf_page_to_png(
+                doc_path,
+                rendered,
+                dpi=300,
+                page=actual_page + 1,  # pdftoppm is 1-indexed
                 timeout=60,
             )
-        except subprocess.TimeoutExpired:
-            logger.error("Zone OCR: pdftoppm timed out for page %d", actual_page)
-            continue
-        except subprocess.CalledProcessError as e:
+        except ParseError as e:
             logger.exception(
                 "Zone OCR: pdftoppm failed for page %d: %s",
                 actual_page,
-                e.stderr.decode(errors="replace") if e.stderr else str(e),
+                e,
             )
             continue
-        except FileNotFoundError:
-            logger.error("Zone OCR: pdftoppm not found")
-            return result
 
-        rendered = output_prefix.with_suffix(".png")
         if rendered.is_file():
             result[actual_page] = rendered
 
@@ -519,9 +503,6 @@ def _ocr_text(cropped: Image.Image, zone: OcrTemplateZone, tmp_dir: Path) -> str
             zone.name,
             e.stderr[:200] if e.stderr else str(e),
         )
-        return None
-    except FileNotFoundError:
-        logger.error("Zone OCR: Tesseract not found")
         return None
 
 

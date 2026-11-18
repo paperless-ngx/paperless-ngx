@@ -20,6 +20,7 @@ from documents.models import Document
 from documents.models import MatchingModel
 from documents.models import OcrTemplate
 from documents.models import OcrTemplateZone
+from documents.parsers import ParseError
 from documents.zone_ocr import _apply_transform
 from documents.zone_ocr import _combine_field_value
 from documents.zone_ocr import _convert_value
@@ -291,7 +292,6 @@ class TestZoneExtraction:
                 subprocess.CalledProcessError(1, "tesseract"),
                 id="called-process-error-without-stderr",
             ),
-            pytest.param(FileNotFoundError("tesseract"), id="reader-not-found"),
         ],
     )
     def test_reader_failures_return_no_value(
@@ -304,7 +304,7 @@ class TestZoneExtraction:
     ) -> None:
         """
         GIVEN:
-            - A reader that fails with a timeout, process error or missing binary
+            - A reader that fails with a timeout or process error
         WHEN:
             - The zone is extracted
         THEN:
@@ -700,6 +700,7 @@ class TestSavedZoneExtraction:
 
     def test_document_run_renders_each_page_once_across_templates(
         self,
+        mocker: MockerFixture,
         mock_zone_ocr_run: MagicMock,
         paperless_dirs: PaperlessDirs,
         document: Document,
@@ -723,28 +724,24 @@ class TestSavedZoneExtraction:
         pdf.write_bytes(b"%PDF-1.4")
         rendered = []
 
-        def execute(args: list[str], **kwargs: Any) -> subprocess.CompletedProcess[str]:
-            if args[0] == "pdftoppm":
-                output = Path(args[-1]).with_suffix(".png")
-                with Image.new("RGB", (100, 50), "white") as image:
-                    image.save(output)
-                rendered.append(output)
-                return subprocess.CompletedProcess(args, 0)
-            return subprocess.CompletedProcess(args, 0, stdout="extracted")
+        def render(in_path: Path, out_path: Path, **kwargs: Any) -> None:
+            with Image.new("RGB", (100, 50), "white") as image:
+                image.save(out_path)
+            rendered.append(out_path)
 
-        mock_zone_ocr_run.side_effect = execute
+        mock_rasterize = mocker.patch(
+            "documents.zone_ocr.rasterize_pdf_page_to_png",
+            side_effect=render,
+        )
+        mock_zone_ocr_run.return_value = subprocess.CompletedProcess(
+            [],
+            0,
+            stdout="extracted",
+        )
 
         results = run_zone_extraction(document, pdf, templates=[template, second])
 
-        render_calls = [
-            call
-            for call in mock_zone_ocr_run.call_args_list
-            if call.args[0][0] == "pdftoppm"
-        ]
-        assert len(render_calls) == 2
-        assert [
-            call.args[0][call.args[0].index("-f") + 1] for call in render_calls
-        ] == ["1", "2"]
+        assert [call.kwargs["page"] for call in mock_rasterize.call_args_list] == [1, 2]
         assert [result.reason for result in results] == [None, None, None]
         assert not any(path.exists() for path in rendered)
 
@@ -2822,11 +2819,21 @@ class TestRenderPages:
         pdf.write_bytes(b"%PDF-1.4")
         return pdf
 
+    @pytest.fixture
+    def mock_rasterize(self, mocker: MockerFixture) -> MagicMock:
+        def render(in_path: Path, out_path: Path, **kwargs: Any) -> None:
+            out_path.write_bytes(b"rendered")
+
+        return mocker.patch(
+            "documents.zone_ocr.rasterize_pdf_page_to_png",
+            side_effect=render,
+        )
+
     def test_renders_requested_pages_in_order_and_skips_out_of_range(
         self,
         pdf: Path,
         tmp_path: Path,
-        mock_zone_ocr_run: MagicMock,
+        mock_rasterize: MagicMock,
     ) -> None:
         """
         GIVEN:
@@ -2834,30 +2841,22 @@ class TestRenderPages:
         WHEN:
             - The pages are rendered
         THEN:
-            - Only the in range pages are rendered, in order, with the expected
-              renderer arguments
+            - Only the in range pages are rendered, in order, as 1-based pages
+              at 300 DPI with a 60 second timeout
         """
-
-        def render(args: list[str], **kwargs: Any) -> None:
-            Path(args[-1]).with_suffix(".png").write_bytes(b"rendered")
-
-        mock_zone_ocr_run.side_effect = render
         pages = _render_pages(pdf, {-1, 0, 2, 3}, tmp_path, 3)
-        assert list(pages) == [0, 2]
-        assert mock_zone_ocr_run.call_count == 2
-        for page, call in zip([1, 3], mock_zone_ocr_run.call_args_list, strict=True):
-            args = call.args[0]
-            assert "-singlefile" in args
-            assert args[args.index("-f") + 1] == str(page)
-            assert args[args.index("-l") + 1] == str(page)
-            assert call.kwargs["timeout"] == 60
-            assert call.kwargs["check"]
 
-    @pytest.mark.usefixtures("mock_zone_ocr_run")
+        assert list(pages) == [0, 2]
+        assert mock_rasterize.call_count == 2
+        for page, call in zip([1, 3], mock_rasterize.call_args_list, strict=True):
+            assert call.args[0] == pdf
+            assert call.kwargs == {"dpi": 300, "page": page, "timeout": 60}
+
     def test_missing_render_output_is_not_a_page(
         self,
         pdf: Path,
         tmp_path: Path,
+        mock_rasterize: MagicMock,
     ) -> None:
         """
         GIVEN:
@@ -2867,19 +2866,17 @@ class TestRenderPages:
         THEN:
             - No pages are returned
         """
+        mock_rasterize.side_effect = None
+
         assert _render_pages(pdf, {0}, tmp_path, None) == {}
 
     @pytest.mark.parametrize(
         "error",
         [
-            pytest.param(subprocess.TimeoutExpired("pdftoppm", 60), id="timeout"),
+            pytest.param(ParseError("pdftoppm timed out after 60s"), id="timeout"),
             pytest.param(
-                subprocess.CalledProcessError(1, "pdftoppm", stderr=b"failure"),
-                id="called-process-error-with-stderr",
-            ),
-            pytest.param(
-                subprocess.CalledProcessError(1, "pdftoppm"),
-                id="called-process-error-without-stderr",
+                ParseError("pdftoppm failed at ['pdftoppm']"),
+                id="render-failure",
             ),
         ],
     )
@@ -2887,7 +2884,7 @@ class TestRenderPages:
         self,
         pdf: Path,
         tmp_path: Path,
-        mock_zone_ocr_run: MagicMock,
+        mock_rasterize: MagicMock,
         error: Exception,
     ) -> None:
         """
@@ -2899,36 +2896,19 @@ class TestRenderPages:
             - The failing page is skipped and the other page is still rendered
         """
 
-        def render(args: list[str], **kwargs: Any) -> None:
-            if args[args.index("-f") + 1] == "1":
+        def render(in_path: Path, out_path: Path, *, page: int, **kwargs: Any) -> None:
+            if page == 1:
                 raise error
-            Path(args[-1]).with_suffix(".png").write_bytes(b"rendered")
+            out_path.write_bytes(b"rendered")
 
-        mock_zone_ocr_run.side_effect = render
+        mock_rasterize.side_effect = render
+
         assert list(_render_pages(pdf, {0, 1}, tmp_path, 2)) == [1]
-
-    def test_missing_renderer_stops_without_retrying_every_page(
-        self,
-        pdf: Path,
-        tmp_path: Path,
-        mock_zone_ocr_run: MagicMock,
-    ) -> None:
-        """
-        GIVEN:
-            - A renderer binary that is not installed
-        WHEN:
-            - Two pages are rendered
-        THEN:
-            - No pages are returned and the renderer is only attempted once
-        """
-        mock_zone_ocr_run.side_effect = FileNotFoundError("pdftoppm")
-        assert _render_pages(pdf, {0, 1}, tmp_path, 2) == {}
-        mock_zone_ocr_run.assert_called_once()
 
     def test_image_is_used_directly_only_for_first_page(
         self,
         tmp_path: Path,
-        mock_zone_ocr_run: MagicMock,
+        mock_rasterize: MagicMock,
     ) -> None:
         """
         GIVEN:
@@ -2944,7 +2924,7 @@ class TestRenderPages:
             image.save(image_path)
         assert _render_pages(image_path, {0}, tmp_path, 1) == {0: image_path}
         assert _render_pages(image_path, {1}, tmp_path, 1) == {}
-        mock_zone_ocr_run.assert_not_called()
+        mock_rasterize.assert_not_called()
 
 
 class TestDetectMime:

@@ -164,14 +164,23 @@ def run_subprocess(
     check_exit_code: bool = True,
     log_stdout: bool = True,
     log_stderr: bool = True,
+    timeout: float | None = None,
 ) -> CompletedProcess:
     """
-    Runs a subprocess and logs its output, checking return code if requested
+    Runs a subprocess and logs its output, checking return code if requested.
+
+    A timeout, in seconds, raises subprocess.TimeoutExpired once exceeded.
     """
 
     proc_name = arguments[0]
 
-    completed_proc = run(args=arguments, env=env, capture_output=True, check=False)
+    completed_proc = run(
+        args=arguments,
+        env=env,
+        capture_output=True,
+        check=False,
+        timeout=timeout,
+    )
 
     if logger:
         logger.info(f"{proc_name} exited {completed_proc.returncode}")

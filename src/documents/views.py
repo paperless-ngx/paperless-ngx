@@ -3,7 +3,6 @@ import logging
 import os
 import platform
 import re
-import subprocess
 import tempfile
 import zipfile
 from collections import Counter
@@ -176,6 +175,8 @@ from documents.models import UiSettings
 from documents.models import Workflow
 from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
+from documents.parsers import ParseError
+from documents.parsers import rasterize_pdf_page_to_png
 from documents.permissions import AcknowledgeTasksPermissions
 from documents.permissions import PaperlessAdminPermissions
 from documents.permissions import PaperlessNotePermissions
@@ -5871,26 +5872,16 @@ class OcrTemplateViewSet(BulkPermissionMixin, PassUserMixin, ModelViewSet[OcrTem
             return HttpResponse(doc_path.read_bytes(), content_type=document.mime_type)
 
         with tempfile.TemporaryDirectory(dir=settings.SCRATCH_DIR) as tmp_dir:
-            output_prefix = Path(tmp_dir) / "page"
+            rendered = Path(tmp_dir) / "page.png"
             try:
-                subprocess.run(
-                    [
-                        "pdftoppm",
-                        "-png",
-                        "-r",
-                        "150",
-                        "-f",
-                        str(page_num + 1),
-                        "-l",
-                        str(page_num + 1),
-                        str(doc_path),
-                        str(output_prefix),
-                    ],
-                    check=True,
-                    capture_output=True,
+                rasterize_pdf_page_to_png(
+                    doc_path,
+                    rendered,
+                    dpi=150,
+                    page=page_num + 1,
                     timeout=30,
                 )
-            except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as error:
+            except ParseError as error:
                 logger.warning(
                     "Failed to render page %s of document %s: %s",
                     page_num,
@@ -5898,15 +5889,11 @@ class OcrTemplateViewSet(BulkPermissionMixin, PassUserMixin, ModelViewSet[OcrTem
                     error,
                 )
                 raise Http404("Failed to render page") from error
-            except FileNotFoundError as error:
-                logger.warning("pdftoppm is not available")
-                raise Http404("Failed to render page") from error
 
-            rendered = sorted(Path(tmp_dir).glob("page-*.png"))
-            if not rendered:
+            if not rendered.is_file():
                 raise Http404("No rendered page found")
 
-            content = rendered[0].read_bytes()
+            content = rendered.read_bytes()
 
         return HttpResponse(content, content_type="image/png")
 

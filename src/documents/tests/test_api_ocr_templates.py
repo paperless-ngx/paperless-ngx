@@ -5,7 +5,6 @@ from __future__ import annotations
 import functools
 import subprocess
 from io import BytesIO
-from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Any
 
@@ -21,6 +20,7 @@ from documents.models import Document
 from documents.models import MatchingModel
 from documents.models import OcrTemplate
 from documents.models import OcrTemplateZone
+from documents.parsers import ParseError
 from documents.search import get_backend
 from documents.signals import document_consumption_finished
 from documents.tasks import extract_zones
@@ -34,6 +34,7 @@ from paperless_testing.permissions import grant_object
 
 if TYPE_CHECKING:
     from collections.abc import Callable
+    from pathlib import Path
     from unittest.mock import MagicMock
 
     from django.contrib.auth.models import User
@@ -152,7 +153,7 @@ def mock_preview(mocker: MockerFixture) -> MagicMock:
 
 @pytest.fixture
 def mock_render(mocker: MockerFixture) -> MagicMock:
-    return mocker.patch("documents.views.subprocess.run")
+    return mocker.patch("documents.views.rasterize_pdf_page_to_png")
 
 
 def detail_url(pk: int) -> str:
@@ -1851,7 +1852,7 @@ class TestDocumentPageImage:
         WHEN:
             - Its page image is requested
         THEN:
-            - The original file is served and no render subprocess runs
+            - The original file is served and no page is rendered
         """
         document = DocumentFactory(owner=preview_user, mime_type="image/png")
         document.source_path.write_bytes(b"image contents")
@@ -1907,12 +1908,12 @@ class TestDocumentPageImage:
         WHEN:
             - The second page image is requested
         THEN:
-            - pdftoppm is invoked for page 2 with the expected arguments
+            - The renderer is invoked for page 2 at 150 DPI with a 30 second timeout
             - The rendered page is served and the temporary directory removed
         """
 
-        def render_page(command: list[str], **kwargs: Any) -> None:
-            Path(command[-1] + "-2.png").write_bytes(b"rendered page")
+        def render_page(in_path: Path, out_path: Path, **kwargs: Any) -> None:
+            out_path.write_bytes(b"rendered page")
 
         mock_render.side_effect = render_page
 
@@ -1921,61 +1922,34 @@ class TestDocumentPageImage:
         assert response.status_code == status.HTTP_200_OK
         assert response["Content-Type"] == "image/png"
         assert response.content == b"rendered page"
-        command = mock_render.call_args.args[0]
-        assert command[:9] == [
-            "pdftoppm",
-            "-png",
-            "-r",
-            "150",
-            "-f",
-            "2",
-            "-l",
-            "2",
-            str(preview_document.source_path),
-        ]
-        assert mock_render.call_args.kwargs == {
-            "check": True,
-            "capture_output": True,
-            "timeout": 30,
-        }
-        assert not Path(command[-1]).parent.exists()
+        mock_render.assert_called_once()
+        in_path, out_path = mock_render.call_args.args
+        assert in_path == preview_document.source_path
+        assert mock_render.call_args.kwargs == {"dpi": 150, "page": 2, "timeout": 30}
+        assert not out_path.parent.exists()
 
-    @pytest.mark.parametrize(
-        "error",
-        [
-            pytest.param(
-                subprocess.CalledProcessError(
-                    1,
-                    ["pdftoppm"],
-                    stderr=b"sensitive server path",
-                ),
-                id="called-process-error",
-            ),
-            pytest.param(subprocess.TimeoutExpired(["pdftoppm"], 30), id="timeout"),
-            pytest.param(FileNotFoundError("pdftoppm"), id="missing-binary"),
-        ],
-    )
-    def test_render_failures_are_controlled_and_do_not_expose_paths(
+    def test_render_failure_is_controlled_and_does_not_expose_paths(
         self,
         preview_client: APIClient,
         preview_document: Document,
         mock_render: MagicMock,
-        error: Exception,
     ) -> None:
         """
         GIVEN:
-            - A PDF document and a render subprocess that fails
+            - A PDF document whose page render fails
         WHEN:
             - Its page image is requested
         THEN:
-            - 404 is returned without leaking the subprocess error output
+            - 404 is returned without leaking the renderer's error message
         """
-        mock_render.side_effect = error
+        mock_render.side_effect = ParseError(
+            "pdftoppm failed at /sensitive/server/path",
+        )
 
         response = preview_client.get(preview_url(preview_document))
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
-        assert "sensitive server path" not in str(response.content)
+        assert "sensitive" not in str(response.content)
 
     @pytest.mark.usefixtures("mock_render")
     def test_missing_render_output_returns_not_found(
@@ -1985,7 +1959,7 @@ class TestDocumentPageImage:
     ) -> None:
         """
         GIVEN:
-            - A PDF document and a render subprocess that writes no output
+            - A PDF document whose page render writes no output
         WHEN:
             - Its page image is requested
         THEN:

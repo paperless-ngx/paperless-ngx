@@ -421,6 +421,101 @@ class TestRasterizePdfPageToPng:
         with pytest.raises(ParseError):
             rasterize_pdf_page_to_png(bad, tmp_path / "page1.png", dpi=72)
 
+    def test_renders_the_requested_page(self, tmp_path: Path) -> None:
+        """
+        GIVEN:
+            - A two page PDF with a 144x72 first page and a 300x300 second page
+        WHEN:
+            - The second page is rasterized at 72 DPI
+        THEN:
+            - Only out_path is written, sized like the second page
+        """
+        pdf_path = self._write_pdf(tmp_path / "in.pdf")
+        out_dir = tmp_path / "out"
+        out_dir.mkdir()
+        out_path = out_dir / "page2.png"
+
+        rasterize_pdf_page_to_png(pdf_path, out_path, dpi=72, page=2, timeout=30)
+
+        assert list(out_dir.iterdir()) == [out_path]
+        with Image.open(out_path) as im:
+            assert im.size == (300, 300)
+
+    def test_page_out_of_range_raises_parse_error(self, tmp_path: Path) -> None:
+        """
+        GIVEN:
+            - A two page PDF
+        WHEN:
+            - A page past the end is rasterized
+        THEN:
+            - A ParseError is raised and nothing is written
+        """
+        pdf_path = self._write_pdf(tmp_path / "in.pdf")
+        out_path = tmp_path / "page3.png"
+
+        with pytest.raises(ParseError):
+            rasterize_pdf_page_to_png(pdf_path, out_path, dpi=72, page=3)
+
+        assert not out_path.exists()
+
+    def test_arguments_and_timeout_are_passed_to_pdftoppm(
+        self,
+        tmp_path: Path,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A subprocess runner that succeeds
+        WHEN:
+            - Page 4 is rasterized with a timeout
+        THEN:
+            - pdftoppm renders only that page and the timeout reaches the runner
+        """
+        run = mocker.patch("documents.parsers.run_subprocess")
+
+        rasterize_pdf_page_to_png(
+            tmp_path / "in.pdf",
+            tmp_path / "out.png",
+            dpi=150,
+            page=4,
+            timeout=12,
+        )
+
+        args = run.call_args.args[0]
+        assert args[args.index("-f") + 1] == "4"
+        assert args[args.index("-l") + 1] == "4"
+        assert args[args.index("-r") + 1] == "150"
+        assert "-singlefile" in args
+        assert "-cropbox" in args
+        assert args[-1] == str(tmp_path / "out")
+        assert run.call_args.kwargs["timeout"] == 12
+
+    def test_timeout_raises_parse_error(
+        self,
+        tmp_path: Path,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A subprocess runner that times out
+        WHEN:
+            - A page is rasterized
+        THEN:
+            - A ParseError is raised
+        """
+        mocker.patch(
+            "documents.parsers.run_subprocess",
+            side_effect=subprocess.TimeoutExpired(["pdftoppm"], 5),
+        )
+
+        with pytest.raises(ParseError, match="timed out"):
+            rasterize_pdf_page_to_png(
+                tmp_path / "in.pdf",
+                tmp_path / "out.png",
+                dpi=72,
+                timeout=5,
+            )
+
 
 class TestEncodeThumbnailWebp:
     @pytest.mark.parametrize(
