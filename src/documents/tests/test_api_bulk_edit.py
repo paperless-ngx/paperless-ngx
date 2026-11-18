@@ -753,7 +753,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         m.assert_called_once()
         args, kwargs = m.call_args
         self.assertEqual(args[0], [self.doc1.id])
-        self.assertEqual(kwargs, {})
+        self.assertEqual(kwargs, {"user": self.user})
 
     @mock.patch("documents.views.bulk_edit.run_zone_ocr")
     def test_run_zone_ocr_documents_endpoint_with_template(self, m) -> None:
@@ -780,7 +780,7 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         m.assert_called_once()
         args, kwargs = m.call_args
         self.assertEqual(args[0], [self.doc1.id])
-        self.assertEqual(kwargs, {"template": template.pk})
+        self.assertEqual(kwargs, {"template": template.pk, "user": self.user})
 
     @mock.patch("documents.views.bulk_edit.run_zone_ocr")
     def test_run_zone_ocr_documents_endpoint_rejects_private_template(

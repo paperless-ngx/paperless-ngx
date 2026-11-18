@@ -115,9 +115,34 @@ def test_zone_ocr_finishes_extraction_within_the_tracked_task(bulk_setup):
             {"template": template.pk},
             user.pk,
         )
-    extract.assert_called_once_with(document_id=doc.pk, template_id=template.pk)
+    extract.assert_called_once_with(
+        document_id=doc.pk,
+        template_id=template.pk,
+        requester=user,
+    )
     extract.apply_async.assert_not_called()
     assert result == {"operation": "run_zone_ocr", "document_count": 1}
+
+
+@pytest.mark.django_db
+def test_zone_ocr_without_template_selects_for_the_requester(bulk_setup):
+    """
+    GIVEN:
+        - A queued zone OCR run without a chosen template
+    WHEN:
+        - The tracked task executes it
+    THEN:
+        - Extraction receives the requesting user so templates are limited to
+          those they can view
+    """
+    user, _, doc, _ = bulk_setup
+    with mock.patch("documents.bulk_edit.extract_zones") as extract:
+        execute_bulk_operation("run_zone_ocr", [doc.pk], {}, user.pk)
+    extract.assert_called_once_with(
+        document_id=doc.pk,
+        template_id=None,
+        requester=user,
+    )
 
 
 @pytest.mark.django_db

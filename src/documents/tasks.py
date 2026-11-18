@@ -11,6 +11,7 @@ from tempfile import mkstemp
 from celery import Task
 from celery import shared_task
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sessions.models import Session
 from django.db import models
@@ -73,6 +74,7 @@ from documents.utils import identity
 from documents.versioning import annotate_effective_content
 from documents.versioning import latest_version
 from documents.workflows.utils import get_workflows_for_trigger
+from documents.zone_ocr import get_templates_for_document
 from documents.zone_ocr import run_zone_extraction
 from paperless.config import AIConfig
 from paperless.config import BarcodeConfig
@@ -373,14 +375,20 @@ def _read_barcodes_for_reprocess(document: Document) -> list[StoredBarcode] | No
 
 
 @shared_task
-def extract_zones(document_id: int, template_id: int | None = None) -> None:
+def extract_zones(
+    document_id: int,
+    template_id: int | None = None,
+    requester: User | None = None,
+) -> None:
     """
     Run an OCR template against a stored document, or every template that
-    matches it when no template is given.
+    matches it when no template is given. Matched templates are limited to
+    those the requester can view.
     """
-    document = Document.objects.get(id=document_id)
-    templates = None
-    if template_id is not None:
+    document = latest_version(Document.objects.get(id=document_id))
+    if template_id is None:
+        templates = get_templates_for_document(document, requester=requester)
+    else:
         try:
             template = OcrTemplate.objects.prefetch_related(
                 "zones",
@@ -394,7 +402,7 @@ def extract_zones(document_id: int, template_id: int | None = None) -> None:
             return
         templates = [template]
 
-    run_zone_extraction(latest_version(document), templates=templates, reindex=True)
+    run_zone_extraction(document, templates=templates, reindex=True)
 
 
 @shared_task

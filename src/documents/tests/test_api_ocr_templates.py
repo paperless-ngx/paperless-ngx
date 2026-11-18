@@ -1134,6 +1134,66 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
         )
         self.assertEqual(run.call_count, 3)
 
+    @patch("documents.zone_ocr.subprocess.run")
+    def test_run_zone_ocr_hides_the_owners_private_templates_from_an_editor(
+        self,
+        run,
+    ):
+        """
+        GIVEN:
+            - A document shared for editing with another user
+            - Templates private to the owner, unowned, and shared with both
+        WHEN:
+            - The editor runs zone OCR without choosing a template
+        THEN:
+            - Only templates the editor can also view run and are reported
+        """
+        owner = User.objects.create_user(username="document_owner")
+        editor = User.objects.create_user(username="document_editor")
+        editor.user_permissions.add(
+            *Permission.objects.filter(
+                codename__in=["view_document", "change_document"],
+            ),
+        )
+        document = DocumentFactory(content=CONTENT, owner=owner)
+        grant_object(editor, document, "view_document", "change_document")
+        with Image.new("RGB", (100, 100), "white") as image:
+            image.save(document.source_path, format="PNG")
+        run.return_value.stdout = "extracted"
+        for name, template_owner in [
+            ("Owner private", owner),
+            ("Unowned", None),
+            ("Shared", owner),
+        ]:
+            template = OcrTemplate.objects.create(
+                name=name,
+                owner=template_owner,
+                match="Northwind",
+                source_width=100,
+                source_height=100,
+            )
+            OcrTemplateZone.objects.create(
+                template=template,
+                name=name,
+                target="title",
+                x=0,
+                y=0,
+                width=20,
+                height=20,
+            )
+            if name == "Shared":
+                grant_object(editor, template, "view_ocrtemplate")
+        self.client.force_authenticate(editor)
+
+        response = self.client.post(f"/api/documents/{document.pk}/run-zone-ocr/")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertCountEqual(
+            [result["template"] for result in response.json()["results"]],
+            ["Unowned", "Shared"],
+        )
+        self.assertEqual(run.call_count, 2)
+
     def test_shared_editor_cannot_transfer_ownership_or_change_sharing(self):
         editor = User.objects.create_user(username="shared_editor")
         editor.user_permissions.add(

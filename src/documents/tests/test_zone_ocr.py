@@ -654,6 +654,24 @@ class TestTemplateVisibility(DirectoriesMixin, TestCase):
             [self.mine, self.unowned, self.private],
         )
 
+    def test_requester_limits_the_owners_templates(self):
+        """
+        GIVEN:
+            - Templates owned by the document owner, unowned, private to
+              another user, and owned by the owner but shared with the requester
+        WHEN:
+            - Templates are selected for a manual run by the requester
+        THEN:
+            - Only templates both the owner and the requester can view are used
+        """
+        shared = self.template("Shared", owner=self.owner)
+        grant_object(self.other, shared, "view_ocrtemplate")
+
+        self.assertCountEqual(
+            get_templates_for_document(self.document, requester=self.other),
+            [self.unowned, shared],
+        )
+
     def test_inactive_owner_has_no_templates(self):
         self.owner.is_active = False
         self.assertEqual(get_templates_for_document(self.document), [])

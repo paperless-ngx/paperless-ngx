@@ -30,6 +30,7 @@ from documents.permissions import set_permissions_for_objects
 from documents.tasks import extract_zones
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import DocumentFactory
+from paperless_testing.factories import UserFactory
 from paperless_testing.permissions import grant_object
 from paperless_testing.samples import MULTI_PAGE_DIGITAL_PDF
 from paperless_testing.samples import SIMPLE_DIGITAL_PDF
@@ -1948,11 +1949,14 @@ class TestBulkEditRunZoneOcr:
     ) -> None:
         docs = DocumentFactory.create_batch(2)
 
-        result = bulk_edit.run_zone_ocr([doc.id for doc in docs])
+        user = UserFactory()
+
+        result = bulk_edit.run_zone_ocr([doc.id for doc in docs], user=user)
 
         assert result == "OK"
         assert mock_task.call_args_list == [
-            mock.call(document_id=doc.id, template_id=None) for doc in docs
+            mock.call(document_id=doc.id, template_id=None, requester=user)
+            for doc in docs
         ]
         mock_task.apply_async.assert_not_called()
 
@@ -1966,7 +1970,11 @@ class TestBulkEditRunZoneOcr:
 
         bulk_edit.run_zone_ocr([doc.id], template=template.pk)
 
-        mock_task.assert_called_once_with(document_id=doc.id, template_id=template.pk)
+        mock_task.assert_called_once_with(
+            document_id=doc.id,
+            template_id=template.pk,
+            requester=None,
+        )
         mock_task.apply_async.assert_not_called()
 
     def test_task_runs_extraction(self, mocker: MockerFixture) -> None:
@@ -1976,14 +1984,22 @@ class TestBulkEditRunZoneOcr:
         WHEN:
             - The task runs
         THEN:
-            - Zone extraction runs on the stored document
+            - Templates are selected for the requester and extraction runs on
+              the stored document
         """
         extract = mocker.patch("documents.tasks.run_zone_extraction")
+        select = mocker.patch("documents.tasks.get_templates_for_document")
         doc = DocumentFactory()
+        user = UserFactory()
 
-        extract_zones(doc.id)
+        extract_zones(doc.id, requester=user)
 
-        extract.assert_called_once_with(doc, templates=None, reindex=True)
+        select.assert_called_once_with(doc, requester=user)
+        extract.assert_called_once_with(
+            doc,
+            templates=select.return_value,
+            reindex=True,
+        )
 
     def test_task_runs_the_chosen_template(self, mocker: MockerFixture) -> None:
         """

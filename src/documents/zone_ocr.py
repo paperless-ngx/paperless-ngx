@@ -13,6 +13,7 @@ from decimal import Decimal
 from decimal import InvalidOperation
 from functools import partial
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import dateparser
 import magic
@@ -33,6 +34,9 @@ from documents.permissions import permitted_object_ids
 from documents.regex import safe_regex_fullmatch
 from documents.signals.handlers import add_to_index
 from documents.versioning import get_root_document
+
+if TYPE_CHECKING:
+    from django.contrib.auth.models import User
 
 logger = logging.getLogger("paperless.zone_ocr")
 
@@ -73,19 +77,29 @@ def _zone_result(
     return ZoneOcrResult(template.name, zone.name, label, value, reason)
 
 
-def get_templates_for_document(document: Document) -> list[OcrTemplate]:
+def get_templates_for_document(
+    document: Document,
+    *,
+    requester: User | None = None,
+) -> list[OcrTemplate]:
     """
     The enabled templates that match the selected file's content and that the
-    root document's owner can view.
+    root document's owner can view. For a manual run, the templates are further
+    limited to those the requester can view, so a user editing someone else's
+    document never runs or sees that owner's private templates.
     """
     owner = get_root_document(document).owner
-    templates = (
-        OcrTemplate.objects.filter(
-            enabled=True,
-            id__in=permitted_object_ids(owner, OcrTemplate, "view_ocrtemplate"),
+    templates = OcrTemplate.objects.filter(
+        enabled=True,
+        id__in=permitted_object_ids(owner, OcrTemplate, "view_ocrtemplate"),
+    )
+    if requester is not None:
+        templates = templates.filter(
+            id__in=permitted_object_ids(requester, OcrTemplate, "view_ocrtemplate"),
         )
-        .order_by("name", "pk")
-        .prefetch_related("zones", "zones__custom_field")
+    templates = templates.order_by("name", "pk").prefetch_related(
+        "zones",
+        "zones__custom_field",
     )
     if document.root_document_id is None and templates:
         # The original file can be selected even when newer versions exist.

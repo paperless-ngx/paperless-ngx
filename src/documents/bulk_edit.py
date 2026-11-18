@@ -1262,9 +1262,10 @@ def run_zone_ocr(
     doc_ids: list[int],
     *,
     template: int | None = None,
+    user: User | None = None,
 ) -> Literal["OK"]:
     """Run zone OCR within the tracked bulk operation task."""
     for document_id in doc_ids:
-        extract_zones(document_id=document_id, template_id=template)
+        extract_zones(document_id=document_id, template_id=template, requester=user)
 
     return "OK"

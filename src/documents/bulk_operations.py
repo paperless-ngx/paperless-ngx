@@ -55,10 +55,11 @@ USER_OPERATIONS = frozenset(
         "edit_pdf",
         "remove_password",
         "merge_as_versions",
+        "run_zone_ocr",
     },
 )
-# merge_as_versions doesn't queue any consume tasks
-TRIGGER_SOURCE_OPERATIONS = USER_OPERATIONS - {"merge_as_versions"}
+# These don't queue any consume tasks
+TRIGGER_SOURCE_OPERATIONS = USER_OPERATIONS - {"merge_as_versions", "run_zone_ocr"}
 
 
 def snapshot_field(doc_ids: list[int], field: str) -> dict[int, Any]:

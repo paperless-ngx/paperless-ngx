@@ -2336,7 +2336,7 @@ class DocumentViewSet(
         templates = (
             [template]
             if template is not None
-            else get_templates_for_document(file_document)
+            else get_templates_for_document(file_document, requester=request.user)
         )
         if not templates:
             return Response(
