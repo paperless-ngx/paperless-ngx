@@ -722,7 +722,7 @@ describe('AppFrameComponent', () => {
     ).toBeUndefined()
   })
 
-  it('should show new release dot in slim sidebar', () => {
+  it('should show new release dot instead of documentation in slim sidebar', () => {
     settingsService.set(SETTINGS_KEYS.SLIM_SIDEBAR, true)
     settingsService.set(SETTINGS_KEYS.VERSION, '3.5.1')
     settingsService.set(SETTINGS_KEYS.WHATS_NEW_LAST_SEEN_VERSION, '3.4.2')
@@ -733,6 +733,10 @@ describe('AppFrameComponent', () => {
         By.css('button[aria-label="See what\'s new in this version"]')
       )
     ).toBeTruthy()
+    const docsItem = fixture.debugElement
+      .query(By.css('a[href="https://docs.paperless-ngx.com"].nav-anchor'))
+      .nativeElement.closest('li')
+    expect(docsItem.classList).toContain('d-md-none')
   })
 
   it('should show tasks badge for needs-attention tasks', () => {
