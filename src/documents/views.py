@@ -4314,7 +4314,7 @@ class UiSettingsView(GenericAPIView[Any]):
         )
 
 
-GITHUB_CACHE_KEY = "github_releases:%s"
+GITHUB_CACHE_KEY = "github_data:%s"
 
 
 def get_github_releases(
