@@ -2908,7 +2908,7 @@ class TestRunZoneOcrBulkEditAPI:
 
     @pytest.fixture
     def doc1(self) -> Document:
-        return DocumentFactory(checksum="A", title="A")
+        return DocumentFactory()
 
     def test_run_zone_ocr_documents_endpoint(
         self,
@@ -2951,11 +2951,7 @@ class TestRunZoneOcrBulkEditAPI:
         THEN:
             - run_zone_ocr is called with the template
         """
-        template = OcrTemplateFactory(
-            name="Bills",
-            source_width=100,
-            source_height=100,
-        )
+        template = OcrTemplateFactory()
         response = api_client.post(
             "/api/documents/run_zone_ocr/",
             json.dumps({"documents": [doc1.id], "template": template.pk}),
@@ -2986,8 +2982,6 @@ class TestRunZoneOcrBulkEditAPI:
         template = OcrTemplateFactory(
             name="Private",
             owner=UserFactory(username="other"),
-            source_width=100,
-            source_height=100,
         )
         api_client.force_authenticate(user=user)
 

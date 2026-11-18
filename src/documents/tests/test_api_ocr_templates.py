@@ -212,7 +212,6 @@ class TestZoneOcrIndexing:
         template = OcrTemplateFactory(
             name="Invoice template",
             match="Northwind",
-            matching_algorithm=MatchingModel.MATCH_ANY,
             source_width=100,
             source_height=100,
         )
@@ -220,12 +219,8 @@ class TestZoneOcrIndexing:
         OcrTemplateZoneFactory(
             template=template,
             name="Title",
-            target=OcrTemplateZone.TargetType.TITLE,
             page=-1,
-            x=0,
-            y=0,
             width=50,
-            height=50,
         )
         OcrTemplateZoneFactory(
             template=template,
@@ -233,10 +228,8 @@ class TestZoneOcrIndexing:
             target=OcrTemplateZone.TargetType.CUSTOM_FIELD,
             custom_field=field,
             page=-1,
-            x=0,
             y=50,
             width=50,
-            height=50,
             order=1,
         )
         mocker.patch(
@@ -452,9 +445,6 @@ class TestOcrTemplatePermissions:
             return OcrTemplateFactory(
                 name=name,
                 match="Northwind",
-                matching_algorithm=MatchingModel.MATCH_ANY,
-                source_width=1000,
-                source_height=1000,
                 owner=owner,
             )
 
@@ -491,9 +481,6 @@ class TestOcrTemplatePermissions:
         template = OcrTemplateFactory(
             name="Private",
             match="Northwind",
-            matching_algorithm=MatchingModel.MATCH_ANY,
-            source_width=1000,
-            source_height=1000,
             owner=other,
         )
         grant_object(user, template, "view_ocrtemplate")
@@ -620,7 +607,6 @@ class TestOcrTemplatePermissions:
             name="Shared",
             owner=admin_user,
             match="Northwind",
-            matching_algorithm=MatchingModel.MATCH_ANY,
             source_width=100,
             source_height=100,
         )
@@ -806,10 +792,7 @@ class TestOcrTemplateValidation:
         """
         template = OcrTemplateFactory(
             name="Test",
-            matching_algorithm=MatchingModel.MATCH_ANY,
             owner=admin_user,
-            source_width=1000,
-            source_height=1000,
         )
         response = admin_client.patch(
             f"{ENDPOINT}{template.pk}/",
@@ -834,10 +817,7 @@ class TestOcrTemplateValidation:
         """
         template = OcrTemplateFactory(
             name="Test",
-            matching_algorithm=MatchingModel.MATCH_ANY,
             owner=admin_user,
-            source_width=1000,
-            source_height=1000,
         )
         response = admin_client.patch(
             f"{ENDPOINT}{template.pk}/",
@@ -861,17 +841,12 @@ class TestOcrTemplateValidation:
         """
         template = OcrTemplateFactory(
             name="Test",
-            matching_algorithm=MatchingModel.MATCH_ANY,
             owner=admin_user,
-            source_width=1000,
-            source_height=1000,
         )
         zone = OcrTemplateZoneFactory(
             template=template,
             name="Original",
             target=OcrTemplateZone.TargetType.CUSTOM_FIELD,
-            x=0,
-            y=0,
             width=10,
             height=10,
         )
@@ -981,9 +956,6 @@ class TestOcrTemplateList:
         template = OcrTemplateFactory(
             name="Test Template",
             match="Northwind",
-            matching_algorithm=MatchingModel.MATCH_ANY,
-            source_width=2480,
-            source_height=3508,
         )
         OcrTemplateZoneFactory(
             template=template,
@@ -993,7 +965,6 @@ class TestOcrTemplateList:
             x=100,
             y=100,
             width=200,
-            height=50,
         )
 
         resp = admin_client.get(ENDPOINT)
@@ -1036,18 +1007,12 @@ class TestOcrTemplateUpdate:
         template = OcrTemplateFactory(
             name="Old Name",
             match="Northwind",
-            matching_algorithm=MatchingModel.MATCH_ANY,
-            source_width=2480,
-            source_height=3508,
         )
         OcrTemplateZoneFactory(
             template=template,
             name="Old Zone",
             target=OcrTemplateZone.TargetType.CUSTOM_FIELD,
             custom_field=text_field,
-            x=0,
-            y=0,
-            width=100,
             height=100,
         )
 
@@ -1081,17 +1046,12 @@ class TestOcrTemplateUpdate:
         """
         template = OcrTemplateFactory(
             name="Original",
-            matching_algorithm=MatchingModel.MATCH_ANY,
             owner=admin_user,
-            source_width=1000,
-            source_height=1000,
         )
         zone = OcrTemplateZoneFactory(
             template=template,
             name="Original zone",
             target=OcrTemplateZone.TargetType.CUSTOM_FIELD,
-            x=0,
-            y=0,
             width=10,
             height=10,
         )
@@ -1121,17 +1081,12 @@ class TestOcrTemplateUpdate:
         """
         template = OcrTemplateFactory(
             name="Test",
-            matching_algorithm=MatchingModel.MATCH_ANY,
             owner=admin_user,
-            source_width=1000,
-            source_height=1000,
         )
         OcrTemplateZoneFactory(
             template=template,
             name="Zone",
             target=OcrTemplateZone.TargetType.CUSTOM_FIELD,
-            x=0,
-            y=0,
             width=10,
             height=10,
         )
@@ -1155,10 +1110,6 @@ class TestOcrTemplateUpdate:
         template = OcrTemplateFactory(
             name="Toggle Test",
             match="Northwind",
-            matching_algorithm=MatchingModel.MATCH_ANY,
-            source_width=2480,
-            source_height=3508,
-            enabled=True,
         )
 
         resp = admin_client.patch(
@@ -1186,18 +1137,12 @@ class TestOcrTemplateUpdate:
         template = OcrTemplateFactory(
             name="Patch Test",
             match="Northwind",
-            matching_algorithm=MatchingModel.MATCH_ANY,
-            source_width=2480,
-            source_height=3508,
         )
         OcrTemplateZoneFactory(
             template=template,
             name="Existing Zone",
             target=OcrTemplateZone.TargetType.CUSTOM_FIELD,
             custom_field=text_field,
-            x=0,
-            y=0,
-            width=100,
             height=100,
         )
 
@@ -1229,18 +1174,12 @@ class TestOcrTemplateDelete:
         template = OcrTemplateFactory(
             name="To Delete",
             match="Northwind",
-            matching_algorithm=MatchingModel.MATCH_ANY,
-            source_width=2480,
-            source_height=3508,
         )
         OcrTemplateZoneFactory(
             template=template,
             name="Zone",
             target=OcrTemplateZone.TargetType.CUSTOM_FIELD,
             custom_field=text_field,
-            x=0,
-            y=0,
-            width=100,
             height=100,
         )
 
@@ -1283,9 +1222,6 @@ class TestRunZoneOcr:
         OcrTemplateFactory(
             name="Other sender",
             match="Contoso",
-            matching_algorithm=MatchingModel.MATCH_ANY,
-            source_width=1000,
-            source_height=1000,
         )
 
         response = admin_client.post(RUN_ZONE_OCR_URL.format(pk=document.pk))
@@ -1325,9 +1261,6 @@ class TestRunZoneOcr:
             OcrTemplateFactory(
                 name="Disabled template",
                 match="Northwind",
-                matching_algorithm=MatchingModel.MATCH_ANY,
-                source_width=1000,
-                source_height=1000,
                 enabled=False,
             )
 
@@ -1360,10 +1293,7 @@ class TestRunZoneOcr:
         template = OcrTemplateFactory(
             name="Manual only",
             match="Contoso",
-            matching_algorithm=MatchingModel.MATCH_ANY,
             enabled=False,
-            source_width=1000,
-            source_height=1000,
         )
 
         response = admin_client.post(
@@ -1411,7 +1341,6 @@ class TestRunZoneOcr:
         template = OcrTemplateFactory(
             name="Northwind",
             match="Northwind",
-            matching_algorithm=MatchingModel.MATCH_ANY,
             source_width=100,
             source_height=100,
         )
@@ -1523,9 +1452,6 @@ class TestRunZoneOcr:
         OcrTemplateFactory(
             name="Template",
             match="Northwind",
-            matching_algorithm=MatchingModel.MATCH_ANY,
-            source_width=1000,
-            source_height=1000,
         )
 
         response = admin_client.post(RUN_ZONE_OCR_URL.format(pk=document.pk))
@@ -1558,17 +1484,10 @@ class TestRunZoneOcr:
         template = OcrTemplateFactory(
             name="Template",
             match="Northwind",
-            matching_algorithm=MatchingModel.MATCH_ANY,
-            source_width=1000,
-            source_height=1000,
         )
         OcrTemplateZoneFactory(
             template=template,
             name="Title zone",
-            target=OcrTemplateZone.TargetType.TITLE,
-            x=0,
-            y=0,
-            width=100,
             height=100,
         )
 
@@ -1611,16 +1530,12 @@ class TestRunZoneOcr:
         template = OcrTemplateFactory(
             name="Template",
             match="Northwind",
-            matching_algorithm=MatchingModel.MATCH_ANY,
             source_width=100,
             source_height=100,
         )
         OcrTemplateZoneFactory(
             template=template,
             name="Title",
-            target=OcrTemplateZone.TargetType.TITLE,
-            x=0,
-            y=0,
             width=20,
             height=20,
         )
@@ -1667,7 +1582,6 @@ class TestRunZoneOcr:
         ]
         template = OcrTemplateFactory(
             name="Test",
-            matching_algorithm=MatchingModel.MATCH_ANY,
             source_width=100,
             source_height=100,
         )
@@ -1689,8 +1603,6 @@ class TestRunZoneOcr:
                 name=name,
                 target=target,
                 custom_field=field,
-                x=0,
-                y=0,
                 width=10,
                 height=10,
             )
@@ -1738,10 +1650,7 @@ class TestRunZoneOcrPermissions:
         document = DocumentFactory(content=CONTENT, owner=user)
         template = OcrTemplateFactory(
             name="Private",
-            matching_algorithm=MatchingModel.MATCH_ANY,
             owner=UserFactory(),
-            source_width=1000,
-            source_height=1000,
         )
         rest_api_client.force_authenticate(user=user)
 
@@ -1830,7 +1739,6 @@ class TestRunZoneOcrPermissions:
             source_width=100,
             source_height=100,
             match="Northwind",
-            matching_algorithm=MatchingModel.MATCH_ANY,
         )
         rest_api_client.force_authenticate(user)
 
@@ -1861,7 +1769,6 @@ class TestRunZoneOcrPermissions:
             name="Requester's private template",
             owner=admin_user,
             match="Northwind",
-            matching_algorithm=MatchingModel.MATCH_ANY,
             source_width=100,
             source_height=100,
         )
@@ -1908,16 +1815,12 @@ class TestRunZoneOcrPermissions:
                 name=name,
                 owner=template_owner,
                 match="Northwind",
-                matching_algorithm=MatchingModel.MATCH_ANY,
                 source_width=100,
                 source_height=100,
             )
             OcrTemplateZoneFactory(
                 template=template,
                 name=name,
-                target=OcrTemplateZone.TargetType.TITLE,
-                x=0,
-                y=0,
                 width=20,
                 height=20,
             )
@@ -1966,16 +1869,12 @@ class TestRunZoneOcrPermissions:
                 name=name,
                 owner=template_owner,
                 match="Northwind",
-                matching_algorithm=MatchingModel.MATCH_ANY,
                 source_width=100,
                 source_height=100,
             )
             OcrTemplateZoneFactory(
                 template=template,
                 name=name,
-                target=OcrTemplateZone.TargetType.TITLE,
-                x=0,
-                y=0,
                 width=20,
                 height=20,
             )

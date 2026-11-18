@@ -86,7 +86,7 @@ class TestRunZoneOcrBulkOperation:
             - Extraction does not run in the request
         """
         user, client, doc, _ = bulk_setup
-        template = OcrTemplateFactory(source_width=100, source_height=100)
+        template = OcrTemplateFactory()
         enqueue = mocker.patch("documents.views.execute_bulk_operation.apply_async")
         extract = mocker.patch("documents.bulk_edit.extract_zones")
         enqueue.return_value.id = "zone-ocr-task"
@@ -127,7 +127,7 @@ class TestRunZoneOcrBulkOperation:
             - The result reports the operation and document count
         """
         user, _, doc, _ = bulk_setup
-        template = OcrTemplateFactory(source_width=100, source_height=100)
+        template = OcrTemplateFactory()
         extract = mocker.patch("documents.bulk_edit.extract_zones")
         result = execute_bulk_operation(
             "run_zone_ocr",
@@ -194,11 +194,7 @@ class TestRunZoneOcrBulkOperation:
         _, client, doc, _ = bulk_setup
         user = UserFactory()
         grant_global(user, "change_document")
-        template = OcrTemplateFactory(
-            owner=user,
-            source_width=100,
-            source_height=100,
-        )
+        template = OcrTemplateFactory(owner=user)
         client.force_authenticate(user)
         enqueue = mocker.patch("documents.views.execute_bulk_operation.apply_async")
         enqueue.return_value.id = "zone-ocr-task"

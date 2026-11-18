@@ -118,7 +118,7 @@ class OcrTemplateFactory(TypedModelFactory[OcrTemplate]):
 
     name = factory.Sequence(lambda n: f"OCR template {n}")
     match = ""
-    matching_algorithm = MatchingModel.MATCH_NONE
+    matching_algorithm = MatchingModel.MATCH_ANY
     source_width = 1000
     source_height = 1000
 

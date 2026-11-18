@@ -426,8 +426,7 @@ class TestZoneExtraction:
 
 
 def make_template(name: str, **kwargs: Any) -> OcrTemplate:
-    """Build a saved template, 100x50 by default, using the model default matching."""
-    kwargs.setdefault("matching_algorithm", MatchingModel.MATCH_ANY)
+    """Build a saved template, 100x50 by default."""
     kwargs.setdefault("source_width", 100)
     kwargs.setdefault("source_height", 50)
     return OcrTemplateFactory(name=name, **kwargs)
@@ -444,8 +443,6 @@ def make_zone(
         template=template,
         name=name,
         target=target,
-        x=0,
-        y=0,
         width=20,
         height=10,
         **kwargs,
@@ -1306,9 +1303,6 @@ class TestTemplateVisibility:
             OcrTemplateZoneFactory(
                 template=template,
                 name="Title",
-                target="title",
-                x=0,
-                y=0,
                 width=20,
                 height=20,
             )
@@ -2049,9 +2043,6 @@ class TestRunZoneExtraction:
             kwargs.setdefault("match", "test")
             template = OcrTemplateFactory(
                 name=name,
-                matching_algorithm=MatchingModel.MATCH_ANY,
-                source_width=2480,
-                source_height=3508,
                 **kwargs,
             )
             OcrTemplateZoneFactory(
@@ -2059,10 +2050,6 @@ class TestRunZoneExtraction:
                 name="Zone",
                 target=OcrTemplateZone.TargetType.CUSTOM_FIELD,
                 custom_field=custom_field,
-                x=0,
-                y=0,
-                width=100,
-                height=50,
             )
             return template
 
@@ -2124,10 +2111,6 @@ class TestRunZoneExtraction:
         OcrTemplateFactory(
             name="Empty",
             match="test",
-            matching_algorithm=MatchingModel.MATCH_ANY,
-            source_width=2480,
-            source_height=3508,
-            enabled=True,
         )
 
         run_zone_extraction(document, pdf)

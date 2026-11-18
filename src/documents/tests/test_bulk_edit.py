@@ -21,7 +21,6 @@ from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
-from documents.models import OcrTemplate
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.pdf_ops import PageSpec
@@ -30,6 +29,7 @@ from documents.permissions import set_permissions_for_objects
 from documents.tasks import extract_zones
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import DocumentFactory
+from paperless_testing.factories import OcrTemplateFactory
 from paperless_testing.factories import UserFactory
 from paperless_testing.permissions import grant_object
 from paperless_testing.samples import MULTI_PAGE_DIGITAL_PDF
@@ -1962,11 +1962,7 @@ class TestBulkEditRunZoneOcr:
 
     def test_runs_the_chosen_template(self, mock_task: mock.MagicMock) -> None:
         doc = DocumentFactory()
-        template = OcrTemplate.objects.create(
-            name="Bills",
-            source_width=100,
-            source_height=100,
-        )
+        template = OcrTemplateFactory()
 
         bulk_edit.run_zone_ocr([doc.id], template=template.pk)
 
@@ -2012,11 +2008,7 @@ class TestBulkEditRunZoneOcr:
         """
         extract = mocker.patch("documents.tasks.run_zone_extraction")
         doc = DocumentFactory()
-        template = OcrTemplate.objects.create(
-            name="Bills",
-            source_width=100,
-            source_height=100,
-        )
+        template = OcrTemplateFactory()
 
         extract_zones(doc.id, template.pk)
 
