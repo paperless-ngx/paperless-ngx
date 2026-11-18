@@ -242,6 +242,37 @@ describe('OcrTemplateEditorComponent', () => {
     expect(component.previewPage).toBe(4)
   })
 
+  it('uses the standard picker styling and shows a known page total', () => {
+    component.setSampleDocument([5])
+    fixture.detectChanges()
+    const picker = fixture.nativeElement.querySelector(
+      'pngx-input-document-link'
+    )
+    expect(picker.classList.contains('paperless-input-select')).toBe(true)
+    const pageInput = fixture.nativeElement.querySelector(
+      'input[aria-label="Page"]'
+    )
+    expect(pageInput.max).toBe('3')
+    expect(pageInput.parentElement.textContent.trim()).toBe('of 3')
+  })
+
+  it('does not display a question mark when the page total is unknown', () => {
+    jest
+      .spyOn(documentService, 'get')
+      .mockReturnValueOnce(of({ id: 5, page_count: null }))
+    component.setSampleDocument([5])
+    fixture.detectChanges()
+    const pageInput = fixture.nativeElement.querySelector(
+      'input[aria-label="Page"]'
+    )
+    expect(
+      pageInput.parentElement.querySelector('.input-group-text')
+    ).toBeNull()
+    component.pageLoaded.set(true)
+    component.previewPageDisplay = 2
+    expect(component.previewPage).toBe(1)
+  })
+
   it('limits zoom and resets it to the original size', () => {
     for (let i = 0; i < 20; i++) component.zoomIn()
     expect(component.zoom).toBe(4)
