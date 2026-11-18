@@ -13,7 +13,7 @@
     <ng-container *ngTemplateOutlet="githubLink"></ng-container>
   } @else if (loading()) {
     <div class="d-flex align-items-center gap-2 text-muted">
-      <div class="spinner-border spinner-border-sm" role="status"></div>
+      <output class="spinner-border spinner-border-sm"></output>
       <ng-container i18n>Loading release notes...</ng-container>
     </div>
   } @else if (!releases()?.length) {
