@@ -3,17 +3,14 @@
 from __future__ import annotations
 
 import subprocess
-import tempfile
+from collections import Counter
 from datetime import date
 from pathlib import Path
 from typing import TYPE_CHECKING
-from unittest.mock import MagicMock
-from unittest.mock import patch
+from typing import Any
 
 import pytest
 from django.contrib.auth.models import Group
-from django.contrib.auth.models import User
-from django.test import TestCase
 from PIL import Image
 
 from documents.models import CustomField
@@ -35,13 +32,21 @@ from documents.zone_ocr import _resolve_doc_path
 from documents.zone_ocr import extract_zone_preview
 from documents.zone_ocr import get_templates_for_document
 from documents.zone_ocr import run_zone_extraction
-from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import DocumentFactory
+from paperless_testing.factories import OcrTemplateFactory
+from paperless_testing.factories import OcrTemplateZoneFactory
+from paperless_testing.factories import UserFactory
 from paperless_testing.permissions import grant_object
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+    from unittest.mock import MagicMock
+
+    from django.contrib.auth.models import User
     from pytest_django.fixtures import SettingsWrapper
     from pytest_mock import MockerFixture
+
+    from paperless_testing.dirs import PaperlessDirs
 
 
 class TestZoneExtraction:
@@ -420,97 +425,172 @@ class TestZoneExtraction:
         mock_run.assert_not_called()
 
 
-class TestSavedZoneExtraction(DirectoriesMixin, TestCase):
-    def setUp(self):
-        super().setUp()
-        self.page = self.dirs.scratch_dir / "page.png"
+def make_template(name: str, **kwargs: Any) -> OcrTemplate:
+    """Build a saved template, 100x50 by default, using the model default matching."""
+    kwargs.setdefault("matching_algorithm", MatchingModel.MATCH_ANY)
+    kwargs.setdefault("source_width", 100)
+    kwargs.setdefault("source_height", 50)
+    return OcrTemplateFactory(name=name, **kwargs)
+
+
+def make_zone(
+    template: OcrTemplate,
+    name: str,
+    target: str = OcrTemplateZone.TargetType.TITLE,
+    **kwargs: Any,
+) -> OcrTemplateZone:
+    """Build a 20x10 zone at the origin of the template."""
+    return OcrTemplateZoneFactory(
+        template=template,
+        name=name,
+        target=target,
+        x=0,
+        y=0,
+        width=20,
+        height=10,
+        **kwargs,
+    )
+
+
+@pytest.mark.django_db
+@pytest.mark.usefixtures("paperless_dirs")
+class TestSavedZoneExtraction:
+    """Tests for extracting zones from a saved template and writing the results."""
+
+    @pytest.fixture
+    def page(self, paperless_dirs: PaperlessDirs) -> Path:
+        page = paperless_dirs.scratch_dir / "page.png"
         with Image.new("RGB", (200, 100), "white") as image:
-            image.save(self.page)
-        self.document = DocumentFactory(title="Original")
-        self.template = OcrTemplate.objects.create(
-            name="Account",
-            source_width=100,
-            source_height=50,
+            image.save(page)
+        return page
+
+    @pytest.fixture
+    def document(self) -> Document:
+        return DocumentFactory(title="Original")
+
+    @pytest.fixture
+    def template(self) -> OcrTemplate:
+        return make_template("Account")
+
+    @pytest.fixture
+    def mock_run(self, mocker: MockerFixture) -> MagicMock:
+        return mocker.patch("documents.zone_ocr.subprocess.run")
+
+    def test_combines_zones_and_writes_each_field_once(
+        self,
+        mocker: MockerFixture,
+        mock_run: MagicMock,
+        paperless_dirs: PaperlessDirs,
+        page: Path,
+        document: Document,
+        template: OcrTemplate,
+    ) -> None:
+        """
+        GIVEN:
+            - Two title zones and a combine format that joins them
+        WHEN:
+            - The template is processed
+        THEN:
+            - The combined value is written to the title with a single save
+        """
+        zones = [make_zone(template, "First"), make_zone(template, "Second")]
+        template.combine_formats = {"title": "{Second} / {First}"}
+        mock_run.side_effect = [
+            mocker.MagicMock(stdout="one"),
+            mocker.MagicMock(stdout="two"),
+        ]
+        save = mocker.patch.object(document, "save", wraps=document.save)
+
+        _process_template(
+            document,
+            {0: page},
+            template,
+            zones,
+            paperless_dirs.scratch_dir,
         )
 
-    def zone(self, name, target="title", **kwargs):
-        return OcrTemplateZone.objects.create(
-            template=self.template,
-            name=name,
-            target=target,
-            x=0,
-            y=0,
-            width=20,
-            height=10,
-            **kwargs,
-        )
-
-    @patch("documents.zone_ocr.subprocess.run")
-    def test_combines_zones_and_writes_each_field_once(self, run):
-        zones = [self.zone("First"), self.zone("Second")]
-        self.template.combine_formats = {"title": "{Second} / {First}"}
-        run.side_effect = [MagicMock(stdout="one"), MagicMock(stdout="two")]
-        with patch.object(self.document, "save", wraps=self.document.save) as save:
-            _process_template(
-                self.document,
-                {0: self.page},
-                self.template,
-                zones,
-                self.dirs.scratch_dir,
-            )
-        self.document.refresh_from_db()
-        self.assertEqual(self.document.title, "two / one")
+        document.refresh_from_db()
+        assert document.title == "two / one"
         save.assert_called_once_with(update_fields=["title"])
 
-    @patch("documents.zone_ocr.subprocess.run")
-    def test_converts_custom_and_builtin_fields_before_saving(self, run):
+    def test_converts_custom_and_builtin_fields_before_saving(
+        self,
+        mocker: MockerFixture,
+        mock_run: MagicMock,
+        paperless_dirs: PaperlessDirs,
+        page: Path,
+        document: Document,
+        template: OcrTemplate,
+    ) -> None:
+        """
+        GIVEN:
+            - Zones for the title, ASN, created date and a boolean custom field
+        WHEN:
+            - The template is processed
+        THEN:
+            - Each raw value is converted to its field type and saved
+        """
         field = CustomField.objects.create(name="Paid", data_type="boolean")
         zones = [
-            self.zone("Title"),
-            self.zone("ASN", "asn"),
-            self.zone("Created", "created"),
-            self.zone("Paid", "custom_field", custom_field=field),
+            make_zone(template, "Title"),
+            make_zone(template, "ASN", "asn"),
+            make_zone(template, "Created", "created"),
+            make_zone(template, "Paid", "custom_field", custom_field=field),
         ]
-        run.side_effect = [
-            MagicMock(stdout=value)
-            for value in [
-                "New title",
-                "ASN 42",
-                "2026-04-13",
-                "no",
-            ]
+        mock_run.side_effect = [
+            mocker.MagicMock(stdout=value)
+            for value in ["New title", "ASN 42", "2026-04-13", "no"]
         ]
-        _process_template(
-            self.document,
-            {0: self.page},
-            self.template,
-            zones,
-            self.dirs.scratch_dir,
-        )
-        self.document.refresh_from_db()
-        self.assertEqual(self.document.title, "New title")
-        self.assertEqual(self.document.archive_serial_number, 42)
-        self.assertEqual(self.document.created, date(2026, 4, 13))
-        self.assertFalse(self.document.custom_fields.get(field=field).value)
 
-    @patch("documents.zone_ocr.subprocess.run")
-    def test_invalid_field_values_preserve_existing_values(self, run):
+        _process_template(
+            document,
+            {0: page},
+            template,
+            zones,
+            paperless_dirs.scratch_dir,
+        )
+
+        document.refresh_from_db()
+        assert document.title == "New title"
+        assert document.archive_serial_number == 42
+        assert document.created == date(2026, 4, 13)
+        assert not document.custom_fields.get(field=field).value
+
+    def test_invalid_field_values_preserve_existing_values(
+        self,
+        mocker: MockerFixture,
+        mock_run: MagicMock,
+        paperless_dirs: PaperlessDirs,
+        page: Path,
+        document: Document,
+        template: OcrTemplate,
+    ) -> None:
+        """
+        GIVEN:
+            - A document with an existing custom field value
+            - Zones whose ASN, created date and custom field values are invalid
+              or unassigned
+        WHEN:
+            - The template is processed
+        THEN:
+            - Only the valid title is written and the other values are preserved
+        """
         field = CustomField.objects.create(name="Number", data_type="integer")
         CustomFieldInstance.objects.create(
-            document=self.document,
+            document=document,
             field=field,
             value_int=12,
         )
         zones = [
-            self.zone("Title"),
-            self.zone("ASN", "asn"),
-            self.zone("Created", "created"),
-            self.zone("Number", "custom_field", custom_field=field),
-            self.zone("Unassigned", "custom_field"),
+            make_zone(template, "Title"),
+            make_zone(template, "ASN", "asn"),
+            make_zone(template, "Created", "created"),
+            make_zone(template, "Number", "custom_field", custom_field=field),
+            make_zone(template, "Unassigned", "custom_field"),
         ]
-        original_created = self.document.created
-        run.side_effect = [
-            MagicMock(stdout=value)
+        original_created = document.created
+        mock_run.side_effect = [
+            mocker.MagicMock(stdout=value)
             for value in [
                 "Valid",
                 "9999999999999999999999999999999",
@@ -519,89 +599,128 @@ class TestSavedZoneExtraction(DirectoriesMixin, TestCase):
                 "text",
             ]
         ]
-        _process_template(
-            self.document,
-            {0: self.page},
-            self.template,
-            zones,
-            self.dirs.scratch_dir,
-        )
-        self.document.refresh_from_db()
-        self.assertEqual(self.document.title, "Valid")
-        self.assertIsNone(self.document.archive_serial_number)
-        self.assertEqual(self.document.created, original_created)
-        self.assertEqual(self.document.custom_fields.get(field=field).value, 12)
 
-    @patch("documents.zone_ocr.subprocess.run")
-    def test_write_failure_rolls_back_template_and_restores_document(self, run):
+        _process_template(
+            document,
+            {0: page},
+            template,
+            zones,
+            paperless_dirs.scratch_dir,
+        )
+
+        document.refresh_from_db()
+        assert document.title == "Valid"
+        assert document.archive_serial_number is None
+        assert document.created == original_created
+        assert document.custom_fields.get(field=field).value == 12
+
+    def test_write_failure_rolls_back_template_and_restores_document(
+        self,
+        mocker: MockerFixture,
+        mock_run: MagicMock,
+        paperless_dirs: PaperlessDirs,
+        page: Path,
+        document: Document,
+        template: OcrTemplate,
+    ) -> None:
+        """
+        GIVEN:
+            - A title zone and a custom field zone
+            - A document save that raises after writing
+        WHEN:
+            - The template is processed
+        THEN:
+            - The error propagates, the write is rolled back and the in-memory
+              document is restored
+        """
         field = CustomField.objects.create(name="Number", data_type="integer")
         zones = [
-            self.zone("Title"),
-            self.zone("Number", "custom_field", custom_field=field),
+            make_zone(template, "Title"),
+            make_zone(template, "Number", "custom_field", custom_field=field),
         ]
-        run.side_effect = [MagicMock(stdout="New title"), MagicMock(stdout="42")]
-        save = self.document.save
+        mock_run.side_effect = [
+            mocker.MagicMock(stdout="New title"),
+            mocker.MagicMock(stdout="42"),
+        ]
+        save = document.save
 
-        def fail_after_save(**kwargs):
+        def fail_after_save(**kwargs: Any) -> None:
             save(**kwargs)
             raise RuntimeError("save failed")
 
-        with patch.object(self.document, "save", side_effect=fail_after_save):
-            with self.assertRaisesMessage(RuntimeError, "save failed"):
-                _process_template(
-                    self.document,
-                    {0: self.page},
-                    self.template,
-                    zones,
-                    self.dirs.scratch_dir,
-                )
-        self.assertEqual(self.document.title, "Original")
-        self.document.refresh_from_db()
-        self.assertEqual(self.document.title, "Original")
-        self.assertFalse(self.document.custom_fields.exists())
+        mocker.patch.object(document, "save", side_effect=fail_after_save)
 
-    @patch("documents.zone_ocr.subprocess.run")
-    def test_last_successful_template_wins(self, run):
-        self.zone("First")
-        second = OcrTemplate.objects.create(
-            name="Second",
-            source_width=100,
-            source_height=50,
-        )
-        self.template = second
-        self.zone("Second")
-        third = OcrTemplate.objects.create(
-            name="Third",
-            source_width=100,
-            source_height=50,
-        )
-        self.template = third
-        self.zone("Third", validation_regex="accepted")
+        with pytest.raises(RuntimeError, match="save failed"):
+            _process_template(
+                document,
+                {0: page},
+                template,
+                zones,
+                paperless_dirs.scratch_dir,
+            )
+
+        assert document.title == "Original"
+        document.refresh_from_db()
+        assert document.title == "Original"
+        assert not document.custom_fields.exists()
+
+    def test_last_successful_template_wins(
+        self,
+        mocker: MockerFixture,
+        mock_run: MagicMock,
+        page: Path,
+        document: Document,
+        template: OcrTemplate,
+    ) -> None:
+        """
+        GIVEN:
+            - Three templates writing the title, the last of which rejects its value
+        WHEN:
+            - Zone extraction runs over all of them
+        THEN:
+            - The title comes from the last template that produced a value
+        """
+        make_zone(template, "First")
+        second = make_template("Second")
+        make_zone(second, "Second")
+        third = make_template("Third")
+        make_zone(third, "Third", validation_regex="accepted")
         templates = list(OcrTemplate.objects.order_by("pk"))
-        run.side_effect = [
-            MagicMock(stdout=value) for value in ["First", "Second", "rejected"]
+        mock_run.side_effect = [
+            mocker.MagicMock(stdout=value) for value in ["First", "Second", "rejected"]
         ]
-        run_zone_extraction(self.document, self.page, templates=templates)
-        self.document.refresh_from_db()
-        self.assertEqual(self.document.title, "Second")
 
-    @patch("documents.zone_ocr.subprocess.run")
-    def test_document_run_renders_each_page_once_across_templates(self, run):
-        self.document.page_count = 2
-        self.zone("First", page=1)
-        self.zone("Last", page=-1)
-        first = self.template
-        self.template = OcrTemplate.objects.create(
-            name="Second",
-            source_width=100,
-            source_height=50,
-        )
-        self.zone("Last again", page=2)
-        pdf = self.dirs.scratch_dir / "document.pdf"
+        run_zone_extraction(document, page, templates=templates)
+
+        document.refresh_from_db()
+        assert document.title == "Second"
+
+    def test_document_run_renders_each_page_once_across_templates(
+        self,
+        mock_run: MagicMock,
+        paperless_dirs: PaperlessDirs,
+        document: Document,
+        template: OcrTemplate,
+    ) -> None:
+        """
+        GIVEN:
+            - Two templates with zones on the first, last and second page of a
+              two page document
+        WHEN:
+            - Zone extraction runs over both templates
+        THEN:
+            - Each page is rendered only once and the rendered files are removed
+        """
+        document.page_count = 2
+        make_zone(template, "First", page=1)
+        make_zone(template, "Last", page=-1)
+        second = make_template("Second")
+        make_zone(second, "Last again", page=2)
+        pdf = paperless_dirs.scratch_dir / "document.pdf"
         pdf.write_bytes(b"%PDF-1.4")
         rendered = []
 
-        def execute(args, **kwargs):
+        def execute(args: list[str], **kwargs: Any) -> subprocess.CompletedProcess:
             if args[0] == "pdftoppm":
                 output = Path(args[-1]).with_suffix(".png")
                 with Image.new("RGB", (100, 50), "white") as image:
@@ -610,178 +729,300 @@ class TestSavedZoneExtraction(DirectoriesMixin, TestCase):
                 return subprocess.CompletedProcess(args, 0)
             return subprocess.CompletedProcess(args, 0, stdout="extracted")
 
-        run.side_effect = execute
-        results = run_zone_extraction(
-            self.document,
-            pdf,
-            templates=[first, self.template],
-        )
+        mock_run.side_effect = execute
+
+        results = run_zone_extraction(document, pdf, templates=[template, second])
+
         render_calls = [
-            call for call in run.call_args_list if call.args[0][0] == "pdftoppm"
+            call for call in mock_run.call_args_list if call.args[0][0] == "pdftoppm"
         ]
-        self.assertEqual(len(render_calls), 2)
-        self.assertEqual(
-            [call.args[0][call.args[0].index("-f") + 1] for call in render_calls],
-            ["1", "2"],
+        assert len(render_calls) == 2
+        assert [
+            call.args[0][call.args[0].index("-f") + 1] for call in render_calls
+        ] == ["1", "2"]
+        assert [result.reason for result in results] == [None, None, None]
+        assert not any(path.exists() for path in rendered)
+
+    def test_zone_dimensions_override_template_dimensions(
+        self,
+        mock_run: MagicMock,
+        paperless_dirs: PaperlessDirs,
+        page: Path,
+        document: Document,
+        template: OcrTemplate,
+    ) -> None:
+        """
+        GIVEN:
+            - A zone with its own source dimensions, differing from the template's
+        WHEN:
+            - The template is processed
+        THEN:
+            - The zone is cropped using the zone's dimensions
+        """
+        zone = make_zone(
+            template,
+            "Title",
+            zone_source_width=200,
+            zone_source_height=100,
         )
-        self.assertEqual([result.reason for result in results], [None, None, None])
-        self.assertFalse(any(path.exists() for path in rendered))
 
-    @patch("documents.zone_ocr.subprocess.run")
-    def test_zone_dimensions_override_template_dimensions(self, run):
-        zone = self.zone("Title", zone_source_width=200, zone_source_height=100)
-
-        def read_crop(args, **kwargs):
+        def read_crop(args: list[str], **kwargs: Any) -> subprocess.CompletedProcess:
             with Image.open(args[1]) as crop:
-                self.assertEqual(crop.size, (20, 10))
+                assert crop.size == (20, 10)
             return subprocess.CompletedProcess(args, 0, stdout="extracted")
 
-        run.side_effect = read_crop
+        mock_run.side_effect = read_crop
+
         _process_template(
-            self.document,
-            {0: self.page},
-            self.template,
+            document,
+            {0: page},
+            template,
             [zone],
-            self.dirs.scratch_dir,
+            paperless_dirs.scratch_dir,
         )
-        self.assertEqual(self.document.title, "extracted")
 
-    def test_missing_page_returns_skipped_result(self):
-        zone = self.zone("Last", page=-1)
+        assert document.title == "extracted"
+
+    def test_missing_page_returns_skipped_result(
+        self,
+        paperless_dirs: PaperlessDirs,
+        document: Document,
+        template: OcrTemplate,
+    ) -> None:
+        """
+        GIVEN:
+            - A zone on the last page and no rendered pages
+        WHEN:
+            - The template is processed
+        THEN:
+            - The zone result is skipped as a missing page with no value
+        """
+        zone = make_zone(template, "Last", page=-1)
+
         results = _process_template(
-            self.document,
+            document,
             {},
-            self.template,
+            template,
             [zone],
-            self.dirs.scratch_dir,
+            paperless_dirs.scratch_dir,
         )
-        self.assertEqual(results[0].reason, "missing_page")
-        self.assertIsNone(results[0].value)
 
-    def test_missing_document_file_returns_skipped_results(self):
-        self.zone("Title")
-        results = run_zone_extraction(self.document, None, templates=[self.template])
-        self.assertEqual(len(results), 1)
-        self.assertEqual(results[0].reason, "missing_file")
-        self.assertIsNone(results[0].value)
+        assert results[0].reason == "missing_page"
+        assert results[0].value is None
 
-    @patch("documents.zone_ocr.subprocess.run")
-    def test_empty_combination_cannot_clear_a_field(self, run):
-        zone = self.zone("Title")
-        self.template.combine_formats = {"title": "{Unknown}"}
-        run.return_value.stdout = "extracted"
+    def test_missing_document_file_returns_skipped_results(
+        self,
+        document: Document,
+        template: OcrTemplate,
+    ) -> None:
+        """
+        GIVEN:
+            - A template with a zone and no document file
+        WHEN:
+            - Zone extraction runs
+        THEN:
+            - A single result is skipped as a missing file with no value
+        """
+        make_zone(template, "Title")
+
+        results = run_zone_extraction(document, None, templates=[template])
+
+        assert len(results) == 1
+        assert results[0].reason == "missing_file"
+        assert results[0].value is None
+
+    def test_empty_combination_cannot_clear_a_field(
+        self,
+        mock_run: MagicMock,
+        paperless_dirs: PaperlessDirs,
+        page: Path,
+        document: Document,
+        template: OcrTemplate,
+    ) -> None:
+        """
+        GIVEN:
+            - A combine format that references an unknown zone and so is empty
+        WHEN:
+            - The template is processed
+        THEN:
+            - The result is an invalid value and the title is not cleared
+        """
+        zone = make_zone(template, "Title")
+        template.combine_formats = {"title": "{Unknown}"}
+        mock_run.return_value.stdout = "extracted"
+
         results = _process_template(
-            self.document,
-            {0: self.page},
-            self.template,
+            document,
+            {0: page},
+            template,
             [zone],
-            self.dirs.scratch_dir,
+            paperless_dirs.scratch_dir,
         )
-        self.assertEqual(results[0].reason, "invalid_value")
-        self.assertIsNone(results[0].value)
-        self.assertEqual(self.document.title, "Original")
 
-    @patch("documents.zone_ocr.subprocess.run")
-    def test_skipped_results_never_report_existing_document_values(self, run):
+        assert results[0].reason == "invalid_value"
+        assert results[0].value is None
+        assert document.title == "Original"
+
+    def test_skipped_results_never_report_existing_document_values(
+        self,
+        mocker: MockerFixture,
+        mock_run: MagicMock,
+        paperless_dirs: PaperlessDirs,
+        page: Path,
+        document: Document,
+        template: OcrTemplate,
+    ) -> None:
+        """
+        GIVEN:
+            - Zones that are empty, rejected by regex, invalid or unassigned
+        WHEN:
+            - The template is processed
+        THEN:
+            - Each result carries its skip reason and no value, and the title
+              is unchanged
+        """
         zones = [
-            self.zone("Empty"),
-            self.zone("Rejected", validation_regex="accepted"),
-            self.zone("Invalid", "asn"),
-            self.zone("Unassigned", "custom_field"),
+            make_zone(template, "Empty"),
+            make_zone(template, "Rejected", validation_regex="accepted"),
+            make_zone(template, "Invalid", "asn"),
+            make_zone(template, "Unassigned", "custom_field"),
         ]
-        run.side_effect = [
-            MagicMock(stdout=value) for value in ["", "rejected", "abc", "orphan"]
+        mock_run.side_effect = [
+            mocker.MagicMock(stdout=value)
+            for value in ["", "rejected", "abc", "orphan"]
         ]
+
         results = _process_template(
-            self.document,
-            {0: self.page},
-            self.template,
+            document,
+            {0: page},
+            template,
             zones,
-            self.dirs.scratch_dir,
+            paperless_dirs.scratch_dir,
         )
-        self.assertEqual(
-            [result.reason for result in results],
-            [
-                "no_value",
-                "regex_mismatch",
-                "invalid_value",
-                "unassigned",
-            ],
-        )
-        self.assertEqual([result.value for result in results], [None] * 4)
-        self.assertEqual(self.document.title, "Original")
 
-    @patch("documents.zone_ocr.subprocess.run")
-    def test_failed_template_reports_rollback_and_next_template_still_runs(self, run):
-        DocumentFactory(archive_serial_number=42)
-        self.zone("Title")
-        self.zone("Conflict", "asn")
-        second = OcrTemplate.objects.create(
-            name="Second",
-            source_width=100,
-            source_height=50,
-        )
-        first = self.template
-        self.template = second
-        self.zone("Second")
-        run.side_effect = [
-            MagicMock(stdout=value) for value in ["Rolled back", "42", "Applied"]
+        assert [result.reason for result in results] == [
+            "no_value",
+            "regex_mismatch",
+            "invalid_value",
+            "unassigned",
         ]
-        results = run_zone_extraction(
-            self.document,
-            self.page,
-            templates=[first, second],
-        )
-        self.assertEqual(
-            [result.reason for result in results],
-            ["template_failed", "template_failed", None],
-        )
-        self.assertEqual([result.value for result in results], [None, None, "Applied"])
-        self.document.refresh_from_db()
-        self.assertEqual(self.document.title, "Applied")
-        self.assertIsNone(self.document.archive_serial_number)
+        assert [result.value for result in results] == [None] * 4
+        assert document.title == "Original"
 
-    @patch("documents.zone_ocr.subprocess.run")
-    def test_literal_format_does_not_write_when_every_zone_failed(self, run):
-        zone = self.zone("Title")
-        self.template.combine_formats = {"title": "Invoice {Title}"}
-        run.return_value.stdout = ""
+    def test_failed_template_reports_rollback_and_next_template_still_runs(
+        self,
+        mocker: MockerFixture,
+        mock_run: MagicMock,
+        page: Path,
+        document: Document,
+        template: OcrTemplate,
+    ) -> None:
+        """
+        GIVEN:
+            - A template whose ASN zone conflicts with another document's ASN
+            - A second template that would succeed
+        WHEN:
+            - Zone extraction runs over both templates
+        THEN:
+            - The first template is reported as failed and rolled back, and the
+              second template is still applied
+        """
+        DocumentFactory(archive_serial_number=42)
+        make_zone(template, "Title")
+        make_zone(template, "Conflict", "asn")
+        second = make_template("Second")
+        make_zone(second, "Second")
+        mock_run.side_effect = [
+            mocker.MagicMock(stdout=value) for value in ["Rolled back", "42", "Applied"]
+        ]
+
+        results = run_zone_extraction(document, page, templates=[template, second])
+
+        assert [result.reason for result in results] == [
+            "template_failed",
+            "template_failed",
+            None,
+        ]
+        assert [result.value for result in results] == [None, None, "Applied"]
+        document.refresh_from_db()
+        assert document.title == "Applied"
+        assert document.archive_serial_number is None
+
+    def test_literal_format_does_not_write_when_every_zone_failed(
+        self,
+        mock_run: MagicMock,
+        paperless_dirs: PaperlessDirs,
+        page: Path,
+        document: Document,
+        template: OcrTemplate,
+    ) -> None:
+        """
+        GIVEN:
+            - A combine format with literal text around a zone that reads nothing
+        WHEN:
+            - The template is processed
+        THEN:
+            - The result has no value and the title is not written
+        """
+        zone = make_zone(template, "Title")
+        template.combine_formats = {"title": "Invoice {Title}"}
+        mock_run.return_value.stdout = ""
+
         results = _process_template(
-            self.document,
-            {0: self.page},
-            self.template,
+            document,
+            {0: page},
+            template,
             [zone],
-            self.dirs.scratch_dir,
+            paperless_dirs.scratch_dir,
         )
-        self.assertEqual(results[0].reason, "no_value")
-        self.assertIsNone(results[0].value)
-        self.assertEqual(self.document.title, "Original")
 
-    @patch("documents.zone_ocr.subprocess.run")
-    def test_saved_extraction_matches_preview_and_rejects_invalid_value(self, run):
-        zone = self.zone(
+        assert results[0].reason == "no_value"
+        assert results[0].value is None
+        assert document.title == "Original"
+
+    def test_saved_extraction_matches_preview_and_rejects_invalid_value(
+        self,
+        mock_run: MagicMock,
+        paperless_dirs: PaperlessDirs,
+        page: Path,
+        document: Document,
+        template: OcrTemplate,
+    ) -> None:
+        """
+        GIVEN:
+            - A zone that uppercases its text and validates it against a regex
+        WHEN:
+            - A valid value and then an invalid value are previewed and saved in
+              turn
+        THEN:
+            - The preview matches the transformed text for both, the valid value
+              is saved, and the invalid value leaves the saved title unchanged
+        """
+        zone = make_zone(
+            template,
             "Title",
             transform="uppercase",
             validation_regex="ACCOUNT [A-Z]+",
         )
-        for raw_text, expected_title in [
-            ("account abc", "ACCOUNT ABC"),
-            ("invalid", "ACCOUNT ABC"),
-        ]:
-            with self.subTest(raw_text=raw_text):
-                run.return_value.stdout = raw_text
-                preview = extract_zone_preview(self.page, zone, 100, 50, 1)
-                self.assertEqual(preview["raw_text"], raw_text)
-                self.assertEqual(preview["value"], raw_text.upper())
-                _process_template(
-                    self.document,
-                    {0: self.page},
-                    self.template,
-                    [zone],
-                    self.dirs.scratch_dir,
-                )
-                self.document.refresh_from_db()
-                self.assertEqual(self.document.title, expected_title)
+
+        def preview_and_save(raw_text: str) -> None:
+            mock_run.return_value.stdout = raw_text
+            preview = extract_zone_preview(page, zone, 100, 50, 1)
+            assert preview["raw_text"] == raw_text
+            assert preview["value"] == raw_text.upper()
+            _process_template(
+                document,
+                {0: page},
+                template,
+                [zone],
+                paperless_dirs.scratch_dir,
+            )
+            document.refresh_from_db()
+
+        preview_and_save("account abc")
+        assert document.title == "ACCOUNT ABC"
+        preview_and_save("invalid")
+        assert document.title == "ACCOUNT ABC"
 
 
 class TestCombineFieldValue:
@@ -819,83 +1060,197 @@ class TestCombineFieldValue:
         assert _combine_field_value(fmt, zones) == expected
 
 
-class TestTemplateVisibility(DirectoriesMixin, TestCase):
-    def setUp(self):
-        super().setUp()
-        self.owner = User.objects.create_user(username="document_owner")
-        self.other = User.objects.create_user(username="other_owner")
-        self.document = DocumentFactory(
-            owner=self.owner,
+def make_visible_template(name: str, **kwargs: Any) -> OcrTemplate:
+    """Build a 100x100 template matching "Northwind"."""
+    kwargs.setdefault("match", "Northwind")
+    kwargs.setdefault("source_height", 100)
+    return make_template(name, **kwargs)
+
+
+@pytest.mark.django_db
+@pytest.mark.usefixtures("paperless_dirs")
+class TestTemplateVisibility:
+    """Tests for which templates apply to a document and its requester."""
+
+    @pytest.fixture
+    def owner(self) -> User:
+        return UserFactory(username="document_owner")
+
+    @pytest.fixture
+    def other(self) -> User:
+        return UserFactory(username="other_owner")
+
+    @pytest.fixture
+    def document(self, owner: User) -> Document:
+        return DocumentFactory(
+            owner=owner,
             content="Northwind Power & Light statement",
         )
-        self.mine = self.template("Mine", owner=self.owner)
-        self.unowned = self.template("Unowned")
-        self.private = self.template("Private", owner=self.other)
 
-    def template(self, name, **kwargs):
-        kwargs.setdefault("match", "Northwind")
-        kwargs.setdefault("matching_algorithm", MatchingModel.MATCH_ANY)
-        return OcrTemplate.objects.create(
-            name=name,
-            source_width=100,
-            source_height=100,
-            **kwargs,
-        )
+    @pytest.fixture
+    def mine(self, owner: User) -> OcrTemplate:
+        return make_visible_template("Mine", owner=owner)
 
-    def test_only_matching_owned_unowned_and_shared_templates_apply(self):
-        shared = self.template("Shared", owner=self.other)
-        grant_object(self.owner, shared, "view_ocrtemplate")
-        self.template("Disabled", owner=self.owner, enabled=False)
-        self.template("Other sender", owner=self.owner, match="Contoso")
-        self.template(
+    @pytest.fixture
+    def unowned(self) -> OcrTemplate:
+        return make_visible_template("Unowned")
+
+    @pytest.fixture
+    def private(self, other: User) -> OcrTemplate:
+        return make_visible_template("Private", owner=other)
+
+    @pytest.mark.usefixtures("private")
+    def test_only_matching_owned_unowned_and_shared_templates_apply(
+        self,
+        owner: User,
+        other: User,
+        document: Document,
+        mine: OcrTemplate,
+        unowned: OcrTemplate,
+    ) -> None:
+        """
+        GIVEN:
+            - Templates owned by the document owner, unowned, private to another
+              user, shared with the owner, disabled, for another sender and
+              with no matching
+        WHEN:
+            - Templates are selected for the document
+        THEN:
+            - Only the enabled, matching, owned, unowned and shared templates apply
+        """
+        shared = make_visible_template("Shared", owner=other)
+        grant_object(owner, shared, "view_ocrtemplate")
+        make_visible_template("Disabled", owner=owner, enabled=False)
+        make_visible_template("Other sender", owner=owner, match="Contoso")
+        make_visible_template(
             "No matching",
-            owner=self.owner,
+            owner=owner,
             matching_algorithm=MatchingModel.MATCH_NONE,
         )
-        self.assertCountEqual(
-            get_templates_for_document(self.document),
-            [self.mine, self.unowned, shared],
+
+        assert Counter(get_templates_for_document(document)) == Counter(
+            [mine, unowned, shared],
         )
 
-    def test_group_sharing_applies(self):
+    @pytest.mark.usefixtures("mine", "unowned")
+    def test_group_sharing_applies(
+        self,
+        owner: User,
+        document: Document,
+        private: OcrTemplate,
+    ) -> None:
+        """
+        GIVEN:
+            - A private template shared with a group the document owner is in
+        WHEN:
+            - Templates are selected for the document
+        THEN:
+            - The group-shared template applies
+        """
         group = Group.objects.create(name="OCR users")
-        self.owner.groups.add(group)
-        grant_object(group, self.private, "view_ocrtemplate")
-        self.assertIn(self.private, get_templates_for_document(self.document))
+        owner.groups.add(group)
+        grant_object(group, private, "view_ocrtemplate")
 
-    def test_unowned_documents_only_use_unowned_templates(self):
-        self.document.owner = None
-        self.assertEqual(get_templates_for_document(self.document), [self.unowned])
+        assert private in get_templates_for_document(document)
 
-    def test_versions_use_the_root_documents_owner(self):
+    @pytest.mark.usefixtures("mine", "private")
+    def test_unowned_documents_only_use_unowned_templates(
+        self,
+        document: Document,
+        unowned: OcrTemplate,
+    ) -> None:
+        """
+        GIVEN:
+            - A document with no owner
+        WHEN:
+            - Templates are selected for the document
+        THEN:
+            - Only unowned templates apply
+        """
+        document.owner = None
+
+        assert get_templates_for_document(document) == [unowned]
+
+    @pytest.mark.usefixtures("private")
+    def test_versions_use_the_root_documents_owner(
+        self,
+        other: User,
+        document: Document,
+        mine: OcrTemplate,
+        unowned: OcrTemplate,
+    ) -> None:
+        """
+        GIVEN:
+            - A version document owned by another user than its root document
+        WHEN:
+            - Templates are selected for the version
+        THEN:
+            - The root document's owner decides the visible templates
+        """
         version = DocumentFactory(
-            root_document=self.document,
-            owner=self.other,
-            content=self.document.content,
-        )
-        self.assertCountEqual(
-            get_templates_for_document(version),
-            [self.mine, self.unowned],
+            root_document=document,
+            owner=other,
+            content=document.content,
         )
 
-    def test_matching_uses_the_selected_files_content(self):
-        version = DocumentFactory(root_document=self.document, content="Contoso")
-        contoso = self.template("Contoso", match="Contoso")
-
-        self.assertCountEqual(
-            get_templates_for_document(self.document),
-            [self.mine, self.unowned],
-        )
-        self.assertEqual(get_templates_for_document(version), [contoso])
-
-    def test_superuser_owner_can_use_all_visible_templates(self):
-        self.owner.is_superuser = True
-        self.assertCountEqual(
-            get_templates_for_document(self.document),
-            [self.mine, self.unowned, self.private],
+        assert Counter(get_templates_for_document(version)) == Counter(
+            [mine, unowned],
         )
 
-    def test_requester_limits_the_owners_templates(self):
+    @pytest.mark.usefixtures("private")
+    def test_matching_uses_the_selected_files_content(
+        self,
+        document: Document,
+        mine: OcrTemplate,
+        unowned: OcrTemplate,
+    ) -> None:
+        """
+        GIVEN:
+            - A root document and a version with different content
+            - A template matching only the version's content
+        WHEN:
+            - Templates are selected for each
+        THEN:
+            - Each is matched against its own content
+        """
+        version = DocumentFactory(root_document=document, content="Contoso")
+        contoso = make_visible_template("Contoso", match="Contoso")
+
+        assert Counter(get_templates_for_document(document)) == Counter(
+            [mine, unowned],
+        )
+        assert get_templates_for_document(version) == [contoso]
+
+    def test_superuser_owner_can_use_all_visible_templates(
+        self,
+        owner: User,
+        document: Document,
+        mine: OcrTemplate,
+        unowned: OcrTemplate,
+        private: OcrTemplate,
+    ) -> None:
+        """
+        GIVEN:
+            - A document owned by a superuser
+        WHEN:
+            - Templates are selected for the document
+        THEN:
+            - Every matching template applies, including private ones
+        """
+        owner.is_superuser = True
+
+        assert Counter(get_templates_for_document(document)) == Counter(
+            [mine, unowned, private],
+        )
+
+    @pytest.mark.usefixtures("mine", "private")
+    def test_requester_limits_the_owners_templates(
+        self,
+        owner: User,
+        other: User,
+        document: Document,
+        unowned: OcrTemplate,
+    ) -> None:
         """
         GIVEN:
             - Templates owned by the document owner, unowned, private to
@@ -905,22 +1260,50 @@ class TestTemplateVisibility(DirectoriesMixin, TestCase):
         THEN:
             - Only templates both the owner and the requester can view are used
         """
-        shared = self.template("Shared", owner=self.owner)
-        grant_object(self.other, shared, "view_ocrtemplate")
+        shared = make_visible_template("Shared", owner=owner)
+        grant_object(other, shared, "view_ocrtemplate")
 
-        self.assertCountEqual(
-            get_templates_for_document(self.document, requester=self.other),
-            [self.unowned, shared],
-        )
+        assert Counter(
+            get_templates_for_document(document, requester=other),
+        ) == Counter([unowned, shared])
 
-    def test_inactive_owner_has_no_templates(self):
-        self.owner.is_active = False
-        self.assertEqual(get_templates_for_document(self.document), [])
+    @pytest.mark.usefixtures("mine", "unowned", "private")
+    def test_inactive_owner_has_no_templates(
+        self,
+        owner: User,
+        document: Document,
+    ) -> None:
+        """
+        GIVEN:
+            - A document whose owner is inactive
+        WHEN:
+            - Templates are selected for the document
+        THEN:
+            - No templates apply
+        """
+        owner.is_active = False
 
-    @patch("documents.zone_ocr._process_template")
-    def test_extraction_never_processes_private_templates(self, process):
-        for template in (self.mine, self.unowned, self.private):
-            OcrTemplateZone.objects.create(
+        assert get_templates_for_document(document) == []
+
+    def test_extraction_never_processes_private_templates(
+        self,
+        mocker: MockerFixture,
+        document: Document,
+        mine: OcrTemplate,
+        unowned: OcrTemplate,
+        private: OcrTemplate,
+    ) -> None:
+        """
+        GIVEN:
+            - Owned, unowned and private templates each with a zone
+        WHEN:
+            - Zone extraction runs for the document
+        THEN:
+            - Only the owned and unowned templates are processed
+        """
+        mock_process = mocker.patch("documents.zone_ocr._process_template")
+        for template in (mine, unowned, private):
+            OcrTemplateZoneFactory(
                 template=template,
                 name="Title",
                 target="title",
@@ -929,13 +1312,12 @@ class TestTemplateVisibility(DirectoriesMixin, TestCase):
                 width=20,
                 height=20,
             )
-        self.document.source_path.write_bytes(b"test PDF")
+        document.source_path.write_bytes(b"test PDF")
 
-        run_zone_extraction(self.document, None)
+        run_zone_extraction(document, None)
 
-        self.assertCountEqual(
-            [call.args[2] for call in process.call_args_list],
-            [self.mine, self.unowned],
+        assert Counter(call.args[2] for call in mock_process.call_args_list) == Counter(
+            [mine, unowned],
         )
 
 
@@ -1626,198 +2008,204 @@ class TestResolveDocPath:
         assert _resolve_doc_path(document, None) is None
 
 
-class TestRunZoneExtraction(TestCase):
+@pytest.mark.django_db
+@pytest.mark.usefixtures("paperless_dirs")
+class TestRunZoneExtraction:
     """Tests for the full extraction pipeline."""
 
-    def setUp(self):
-        self.custom_field = CustomField.objects.create(
+    @pytest.fixture
+    def custom_field(self) -> CustomField:
+        return CustomField.objects.create(
             name="Invoice Number",
             data_type=CustomField.FieldDataType.STRING,
         )
 
-    @patch("documents.zone_ocr._process_template")
-    def test_skips_template_that_does_not_match(self, mock_process):
-        template = OcrTemplate.objects.create(
-            name="Other sender",
-            match="Contoso",
-            source_width=2480,
-            source_height=3508,
-        )
-        OcrTemplateZone.objects.create(
-            template=template,
-            name="Zone",
-            custom_field=self.custom_field,
-            x=0,
-            y=0,
-            width=100,
-            height=50,
-        )
-        doc = Document.objects.create(
-            title="No Template",
-            content="test",
-            mime_type="application/pdf",
-        )
-
-        with tempfile.NamedTemporaryFile(suffix=".pdf") as f:
-            f.write(b"%PDF-1.4 fake")
-            f.flush()
-            run_zone_extraction(doc, Path(f.name))
-
-        mock_process.assert_not_called()
-
-    def test_skips_disabled_template(self):
-        template = OcrTemplate.objects.create(
-            name="Disabled",
-            match="test",
-            source_width=2480,
-            source_height=3508,
-            enabled=False,
-        )
-        OcrTemplateZone.objects.create(
-            template=template,
-            name="Zone",
-            custom_field=self.custom_field,
-            x=0,
-            y=0,
-            width=100,
-            height=50,
-        )
-
-        doc = Document.objects.create(
-            title="Test",
-            content="test",
-            mime_type="application/pdf",
-        )
-        run_zone_extraction(doc, Path("/nonexistent"))
-        self.assertEqual(CustomFieldInstance.objects.count(), 0)
-
-    def test_skips_template_with_no_zones(self):
-        OcrTemplate.objects.create(
-            name="Empty",
-            match="test",
-            source_width=2480,
-            source_height=3508,
-            enabled=True,
-        )
-
-        doc = Document.objects.create(
+    @pytest.fixture
+    def document(self) -> Document:
+        return DocumentFactory(
             title="Test",
             content="test",
             mime_type="application/pdf",
         )
 
-        with tempfile.NamedTemporaryFile(suffix=".pdf") as f:
-            f.write(b"%PDF-1.4 fake")
-            f.flush()
-            run_zone_extraction(doc, Path(f.name))
-        self.assertEqual(CustomFieldInstance.objects.count(), 0)
+    @pytest.fixture
+    def pdf(self, tmp_path: Path) -> Path:
+        pdf = tmp_path / "document.pdf"
+        pdf.write_bytes(b"%PDF-1.4 fake")
+        return pdf
 
-    @patch("documents.zone_ocr._process_template")
-    def test_calls_process_for_enabled_template(self, mock_process):
-        template = OcrTemplate.objects.create(
-            name="Active",
-            match="test",
-            source_width=2480,
-            source_height=3508,
-            enabled=True,
-        )
-        OcrTemplateZone.objects.create(
-            template=template,
-            name="Zone",
-            custom_field=self.custom_field,
-            x=0,
-            y=0,
-            width=100,
-            height=50,
-        )
+    @pytest.fixture
+    def mock_process(self, mocker: MockerFixture) -> MagicMock:
+        return mocker.patch("documents.zone_ocr._process_template")
 
-        doc = Document.objects.create(
-            title="Test",
-            content="test",
-            mime_type="application/pdf",
-        )
+    @pytest.fixture
+    def template_with_zone(
+        self,
+        custom_field: CustomField,
+    ) -> Callable[..., OcrTemplate]:
+        """Build a template with one custom field zone, matching "test" by default."""
 
-        with tempfile.NamedTemporaryFile(suffix=".pdf") as f:
-            f.write(b"%PDF-1.4 fake")
-            f.flush()
-            run_zone_extraction(doc, Path(f.name))
-
-        self.assertTrue(mock_process.called)
-
-    @patch("documents.zone_ocr._process_template")
-    def test_handles_process_exception_gracefully(self, mock_process):
-        """A failing template should not prevent other templates from running."""
-        mock_process.side_effect = RuntimeError("test error")
-
-        template = OcrTemplate.objects.create(
-            name="Failing",
-            match="test",
-            source_width=2480,
-            source_height=3508,
-            enabled=True,
-        )
-        OcrTemplateZone.objects.create(
-            template=template,
-            name="Zone",
-            custom_field=self.custom_field,
-            x=0,
-            y=0,
-            width=100,
-            height=50,
-        )
-
-        doc = Document.objects.create(
-            title="Test",
-            content="test",
-            mime_type="application/pdf",
-        )
-
-        with tempfile.NamedTemporaryFile(suffix=".pdf") as f:
-            f.write(b"%PDF-1.4 fake")
-            f.flush()
-            # Should not raise
-            run_zone_extraction(doc, Path(f.name))
-
-    def test_handles_none_original_file(self):
-        """Should not crash when original_file is None."""
-        doc = Document.objects.create(
-            title="Test",
-            content="test",
-            mime_type="application/pdf",
-        )
-        # No template, so it exits early — but shouldn't crash on None
-        run_zone_extraction(doc, None)
-
-    @patch("documents.zone_ocr._process_template")
-    def test_multiple_templates_all_process(self, mock_process):
-        """Multiple matching templates should all run."""
-        for i in range(3):
-            template = OcrTemplate.objects.create(
-                name=f"Template {i}",
-                match="test",
+        def _make(name: str, **kwargs: Any) -> OcrTemplate:
+            kwargs.setdefault("match", "test")
+            template = OcrTemplateFactory(
+                name=name,
+                matching_algorithm=MatchingModel.MATCH_ANY,
                 source_width=2480,
                 source_height=3508,
-                enabled=True,
+                **kwargs,
             )
-            OcrTemplateZone.objects.create(
+            OcrTemplateZoneFactory(
                 template=template,
-                name=f"Zone {i}",
-                custom_field=self.custom_field,
+                name="Zone",
+                target=OcrTemplateZone.TargetType.CUSTOM_FIELD,
+                custom_field=custom_field,
                 x=0,
                 y=0,
                 width=100,
                 height=50,
             )
+            return template
 
-        doc = Document.objects.create(
-            title="Test",
-            content="test",
-            mime_type="application/pdf",
+        return _make
+
+    def test_skips_template_that_does_not_match(
+        self,
+        mock_process: MagicMock,
+        template_with_zone: Callable[..., OcrTemplate],
+        document: Document,
+        pdf: Path,
+    ) -> None:
+        """
+        GIVEN:
+            - A template whose match text is not in the document content
+        WHEN:
+            - Zone extraction runs
+        THEN:
+            - The template is not processed
+        """
+        template_with_zone("Other sender", match="Contoso")
+
+        run_zone_extraction(document, pdf)
+
+        mock_process.assert_not_called()
+
+    def test_skips_disabled_template(
+        self,
+        template_with_zone: Callable[..., OcrTemplate],
+        document: Document,
+    ) -> None:
+        """
+        GIVEN:
+            - A disabled template matching the document
+        WHEN:
+            - Zone extraction runs
+        THEN:
+            - No custom field instances are created
+        """
+        template_with_zone("Disabled", enabled=False)
+
+        run_zone_extraction(document, Path("/nonexistent"))
+
+        assert CustomFieldInstance.objects.count() == 0
+
+    def test_skips_template_with_no_zones(
+        self,
+        document: Document,
+        pdf: Path,
+    ) -> None:
+        """
+        GIVEN:
+            - An enabled matching template with no zones
+        WHEN:
+            - Zone extraction runs
+        THEN:
+            - No custom field instances are created
+        """
+        OcrTemplateFactory(
+            name="Empty",
+            match="test",
+            matching_algorithm=MatchingModel.MATCH_ANY,
+            source_width=2480,
+            source_height=3508,
+            enabled=True,
         )
 
-        with tempfile.NamedTemporaryFile(suffix=".pdf") as f:
-            f.write(b"%PDF-1.4 fake")
-            f.flush()
-            run_zone_extraction(doc, Path(f.name))
+        run_zone_extraction(document, pdf)
 
-        self.assertEqual(mock_process.call_count, 3)
+        assert CustomFieldInstance.objects.count() == 0
+
+    def test_calls_process_for_enabled_template(
+        self,
+        mock_process: MagicMock,
+        template_with_zone: Callable[..., OcrTemplate],
+        document: Document,
+        pdf: Path,
+    ) -> None:
+        """
+        GIVEN:
+            - An enabled matching template with a zone
+        WHEN:
+            - Zone extraction runs
+        THEN:
+            - The template is processed
+        """
+        template_with_zone("Active", enabled=True)
+
+        run_zone_extraction(document, pdf)
+
+        assert mock_process.called
+
+    def test_handles_process_exception_gracefully(
+        self,
+        mock_process: MagicMock,
+        template_with_zone: Callable[..., OcrTemplate],
+        document: Document,
+        pdf: Path,
+    ) -> None:
+        """
+        GIVEN:
+            - A matching template whose processing raises
+        WHEN:
+            - Zone extraction runs
+        THEN:
+            - The error does not propagate, so other templates can still run
+        """
+        mock_process.side_effect = RuntimeError("test error")
+        template_with_zone("Failing", enabled=True)
+
+        # Should not raise
+        run_zone_extraction(document, pdf)
+
+    def test_handles_none_original_file(self, document: Document) -> None:
+        """
+        GIVEN:
+            - A document and no original file
+        WHEN:
+            - Zone extraction runs
+        THEN:
+            - It does not crash
+        """
+        # No template, so it exits early, but shouldn't crash on None
+        run_zone_extraction(document, None)
+
+    def test_multiple_templates_all_process(
+        self,
+        mock_process: MagicMock,
+        template_with_zone: Callable[..., OcrTemplate],
+        document: Document,
+        pdf: Path,
+    ) -> None:
+        """
+        GIVEN:
+            - Three enabled matching templates, each with a zone
+        WHEN:
+            - Zone extraction runs
+        THEN:
+            - All three templates are processed
+        """
+        for i in range(3):
+            template_with_zone(f"Template {i}", enabled=True)
+
+        run_zone_extraction(document, pdf)
+
+        assert mock_process.call_count == 3
