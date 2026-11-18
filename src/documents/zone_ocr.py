@@ -60,6 +60,14 @@ YEAR_FIRST_DATE_RE = re.compile(
     r"(?<!\d)(\d{4})([-/.])(\d{2})\2(\d{2})(?!\d)",
 )
 
+# Date-shaped tokens inside labelled text: a numeric day/month/year with a
+# separator, or a day, a month name and a four-digit year. Only these tokens are
+# handed to dateparser, so bare numbers around a label are never read as dates.
+DATE_TOKEN_RE = re.compile(
+    r"(?<!\d)\d{1,2}[./-]\d{1,2}[./-]\d{4}(?!\d)"
+    r"|(?<!\d)\d{1,2}\.?\s+[^\W\d_]{3,}\.?\s+\d{4}(?!\d)",
+)
+
 # Earlier dates are far more likely OCR noise than a real document date.
 MIN_ZONE_DATE_YEAR = 1900
 
@@ -541,19 +549,8 @@ def _date_rules(ocr_language: str, date_format: str = "") -> DateRules:
     return DateRules(_zone_language(ocr_language), date_format)
 
 
-def _candidate_dates(text: str, rules: DateRules) -> Iterator[date]:
-    """Yield the dates the text may hold, most specific reading first."""
-    if rules.date_format:
-        try:
-            yield datetime.strptime(text, rules.date_format).date()
-        except ValueError:
-            pass
-    for match in YEAR_FIRST_DATE_RE.finditer(text):
-        year, _, month, day = match.groups()
-        try:
-            yield date(int(year), int(month), int(day))
-        except ValueError:
-            continue
+def _dateparser_date(text: str, rules: DateRules) -> date | None:
+    """Read a whole-text absolute date with dateparser in the zone's language."""
     # Only absolute dates: dateparser would also read "now" or "yesterday"
     date_settings: dict[str, Any] = {
         "PARSERS": ["custom-formats", "absolute-time"],
@@ -570,17 +567,44 @@ def _candidate_dates(text: str, rules: DateRules) -> Iterator[date]:
         )
     except (ValueError, OverflowError):
         logger.debug("Zone OCR: date parsing failed")
-        return
-    if parsed:
-        yield parsed.date()
+        return None
+    return parsed.date() if parsed else None
+
+
+def _candidate_dates(text: str, rules: DateRules) -> Iterator[date]:
+    """Yield the dates the text may hold, most specific reading first."""
+    if rules.date_format:
+        try:
+            yield datetime.strptime(text, rules.date_format).date()
+        except ValueError:
+            pass
+    for match in YEAR_FIRST_DATE_RE.finditer(text):
+        year, _, month, day = match.groups()
+        try:
+            yield date(int(year), int(month), int(day))
+        except ValueError:
+            continue
+    whole_text = _dateparser_date(text, rules)
+    if whole_text is not None:
+        yield whole_text
+    # Labelled text such as "Datum: 13.04.2026": try each date-shaped token in order
+    for token in DATE_TOKEN_RE.finditer(text):
+        labelled = _dateparser_date(token.group(), rules)
+        if labelled is not None:
+            yield labelled
 
 
 def _parse_date(text: str, rules: DateRules) -> date | None:
     """Read a calendar date from OCR text.
 
     Tries the zone's date format, year-first dates, then dateparser in the zone's
-    language (or the configured date order when the language is unknown).
-    Dates before MIN_ZONE_DATE_YEAR are treated as OCR noise.
+    language (or the configured date order when the language is unknown) on the
+    whole text. As a last resort, labelled text such as "Datum: 13.04.2026" is
+    searched for date-shaped tokens with a four-digit year (numeric, or day,
+    month name and year), and the first token dateparser accepts is used. Bare
+    numbers and two-digit years in surrounding text are never read as dates, so
+    version or article numbers like "1.2.34" are ignored. Dates before
+    MIN_ZONE_DATE_YEAR are treated as OCR noise.
     """
     return next(
         (

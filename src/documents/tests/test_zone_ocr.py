@@ -1615,6 +1615,161 @@ class TestParseDate:
         assert _parse_date(text, _date_rules(ocr_language)) is None
 
     @pytest.mark.parametrize(
+        ("text", "ocr_language", "expected"),
+        [
+            pytest.param(
+                "Datum: 13.04.2026",
+                "deu",
+                date(2026, 4, 13),
+                id="german-label-colon",
+            ),
+            pytest.param(
+                "Rechnungsdatum 12.05.2024",
+                "deu",
+                date(2024, 5, 12),
+                id="german-compound-label",
+            ),
+            pytest.param(
+                "Invoice date 05/12/2024",
+                "eng",
+                date(2024, 5, 12),
+                id="english-label-numeric",
+            ),
+            pytest.param(
+                "Date: 13 April 2026",
+                "eng",
+                date(2026, 4, 13),
+                id="english-label-month-name",
+            ),
+            pytest.param(
+                "Rechnung 2024-001 vom 12.05.2024",
+                "deu",
+                date(2024, 5, 12),
+                id="german-label-before-invoice-number",
+            ),
+            pytest.param(
+                "No. 12 Datum 13.04.2026",
+                "deu",
+                date(2026, 4, 13),
+                id="german-label-after-number",
+            ),
+            pytest.param(
+                "Kd-Nr 12345 05.06.2024",
+                "deu",
+                date(2024, 6, 5),
+                id="german-label-after-customer-number",
+            ),
+            pytest.param(
+                "Lieferdatum: 12. Mai 2024",
+                "deu",
+                date(2024, 5, 12),
+                id="german-label-month-name",
+            ),
+            pytest.param(
+                "Total 5",
+                "eng",
+                None,
+                id="single-number-after-label",
+            ),
+            pytest.param(
+                "Total 5 items 2024",
+                "eng",
+                None,
+                id="number-run-without-month",
+            ),
+            pytest.param(
+                "Page 3 of 2024",
+                "eng",
+                None,
+                id="page-number-without-month",
+            ),
+            pytest.param(
+                "Invoice 12.5",
+                "eng",
+                None,
+                id="partial-numeric-date",
+            ),
+            pytest.param(
+                "Page 3 of 12 2024",
+                "eng",
+                None,
+                id="page-of-number-run-with-year",
+            ),
+            pytest.param(
+                "Total 3 10 2024",
+                "eng",
+                None,
+                id="space-separated-numbers-with-year",
+            ),
+            pytest.param(
+                "Order 12 3 2024",
+                "eng",
+                None,
+                id="order-numbers-with-year",
+            ),
+            pytest.param(
+                "Ref 1 2 2024",
+                "eng",
+                None,
+                id="ref-numbers-with-year",
+            ),
+            pytest.param(
+                "Invoice #2024 from 5 May",
+                "eng",
+                None,
+                id="year-token-before-day-month",
+            ),
+            pytest.param(
+                "Page 1 of 3 03 2024",
+                "eng",
+                None,
+                id="page-numbers-ending-in-year",
+            ),
+            pytest.param(
+                "Version 1.2.34",
+                "deu",
+                None,
+                id="version-number-with-two-digit-tail",
+            ),
+            pytest.param(
+                "v1.2.24",
+                "eng",
+                None,
+                id="short-version-number",
+            ),
+            pytest.param(
+                "Art. 12.3.45",
+                "deu",
+                None,
+                id="article-number",
+            ),
+            pytest.param(
+                "Ticket 1-2-34",
+                "eng",
+                None,
+                id="dashed-ticket-number",
+            ),
+        ],
+    )
+    def test_labelled_text_yields_the_date_after_the_label(
+        self,
+        text: str,
+        ocr_language: str,
+        expected: date | None,
+    ) -> None:
+        """
+        GIVEN:
+            - OCR text with a label before a date, or a label-like number
+              with no complete date
+        WHEN:
+            - The date is parsed
+        THEN:
+            - The date after the label is returned in the zone's day/month order
+            - Text without a complete date after a label returns no date
+        """
+        assert _parse_date(text, _date_rules(ocr_language)) == expected
+
+    @pytest.mark.parametrize(
         ("text", "date_format", "expected"),
         [
             pytest.param(
