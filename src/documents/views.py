@@ -4395,6 +4395,33 @@ class RemoteVersionView(GenericAPIView[Any]):
         )
 
 
+class ReleaseNotesView(GenericAPIView[Any]):
+    def get(self, request, format=None):
+        current_version = packaging_version.parse(version.__full_version_str__)
+        since_param = request.query_params.get("since")
+        since = None
+        if since_param:
+            try:
+                since = packaging_version.parse(since_param)
+            except packaging_version.InvalidVersion:
+                return HttpResponseBadRequest("Invalid since version")
+
+        releases = get_github_releases(current_version) or []
+
+        def in_range(release_version: str) -> bool:
+            v = packaging_version.parse(release_version)
+            if since is None:
+                return v == current_version
+            return since < v <= current_version
+
+        return Response(
+            {
+                "version": version.__full_version_str__,
+                "releases": [r for r in releases if in_range(r["version"])],
+            },
+        )
+
+
 class _TasksViewSetSchema(AutoSchema):
     _UNPAGINATED_ACTIONS = frozenset({"summary", "active", "status_counts"})
 
