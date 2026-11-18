@@ -7,9 +7,8 @@ from rest_framework.test import APIClient
 
 from paperless import version
 
-RELEASES_URL = (
-    "https://api.github.com/repos/paperless-ngx/paperless-ngx/releases?per_page=10"
-)
+REPO_URL = "https://api.github.com/repos/paperless-ngx/paperless-ngx"
+RELEASES_URL = f"{REPO_URL}/releases?per_page=10"
 
 
 def _release(tag: str, **kwargs) -> dict:
@@ -163,12 +162,13 @@ class TestApiRemoteVersion:
             url=RELEASES_URL,
             json=[_release(f"v{version.__full_version_str__}")],
         )
+        httpx_mock.add_response(url=REPO_URL, json={"stargazers_count": 1234})
 
         rest_api_client.get(self.ENDPOINT)
         response = rest_api_client.get("/api/release_notes/")
 
         assert len(response.data["releases"]) == 1
-        assert len(httpx_mock.get_requests()) == 1
+        assert len(httpx_mock.get_requests(url=RELEASES_URL)) == 1
 
     def test_new_running_version_refetches_releases(
         self,
@@ -190,10 +190,11 @@ class TestApiRemoteVersion:
             json=[_release(f"v{version.__full_version_str__}")],
         )
         httpx_mock.add_response(url=RELEASES_URL, json=[_release(f"v{upgraded}")])
+        httpx_mock.add_response(url=REPO_URL, json={"stargazers_count": 1234})
 
         rest_api_client.get(self.ENDPOINT)
         with mock.patch.object(version, "__full_version_str__", upgraded):
             response = rest_api_client.get("/api/release_notes/")
 
-        assert len(httpx_mock.get_requests()) == 2
+        assert len(httpx_mock.get_requests(url=RELEASES_URL)) == 2
         assert [r["version"] for r in response.data["releases"]] == [upgraded]
