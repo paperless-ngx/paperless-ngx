@@ -398,6 +398,60 @@ describe('SettingsService', () => {
     expect(req.request.method).toEqual('POST')
   })
 
+  it('seeds last seen version on first load', () => {
+    const settings = {
+      ...ui_settings,
+      user: { ...ui_settings.user, is_superuser: true },
+      settings: {
+        ...ui_settings.settings,
+        documentListSize: 50,
+        update_checking: { enabled: false, backend_setting: 'default' },
+      },
+    }
+    settings.settings['version'] = '3.5.1'
+    httpTestingController
+      .expectOne(`${environment.apiBaseUrl}ui_settings/`)
+      .flush(settings)
+
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}ui_settings/`
+    )
+    expect(req.request.method).toEqual('POST')
+    expect(req.request.body.settings.whats_new.last_seen_version).toEqual(
+      '3.5.1'
+    )
+    expect(settingsService.unseenReleasesSince).toBeNull()
+  })
+
+  it('reports unseen releases and marks them seen', () => {
+    const settings = {
+      ...ui_settings,
+      user: { ...ui_settings.user, is_superuser: true },
+      settings: {
+        ...ui_settings.settings,
+        documentListSize: 50,
+        update_checking: { enabled: false, backend_setting: 'default' },
+      },
+    }
+    settings.settings['version'] = '3.5.1'
+    settings.settings['whats_new'] = { last_seen_version: '3.4.2' }
+    httpTestingController
+      .expectOne(`${environment.apiBaseUrl}ui_settings/`)
+      .flush(settings)
+    httpTestingController.expectNone(`${environment.apiBaseUrl}ui_settings/`)
+
+    expect(settingsService.unseenReleasesSince).toEqual('3.4.2')
+
+    subscription = settingsService.markReleasesSeen().subscribe()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}ui_settings/`
+    )
+    expect(req.request.body.settings.whats_new.last_seen_version).toEqual(
+      '3.5.1'
+    )
+    expect(settingsService.unseenReleasesSince).toBeNull()
+  })
+
   it('updates settings on complete tour', () => {
     let req = httpTestingController.expectOne(
       `${environment.apiBaseUrl}ui_settings/`
