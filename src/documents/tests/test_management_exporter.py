@@ -36,6 +36,8 @@ from documents.models import Document
 from documents.models import DocumentBarcode
 from documents.models import DocumentType
 from documents.models import Note
+from documents.models import OcrTemplate
+from documents.models import OcrTemplateZone
 from documents.models import ShareLink
 from documents.models import ShareLinkBundle
 from documents.models import StoragePath
@@ -58,6 +60,8 @@ from paperless_testing.dirs import PaperlessDirs
 from paperless_testing.dirs import paperless_environment
 from paperless_testing.factories import DocumentBarcodeFactory
 from paperless_testing.factories import DocumentFactory
+from paperless_testing.factories import OcrTemplateFactory
+from paperless_testing.factories import OcrTemplateZoneFactory
 from paperless_testing.permissions import grant_object
 from paperless_testing.samples import install_document_samples
 
@@ -413,6 +417,63 @@ class TestExportImport(
             self.assertEqual(
                 imported_bundle_path.read_bytes(),
                 b"share-bundle-contents",
+            )
+
+    def test_exporter_includes_ocr_templates(self) -> None:
+        """
+        GIVEN:
+            - An OCR template with a sample document and zones targeting a
+              custom field and a built-in field
+        WHEN:
+            - The data is exported, the templates are deleted, and the export is
+              imported again
+        THEN:
+            - The template and its zones are restored with their relations
+        """
+        shutil.rmtree(Path(self.dirs.media_dir) / "documents")
+        install_document_samples(Path(self.dirs.media_dir) / "documents")
+
+        template = OcrTemplateFactory(
+            name="Invoice",
+            owner=self.user,
+            sample_document=self.d1,
+            combine_formats={str(self.cf1.pk): "{Number}"},
+        )
+        cf_zone = OcrTemplateZoneFactory(
+            template=template,
+            name="Number",
+            target=OcrTemplateZone.TargetType.CUSTOM_FIELD,
+            custom_field=self.cf1,
+        )
+        title_zone = OcrTemplateZoneFactory(template=template, name="Title")
+
+        manifest = self._do_export()
+
+        exported_models = [record["model"] for record in manifest]
+        self.assertEqual(exported_models.count("documents.ocrtemplate"), 1)
+        self.assertEqual(exported_models.count("documents.ocrtemplatezone"), 2)
+
+        with paperless_environment():
+            OcrTemplate.objects.all().delete()
+
+            call_command(
+                "document_importer",
+                "--no-progress-bar",
+                self.target,
+                skip_checks=True,
+            )
+
+            imported = OcrTemplate.objects.get(pk=template.pk)
+            self.assertEqual(imported.owner_id, self.user.pk)
+            self.assertEqual(imported.sample_document_id, self.d1.pk)
+            self.assertEqual(imported.combine_formats, {str(self.cf1.pk): "{Number}"})
+            self.assertEqual(
+                list(imported.zones.order_by("pk").values_list("pk", flat=True)),
+                [cf_zone.pk, title_zone.pk],
+            )
+            self.assertEqual(
+                OcrTemplateZone.objects.get(pk=cf_zone.pk).custom_field_id,
+                self.cf1.pk,
             )
 
     def test_update_export_changed_time(self) -> None:

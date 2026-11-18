@@ -12,6 +12,8 @@ from documents.models import Document
 from documents.models import DocumentBarcode
 from documents.models import DocumentType
 from documents.models import MatchingModel
+from documents.models import OcrTemplate
+from documents.models import OcrTemplateZone
 from documents.models import PaperlessTask
 from documents.models import StoragePath
 from documents.models import Tag
@@ -108,3 +110,27 @@ class PaperlessTaskFactory(TypedModelFactory[PaperlessTask]):
     input_data = factory.LazyFunction(dict)
     result_data = None
     acknowledged = False
+
+
+class OcrTemplateFactory(TypedModelFactory[OcrTemplate]):
+    class Meta:
+        model = OcrTemplate
+
+    name = factory.Sequence(lambda n: f"OCR template {n}")
+    match = ""
+    matching_algorithm = MatchingModel.MATCH_NONE
+    source_width = 1000
+    source_height = 1000
+
+
+class OcrTemplateZoneFactory(TypedModelFactory[OcrTemplateZone]):
+    class Meta:
+        model = OcrTemplateZone
+
+    template = factory.SubFactory(OcrTemplateFactory)
+    name = factory.Sequence(lambda n: f"Zone {n}")
+    target = OcrTemplateZone.TargetType.TITLE
+    x = 0
+    y = 0
+    width = 100
+    height = 50

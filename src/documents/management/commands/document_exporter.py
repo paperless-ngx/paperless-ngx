@@ -49,6 +49,8 @@ from documents.models import Document
 from documents.models import DocumentBarcode
 from documents.models import DocumentType
 from documents.models import Note
+from documents.models import OcrTemplate
+from documents.models import OcrTemplateZone
 from documents.models import SavedView
 from documents.models import SavedViewFilterRule
 from documents.models import ShareLink
@@ -364,6 +366,8 @@ class Command(CryptMixin, PaperlessCommand):
             "workflows": Workflow.objects.all(),
             "custom_fields": CustomField.objects.all(),
             "custom_field_instances": CustomFieldInstance.global_objects.all(),
+            "ocr_templates": OcrTemplate.objects.all(),
+            "ocr_template_zones": OcrTemplateZone.objects.all(),
             "document_barcodes": DocumentBarcode.objects.all(),
             "app_configs": ApplicationConfiguration.objects.all(),
             "notes": Note.global_objects.all(),
