@@ -4459,6 +4459,7 @@ class ReleaseNotesView(GenericAPIView[Any]):
             {
                 "version": version.__full_version_str__,
                 "releases": [r for r in releases if in_range(r["version"])],
+                "stars": get_github_stars(),
             },
         )
 

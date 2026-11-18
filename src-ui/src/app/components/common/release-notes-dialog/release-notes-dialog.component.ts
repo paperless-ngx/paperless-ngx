@@ -1,4 +1,4 @@
-import { NgTemplateOutlet } from '@angular/common'
+import { DecimalPipe, NgTemplateOutlet } from '@angular/common'
 import { Component, inject, signal } from '@angular/core'
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { first } from 'rxjs'
@@ -38,7 +38,12 @@ export function prepareReleaseHtml(html: string): string {
   selector: 'pngx-release-notes-dialog',
   templateUrl: './release-notes-dialog.component.html',
   styleUrls: ['./release-notes-dialog.component.scss'],
-  imports: [BootstrapIconComponent, CustomDatePipe, NgTemplateOutlet],
+  imports: [
+    BootstrapIconComponent,
+    CustomDatePipe,
+    NgTemplateOutlet,
+    DecimalPipe,
+  ],
 })
 export class ReleaseNotesDialogComponent {
   readonly activeModal = inject(NgbActiveModal)
@@ -47,6 +52,7 @@ export class ReleaseNotesDialogComponent {
 
   readonly since = signal<string | null>(null)
   readonly releases = signal<AppRelease[] | null>(null)
+  readonly stars = signal<number | null>(null)
   readonly loading = signal(false)
 
   readonly version: string = this.settingsService.get(SETTINGS_KEYS.VERSION)
@@ -81,6 +87,7 @@ export class ReleaseNotesDialogComponent {
               body_html: prepareReleaseHtml(release.body_html),
             }))
           )
+          this.stars.set(notes.stars ?? null)
           this.loading.set(false)
         },
         error: () => {

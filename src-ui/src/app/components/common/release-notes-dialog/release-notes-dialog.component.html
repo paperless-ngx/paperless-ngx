@@ -10,6 +10,9 @@
       <a class="btn btn-outline-secondary d-flex align-items-center" [href]="repoUrl" target="_blank" rel="noopener noreferrer"
         title="Star Paperless-ngx on GitHub" i18n-title>
         <pngx-bs-icon name="github" class="me-1 d-flex" width="12" height="12"></pngx-bs-icon><span class="small" i18n>Star</span>
+        @if (stars() !== null) {
+          <div class="text-muted small ms-1">{{ stars() | number }}</div>
+        }
       </a>
     </div>
     <button type="button" class="btn-close m-0" aria-label="Close" i18n-aria-label (click)="close()"></button>

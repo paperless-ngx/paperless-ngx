@@ -19,6 +19,7 @@ export interface AppRelease {
 export interface AppReleaseNotes {
   version: string
   releases: AppRelease[]
+  stars: number | null
 }
 
 @Injectable({
