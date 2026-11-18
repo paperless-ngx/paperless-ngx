@@ -1,3 +1,6 @@
-:host ::ng-deep .release-notes-body > h2 {
-  display: none !important;
+:host ::ng-deep .release-notes-body > h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
 }

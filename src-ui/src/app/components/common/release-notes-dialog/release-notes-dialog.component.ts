@@ -12,6 +12,20 @@ import { SettingsService } from 'src/app/services/settings.service'
 
 const RELEASES_URL = 'https://github.com/paperless-ngx/paperless-ngx/releases'
 
+const RELEASE_TITLE = /^\s*##\s+paperless-ngx[^\n]*\n+/i
+const ALL_CHANGES_SECTION = /^###\s+All App Changes\s*$[\s\S]*/im
+const DETAILS_MARKUP = /^\s*(<\/?details>|<summary>.*<\/summary>)\s*$/gim
+
+/**
+ * Drops the "## paperless-ngx x.y.z" title, the "All App Changes"
+ * section and `<details>` / `<summary>` wrappers.
+ */
+export function cleanReleaseBody(body: string): string {
+  body = body.replace(RELEASE_TITLE, '')
+  body = body.replace(ALL_CHANGES_SECTION, '')
+  return body.replace(DETAILS_MARKUP, '').trim()
+}
+
 @Component({
   selector: 'pngx-release-notes-dialog',
   templateUrl: './release-notes-dialog.component.html',
@@ -49,7 +63,12 @@ export class ReleaseNotesDialogComponent {
       .pipe(first())
       .subscribe({
         next: (notes) => {
-          this.releases.set(notes.releases)
+          this.releases.set(
+            notes.releases.map((release) => ({
+              ...release,
+              body: cleanReleaseBody(release.body),
+            }))
+          )
           this.loading.set(false)
         },
         error: () => {

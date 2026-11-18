@@ -8,7 +8,10 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { SettingsService } from 'src/app/services/settings.service'
 import { environment } from 'src/environments/environment'
-import { ReleaseNotesDialogComponent } from './release-notes-dialog.component'
+import {
+  cleanReleaseBody,
+  ReleaseNotesDialogComponent,
+} from './release-notes-dialog.component'
 
 describe('ReleaseNotesDialogComponent', () => {
   let component: ReleaseNotesDialogComponent
@@ -68,6 +71,33 @@ describe('ReleaseNotesDialogComponent', () => {
     expect(text).toContain('Bug Fixes')
     expect(text).not.toContain('paperless-ngx 3.5.1')
     expect(text).not.toContain('(github.com)')
+  })
+
+  it('should drop the duplicate All App Changes section and details markup', () => {
+    const body = [
+      '## paperless-ngx 3.5.1',
+      '### Bug Fixes',
+      '- Fix: a thing',
+      '### Dependencies',
+      '<details>',
+      '<summary>1 change</summary>',
+      '',
+      '- Chore(deps): bump a thing',
+      '</details>',
+      '### All App Changes',
+      '<details>',
+      '<summary>2 changes</summary>',
+      '',
+      '- Fix: a thing',
+      '- Chore(deps): bump a thing',
+      '</details>',
+    ].join('\r\n')
+    const cleaned = cleanReleaseBody(body)
+    expect(cleaned).toContain('### Dependencies')
+    expect(cleaned).toContain('- Chore(deps): bump a thing')
+    expect(cleaned).not.toContain('All App Changes')
+    expect(cleaned).not.toContain('details>')
+    expect(cleaned).not.toContain('summary>')
   })
 
   it('should show a message if release notes could not be loaded', () => {
