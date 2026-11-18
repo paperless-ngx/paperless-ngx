@@ -1,19 +1,20 @@
 """Tests for the zone-based OCR extraction engine."""
 
+from __future__ import annotations
+
 import subprocess
 import tempfile
 from datetime import date
 from pathlib import Path
+from typing import TYPE_CHECKING
 from unittest.mock import MagicMock
 from unittest.mock import patch
 
 import pytest
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
-from django.test import SimpleTestCase
 from django.test import TestCase
 from PIL import Image
-from pytest_mock import MockerFixture
 
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
@@ -38,17 +39,25 @@ from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import DocumentFactory
 from paperless_testing.permissions import grant_object
 
+if TYPE_CHECKING:
+    from pytest_django.fixtures import SettingsWrapper
+    from pytest_mock import MockerFixture
 
-class TestZoneExtraction(SimpleTestCase):
-    def setUp(self):
-        directory = tempfile.TemporaryDirectory()
-        self.addCleanup(directory.cleanup)
-        self.tmp_path = Path(directory.name)
-        self.page = self.tmp_path / "page.png"
+
+class TestZoneExtraction:
+    """Tests for single-zone cropping, extraction and preview."""
+
+    @pytest.fixture
+    def page(self, tmp_path: Path) -> Path:
+        page = tmp_path / "page.png"
         with Image.new("RGB", (200, 100), "white") as image:
             image.paste("black", (20, 10, 60, 30))
-            image.save(self.page)
-        self.zone = OcrTemplateZone(
+            image.save(page)
+        return page
+
+    @pytest.fixture
+    def zone(self) -> OcrTemplateZone:
+        return OcrTemplateZone(
             name="Account",
             x=10,
             y=5,
@@ -57,147 +66,358 @@ class TestZoneExtraction(SimpleTestCase):
             transform="uppercase",
             ocr_language="eng",
         )
-        settings = self.settings(SCRATCH_DIR=self.tmp_path)
-        settings.enable()
-        self.addCleanup(settings.disable)
 
-    def test_crop_scales_coordinates(self):
-        with _crop_zone(self.page, self.zone, 100, 50) as cropped:
-            self.assertEqual(cropped.size, (40, 20))
-            self.assertEqual(cropped.getextrema(), ((0, 0), (0, 0), (0, 0)))
+    @pytest.fixture(autouse=True)
+    def scratch_dir(self, settings: SettingsWrapper, tmp_path: Path) -> None:
+        settings.SCRATCH_DIR = tmp_path
 
-    def test_crop_defaults_to_image_dimensions(self):
-        with _crop_zone(self.page, self.zone, 0, 0) as cropped:
-            self.assertEqual(cropped.size, (20, 10))
-            self.assertEqual(cropped.getpixel((0, 0)), (255, 255, 255))
-            self.assertEqual(cropped.getpixel((19, 9)), (0, 0, 0))
+    @pytest.fixture
+    def mock_run(self, mocker: MockerFixture) -> MagicMock:
+        return mocker.patch("documents.zone_ocr.subprocess.run")
 
-    def test_crop_clamps_to_image(self):
-        self.zone.x, self.zone.y = 90, 40
-        with _crop_zone(self.page, self.zone, 100, 50) as cropped:
-            self.assertEqual(cropped.size, (20, 20))
+    def test_crop_scales_coordinates(
+        self,
+        page: Path,
+        zone: OcrTemplateZone,
+    ) -> None:
+        """
+        GIVEN:
+            - A zone and a page image rendered at a different size than the zone's
+        WHEN:
+            - The zone is cropped
+        THEN:
+            - The zone coordinates are scaled to the image and the crop is black
+        """
+        with _crop_zone(page, zone, 100, 50) as cropped:
+            assert cropped.size == (40, 20)
+            assert cropped.getextrema() == ((0, 0), (0, 0), (0, 0))
 
-    @patch("documents.zone_ocr.subprocess.run")
-    def test_tiny_crop_skips_reader(self, run):
-        self.zone.width = 0
-        result = _extract_zone(self.page, self.zone, 100, 50, self.tmp_path)
-        self.assertIsNone(result.raw_text)
-        self.assertIsNone(result.value)
-        run.assert_not_called()
+    def test_crop_defaults_to_image_dimensions(
+        self,
+        page: Path,
+        zone: OcrTemplateZone,
+    ) -> None:
+        """
+        GIVEN:
+            - A zone and a page with unknown (zero) reference dimensions
+        WHEN:
+            - The zone is cropped
+        THEN:
+            - The image's own dimensions are used for the crop
+        """
+        with _crop_zone(page, zone, 0, 0) as cropped:
+            assert cropped.size == (20, 10)
+            assert cropped.getpixel((0, 0)) == (255, 255, 255)
+            assert cropped.getpixel((19, 9)) == (0, 0, 0)
 
-    @patch("documents.zone_ocr.subprocess.run")
-    def test_unreadable_image_skips_reader(self, run):
-        self.page.write_bytes(b"not an image")
-        result = _extract_zone(self.page, self.zone, 100, 50, self.tmp_path)
-        self.assertIsNone(result.raw_text)
-        self.assertIsNone(result.value)
-        run.assert_not_called()
+    def test_crop_clamps_to_image(
+        self,
+        page: Path,
+        zone: OcrTemplateZone,
+    ) -> None:
+        """
+        GIVEN:
+            - A zone that extends past the edge of the page image
+        WHEN:
+            - The zone is cropped
+        THEN:
+            - The crop is clamped to the image bounds
+        """
+        zone.x, zone.y = 90, 40
+        with _crop_zone(page, zone, 100, 50) as cropped:
+            assert cropped.size == (20, 20)
 
-    @patch("documents.zone_ocr.subprocess.run")
-    def test_text_extraction_retains_raw_text_and_transforms(self, run):
-        def read_crop(args, **kwargs):
+    def test_tiny_crop_skips_reader(
+        self,
+        page: Path,
+        zone: OcrTemplateZone,
+        tmp_path: Path,
+        mock_run: MagicMock,
+    ) -> None:
+        """
+        GIVEN:
+            - A zone with zero width
+        WHEN:
+            - The zone is extracted
+        THEN:
+            - No text or value is returned and the reader is never run
+        """
+        zone.width = 0
+        result = _extract_zone(page, zone, 100, 50, tmp_path)
+        assert result.raw_text is None
+        assert result.value is None
+        mock_run.assert_not_called()
+
+    def test_unreadable_image_skips_reader(
+        self,
+        page: Path,
+        zone: OcrTemplateZone,
+        tmp_path: Path,
+        mock_run: MagicMock,
+    ) -> None:
+        """
+        GIVEN:
+            - A page file that is not a valid image
+        WHEN:
+            - The zone is extracted
+        THEN:
+            - No text or value is returned and the reader is never run
+        """
+        page.write_bytes(b"not an image")
+        result = _extract_zone(page, zone, 100, 50, tmp_path)
+        assert result.raw_text is None
+        assert result.value is None
+        mock_run.assert_not_called()
+
+    def test_text_extraction_retains_raw_text_and_transforms(
+        self,
+        mocker: MockerFixture,
+        page: Path,
+        zone: OcrTemplateZone,
+        tmp_path: Path,
+        mock_run: MagicMock,
+    ) -> None:
+        """
+        GIVEN:
+            - A zone with an uppercase transform and a reader returning padded text
+        WHEN:
+            - The zone is extracted
+        THEN:
+            - The reader receives the cropped image with the expected arguments
+            - The stripped raw text is retained and the transformed value returned
+        """
+
+        def read_crop(args: list[str], **kwargs: object) -> MagicMock:
             with Image.open(args[1]) as crop:
-                self.assertEqual(crop.size, (40, 20))
-                self.assertEqual(crop.getpixel((0, 0)), (0, 0, 0))
-            return MagicMock(stdout="  account abc\n")
+                assert crop.size == (40, 20)
+                assert crop.getpixel((0, 0)) == (0, 0, 0)
+            return mocker.MagicMock(stdout="  account abc\n")
 
-        run.side_effect = read_crop
-        result = _extract_zone(self.page, self.zone, 100, 50, self.tmp_path)
-        self.assertEqual(result.raw_text, "account abc")
-        self.assertEqual(result.value, "ACCOUNT ABC")
-        self.assertEqual(run.call_args.args[0][-4:], ["-l", "eng", "--psm", "6"])
-        self.assertEqual(run.call_args.kwargs["timeout"], 30)
+        mock_run.side_effect = read_crop
+        result = _extract_zone(page, zone, 100, 50, tmp_path)
+        assert result.raw_text == "account abc"
+        assert result.value == "ACCOUNT ABC"
+        assert mock_run.call_args.args[0][-4:] == ["-l", "eng", "--psm", "6"]
+        assert mock_run.call_args.kwargs["timeout"] == 30
 
-    @patch("documents.zone_ocr.subprocess.run")
-    def test_no_text_returns_no_value(self, run):
-        run.return_value.stdout = " \n"
-        result = _extract_zone(self.page, self.zone, 100, 50, self.tmp_path)
-        self.assertIsNone(result.raw_text)
-        self.assertIsNone(result.value)
+    def test_no_text_returns_no_value(
+        self,
+        page: Path,
+        zone: OcrTemplateZone,
+        tmp_path: Path,
+        mock_run: MagicMock,
+    ) -> None:
+        """
+        GIVEN:
+            - A reader that returns only whitespace
+        WHEN:
+            - The zone is extracted
+        THEN:
+            - No text or value is returned
+        """
+        mock_run.return_value.stdout = " \n"
+        result = _extract_zone(page, zone, 100, 50, tmp_path)
+        assert result.raw_text is None
+        assert result.value is None
 
-    @patch("documents.zone_ocr.subprocess.run")
-    def test_reader_failures_return_no_value(self, run):
-        for error in [
-            subprocess.TimeoutExpired("tesseract", 30),
-            subprocess.CalledProcessError(1, "tesseract", stderr="failure"),
-            subprocess.CalledProcessError(1, "tesseract"),
-            FileNotFoundError("tesseract"),
-        ]:
-            with self.subTest(error=type(error).__name__):
-                run.side_effect = error
-                result = _extract_zone(self.page, self.zone, 100, 50, self.tmp_path)
-                self.assertIsNone(result.raw_text)
-                self.assertIsNone(result.value)
+    @pytest.mark.parametrize(
+        "error",
+        [
+            pytest.param(subprocess.TimeoutExpired("tesseract", 30), id="timeout"),
+            pytest.param(
+                subprocess.CalledProcessError(1, "tesseract", stderr="failure"),
+                id="called-process-error-with-stderr",
+            ),
+            pytest.param(
+                subprocess.CalledProcessError(1, "tesseract"),
+                id="called-process-error-without-stderr",
+            ),
+            pytest.param(FileNotFoundError("tesseract"), id="reader-not-found"),
+        ],
+    )
+    def test_reader_failures_return_no_value(
+        self,
+        page: Path,
+        zone: OcrTemplateZone,
+        tmp_path: Path,
+        mock_run: MagicMock,
+        error: Exception,
+    ) -> None:
+        """
+        GIVEN:
+            - A reader that fails with a timeout, process error or missing binary
+        WHEN:
+            - The zone is extracted
+        THEN:
+            - No text or value is returned
+        """
+        mock_run.side_effect = error
+        result = _extract_zone(page, zone, 100, 50, tmp_path)
+        assert result.raw_text is None
+        assert result.value is None
 
-    @patch("zxingcpp.read_barcodes", side_effect=RuntimeError("reader failed"))
-    def test_barcode_failure_returns_no_value(self, read_barcodes):
-        self.zone.transform = "qr_code"
-        result = _extract_zone(self.page, self.zone, 100, 50, self.tmp_path)
-        self.assertIsNone(result.raw_text)
-        self.assertIsNone(result.value)
-
-    @patch("documents.zone_ocr.subprocess.run")
-    def test_preview_tiny_crop_returns_empty_result(self, run):
-        self.zone.width = 0
-        self.assertEqual(
-            extract_zone_preview(self.page, self.zone, 100, 50, 1),
-            {
-                "raw_text": None,
-                "value": None,
-            },
+    def test_barcode_failure_returns_no_value(
+        self,
+        mocker: MockerFixture,
+        page: Path,
+        zone: OcrTemplateZone,
+        tmp_path: Path,
+    ) -> None:
+        """
+        GIVEN:
+            - A QR code zone and a barcode reader that raises
+        WHEN:
+            - The zone is extracted
+        THEN:
+            - No text or value is returned
+        """
+        mocker.patch(
+            "zxingcpp.read_barcodes",
+            side_effect=RuntimeError("reader failed"),
         )
-        run.assert_not_called()
+        zone.transform = "qr_code"
+        result = _extract_zone(page, zone, 100, 50, tmp_path)
+        assert result.raw_text is None
+        assert result.value is None
 
-    @patch("documents.zone_ocr.subprocess.run")
-    def test_date_transform_uses_zone_format(self, run):
-        self.zone.transform = "date"
-        self.zone.date_format = "%d/%m/%Y"
-        run.return_value.stdout = "25/12/2025"
-        result = _extract_zone(self.page, self.zone, 100, 50, self.tmp_path)
-        self.assertEqual(result.raw_text, "25/12/2025")
-        self.assertEqual(result.value, "2025-12-25")
+    def test_preview_tiny_crop_returns_empty_result(
+        self,
+        page: Path,
+        zone: OcrTemplateZone,
+        mock_run: MagicMock,
+    ) -> None:
+        """
+        GIVEN:
+            - A zone with zero width
+        WHEN:
+            - A preview is requested
+        THEN:
+            - An empty result is returned and the reader is never run
+        """
+        zone.width = 0
+        assert extract_zone_preview(page, zone, 100, 50, 1) == {
+            "raw_text": None,
+            "value": None,
+        }
+        mock_run.assert_not_called()
 
-    @patch("documents.zone_ocr.subprocess.run")
-    @patch("zxingcpp.read_barcodes")
-    def test_barcode_extraction_bypasses_tesseract(self, read_barcodes, run):
-        self.zone.transform = "qr_code"
+    def test_date_transform_uses_zone_format(
+        self,
+        page: Path,
+        zone: OcrTemplateZone,
+        tmp_path: Path,
+        mock_run: MagicMock,
+    ) -> None:
+        """
+        GIVEN:
+            - A date zone with a custom date format
+        WHEN:
+            - The zone is extracted from text in that format
+        THEN:
+            - The raw text is retained and the value is an ISO date
+        """
+        zone.transform = "date"
+        zone.date_format = "%d/%m/%Y"
+        mock_run.return_value.stdout = "25/12/2025"
+        result = _extract_zone(page, zone, 100, 50, tmp_path)
+        assert result.raw_text == "25/12/2025"
+        assert result.value == "2025-12-25"
 
-        def read_crop(image):
-            self.assertEqual(image.size, (40, 20))
-            self.assertEqual(image.getpixel((0, 0)), (0, 0, 0))
-            return [MagicMock(text="  https://example.com  ")]
+    def test_barcode_extraction_bypasses_tesseract(
+        self,
+        mocker: MockerFixture,
+        page: Path,
+        zone: OcrTemplateZone,
+        tmp_path: Path,
+        mock_run: MagicMock,
+    ) -> None:
+        """
+        GIVEN:
+            - A QR code zone and a barcode reader returning padded text
+        WHEN:
+            - The zone is extracted
+        THEN:
+            - The barcode reader receives the cropped image
+            - The raw text is kept as read and the value is stripped
+            - The text reader is never run and the image is closed afterwards
+        """
+        read_barcodes = mocker.patch("zxingcpp.read_barcodes")
+        zone.transform = "qr_code"
+
+        def read_crop(image: Image.Image) -> list[MagicMock]:
+            assert image.size == (40, 20)
+            assert image.getpixel((0, 0)) == (0, 0, 0)
+            return [mocker.MagicMock(text="  https://example.com  ")]
 
         read_barcodes.side_effect = read_crop
-        result = _extract_zone(self.page, self.zone, 100, 50, self.tmp_path)
-        self.assertEqual(result.raw_text, "  https://example.com  ")
-        self.assertEqual(result.value, "https://example.com")
-        run.assert_not_called()
-        with self.assertRaises(ValueError):
+        result = _extract_zone(page, zone, 100, 50, tmp_path)
+        assert result.raw_text == "  https://example.com  "
+        assert result.value == "https://example.com"
+        mock_run.assert_not_called()
+        with pytest.raises(ValueError):
             read_barcodes.call_args.args[0].getpixel((0, 0))
 
-    @patch("zxingcpp.read_barcodes", return_value=[])
-    def test_missing_barcode_returns_no_value(self, read_barcodes):
-        self.zone.transform = "qr_code"
-        result = _extract_zone(self.page, self.zone, 100, 50, self.tmp_path)
-        self.assertIsNone(result.raw_text)
-        self.assertIsNone(result.value)
+    def test_missing_barcode_returns_no_value(
+        self,
+        mocker: MockerFixture,
+        page: Path,
+        zone: OcrTemplateZone,
+        tmp_path: Path,
+    ) -> None:
+        """
+        GIVEN:
+            - A QR code zone and a barcode reader that finds nothing
+        WHEN:
+            - The zone is extracted
+        THEN:
+            - No text or value is returned
+        """
+        mocker.patch("zxingcpp.read_barcodes", return_value=[])
+        zone.transform = "qr_code"
+        result = _extract_zone(page, zone, 100, 50, tmp_path)
+        assert result.raw_text is None
+        assert result.value is None
 
-    @patch("documents.zone_ocr.subprocess.run")
-    def test_preview_uses_image_dimensions_without_writing(self, run):
-        run.return_value.stdout = "account abc"
-        self.assertEqual(
-            extract_zone_preview(self.page, self.zone, 0, 0, 1),
-            {"raw_text": "account abc", "value": "ACCOUNT ABC"},
-        )
+    def test_preview_uses_image_dimensions_without_writing(
+        self,
+        page: Path,
+        zone: OcrTemplateZone,
+        mock_run: MagicMock,
+    ) -> None:
+        """
+        GIVEN:
+            - A zone and a reader returning text
+        WHEN:
+            - A preview is requested with unknown (zero) reference dimensions
+        THEN:
+            - The raw text and transformed value are returned
+        """
+        mock_run.return_value.stdout = "account abc"
+        assert extract_zone_preview(page, zone, 0, 0, 1) == {
+            "raw_text": "account abc",
+            "value": "ACCOUNT ABC",
+        }
 
-    @patch("documents.zone_ocr.subprocess.run")
-    def test_preview_unavailable_page_skips_reader(self, run):
-        self.zone.page = 2
-        self.assertEqual(
-            extract_zone_preview(self.page, self.zone, 100, 50, 1),
-            {"raw_text": None, "value": None},
-        )
-        run.assert_not_called()
+    def test_preview_unavailable_page_skips_reader(
+        self,
+        page: Path,
+        zone: OcrTemplateZone,
+        mock_run: MagicMock,
+    ) -> None:
+        """
+        GIVEN:
+            - A zone targeting a page that is not available
+        WHEN:
+            - A preview is requested
+        THEN:
+            - An empty result is returned and the reader is never run
+        """
+        zone.page = 2
+        assert extract_zone_preview(page, zone, 100, 50, 1) == {
+            "raw_text": None,
+            "value": None,
+        }
+        mock_run.assert_not_called()
 
 
 class TestSavedZoneExtraction(DirectoriesMixin, TestCase):
@@ -1166,74 +1386,142 @@ class TestConvertValue:
         assert _convert_value(value, CustomField.FieldDataType.BOOL) is False
 
 
-class TestRenderPages(SimpleTestCase):
-    def setUp(self):
-        directory = tempfile.TemporaryDirectory()
-        self.addCleanup(directory.cleanup)
-        self.tmp_path = Path(directory.name)
-        self.pdf = self.tmp_path / "document.pdf"
-        self.pdf.write_bytes(b"%PDF-1.4")
+class TestRenderPages:
+    """Tests for _render_pages."""
 
-    @patch("documents.zone_ocr.subprocess.run")
-    def test_renders_requested_pages_in_order_and_skips_out_of_range(self, run):
-        def render(args, **kwargs):
+    @pytest.fixture
+    def pdf(self, tmp_path: Path) -> Path:
+        pdf = tmp_path / "document.pdf"
+        pdf.write_bytes(b"%PDF-1.4")
+        return pdf
+
+    @pytest.fixture
+    def mock_run(self, mocker: MockerFixture) -> MagicMock:
+        return mocker.patch("documents.zone_ocr.subprocess.run")
+
+    def test_renders_requested_pages_in_order_and_skips_out_of_range(
+        self,
+        pdf: Path,
+        tmp_path: Path,
+        mock_run: MagicMock,
+    ) -> None:
+        """
+        GIVEN:
+            - A 3 page PDF and requested pages including out of range indexes
+        WHEN:
+            - The pages are rendered
+        THEN:
+            - Only the in range pages are rendered, in order, with the expected
+              renderer arguments
+        """
+
+        def render(args: list[str], **kwargs: object) -> None:
             Path(args[-1]).with_suffix(".png").write_bytes(b"rendered")
 
-        run.side_effect = render
-        pages = _render_pages(self.pdf, {-1, 0, 2, 3}, self.tmp_path, 3)
-        self.assertEqual(list(pages), [0, 2])
-        self.assertEqual(run.call_count, 2)
-        for page, call in zip([1, 3], run.call_args_list, strict=True):
+        mock_run.side_effect = render
+        pages = _render_pages(pdf, {-1, 0, 2, 3}, tmp_path, 3)
+        assert list(pages) == [0, 2]
+        assert mock_run.call_count == 2
+        for page, call in zip([1, 3], mock_run.call_args_list, strict=True):
             args = call.args[0]
-            self.assertIn("-singlefile", args)
-            self.assertEqual(args[args.index("-f") + 1], str(page))
-            self.assertEqual(args[args.index("-l") + 1], str(page))
-            self.assertEqual(call.kwargs["timeout"], 60)
-            self.assertTrue(call.kwargs["check"])
+            assert "-singlefile" in args
+            assert args[args.index("-f") + 1] == str(page)
+            assert args[args.index("-l") + 1] == str(page)
+            assert call.kwargs["timeout"] == 60
+            assert call.kwargs["check"]
 
-    @patch("documents.zone_ocr.subprocess.run")
-    def test_missing_render_output_is_not_a_page(self, run):
-        self.assertEqual(_render_pages(self.pdf, {0}, self.tmp_path, None), {})
+    @pytest.mark.usefixtures("mock_run")
+    def test_missing_render_output_is_not_a_page(
+        self,
+        pdf: Path,
+        tmp_path: Path,
+    ) -> None:
+        """
+        GIVEN:
+            - A renderer that produces no output file
+        WHEN:
+            - A page is rendered
+        THEN:
+            - No pages are returned
+        """
+        assert _render_pages(pdf, {0}, tmp_path, None) == {}
 
-    @patch("documents.zone_ocr.subprocess.run")
-    def test_render_failure_does_not_prevent_other_pages(self, run):
-        for error in [
-            subprocess.TimeoutExpired("pdftoppm", 60),
-            subprocess.CalledProcessError(1, "pdftoppm", stderr=b"failure"),
-            subprocess.CalledProcessError(1, "pdftoppm"),
-        ]:
-            with self.subTest(error=type(error).__name__):
-
-                def render(args, **kwargs):
-                    if args[args.index("-f") + 1] == "1":
-                        raise error
-                    Path(args[-1]).with_suffix(".png").write_bytes(b"rendered")
-
-                run.side_effect = render
-                self.assertEqual(
-                    list(_render_pages(self.pdf, {0, 1}, self.tmp_path, 2)),
-                    [1],
-                )
-
-    @patch(
-        "documents.zone_ocr.subprocess.run",
-        side_effect=FileNotFoundError("pdftoppm"),
+    @pytest.mark.parametrize(
+        "error",
+        [
+            pytest.param(subprocess.TimeoutExpired("pdftoppm", 60), id="timeout"),
+            pytest.param(
+                subprocess.CalledProcessError(1, "pdftoppm", stderr=b"failure"),
+                id="called-process-error-with-stderr",
+            ),
+            pytest.param(
+                subprocess.CalledProcessError(1, "pdftoppm"),
+                id="called-process-error-without-stderr",
+            ),
+        ],
     )
-    def test_missing_renderer_stops_without_retrying_every_page(self, run):
-        self.assertEqual(_render_pages(self.pdf, {0, 1}, self.tmp_path, 2), {})
-        run.assert_called_once()
+    def test_render_failure_does_not_prevent_other_pages(
+        self,
+        pdf: Path,
+        tmp_path: Path,
+        mock_run: MagicMock,
+        error: Exception,
+    ) -> None:
+        """
+        GIVEN:
+            - A renderer that fails for the first page only
+        WHEN:
+            - Two pages are rendered
+        THEN:
+            - The failing page is skipped and the other page is still rendered
+        """
 
-    @patch("documents.zone_ocr.subprocess.run")
-    def test_image_is_used_directly_only_for_first_page(self, run):
-        image_path = self.tmp_path / "image.png"
+        def render(args: list[str], **kwargs: object) -> None:
+            if args[args.index("-f") + 1] == "1":
+                raise error
+            Path(args[-1]).with_suffix(".png").write_bytes(b"rendered")
+
+        mock_run.side_effect = render
+        assert list(_render_pages(pdf, {0, 1}, tmp_path, 2)) == [1]
+
+    def test_missing_renderer_stops_without_retrying_every_page(
+        self,
+        pdf: Path,
+        tmp_path: Path,
+        mock_run: MagicMock,
+    ) -> None:
+        """
+        GIVEN:
+            - A renderer binary that is not installed
+        WHEN:
+            - Two pages are rendered
+        THEN:
+            - No pages are returned and the renderer is only attempted once
+        """
+        mock_run.side_effect = FileNotFoundError("pdftoppm")
+        assert _render_pages(pdf, {0, 1}, tmp_path, 2) == {}
+        mock_run.assert_called_once()
+
+    def test_image_is_used_directly_only_for_first_page(
+        self,
+        tmp_path: Path,
+        mock_run: MagicMock,
+    ) -> None:
+        """
+        GIVEN:
+            - A single image file
+        WHEN:
+            - The first page, then the second page, is requested
+        THEN:
+            - The image itself is returned for the first page only
+            - The renderer is never run
+        """
+        image_path = tmp_path / "image.png"
         with Image.new("RGB", (10, 10)) as image:
             image.save(image_path)
-        self.assertEqual(
-            _render_pages(image_path, {0}, self.tmp_path, 1),
-            {0: image_path},
-        )
-        self.assertEqual(_render_pages(image_path, {1}, self.tmp_path, 1), {})
-        run.assert_not_called()
+        assert _render_pages(image_path, {0}, tmp_path, 1) == {0: image_path}
+        assert _render_pages(image_path, {1}, tmp_path, 1) == {}
+        mock_run.assert_not_called()
 
 
 class TestDetectMime:
@@ -1261,46 +1549,81 @@ class TestDetectMime:
         assert _detect_mime(Path(filename)) == expected
 
 
-class TestResolveDocPath(TestCase):
+class TestResolveDocPath:
     """Tests for _resolve_doc_path."""
 
-    def test_returns_none_when_no_files_exist(self):
-        doc = MagicMock()
+    @pytest.fixture
+    def document(self, mocker: MockerFixture) -> MagicMock:
+        doc = mocker.MagicMock()
         doc.has_archive_version = False
         doc.source_path = Path("/nonexistent/source.pdf")
-        result = _resolve_doc_path(doc, None)
-        self.assertIsNone(result)
+        return doc
 
-    def test_prefers_archive_and_falls_back_to_source(self):
-        with tempfile.TemporaryDirectory() as directory:
-            source = Path(directory) / "source.pdf"
-            archive = Path(directory) / "archive.pdf"
-            source.touch()
-            archive.touch()
-            document = MagicMock(
-                has_archive_version=True,
-                archive_path=archive,
-                source_path=source,
-            )
-            self.assertEqual(_resolve_doc_path(document, None), archive)
-            archive.unlink()
-            self.assertEqual(_resolve_doc_path(document, None), source)
+    def test_returns_none_when_no_files_exist(self, document: MagicMock) -> None:
+        """
+        GIVEN:
+            - A document with no archive version and a missing source file
+        WHEN:
+            - The document path is resolved without an original file
+        THEN:
+            - None is returned
+        """
+        assert _resolve_doc_path(document, None) is None
 
-    def test_returns_original_file_as_fallback(self):
-        doc = MagicMock()
-        doc.has_archive_version = False
-        doc.source_path = Path("/nonexistent/source.pdf")
+    def test_prefers_archive_and_falls_back_to_source(
+        self,
+        mocker: MockerFixture,
+        tmp_path: Path,
+    ) -> None:
+        """
+        GIVEN:
+            - A document with existing archive and source files
+        WHEN:
+            - The path is resolved, then the archive file is removed and it is
+              resolved again
+        THEN:
+            - The archive path is returned first, then the source path
+        """
+        source = tmp_path / "source.pdf"
+        archive = tmp_path / "archive.pdf"
+        source.touch()
+        archive.touch()
+        document = mocker.MagicMock(
+            has_archive_version=True,
+            archive_path=archive,
+            source_path=source,
+        )
+        assert _resolve_doc_path(document, None) == archive
+        archive.unlink()
+        assert _resolve_doc_path(document, None) == source
 
-        with tempfile.NamedTemporaryFile(suffix=".pdf") as f:
-            result = _resolve_doc_path(doc, Path(f.name))
-            self.assertEqual(result, Path(f.name))
+    def test_returns_original_file_as_fallback(
+        self,
+        document: MagicMock,
+        tmp_path: Path,
+    ) -> None:
+        """
+        GIVEN:
+            - A document whose own files are missing and an existing original file
+        WHEN:
+            - The document path is resolved with the original file
+        THEN:
+            - The original file path is returned
+        """
+        original = tmp_path / "original.pdf"
+        original.touch()
+        assert _resolve_doc_path(document, original) == original
 
-    def test_returns_none_for_none_original_file(self):
-        doc = MagicMock()
-        doc.has_archive_version = False
-        doc.source_path = Path("/nonexistent/source.pdf")
-        result = _resolve_doc_path(doc, None)
-        self.assertIsNone(result)
+    def test_returns_none_for_none_original_file(self, document: MagicMock) -> None:
+        """
+        GIVEN:
+            - A document whose own files are missing and no original file
+        WHEN:
+            - The document path is resolved
+        THEN:
+            - None is returned
+        """
+        assert _resolve_doc_path(document, None) is None
 
 
 class TestRunZoneExtraction(TestCase):
