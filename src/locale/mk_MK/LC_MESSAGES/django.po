@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-17 00:24+0000\n"
-"PO-Revision-Date: 2026-11-17 00:26\n"
+"POT-Creation-Date: 2026-11-17 20:48+0000\n"
+"PO-Revision-Date: 2026-11-17 20:49\n"
 "Last-Translator: \n"
 "Language-Team: Macedonian\n"
 "Language: mk_MK\n"
@@ -1652,8 +1652,8 @@ msgid "workflow runs"
 msgstr "извршувања на работен тек"
 
 #: documents/serialisers.py:483 documents/serialisers.py:844
-#: documents/serialisers.py:2893 documents/views.py:356 documents/views.py:622
-#: documents/views.py:2761 paperless_mail/serialisers.py:145
+#: documents/serialisers.py:2893 documents/views.py:359 documents/views.py:625
+#: documents/views.py:2783 paperless_mail/serialisers.py:145
 msgid "Insufficient permissions."
 msgstr "Недоволни дозволи."
 
@@ -1692,7 +1692,7 @@ msgstr "Детектирана е невалидна променлива."
 msgid "Duplicate document identifiers are not allowed."
 msgstr "Не се дозволени дупликат идентификатори на документи."
 
-#: documents/serialisers.py:2979 documents/views.py:4748
+#: documents/serialisers.py:2979 documents/views.py:4770
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr "Документите не се пронајдени: %(ids)s"
@@ -1933,40 +1933,40 @@ msgstr "Како последен чекор, пополнете го следн
 msgid ", "
 msgstr ", "
 
-#: documents/views.py:311
+#: documents/views.py:314
 msgid "Specify only one of text, title_search, query, or more_like_id."
 msgstr "Наведете само едно од text, title_search, query или more_like_id."
 
-#: documents/views.py:349 documents/views.py:2758
+#: documents/views.py:352 documents/views.py:2780
 msgid "Invalid more_like_id"
 msgstr "Невалиден more_like_id"
 
-#: documents/views.py:1681
+#: documents/views.py:1684
 msgid "Invalid AI configuration."
 msgstr "Невалидна AI конфигурација."
 
-#: documents/views.py:1692
+#: documents/views.py:1695
 msgid "AI backend request timed out."
 msgstr "Барањето до AI backend-от истече."
 
-#: documents/views.py:1704
+#: documents/views.py:1707
 msgid "AI backend rejected the request. Check logs for details."
 msgstr "AI backend-от го одби барањето. Проверете ги дневниците за детали."
 
-#: documents/views.py:4764
+#: documents/views.py:4786
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr "Недоволни дозволи за споделување на документот %(id)s."
 
-#: documents/views.py:4811
+#: documents/views.py:4833
 msgid "Bundle is already being processed."
 msgstr "Пакетот веќе се обработува."
 
-#: documents/views.py:4877
+#: documents/views.py:4899
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr "Пакетот врски за споделување сè уште се подготвува. Обидете се повторно подоцна."
 
-#: documents/views.py:4891
+#: documents/views.py:4913
 msgid "The share link bundle is unavailable."
 msgstr "Пакетот врски за споделување не е достапен."
 

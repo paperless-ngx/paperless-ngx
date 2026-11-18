@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-17 00:24+0000\n"
-"PO-Revision-Date: 2026-11-17 00:26\n"
+"POT-Creation-Date: 2026-11-17 20:48+0000\n"
+"PO-Revision-Date: 2026-11-17 20:49\n"
 "Last-Translator: \n"
 "Language-Team: Indonesian\n"
 "Language: id_ID\n"
@@ -1652,8 +1652,8 @@ msgid "workflow runs"
 msgstr "daftar jalankan alur kerja"
 
 #: documents/serialisers.py:483 documents/serialisers.py:844
-#: documents/serialisers.py:2893 documents/views.py:356 documents/views.py:622
-#: documents/views.py:2761 paperless_mail/serialisers.py:145
+#: documents/serialisers.py:2893 documents/views.py:359 documents/views.py:625
+#: documents/views.py:2783 paperless_mail/serialisers.py:145
 msgid "Insufficient permissions."
 msgstr "Izin tidak mencukupi"
 
@@ -1692,7 +1692,7 @@ msgstr "Variabel ilegal terdeteksi."
 msgid "Duplicate document identifiers are not allowed."
 msgstr "Penggunaan pengenal dokumen ganda tidak diperbolehkan."
 
-#: documents/serialisers.py:2979 documents/views.py:4748
+#: documents/serialisers.py:2979 documents/views.py:4770
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr "Dokumen tidak ditemukan: %(ids)s"
@@ -1933,40 +1933,40 @@ msgstr "Sebagai langkah terakhir, mohon formulir berikut:"
 msgid ", "
 msgstr ""
 
-#: documents/views.py:311
+#: documents/views.py:314
 msgid "Specify only one of text, title_search, query, or more_like_id."
 msgstr ""
 
-#: documents/views.py:349 documents/views.py:2758
+#: documents/views.py:352 documents/views.py:2780
 msgid "Invalid more_like_id"
 msgstr ""
 
-#: documents/views.py:1681
+#: documents/views.py:1684
 msgid "Invalid AI configuration."
 msgstr ""
 
-#: documents/views.py:1692
+#: documents/views.py:1695
 msgid "AI backend request timed out."
 msgstr ""
 
-#: documents/views.py:1704
+#: documents/views.py:1707
 msgid "AI backend rejected the request. Check logs for details."
 msgstr ""
 
-#: documents/views.py:4764
+#: documents/views.py:4786
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr "Izin tidak mencukupi untuk berbagi dokumen %(id)s"
 
-#: documents/views.py:4811
+#: documents/views.py:4833
 msgid "Bundle is already being processed."
 msgstr "Paket sedang diproses."
 
-#: documents/views.py:4877
+#: documents/views.py:4899
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr "Bundel tautan berbagi masih dalam proses persiapan. Silakan coba lagi nanti."
 
-#: documents/views.py:4891
+#: documents/views.py:4913
 msgid "The share link bundle is unavailable."
 msgstr "Bundel tautan berbagi tidak tersedia."
 
