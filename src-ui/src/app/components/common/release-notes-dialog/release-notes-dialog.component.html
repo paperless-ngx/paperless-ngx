@@ -7,12 +7,12 @@
   </div>
   <div class="d-flex align-items-center gap-3 ms-auto">
     <div class="btn-group btn-group-sm" role="group">
-      <a class="btn btn-outline-secondary d-flex align-items-center" [href]="repoUrl" target="_blank" rel="noopener noreferrer"
+      <a class="btn btn-dark border-dark-subtle d-flex align-items-center" [href]="repoUrl" target="_blank" rel="noopener noreferrer"
         title="Star Paperless-ngx on GitHub" i18n-title>
         <pngx-bs-icon name="github" class="me-1 d-flex" width="12" height="12"></pngx-bs-icon><span class="small" i18n>Star</span>
       </a>
       @if (stars() !== null) {
-        <a class="btn btn-outline-secondary d-flex align-items-center" [href]="repoUrl + '/stargazers'" target="_blank" rel="noopener noreferrer"
+        <a class="btn btn-dark border-dark-subtle d-flex align-items-center" [href]="repoUrl + '/stargazers'" target="_blank" rel="noopener noreferrer"
           title="Stargazers" i18n-title>
           <span class="small">{{ stars() | number }}</span>
         </a>
