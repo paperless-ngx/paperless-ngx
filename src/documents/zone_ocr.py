@@ -68,6 +68,9 @@ DATE_TOKEN_RE = re.compile(
     r"|(?<!\d)\d{1,2}\.?\s+[^\W\d_]{3,}\.?\s+\d{4}(?!\d)",
 )
 
+# Literal text made only of whitespace and separator punctuation.
+SEPARATOR_ONLY_RE = re.compile(r"[\s\-/.,;:|]*")
+
 # Earlier dates are far more likely OCR noise than a real document date.
 MIN_ZONE_DATE_YEAR = 1900
 
@@ -285,6 +288,12 @@ def _process_template(
         accepted = [result for _, result in field_zones if result.reason is None]
         if not accepted:
             continue
+        # An empty zone is an optional token; any other failure blocks the group.
+        if any(result.reason not in (None, "no_value") for _, result in field_zones):
+            for result in accepted:
+                result.value = None
+                result.reason = "incomplete"
+            continue
         value = _combine_field_value(
             combine_formats.get(key, ""),
             [(zone.name, result.value) for zone, result in field_zones],
@@ -318,22 +327,58 @@ def _combine_field_value(
     """Combine the OCR values of all zones targeting one field.
 
     With a format string, `{Zone Name}` tokens are replaced by that zone's value
-    and literal text is kept; separators left dangling by an empty token are
-    cleaned up. Without a format, the zone values are joined in order by a space.
+    and literal text is kept. Values are inserted verbatim (only surrounding
+    whitespace is removed), so punctuation inside an OCR value is never altered.
+    Unknown token names count as empty. Tidying only touches the format's own
+    literal text: a separator-only literal following an empty token is dropped
+    (for a trailing empty token, the nearest preceding kept separator is
+    dropped instead), as is a leading separator-only literal in front of an
+    empty first token. Other literal text, such as brackets around an empty
+    token ("{A}, {B} ({C})" gives "a, b ()"), is kept as long as at least one
+    token has a value; when every token is empty the result is an empty
+    string. Without a format, the non-empty zone values are joined in order by
+    a space.
     """
-    values = {name: value or "" for name, value in field_zones}
-
     if not fmt:
         return " ".join(value for _, value in field_zones if value).strip()
 
-    def _replace(match: re.Match) -> str:
-        return values.get(match.group(1).strip(), "")
+    values = {name.strip(): (value or "").strip() for name, value in field_zones}
 
-    combined = re.sub(r"\{([^{}]+)\}", _replace, fmt)
-    # Tidy up separators an empty token may have left behind.
-    combined = re.sub(r"\s{2,}", " ", combined)
-    combined = re.sub(r"([^\w\s])\s*\1+", r"\1", combined)
-    return combined.strip().strip("-/.,;:| \t")
+    # Pairs of (is_token, text); tokens carry their value.
+    parts: list[tuple[bool, str]] = []
+    for index, piece in enumerate(re.split(r"(\{[^{}]+\})", fmt)):
+        if not piece:
+            continue
+        if index % 2:
+            parts.append((True, values.get(piece[1:-1].strip(), "")))
+        else:
+            parts.append((False, piece))
+
+    if not any(is_token and text for is_token, text in parts):
+        return ""
+
+    def _is_separator(part: tuple[bool, str]) -> bool:
+        return not part[0] and SEPARATOR_ONLY_RE.fullmatch(part[1]) is not None
+
+    kept: list[tuple[bool, str]] = []
+    drop_next_separator = False
+    for position, part in enumerate(parts):
+        if drop_next_separator:
+            drop_next_separator = False
+            continue
+        is_token, text = part
+        if not is_token or text:
+            kept.append(part)
+            continue
+        following = parts[position + 1] if position + 1 < len(parts) else None
+        if following is not None:
+            drop_next_separator = _is_separator(following)
+        elif kept and _is_separator(kept[-1]):
+            kept.pop()
+        # A leading separator left in front of an empty first token.
+        if len(kept) == 1 and _is_separator(kept[0]):
+            kept.pop()
+    return "".join(text for _, text in kept).strip()
 
 
 def _render_pages(

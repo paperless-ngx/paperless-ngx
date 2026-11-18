@@ -85,6 +85,14 @@ def make_zone(
     )
 
 
+def ocr_outputs(*values: str) -> list[subprocess.CompletedProcess[str]]:
+    """Build one successful fake OCR process result per extracted text."""
+    return [
+        subprocess.CompletedProcess(args=[], returncode=0, stdout=value, stderr="")
+        for value in values
+    ]
+
+
 def make_visible_template(name: str, **kwargs: Any) -> OcrTemplate:
     """Build a 100x100 template matching "Northwind"."""
     kwargs.setdefault("match", "Northwind")
@@ -1023,6 +1031,137 @@ class TestSavedZoneExtraction:
         preview_and_save("invalid")
         assert document.title == "ACCOUNT ABC"
 
+    @pytest.mark.parametrize(
+        ("failing_zone", "expected_failure"),
+        [
+            pytest.param(
+                {"validation_regex": r"\d{2}"},
+                "regex_mismatch",
+                id="regex-mismatch",
+            ),
+            pytest.param({"page": 2}, "missing_page", id="missing-page"),
+        ],
+    )
+    def test_failed_zone_blocks_combined_field(
+        self,
+        mock_zone_ocr_run: MagicMock,
+        paperless_dirs: PaperlessDirs,
+        page: Path,
+        document: Document,
+        template: OcrTemplate,
+        failing_zone: dict[str, Any],
+        expected_failure: str,
+    ) -> None:
+        """
+        GIVEN:
+            - Three title zones combined as a date, where the first one fails
+        WHEN:
+            - The template is processed
+        THEN:
+            - Nothing is written, the failing zone reports its own reason and
+              the accepted zones report incomplete
+        """
+        zones = [
+            make_zone(template, "Day", **failing_zone),
+            make_zone(template, "Month"),
+            make_zone(template, "Year"),
+        ]
+        template.combine_formats = {"title": "{Day}.{Month}.{Year}"}
+        # A zone on a missing page is never read.
+        mock_zone_ocr_run.side_effect = ocr_outputs(
+            *(
+                ["x", "05", "2024"]
+                if "validation_regex" in failing_zone
+                else ["05", "2024"]
+            ),
+        )
+
+        results = _process_template(
+            document,
+            {0: page},
+            template,
+            zones,
+            paperless_dirs.scratch_dir,
+        )
+
+        assert [result.reason for result in results] == [
+            expected_failure,
+            "incomplete",
+            "incomplete",
+        ]
+        assert [result.value for result in results] == [None] * 3
+        document.refresh_from_db()
+        assert document.title == "Original"
+
+    def test_zone_with_no_value_is_an_optional_token(
+        self,
+        mock_zone_ocr_run: MagicMock,
+        paperless_dirs: PaperlessDirs,
+        page: Path,
+        document: Document,
+        template: OcrTemplate,
+    ) -> None:
+        """
+        GIVEN:
+            - Two title zones combined with a separator, where the first reads
+              nothing
+        WHEN:
+            - The template is processed
+        THEN:
+            - The remaining value is still written and reported
+        """
+        zones = [make_zone(template, "First"), make_zone(template, "Second")]
+        template.combine_formats = {"title": "{First} / {Second}"}
+        mock_zone_ocr_run.side_effect = ocr_outputs("", "two")
+
+        results = _process_template(
+            document,
+            {0: page},
+            template,
+            zones,
+            paperless_dirs.scratch_dir,
+        )
+
+        assert [result.reason for result in results] == ["no_value", None]
+        assert results[1].value == "two"
+        document.refresh_from_db()
+        assert document.title == "two"
+
+    def test_failed_single_zone_field_does_not_affect_other_fields(
+        self,
+        mock_zone_ocr_run: MagicMock,
+        paperless_dirs: PaperlessDirs,
+        page: Path,
+        document: Document,
+        template: OcrTemplate,
+    ) -> None:
+        """
+        GIVEN:
+            - A title zone and a separate ASN zone, where the ASN fails its
+              validation regex
+        WHEN:
+            - The template is processed
+        THEN:
+            - The title is written and the failing zone keeps regex_mismatch
+        """
+        zones = [
+            make_zone(template, "Title"),
+            make_zone(template, "ASN", "asn", validation_regex=r"\d+"),
+        ]
+        mock_zone_ocr_run.side_effect = ocr_outputs("New title", "abc")
+
+        results = _process_template(
+            document,
+            {0: page},
+            template,
+            zones,
+            paperless_dirs.scratch_dir,
+        )
+
+        assert [result.reason for result in results] == [None, "regex_mismatch"]
+        document.refresh_from_db()
+        assert document.title == "New title"
+
 
 class TestCombineFieldValue:
     """Tests for combining zone values into one field value."""
@@ -1041,6 +1180,96 @@ class TestCombineFieldValue:
                 [("First", "one"), ("Second", None)],
                 "one",
                 id="format-preserves-existing-missing-token-cleanup",
+            ),
+            pytest.param(
+                "{Amount}",
+                [("Amount", "-12.50")],
+                "-12.50",
+                id="negative-amount-sign-kept",
+            ),
+            pytest.param(
+                "{Url}",
+                [("Url", "http://x.com/a//b")],
+                "http://x.com/a//b",
+                id="url-double-slash-kept-verbatim",
+            ),
+            pytest.param(
+                "{Value}",
+                [("Value", "A--B")],
+                "A--B",
+                id="repeated-punctuation-in-value-kept",
+            ),
+            pytest.param(
+                "{Name}",
+                [("Name", "Dr. Smith Jr.")],
+                "Dr. Smith Jr.",
+                id="trailing-period-in-value-kept",
+            ),
+            pytest.param(
+                "{Value}",
+                [("Value", "wait...")],
+                "wait...",
+                id="trailing-ellipsis-in-value-kept",
+            ),
+            pytest.param(
+                "{A} / {B} / {C}",
+                [("A", "a"), ("B", None), ("C", "c")],
+                "a / c",
+                id="middle-empty-token-drops-one-separator",
+            ),
+            pytest.param(
+                "{A} / {B} / {C}",
+                [("A", None), ("B", "b"), ("C", "c")],
+                "b / c",
+                id="leading-empty-token-drops-leading-separator",
+            ),
+            pytest.param(
+                "{A} / {B} / {C}",
+                [("A", "a"), ("B", "b"), ("C", None)],
+                "a / b",
+                id="trailing-empty-token-drops-trailing-separator",
+            ),
+            pytest.param(
+                "{A} / {B} / {C}",
+                [("A", "a"), ("B", None), ("C", None)],
+                "a",
+                id="trailing-run-of-empty-tokens-drops-nearest-separator",
+            ),
+            pytest.param(
+                "Total: {A} / {B}",
+                [("A", None), ("B", "b")],
+                "Total: b",
+                id="leading-literal-kept-before-empty-first-token",
+            ),
+            pytest.param(
+                "- {A} {B}",
+                [("A", None), ("B", "b")],
+                "b",
+                id="leading-separator-dropped-before-empty-first-token",
+            ),
+            pytest.param(
+                "{Day}.{Month}.{Year}",
+                [("Day", "12"), ("Month", "05"), ("Year", "2024")],
+                "12.05.2024",
+                id="all-tokens-present",
+            ),
+            pytest.param(
+                "INV-{Number}",
+                [("Number", "123")],
+                "INV-123",
+                id="literal-prefix-kept-with-value",
+            ),
+            pytest.param(
+                "INV-{Number}",
+                [("Number", None)],
+                "",
+                id="literal-prefix-dropped-when-every-token-empty",
+            ),
+            pytest.param(
+                "{A} / {B}",
+                [("A", None), ("B", "  ")],
+                "",
+                id="every-token-empty",
             ),
         ],
     )
