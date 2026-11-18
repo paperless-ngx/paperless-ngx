@@ -32,6 +32,7 @@ from documents.zone_ocr import _resolve_doc_path
 from documents.zone_ocr import extract_zone_preview
 from documents.zone_ocr import get_templates_for_document
 from documents.zone_ocr import run_zone_extraction
+from paperless_testing.factories import CustomFieldFactory
 from paperless_testing.factories import DocumentFactory
 from paperless_testing.factories import OcrTemplateFactory
 from paperless_testing.factories import OcrTemplateZoneFactory
@@ -527,7 +528,7 @@ class TestSavedZoneExtraction:
         THEN:
             - Each raw value is converted to its field type and saved
         """
-        field = CustomField.objects.create(name="Paid", data_type="boolean")
+        field = CustomFieldFactory(name="Paid", data_type="boolean")
         zones = [
             make_zone(template, "Title"),
             make_zone(template, "ASN", "asn"),
@@ -572,7 +573,7 @@ class TestSavedZoneExtraction:
         THEN:
             - Only the valid title is written and the other values are preserved
         """
-        field = CustomField.objects.create(name="Number", data_type="integer")
+        field = CustomFieldFactory(name="Number", data_type="integer")
         CustomFieldInstance.objects.create(
             document=document,
             field=field,
@@ -630,7 +631,7 @@ class TestSavedZoneExtraction:
             - The error propagates, the write is rolled back and the in-memory
               document is restored
         """
-        field = CustomField.objects.create(name="Number", data_type="integer")
+        field = CustomFieldFactory(name="Number", data_type="integer")
         zones = [
             make_zone(template, "Title"),
             make_zone(template, "Number", "custom_field", custom_field=field),
@@ -2009,7 +2010,7 @@ class TestRunZoneExtraction:
 
     @pytest.fixture
     def custom_field(self) -> CustomField:
-        return CustomField.objects.create(
+        return CustomFieldFactory(
             name="Invoice Number",
             data_type=CustomField.FieldDataType.STRING,
         )

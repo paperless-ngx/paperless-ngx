@@ -8,6 +8,7 @@ import factory
 from django.contrib.auth.models import User
 
 from documents.models import Correspondent
+from documents.models import CustomField
 from documents.models import Document
 from documents.models import DocumentBarcode
 from documents.models import DocumentType
@@ -46,6 +47,14 @@ class TagFactory(TypedModelFactory[Tag]):
     match = ""
     matching_algorithm = MatchingModel.MATCH_NONE
     is_inbox_tag = False
+
+
+class CustomFieldFactory(TypedModelFactory[CustomField]):
+    class Meta:
+        model = CustomField
+
+    name = factory.Sequence(lambda n: f"Custom field {n}")
+    data_type = CustomField.FieldDataType.STRING
 
 
 class StoragePathFactory(TypedModelFactory[StoragePath]):

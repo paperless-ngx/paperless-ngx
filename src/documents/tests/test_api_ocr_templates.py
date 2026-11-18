@@ -24,6 +24,7 @@ from documents.models import OcrTemplateZone
 from documents.search import get_backend
 from documents.signals import document_consumption_finished
 from documents.tasks import extract_zones
+from paperless_testing.factories import CustomFieldFactory
 from paperless_testing.factories import DocumentFactory
 from paperless_testing.factories import OcrTemplateFactory
 from paperless_testing.factories import OcrTemplateZoneFactory
@@ -82,7 +83,7 @@ def make_zone_data(custom_field_id: int | None, **overrides: Any) -> dict[str, A
 
 @pytest.fixture
 def text_field(db: None) -> CustomField:
-    return CustomField.objects.create(
+    return CustomFieldFactory(
         name="Invoice Number",
         data_type=CustomField.FieldDataType.STRING,
     )
@@ -90,7 +91,7 @@ def text_field(db: None) -> CustomField:
 
 @pytest.fixture
 def date_field(db: None) -> CustomField:
-    return CustomField.objects.create(
+    return CustomFieldFactory(
         name="Invoice Date",
         data_type=CustomField.FieldDataType.DATE,
     )
@@ -98,7 +99,7 @@ def date_field(db: None) -> CustomField:
 
 @pytest.fixture
 def doclink_field(db: None) -> CustomField:
-    return CustomField.objects.create(
+    return CustomFieldFactory(
         name="Related Docs",
         data_type=CustomField.FieldDataType.DOCUMENTLINK,
     )
@@ -215,7 +216,7 @@ class TestZoneOcrIndexing:
             source_width=100,
             source_height=100,
         )
-        field = CustomField.objects.create(name="Invoice code", data_type="string")
+        field = CustomFieldFactory(name="Invoice code", data_type="string")
         OcrTemplateZoneFactory(
             template=template,
             name="Title",
