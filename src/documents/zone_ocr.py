@@ -44,12 +44,24 @@ from documents.versioning import get_root_document
 from paperless.utils import OCR_TO_DATEPARSER_LANGUAGES
 
 if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from typing import Any
+
     from django.contrib.auth.models import User
 
 logger = logging.getLogger("paperless.zone_ocr")
 
 # Unicode general category for decimal digits in any script.
 UNICODE_DECIMAL_DIGIT = "Nd"  # codespell:ignore
+
+# Year-first dates (ISO and its slashed or dotted variants), never a slice of a
+# longer digit run. They are unambiguous, so no date order is needed.
+YEAR_FIRST_DATE_RE = re.compile(
+    r"(?<!\d)(\d{4})([-/.])(\d{2})\2(\d{2})(?!\d)",
+)
+
+# Earlier dates are far more likely OCR noise than a real document date.
+MIN_ZONE_DATE_YEAR = 1900
 
 
 @dataclass(frozen=True)
@@ -482,7 +494,11 @@ def _extract_zone(
         cropped.close()
     return ZoneExtraction(
         raw_text=raw_text,
-        value=_apply_transform(raw_text, zone.transform, zone.date_format)
+        value=_apply_transform(
+            raw_text,
+            zone.transform,
+            _date_rules(zone.ocr_language, zone.date_format),
+        )
         if raw_text
         else None,
     )
@@ -513,40 +529,74 @@ def extract_zone_preview(
         return {"raw_text": result.raw_text, "value": result.value}
 
 
-def _parse_iso_date(text: str) -> date | None:
-    match = re.search(r"\d{4}-\d{2}-\d{2}", text)
-    return date.fromisoformat(match[0]) if match else None
+@dataclass(frozen=True)
+class DateRules:
+    """How a zone reads dates: its language and optional strptime format."""
+
+    language: str | None = None
+    date_format: str = ""
 
 
-def _parse_date(text: str, fmt: str = "") -> date | None:
-    """Try the zone's date format, ISO dates, then automatic date detection."""
-    if fmt:
+def _date_rules(ocr_language: str, date_format: str = "") -> DateRules:
+    return DateRules(_zone_language(ocr_language), date_format)
+
+
+def _candidate_dates(text: str, rules: DateRules) -> Iterator[date]:
+    """Yield the dates the text may hold, most specific reading first."""
+    if rules.date_format:
         try:
-            return datetime.strptime(text, fmt).date()
+            yield datetime.strptime(text, rules.date_format).date()
         except ValueError:
             pass
-    try:
-        iso_date = _parse_iso_date(text)
-    except ValueError:
-        iso_date = None
-    if iso_date is not None:
-        return iso_date
+    for match in YEAR_FIRST_DATE_RE.finditer(text):
+        year, _, month, day = match.groups()
+        try:
+            yield date(int(year), int(month), int(day))
+        except ValueError:
+            continue
+    # Only absolute dates: dateparser would also read "now" or "yesterday"
+    date_settings: dict[str, Any] = {
+        "PARSERS": ["custom-formats", "absolute-time"],
+        "REQUIRE_PARTS": ["day", "month", "year"],
+        "RETURN_AS_TIMEZONE_AWARE": False,
+    }
+    if rules.language is None:
+        date_settings["DATE_ORDER"] = settings.DATE_ORDER
     try:
         parsed = dateparser.parse(
             text,
-            settings={
-                "PREFER_DAY_OF_MONTH": "first",
-                "RETURN_AS_TIMEZONE_AWARE": False,
-            },
+            languages=None if rules.language is None else [rules.language],
+            settings=date_settings,
         )
-        if parsed:
-            return parsed.date()
     except (ValueError, OverflowError):
         logger.debug("Zone OCR: date parsing failed")
-    return None
+        return
+    if parsed:
+        yield parsed.date()
 
 
-def _apply_transform(text: str, transform: str, date_format: str = "") -> str:
+def _parse_date(text: str, rules: DateRules) -> date | None:
+    """Read a calendar date from OCR text.
+
+    Tries the zone's date format, year-first dates, then dateparser in the zone's
+    language (or the configured date order when the language is unknown).
+    Dates before MIN_ZONE_DATE_YEAR are treated as OCR noise.
+    """
+    return next(
+        (
+            candidate
+            for candidate in _candidate_dates(text, rules)
+            if candidate.year >= MIN_ZONE_DATE_YEAR
+        ),
+        None,
+    )
+
+
+def _apply_transform(
+    text: str,
+    transform: str,
+    dates: DateRules,
+) -> str:
     """Apply post-processing transform to extracted text."""
     text = text.strip()
     if not text:
@@ -555,7 +605,7 @@ def _apply_transform(text: str, transform: str, date_format: str = "") -> str:
     if transform in ("strip", "none"):
         return text
     elif transform == "date":
-        parsed = _parse_date(text, date_format)
+        parsed = _parse_date(text, dates)
         return parsed.isoformat() if parsed else text
     elif transform == "uppercase":
         return text.upper()
@@ -584,6 +634,7 @@ def _prepare_field_update(
             value,
             custom_field.data_type,
             _number_locale(zone.ocr_language),
+            _date_rules(zone.ocr_language, zone.date_format),
         )
         model = CustomFieldInstance
     elif zone.target == OcrTemplateZone.TargetType.TITLE:
@@ -595,7 +646,13 @@ def _prepare_field_update(
         typed_value = int(digits) if digits else None
         model = Document
     elif zone.target == OcrTemplateZone.TargetType.CREATED:
-        field_name, typed_value = "created", _parse_date(value)
+        field_name, typed_value = (
+            "created",
+            _parse_date(
+                value,
+                _date_rules(zone.ocr_language, zone.date_format),
+            ),
+        )
         model = Document
     else:
         return None
@@ -636,14 +693,22 @@ def _apply_field_updates(document: Document, updates: list[FieldUpdate]) -> None
         raise
 
 
+def _zone_language(ocr_language: str) -> str | None:
+    """Map the first tesseract language of a zone to a dateparser/Babel code.
+
+    Only the first language counts, so "deu+eng" is German. Returns None when
+    the language is not mapped.
+    """
+    tesseract_code = ocr_language.split("+", maxsplit=1)[0].split("_", maxsplit=1)[0]
+    return OCR_TO_DATEPARSER_LANGUAGES.get(tesseract_code)
+
+
 def _number_locale(ocr_language: str) -> Locale:
     """Derive the locale used to read numbers from a tesseract language code.
 
-    Only the first language counts, so "deu+eng" reads numbers the German way.
     Languages Babel does not know fall back to English.
     """
-    tesseract_code = ocr_language.split("+", maxsplit=1)[0].split("_", maxsplit=1)[0]
-    code = OCR_TO_DATEPARSER_LANGUAGES.get(tesseract_code)
+    code = _zone_language(ocr_language)
     if code is not None:
         try:
             return Locale.parse(code)
@@ -700,10 +765,12 @@ def _convert_value(
     value: str,
     data_type: str,
     locale: Locale,
+    dates: DateRules,
 ) -> object | None:
     """Convert an extracted OCR string to the appropriate type for the custom field.
 
-    Numeric types are read with the number format of the given locale.
+    Numeric types are read with the number format of the given locale and
+    dates with the given date rules.
     """
     if not value:
         return None
@@ -732,7 +799,7 @@ def _convert_value(
             return number if math.isfinite(number) else None
 
         elif data_type == CustomField.FieldDataType.DATE:
-            parsed = _parse_iso_date(value)
+            parsed = _parse_date(value, dates)
             return parsed.isoformat() if parsed else None
 
         elif data_type == CustomField.FieldDataType.MONETARY:

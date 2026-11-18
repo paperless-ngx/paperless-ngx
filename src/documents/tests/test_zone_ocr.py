@@ -24,13 +24,16 @@ from documents.zone_ocr import _apply_transform
 from documents.zone_ocr import _combine_field_value
 from documents.zone_ocr import _convert_value
 from documents.zone_ocr import _crop_zone
+from documents.zone_ocr import _date_rules
 from documents.zone_ocr import _detect_mime
 from documents.zone_ocr import _extract_zone
 from documents.zone_ocr import _number_locale
+from documents.zone_ocr import _parse_date
 from documents.zone_ocr import _prepare_field_update
 from documents.zone_ocr import _process_template
 from documents.zone_ocr import _render_pages
 from documents.zone_ocr import _resolve_doc_path
+from documents.zone_ocr import _zone_language
 from documents.zone_ocr import extract_zone_preview
 from documents.zone_ocr import get_templates_for_document
 from documents.zone_ocr import run_zone_extraction
@@ -54,6 +57,7 @@ if TYPE_CHECKING:
 
 EN = Locale.parse("en")
 DE = Locale.parse("de")
+ENG_DATES = _date_rules("eng")
 FR = Locale.parse("fr")
 
 
@@ -1449,12 +1453,14 @@ class TestApplyTransform:
         """
         GIVEN:
             - Extracted text, a transform name and an optional date format
+            - A zone reading English
         WHEN:
             - The transform is applied
         THEN:
             - The transformed text matches the expected result
         """
-        assert _apply_transform(text, transform, date_format) == expected
+        rules = _date_rules("eng", date_format)
+        assert _apply_transform(text, transform, rules) == expected
 
     def test_unparseable_date_preserves_text(self, mocker: MockerFixture) -> None:
         """
@@ -1466,7 +1472,278 @@ class TestApplyTransform:
             - The original text is returned unchanged
         """
         mocker.patch("documents.zone_ocr.dateparser.parse", side_effect=OverflowError)
-        assert _apply_transform("unparsable", "date") == "unparsable"
+        assert (
+            _apply_transform("unparsable", "date", _date_rules("eng")) == "unparsable"
+        )
+
+
+class TestZoneLanguage:
+    """Tests for mapping the OCR language to a dateparser language."""
+
+    @pytest.mark.parametrize(
+        ("ocr_language", "expected"),
+        [
+            pytest.param("deu", "de", id="single-language"),
+            pytest.param("deu+eng", "de", id="first-of-several-languages"),
+            pytest.param("aze_Cyrl", "az", id="script-suffix-is-dropped"),
+            pytest.param("xyz", None, id="unmapped-language-is-none"),
+        ],
+    )
+    def test_zone_language(self, ocr_language: str, expected: str | None) -> None:
+        """
+        GIVEN:
+            - A tesseract language code, possibly several or with a script
+        WHEN:
+            - The zone language is derived
+        THEN:
+            - The first language is mapped, or None when it is unknown
+        """
+        assert _zone_language(ocr_language) == expected
+
+
+class TestParseDate:
+    """Tests for the zone date parser."""
+
+    @pytest.mark.parametrize(
+        ("text", "ocr_language", "expected"),
+        [
+            pytest.param("12.05.2024", "deu", date(2024, 5, 12), id="german-day-first"),
+            pytest.param(
+                "05/12/2024",
+                "eng",
+                date(2024, 5, 12),
+                id="english-month-first",
+            ),
+            pytest.param(
+                "12. Mai 2024",
+                "deu",
+                date(2024, 5, 12),
+                id="german-month-name",
+            ),
+            pytest.param(
+                "13 April 2026",
+                "eng",
+                date(2026, 4, 13),
+                id="english-month-name",
+            ),
+            pytest.param(
+                "2026/04/13",
+                "eng",
+                date(2026, 4, 13),
+                id="year-first-slashed",
+            ),
+            pytest.param(
+                "01.01.2999",
+                "deu",
+                date(2999, 1, 1),
+                id="future-date-allowed",
+            ),
+        ],
+    )
+    def test_locale_decides_the_order(
+        self,
+        text: str,
+        ocr_language: str,
+        expected: date,
+    ) -> None:
+        """
+        GIVEN:
+            - A date written in the convention of the zone's language
+        WHEN:
+            - The date is parsed
+        THEN:
+            - The locale's day and month order is used
+        """
+        assert _parse_date(text, _date_rules(ocr_language)) == expected
+
+    @pytest.mark.parametrize(
+        ("date_order", "expected"),
+        [
+            pytest.param("DMY", date(2024, 5, 12), id="day-first"),
+            pytest.param("MDY", date(2024, 12, 5), id="month-first"),
+        ],
+    )
+    def test_unmapped_language_uses_the_configured_date_order(
+        self,
+        settings: SettingsWrapper,
+        date_order: str,
+        expected: date,
+    ) -> None:
+        """
+        GIVEN:
+            - A zone whose language has no dateparser mapping
+            - A configured PAPERLESS_DATE_ORDER
+        WHEN:
+            - An ambiguous numeric date is parsed
+        THEN:
+            - The configured date order decides the result
+        """
+        settings.DATE_ORDER = date_order
+        assert _parse_date("12.05.2024", _date_rules("xyz")) == expected
+
+    @pytest.mark.parametrize(
+        "text",
+        [
+            pytest.param("now", id="now"),
+            pytest.param("yesterday", id="yesterday"),
+            pytest.param("today", id="today"),
+            pytest.param("in 2 days", id="relative-offset"),
+            pytest.param("Mon", id="weekday"),
+            pytest.param("March", id="month-only"),
+            pytest.param("2024", id="year-only"),
+            pytest.param("5", id="day-only"),
+            pytest.param("12", id="two-digits"),
+            pytest.param("not a date", id="words"),
+        ],
+    )
+    @pytest.mark.parametrize(
+        "ocr_language",
+        [
+            pytest.param("eng", id="mapped-language"),
+            pytest.param("xyz", id="unmapped-language"),
+        ],
+    )
+    def test_non_dates_are_rejected(self, text: str, ocr_language: str) -> None:
+        """
+        GIVEN:
+            - Text that is not a complete calendar date
+        WHEN:
+            - The date is parsed
+        THEN:
+            - No date is returned
+        """
+        assert _parse_date(text, _date_rules(ocr_language)) is None
+
+    @pytest.mark.parametrize(
+        ("text", "date_format", "expected"),
+        [
+            pytest.param(
+                "12.05.2024",
+                "%m.%d.%Y",
+                date(2024, 12, 5),
+                id="format-overrides-locale-order",
+            ),
+            pytest.param(
+                "12.05.2024",
+                "%Y/%m/%d",
+                date(2024, 5, 12),
+                id="invalid-format-falls-back",
+            ),
+        ],
+    )
+    def test_date_format_is_tried_first(
+        self,
+        text: str,
+        date_format: str,
+        expected: date,
+    ) -> None:
+        """
+        GIVEN:
+            - A German zone with a date format
+        WHEN:
+            - A date is parsed
+        THEN:
+            - A matching format is used, otherwise parsing falls back to the locale
+        """
+        assert _parse_date(text, _date_rules("deu", date_format)) == expected
+
+    @pytest.mark.parametrize(
+        ("text", "expected"),
+        [
+            pytest.param("2024-05-06", date(2024, 5, 6), id="plain-iso"),
+            pytest.param("Due 2024-05-06.", date(2024, 5, 6), id="iso-inside-text"),
+            pytest.param("No. 12345-06-07", None, id="digit-before-is-not-iso"),
+            pytest.param("2024-05-061", None, id="digit-after-is-not-iso"),
+            pytest.param(
+                "2024-13-45 and 2024-05-06",
+                date(2024, 5, 6),
+                id="invalid-match-is-skipped",
+            ),
+            pytest.param("2024-13-45", None, id="only-invalid-match"),
+        ],
+    )
+    def test_iso_dates_are_anchored(self, text: str, expected: date | None) -> None:
+        """
+        GIVEN:
+            - Text containing ISO-like dates, some invalid or part of longer numbers
+        WHEN:
+            - The date is parsed
+        THEN:
+            - Only whole, valid ISO dates are returned, trying every match
+        """
+        assert _parse_date(text, _date_rules("eng")) == expected
+
+    @pytest.mark.parametrize(
+        "text",
+        [
+            pytest.param("2026/04/13", id="slashed"),
+            pytest.param("2026.04.13", id="dotted"),
+            pytest.param("2026-04-13", id="dashed"),
+        ],
+    )
+    @pytest.mark.parametrize(
+        ("ocr_language", "date_order"),
+        [
+            pytest.param("xyz", "DMY", id="unmapped-language-day-first"),
+            pytest.param("xyz", "MDY", id="unmapped-language-month-first"),
+            pytest.param("deu", "DMY", id="mapped-language"),
+        ],
+    )
+    def test_year_first_dates_ignore_the_date_order(
+        self,
+        settings: SettingsWrapper,
+        text: str,
+        ocr_language: str,
+        date_order: str,
+    ) -> None:
+        """
+        GIVEN:
+            - A year-first date separated by a dash, slash or dot
+            - A mapped or unmapped zone language and a configured date order
+        WHEN:
+            - The date is parsed
+        THEN:
+            - The date is read as year, month, day regardless of the order
+        """
+        settings.DATE_ORDER = date_order
+        assert _parse_date(text, _date_rules(ocr_language)) == date(2026, 4, 13)
+
+    @pytest.mark.parametrize(
+        "text",
+        [
+            pytest.param("1.2026/04/133", id="digit-after"),
+            pytest.param("12026/04/13", id="digit-before"),
+            pytest.param("2026/13/45", id="invalid-month"),
+        ],
+    )
+    def test_year_first_dates_are_anchored_and_validated(self, text: str) -> None:
+        """
+        GIVEN:
+            - Year-first looking text that is part of longer digits or invalid
+        WHEN:
+            - The date is parsed
+        THEN:
+            - No date is returned
+        """
+        assert _parse_date(text, _date_rules("xyz")) is None
+
+    @pytest.mark.parametrize(
+        "text",
+        [
+            pytest.param("1899-12-31", id="iso"),
+            pytest.param("31.12.1899", id="locale-numeric"),
+        ],
+    )
+    def test_years_before_1900_are_rejected(self, text: str) -> None:
+        """
+        GIVEN:
+            - A valid calendar date before the year 1900
+        WHEN:
+            - The date is parsed
+        THEN:
+            - No date is returned
+        """
+        assert _parse_date(text, _date_rules("deu")) is None
 
 
 @pytest.mark.django_db
@@ -1513,6 +1790,82 @@ class TestPrepareFieldUpdate:
         )
 
         update = _prepare_field_update(zone, "1.234")
+
+        assert (update.value if update else None) == expected
+
+    @pytest.mark.parametrize(
+        "target",
+        [
+            pytest.param(OcrTemplateZone.TargetType.CREATED, id="created"),
+            pytest.param(OcrTemplateZone.TargetType.CUSTOM_FIELD, id="date-field"),
+        ],
+    )
+    @pytest.mark.parametrize(
+        ("ocr_language", "date_format", "text", "expected"),
+        [
+            pytest.param("deu", "", "12.05.2024", date(2024, 5, 12), id="german-order"),
+            pytest.param(
+                "eng",
+                "",
+                "05/12/2024",
+                date(2024, 5, 12),
+                id="english-order",
+            ),
+            pytest.param(
+                "deu",
+                "",
+                "12. Mai 2024",
+                date(2024, 5, 12),
+                id="german-month-name",
+            ),
+            pytest.param(
+                "deu",
+                "%m.%d.%Y",
+                "12.05.2024",
+                date(2024, 12, 5),
+                id="zone-date-format",
+            ),
+            pytest.param(
+                "deu",
+                "%Y/%m/%d",
+                "12.05.2024",
+                date(2024, 5, 12),
+                id="invalid-format-falls-back",
+            ),
+            pytest.param("eng", "", "2024", None, id="year-only-is-rejected"),
+        ],
+    )
+    def test_date_targets_parse_alike(
+        self,
+        target: str,
+        ocr_language: str,
+        date_format: str,
+        text: str,
+        expected: date | None,
+    ) -> None:
+        """
+        GIVEN:
+            - A zone targeting the created date or a date custom field
+            - An OCR language and optionally a date format
+        WHEN:
+            - A field update is prepared for non-ISO date text
+        THEN:
+            - Both targets read the text the same way, honoring the zone's
+              language and date format
+        """
+        field = (
+            CustomFieldFactory(data_type=CustomField.FieldDataType.DATE)
+            if target == OcrTemplateZone.TargetType.CUSTOM_FIELD
+            else None
+        )
+        zone = OcrTemplateZoneFactory(
+            target=target,
+            custom_field=field,
+            ocr_language=ocr_language,
+            date_format=date_format,
+        )
+
+        update = _prepare_field_update(zone, text)
 
         assert (update.value if update else None) == expected
 
@@ -1775,7 +2128,7 @@ class TestConvertValue:
         THEN:
             - The converted value equals the expected value exactly
         """
-        assert _convert_value(value, data_type, locale) == expected
+        assert _convert_value(value, data_type, locale, ENG_DATES) == expected
 
     def test_string_truncation(self) -> None:
         """
@@ -1786,7 +2139,12 @@ class TestConvertValue:
         THEN:
             - The result is truncated to 128 characters
         """
-        result = _convert_value("x" * 200, CustomField.FieldDataType.STRING, EN)
+        result = _convert_value(
+            "x" * 200,
+            CustomField.FieldDataType.STRING,
+            EN,
+            ENG_DATES,
+        )
         assert isinstance(result, str)
         assert len(result) == 128
 
@@ -1829,7 +2187,8 @@ class TestConvertValue:
             - The result is the expected float
         """
         assert (
-            _convert_value(value, CustomField.FieldDataType.FLOAT, locale) == expected
+            _convert_value(value, CustomField.FieldDataType.FLOAT, locale, ENG_DATES)
+            == expected
         )
 
     @pytest.mark.parametrize(
@@ -1984,7 +2343,7 @@ class TestConvertValue:
         THEN:
             - None is returned
         """
-        assert _convert_value(value, data_type, locale) is None
+        assert _convert_value(value, data_type, locale, ENG_DATES) is None
 
     @pytest.mark.parametrize(
         "data_type",
@@ -2018,7 +2377,7 @@ class TestConvertValue:
         THEN:
             - None is returned
         """
-        assert _convert_value(value, data_type, EN) is None
+        assert _convert_value(value, data_type, EN, ENG_DATES) is None
 
     @pytest.mark.parametrize(
         "value",
@@ -2041,7 +2400,9 @@ class TestConvertValue:
         THEN:
             - The result is True
         """
-        assert _convert_value(value, CustomField.FieldDataType.BOOL, EN) is True
+        assert (
+            _convert_value(value, CustomField.FieldDataType.BOOL, EN, ENG_DATES) is True
+        )
 
     @pytest.mark.parametrize(
         "value",
@@ -2062,7 +2423,10 @@ class TestConvertValue:
         THEN:
             - The result is False
         """
-        assert _convert_value(value, CustomField.FieldDataType.BOOL, EN) is False
+        assert (
+            _convert_value(value, CustomField.FieldDataType.BOOL, EN, ENG_DATES)
+            is False
+        )
 
 
 class TestRenderPages:
