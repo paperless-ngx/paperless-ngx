@@ -11,6 +11,7 @@ from django.test import TestCase
 from django.test import override_settings
 from django.test.utils import CaptureQueriesContext
 from django.utils import timezone
+from pytest_mock import MockerFixture
 
 from documents import tasks
 from documents.models import Correspondent
@@ -20,10 +21,13 @@ from documents.models import Tag
 from documents.models import WorkflowAction
 from documents.sanity_checker import SanityCheckFailedException
 from documents.sanity_checker import SanityCheckMessages
+from documents.tasks import extract_zones
 from documents.tests.helpers import dummy_preprocess
 from paperless_testing.assertions import FileSystemAssertsMixin
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import DocumentFactory
+from paperless_testing.factories import OcrTemplateFactory
+from paperless_testing.factories import UserFactory
 from paperless_testing.samples import SIMPLE_DIGITAL_PDF
 
 
@@ -648,3 +652,65 @@ class TestClearExpiredSessions:
 
         assert set(Session.objects.values_list("session_key", flat=True)) == {"valid"}
         assert sum(query["sql"].startswith("DELETE FROM") for query in queries) == 2
+
+
+@pytest.mark.django_db
+class TestExtractZonesTask:
+    """Tests for the extract_zones task."""
+
+    def test_task_runs_extraction(self, mocker: MockerFixture) -> None:
+        """
+        GIVEN:
+            - A queued zone OCR task
+        WHEN:
+            - The task runs
+        THEN:
+            - Templates are selected for the requester and extraction runs on
+              the stored document
+        """
+        extract = mocker.patch("documents.tasks.run_zone_extraction")
+        select = mocker.patch("documents.tasks.get_templates_for_document")
+        doc = DocumentFactory()
+        user = UserFactory()
+
+        extract_zones(doc.id, requester=user)
+
+        select.assert_called_once_with(doc, requester=user)
+        extract.assert_called_once_with(
+            doc,
+            templates=select.return_value,
+            reindex=True,
+        )
+
+    def test_task_runs_the_chosen_template(self, mocker: MockerFixture) -> None:
+        """
+        GIVEN:
+            - A queued zone OCR task with a chosen template
+        WHEN:
+            - The task runs
+        THEN:
+            - Zone extraction runs with only that template
+        """
+        extract = mocker.patch("documents.tasks.run_zone_extraction")
+        doc = DocumentFactory()
+        template = OcrTemplateFactory()
+
+        extract_zones(doc.id, template.pk)
+
+        extract.assert_called_once_with(doc, templates=[template], reindex=True)
+
+    def test_task_skips_a_deleted_template(self, mocker: MockerFixture) -> None:
+        """
+        GIVEN:
+            - A template deleted between queueing and running
+        WHEN:
+            - The task runs
+        THEN:
+            - Nothing is extracted
+        """
+        extract = mocker.patch("documents.tasks.run_zone_extraction")
+        doc = DocumentFactory()
+
+        extract_zones(doc.id, 999)
+
+        extract.assert_not_called()

@@ -1456,6 +1456,10 @@ class TestApplyTransform:
         mocker.patch("documents.zone_ocr.dateparser.parse", side_effect=OverflowError)
         assert _apply_transform("unparsable", "date") == "unparsable"
 
+
+class TestPrepareFieldUpdate:
+    """Tests for converting extracted values into field updates."""
+
     def test_unknown_target_cannot_produce_a_field_update(self) -> None:
         """
         GIVEN:

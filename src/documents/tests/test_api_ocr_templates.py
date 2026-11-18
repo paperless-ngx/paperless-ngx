@@ -561,68 +561,6 @@ class TestOcrTemplatePermissions:
             status.HTTP_403_FORBIDDEN,
         )
 
-    def test_document_page_image_requires_view_permission_on_the_document(
-        self,
-        regular_user: User,
-        user_client: APIClient,
-    ) -> None:
-        """
-        GIVEN:
-            - A document owned by another user
-            - A user with global view permissions only
-        WHEN:
-            - The user requests a page image of the document
-        THEN:
-            - The request is refused until the user is granted view on the document
-            - Afterwards it passes the permission check and reaches the missing file
-        """
-        owner = UserFactory()
-        grant_global(regular_user, "view_ocrtemplate", "view_document")
-        document = DocumentFactory(owner=owner)
-        url = f"{ENDPOINT}document-page-image/{document.pk}/0/"
-
-        response = user_client.get(url)
-        assert response.status_code == status.HTTP_403_FORBIDDEN
-
-        grant_object(regular_user, document, "view_document")
-        response = user_client.get(url)
-        # Past the permission check; the factory document has no file on disk.
-        assert response.status_code == status.HTTP_404_NOT_FOUND
-
-    def test_test_zone_requires_view_permission_on_the_document(
-        self,
-        regular_user: User,
-        user_client: APIClient,
-        mock_preview: MagicMock,
-    ) -> None:
-        """
-        GIVEN:
-            - A document owned by another user
-            - A user with global add template and view document permissions
-        WHEN:
-            - The user previews a zone on the document
-        THEN:
-            - The request is refused until the user is granted view on the document
-            - Afterwards it passes the permission check and reaches the missing file
-            - No preview extraction runs
-        """
-        owner = UserFactory()
-        grant_global(regular_user, "add_ocrtemplate", "view_document")
-        document = DocumentFactory(owner=owner)
-        data = {
-            "document": document.pk,
-            "zone": {"x": 0, "y": 0, "width": 100, "height": 100, "page": 1},
-        }
-
-        response = user_client.post(PREVIEW_ZONE_URL, data, format="json")
-        assert response.status_code == status.HTTP_403_FORBIDDEN
-
-        grant_object(regular_user, document, "view_document")
-        response = user_client.post(PREVIEW_ZONE_URL, data, format="json")
-        # Past the permission check; the factory document has no file on disk.
-        assert response.status_code == status.HTTP_404_NOT_FOUND
-        mock_preview.assert_not_called()
-
     @pytest.mark.parametrize(
         "make_data",
         [
@@ -2288,3 +2226,65 @@ class TestOcrTemplatePreviewPermissions:
             preview_client.post(PREVIEW_ZONE_URL, data, format="json").status_code
             == 200
         )
+
+    def test_document_page_image_requires_view_permission_on_the_document(
+        self,
+        regular_user: User,
+        user_client: APIClient,
+    ) -> None:
+        """
+        GIVEN:
+            - A document owned by another user
+            - A user with global view permissions only
+        WHEN:
+            - The user requests a page image of the document
+        THEN:
+            - The request is refused until the user is granted view on the document
+            - Afterwards it passes the permission check and reaches the missing file
+        """
+        owner = UserFactory()
+        grant_global(regular_user, "view_ocrtemplate", "view_document")
+        document = DocumentFactory(owner=owner)
+        url = f"{ENDPOINT}document-page-image/{document.pk}/0/"
+
+        response = user_client.get(url)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+        grant_object(regular_user, document, "view_document")
+        response = user_client.get(url)
+        # Past the permission check; the factory document has no file on disk.
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_test_zone_requires_view_permission_on_the_document(
+        self,
+        regular_user: User,
+        user_client: APIClient,
+        mock_preview: MagicMock,
+    ) -> None:
+        """
+        GIVEN:
+            - A document owned by another user
+            - A user with global add template and view document permissions
+        WHEN:
+            - The user previews a zone on the document
+        THEN:
+            - The request is refused until the user is granted view on the document
+            - Afterwards it passes the permission check and reaches the missing file
+            - No preview extraction runs
+        """
+        owner = UserFactory()
+        grant_global(regular_user, "add_ocrtemplate", "view_document")
+        document = DocumentFactory(owner=owner)
+        data = {
+            "document": document.pk,
+            "zone": {"x": 0, "y": 0, "width": 100, "height": 100, "page": 1},
+        }
+
+        response = user_client.post(PREVIEW_ZONE_URL, data, format="json")
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+        grant_object(regular_user, document, "view_document")
+        response = user_client.post(PREVIEW_ZONE_URL, data, format="json")
+        # Past the permission check; the factory document has no file on disk.
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+        mock_preview.assert_not_called()
