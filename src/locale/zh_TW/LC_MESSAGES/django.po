@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-17 00:24+0000\n"
-"PO-Revision-Date: 2026-11-17 00:26\n"
+"POT-Creation-Date: 2026-11-17 20:48+0000\n"
+"PO-Revision-Date: 2026-11-17 20:49\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
@@ -1652,8 +1652,8 @@ msgid "workflow runs"
 msgstr "執行工作流程"
 
 #: documents/serialisers.py:483 documents/serialisers.py:844
-#: documents/serialisers.py:2893 documents/views.py:356 documents/views.py:622
-#: documents/views.py:2761 paperless_mail/serialisers.py:145
+#: documents/serialisers.py:2893 documents/views.py:359 documents/views.py:625
+#: documents/views.py:2783 paperless_mail/serialisers.py:145
 msgid "Insufficient permissions."
 msgstr "權限不足。"
 
@@ -1692,7 +1692,7 @@ msgstr "偵測到無效的變數。"
 msgid "Duplicate document identifiers are not allowed."
 msgstr "文件識別碼不得重複。"
 
-#: documents/serialisers.py:2979 documents/views.py:4748
+#: documents/serialisers.py:2979 documents/views.py:4770
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr "找不到文件：%(ids)s"
@@ -1933,40 +1933,40 @@ msgstr "最後一步，請填寫以下表單："
 msgid ", "
 msgstr ""
 
-#: documents/views.py:311
+#: documents/views.py:314
 msgid "Specify only one of text, title_search, query, or more_like_id."
 msgstr "只能指定 text、title_search、query 或 more_like_id 的其中一項。"
 
-#: documents/views.py:349 documents/views.py:2758
+#: documents/views.py:352 documents/views.py:2780
 msgid "Invalid more_like_id"
 msgstr "無效的 more_like_id"
 
-#: documents/views.py:1681
+#: documents/views.py:1684
 msgid "Invalid AI configuration."
 msgstr "無效的 AI 配置。"
 
-#: documents/views.py:1692
+#: documents/views.py:1695
 msgid "AI backend request timed out."
 msgstr "AI 後端請求逾時。"
 
-#: documents/views.py:1704
+#: documents/views.py:1707
 msgid "AI backend rejected the request. Check logs for details."
 msgstr "AI 後端拒絕了請求。請檢查日誌以取得詳細資訊。"
 
-#: documents/views.py:4764
+#: documents/views.py:4786
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr "權限不足，無法共用文件：%(id)s"
 
-#: documents/views.py:4811
+#: documents/views.py:4833
 msgid "Bundle is already being processed."
 msgstr "組合已在處理中。"
 
-#: documents/views.py:4877
+#: documents/views.py:4899
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr "共用連結組合仍在準備中，請稍後再試。"
 
-#: documents/views.py:4891
+#: documents/views.py:4913
 msgid "The share link bundle is unavailable."
 msgstr "共用連結組合無法使用。"
 
