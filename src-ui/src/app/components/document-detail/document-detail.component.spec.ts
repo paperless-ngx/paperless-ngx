@@ -390,14 +390,12 @@ describe('DocumentDetailComponent', () => {
     expect(component.documentForm.get('title').value).toEqual('Foo Bar')
   })
 
-  it('should update title before doc change if was not updated via debounce', () => {
+  it('should update the title form value without waiting for debounce or blur', () => {
     jest.useFakeTimers()
     initNormally()
-    component.titleInput.value = 'Foo Bar'
-    component.titleInput.inputField.nativeElement.dispatchEvent(
-      new Event('change')
-    )
-    jest.advanceTimersByTime(1000)
+    const input = component.titleInput.inputField.nativeElement
+    input.value = 'Foo Bar'
+    input.dispatchEvent(new Event('input'))
     expect(component.documentForm.get('title').value).toEqual('Foo Bar')
   })
 
