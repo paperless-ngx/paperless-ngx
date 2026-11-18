@@ -2,7 +2,7 @@
 
 ## paperless-ngx 3.5.1
 
-### Features / Enhancements
+### Changes
 
 - Tweak: adjust chat timing for streaming [@shamoon](https://github.com/shamoon) ([#14805](https://github.com/paperless-ngx/paperless-ngx/pull/14805))
 
