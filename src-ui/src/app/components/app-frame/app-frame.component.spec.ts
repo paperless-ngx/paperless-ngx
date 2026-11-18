@@ -728,15 +728,15 @@ describe('AppFrameComponent', () => {
     settingsService.set(SETTINGS_KEYS.WHATS_NEW_LAST_SEEN_VERSION, '3.4.2')
     fixture.detectChanges()
 
-    expect(
-      fixture.debugElement.query(
-        By.css('button[aria-label="See what\'s new in this version"]')
-      )
-    ).toBeTruthy()
-    const docsItem = fixture.debugElement
-      .query(By.css('a[href="https://docs.paperless-ngx.com"].nav-anchor'))
-      .nativeElement.closest('li')
-    expect(docsItem.classList).toContain('d-md-none')
+    const whatsNew = fixture.debugElement.query(
+      By.css('button[aria-label="See what\'s new in this version"]')
+    ).nativeElement
+    const docs = fixture.debugElement.query(
+      By.css('a[href="https://docs.paperless-ngx.com"].nav-anchor')
+    ).nativeElement
+    expect(docs.classList).toContain('d-md-none')
+    // both share one li so the tour anchor points at whichever is shown
+    expect(whatsNew.closest('li')).toBe(docs.closest('li'))
   })
 
   it('should show tasks badge for needs-attention tasks', () => {

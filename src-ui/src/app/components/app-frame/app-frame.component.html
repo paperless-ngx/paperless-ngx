@@ -362,8 +362,8 @@
               </li>
             }
             <li class="nav-item mt-2 position-relative" [class.d-none]="settingsService.sidebarItemIsHidden(HideableSidebarItemID.Documentation) && !settingsService.organizingSidebarItems()"
-              [class.d-md-none]="slimSidebarEnabled && settingsService.unseenReleasesSince()" tourAnchor="tour.outro">
-              <a class="text-muted small d-flex align-items-center flex-wrap text-decoration-none nav-anchor" [class.opacity-50]="settingsService.sidebarItemIsHidden(HideableSidebarItemID.Documentation)" [class.pe-5]="settingsService.organizingSidebarItems() && !slimSidebarEnabled && !slimSidebarAnimating()"
+              [class.d-md-block]="slimSidebarEnabled && settingsService.unseenReleasesSince()" tourAnchor="tour.outro">
+              <a class="text-muted small d-flex align-items-center flex-wrap text-decoration-none nav-anchor" [class.d-md-none]="slimSidebarEnabled && settingsService.unseenReleasesSince()" [class.opacity-50]="settingsService.sidebarItemIsHidden(HideableSidebarItemID.Documentation)" [class.pe-5]="settingsService.organizingSidebarItems() && !slimSidebarEnabled && !slimSidebarAnimating()"
                 target="_blank" rel="noopener noreferrer" href="https://docs.paperless-ngx.com" ngbPopover="Documentation"
                 i18n-ngbPopover [disablePopover]="!slimSidebarPopoversEnabled" placement="end" container="body"
                 triggers="mouseenter:mouseleave" popoverClass="popover-slim">
@@ -372,18 +372,16 @@
               @if (settingsService.organizingSidebarItems()) {
                 <pngx-input-switch class="position-absolute top-50 end-0 translate-middle-y me-1" [class.d-none]="slimSidebarEnabled || slimSidebarAnimating()" [compact]="true" title="Documentation" i18n-title [ngModel]="!settingsService.sidebarItemIsHidden(HideableSidebarItemID.Documentation)" (ngModelChange)="toggleSidebarItem(HideableSidebarItemID.Documentation, $event)"></pngx-input-switch>
               }
-            </li>
-            @if (slimSidebarEnabled && settingsService.unseenReleasesSince()) {
-              <li class="nav-item mt-2 d-none d-md-block">
-                <button type="button" class="btn btn-link border-0 w-100 text-muted small d-flex align-items-center nav-anchor position-relative" (click)="showReleaseNotes()"
+              @if (slimSidebarEnabled && settingsService.unseenReleasesSince()) {
+                <button type="button" class="btn btn-link border-0 w-100 text-muted small d-none d-md-flex align-items-center nav-anchor position-relative" (click)="showReleaseNotes()"
                   aria-label="See what's new in this version" i18n-aria-label
                   ngbPopover="What's new" i18n-ngbPopover placement="end" container="body"
                   triggers="mouseenter:mouseleave" popoverClass="popover-slim">
                   <pngx-bs-icon class="d-flex" name="info-circle"></pngx-bs-icon>
                   <div class="position-absolute top-0 start-50 ms-1 p-1 bg-success rounded-circle"></div>
                 </button>
-              </li>
-            }
+              }
+            </li>
             <li class="nav-item" [class.visually-hidden]="slimSidebarEnabled">
               <div class="text-muted small d-flex align-items-center flex-wrap nav-label">
                 <div class="me-2">
