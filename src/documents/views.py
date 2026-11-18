@@ -4395,6 +4395,26 @@ class RemoteVersionView(GenericAPIView[Any]):
         )
 
 
+@extend_schema_view(
+    get=extend_schema(
+        description=(
+            "Get release notes from GitHub for releases newer than `since`, "
+            "up to and including the running version. Without `since`, only "
+            "the running version's notes are returned."
+        ),
+        parameters=[
+            OpenApiParameter(
+                name="since",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.QUERY,
+                required=False,
+            ),
+        ],
+        responses={
+            (200, "application/json"): OpenApiTypes.OBJECT,
+        },
+    ),
+)
 class ReleaseNotesView(GenericAPIView[Any]):
     def get(self, request, format=None):
         current_version = packaging_version.parse(version.__full_version_str__)
