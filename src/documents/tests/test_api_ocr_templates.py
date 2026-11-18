@@ -8,25 +8,22 @@ from io import BytesIO
 from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Any
-from unittest.mock import patch
 
 import pytest
-from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.utils import timezone
 from PIL import Image
 from rest_framework import status
-from rest_framework.test import APITestCase
 
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
+from documents.models import Document
 from documents.models import MatchingModel
 from documents.models import OcrTemplate
 from documents.models import OcrTemplateZone
 from documents.search import get_backend
 from documents.signals import document_consumption_finished
 from documents.tasks import extract_zones
-from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import DocumentFactory
 from paperless_testing.factories import OcrTemplateFactory
 from paperless_testing.factories import OcrTemplateZoneFactory
@@ -37,14 +34,19 @@ from paperless_testing.permissions import grant_object
 if TYPE_CHECKING:
     from collections.abc import Callable
 
+    from django.contrib.auth.models import User
     from pytest_django.fixtures import DjangoCaptureOnCommitCallbacks
     from pytest_mock import MockerFixture
+    from rest_framework.response import Response
     from rest_framework.test import APIClient
+
+    from paperless_testing.dirs import PaperlessDirs
 
 CONTENT = "Northwind Power & Light statement"
 
 ENDPOINT = "/api/ocr_templates/"
 RUN_ZONE_OCR_URL = "/api/documents/{pk}/run-zone-ocr/"
+PREVIEW_ZONE_URL = f"{ENDPOINT}test-zone/"
 
 
 def make_template_data(**overrides: Any) -> dict[str, Any]:
@@ -106,6 +108,49 @@ def doclink_field(db: None) -> CustomField:
 def make_zone(text_field: CustomField) -> Callable[..., dict[str, Any]]:
     """Zone payload builder whose custom field defaults to the text field."""
     return functools.partial(make_zone_data, text_field.pk)
+
+
+def preview_url(document: Document, page: int = 0) -> str:
+    return f"{ENDPOINT}document-page-image/{document.pk}/{page}/"
+
+
+def preview_zone(
+    client: APIClient,
+    document: Document,
+    **zone: Any,
+) -> Response:
+    return client.post(
+        PREVIEW_ZONE_URL,
+        {
+            "document": document.pk,
+            "zone": {"width": 100, "height": 50, **zone},
+        },
+        format="json",
+    )
+
+
+@pytest.fixture
+def preview_user(db: None) -> User:
+    user = UserFactory()
+    grant_global(user, "view_ocrtemplate", "add_ocrtemplate", "view_document")
+    return user
+
+
+@pytest.fixture
+def preview_client(rest_api_client: APIClient, preview_user: User) -> APIClient:
+    rest_api_client.force_authenticate(preview_user)
+    return rest_api_client
+
+
+@pytest.fixture
+def preview_document(preview_user: User, paperless_dirs: PaperlessDirs) -> Document:
+    document = DocumentFactory(
+        owner=preview_user,
+        page_count=3,
+        mime_type="application/pdf",
+    )
+    document.source_path.write_bytes(b"test document")
+    return document
 
 
 @pytest.mark.django_db
@@ -536,11 +581,11 @@ class TestOcrTemplatePermissions:
             "zone": {"x": 0, "y": 0, "width": 100, "height": 100, "page": 1},
         }
 
-        response = rest_api_client.post(f"{ENDPOINT}test-zone/", data, format="json")
+        response = rest_api_client.post(PREVIEW_ZONE_URL, data, format="json")
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
         grant_object(user, document, "view_document")
-        response = rest_api_client.post(f"{ENDPOINT}test-zone/", data, format="json")
+        response = rest_api_client.post(PREVIEW_ZONE_URL, data, format="json")
         # Past the permission check; the factory document has no file on disk.
         assert response.status_code == status.HTTP_404_NOT_FOUND
         preview.assert_not_called()
@@ -1948,72 +1993,66 @@ class TestRunZoneOcrPermissions:
         assert run.call_count == 2
 
 
-class TestOcrTemplatePreviewAPI(DirectoriesMixin, APITestCase):
-    def setUp(self):
-        super().setUp()
-        self.user = User.objects.create_user(username="template_editor")
-        grant_global(self.user, "view_ocrtemplate", "add_ocrtemplate", "view_document")
-        self.client.force_authenticate(self.user)
-        self.document = DocumentFactory(
-            owner=self.user,
-            page_count=3,
-            mime_type="application/pdf",
-        )
-        self.document.source_path.write_bytes(b"test document")
+@pytest.mark.django_db
+@pytest.mark.usefixtures("paperless_dirs")
+class TestDocumentPageImage:
+    def test_missing_document_and_out_of_range_pages(
+        self,
+        preview_client: APIClient,
+        preview_document: Document,
+    ) -> None:
+        """
+        GIVEN:
+            - A 3 page document
+        WHEN:
+            - A page image is requested for a missing document, and for page 3
+        THEN:
+            - 404 is returned for both
+        """
+        response = preview_client.get(f"{ENDPOINT}document-page-image/99999/0/")
+        assert response.status_code == 404
+        assert preview_client.get(preview_url(preview_document, 3)).status_code == 404
 
-    def preview_url(self, document=None, page=0):
-        document = document or self.document
-        return f"/api/ocr_templates/document-page-image/{document.pk}/{page}/"
-
-    def preview_zone(self, **zone):
-        return self.client.post(
-            "/api/ocr_templates/test-zone/",
-            {
-                "document": self.document.pk,
-                "zone": {"width": 100, "height": 50, **zone},
-            },
-            format="json",
-        )
-
-    @patch("documents.zone_ocr.extract_zone_preview")
-    def test_previews_require_global_document_view_permission(self, extract):
-        user = User.objects.create_user(username="template_only")
-        grant_global(user, "view_ocrtemplate", "add_ocrtemplate")
-        self.client.force_authenticate(user)
-        document = DocumentFactory(owner=None, mime_type="image/png")
-        document.source_path.write_bytes(b"document contents")
-        extract.return_value = {"raw_text": "document contents", "value": None}
-
-        with self.subTest(action="document-page-image"):
-            response = self.client.get(self.preview_url(document))
-            self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-        with self.subTest(action="test-zone"):
-            response = self.client.post(
-                "/api/ocr_templates/test-zone/",
-                {"document": document.pk, "zone": {"width": 100, "height": 50}},
-                format="json",
-            )
-            self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-        extract.assert_not_called()
-
-    def test_missing_document_and_out_of_range_pages(self):
-        response = self.client.get("/api/ocr_templates/document-page-image/99999/0/")
-        self.assertEqual(response.status_code, 404)
-        self.assertEqual(self.client.get(self.preview_url(page=3)).status_code, 404)
-
-    @patch("documents.views.subprocess.run")
-    def test_serves_image_documents_without_running_poppler(self, render):
-        document = DocumentFactory(owner=self.user, mime_type="image/png")
+    def test_serves_image_documents_without_running_poppler(
+        self,
+        preview_client: APIClient,
+        preview_user: User,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - An image document
+        WHEN:
+            - Its page image is requested
+        THEN:
+            - The original file is served and no render subprocess runs
+        """
+        render = mocker.patch("documents.views.subprocess.run")
+        document = DocumentFactory(owner=preview_user, mime_type="image/png")
         document.source_path.write_bytes(b"image contents")
-        response = self.client.get(self.preview_url(document))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response["Content-Type"], "image/png")
-        self.assertEqual(response.content, b"image contents")
+
+        response = preview_client.get(preview_url(document))
+
+        assert response.status_code == 200
+        assert response["Content-Type"] == "image/png"
+        assert response.content == b"image contents"
         render.assert_not_called()
 
-    def test_renders_pdf_archive_for_an_image_upload(self):
+    def test_renders_pdf_archive_for_an_image_upload(
+        self,
+        preview_client: APIClient,
+        preview_user: User,
+    ) -> None:
+        """
+        GIVEN:
+            - An image upload with a PDF archive version
+        WHEN:
+            - Its page image is requested
+        THEN:
+            - A rendered PNG, different from the source file, is returned
+        """
         document = DocumentFactory(
-            owner=self.user,
+            owner=preview_user,
             mime_type="image/png",
             archive_filename="archived-image.pdf",
             page_count=1,
@@ -2022,71 +2061,143 @@ class TestOcrTemplatePreviewAPI(DirectoriesMixin, APITestCase):
             image.save(document.source_path, format="PNG")
             image.save(document.archive_path, format="PDF")
 
-        response = self.client.get(self.preview_url(document))
+        response = preview_client.get(preview_url(document))
 
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response["Content-Type"], "image/png")
-        self.assertNotEqual(response.content, document.source_path.read_bytes())
+        assert response.status_code == status.HTTP_200_OK
+        assert response["Content-Type"] == "image/png"
+        assert response.content != document.source_path.read_bytes()
         with Image.open(BytesIO(response.content)) as rendered:
-            self.assertEqual(rendered.format, "PNG")
+            assert rendered.format == "PNG"
             rendered.verify()
 
-    @patch("documents.views.subprocess.run")
-    def test_renders_the_requested_pdf_page(self, render):
-        def render_page(command, **kwargs):
+    def test_renders_the_requested_pdf_page(
+        self,
+        preview_client: APIClient,
+        preview_document: Document,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A 3 page PDF document
+        WHEN:
+            - The second page image is requested
+        THEN:
+            - pdftoppm is invoked for page 2 with the expected arguments
+            - The rendered page is served and the temporary directory removed
+        """
+        render = mocker.patch("documents.views.subprocess.run")
+
+        def render_page(command: list[str], **kwargs: Any) -> None:
             Path(command[-1] + "-2.png").write_bytes(b"rendered page")
 
         render.side_effect = render_page
-        response = self.client.get(self.preview_url(page=1))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response["Content-Type"], "image/png")
-        self.assertEqual(response.content, b"rendered page")
+
+        response = preview_client.get(preview_url(preview_document, 1))
+
+        assert response.status_code == 200
+        assert response["Content-Type"] == "image/png"
+        assert response.content == b"rendered page"
         command = render.call_args.args[0]
-        self.assertEqual(
-            command[:9],
-            [
-                "pdftoppm",
-                "-png",
-                "-r",
-                "150",
-                "-f",
-                "2",
-                "-l",
-                "2",
-                str(self.document.source_path),
-            ],
-        )
-        self.assertEqual(
-            render.call_args.kwargs,
-            {"check": True, "capture_output": True, "timeout": 30},
-        )
-        self.assertFalse(Path(command[-1]).parent.exists())
+        assert command[:9] == [
+            "pdftoppm",
+            "-png",
+            "-r",
+            "150",
+            "-f",
+            "2",
+            "-l",
+            "2",
+            str(preview_document.source_path),
+        ]
+        assert render.call_args.kwargs == {
+            "check": True,
+            "capture_output": True,
+            "timeout": 30,
+        }
+        assert not Path(command[-1]).parent.exists()
 
-    @patch("documents.views.subprocess.run")
-    def test_render_failures_are_controlled_and_do_not_expose_paths(self, render):
-        for error in [
-            subprocess.CalledProcessError(
-                1,
-                ["pdftoppm"],
-                stderr=b"sensitive server path",
+    @pytest.mark.parametrize(
+        "error",
+        [
+            pytest.param(
+                subprocess.CalledProcessError(
+                    1,
+                    ["pdftoppm"],
+                    stderr=b"sensitive server path",
+                ),
+                id="called-process-error",
             ),
-            subprocess.TimeoutExpired(["pdftoppm"], 30),
-            FileNotFoundError("pdftoppm"),
-        ]:
-            with self.subTest(error=error):
-                render.side_effect = error
-                response = self.client.get(self.preview_url())
-                self.assertEqual(response.status_code, 404)
-                self.assertNotIn("sensitive server path", str(response.content))
+            pytest.param(subprocess.TimeoutExpired(["pdftoppm"], 30), id="timeout"),
+            pytest.param(FileNotFoundError("pdftoppm"), id="missing-binary"),
+        ],
+    )
+    def test_render_failures_are_controlled_and_do_not_expose_paths(
+        self,
+        preview_client: APIClient,
+        preview_document: Document,
+        mocker: MockerFixture,
+        error: Exception,
+    ) -> None:
+        """
+        GIVEN:
+            - A PDF document and a render subprocess that fails
+        WHEN:
+            - Its page image is requested
+        THEN:
+            - 404 is returned without leaking the subprocess error output
+        """
+        render = mocker.patch("documents.views.subprocess.run")
+        render.side_effect = error
 
-    @patch("documents.views.subprocess.run")
-    def test_missing_render_output_returns_not_found(self, render):
-        self.assertEqual(self.client.get(self.preview_url()).status_code, 404)
+        response = preview_client.get(preview_url(preview_document))
 
-    @patch("documents.zone_ocr.extract_zone_preview")
-    def test_zone_preview_uses_validated_settings_and_does_not_write(self, extract):
+        assert response.status_code == 404
+        assert "sensitive server path" not in str(response.content)
+
+    def test_missing_render_output_returns_not_found(
+        self,
+        preview_client: APIClient,
+        preview_document: Document,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A PDF document and a render subprocess that writes no output
+        WHEN:
+            - Its page image is requested
+        THEN:
+            - 404 is returned
+        """
+        mocker.patch("documents.views.subprocess.run")
+
+        assert preview_client.get(preview_url(preview_document)).status_code == 404
+
+
+@pytest.mark.django_db
+@pytest.mark.usefixtures("paperless_dirs")
+class TestZonePreview:
+    def test_uses_validated_settings_and_does_not_write(
+        self,
+        preview_client: APIClient,
+        preview_document: Document,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A 3 page document
+        WHEN:
+            - A zone preview is requested with string numbers and full settings
+        THEN:
+            - Extraction receives the validated, coerced zone and dimensions
+            - The result includes the regex match
+            - No zone is saved
+        """
+        extract = mocker.patch("documents.zone_ocr.extract_zone_preview")
         extract.return_value = {"raw_text": " 123 ", "value": "123"}
-        response = self.preview_zone(
+
+        response = preview_zone(
+            preview_client,
+            preview_document,
             x="10",
             y="20",
             page=-1,
@@ -2096,107 +2207,245 @@ class TestOcrTemplatePreviewAPI(DirectoriesMixin, APITestCase):
             zone_source_width="1000",
             zone_source_height=1500,
         )
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            response.json(),
-            {"raw_text": " 123 ", "value": "123", "regex": r"\d+", "regex_match": True},
-        )
+
+        assert response.status_code == 200
+        assert response.json() == {
+            "raw_text": " 123 ",
+            "value": "123",
+            "regex": r"\d+",
+            "regex_match": True,
+        }
         path, zone, width, height, page_count = extract.call_args.args
-        self.assertEqual(path, self.document.source_path)
-        self.assertEqual(
-            (zone.x, zone.y, zone.width, zone.height, zone.page),
-            (10, 20, 100, 50, -1),
+        assert path == preview_document.source_path
+        assert (zone.x, zone.y, zone.width, zone.height, zone.page) == (
+            10,
+            20,
+            100,
+            50,
+            -1,
         )
-        self.assertEqual(zone.name, "test")
-        self.assertEqual(zone.ocr_language, "deu+eng")
-        self.assertEqual(zone.transform, "numeric")
-        self.assertEqual((width, height, page_count), (1000, 1500, 3))
-        self.assertEqual(OcrTemplateZone.objects.count(), 0)
+        assert zone.name == "test"
+        assert zone.ocr_language == "deu+eng"
+        assert zone.transform == "numeric"
+        assert (width, height, page_count) == (1000, 1500, 3)
+        assert OcrTemplateZone.objects.count() == 0
 
-    @patch("documents.zone_ocr.extract_zone_preview")
-    def test_zone_preview_reports_regex_failures_and_empty_results(self, extract):
-        for regex, value, expected in [
-            ("", "123", None),
-            (r"\d+", "abc", False),
-            (r"\d+", None, None),
-            ("[invalid", "123", False),
-        ]:
-            with self.subTest(regex=regex, value=value):
-                extract.return_value = {"raw_text": value, "value": value}
-                response = self.preview_zone(validation_regex=regex)
-                self.assertEqual(response.status_code, 200)
-                self.assertEqual(response.json()["regex_match"], expected)
-        self.assertEqual(extract.call_args.args[2:4], (0, 0))
+    @pytest.mark.parametrize(
+        ("regex", "value", "expected"),
+        [
+            pytest.param("", "123", None, id="no-regex"),
+            pytest.param(r"\d+", "abc", False, id="no-match"),
+            pytest.param(r"\d+", None, None, id="no-value"),
+            pytest.param("[invalid", "123", False, id="invalid-regex"),
+        ],
+    )
+    def test_reports_regex_failures_and_empty_results(
+        self,
+        preview_client: APIClient,
+        preview_document: Document,
+        mocker: MockerFixture,
+        regex: str,
+        value: str | None,
+        expected: bool | None,  # noqa: FBT001
+    ) -> None:
+        """
+        GIVEN:
+            - A zone preview with an empty, non-matching, valueless or
+              invalid validation regex
+        WHEN:
+            - The preview is requested
+        THEN:
+            - regex_match reflects the outcome
+            - Source dimensions default to 0
+        """
+        extract = mocker.patch("documents.zone_ocr.extract_zone_preview")
+        extract.return_value = {"raw_text": value, "value": value}
 
-    @patch("documents.zone_ocr.extract_zone_preview")
-    def test_zone_preview_rejects_invalid_settings_before_extraction(self, extract):
-        for zone in [
-            {"width": 1},
-            {"height": 0},
-            {"x": -1},
-            {"y": -1},
-            {"width": "invalid"},
-            {"page": "invalid"},
-            {"page": 0},
-            {"page": -2},
-            {"transform": "invalid"},
-            {"ocr_language": "x" * 21},
-            {"zone_source_width": "invalid"},
-            {"zone_source_height": 0},
-        ]:
-            with self.subTest(zone=zone):
-                self.assertEqual(self.preview_zone(**zone).status_code, 400)
+        response = preview_zone(
+            preview_client,
+            preview_document,
+            validation_regex=regex,
+        )
+
+        assert response.status_code == 200
+        assert response.json()["regex_match"] == expected
+        assert extract.call_args.args[2:4] == (0, 0)
+
+    @pytest.mark.parametrize(
+        "zone",
+        [
+            pytest.param({"width": 1}, id="width-below-minimum"),
+            pytest.param({"height": 0}, id="zero-height"),
+            pytest.param({"x": -1}, id="negative-x"),
+            pytest.param({"y": -1}, id="negative-y"),
+            pytest.param({"width": "invalid"}, id="non-numeric-width"),
+            pytest.param({"page": "invalid"}, id="non-numeric-page"),
+            pytest.param({"page": 0}, id="page-zero"),
+            pytest.param({"page": -2}, id="page-below-last"),
+            pytest.param({"transform": "invalid"}, id="unknown-transform"),
+            pytest.param({"ocr_language": "x" * 21}, id="language-too-long"),
+            pytest.param(
+                {"zone_source_width": "invalid"},
+                id="non-numeric-source-width",
+            ),
+            pytest.param({"zone_source_height": 0}, id="zero-source-height"),
+        ],
+    )
+    def test_rejects_invalid_settings_before_extraction(
+        self,
+        preview_client: APIClient,
+        preview_document: Document,
+        mocker: MockerFixture,
+        zone: dict[str, Any],
+    ) -> None:
+        """
+        GIVEN:
+            - A zone preview request with one invalid zone setting
+        WHEN:
+            - The preview is requested
+        THEN:
+            - 400 is returned and extraction does not run
+        """
+        extract = mocker.patch("documents.zone_ocr.extract_zone_preview")
+
+        assert preview_zone(preview_client, preview_document, **zone).status_code == 400
         extract.assert_not_called()
 
-    @patch("documents.zone_ocr.extract_zone_preview")
-    def test_zone_preview_rejects_malformed_requests(self, extract):
-        for data in [
-            {},
-            {"document": "invalid", "zone": {}},
-            {"document": 99999, "zone": {}},
-            {"document": self.document.pk, "zone": None},
-            {"document": self.document.pk, "zone": []},
-        ]:
-            with self.subTest(data=data):
-                response = self.client.post(
-                    "/api/ocr_templates/test-zone/",
-                    data,
-                    format="json",
-                )
-                self.assertEqual(response.status_code, 400)
+    @pytest.mark.parametrize(
+        "make_data",
+        [
+            pytest.param(lambda doc: {}, id="empty"),
+            pytest.param(
+                lambda doc: {"document": "invalid", "zone": {}},
+                id="non-numeric-document",
+            ),
+            pytest.param(
+                lambda doc: {"document": 99999, "zone": {}},
+                id="unknown-document",
+            ),
+            pytest.param(
+                lambda doc: {"document": doc.pk, "zone": None},
+                id="null-zone",
+            ),
+            pytest.param(
+                lambda doc: {"document": doc.pk, "zone": []},
+                id="list-zone",
+            ),
+        ],
+    )
+    def test_rejects_malformed_requests(
+        self,
+        preview_client: APIClient,
+        preview_document: Document,
+        mocker: MockerFixture,
+        make_data: Callable[[Document], dict[str, Any]],
+    ) -> None:
+        """
+        GIVEN:
+            - A malformed zone preview payload
+        WHEN:
+            - The preview is requested
+        THEN:
+            - 400 is returned and extraction does not run
+        """
+        extract = mocker.patch("documents.zone_ocr.extract_zone_preview")
+
+        response = preview_client.post(
+            PREVIEW_ZONE_URL,
+            make_data(preview_document),
+            format="json",
+        )
+
+        assert response.status_code == 400
         extract.assert_not_called()
 
-    @patch("documents.zone_ocr.extract_zone_preview")
-    @patch("documents.views.subprocess.run")
-    def test_versions_are_authorized_through_the_root_document(self, render, extract):
-        other = User.objects.create_user(username="private_owner")
+
+@pytest.mark.django_db
+@pytest.mark.usefixtures("paperless_dirs")
+class TestOcrTemplatePreviewPermissions:
+    @pytest.mark.parametrize(
+        "action",
+        [
+            pytest.param("document-page-image", id="document-page-image"),
+            pytest.param("test-zone", id="test-zone"),
+        ],
+    )
+    def test_previews_require_global_document_view_permission(
+        self,
+        rest_api_client: APIClient,
+        mocker: MockerFixture,
+        action: str,
+    ) -> None:
+        """
+        GIVEN:
+            - A user with template permissions but no global view document
+              permission
+            - An unowned image document
+        WHEN:
+            - The user requests a page image or a zone preview
+        THEN:
+            - 403 is returned and no extraction runs
+        """
+        extract = mocker.patch("documents.zone_ocr.extract_zone_preview")
+        user = UserFactory()
+        grant_global(user, "view_ocrtemplate", "add_ocrtemplate")
+        rest_api_client.force_authenticate(user)
+        document = DocumentFactory(owner=None, mime_type="image/png")
+        document.source_path.write_bytes(b"document contents")
+        extract.return_value = {"raw_text": "document contents", "value": None}
+
+        if action == "document-page-image":
+            response = rest_api_client.get(preview_url(document))
+        else:
+            response = rest_api_client.post(
+                PREVIEW_ZONE_URL,
+                {"document": document.pk, "zone": {"width": 100, "height": 50}},
+                format="json",
+            )
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+        extract.assert_not_called()
+
+    def test_versions_are_authorized_through_the_root_document(
+        self,
+        preview_client: APIClient,
+        preview_user: User,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A version owned by the user whose root document belongs to
+              another user
+        WHEN:
+            - The user requests a page image and a zone preview of the version
+        THEN:
+            - Both are refused until the user is granted view on the root
+            - Afterwards both succeed
+        """
+        extract = mocker.patch("documents.zone_ocr.extract_zone_preview")
+        render = mocker.patch("documents.views.subprocess.run")
+        other = UserFactory()
         root = DocumentFactory(owner=other)
         version = DocumentFactory(
             root_document=root,
-            owner=self.user,
+            owner=preview_user,
             mime_type="image/png",
         )
         version.source_path.write_bytes(b"private version")
         data = {"document": version.pk, "zone": {"width": 100, "height": 50}}
-        self.assertEqual(self.client.get(self.preview_url(version)).status_code, 403)
-        self.assertEqual(
-            self.client.post(
-                "/api/ocr_templates/test-zone/",
-                data,
-                format="json",
-            ).status_code,
-            403,
+
+        assert preview_client.get(preview_url(version)).status_code == 403
+        assert (
+            preview_client.post(PREVIEW_ZONE_URL, data, format="json").status_code
+            == 403
         )
         render.assert_not_called()
         extract.assert_not_called()
-        grant_object(self.user, root, "view_document")
+
+        grant_object(preview_user, root, "view_document")
         extract.return_value = {"raw_text": None, "value": None}
-        self.assertEqual(self.client.get(self.preview_url(version)).status_code, 200)
-        self.assertEqual(
-            self.client.post(
-                "/api/ocr_templates/test-zone/",
-                data,
-                format="json",
-            ).status_code,
-            200,
+        assert preview_client.get(preview_url(version)).status_code == 200
+        assert (
+            preview_client.post(PREVIEW_ZONE_URL, data, format="json").status_code
+            == 200
         )
