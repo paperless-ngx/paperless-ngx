@@ -4314,6 +4314,53 @@ class UiSettingsView(GenericAPIView[Any]):
         )
 
 
+GITHUB_RELEASES_CACHE_KEY = "github_releases"
+
+
+def get_github_releases() -> list[dict[str, Any]] | None:
+    """
+    Fetch recent pngx releases from GitHub, newest first.
+    """
+    releases = cache.get(GITHUB_RELEASES_CACHE_KEY)
+    if releases is not None:
+        return releases
+    try:
+        resp = httpx.get(
+            "https://api.github.com/repos/paperless-ngx/paperless-ngx/releases",
+            params={"per_page": 10},
+            headers={"Accept": "application/json"},
+        )
+        resp.raise_for_status()
+        releases = []
+        for release in resp.json():
+            if release.get("draft") or release.get("prerelease"):
+                continue
+            try:
+                # Some early tags used ngx-x.y.z
+                release_version = packaging_version.parse(
+                    release["tag_name"].removeprefix("ngx-"),
+                )
+            except packaging_version.InvalidVersion:
+                continue
+            releases.append(
+                {
+                    "version": str(release_version),
+                    "name": release.get("name") or release["tag_name"],
+                    "body": release.get("body") or "",
+                    "html_url": release["html_url"],
+                    "published_at": release.get("published_at"),
+                },
+            )
+    except (ValueError, KeyError, TypeError) as e:
+        logger.debug(f"An error occurred parsing GitHub releases json: {e}")
+        return None
+    except httpx.HTTPError as e:
+        logger.debug(f"An error occurred fetching GitHub releases: {e}")
+        return None
+    cache.set(GITHUB_RELEASES_CACHE_KEY, releases, 60 * 15)
+    return releases
+
+
 @extend_schema_view(
     get=extend_schema(
         description="Get the current version of the Paperless-NGX server",
