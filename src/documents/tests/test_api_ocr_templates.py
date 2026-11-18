@@ -11,7 +11,6 @@ from typing import Any
 from unittest.mock import patch
 
 import pytest
-from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.utils import timezone
@@ -45,6 +44,7 @@ if TYPE_CHECKING:
 CONTENT = "Northwind Power & Light statement"
 
 ENDPOINT = "/api/ocr_templates/"
+RUN_ZONE_OCR_URL = "/api/documents/{pk}/run-zone-ocr/"
 
 
 def make_template_data(**overrides: Any) -> dict[str, Any]:
@@ -464,6 +464,133 @@ class TestOcrTemplatePermissions:
         template.refresh_from_db()
         assert template.name == "Renamed"
         assert template.owner == other
+
+    def test_unauthenticated_rejected(self, rest_api_client: APIClient) -> None:
+        """
+        GIVEN:
+            - An unauthenticated client
+        WHEN:
+            - The OCR templates are listed
+        THEN:
+            - The request is rejected with 401 or 403
+        """
+        resp = rest_api_client.get(ENDPOINT)
+        assert resp.status_code in (
+            status.HTTP_401_UNAUTHORIZED,
+            status.HTTP_403_FORBIDDEN,
+        )
+
+    def test_document_page_image_requires_view_permission_on_the_document(
+        self,
+        rest_api_client: APIClient,
+    ) -> None:
+        """
+        GIVEN:
+            - A document owned by another user
+            - A user with global view permissions only
+        WHEN:
+            - The user requests a page image of the document
+        THEN:
+            - The request is refused until the user is granted view on the document
+            - Afterwards it passes the permission check and reaches the missing file
+        """
+        owner = UserFactory()
+        user = UserFactory()
+        grant_global(user, "view_ocrtemplate", "view_document")
+        document = DocumentFactory(owner=owner)
+        rest_api_client.force_authenticate(user=user)
+        url = f"{ENDPOINT}document-page-image/{document.pk}/0/"
+
+        response = rest_api_client.get(url)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+        grant_object(user, document, "view_document")
+        response = rest_api_client.get(url)
+        # Past the permission check; the factory document has no file on disk.
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_test_zone_requires_view_permission_on_the_document(
+        self,
+        rest_api_client: APIClient,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A document owned by another user
+            - A user with global add template and view document permissions
+        WHEN:
+            - The user previews a zone on the document
+        THEN:
+            - The request is refused until the user is granted view on the document
+            - Afterwards it passes the permission check and reaches the missing file
+            - No preview extraction runs
+        """
+        preview = mocker.patch("documents.zone_ocr.extract_zone_preview")
+        owner = UserFactory()
+        user = UserFactory()
+        grant_global(user, "add_ocrtemplate", "view_document")
+        document = DocumentFactory(owner=owner)
+        rest_api_client.force_authenticate(user=user)
+        data = {
+            "document": document.pk,
+            "zone": {"x": 0, "y": 0, "width": 100, "height": 100, "page": 1},
+        }
+
+        response = rest_api_client.post(f"{ENDPOINT}test-zone/", data, format="json")
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+        grant_object(user, document, "view_document")
+        response = rest_api_client.post(f"{ENDPOINT}test-zone/", data, format="json")
+        # Past the permission check; the factory document has no file on disk.
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+        preview.assert_not_called()
+
+    @pytest.mark.parametrize(
+        "make_data",
+        [
+            pytest.param(lambda editor: {"owner": editor.pk}, id="transfer-ownership"),
+            pytest.param(
+                lambda editor: {"set_permissions": {"view": {"users": []}}},
+                id="change-sharing",
+            ),
+        ],
+    )
+    def test_shared_editor_cannot_transfer_ownership_or_change_sharing(
+        self,
+        rest_api_client: APIClient,
+        admin_user: User,
+        make_data: Callable[[User], dict[str, Any]],
+    ) -> None:
+        """
+        GIVEN:
+            - A template owned by another user and shared with an editor
+        WHEN:
+            - The editor tries to transfer ownership or change sharing
+        THEN:
+            - The request is refused and the owner is unchanged
+        """
+        editor = UserFactory()
+        grant_global(editor, "view_ocrtemplate", "change_ocrtemplate")
+        template = OcrTemplateFactory(
+            name="Shared",
+            owner=admin_user,
+            match="Northwind",
+            matching_algorithm=MatchingModel.MATCH_ANY,
+            source_width=100,
+            source_height=100,
+        )
+        grant_object(editor, template, "view_ocrtemplate", "change_ocrtemplate")
+        rest_api_client.force_authenticate(editor)
+
+        response = rest_api_client.patch(
+            f"{ENDPOINT}{template.pk}/",
+            make_data(editor),
+            format="json",
+        )
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+        template.refresh_from_db()
+        assert template.owner == admin_user
 
 
 @pytest.mark.django_db
@@ -1090,81 +1217,90 @@ class TestOcrTemplateDelete:
         assert resp.status_code == status.HTTP_404_NOT_FOUND
 
 
-class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
-    ENDPOINT = "/api/ocr_templates/"
-
-    def setUp(self) -> None:
-        self.user = User.objects.create_superuser(username="temp_admin")
-        self.client.force_authenticate(user=self.user)
-
-        self.custom_field_text = CustomField.objects.create(
-            name="Invoice Number",
-            data_type=CustomField.FieldDataType.STRING,
-        )
-        self.custom_field_date = CustomField.objects.create(
-            name="Invoice Date",
-            data_type=CustomField.FieldDataType.DATE,
-        )
-
-        return super().setUp()
-
-    # --- Auth ---
-
-    def test_unauthenticated_rejected(self):
-        self.client.logout()
-        resp = self.client.get(self.ENDPOINT)
-        self.assertIn(
-            resp.status_code,
-            (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN),
-        )
-
-    @patch("documents.zone_ocr.run_zone_extraction")
-    def test_run_zone_ocr_without_matching_template_is_skipped(self, extract):
+@pytest.mark.django_db
+@pytest.mark.usefixtures("paperless_dirs")
+class TestRunZoneOcr:
+    def test_without_matching_template_is_skipped(
+        self,
+        admin_client: APIClient,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A document and a template that does not match it
+        WHEN:
+            - Zone OCR is run on the document
+        THEN:
+            - The run is skipped with reason no_template and nothing is extracted
+        """
+        extract = mocker.patch("documents.zone_ocr.run_zone_extraction")
         document = DocumentFactory(content=CONTENT)
-        OcrTemplate.objects.create(
+        OcrTemplateFactory(
             name="Other sender",
             match="Contoso",
+            matching_algorithm=MatchingModel.MATCH_ANY,
             source_width=1000,
             source_height=1000,
         )
 
-        response = self.client.post(f"/api/documents/{document.pk}/run-zone-ocr/")
+        response = admin_client.post(RUN_ZONE_OCR_URL.format(pk=document.pk))
 
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(
-            response.json(),
-            {"status": "skipped", "reason": "no_template", "results": []},
-        )
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == {
+            "status": "skipped",
+            "reason": "no_template",
+            "results": [],
+        }
         extract.assert_not_called()
 
-    @patch("documents.zone_ocr.run_zone_extraction")
-    def test_run_zone_ocr_without_enabled_template_is_skipped(self, extract):
+    @pytest.mark.parametrize(
+        "with_disabled_template",
+        [
+            pytest.param(False, id="no-templates"),
+            pytest.param(True, id="disabled-template"),
+        ],
+    )
+    def test_without_enabled_template_is_skipped(
+        self,
+        admin_client: APIClient,
+        mocker: MockerFixture,
+        with_disabled_template: bool,  # noqa: FBT001
+    ) -> None:
+        """
+        GIVEN:
+            - A document and either no templates or a matching disabled template
+        WHEN:
+            - Zone OCR is run on the document
+        THEN:
+            - The run is skipped with reason no_template and nothing is extracted
+        """
+        extract = mocker.patch("documents.zone_ocr.run_zone_extraction")
         document = DocumentFactory(content=CONTENT)
+        if with_disabled_template:
+            OcrTemplateFactory(
+                name="Disabled template",
+                match="Northwind",
+                matching_algorithm=MatchingModel.MATCH_ANY,
+                source_width=1000,
+                source_height=1000,
+                enabled=False,
+            )
 
-        for enabled in (None, False):
-            with self.subTest(enabled=enabled):
-                if enabled is False:
-                    OcrTemplate.objects.create(
-                        name="Disabled template",
-                        match="Northwind",
-                        source_width=1000,
-                        source_height=1000,
-                        enabled=False,
-                    )
+        response = admin_client.post(RUN_ZONE_OCR_URL.format(pk=document.pk))
 
-                response = self.client.post(
-                    f"/api/documents/{document.pk}/run-zone-ocr/",
-                )
-
-                self.assertEqual(response.status_code, status.HTTP_200_OK)
-                self.assertEqual(
-                    response.json(),
-                    {"status": "skipped", "reason": "no_template", "results": []},
-                )
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == {
+            "status": "skipped",
+            "reason": "no_template",
+            "results": [],
+        }
         extract.assert_not_called()
 
-    @patch("documents.zone_ocr.run_zone_extraction")
-    def test_run_zone_ocr_applies_a_chosen_template(self, extract):
+    def test_applies_a_chosen_template(
+        self,
+        admin_client: APIClient,
+        mocker: MockerFixture,
+    ) -> None:
         """
         GIVEN:
             - A disabled template that does not match the document
@@ -1173,28 +1309,53 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
         THEN:
             - The template is applied anyway, since it was chosen explicitly
         """
+        extract = mocker.patch("documents.zone_ocr.run_zone_extraction")
         document = DocumentFactory(content=CONTENT, mime_type="application/pdf")
         document.source_path.write_bytes(b"test PDF")
-        template = OcrTemplate.objects.create(
+        template = OcrTemplateFactory(
             name="Manual only",
             match="Contoso",
+            matching_algorithm=MatchingModel.MATCH_ANY,
             enabled=False,
             source_width=1000,
             source_height=1000,
         )
 
-        response = self.client.post(
-            f"/api/documents/{document.pk}/run-zone-ocr/",
+        response = admin_client.post(
+            RUN_ZONE_OCR_URL.format(pk=document.pk),
             {"template": template.pk},
             format="json",
         )
 
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.json()["status"], "completed")
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()["status"] == "completed"
         extract.assert_called_once_with(document, templates=[template], reindex=True)
 
-    @patch("documents.zone_ocr.run_zone_extraction", return_value=[])
-    def test_run_zone_ocr_matches_the_requested_file_version(self, extract):
+    @pytest.mark.parametrize(
+        "version",
+        [
+            pytest.param("root", id="root-version"),
+            pytest.param("older", id="older-version"),
+        ],
+    )
+    def test_matches_the_requested_file_version(
+        self,
+        admin_client: APIClient,
+        mocker: MockerFixture,
+        version: str,
+    ) -> None:
+        """
+        GIVEN:
+            - A document with two versions, the newest not matching the template
+        WHEN:
+            - Zone OCR is run for the root document or an older version
+        THEN:
+            - The template is applied to the requested file document
+        """
+        extract = mocker.patch(
+            "documents.zone_ocr.run_zone_extraction",
+            return_value=[],
+        )
         document = DocumentFactory(content=CONTENT)
         older = DocumentFactory(
             root_document=document,
@@ -1202,29 +1363,51 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
             content=CONTENT,
         )
         DocumentFactory(root_document=document, version_index=2, content="Contoso")
-        template = OcrTemplate.objects.create(
+        template = OcrTemplateFactory(
             name="Northwind",
             match="Northwind",
+            matching_algorithm=MatchingModel.MATCH_ANY,
             source_width=100,
             source_height=100,
         )
-        url = f"/api/documents/{document.pk}/run-zone-ocr/"
+        file_document = {"root": document, "older": older}[version]
+        file_document.source_path.write_bytes(b"test PDF")
 
-        for file_document in (document, older):
-            with self.subTest(version=file_document.pk):
-                file_document.source_path.write_bytes(b"test PDF")
-                response = self.client.post(f"{url}?version={file_document.pk}")
-                self.assertEqual(response.status_code, status.HTTP_200_OK)
-                self.assertEqual(response.json()["status"], "completed")
-                extract.assert_called_once_with(
-                    file_document,
-                    templates=[template],
-                    reindex=True,
-                )
-                extract.reset_mock()
+        response = admin_client.post(
+            f"{RUN_ZONE_OCR_URL.format(pk=document.pk)}?version={file_document.pk}",
+        )
 
-    @patch("documents.zone_ocr.run_zone_extraction")
-    def test_run_zone_ocr_rejects_invalid_or_unavailable_versions(self, extract):
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()["status"] == "completed"
+        extract.assert_called_once_with(
+            file_document,
+            templates=[template],
+            reindex=True,
+        )
+
+    @pytest.mark.parametrize(
+        "version",
+        [
+            pytest.param("invalid", id="not-a-number"),
+            pytest.param("unrelated", id="unrelated-document"),
+            pytest.param("deleted", id="deleted-version"),
+        ],
+    )
+    def test_rejects_invalid_or_unavailable_versions(
+        self,
+        admin_client: APIClient,
+        mocker: MockerFixture,
+        version: str,
+    ) -> None:
+        """
+        GIVEN:
+            - A document, an unrelated document and a deleted version
+        WHEN:
+            - Zone OCR is run with an invalid or unavailable version
+        THEN:
+            - 404 is returned and nothing is extracted
+        """
+        extract = mocker.patch("documents.zone_ocr.run_zone_extraction")
         document = DocumentFactory()
         unrelated = DocumentFactory()
         deleted = DocumentFactory(
@@ -1232,326 +1415,94 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
             version_index=1,
             deleted_at=timezone.now(),
         )
+        value = {
+            "invalid": "invalid",
+            "unrelated": unrelated.pk,
+            "deleted": deleted.pk,
+        }[version]
 
-        for version in ("invalid", unrelated.pk, deleted.pk):
-            with self.subTest(version=version):
-                response = self.client.post(
-                    f"/api/documents/{document.pk}/run-zone-ocr/?version={version}",
-                )
-                self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        response = admin_client.post(
+            f"{RUN_ZONE_OCR_URL.format(pk=document.pk)}?version={value}",
+        )
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
         extract.assert_not_called()
 
-    @patch("documents.zone_ocr.run_zone_extraction")
-    def test_run_zone_ocr_rejects_a_template_the_user_cannot_view(self, extract):
-        user = User.objects.create_user(username="editor")
-        user.user_permissions.add(
-            *Permission.objects.filter(
-                codename__in=["view_document", "change_document"],
-            ),
-        )
-        document = DocumentFactory(content=CONTENT, owner=user)
-        template = OcrTemplate.objects.create(
-            name="Private",
-            owner=User.objects.create_user(username="other"),
-            source_width=1000,
-            source_height=1000,
-        )
-        self.client.force_authenticate(user=user)
-
-        response = self.client.post(
-            f"/api/documents/{document.pk}/run-zone-ocr/",
-            {"template": template.pk},
-            format="json",
-        )
-
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-        extract.assert_not_called()
-
-    def test_run_zone_ocr_rejects_an_unknown_template(self):
+    def test_rejects_an_unknown_template(self, admin_client: APIClient) -> None:
+        """
+        GIVEN:
+            - A document
+        WHEN:
+            - Zone OCR is run with a template id that does not exist
+        THEN:
+            - 400 is returned
+        """
         document = DocumentFactory(content=CONTENT)
 
-        response = self.client.post(
-            f"/api/documents/{document.pk}/run-zone-ocr/",
+        response = admin_client.post(
+            RUN_ZONE_OCR_URL.format(pk=document.pk),
             {"template": 999},
             format="json",
         )
 
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
-    def test_document_page_image_requires_view_permission_on_the_document(self):
-        owner = User.objects.create_user(username="owner")
-        user = User.objects.create_user(username="template_editor")
-        grant_global(user, "view_ocrtemplate", "view_document")
-        document = DocumentFactory(owner=owner)
-        self.client.force_authenticate(user=user)
-        url = f"{self.ENDPOINT}document-page-image/{document.pk}/0/"
-
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-
-        grant_object(user, document, "view_document")
-        response = self.client.get(url)
-        # Past the permission check; the factory document has no file on disk.
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
-    @patch("documents.zone_ocr.extract_zone_preview")
-    def test_test_zone_requires_view_permission_on_the_document(self, preview):
-        owner = User.objects.create_user(username="owner")
-        user = User.objects.create_user(username="template_editor")
-        grant_global(user, "add_ocrtemplate", "view_document")
-        document = DocumentFactory(owner=owner)
-        self.client.force_authenticate(user=user)
-        data = {
-            "document": document.pk,
-            "zone": {"x": 0, "y": 0, "width": 100, "height": 100, "page": 1},
-        }
-
-        response = self.client.post(f"{self.ENDPOINT}test-zone/", data, format="json")
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-
-        grant_object(user, document, "view_document")
-        response = self.client.post(f"{self.ENDPOINT}test-zone/", data, format="json")
-        # Past the permission check; the factory document has no file on disk.
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        preview.assert_not_called()
-
-    @patch("documents.zone_ocr.run_zone_extraction")
-    def test_run_zone_ocr_requires_change_permission_on_the_document(
-        self,
-        extract,
-    ):
-        owner = User.objects.create_user(username="owner")
-        user = User.objects.create_user(username="editor")
-        user.user_permissions.add(
-            *Permission.objects.filter(
-                codename__in=["view_document", "change_document"],
-            ),
-        )
-        document = DocumentFactory(content=CONTENT, owner=owner)
-        self.client.force_authenticate(user=user)
-
-        response = self.client.post(f"/api/documents/{document.pk}/run-zone-ocr/")
-
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-        extract.assert_not_called()
-
-    @patch("documents.zone_ocr.run_zone_extraction")
-    def test_run_zone_ocr_requires_global_change_permission(self, extract):
-        user = User.objects.create_user(username="uploader")
-        user.user_permissions.add(
-            *Permission.objects.filter(codename__in=["view_document", "add_document"]),
-        )
-        document = DocumentFactory(content=CONTENT, owner=user)
-        self.client.force_authenticate(user=user)
-
-        response = self.client.post(f"/api/documents/{document.pk}/run-zone-ocr/")
-
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-        extract.assert_not_called()
-
-    @patch("documents.zone_ocr.run_zone_extraction")
-    def test_run_zone_ocr_does_not_require_document_upload_permission(self, extract):
-        user = User.objects.create_user(username="document_editor")
-        user.user_permissions.add(Permission.objects.get(codename="change_document"))
-        document = DocumentFactory(owner=user, content=CONTENT)
-        document.source_path.write_bytes(b"test PDF")
-        OcrTemplate.objects.create(
-            name="Matching",
-            owner=user,
-            source_width=100,
-            source_height=100,
-            match="Northwind",
-            matching_algorithm=MatchingModel.MATCH_ANY,
-        )
-        self.client.force_authenticate(user)
-
-        response = self.client.post(f"/api/documents/{document.pk}/run-zone-ocr/")
-
-        self.assertEqual(response.status_code, 200)
-        extract.assert_called_once()
-
-    def test_run_zone_ocr_missing_document_is_an_error(self):
-        response = self.client.post("/api/documents/99999/run-zone-ocr/")
-
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
-    @patch("documents.zone_ocr.run_zone_extraction")
-    def test_run_zone_ocr_skips_templates_private_to_the_requester(self, extract):
-        owner = User.objects.create_user(username="document_owner")
-        document = DocumentFactory(content=CONTENT, owner=owner)
-        OcrTemplate.objects.create(
-            name="Requester's private template",
-            owner=self.user,
-            match="Northwind",
-            source_width=100,
-            source_height=100,
-        )
-
-        response = self.client.post(f"/api/documents/{document.pk}/run-zone-ocr/")
-
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(
-            response.json(),
-            {
-                "status": "skipped",
-                "reason": "no_template",
-                "results": [],
-            },
-        )
-        extract.assert_not_called()
-
-    @patch("documents.zone_ocr.subprocess.run")
-    def test_run_zone_ocr_reports_only_templates_visible_to_the_document_owner(
-        self,
-        run,
-    ):
-        owner = User.objects.create_user(username="document_owner")
-        document = DocumentFactory(content=CONTENT, owner=owner)
-        with Image.new("RGB", (100, 100), "white") as image:
-            image.save(document.source_path, format="PNG")
-        run.return_value.stdout = "extracted"
-        for name, template_owner in [
-            ("Owned", owner),
-            ("Unowned", None),
-            ("Shared", self.user),
-            ("Private", self.user),
-        ]:
-            template = OcrTemplate.objects.create(
-                name=name,
-                owner=template_owner,
-                match="Northwind",
-                source_width=100,
-                source_height=100,
-            )
-            OcrTemplateZone.objects.create(
-                template=template,
-                name=name,
-                target="title",
-                x=0,
-                y=0,
-                width=20,
-                height=20,
-            )
-            if name == "Shared":
-                grant_object(owner, template, "view_ocrtemplate")
-
-        response = self.client.post(f"/api/documents/{document.pk}/run-zone-ocr/")
-
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertCountEqual(
-            [result["template"] for result in response.json()["results"]],
-            ["Owned", "Unowned", "Shared"],
-        )
-        self.assertEqual(run.call_count, 3)
-
-    @patch("documents.zone_ocr.subprocess.run")
-    def test_run_zone_ocr_hides_the_owners_private_templates_from_an_editor(
-        self,
-        run,
-    ):
+    def test_missing_document_is_an_error(self, admin_client: APIClient) -> None:
         """
         GIVEN:
-            - A document shared for editing with another user
-            - Templates private to the owner, unowned, and shared with both
+            - No document with the requested id
         WHEN:
-            - The editor runs zone OCR without choosing a template
+            - Zone OCR is run on it
         THEN:
-            - Only templates the editor can also view run and are reported
+            - 404 is returned
         """
-        owner = User.objects.create_user(username="document_owner")
-        editor = User.objects.create_user(username="document_editor")
-        editor.user_permissions.add(
-            *Permission.objects.filter(
-                codename__in=["view_document", "change_document"],
-            ),
-        )
-        document = DocumentFactory(content=CONTENT, owner=owner)
-        grant_object(editor, document, "view_document", "change_document")
-        with Image.new("RGB", (100, 100), "white") as image:
-            image.save(document.source_path, format="PNG")
-        run.return_value.stdout = "extracted"
-        for name, template_owner in [
-            ("Owner private", owner),
-            ("Unowned", None),
-            ("Shared", owner),
-        ]:
-            template = OcrTemplate.objects.create(
-                name=name,
-                owner=template_owner,
-                match="Northwind",
-                source_width=100,
-                source_height=100,
-            )
-            OcrTemplateZone.objects.create(
-                template=template,
-                name=name,
-                target="title",
-                x=0,
-                y=0,
-                width=20,
-                height=20,
-            )
-            if name == "Shared":
-                grant_object(editor, template, "view_ocrtemplate")
-        self.client.force_authenticate(editor)
+        response = admin_client.post(RUN_ZONE_OCR_URL.format(pk=99999))
 
-        response = self.client.post(f"/api/documents/{document.pk}/run-zone-ocr/")
+        assert response.status_code == status.HTTP_404_NOT_FOUND
 
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertCountEqual(
-            [result["template"] for result in response.json()["results"]],
-            ["Unowned", "Shared"],
-        )
-        self.assertEqual(run.call_count, 2)
-
-    def test_shared_editor_cannot_transfer_ownership_or_change_sharing(self):
-        editor = User.objects.create_user(username="shared_editor")
-        editor.user_permissions.add(
-            *Permission.objects.filter(
-                codename__in=["view_ocrtemplate", "change_ocrtemplate"],
-            ),
-        )
-        template = OcrTemplate.objects.create(
-            name="Shared",
-            owner=self.user,
-            match="Northwind",
-            source_width=100,
-            source_height=100,
-        )
-        grant_object(editor, template, "view_ocrtemplate", "change_ocrtemplate")
-        self.client.force_authenticate(editor)
-        for data in [
-            {"owner": editor.pk},
-            {"set_permissions": {"view": {"users": []}}},
-        ]:
-            with self.subTest(data=data):
-                response = self.client.patch(
-                    f"{self.ENDPOINT}{template.pk}/",
-                    data,
-                    format="json",
-                )
-                self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-        template.refresh_from_db()
-        self.assertEqual(template.owner, self.user)
-
-    @patch("documents.zone_ocr.run_zone_extraction")
-    def test_run_zone_ocr_missing_file_is_an_error(self, extract):
+    def test_missing_file_is_an_error(
+        self,
+        admin_client: APIClient,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A document with a matching template but no file on disk
+        WHEN:
+            - Zone OCR is run on the document
+        THEN:
+            - 404 is returned with a file not found error and nothing is extracted
+        """
+        extract = mocker.patch("documents.zone_ocr.run_zone_extraction")
         document = DocumentFactory(content=CONTENT)
-        OcrTemplate.objects.create(
+        OcrTemplateFactory(
             name="Template",
             match="Northwind",
+            matching_algorithm=MatchingModel.MATCH_ANY,
             source_width=1000,
             source_height=1000,
         )
 
-        response = self.client.post(f"/api/documents/{document.pk}/run-zone-ocr/")
+        response = admin_client.post(RUN_ZONE_OCR_URL.format(pk=document.pk))
 
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertEqual(response.json(), {"error": "Document file not found"})
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+        assert response.json() == {"error": "Document file not found"}
         extract.assert_not_called()
 
-    @patch("documents.zone_ocr.subprocess.run")
-    def test_run_zone_ocr_reports_completed_results(self, run):
+    def test_reports_completed_results(
+        self,
+        admin_client: APIClient,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A document and a matching template with a title zone
+        WHEN:
+            - Zone OCR is run on the document
+        THEN:
+            - The completed result lists the extracted title value
+        """
+        run = mocker.patch("documents.zone_ocr.subprocess.run")
         document = DocumentFactory(
             content=CONTENT,
             mime_type="application/pdf",
@@ -1559,75 +1510,102 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
         with Image.new("RGB", (100, 100), "white") as image:
             image.save(document.source_path, format="PNG")
         run.return_value.stdout = "Extracted title"
-        template = OcrTemplate.objects.create(
+        template = OcrTemplateFactory(
             name="Template",
             match="Northwind",
+            matching_algorithm=MatchingModel.MATCH_ANY,
             source_width=1000,
             source_height=1000,
         )
-        OcrTemplateZone.objects.create(
+        OcrTemplateZoneFactory(
             template=template,
             name="Title zone",
-            target="title",
+            target=OcrTemplateZone.TargetType.TITLE,
             x=0,
             y=0,
             width=100,
             height=100,
         )
 
-        response = self.client.post(f"/api/documents/{document.pk}/run-zone-ocr/")
+        response = admin_client.post(RUN_ZONE_OCR_URL.format(pk=document.pk))
 
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(
-            response.json(),
-            {
-                "status": "completed",
-                "results": [
-                    {
-                        "template": template.name,
-                        "zone": "Title zone",
-                        "custom_field": "Title",
-                        "value": "Extracted title",
-                        "reason": None,
-                    },
-                ],
-            },
-        )
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == {
+            "status": "completed",
+            "results": [
+                {
+                    "template": template.name,
+                    "zone": "Title zone",
+                    "custom_field": "Title",
+                    "value": "Extracted title",
+                    "reason": None,
+                },
+            ],
+        }
         run.assert_called_once()
 
-    @patch("documents.zone_ocr.subprocess.run")
-    def test_run_zone_ocr_does_not_report_an_old_title_when_extraction_is_empty(
+    def test_does_not_report_an_old_title_when_extraction_is_empty(
         self,
-        run,
-    ):
+        admin_client: APIClient,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A document with a title and a template whose title zone extracts
+              nothing
+        WHEN:
+            - Zone OCR is run on the document
+        THEN:
+            - The result has reason no_value and no value
+            - The document title is unchanged
+        """
+        run = mocker.patch("documents.zone_ocr.subprocess.run")
         document = DocumentFactory(title="Existing title", content=CONTENT)
         with Image.new("RGB", (100, 100), "white") as image:
             image.save(document.source_path, format="PNG")
-        template = OcrTemplate.objects.create(
+        template = OcrTemplateFactory(
             name="Template",
             match="Northwind",
+            matching_algorithm=MatchingModel.MATCH_ANY,
             source_width=100,
             source_height=100,
         )
-        OcrTemplateZone.objects.create(
+        OcrTemplateZoneFactory(
             template=template,
             name="Title",
-            target="title",
+            target=OcrTemplateZone.TargetType.TITLE,
             x=0,
             y=0,
             width=20,
             height=20,
         )
         run.return_value.stdout = ""
-        response = self.client.post(f"/api/documents/{document.pk}/run-zone-ocr/")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()["results"][0]["reason"], "no_value")
-        self.assertIsNone(response.json()["results"][0]["value"])
-        document.refresh_from_db()
-        self.assertEqual(document.title, "Existing title")
 
-    @patch("documents.zone_ocr.subprocess.run")
-    def test_run_zone_ocr_reports_all_target_types_and_missing_values(self, run):
+        response = admin_client.post(RUN_ZONE_OCR_URL.format(pk=document.pk))
+
+        assert response.status_code == 200
+        assert response.json()["results"][0]["reason"] == "no_value"
+        assert response.json()["results"][0]["value"] is None
+        document.refresh_from_db()
+        assert document.title == "Existing title"
+
+    def test_reports_all_target_types_and_missing_values(
+        self,
+        admin_client: APIClient,
+        mocker: MockerFixture,
+        text_field: CustomField,
+        date_field: CustomField,
+    ) -> None:
+        """
+        GIVEN:
+            - A document with an existing custom field value and ASN
+            - A template with zones for every target type, some extracting nothing
+        WHEN:
+            - Zone OCR is run with that template chosen
+        THEN:
+            - Each zone reports the value for its target, or None when missing
+        """
+        run = mocker.patch("documents.zone_ocr.subprocess.run")
         document = DocumentFactory(content=CONTENT, archive_serial_number=123)
         with Image.new("RGB", (100, 100), "white") as image:
             image.save(document.source_path, format="PNG")
@@ -1642,25 +1620,26 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
                 "2026-04-13",
             ]
         ]
-        template = OcrTemplate.objects.create(
+        template = OcrTemplateFactory(
             name="Test",
+            matching_algorithm=MatchingModel.MATCH_ANY,
             source_width=100,
             source_height=100,
         )
         CustomFieldInstance.objects.create(
             document=document,
-            field=self.custom_field_text,
+            field=text_field,
             value_text="INV-123",
         )
         for name, target, field in [
-            ("Present", "custom_field", self.custom_field_text),
-            ("Missing", "custom_field", self.custom_field_date),
+            ("Present", "custom_field", text_field),
+            ("Missing", "custom_field", date_field),
             ("Unassigned", "custom_field", None),
             ("Title", "title", None),
             ("ASN", "asn", None),
             ("Created", "created", None),
         ]:
-            OcrTemplateZone.objects.create(
+            OcrTemplateZoneFactory(
                 template=template,
                 name=name,
                 target=target,
@@ -1670,26 +1649,303 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
                 width=10,
                 height=10,
             )
-        response = self.client.post(
-            f"/api/documents/{document.pk}/run-zone-ocr/",
+
+        response = admin_client.post(
+            RUN_ZONE_OCR_URL.format(pk=document.pk),
             {"template": template.pk},
             format="json",
         )
-        self.assertEqual(response.status_code, 200)
+
+        assert response.status_code == 200
         values = {
             result["zone"]: result["value"] for result in response.json()["results"]
         }
-        self.assertEqual(
-            values,
-            {
-                "Present": "New invoice",
-                "Missing": None,
-                "Unassigned": None,
-                "Title": "New title",
-                "ASN": 456,
-                "Created": "2026-04-13",
-            },
+        assert values == {
+            "Present": "New invoice",
+            "Missing": None,
+            "Unassigned": None,
+            "Title": "New title",
+            "ASN": 456,
+            "Created": "2026-04-13",
+        }
+
+
+@pytest.mark.django_db
+@pytest.mark.usefixtures("paperless_dirs")
+class TestRunZoneOcrPermissions:
+    def test_rejects_a_template_the_user_cannot_view(
+        self,
+        rest_api_client: APIClient,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - An editor owning a document
+            - A template private to another user
+        WHEN:
+            - The editor runs zone OCR choosing that template
+        THEN:
+            - 403 is returned and nothing is extracted
+        """
+        extract = mocker.patch("documents.zone_ocr.run_zone_extraction")
+        user = UserFactory()
+        grant_global(user, "view_document", "change_document")
+        document = DocumentFactory(content=CONTENT, owner=user)
+        template = OcrTemplateFactory(
+            name="Private",
+            matching_algorithm=MatchingModel.MATCH_ANY,
+            owner=UserFactory(),
+            source_width=1000,
+            source_height=1000,
         )
+        rest_api_client.force_authenticate(user=user)
+
+        response = rest_api_client.post(
+            RUN_ZONE_OCR_URL.format(pk=document.pk),
+            {"template": template.pk},
+            format="json",
+        )
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+        extract.assert_not_called()
+
+    def test_requires_change_permission_on_the_document(
+        self,
+        rest_api_client: APIClient,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A document owned by another user
+            - A user with global view and change document permissions only
+        WHEN:
+            - The user runs zone OCR on the document
+        THEN:
+            - 403 is returned and nothing is extracted
+        """
+        extract = mocker.patch("documents.zone_ocr.run_zone_extraction")
+        owner = UserFactory()
+        user = UserFactory()
+        grant_global(user, "view_document", "change_document")
+        document = DocumentFactory(content=CONTENT, owner=owner)
+        rest_api_client.force_authenticate(user=user)
+
+        response = rest_api_client.post(RUN_ZONE_OCR_URL.format(pk=document.pk))
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+        extract.assert_not_called()
+
+    def test_requires_global_change_permission(
+        self,
+        rest_api_client: APIClient,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A user owning a document but holding only view and add document
+              permissions
+        WHEN:
+            - The user runs zone OCR on the document
+        THEN:
+            - 403 is returned and nothing is extracted
+        """
+        extract = mocker.patch("documents.zone_ocr.run_zone_extraction")
+        user = UserFactory()
+        grant_global(user, "view_document", "add_document")
+        document = DocumentFactory(content=CONTENT, owner=user)
+        rest_api_client.force_authenticate(user=user)
+
+        response = rest_api_client.post(RUN_ZONE_OCR_URL.format(pk=document.pk))
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+        extract.assert_not_called()
+
+    def test_does_not_require_document_upload_permission(
+        self,
+        rest_api_client: APIClient,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A user owning a document and a matching template, holding only
+              the change document permission
+        WHEN:
+            - The user runs zone OCR on the document
+        THEN:
+            - The request succeeds and extraction runs
+        """
+        extract = mocker.patch("documents.zone_ocr.run_zone_extraction")
+        user = UserFactory()
+        grant_global(user, "change_document")
+        document = DocumentFactory(owner=user, content=CONTENT)
+        document.source_path.write_bytes(b"test PDF")
+        OcrTemplateFactory(
+            name="Matching",
+            owner=user,
+            source_width=100,
+            source_height=100,
+            match="Northwind",
+            matching_algorithm=MatchingModel.MATCH_ANY,
+        )
+        rest_api_client.force_authenticate(user)
+
+        response = rest_api_client.post(RUN_ZONE_OCR_URL.format(pk=document.pk))
+
+        assert response.status_code == 200
+        extract.assert_called_once()
+
+    def test_skips_templates_private_to_the_requester(
+        self,
+        admin_client: APIClient,
+        admin_user: User,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A document owned by another user
+            - A matching template private to the requester
+        WHEN:
+            - The requester runs zone OCR on the document
+        THEN:
+            - The run is skipped with reason no_template and nothing is extracted
+        """
+        extract = mocker.patch("documents.zone_ocr.run_zone_extraction")
+        owner = UserFactory()
+        document = DocumentFactory(content=CONTENT, owner=owner)
+        OcrTemplateFactory(
+            name="Requester's private template",
+            owner=admin_user,
+            match="Northwind",
+            matching_algorithm=MatchingModel.MATCH_ANY,
+            source_width=100,
+            source_height=100,
+        )
+
+        response = admin_client.post(RUN_ZONE_OCR_URL.format(pk=document.pk))
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == {
+            "status": "skipped",
+            "reason": "no_template",
+            "results": [],
+        }
+        extract.assert_not_called()
+
+    def test_reports_only_templates_visible_to_the_document_owner(
+        self,
+        admin_client: APIClient,
+        admin_user: User,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A document owned by another user
+            - Templates owned by the document owner, unowned, shared with the
+              document owner, and private to the requester
+        WHEN:
+            - The requester runs zone OCR on the document
+        THEN:
+            - Only templates visible to the document owner run and are reported
+        """
+        run = mocker.patch("documents.zone_ocr.subprocess.run")
+        owner = UserFactory()
+        document = DocumentFactory(content=CONTENT, owner=owner)
+        with Image.new("RGB", (100, 100), "white") as image:
+            image.save(document.source_path, format="PNG")
+        run.return_value.stdout = "extracted"
+        for name, template_owner in [
+            ("Owned", owner),
+            ("Unowned", None),
+            ("Shared", admin_user),
+            ("Private", admin_user),
+        ]:
+            template = OcrTemplateFactory(
+                name=name,
+                owner=template_owner,
+                match="Northwind",
+                matching_algorithm=MatchingModel.MATCH_ANY,
+                source_width=100,
+                source_height=100,
+            )
+            OcrTemplateZoneFactory(
+                template=template,
+                name=name,
+                target=OcrTemplateZone.TargetType.TITLE,
+                x=0,
+                y=0,
+                width=20,
+                height=20,
+            )
+            if name == "Shared":
+                grant_object(owner, template, "view_ocrtemplate")
+
+        response = admin_client.post(RUN_ZONE_OCR_URL.format(pk=document.pk))
+
+        assert response.status_code == status.HTTP_200_OK
+        assert sorted(result["template"] for result in response.json()["results"]) == [
+            "Owned",
+            "Shared",
+            "Unowned",
+        ]
+        assert run.call_count == 3
+
+    def test_hides_the_owners_private_templates_from_an_editor(
+        self,
+        rest_api_client: APIClient,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A document shared for editing with another user
+            - Templates private to the owner, unowned, and shared with both
+        WHEN:
+            - The editor runs zone OCR without choosing a template
+        THEN:
+            - Only templates the editor can also view run and are reported
+        """
+        run = mocker.patch("documents.zone_ocr.subprocess.run")
+        owner = UserFactory()
+        editor = UserFactory()
+        grant_global(editor, "view_document", "change_document")
+        document = DocumentFactory(content=CONTENT, owner=owner)
+        grant_object(editor, document, "view_document", "change_document")
+        with Image.new("RGB", (100, 100), "white") as image:
+            image.save(document.source_path, format="PNG")
+        run.return_value.stdout = "extracted"
+        for name, template_owner in [
+            ("Owner private", owner),
+            ("Unowned", None),
+            ("Shared", owner),
+        ]:
+            template = OcrTemplateFactory(
+                name=name,
+                owner=template_owner,
+                match="Northwind",
+                matching_algorithm=MatchingModel.MATCH_ANY,
+                source_width=100,
+                source_height=100,
+            )
+            OcrTemplateZoneFactory(
+                template=template,
+                name=name,
+                target=OcrTemplateZone.TargetType.TITLE,
+                x=0,
+                y=0,
+                width=20,
+                height=20,
+            )
+            if name == "Shared":
+                grant_object(editor, template, "view_ocrtemplate")
+        rest_api_client.force_authenticate(editor)
+
+        response = rest_api_client.post(RUN_ZONE_OCR_URL.format(pk=document.pk))
+
+        assert response.status_code == status.HTTP_200_OK
+        assert sorted(result["template"] for result in response.json()["results"]) == [
+            "Shared",
+            "Unowned",
+        ]
+        assert run.call_count == 2
 
 
 class TestOcrTemplatePreviewAPI(DirectoriesMixin, APITestCase):
