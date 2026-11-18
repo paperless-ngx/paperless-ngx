@@ -87,6 +87,7 @@ import folderFill from 'bootstrap-icons/icons/folder-fill.svg'
 import folder from 'bootstrap-icons/icons/folder.svg'
 import funnel from 'bootstrap-icons/icons/funnel.svg'
 import gear from 'bootstrap-icons/icons/gear.svg'
+import github from 'bootstrap-icons/icons/github.svg'
 import globe2 from 'bootstrap-icons/icons/globe2.svg'
 import google from 'bootstrap-icons/icons/google.svg'
 import grid from 'bootstrap-icons/icons/grid.svg'
@@ -135,7 +136,6 @@ import sliders2Vertical from 'bootstrap-icons/icons/sliders2-vertical.svg'
 import sortAlphaDown from 'bootstrap-icons/icons/sort-alpha-down.svg'
 import sortAlphaUpAlt from 'bootstrap-icons/icons/sort-alpha-up-alt.svg'
 import stack from 'bootstrap-icons/icons/stack.svg'
-import star from 'bootstrap-icons/icons/star.svg'
 import stars from 'bootstrap-icons/icons/stars.svg'
 import tagFill from 'bootstrap-icons/icons/tag-fill.svg'
 import tag from 'bootstrap-icons/icons/tag.svg'
@@ -250,6 +250,7 @@ export const icons: Record<string, string> = {
   folderFill,
   funnel,
   gear,
+  github,
   globe2,
   google,
   grid,
@@ -298,7 +299,6 @@ export const icons: Record<string, string> = {
   sortAlphaDown,
   sortAlphaUpAlt,
   stack,
-  star,
   stars,
   tagFill,
   tag,
