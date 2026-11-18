@@ -24,7 +24,7 @@
   } @else {
     @for (release of releases(); track release.version) {
       <section class="release-notes" [class.mt-4]="!$first">
-        <h5>{{ release.version }}</h5>
+        <h4>{{ release.version }} <a class="btn btn-link btn-sm text-secondary d-inline-flex p-0" [href]="release.html_url" aria-label="View on GitHub" target="_blank" rel="noopener noreferrer"><pngx-bs-icon name="box-arrow-up-right" class="ms-2 mt-n1"></pngx-bs-icon></a></h4>
         <div class="release-notes-body" [innerHTML]="release.body_html"></div>
       </section>
     }
