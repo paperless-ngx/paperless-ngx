@@ -6,6 +6,7 @@ import re
 import string
 import subprocess
 import tempfile
+import unicodedata
 from dataclasses import dataclass
 from datetime import date
 from datetime import datetime
@@ -18,6 +19,12 @@ from typing import TYPE_CHECKING
 import dateparser
 import magic
 import zxingcpp
+from babel import Locale
+from babel import UnknownLocaleError
+from babel.numbers import NumberFormatError
+from babel.numbers import get_decimal_symbol
+from babel.numbers import get_group_symbol
+from babel.numbers import parse_decimal
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import transaction
@@ -34,11 +41,15 @@ from documents.permissions import permitted_object_ids
 from documents.regex import safe_regex_fullmatch
 from documents.signals.handlers import add_to_index
 from documents.versioning import get_root_document
+from paperless.utils import OCR_TO_DATEPARSER_LANGUAGES
 
 if TYPE_CHECKING:
     from django.contrib.auth.models import User
 
 logger = logging.getLogger("paperless.zone_ocr")
+
+# Unicode general category for decimal digits in any script.
+UNICODE_DECIMAL_DIGIT = "Nd"  # codespell:ignore
 
 
 @dataclass(frozen=True)
@@ -569,7 +580,11 @@ def _prepare_field_update(
             return None
         custom_field = zone.custom_field
         field_name = CustomFieldInstance.get_value_field_name(custom_field.data_type)
-        typed_value = _convert_value(value, custom_field.data_type)
+        typed_value = _convert_value(
+            value,
+            custom_field.data_type,
+            _number_locale(zone.ocr_language),
+        )
         model = CustomFieldInstance
     elif zone.target == OcrTemplateZone.TargetType.TITLE:
         field_name, typed_value = "title", value[:128]
@@ -621,22 +636,75 @@ def _apply_field_updates(document: Document, updates: list[FieldUpdate]) -> None
         raise
 
 
-def _normalize_number(value: str) -> str:
-    cleaned = re.sub(r"[^\d.,\-]", "", value)
-    # When both separators occur, the rightmost one is the decimal separator.
-    if "," in cleaned and "." in cleaned:
-        if cleaned.rindex(",") > cleaned.rindex("."):
-            cleaned = cleaned.replace(".", "").replace(",", ".")
-        else:
-            cleaned = cleaned.replace(",", "")
-    else:
-        cleaned = cleaned.replace(",", ".")
-    Decimal(cleaned)
-    return cleaned
+def _number_locale(ocr_language: str) -> Locale:
+    """Derive the locale used to read numbers from a tesseract language code.
+
+    Only the first language counts, so "deu+eng" reads numbers the German way.
+    Languages Babel does not know fall back to English.
+    """
+    tesseract_code = ocr_language.split("+", maxsplit=1)[0].split("_", maxsplit=1)[0]
+    code = OCR_TO_DATEPARSER_LANGUAGES.get(tesseract_code)
+    if code is not None:
+        try:
+            return Locale.parse(code)
+        except (UnknownLocaleError, ValueError):
+            pass
+    return Locale.parse("en")
 
 
-def _convert_value(value: str, data_type: str) -> object | None:
-    """Convert an extracted OCR string to the appropriate type for the custom field."""
+def _parse_number(value: str, locale: Locale) -> Decimal | None:
+    """Parse OCR text as a decimal number using the locale's number format.
+
+    Digits of any script are read as their ASCII equivalents, and characters
+    that are not part of a number, such as letters or currency symbols, are
+    dropped. A dash (also a unicode minus or en dash) makes the number negative
+    when it comes before the first digit and does not directly follow a letter
+    or digit, so "-5", "EUR -5" and "$-5" are negative while "INV-123" is
+    just 123. Any other dash makes the text invalid. Returns None when the
+    text is not a well-formed number in the locale.
+    """
+    text = "".join(
+        str(unicodedata.digit(char))
+        if unicodedata.category(char) == UNICODE_DECIMAL_DIGIT
+        else char
+        for char in value.strip()
+    )
+    text = (
+        text.replace("\N{MINUS SIGN}", "-")
+        .replace("\N{EN DASH}", "-")
+        .replace("\N{ARABIC DECIMAL SEPARATOR}", ".")
+        .replace("\N{ARABIC THOUSANDS SEPARATOR}", ",")
+    )
+    sign = re.search(r"(?<!\w)-(?=\D*\d)", text)
+    negative = sign is not None and not re.search(r"\d", text[: sign.start()])
+    if negative:
+        text = text[: sign.start()] + text[sign.end() :]
+    if re.search(r"\d\D*-|(?<!\w)-", text):
+        return None
+    decimal_symbol = get_decimal_symbol(locale)
+    group_symbol = get_group_symbol(locale)
+    if group_symbol.isspace():
+        text = re.sub(r"(?<=\d)[ \u00a0\u202f]+(?=\d)", group_symbol, text)
+    allowed = {*string.digits, ".", ",", decimal_symbol, group_symbol}
+    body = "".join(char for char in text if char in allowed)
+    if not body:
+        return None
+    try:
+        number = parse_decimal(body, locale=locale, strict=True)
+    except NumberFormatError:
+        return None
+    return number.copy_negate() if negative else number
+
+
+def _convert_value(
+    value: str,
+    data_type: str,
+    locale: Locale,
+) -> object | None:
+    """Convert an extracted OCR string to the appropriate type for the custom field.
+
+    Numeric types are read with the number format of the given locale.
+    """
     if not value:
         return None
 
@@ -651,16 +719,16 @@ def _convert_value(value: str, data_type: str) -> object | None:
             return value
 
         elif data_type == CustomField.FieldDataType.INT:
-            digits = re.sub(r"[^\d\-]", "", value)
-            digits = digits.lstrip("-")
-            if not digits:
+            integer = _parse_number(value, locale)
+            if integer is None or integer != integer.to_integral_value():
                 return None
-            if value.strip().startswith("-"):
-                digits = "-" + digits
-            return int(digits)
+            return int(integer)
 
         elif data_type == CustomField.FieldDataType.FLOAT:
-            number = float(_normalize_number(value))
+            decimal = _parse_number(value, locale)
+            if decimal is None:
+                return None
+            number = float(decimal)
             return number if math.isfinite(number) else None
 
         elif data_type == CustomField.FieldDataType.DATE:
@@ -668,7 +736,8 @@ def _convert_value(value: str, data_type: str) -> object | None:
             return parsed.isoformat() if parsed else None
 
         elif data_type == CustomField.FieldDataType.MONETARY:
-            return _normalize_number(value)
+            monetary = _parse_number(value, locale)
+            return None if monetary is None else format(monetary, "f")
 
         elif data_type == CustomField.FieldDataType.BOOL:
             lower = value.lower().strip()

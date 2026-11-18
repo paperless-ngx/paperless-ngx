@@ -10,6 +10,7 @@ from typing import TYPE_CHECKING
 from typing import Any
 
 import pytest
+from babel import Locale
 from django.contrib.auth.models import Group
 from PIL import Image
 
@@ -25,6 +26,7 @@ from documents.zone_ocr import _convert_value
 from documents.zone_ocr import _crop_zone
 from documents.zone_ocr import _detect_mime
 from documents.zone_ocr import _extract_zone
+from documents.zone_ocr import _number_locale
 from documents.zone_ocr import _prepare_field_update
 from documents.zone_ocr import _process_template
 from documents.zone_ocr import _render_pages
@@ -48,6 +50,11 @@ if TYPE_CHECKING:
     from pytest_mock import MockerFixture
 
     from paperless_testing.dirs import PaperlessDirs
+
+
+EN = Locale.parse("en")
+DE = Locale.parse("de")
+FR = Locale.parse("fr")
 
 
 def make_template(name: str, **kwargs: Any) -> OcrTemplate:
@@ -1462,6 +1469,7 @@ class TestApplyTransform:
         assert _apply_transform("unparsable", "date") == "unparsable"
 
 
+@pytest.mark.django_db
 class TestPrepareFieldUpdate:
     """Tests for converting extracted values into field updates."""
 
@@ -1476,68 +1484,279 @@ class TestPrepareFieldUpdate:
         """
         assert _prepare_field_update(OcrTemplateZone(target="unknown"), "value") is None
 
+    @pytest.mark.parametrize(
+        ("ocr_language", "expected"),
+        [
+            pytest.param("deu", 1234, id="german-reads-dot-as-thousands"),
+            pytest.param("eng", None, id="english-reads-dot-as-fraction"),
+        ],
+    )
+    def test_int_field_uses_the_zone_language_for_numbers(
+        self,
+        ocr_language: str,
+        expected: int | None,
+    ) -> None:
+        """
+        GIVEN:
+            - A zone targeting an integer custom field with a given OCR language
+        WHEN:
+            - A field update is prepared for the text "1.234"
+        THEN:
+            - A German zone reads 1234, while an English zone reads a fraction
+              and produces no update
+        """
+        field = CustomFieldFactory(data_type=CustomField.FieldDataType.INT)
+        zone = OcrTemplateZoneFactory(
+            target=OcrTemplateZone.TargetType.CUSTOM_FIELD,
+            custom_field=field,
+            ocr_language=ocr_language,
+        )
+
+        update = _prepare_field_update(zone, "1.234")
+
+        assert (update.value if update else None) == expected
+
+
+class TestNumberLocale:
+    """Tests for deriving a number locale from the OCR language."""
+
+    @pytest.mark.parametrize(
+        ("ocr_language", "expected"),
+        [
+            pytest.param("deu", "de", id="single-language"),
+            pytest.param("deu+eng", "de", id="first-of-several-languages"),
+            pytest.param("aze_Cyrl", "az", id="script-suffix-is-dropped"),
+            pytest.param("xyz", "en", id="unknown-language-falls-back-to-english"),
+        ],
+    )
+    def test_number_locale(self, ocr_language: str, expected: str) -> None:
+        """
+        GIVEN:
+            - A tesseract language code, possibly several or with a script
+        WHEN:
+            - The number locale is derived
+        THEN:
+            - The first language decides the locale, falling back to English
+        """
+        assert _number_locale(ocr_language) == Locale.parse(expected)
+
 
 class TestConvertValue:
     """Tests for the _convert_value function."""
 
     @pytest.mark.parametrize(
-        ("value", "data_type", "expected"),
+        ("value", "data_type", "expected", "locale"),
         [
             pytest.param(
                 "Hello",
                 CustomField.FieldDataType.STRING,
                 "Hello",
+                EN,
                 id="string",
             ),
             pytest.param(
                 "https://example.com",
                 CustomField.FieldDataType.URL,
                 "https://example.com",
+                EN,
                 id="url",
             ),
             pytest.param(
                 "x" * 500,
                 CustomField.FieldDataType.LONG_TEXT,
                 "x" * 500,
+                EN,
                 id="long-text",
             ),
-            pytest.param("42", CustomField.FieldDataType.INT, 42, id="int-simple"),
+            pytest.param("42", CustomField.FieldDataType.INT, 42, EN, id="int-simple"),
             pytest.param(
                 "INV-123",
                 CustomField.FieldDataType.INT,
                 123,
+                EN,
                 id="int-with-noise",
             ),
-            pytest.param("-42", CustomField.FieldDataType.INT, -42, id="int-negative"),
+            pytest.param(
+                "-42",
+                CustomField.FieldDataType.INT,
+                -42,
+                EN,
+                id="int-negative",
+            ),
+            pytest.param(
+                "\N{MINUS SIGN}5",
+                CustomField.FieldDataType.INT,
+                -5,
+                EN,
+                id="int-unicode-minus",
+            ),
+            pytest.param(
+                "1,234",
+                CustomField.FieldDataType.INT,
+                1234,
+                EN,
+                id="int-comma-thousands",
+            ),
+            pytest.param(
+                "1.234.567",
+                CustomField.FieldDataType.INT,
+                1234567,
+                DE,
+                id="int-dot-thousands",
+            ),
+            pytest.param(
+                "12.00",
+                CustomField.FieldDataType.INT,
+                12,
+                EN,
+                id="int-zero-fraction",
+            ),
+            pytest.param(
+                "1.234,00",
+                CustomField.FieldDataType.INT,
+                1234,
+                DE,
+                id="int-thousands-and-zero-fraction",
+            ),
+            pytest.param(
+                "1234.00",
+                CustomField.FieldDataType.INT,
+                1234,
+                EN,
+                id="int-ungrouped-with-zero-fraction",
+            ),
+            pytest.param(
+                "1.234",
+                CustomField.FieldDataType.INT,
+                1234,
+                DE,
+                id="int-dot-is-thousands-in-german",
+            ),
+            pytest.param(
+                "1\N{NARROW NO-BREAK SPACE}234",
+                CustomField.FieldDataType.INT,
+                1234,
+                FR,
+                id="int-narrow-space-thousands-in-french",
+            ),
             pytest.param(
                 "2026-04-13",
                 CustomField.FieldDataType.DATE,
                 "2026-04-13",
+                EN,
                 id="date-iso",
             ),
             pytest.param(
                 "123.45",
                 CustomField.FieldDataType.MONETARY,
                 "123.45",
+                EN,
                 id="monetary-simple",
             ),
             pytest.param(
                 "1.234,56",
                 CustomField.FieldDataType.MONETARY,
                 "1234.56",
+                DE,
                 id="monetary-european",
             ),
             pytest.param(
                 "\u20ac1,234.56",
                 CustomField.FieldDataType.MONETARY,
                 "1234.56",
+                EN,
                 id="monetary-with-currency-symbol",
             ),
             pytest.param(
                 "12345678901234567890,12345678901234567890",
                 CustomField.FieldDataType.MONETARY,
                 "12345678901234567890.12345678901234567890",
+                DE,
                 id="monetary-preserves-decimal-precision",
+            ),
+            pytest.param(
+                "-12345678901234567890,12345678901234567890",
+                CustomField.FieldDataType.MONETARY,
+                "-12345678901234567890.12345678901234567890",
+                DE,
+                id="monetary-negative-preserves-decimal-precision",
+            ),
+            pytest.param(
+                "\u20ac-12.50",
+                CustomField.FieldDataType.MONETARY,
+                "-12.50",
+                EN,
+                id="monetary-sign-after-currency-symbol",
+            ),
+            pytest.param(
+                "-\u20ac12.50",
+                CustomField.FieldDataType.MONETARY,
+                "-12.50",
+                EN,
+                id="monetary-sign-before-currency-symbol",
+            ),
+            pytest.param(
+                "EUR -12.50",
+                CustomField.FieldDataType.MONETARY,
+                "-12.50",
+                EN,
+                id="monetary-sign-after-currency-code",
+            ),
+            pytest.param(
+                "Total: -5",
+                CustomField.FieldDataType.INT,
+                -5,
+                EN,
+                id="int-sign-after-label",
+            ),
+            pytest.param(
+                "\u20ac-12.50",
+                CustomField.FieldDataType.FLOAT,
+                -12.5,
+                EN,
+                id="float-sign-after-currency-symbol",
+            ),
+            pytest.param(
+                "\u0661\u0662\u0663",
+                CustomField.FieldDataType.INT,
+                123,
+                Locale.parse("ar"),
+                id="int-arabic-indic-digits",
+            ),
+            pytest.param(
+                "\u0661\u066c\u0662\u0663\u0664\u066b\u0665",
+                CustomField.FieldDataType.FLOAT,
+                1234.5,
+                Locale.parse("ar"),
+                id="float-arabic-separators",
+            ),
+            pytest.param(
+                "\u06f1\u06f2\u06f3",
+                CustomField.FieldDataType.INT,
+                123,
+                Locale.parse("fa"),
+                id="int-persian-digits",
+            ),
+            pytest.param(
+                "\u0967\u0968\u0969",
+                CustomField.FieldDataType.INT,
+                123,
+                Locale.parse("hi"),
+                id="int-devanagari-digits",
+            ),
+            pytest.param(
+                "1 234,56",
+                CustomField.FieldDataType.FLOAT,
+                1234.56,
+                Locale.parse("ru"),
+                id="float-plain-space-in-russian",
+            ),
+            pytest.param(
+                "1\N{RIGHT SINGLE QUOTATION MARK}234.56",
+                CustomField.FieldDataType.FLOAT,
+                1234.56,
+                Locale.parse("de_CH"),
+                id="float-apostrophe-group-in-swiss-german",
             ),
         ],
     )
@@ -1546,16 +1765,17 @@ class TestConvertValue:
         value: str,
         data_type: str,
         expected: object,
+        locale: Locale,
     ) -> None:
         """
         GIVEN:
-            - An extracted string and a custom field data type
+            - An extracted string, a custom field data type and a number locale
         WHEN:
             - The value is converted
         THEN:
             - The converted value equals the expected value exactly
         """
-        assert _convert_value(value, data_type) == expected
+        assert _convert_value(value, data_type, locale) == expected
 
     def test_string_truncation(self) -> None:
         """
@@ -1566,105 +1786,205 @@ class TestConvertValue:
         THEN:
             - The result is truncated to 128 characters
         """
-        result = _convert_value("x" * 200, CustomField.FieldDataType.STRING)
+        result = _convert_value("x" * 200, CustomField.FieldDataType.STRING, EN)
         assert isinstance(result, str)
         assert len(result) == 128
 
     @pytest.mark.parametrize(
-        ("value", "expected"),
+        ("value", "locale", "expected"),
         [
-            pytest.param("1234.56", 1234.56, id="float-simple"),
-            pytest.param("1.234,56", 1234.56, id="float-european-format"),
-            pytest.param("1,234.56", 1234.56, id="float-us-format"),
-            pytest.param("1234,56", 1234.56, id="float-comma-only"),
+            pytest.param("1234.56", EN, 1234.56, id="float-simple"),
+            pytest.param("1.234,56", DE, 1234.56, id="float-european-format"),
+            pytest.param("1,234.56", EN, 1234.56, id="float-us-format"),
+            pytest.param("1234,56", DE, 1234.56, id="float-comma-only"),
+            pytest.param("1,234", DE, 1.234, id="float-comma-is-decimal-in-german"),
+            pytest.param("1,234", EN, 1234.0, id="float-comma-is-thousands-in-english"),
+            pytest.param("1 234,56", FR, 1234.56, id="float-plain-space-in-french"),
+            pytest.param(
+                "1\N{NARROW NO-BREAK SPACE}234,56",
+                FR,
+                1234.56,
+                id="float-narrow-space-in-french",
+            ),
+            pytest.param(
+                "\N{MINUS SIGN}1.5",
+                EN,
+                -1.5,
+                id="float-unicode-minus",
+            ),
         ],
     )
-    def test_float_conversion(self, value: str, expected: float) -> None:
+    def test_float_conversion(
+        self,
+        value: str,
+        locale: Locale,
+        expected: float,
+    ) -> None:
         """
         GIVEN:
-            - A numeric string in one of several decimal formats
+            - A numeric string in one of several decimal formats and a locale
         WHEN:
             - The value is converted to a FLOAT field value
         THEN:
             - The result is the expected float
         """
-        assert _convert_value(value, CustomField.FieldDataType.FLOAT) == expected
+        assert (
+            _convert_value(value, CustomField.FieldDataType.FLOAT, locale) == expected
+        )
 
     @pytest.mark.parametrize(
-        ("value", "data_type"),
+        ("value", "data_type", "locale"),
         [
             pytest.param(
                 "abc",
                 CustomField.FieldDataType.INT,
+                EN,
                 id="int-empty-returns-none",
             ),
             pytest.param(
                 "-",
                 CustomField.FieldDataType.INT,
+                EN,
                 id="int-only-dash-returns-none",
+            ),
+            pytest.param(
+                "12.50",
+                CustomField.FieldDataType.INT,
+                EN,
+                id="int-fraction-returns-none",
+            ),
+            pytest.param(
+                "1.5",
+                CustomField.FieldDataType.INT,
+                EN,
+                id="int-short-fraction-returns-none",
+            ),
+            pytest.param(
+                "0.500",
+                CustomField.FieldDataType.INT,
+                EN,
+                id="int-leading-zero-fraction-returns-none",
+            ),
+            pytest.param(
+                "1..2",
+                CustomField.FieldDataType.INT,
+                EN,
+                id="int-empty-group-returns-none",
+            ),
+            pytest.param(
+                "5-3",
+                CustomField.FieldDataType.INT,
+                EN,
+                id="int-inner-dash-returns-none",
+            ),
+            pytest.param(
+                "1,234.567",
+                CustomField.FieldDataType.INT,
+                EN,
+                id="int-thousands-and-fraction-returns-none",
+            ),
+            pytest.param(
+                "12.3,00",
+                CustomField.FieldDataType.INT,
+                EN,
+                id="int-bad-grouping-before-fraction-returns-none",
+            ),
+            pytest.param(
+                "1,2345.00",
+                CustomField.FieldDataType.INT,
+                EN,
+                id="int-long-group-before-fraction-returns-none",
             ),
             pytest.param(
                 "abc",
                 CustomField.FieldDataType.FLOAT,
+                EN,
                 id="float-empty-returns-none",
             ),
             pytest.param(
                 ",",
                 CustomField.FieldDataType.FLOAT,
+                EN,
                 id="float-only-separator-returns-none",
             ),
             pytest.param(
                 "not a date",
                 CustomField.FieldDataType.DATE,
+                EN,
                 id="date-invalid-returns-none",
             ),
             pytest.param(
                 "2026-13-32",
                 CustomField.FieldDataType.DATE,
+                EN,
                 id="date-invalid-values-returns-none",
             ),
             pytest.param(
                 "CHF",
                 CustomField.FieldDataType.MONETARY,
+                EN,
                 id="monetary-empty-returns-none",
             ),
             pytest.param(
                 "maybe",
                 CustomField.FieldDataType.BOOL,
+                EN,
                 id="bool-unknown-returns-none",
             ),
             pytest.param(
                 "test",
                 CustomField.FieldDataType.DOCUMENTLINK,
+                EN,
                 id="unsupported-type-documentlink-returns-none",
             ),
             pytest.param(
                 "test",
                 CustomField.FieldDataType.SELECT,
+                EN,
                 id="unsupported-type-select-returns-none",
             ),
             pytest.param(
                 "",
                 CustomField.FieldDataType.STRING,
+                EN,
                 id="empty-string-returns-none",
             ),
             pytest.param(
                 "9" * 400,
                 CustomField.FieldDataType.FLOAT,
+                EN,
                 id="float-overflow-is-not-stored-as-infinity",
+            ),
+            pytest.param(
+                "1.234",
+                CustomField.FieldDataType.INT,
+                EN,
+                id="int-german-thousands-is-a-fraction-in-english",
+            ),
+            pytest.param(
+                "12.50",
+                CustomField.FieldDataType.INT,
+                DE,
+                id="int-english-decimal-is-malformed-in-german",
+            ),
+            pytest.param(
+                "1.234.567",
+                CustomField.FieldDataType.FLOAT,
+                EN,
+                id="float-multiple-dots-in-english",
             ),
         ],
     )
-    def test_returns_none(self, value: str, data_type: str) -> None:
+    def test_returns_none(self, value: str, data_type: str, locale: Locale) -> None:
         """
         GIVEN:
-            - A value that cannot be converted to the given data type
+            - A value that cannot be converted to the given data type in a locale
         WHEN:
             - The value is converted
         THEN:
             - None is returned
         """
-        assert _convert_value(value, data_type) is None
+        assert _convert_value(value, data_type, locale) is None
 
     @pytest.mark.parametrize(
         "data_type",
@@ -1698,7 +2018,7 @@ class TestConvertValue:
         THEN:
             - None is returned
         """
-        assert _convert_value(value, data_type) is None
+        assert _convert_value(value, data_type, EN) is None
 
     @pytest.mark.parametrize(
         "value",
@@ -1721,7 +2041,7 @@ class TestConvertValue:
         THEN:
             - The result is True
         """
-        assert _convert_value(value, CustomField.FieldDataType.BOOL) is True
+        assert _convert_value(value, CustomField.FieldDataType.BOOL, EN) is True
 
     @pytest.mark.parametrize(
         "value",
@@ -1742,7 +2062,7 @@ class TestConvertValue:
         THEN:
             - The result is False
         """
-        assert _convert_value(value, CustomField.FieldDataType.BOOL) is False
+        assert _convert_value(value, CustomField.FieldDataType.BOOL, EN) is False
 
 
 class TestRenderPages:
