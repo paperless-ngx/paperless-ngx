@@ -695,6 +695,46 @@ describe('AppFrameComponent', () => {
     expect(maybeRefreshSpy).toHaveBeenCalled()
   })
 
+  it('should show new release pill and mark releases seen on click', () => {
+    settingsService.set(SETTINGS_KEYS.VERSION, '3.5.1')
+    settingsService.set(SETTINGS_KEYS.WHATS_NEW_LAST_SEEN_VERSION, '3.4.2')
+    fixture.detectChanges()
+
+    const pill = fixture.debugElement
+      .queryAll(By.css('button'))
+      .find((b) => b.nativeElement.textContent.trim() === 'New')
+    expect(pill).toBeTruthy()
+
+    pill.nativeElement.click()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}ui_settings/`
+    )
+    expect(req.request.body.settings.whats_new.last_seen_version).toEqual(
+      '3.5.1'
+    )
+    req.flush({ success: true })
+    fixture.detectChanges()
+
+    expect(
+      fixture.debugElement
+        .queryAll(By.css('button'))
+        .find((b) => b.nativeElement.textContent.trim() === 'New')
+    ).toBeUndefined()
+  })
+
+  it('should show new release dot in slim sidebar', () => {
+    settingsService.set(SETTINGS_KEYS.SLIM_SIDEBAR, true)
+    settingsService.set(SETTINGS_KEYS.VERSION, '3.5.1')
+    settingsService.set(SETTINGS_KEYS.WHATS_NEW_LAST_SEEN_VERSION, '3.4.2')
+    fixture.detectChanges()
+
+    expect(
+      fixture.debugElement.query(
+        By.css('button[aria-label="See what\'s new in this version"]')
+      )
+    ).toBeTruthy()
+  })
+
   it('should show tasks badge for needs-attention tasks', () => {
     jest
       .spyOn(tasksService, 'needsAttentionTasksCount', 'get')

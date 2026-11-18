@@ -372,6 +372,17 @@
                 <pngx-input-switch class="position-absolute top-50 end-0 translate-middle-y me-1" [class.d-none]="slimSidebarEnabled || slimSidebarAnimating()" [compact]="true" title="Documentation" i18n-title [ngModel]="!settingsService.sidebarItemIsHidden(HideableSidebarItemID.Documentation)" (ngModelChange)="toggleSidebarItem(HideableSidebarItemID.Documentation, $event)"></pngx-input-switch>
               }
             </li>
+            @if (slimSidebarEnabled && settingsService.unseenReleasesSince()) {
+              <li class="nav-item d-none d-md-block">
+                <button type="button" class="nav-link btn btn-link position-relative" (click)="showReleaseNotes()"
+                  aria-label="See what's new in this version" i18n-aria-label
+                  ngbPopover="What's new" i18n-ngbPopover placement="end" container="body"
+                  triggers="mouseenter:mouseleave" popoverClass="popover-slim">
+                  <pngx-bs-icon name="info-circle"></pngx-bs-icon>
+                  <span class="position-absolute top-0 end-0 mt-2 me-2 p-1 bg-success rounded-circle"><span class="visually-hidden" i18n>New</span></span>
+                </button>
+              </li>
+            }
             <li class="nav-item" [class.visually-hidden]="slimSidebarEnabled">
               <div class="text-muted small d-flex align-items-center flex-wrap nav-label">
                 <div class="me-2">
@@ -381,6 +392,10 @@
                     triggers="mouseenter:mouseleave" popoverClass="popover-slim">
                     {{ versionString }}
                   </a>
+                  @if (settingsService.unseenReleasesSince()) {
+                    <button type="button" class="badge rounded-pill bg-transparent border border-success text-success fw-normal ms-1 align-middle" (click)="showReleaseNotes()"
+                      title="See what's new in this version" i18n-title i18n>New</button>
+                  }
                 </div>
                 @if (!settingsService.updateCheckingIsSet || appRemoteVersion()) {
                   <div class="version-check d-flex align-items-center">

@@ -551,6 +551,11 @@ export class AppFrameComponent
       })
   }
 
+  showReleaseNotes() {
+    // TODO: open release notes modal
+    this.settingsService.markReleasesSeen().pipe(first()).subscribe()
+  }
+
   setUpdateChecking(enable: boolean) {
     this.settingsService.set(SETTINGS_KEYS.UPDATE_CHECKING_ENABLED, enable)
     this.settingsService
