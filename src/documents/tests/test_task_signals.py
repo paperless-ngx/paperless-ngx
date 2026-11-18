@@ -25,6 +25,8 @@ from paperless_testing.factories import UserFactory
 
 @pytest.mark.django_db
 class TestRunZoneOcrExtraction:
+    """Zone OCR extraction triggered by the consumption finished signal."""
+
     @pytest.mark.parametrize(
         "original_file",
         [

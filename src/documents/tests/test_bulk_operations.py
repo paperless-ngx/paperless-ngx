@@ -25,6 +25,8 @@ from paperless_testing.factories import OcrTemplateFactory
 from paperless_testing.factories import UserFactory
 from paperless_testing.permissions import grant_global
 
+RUN_ZONE_OCR_BULK_URL = "/api/documents/run_zone_ocr/"
+
 
 @pytest.fixture
 def bulk_setup(paperless_dirs):
@@ -98,7 +100,7 @@ class TestRunZoneOcrBulkOperation:
         extract = mocker.patch("documents.bulk_edit.extract_zones")
         enqueue.return_value.id = "zone-ocr-task"
         response = admin_client.post(
-            "/api/documents/run_zone_ocr/",
+            RUN_ZONE_OCR_BULK_URL,
             {
                 "documents": [document.pk],
                 "template": template.pk,
@@ -205,7 +207,7 @@ class TestRunZoneOcrBulkOperation:
         enqueue = mocker.patch("documents.views.execute_bulk_operation.apply_async")
         enqueue.return_value.id = "zone-ocr-task"
         response = user_client.post(
-            "/api/documents/run_zone_ocr/",
+            RUN_ZONE_OCR_BULK_URL,
             {
                 "documents": [document.pk],
                 "template": template.pk,

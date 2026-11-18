@@ -1938,14 +1938,26 @@ class TestPDFActions(DirectoriesMixin, TestCase):
 
 @pytest.mark.django_db
 class TestBulkEditRunZoneOcr:
+    """Bulk run_zone_ocr runs zone extraction for each selected document."""
+
     @pytest.fixture
-    def mock_task(self, mocker: MockerFixture) -> mock.MagicMock:
+    def mock_extract_zones(self, mocker: MockerFixture) -> mock.MagicMock:
         return mocker.patch("documents.bulk_edit.extract_zones")
 
     def test_runs_every_selected_document_in_the_current_task(
         self,
-        mock_task: mock.MagicMock,
+        mock_extract_zones: mock.MagicMock,
+        mocker: MockerFixture,
     ) -> None:
+        """
+        GIVEN:
+            - Two selected documents and a user
+        WHEN:
+            - run_zone_ocr is called for the documents without a template
+        THEN:
+            - Extraction runs inline for each document with the requester
+            - Nothing is queued
+        """
         docs = DocumentFactory.create_batch(2)
 
         user = UserFactory()
@@ -1953,24 +1965,36 @@ class TestBulkEditRunZoneOcr:
         result = bulk_edit.run_zone_ocr([doc.id for doc in docs], user=user)
 
         assert result == "OK"
-        assert mock_task.call_args_list == [
-            mock.call(document_id=doc.id, template_id=None, requester=user)
+        assert mock_extract_zones.call_args_list == [
+            mocker.call(document_id=doc.id, template_id=None, requester=user)
             for doc in docs
         ]
-        mock_task.apply_async.assert_not_called()
+        mock_extract_zones.apply_async.assert_not_called()
 
-    def test_runs_the_chosen_template(self, mock_task: mock.MagicMock) -> None:
+    def test_runs_the_chosen_template(
+        self,
+        mock_extract_zones: mock.MagicMock,
+    ) -> None:
+        """
+        GIVEN:
+            - A document and an OCR template
+        WHEN:
+            - run_zone_ocr is called for the document with the template
+        THEN:
+            - Extraction runs inline with the template and no requester
+            - Nothing is queued
+        """
         doc = DocumentFactory()
         template = OcrTemplateFactory()
 
         bulk_edit.run_zone_ocr([doc.id], template=template.pk)
 
-        mock_task.assert_called_once_with(
+        mock_extract_zones.assert_called_once_with(
             document_id=doc.id,
             template_id=template.pk,
             requester=None,
         )
-        mock_task.apply_async.assert_not_called()
+        mock_extract_zones.apply_async.assert_not_called()
 
 
 @pytest.mark.django_db

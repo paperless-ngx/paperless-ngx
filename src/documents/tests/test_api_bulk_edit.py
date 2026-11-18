@@ -29,6 +29,8 @@ from paperless_testing.permissions import grant_all_global
 from paperless_testing.permissions import grant_global
 from paperless_testing.permissions import grant_object
 
+RUN_ZONE_OCR_BULK_URL = "/api/documents/run_zone_ocr/"
+
 
 class TestBulkEditAPI(DirectoriesMixin, APITestCase):
     def setUp(self) -> None:
@@ -2876,8 +2878,10 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
 @pytest.mark.django_db
 @pytest.mark.usefixtures("paperless_dirs")
 class TestRunZoneOcrBulkEditAPI:
+    """Bulk run_zone_ocr endpoint for selected documents and chosen templates."""
+
     @pytest.fixture
-    def run_zone_ocr_mock(self, mocker: MockerFixture) -> mock.MagicMock:
+    def mock_run_zone_ocr(self, mocker: MockerFixture) -> mock.MagicMock:
         """
         Mocks the bulk method and runs accepted requests through the worker
         synchronously, as the TestBulkEditAPI setup does.
@@ -2889,7 +2893,7 @@ class TestRunZoneOcrBulkEditAPI:
 
         def run_operation(*, kwargs: dict, headers: dict) -> mock.Mock:
             execute_bulk_operation(**kwargs)
-            return mock.Mock(id="test-bulk-operation")
+            return mocker.Mock(id="test-bulk-operation")
 
         mocker.patch(
             "documents.views.execute_bulk_operation.apply_async",
@@ -2901,12 +2905,12 @@ class TestRunZoneOcrBulkEditAPI:
     def document(self) -> Document:
         return DocumentFactory()
 
-    def test_run_zone_ocr_documents_endpoint(
+    def test_queues_selected_documents(
         self,
         admin_client: APIClient,
         admin_user: User,
         document: Document,
-        run_zone_ocr_mock: mock.MagicMock,
+        mock_run_zone_ocr: mock.MagicMock,
     ) -> None:
         """
         GIVEN:
@@ -2917,22 +2921,22 @@ class TestRunZoneOcrBulkEditAPI:
             - run_zone_ocr is called with the document
         """
         response = admin_client.post(
-            "/api/documents/run_zone_ocr/",
-            json.dumps({"documents": [document.id]}),
-            content_type="application/json",
+            RUN_ZONE_OCR_BULK_URL,
+            {"documents": [document.id]},
+            format="json",
         )
         assert response.status_code == status.HTTP_200_OK
-        run_zone_ocr_mock.assert_called_once()
-        args, kwargs = run_zone_ocr_mock.call_args
+        mock_run_zone_ocr.assert_called_once()
+        args, kwargs = mock_run_zone_ocr.call_args
         assert args[0] == [document.id]
         assert kwargs == {"user": admin_user}
 
-    def test_run_zone_ocr_documents_endpoint_with_template(
+    def test_queues_chosen_template(
         self,
         admin_client: APIClient,
         admin_user: User,
         document: Document,
-        run_zone_ocr_mock: mock.MagicMock,
+        mock_run_zone_ocr: mock.MagicMock,
     ) -> None:
         """
         GIVEN:
@@ -2944,21 +2948,21 @@ class TestRunZoneOcrBulkEditAPI:
         """
         template = OcrTemplateFactory()
         response = admin_client.post(
-            "/api/documents/run_zone_ocr/",
-            json.dumps({"documents": [document.id], "template": template.pk}),
-            content_type="application/json",
+            RUN_ZONE_OCR_BULK_URL,
+            {"documents": [document.id], "template": template.pk},
+            format="json",
         )
         assert response.status_code == status.HTTP_200_OK
-        run_zone_ocr_mock.assert_called_once()
-        args, kwargs = run_zone_ocr_mock.call_args
+        mock_run_zone_ocr.assert_called_once()
+        args, kwargs = mock_run_zone_ocr.call_args
         assert args[0] == [document.id]
         assert kwargs == {"template": template.pk, "user": admin_user}
 
-    def test_run_zone_ocr_documents_endpoint_rejects_private_template(
+    def test_rejects_private_template(
         self,
         rest_api_client: APIClient,
         document: Document,
-        run_zone_ocr_mock: mock.MagicMock,
+        mock_run_zone_ocr: mock.MagicMock,
     ) -> None:
         """
         GIVEN:
@@ -2977,10 +2981,10 @@ class TestRunZoneOcrBulkEditAPI:
         rest_api_client.force_authenticate(user=user)
 
         response = rest_api_client.post(
-            "/api/documents/run_zone_ocr/",
-            json.dumps({"documents": [document.id], "template": template.pk}),
-            content_type="application/json",
+            RUN_ZONE_OCR_BULK_URL,
+            {"documents": [document.id], "template": template.pk},
+            format="json",
         )
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
-        run_zone_ocr_mock.assert_not_called()
+        mock_run_zone_ocr.assert_not_called()

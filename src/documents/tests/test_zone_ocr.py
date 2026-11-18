@@ -50,6 +50,37 @@ if TYPE_CHECKING:
     from paperless_testing.dirs import PaperlessDirs
 
 
+def make_template(name: str, **kwargs: Any) -> OcrTemplate:
+    """Build a saved template, 100x50 by default."""
+    kwargs.setdefault("source_width", 100)
+    kwargs.setdefault("source_height", 50)
+    return OcrTemplateFactory(name=name, **kwargs)
+
+
+def make_zone(
+    template: OcrTemplate,
+    name: str,
+    target: str = OcrTemplateZone.TargetType.TITLE,
+    **kwargs: Any,
+) -> OcrTemplateZone:
+    """Build a 20x10 zone at the origin of the template."""
+    return OcrTemplateZoneFactory(
+        template=template,
+        name=name,
+        target=target,
+        width=20,
+        height=10,
+        **kwargs,
+    )
+
+
+def make_visible_template(name: str, **kwargs: Any) -> OcrTemplate:
+    """Build a 100x100 template matching "Northwind"."""
+    kwargs.setdefault("match", "Northwind")
+    kwargs.setdefault("source_height", 100)
+    return make_template(name, **kwargs)
+
+
 class TestZoneExtraction:
     """Tests for single-zone cropping, extraction and preview."""
 
@@ -190,8 +221,8 @@ class TestZoneExtraction:
 
         def read_crop(
             args: list[str],
-            **kwargs: object,
-        ) -> subprocess.CompletedProcess:
+            **kwargs: Any,
+        ) -> subprocess.CompletedProcess[str]:
             with Image.open(args[1]) as crop:
                 assert crop.size == (40, 20)
                 assert crop.getpixel((0, 0)) == (0, 0, 0)
@@ -404,30 +435,6 @@ class TestZoneExtraction:
             "raw_text": "account abc",
             "value": "ACCOUNT ABC",
         }
-
-
-def make_template(name: str, **kwargs: Any) -> OcrTemplate:
-    """Build a saved template, 100x50 by default."""
-    kwargs.setdefault("source_width", 100)
-    kwargs.setdefault("source_height", 50)
-    return OcrTemplateFactory(name=name, **kwargs)
-
-
-def make_zone(
-    template: OcrTemplate,
-    name: str,
-    target: str = OcrTemplateZone.TargetType.TITLE,
-    **kwargs: Any,
-) -> OcrTemplateZone:
-    """Build a 20x10 zone at the origin of the template."""
-    return OcrTemplateZoneFactory(
-        template=template,
-        name=name,
-        target=target,
-        width=20,
-        height=10,
-        **kwargs,
-    )
 
 
 @pytest.mark.django_db
@@ -697,7 +704,7 @@ class TestSavedZoneExtraction:
         pdf.write_bytes(b"%PDF-1.4")
         rendered = []
 
-        def execute(args: list[str], **kwargs: Any) -> subprocess.CompletedProcess:
+        def execute(args: list[str], **kwargs: Any) -> subprocess.CompletedProcess[str]:
             if args[0] == "pdftoppm":
                 output = Path(args[-1]).with_suffix(".png")
                 with Image.new("RGB", (100, 50), "white") as image:
@@ -745,7 +752,10 @@ class TestSavedZoneExtraction:
             zone_source_height=100,
         )
 
-        def read_crop(args: list[str], **kwargs: Any) -> subprocess.CompletedProcess:
+        def read_crop(
+            args: list[str],
+            **kwargs: Any,
+        ) -> subprocess.CompletedProcess[str]:
             with Image.open(args[1]) as crop:
                 assert crop.size == (20, 10)
             return subprocess.CompletedProcess(args, 0, stdout="extracted")
@@ -1004,6 +1014,8 @@ class TestSavedZoneExtraction:
 
 
 class TestCombineFieldValue:
+    """Tests for combining zone values into one field value."""
+
     @pytest.mark.parametrize(
         ("fmt", "zones", "expected"),
         [
@@ -1036,13 +1048,6 @@ class TestCombineFieldValue:
             - The combined string matches the expected result
         """
         assert _combine_field_value(fmt, zones) == expected
-
-
-def make_visible_template(name: str, **kwargs: Any) -> OcrTemplate:
-    """Build a 100x100 template matching "Northwind"."""
-    kwargs.setdefault("match", "Northwind")
-    kwargs.setdefault("source_height", 100)
-    return make_template(name, **kwargs)
 
 
 @pytest.mark.django_db
@@ -1765,7 +1770,7 @@ class TestRenderPages:
               renderer arguments
         """
 
-        def render(args: list[str], **kwargs: object) -> None:
+        def render(args: list[str], **kwargs: Any) -> None:
             Path(args[-1]).with_suffix(".png").write_bytes(b"rendered")
 
         mock_zone_ocr_run.side_effect = render
@@ -1826,7 +1831,7 @@ class TestRenderPages:
             - The failing page is skipped and the other page is still rendered
         """
 
-        def render(args: list[str], **kwargs: object) -> None:
+        def render(args: list[str], **kwargs: Any) -> None:
             if args[args.index("-f") + 1] == "1":
                 raise error
             Path(args[-1]).with_suffix(".png").write_bytes(b"rendered")

@@ -52,7 +52,7 @@ PREVIEW_ZONE_URL = f"{ENDPOINT}test-zone/"
 SKIPPED_NO_TEMPLATE = {"status": "skipped", "reason": "no_template", "results": []}
 
 
-def make_template_data(**overrides: Any) -> dict[str, Any]:
+def template_payload(**overrides: Any) -> dict[str, Any]:
     data: dict[str, Any] = {
         "name": "Invoice Template",
         "match": "Northwind",
@@ -67,7 +67,7 @@ def make_template_data(**overrides: Any) -> dict[str, Any]:
     return data
 
 
-def make_zone_data(custom_field_id: int | None, **overrides: Any) -> dict[str, Any]:
+def zone_payload(custom_field_id: int | None, **overrides: Any) -> dict[str, Any]:
     data: dict[str, Any] = {
         "name": "Zone 1",
         "custom_field": custom_field_id,
@@ -108,9 +108,9 @@ def doclink_field(db: None) -> CustomField:
 
 
 @pytest.fixture
-def make_zone(text_field: CustomField) -> Callable[..., dict[str, Any]]:
+def text_zone_payload(text_field: CustomField) -> Callable[..., dict[str, Any]]:
     """Zone payload builder whose custom field defaults to the text field."""
-    return functools.partial(make_zone_data, text_field.pk)
+    return functools.partial(zone_payload, text_field.pk)
 
 
 def write_blank_png(path: Path) -> None:
@@ -153,6 +153,10 @@ def mock_preview(mocker: MockerFixture) -> MagicMock:
 @pytest.fixture
 def mock_render(mocker: MockerFixture) -> MagicMock:
     return mocker.patch("documents.views.subprocess.run")
+
+
+def detail_url(pk: int) -> str:
+    return f"{ENDPOINT}{pk}/"
 
 
 def preview_url(document: Document, page: int = 0) -> str:
@@ -201,6 +205,8 @@ def preview_document(preview_user: User, paperless_dirs: PaperlessDirs) -> Docum
 @pytest.mark.django_db
 @pytest.mark.usefixtures("paperless_dirs")
 class TestZoneOcrIndexing:
+    """Zone OCR results are reflected in the search index."""
+
     @pytest.mark.parametrize(
         "entry_point",
         [
@@ -301,7 +307,7 @@ class TestZoneOcrIndexing:
                 document_consumption_finished.send(sender=None, document=file_document)
             elif entry_point == "single":
                 response = admin_client.post(
-                    f"/api/documents/{document.pk}/run-zone-ocr/",
+                    RUN_ZONE_OCR_URL.format(pk=document.pk),
                 )
                 assert response.status_code == status.HTTP_200_OK
             else:
@@ -323,22 +329,24 @@ class TestZoneOcrIndexing:
 @pytest.mark.django_db
 @pytest.mark.usefixtures("paperless_dirs")
 class TestOcrTemplateCreate:
-    def test_create_template(
+    """Creating OCR templates through the API."""
+
+    def test_creates_template(
         self,
         admin_client: APIClient,
-        make_zone: Callable[..., dict[str, Any]],
+        text_zone_payload: Callable[..., dict[str, Any]],
     ) -> None:
         """
         GIVEN:
-            - A document type and custom fields exist
+            - A string custom field exists for the zone
         WHEN:
             - API request to create an OCR template with one zone
         THEN:
             - The template and zone are created
         """
-        data = make_template_data(
+        data = template_payload(
             zones=[
-                make_zone(
+                text_zone_payload(
                     name="Invoice Number",
                     x=1500,
                     y=200,
@@ -359,7 +367,7 @@ class TestOcrTemplateCreate:
         assert OcrTemplate.objects.count() == 1
         assert OcrTemplateZone.objects.count() == 1
 
-    def test_create_template_sets_owner(
+    def test_sets_owner(
         self,
         admin_client: APIClient,
         admin_user: User,
@@ -372,12 +380,12 @@ class TestOcrTemplateCreate:
         THEN:
             - The requesting user owns the template
         """
-        response = admin_client.post(ENDPOINT, make_template_data(), format="json")
+        response = admin_client.post(ENDPOINT, template_payload(), format="json")
 
         assert response.status_code == status.HTTP_201_CREATED
         assert OcrTemplate.objects.get().owner == admin_user
 
-    def test_create_template_multiple_zones(
+    def test_multiple_zones(
         self,
         admin_client: APIClient,
         text_field: CustomField,
@@ -391,10 +399,10 @@ class TestOcrTemplateCreate:
         THEN:
             - All zones are created
         """
-        data = make_template_data(
+        data = template_payload(
             zones=[
-                make_zone_data(text_field.pk, name="Invoice Number"),
-                make_zone_data(date_field.pk, name="Invoice Date", order=1),
+                zone_payload(text_field.pk, name="Invoice Number"),
+                zone_payload(date_field.pk, name="Invoice Date", order=1),
             ],
         )
         resp = admin_client.post(ENDPOINT, data, format="json")
@@ -402,7 +410,7 @@ class TestOcrTemplateCreate:
         assert len(resp.json()["zones"]) == 2
         assert OcrTemplateZone.objects.count() == 2
 
-    def test_create_template_no_zones(self, admin_client: APIClient) -> None:
+    def test_no_zones(self, admin_client: APIClient) -> None:
         """
         GIVEN:
             - Valid template data without zones
@@ -411,14 +419,14 @@ class TestOcrTemplateCreate:
         THEN:
             - Template is created with no zones
         """
-        resp = admin_client.post(ENDPOINT, make_template_data(), format="json")
+        resp = admin_client.post(ENDPOINT, template_payload(), format="json")
         assert resp.status_code == status.HTTP_201_CREATED
         assert len(resp.json()["zones"]) == 0
 
     def test_custom_and_builtin_zones_can_have_no_custom_field(
         self,
         admin_client: APIClient,
-        make_zone: Callable[..., dict[str, Any]],
+        text_zone_payload: Callable[..., dict[str, Any]],
     ) -> None:
         """
         GIVEN:
@@ -430,14 +438,14 @@ class TestOcrTemplateCreate:
             - Both zones are created with no custom field
             - The zone string representation names the template and zone
         """
-        data = make_template_data(
+        data = template_payload(
             zones=[
-                make_zone(custom_field=None),
-                make_zone(name="Title", target="title", custom_field=None),
+                text_zone_payload(custom_field=None),
+                text_zone_payload(name="Title", target="title", custom_field=None),
             ],
         )
         response = admin_client.post(ENDPOINT, data, format="json")
-        assert response.status_code == 201
+        assert response.status_code == status.HTTP_201_CREATED
         assert [z["custom_field"] for z in response.json()["zones"]] == [None, None]
         zone = OcrTemplateZone.objects.get(name="Title")
         assert str(zone) == f"{zone.template.name} -> Title"
@@ -445,7 +453,7 @@ class TestOcrTemplateCreate:
     def test_template_creation_rolls_back_when_a_zone_cannot_be_saved(
         self,
         admin_client: APIClient,
-        make_zone: Callable[..., dict[str, Any]],
+        text_zone_payload: Callable[..., dict[str, Any]],
         mocker: MockerFixture,
     ) -> None:
         """
@@ -457,7 +465,9 @@ class TestOcrTemplateCreate:
             - The error propagates
             - Neither the template nor the first zone is persisted
         """
-        data = make_template_data(zones=[make_zone(), make_zone(name="Broken")])
+        data = template_payload(
+            zones=[text_zone_payload(), text_zone_payload(name="Broken")],
+        )
         create = OcrTemplateZone.objects.create
 
         def create_zone(**kwargs: Any) -> OcrTemplateZone:
@@ -478,6 +488,8 @@ class TestOcrTemplateCreate:
 @pytest.mark.django_db
 @pytest.mark.usefixtures("paperless_dirs")
 class TestOcrTemplatePermissions:
+    """Visibility and modification rights for OCR templates."""
+
     def test_list_only_shows_permitted_templates(
         self,
         regular_user: User,
@@ -534,7 +546,7 @@ class TestOcrTemplatePermissions:
             owner=other,
         )
         grant_object(regular_user, template, "view_ocrtemplate")
-        url = f"{ENDPOINT}{template.pk}/"
+        url = detail_url(template.pk)
 
         response = user_client.patch(url, {"name": "Renamed"}, format="json")
         assert response.status_code == status.HTTP_403_FORBIDDEN
@@ -597,7 +609,7 @@ class TestOcrTemplatePermissions:
         grant_object(regular_user, template, "view_ocrtemplate", "change_ocrtemplate")
 
         response = user_client.patch(
-            f"{ENDPOINT}{template.pk}/",
+            detail_url(template.pk),
             make_data(regular_user),
             format="json",
         )
@@ -610,6 +622,8 @@ class TestOcrTemplatePermissions:
 @pytest.mark.django_db
 @pytest.mark.usefixtures("paperless_dirs")
 class TestOcrTemplateValidation:
+    """Validation of OCR template and zone payloads."""
+
     @pytest.mark.parametrize(
         ("template_overrides", "zone_overrides"),
         [
@@ -629,10 +643,10 @@ class TestOcrTemplateValidation:
             ),
         ],
     )
-    def test_create_template_rejects_invalid_dimensions(
+    def test_rejects_invalid_dimensions(
         self,
         admin_client: APIClient,
-        make_zone: Callable[..., dict[str, Any]],
+        text_zone_payload: Callable[..., dict[str, Any]],
         template_overrides: dict[str, Any],
         zone_overrides: dict[str, Any] | None,
     ) -> None:
@@ -645,12 +659,12 @@ class TestOcrTemplateValidation:
         THEN:
             - 400 error is returned
         """
-        zones = [] if zone_overrides is None else [make_zone(**zone_overrides)]
-        data = make_template_data(zones=zones, **template_overrides)
+        zones = [] if zone_overrides is None else [text_zone_payload(**zone_overrides)]
+        data = template_payload(zones=zones, **template_overrides)
         resp = admin_client.post(ENDPOINT, data, format="json")
         assert resp.status_code == status.HTTP_400_BAD_REQUEST
 
-    def test_create_template_rejects_automatic_matching(
+    def test_rejects_automatic_matching(
         self,
         admin_client: APIClient,
     ) -> None:
@@ -665,14 +679,14 @@ class TestOcrTemplateValidation:
         """
         response = admin_client.post(
             ENDPOINT,
-            make_template_data(matching_algorithm=MatchingModel.MATCH_AUTO),
+            template_payload(matching_algorithm=MatchingModel.MATCH_AUTO),
             format="json",
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert OcrTemplate.objects.count() == 0
 
-    def test_create_zone_unsupported_custom_field_type_rejected(
+    def test_zone_unsupported_custom_field_type_rejected(
         self,
         admin_client: APIClient,
         doclink_field: CustomField,
@@ -686,14 +700,14 @@ class TestOcrTemplateValidation:
         THEN:
             - 400 error is returned
         """
-        data = make_template_data(zones=[make_zone_data(doclink_field.pk)])
+        data = template_payload(zones=[zone_payload(doclink_field.pk)])
         resp = admin_client.post(ENDPOINT, data, format="json")
         assert resp.status_code == status.HTTP_400_BAD_REQUEST
 
     def test_zone_bounds_use_the_zones_own_source_dimensions(
         self,
         admin_client: APIClient,
-        make_zone: Callable[..., dict[str, Any]],
+        text_zone_payload: Callable[..., dict[str, Any]],
     ) -> None:
         """
         GIVEN:
@@ -705,11 +719,11 @@ class TestOcrTemplateValidation:
         THEN:
             - The first request succeeds, the second is rejected
         """
-        data = make_template_data(
+        data = template_payload(
             source_width=500,
             source_height=500,
             zones=[
-                make_zone(
+                text_zone_payload(
                     x=700,
                     y=600,
                     width=200,
@@ -720,16 +734,16 @@ class TestOcrTemplateValidation:
             ],
         )
         response = admin_client.post(ENDPOINT, data, format="json")
-        assert response.status_code == 201
+        assert response.status_code == status.HTTP_201_CREATED
         data["name"] = "Invalid bounds"
         data["zones"][0]["zone_source_width"] = 800
         response = admin_client.post(ENDPOINT, data, format="json")
-        assert response.status_code == 400
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     def test_changing_source_dimensions_checks_existing_zones(
         self,
         admin_client: APIClient,
-        make_zone: Callable[..., dict[str, Any]],
+        text_zone_payload: Callable[..., dict[str, Any]],
     ) -> None:
         """
         GIVEN:
@@ -741,28 +755,36 @@ class TestOcrTemplateValidation:
         """
         response = admin_client.post(
             ENDPOINT,
-            make_template_data(zones=[make_zone()]),
+            template_payload(zones=[text_zone_payload()]),
             format="json",
         )
-        url = f"{ENDPOINT}{response.json()['id']}/"
+        url = detail_url(response.json()["id"])
         response = admin_client.patch(url, {"source_width": 200}, format="json")
-        assert response.status_code == 400
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
         response = admin_client.patch(url, {"source_width": 1000}, format="json")
-        assert response.status_code == 200
+        assert response.status_code == status.HTTP_200_OK
 
     @pytest.mark.parametrize(
         ("changes", "expected_status"),
         [
-            pytest.param({"x": 900, "width": 200}, 400, id="exceeds-width"),
-            pytest.param({"y": 990, "height": 50}, 400, id="exceeds-height"),
-            pytest.param({}, 200, id="within-bounds"),
+            pytest.param(
+                {"x": 900, "width": 200},
+                status.HTTP_400_BAD_REQUEST,
+                id="exceeds-width",
+            ),
+            pytest.param(
+                {"y": 990, "height": 50},
+                status.HTTP_400_BAD_REQUEST,
+                id="exceeds-height",
+            ),
+            pytest.param({}, status.HTTP_200_OK, id="within-bounds"),
         ],
     )
     def test_partial_zone_replacement_checks_saved_dimensions(
         self,
         admin_client: APIClient,
         admin_user: User,
-        make_zone: Callable[..., dict[str, Any]],
+        text_zone_payload: Callable[..., dict[str, Any]],
         changes: dict[str, int],
         expected_status: int,
     ) -> None:
@@ -781,8 +803,8 @@ class TestOcrTemplateValidation:
             owner=admin_user,
         )
         response = admin_client.patch(
-            f"{ENDPOINT}{template.pk}/",
-            {"zones": [make_zone(**changes)]},
+            detail_url(template.pk),
+            {"zones": [text_zone_payload(**changes)]},
             format="json",
         )
         assert response.status_code == expected_status
@@ -812,11 +834,11 @@ class TestOcrTemplateValidation:
             height=10,
         )
         response = admin_client.patch(
-            f"{ENDPOINT}{template.pk}/",
+            detail_url(template.pk),
             {"zones": [{"name": "Incomplete"}]},
             format="json",
         )
-        assert response.status_code == 400
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert list(template.zones.all()) == [zone]
 
     @pytest.mark.parametrize(
@@ -830,7 +852,7 @@ class TestOcrTemplateValidation:
     def test_invalid_page_numbers_are_rejected(
         self,
         admin_client: APIClient,
-        make_zone: Callable[..., dict[str, Any]],
+        text_zone_payload: Callable[..., dict[str, Any]],
         page: int | str,
     ) -> None:
         """
@@ -843,10 +865,10 @@ class TestOcrTemplateValidation:
         """
         response = admin_client.post(
             ENDPOINT,
-            make_template_data(zones=[make_zone(page=page)]),
+            template_payload(zones=[text_zone_payload(page=page)]),
             format="json",
         )
-        assert response.status_code == 400
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     @pytest.mark.parametrize(
         "formats",
@@ -860,7 +882,7 @@ class TestOcrTemplateValidation:
     def test_combine_formats_must_map_keys_to_strings(
         self,
         admin_client: APIClient,
-        formats: Any,
+        formats: object,
     ) -> None:
         """
         GIVEN:
@@ -872,10 +894,10 @@ class TestOcrTemplateValidation:
         """
         response = admin_client.post(
             ENDPOINT,
-            make_template_data(combine_formats=formats),
+            template_payload(combine_formats=formats),
             format="json",
         )
-        assert response.status_code == 400
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     def test_combine_formats_accepts_string_values(
         self,
@@ -891,17 +913,19 @@ class TestOcrTemplateValidation:
         """
         response = admin_client.post(
             ENDPOINT,
-            make_template_data(combine_formats={"title": " {A} - {B} "}),
+            template_payload(combine_formats={"title": " {A} - {B} "}),
             format="json",
         )
-        assert response.status_code == 201
+        assert response.status_code == status.HTTP_201_CREATED
         assert response.json()["combine_formats"] == {"title": " {A} - {B} "}
 
 
 @pytest.mark.django_db
 @pytest.mark.usefixtures("paperless_dirs")
 class TestOcrTemplateList:
-    def test_list_templates(
+    """Listing OCR templates."""
+
+    def test_lists_templates(
         self,
         admin_client: APIClient,
         text_field: CustomField,
@@ -934,7 +958,7 @@ class TestOcrTemplateList:
         assert data["count"] == 1
         assert len(data["results"][0]["zones"]) == 1
 
-    def test_list_empty(self, admin_client: APIClient) -> None:
+    def test_empty(self, admin_client: APIClient) -> None:
         """
         GIVEN:
             - No templates
@@ -951,6 +975,8 @@ class TestOcrTemplateList:
 @pytest.mark.django_db
 @pytest.mark.usefixtures("paperless_dirs")
 class TestOcrTemplateUpdate:
+    """Updating OCR templates through the API."""
+
     def test_update_template_replaces_zones(
         self,
         admin_client: APIClient,
@@ -977,11 +1003,11 @@ class TestOcrTemplateUpdate:
             height=100,
         )
 
-        data = make_template_data(
+        data = template_payload(
             name="New Name",
-            zones=[make_zone_data(date_field.pk, name="New Zone")],
+            zones=[zone_payload(date_field.pk, name="New Zone")],
         )
-        resp = admin_client.put(f"{ENDPOINT}{template.pk}/", data, format="json")
+        resp = admin_client.put(detail_url(template.pk), data, format="json")
         assert resp.status_code == status.HTTP_200_OK
 
         template.refresh_from_db()
@@ -993,7 +1019,7 @@ class TestOcrTemplateUpdate:
         self,
         admin_client: APIClient,
         admin_user: User,
-        make_zone: Callable[..., dict[str, Any]],
+        text_zone_payload: Callable[..., dict[str, Any]],
         mocker: MockerFixture,
     ) -> None:
         """
@@ -1016,13 +1042,13 @@ class TestOcrTemplateUpdate:
             width=10,
             height=10,
         )
-        data = make_template_data(name="Changed", zones=[make_zone()])
+        data = template_payload(name="Changed", zones=[text_zone_payload()])
         mocker.patch(
             "documents.serialisers.OcrTemplateZone.objects.create",
             side_effect=IntegrityError("Zone save failed"),
         )
         with pytest.raises(IntegrityError):
-            admin_client.put(f"{ENDPOINT}{template.pk}/", data, format="json")
+            admin_client.put(detail_url(template.pk), data, format="json")
         template.refresh_from_db()
         assert template.name == "Original"
         assert list(template.zones.all()) == [zone]
@@ -1052,11 +1078,11 @@ class TestOcrTemplateUpdate:
             height=10,
         )
         response = admin_client.patch(
-            f"{ENDPOINT}{template.pk}/",
+            detail_url(template.pk),
             {"zones": []},
             format="json",
         )
-        assert response.status_code == 200
+        assert response.status_code == status.HTTP_200_OK
         assert not template.zones.exists()
 
     def test_patch_toggle_enabled(self, admin_client: APIClient) -> None:
@@ -1074,7 +1100,7 @@ class TestOcrTemplateUpdate:
         )
 
         resp = admin_client.patch(
-            f"{ENDPOINT}{template.pk}/",
+            detail_url(template.pk),
             {"enabled": False},
             format="json",
         )
@@ -1108,7 +1134,7 @@ class TestOcrTemplateUpdate:
         )
 
         resp = admin_client.patch(
-            f"{ENDPOINT}{template.pk}/",
+            detail_url(template.pk),
             {"name": "Updated Name"},
             format="json",
         )
@@ -1119,7 +1145,9 @@ class TestOcrTemplateUpdate:
 @pytest.mark.django_db
 @pytest.mark.usefixtures("paperless_dirs")
 class TestOcrTemplateDelete:
-    def test_delete_template_cascades_zones(
+    """Deleting OCR templates through the API."""
+
+    def test_cascades_zones(
         self,
         admin_client: APIClient,
         text_field: CustomField,
@@ -1144,12 +1172,12 @@ class TestOcrTemplateDelete:
             height=100,
         )
 
-        resp = admin_client.delete(f"{ENDPOINT}{template.pk}/")
+        resp = admin_client.delete(detail_url(template.pk))
         assert resp.status_code == status.HTTP_204_NO_CONTENT
         assert OcrTemplate.objects.count() == 0
         assert OcrTemplateZone.objects.count() == 0
 
-    def test_delete_nonexistent_returns_404(self, admin_client: APIClient) -> None:
+    def test_nonexistent_returns_404(self, admin_client: APIClient) -> None:
         """
         GIVEN:
             - No template with the requested id
@@ -1158,13 +1186,15 @@ class TestOcrTemplateDelete:
         THEN:
             - 404 is returned
         """
-        resp = admin_client.delete(f"{ENDPOINT}99999/")
+        resp = admin_client.delete(detail_url(99999))
         assert resp.status_code == status.HTTP_404_NOT_FOUND
 
 
 @pytest.mark.django_db
 @pytest.mark.usefixtures("paperless_dirs")
 class TestRunZoneOcr:
+    """Running zone OCR on documents through the run-zone-ocr endpoint."""
+
     @pytest.mark.parametrize(
         "template_kwargs_list",
         [
@@ -1467,7 +1497,7 @@ class TestRunZoneOcr:
 
         response = admin_client.post(RUN_ZONE_OCR_URL.format(pk=document.pk))
 
-        assert response.status_code == 200
+        assert response.status_code == status.HTTP_200_OK
         assert response.json()["results"][0]["reason"] == "no_value"
         assert response.json()["results"][0]["value"] is None
         document.refresh_from_db()
@@ -1535,7 +1565,7 @@ class TestRunZoneOcr:
             format="json",
         )
 
-        assert response.status_code == 200
+        assert response.status_code == status.HTTP_200_OK
         values = {
             result["zone"]: result["value"] for result in response.json()["results"]
         }
@@ -1552,6 +1582,8 @@ class TestRunZoneOcr:
 @pytest.mark.django_db
 @pytest.mark.usefixtures("paperless_dirs")
 class TestRunZoneOcrPermissions:
+    """Permission checks for the run-zone-ocr endpoint."""
+
     def test_rejects_a_template_the_user_cannot_view(
         self,
         regular_user: User,
@@ -1658,7 +1690,7 @@ class TestRunZoneOcrPermissions:
 
         response = user_client.post(RUN_ZONE_OCR_URL.format(pk=document.pk))
 
-        assert response.status_code == 200
+        assert response.status_code == status.HTTP_200_OK
         mock_extract.assert_called_once()
 
     def test_skips_templates_private_to_the_requester(
@@ -1785,6 +1817,8 @@ class TestRunZoneOcrPermissions:
 @pytest.mark.django_db
 @pytest.mark.usefixtures("paperless_dirs")
 class TestDocumentPageImage:
+    """Page image rendering through the document-page-image endpoint."""
+
     def test_missing_document_and_out_of_range_pages(
         self,
         preview_client: APIClient,
@@ -1799,8 +1833,11 @@ class TestDocumentPageImage:
             - 404 is returned for both
         """
         response = preview_client.get(f"{ENDPOINT}document-page-image/99999/0/")
-        assert response.status_code == 404
-        assert preview_client.get(preview_url(preview_document, 3)).status_code == 404
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+        assert (
+            preview_client.get(preview_url(preview_document, 3)).status_code
+            == status.HTTP_404_NOT_FOUND
+        )
 
     def test_serves_image_documents_without_running_poppler(
         self,
@@ -1821,7 +1858,7 @@ class TestDocumentPageImage:
 
         response = preview_client.get(preview_url(document))
 
-        assert response.status_code == 200
+        assert response.status_code == status.HTTP_200_OK
         assert response["Content-Type"] == "image/png"
         assert response.content == b"image contents"
         mock_render.assert_not_called()
@@ -1881,7 +1918,7 @@ class TestDocumentPageImage:
 
         response = preview_client.get(preview_url(preview_document, 1))
 
-        assert response.status_code == 200
+        assert response.status_code == status.HTTP_200_OK
         assert response["Content-Type"] == "image/png"
         assert response.content == b"rendered page"
         command = mock_render.call_args.args[0]
@@ -1937,7 +1974,7 @@ class TestDocumentPageImage:
 
         response = preview_client.get(preview_url(preview_document))
 
-        assert response.status_code == 404
+        assert response.status_code == status.HTTP_404_NOT_FOUND
         assert "sensitive server path" not in str(response.content)
 
     @pytest.mark.usefixtures("mock_render")
@@ -1955,12 +1992,17 @@ class TestDocumentPageImage:
             - 404 is returned
         """
 
-        assert preview_client.get(preview_url(preview_document)).status_code == 404
+        assert (
+            preview_client.get(preview_url(preview_document)).status_code
+            == status.HTTP_404_NOT_FOUND
+        )
 
 
 @pytest.mark.django_db
 @pytest.mark.usefixtures("paperless_dirs")
 class TestZonePreview:
+    """Zone preview extraction through the test-zone endpoint."""
+
     def test_uses_validated_settings_and_does_not_write(
         self,
         preview_client: APIClient,
@@ -1992,7 +2034,7 @@ class TestZonePreview:
             zone_source_height=1500,
         )
 
-        assert response.status_code == 200
+        assert response.status_code == status.HTTP_200_OK
         assert response.json() == {
             "raw_text": " 123 ",
             "value": "123",
@@ -2050,7 +2092,7 @@ class TestZonePreview:
             validation_regex=regex,
         )
 
-        assert response.status_code == 200
+        assert response.status_code == status.HTTP_200_OK
         assert response.json()["regex_match"] == expected
         assert mock_preview.call_args.args[2:4] == (0, 0)
 
@@ -2090,7 +2132,10 @@ class TestZonePreview:
             - 400 is returned and extraction does not run
         """
 
-        assert preview_zone(preview_client, preview_document, **zone).status_code == 400
+        assert (
+            preview_zone(preview_client, preview_document, **zone).status_code
+            == status.HTTP_400_BAD_REQUEST
+        )
         mock_preview.assert_not_called()
 
     @pytest.mark.parametrize(
@@ -2137,13 +2182,15 @@ class TestZonePreview:
             format="json",
         )
 
-        assert response.status_code == 400
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
         mock_preview.assert_not_called()
 
 
 @pytest.mark.django_db
 @pytest.mark.usefixtures("paperless_dirs")
 class TestOcrTemplatePreviewPermissions:
+    """Permission checks for the page image and zone preview endpoints."""
+
     @pytest.mark.parametrize(
         "action",
         [
@@ -2175,11 +2222,7 @@ class TestOcrTemplatePreviewPermissions:
         if action == "document-page-image":
             response = user_client.get(preview_url(document))
         else:
-            response = user_client.post(
-                PREVIEW_ZONE_URL,
-                {"document": document.pk, "zone": {"width": 100, "height": 50}},
-                format="json",
-            )
+            response = preview_zone(user_client, document)
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
         mock_preview.assert_not_called()
@@ -2209,23 +2252,23 @@ class TestOcrTemplatePreviewPermissions:
             mime_type="image/png",
         )
         version.source_path.write_bytes(b"private version")
-        data = {"document": version.pk, "zone": {"width": 100, "height": 50}}
-
-        assert preview_client.get(preview_url(version)).status_code == 403
         assert (
-            preview_client.post(PREVIEW_ZONE_URL, data, format="json").status_code
-            == 403
+            preview_client.get(preview_url(version)).status_code
+            == status.HTTP_403_FORBIDDEN
+        )
+        assert (
+            preview_zone(preview_client, version).status_code
+            == status.HTTP_403_FORBIDDEN
         )
         mock_render.assert_not_called()
         mock_preview.assert_not_called()
 
         grant_object(preview_user, root, "view_document")
         mock_preview.return_value = {"raw_text": None, "value": None}
-        assert preview_client.get(preview_url(version)).status_code == 200
         assert (
-            preview_client.post(PREVIEW_ZONE_URL, data, format="json").status_code
-            == 200
+            preview_client.get(preview_url(version)).status_code == status.HTTP_200_OK
         )
+        assert preview_zone(preview_client, version).status_code == status.HTTP_200_OK
 
     def test_document_page_image_requires_view_permission_on_the_document(
         self,
@@ -2245,7 +2288,7 @@ class TestOcrTemplatePreviewPermissions:
         owner = UserFactory()
         grant_global(regular_user, "view_ocrtemplate", "view_document")
         document = DocumentFactory(owner=owner)
-        url = f"{ENDPOINT}document-page-image/{document.pk}/0/"
+        url = preview_url(document)
 
         response = user_client.get(url)
         assert response.status_code == status.HTTP_403_FORBIDDEN
@@ -2255,7 +2298,7 @@ class TestOcrTemplatePreviewPermissions:
         # Past the permission check; the factory document has no file on disk.
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
-    def test_test_zone_requires_view_permission_on_the_document(
+    def test_zone_preview_requires_view_permission_on_the_document(
         self,
         regular_user: User,
         user_client: APIClient,
@@ -2275,16 +2318,11 @@ class TestOcrTemplatePreviewPermissions:
         owner = UserFactory()
         grant_global(regular_user, "add_ocrtemplate", "view_document")
         document = DocumentFactory(owner=owner)
-        data = {
-            "document": document.pk,
-            "zone": {"x": 0, "y": 0, "width": 100, "height": 100, "page": 1},
-        }
-
-        response = user_client.post(PREVIEW_ZONE_URL, data, format="json")
+        response = preview_zone(user_client, document, x=0, y=0, height=100, page=1)
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
         grant_object(regular_user, document, "view_document")
-        response = user_client.post(PREVIEW_ZONE_URL, data, format="json")
+        response = preview_zone(user_client, document, x=0, y=0, height=100, page=1)
         # Past the permission check; the factory document has no file on disk.
         assert response.status_code == status.HTTP_404_NOT_FOUND
         mock_preview.assert_not_called()
