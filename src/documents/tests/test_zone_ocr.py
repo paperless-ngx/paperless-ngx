@@ -7,11 +7,13 @@ from pathlib import Path
 from unittest.mock import MagicMock
 from unittest.mock import patch
 
+import pytest
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
 from django.test import SimpleTestCase
 from django.test import TestCase
 from PIL import Image
+from pytest_mock import MockerFixture
 
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
@@ -562,20 +564,39 @@ class TestSavedZoneExtraction(DirectoriesMixin, TestCase):
                 self.assertEqual(self.document.title, expected_title)
 
 
-class TestCombineFieldValue(SimpleTestCase):
-    def test_default_format_preserves_zone_order_and_duplicate_names(self):
-        zones = [("Same", value) for value in ["one", None, "two"]]
-        self.assertEqual(_combine_field_value("", zones), "one two")
-
-    def test_format_preserves_existing_missing_token_cleanup(self):
-        zones = [
-            ("First", "one"),
-            ("Second", None),
-        ]
-        self.assertEqual(
-            _combine_field_value("{ First } / {Second} / {Unknown}", zones),
-            "one",
-        )
+class TestCombineFieldValue:
+    @pytest.mark.parametrize(
+        ("fmt", "zones", "expected"),
+        [
+            pytest.param(
+                "",
+                [("Same", "one"), ("Same", None), ("Same", "two")],
+                "one two",
+                id="default-format-preserves-zone-order-and-duplicate-names",
+            ),
+            pytest.param(
+                "{ First } / {Second} / {Unknown}",
+                [("First", "one"), ("Second", None)],
+                "one",
+                id="format-preserves-existing-missing-token-cleanup",
+            ),
+        ],
+    )
+    def test_combine_field_value(
+        self,
+        fmt: str,
+        zones: list[tuple[str, str | None]],
+        expected: str,
+    ) -> None:
+        """
+        GIVEN:
+            - A combine format and a list of (zone name, extracted value) pairs
+        WHEN:
+            - The zone values are combined into a single field value
+        THEN:
+            - The combined string matches the expected result
+        """
+        assert _combine_field_value(fmt, zones) == expected
 
 
 class TestTemplateVisibility(DirectoriesMixin, TestCase):
@@ -698,243 +719,451 @@ class TestTemplateVisibility(DirectoriesMixin, TestCase):
         )
 
 
-class TestApplyTransform(TestCase):
+class TestApplyTransform:
     """Tests for the _apply_transform function."""
 
-    def test_strip(self):
-        self.assertEqual(_apply_transform("  hello  ", "strip"), "hello")
+    @pytest.mark.parametrize(
+        ("text", "transform", "date_format", "expected"),
+        [
+            pytest.param("  hello  ", "strip", "", "hello", id="strip"),
+            pytest.param("  hello  ", "none", "", "hello", id="none-transform"),
+            pytest.param(
+                "hello world",
+                "uppercase",
+                "",
+                "HELLO WORLD",
+                id="uppercase",
+            ),
+            pytest.param(
+                "HELLO WORLD",
+                "lowercase",
+                "",
+                "hello world",
+                id="lowercase",
+            ),
+            pytest.param(
+                "Invoice 2026-001",
+                "numeric",
+                "",
+                "2026-001",
+                id="numeric-basic",
+            ),
+            pytest.param(
+                "\u20ac1,234.56",
+                "numeric",
+                "",
+                "1,234.56",
+                id="numeric-with-currency",
+            ),
+            pytest.param(
+                "abc",
+                "numeric",
+                "",
+                "abc",
+                id="numeric-empty-result-falls-back",
+            ),
+            pytest.param(
+                "13.04.2026",
+                "date",
+                "%d.%m.%Y",
+                "2026-04-13",
+                id="date-with-format-dotted",
+            ),
+            pytest.param(
+                "01/12/2025",
+                "date",
+                "%d/%m/%Y",
+                "2025-12-01",
+                id="date-with-format-slashed",
+            ),
+            pytest.param(
+                "13.04.26",
+                "date",
+                "%d.%m.%y",
+                "2026-04-13",
+                id="date-two-digit-year",
+            ),
+            pytest.param(
+                "2026-04-13",
+                "date",
+                "",
+                "2026-04-13",
+                id="date-auto-detect-iso",
+            ),
+            pytest.param(
+                "2026/04/13",
+                "date",
+                "",
+                "2026-04-13",
+                id="date-auto-detect-slashed",
+            ),
+            pytest.param(
+                "13 April 2026",
+                "date",
+                "",
+                "2026-04-13",
+                id="date-auto-detect-month-name",
+            ),
+            pytest.param(
+                "2026-04-13",
+                "date",
+                "%d.%m.%Y",
+                "2026-04-13",
+                id="date-format-mismatch-falls-back-to-auto-detect",
+            ),
+            pytest.param(
+                "32.13.2026",
+                "date",
+                "%d.%m.%Y",
+                "32.13.2026",
+                id="date-invalid-with-format-returns-text",
+            ),
+            pytest.param(
+                "2026-13-32",
+                "date",
+                "",
+                "2026-13-32",
+                id="date-invalid-auto-detect-returns-text",
+            ),
+            pytest.param(
+                "not a date",
+                "date",
+                "",
+                "not a date",
+                id="date-not-a-date-returns-text",
+            ),
+            pytest.param("", "strip", "", "", id="empty-string"),
+            pytest.param("   ", "strip", "", "", id="whitespace-only"),
+            pytest.param(
+                "  hello  ",
+                "unknown",
+                "",
+                "hello",
+                id="unknown-transform-strips",
+            ),
+            pytest.param(
+                " -- Account #123. -- ",
+                "strip_punctuation",
+                "",
+                "Account #123",
+                id="strip-punctuation",
+            ),
+            pytest.param(
+                "2026-13-32",
+                "date",
+                "",
+                "2026-13-32",
+                id="invalid-iso-date-is-not-transformed",
+            ),
+        ],
+    )
+    def test_apply_transform(
+        self,
+        text: str,
+        transform: str,
+        date_format: str,
+        expected: str,
+    ) -> None:
+        """
+        GIVEN:
+            - Extracted text, a transform name and an optional date format
+        WHEN:
+            - The transform is applied
+        THEN:
+            - The transformed text matches the expected result
+        """
+        assert _apply_transform(text, transform, date_format) == expected
 
-    def test_none_transform(self):
-        self.assertEqual(_apply_transform("  hello  ", "none"), "hello")
+    def test_unparseable_date_preserves_text(self, mocker: MockerFixture) -> None:
+        """
+        GIVEN:
+            - dateparser raises OverflowError for the input
+        WHEN:
+            - A date transform is applied
+        THEN:
+            - The original text is returned unchanged
+        """
+        mocker.patch("documents.zone_ocr.dateparser.parse", side_effect=OverflowError)
+        assert _apply_transform("unparsable", "date") == "unparsable"
 
-    def test_uppercase(self):
-        self.assertEqual(_apply_transform("hello world", "uppercase"), "HELLO WORLD")
-
-    def test_lowercase(self):
-        self.assertEqual(_apply_transform("HELLO WORLD", "lowercase"), "hello world")
-
-    def test_numeric_basic(self):
-        self.assertEqual(_apply_transform("Invoice 2026-001", "numeric"), "2026-001")
-
-    def test_numeric_with_currency(self):
-        self.assertEqual(_apply_transform("€1,234.56", "numeric"), "1,234.56")
-
-    def test_numeric_empty_result_falls_back(self):
-        self.assertEqual(_apply_transform("abc", "numeric"), "abc")
-
-    def test_date_with_format(self):
-        self.assertEqual(
-            _apply_transform("13.04.2026", "date", "%d.%m.%Y"),
-            "2026-04-13",
-        )
-        self.assertEqual(
-            _apply_transform("01/12/2025", "date", "%d/%m/%Y"),
-            "2025-12-01",
-        )
-
-    def test_date_two_digit_year(self):
-        self.assertEqual(
-            _apply_transform("13.04.26", "date", "%d.%m.%y"),
-            "2026-04-13",
-        )
-
-    def test_date_auto_detect(self):
-        self.assertEqual(_apply_transform("2026-04-13", "date"), "2026-04-13")
-        self.assertEqual(_apply_transform("2026/04/13", "date"), "2026-04-13")
-        self.assertEqual(_apply_transform("13 April 2026", "date"), "2026-04-13")
-
-    def test_date_format_mismatch_falls_back_to_auto_detect(self):
-        self.assertEqual(
-            _apply_transform("2026-04-13", "date", "%d.%m.%Y"),
-            "2026-04-13",
-        )
-
-    def test_date_invalid_returns_text(self):
-        self.assertEqual(
-            _apply_transform("32.13.2026", "date", "%d.%m.%Y"),
-            "32.13.2026",
-        )
-        self.assertEqual(_apply_transform("2026-13-32", "date"), "2026-13-32")
-        self.assertEqual(_apply_transform("not a date", "date"), "not a date")
-
-    def test_empty_string(self):
-        self.assertEqual(_apply_transform("", "strip"), "")
-
-    def test_whitespace_only(self):
-        self.assertEqual(_apply_transform("   ", "strip"), "")
-
-    def test_unknown_transform_strips(self):
-        self.assertEqual(_apply_transform("  hello  ", "unknown"), "hello")
-
-    def test_strip_punctuation(self):
-        self.assertEqual(
-            _apply_transform(" -- Account #123. -- ", "strip_punctuation"),
-            "Account #123",
-        )
-
-    def test_invalid_iso_date_is_not_transformed(self):
-        self.assertEqual(_apply_transform("2026-13-32", "date"), "2026-13-32")
-
-    @patch("documents.zone_ocr.dateparser.parse", side_effect=OverflowError)
-    def test_unparseable_date_preserves_text(self, parse):
-        self.assertEqual(_apply_transform("unparsable", "date"), "unparsable")
-
-    def test_unknown_target_cannot_produce_a_field_update(self):
-        self.assertIsNone(
-            _prepare_field_update(OcrTemplateZone(target="unknown"), "value"),
-        )
+    def test_unknown_target_cannot_produce_a_field_update(self) -> None:
+        """
+        GIVEN:
+            - A zone whose target is not a known target
+        WHEN:
+            - A field update is prepared for it
+        THEN:
+            - No field update is produced
+        """
+        assert _prepare_field_update(OcrTemplateZone(target="unknown"), "value") is None
 
 
-class TestConvertValue(TestCase):
+class TestConvertValue:
     """Tests for the _convert_value function."""
 
-    def test_string(self):
-        self.assertEqual(
-            _convert_value("Hello", CustomField.FieldDataType.STRING),
-            "Hello",
-        )
+    @pytest.mark.parametrize(
+        ("value", "data_type", "expected"),
+        [
+            pytest.param(
+                "Hello",
+                CustomField.FieldDataType.STRING,
+                "Hello",
+                id="string",
+            ),
+            pytest.param(
+                "https://example.com",
+                CustomField.FieldDataType.URL,
+                "https://example.com",
+                id="url",
+            ),
+            pytest.param(
+                "x" * 500,
+                CustomField.FieldDataType.LONG_TEXT,
+                "x" * 500,
+                id="long-text",
+            ),
+            pytest.param("42", CustomField.FieldDataType.INT, 42, id="int-simple"),
+            pytest.param(
+                "INV-123",
+                CustomField.FieldDataType.INT,
+                123,
+                id="int-with-noise",
+            ),
+            pytest.param("-42", CustomField.FieldDataType.INT, -42, id="int-negative"),
+            pytest.param(
+                "2026-04-13",
+                CustomField.FieldDataType.DATE,
+                "2026-04-13",
+                id="date-iso",
+            ),
+            pytest.param(
+                "123.45",
+                CustomField.FieldDataType.MONETARY,
+                "123.45",
+                id="monetary-simple",
+            ),
+            pytest.param(
+                "1.234,56",
+                CustomField.FieldDataType.MONETARY,
+                "1234.56",
+                id="monetary-european",
+            ),
+            pytest.param(
+                "\u20ac1,234.56",
+                CustomField.FieldDataType.MONETARY,
+                "1234.56",
+                id="monetary-with-currency-symbol",
+            ),
+            pytest.param(
+                "12345678901234567890,12345678901234567890",
+                CustomField.FieldDataType.MONETARY,
+                "12345678901234567890.12345678901234567890",
+                id="monetary-preserves-decimal-precision",
+            ),
+        ],
+    )
+    def test_converts_to_exact_value(
+        self,
+        value: str,
+        data_type: str,
+        expected: object,
+    ) -> None:
+        """
+        GIVEN:
+            - An extracted string and a custom field data type
+        WHEN:
+            - The value is converted
+        THEN:
+            - The converted value equals the expected value exactly
+        """
+        assert _convert_value(value, data_type) == expected
 
-    def test_string_truncation(self):
+    def test_string_truncation(self) -> None:
+        """
+        GIVEN:
+            - An extracted string longer than the string field limit
+        WHEN:
+            - The value is converted to a STRING field value
+        THEN:
+            - The result is truncated to 128 characters
+        """
         result = _convert_value("x" * 200, CustomField.FieldDataType.STRING)
-        self.assertEqual(len(result), 128)
+        assert isinstance(result, str)
+        assert len(result) == 128
 
-    def test_url(self):
-        self.assertEqual(
-            _convert_value("https://example.com", CustomField.FieldDataType.URL),
-            "https://example.com",
-        )
+    @pytest.mark.parametrize(
+        ("value", "expected"),
+        [
+            pytest.param("1234.56", 1234.56, id="float-simple"),
+            pytest.param("1.234,56", 1234.56, id="float-european-format"),
+            pytest.param("1,234.56", 1234.56, id="float-us-format"),
+            pytest.param("1234,56", 1234.56, id="float-comma-only"),
+        ],
+    )
+    def test_float_conversion(self, value: str, expected: float) -> None:
+        """
+        GIVEN:
+            - A numeric string in one of several decimal formats
+        WHEN:
+            - The value is converted to a FLOAT field value
+        THEN:
+            - The result is the expected float
+        """
+        assert _convert_value(value, CustomField.FieldDataType.FLOAT) == expected
 
-    def test_long_text(self):
-        long = "x" * 500
-        self.assertEqual(
-            _convert_value(long, CustomField.FieldDataType.LONG_TEXT),
-            long,
-        )
+    @pytest.mark.parametrize(
+        ("value", "data_type"),
+        [
+            pytest.param(
+                "abc",
+                CustomField.FieldDataType.INT,
+                id="int-empty-returns-none",
+            ),
+            pytest.param(
+                "-",
+                CustomField.FieldDataType.INT,
+                id="int-only-dash-returns-none",
+            ),
+            pytest.param(
+                "abc",
+                CustomField.FieldDataType.FLOAT,
+                id="float-empty-returns-none",
+            ),
+            pytest.param(
+                ",",
+                CustomField.FieldDataType.FLOAT,
+                id="float-only-separator-returns-none",
+            ),
+            pytest.param(
+                "not a date",
+                CustomField.FieldDataType.DATE,
+                id="date-invalid-returns-none",
+            ),
+            pytest.param(
+                "2026-13-32",
+                CustomField.FieldDataType.DATE,
+                id="date-invalid-values-returns-none",
+            ),
+            pytest.param(
+                "CHF",
+                CustomField.FieldDataType.MONETARY,
+                id="monetary-empty-returns-none",
+            ),
+            pytest.param(
+                "maybe",
+                CustomField.FieldDataType.BOOL,
+                id="bool-unknown-returns-none",
+            ),
+            pytest.param(
+                "test",
+                CustomField.FieldDataType.DOCUMENTLINK,
+                id="unsupported-type-documentlink-returns-none",
+            ),
+            pytest.param(
+                "test",
+                CustomField.FieldDataType.SELECT,
+                id="unsupported-type-select-returns-none",
+            ),
+            pytest.param(
+                "",
+                CustomField.FieldDataType.STRING,
+                id="empty-string-returns-none",
+            ),
+            pytest.param(
+                "9" * 400,
+                CustomField.FieldDataType.FLOAT,
+                id="float-overflow-is-not-stored-as-infinity",
+            ),
+        ],
+    )
+    def test_returns_none(self, value: str, data_type: str) -> None:
+        """
+        GIVEN:
+            - A value that cannot be converted to the given data type
+        WHEN:
+            - The value is converted
+        THEN:
+            - None is returned
+        """
+        assert _convert_value(value, data_type) is None
 
-    def test_int_simple(self):
-        self.assertEqual(_convert_value("42", CustomField.FieldDataType.INT), 42)
+    @pytest.mark.parametrize(
+        "data_type",
+        [
+            pytest.param(CustomField.FieldDataType.FLOAT, id="float"),
+            pytest.param(CustomField.FieldDataType.MONETARY, id="monetary"),
+        ],
+    )
+    @pytest.mark.parametrize(
+        "value",
+        [
+            pytest.param("1.2.3", id="multiple-dots"),
+            pytest.param("--12", id="double-leading-dash"),
+            pytest.param("12-34", id="embedded-dash"),
+            pytest.param("", id="empty"),
+            pytest.param(".", id="only-dot"),
+            pytest.param("-", id="only-dash"),
+            pytest.param("not numeric", id="not-numeric"),
+        ],
+    )
+    def test_numeric_types_reject_malformed_numbers(
+        self,
+        data_type: str,
+        value: str,
+    ) -> None:
+        """
+        GIVEN:
+            - A malformed numeric string and a FLOAT or MONETARY data type
+        WHEN:
+            - The value is converted
+        THEN:
+            - None is returned
+        """
+        assert _convert_value(value, data_type) is None
 
-    def test_int_with_noise(self):
-        self.assertEqual(_convert_value("INV-123", CustomField.FieldDataType.INT), 123)
+    @pytest.mark.parametrize(
+        "value",
+        [
+            pytest.param("true", id="true"),
+            pytest.param("True", id="true-titlecase"),
+            pytest.param("yes", id="yes"),
+            pytest.param("1", id="one"),
+            pytest.param("ja", id="ja"),
+            pytest.param("x", id="x-lowercase"),
+            pytest.param("X", id="x-uppercase"),
+        ],
+    )
+    def test_bool_true(self, value: str) -> None:
+        """
+        GIVEN:
+            - A string that represents a true boolean
+        WHEN:
+            - The value is converted to a BOOL field value
+        THEN:
+            - The result is True
+        """
+        assert _convert_value(value, CustomField.FieldDataType.BOOL) is True
 
-    def test_int_negative(self):
-        self.assertEqual(_convert_value("-42", CustomField.FieldDataType.INT), -42)
-
-    def test_int_empty_returns_none(self):
-        self.assertIsNone(_convert_value("abc", CustomField.FieldDataType.INT))
-
-    def test_int_only_dash_returns_none(self):
-        self.assertIsNone(_convert_value("-", CustomField.FieldDataType.INT))
-
-    def test_float_simple(self):
-        self.assertAlmostEqual(
-            _convert_value("1234.56", CustomField.FieldDataType.FLOAT),
-            1234.56,
-        )
-
-    def test_float_european_format(self):
-        self.assertAlmostEqual(
-            _convert_value("1.234,56", CustomField.FieldDataType.FLOAT),
-            1234.56,
-        )
-
-    def test_float_us_format(self):
-        self.assertAlmostEqual(
-            _convert_value("1,234.56", CustomField.FieldDataType.FLOAT),
-            1234.56,
-        )
-
-    def test_float_comma_only(self):
-        self.assertAlmostEqual(
-            _convert_value("1234,56", CustomField.FieldDataType.FLOAT),
-            1234.56,
-        )
-
-    def test_float_empty_returns_none(self):
-        self.assertIsNone(_convert_value("abc", CustomField.FieldDataType.FLOAT))
-
-    def test_float_only_separator_returns_none(self):
-        self.assertIsNone(_convert_value(",", CustomField.FieldDataType.FLOAT))
-
-    def test_date_iso(self):
-        self.assertEqual(
-            _convert_value("2026-04-13", CustomField.FieldDataType.DATE),
-            "2026-04-13",
-        )
-
-    def test_date_invalid_returns_none(self):
-        self.assertIsNone(_convert_value("not a date", CustomField.FieldDataType.DATE))
-
-    def test_date_invalid_values_returns_none(self):
-        self.assertIsNone(_convert_value("2026-13-32", CustomField.FieldDataType.DATE))
-
-    def test_monetary_simple(self):
-        self.assertEqual(
-            _convert_value("123.45", CustomField.FieldDataType.MONETARY),
-            "123.45",
-        )
-
-    def test_monetary_european(self):
-        self.assertEqual(
-            _convert_value("1.234,56", CustomField.FieldDataType.MONETARY),
-            "1234.56",
-        )
-
-    def test_monetary_with_currency_symbol(self):
-        self.assertEqual(
-            _convert_value("€1,234.56", CustomField.FieldDataType.MONETARY),
-            "1234.56",
-        )
-
-    def test_monetary_empty_returns_none(self):
-        self.assertIsNone(_convert_value("CHF", CustomField.FieldDataType.MONETARY))
-
-    def test_bool_true(self):
-        for val in ("true", "True", "yes", "1", "ja", "x", "X"):
-            self.assertTrue(
-                _convert_value(val, CustomField.FieldDataType.BOOL),
-                f"Expected True for {val!r}",
-            )
-
-    def test_bool_false(self):
-        for val in ("false", "False", "no", "0", "nein"):
-            self.assertFalse(
-                _convert_value(val, CustomField.FieldDataType.BOOL),
-                f"Expected False for {val!r}",
-            )
-
-    def test_bool_unknown_returns_none(self):
-        self.assertIsNone(_convert_value("maybe", CustomField.FieldDataType.BOOL))
-
-    def test_unsupported_type_returns_none(self):
-        self.assertIsNone(
-            _convert_value("test", CustomField.FieldDataType.DOCUMENTLINK),
-        )
-        self.assertIsNone(
-            _convert_value("test", CustomField.FieldDataType.SELECT),
-        )
-
-    def test_empty_string_returns_none(self):
-        self.assertIsNone(_convert_value("", CustomField.FieldDataType.STRING))
-
-    def test_numeric_types_reject_malformed_numbers(self):
-        for data_type in [
-            CustomField.FieldDataType.FLOAT,
-            CustomField.FieldDataType.MONETARY,
-        ]:
-            for value in ["1.2.3", "--12", "12-34", "", ".", "-", "not numeric"]:
-                with self.subTest(data_type=data_type, value=value):
-                    self.assertIsNone(_convert_value(value, data_type))
-
-    def test_float_overflow_is_not_stored_as_infinity(self):
-        self.assertIsNone(_convert_value("9" * 400, CustomField.FieldDataType.FLOAT))
-
-    def test_monetary_conversion_preserves_decimal_precision(self):
-        value = "12345678901234567890,12345678901234567890"
-        self.assertEqual(
-            _convert_value(value, CustomField.FieldDataType.MONETARY),
-            value.replace(",", "."),
-        )
+    @pytest.mark.parametrize(
+        "value",
+        [
+            pytest.param("false", id="false"),
+            pytest.param("False", id="false-titlecase"),
+            pytest.param("no", id="no"),
+            pytest.param("0", id="zero"),
+            pytest.param("nein", id="nein"),
+        ],
+    )
+    def test_bool_false(self, value: str) -> None:
+        """
+        GIVEN:
+            - A string that represents a false boolean
+        WHEN:
+            - The value is converted to a BOOL field value
+        THEN:
+            - The result is False
+        """
+        assert _convert_value(value, CustomField.FieldDataType.BOOL) is False
 
 
 class TestRenderPages(SimpleTestCase):
@@ -1007,23 +1236,29 @@ class TestRenderPages(SimpleTestCase):
         run.assert_not_called()
 
 
-class TestDetectMime(TestCase):
+class TestDetectMime:
     """Tests for _detect_mime."""
 
-    def test_pdf_extension(self):
-        self.assertEqual(_detect_mime(Path("test.pdf")), "application/pdf")
-
-    def test_png_extension(self):
-        self.assertEqual(_detect_mime(Path("test.png")), "image/png")
-
-    def test_jpg_extension(self):
-        self.assertEqual(_detect_mime(Path("test.jpg")), "image/jpeg")
-
-    def test_unknown_extension(self):
-        self.assertIsNone(_detect_mime(Path("test.xyz")))
-
-    def test_webp_extension(self):
-        self.assertEqual(_detect_mime(Path("test.webp")), "image/webp")
+    @pytest.mark.parametrize(
+        ("filename", "expected"),
+        [
+            pytest.param("test.pdf", "application/pdf", id="pdf-extension"),
+            pytest.param("test.png", "image/png", id="png-extension"),
+            pytest.param("test.jpg", "image/jpeg", id="jpg-extension"),
+            pytest.param("test.xyz", None, id="unknown-extension"),
+            pytest.param("test.webp", "image/webp", id="webp-extension"),
+        ],
+    )
+    def test_detect_mime(self, filename: str, expected: str | None) -> None:
+        """
+        GIVEN:
+            - A path with a given file extension
+        WHEN:
+            - The MIME type is detected
+        THEN:
+            - The expected MIME type, or None for an unknown extension, is returned
+        """
+        assert _detect_mime(Path(filename)) == expected
 
 
 class TestResolveDocPath(TestCase):
