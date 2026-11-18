@@ -1,9 +1,13 @@
 """Tests for the OCR Template API."""
 
-import json
+from __future__ import annotations
+
+import functools
 import subprocess
 from io import BytesIO
 from pathlib import Path
+from typing import TYPE_CHECKING
+from typing import Any
 from unittest.mock import patch
 
 import pytest
@@ -25,98 +29,1065 @@ from documents.signals import document_consumption_finished
 from documents.tasks import extract_zones
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import DocumentFactory
+from paperless_testing.factories import OcrTemplateFactory
+from paperless_testing.factories import OcrTemplateZoneFactory
+from paperless_testing.factories import UserFactory
 from paperless_testing.permissions import grant_global
 from paperless_testing.permissions import grant_object
 
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from pytest_django.fixtures import DjangoCaptureOnCommitCallbacks
+    from pytest_mock import MockerFixture
+    from rest_framework.test import APIClient
+
 CONTENT = "Northwind Power & Light statement"
+
+ENDPOINT = "/api/ocr_templates/"
+
+
+def make_template_data(**overrides: Any) -> dict[str, Any]:
+    data: dict[str, Any] = {
+        "name": "Invoice Template",
+        "match": "Northwind",
+        "matching_algorithm": MatchingModel.MATCH_ANY,
+        "default_page": 0,
+        "source_width": 2480,
+        "source_height": 3508,
+        "enabled": True,
+        "zones": [],
+    }
+    data.update(overrides)
+    return data
+
+
+def make_zone_data(custom_field_id: int | None, **overrides: Any) -> dict[str, Any]:
+    data: dict[str, Any] = {
+        "name": "Zone 1",
+        "custom_field": custom_field_id,
+        "x": 100,
+        "y": 100,
+        "width": 200,
+        "height": 50,
+        "ocr_language": "deu+eng",
+        "transform": "strip",
+        "order": 0,
+    }
+    data.update(overrides)
+    return data
+
+
+@pytest.fixture
+def text_field(db: None) -> CustomField:
+    return CustomField.objects.create(
+        name="Invoice Number",
+        data_type=CustomField.FieldDataType.STRING,
+    )
+
+
+@pytest.fixture
+def date_field(db: None) -> CustomField:
+    return CustomField.objects.create(
+        name="Invoice Date",
+        data_type=CustomField.FieldDataType.DATE,
+    )
+
+
+@pytest.fixture
+def doclink_field(db: None) -> CustomField:
+    return CustomField.objects.create(
+        name="Related Docs",
+        data_type=CustomField.FieldDataType.DOCUMENTLINK,
+    )
+
+
+@pytest.fixture
+def make_zone(text_field: CustomField) -> Callable[..., dict[str, Any]]:
+    """Zone payload builder whose custom field defaults to the text field."""
+    return functools.partial(make_zone_data, text_field.pk)
 
 
 @pytest.mark.django_db
-@pytest.mark.parametrize("entry_point", ["ingestion", "single", "bulk"])
-@pytest.mark.parametrize("versioned", [False, True], ids=["original", "versioned"])
-def test_zone_ocr_indexes_extracted_metadata(
-    entry_point,
-    versioned,
-    admin_client,
-    paperless_dirs,
-    django_capture_on_commit_callbacks,
-    mocker,
-):
-    document = DocumentFactory(
-        title="Before OCR",
-        content="Previous layout" if versioned else CONTENT,
-        mime_type="image/png",
-        page_count=2 if versioned else 1,
+@pytest.mark.usefixtures("paperless_dirs")
+class TestZoneOcrIndexing:
+    @pytest.mark.parametrize(
+        "entry_point",
+        [
+            pytest.param("ingestion", id="ingestion"),
+            pytest.param("single", id="single"),
+            pytest.param("bulk", id="bulk"),
+        ],
     )
-    file_document = document
-    if versioned:
-        file_document = DocumentFactory(
-            root_document=document,
-            version_index=1,
-            title="Uploaded version",
-            content=CONTENT,
+    @pytest.mark.parametrize(
+        "versioned",
+        [
+            pytest.param(False, id="original"),
+            pytest.param(True, id="versioned"),
+        ],
+    )
+    def test_zone_ocr_indexes_extracted_metadata(
+        self,
+        entry_point: str,
+        versioned: bool,  # noqa: FBT001
+        admin_client: APIClient,
+        django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A document (optionally with an uploaded version) indexed for search
+            - An OCR template with a title zone and a custom field zone
+        WHEN:
+            - Zone OCR runs through ingestion, the single-document API or the
+              bulk task
+        THEN:
+            - The root document title and custom field are updated
+            - The search index reflects the new title and custom field value
+            - A version document is left untouched
+        """
+        document = DocumentFactory(
+            title="Before OCR",
+            content="Previous layout" if versioned else CONTENT,
             mime_type="image/png",
-            page_count=1,
+            page_count=2 if versioned else 1,
         )
-    with Image.new("RGB", (100, 100), "white") as image:
-        image.save(file_document.source_path, format="PNG")
-    template = OcrTemplate.objects.create(
-        name="Invoice template",
-        match="Northwind",
-        matching_algorithm=MatchingModel.MATCH_ANY,
-        source_width=100,
-        source_height=100,
-    )
-    field = CustomField.objects.create(name="Invoice code", data_type="string")
-    OcrTemplateZone.objects.create(
-        template=template,
-        name="Title",
-        target="title",
-        page=-1,
-        x=0,
-        y=0,
-        width=50,
-        height=50,
-    )
-    OcrTemplateZone.objects.create(
-        template=template,
-        name="Invoice code",
-        custom_field=field,
-        page=-1,
-        x=0,
-        y=50,
-        width=50,
-        height=50,
-        order=1,
-    )
-    mocker.patch(
-        "documents.zone_ocr.subprocess.run",
-        side_effect=[mocker.Mock(stdout="After OCR"), mocker.Mock(stdout="INV42")],
-    )
+        file_document = document
+        if versioned:
+            file_document = DocumentFactory(
+                root_document=document,
+                version_index=1,
+                title="Uploaded version",
+                content=CONTENT,
+                mime_type="image/png",
+                page_count=1,
+            )
+        with Image.new("RGB", (100, 100), "white") as image:
+            image.save(file_document.source_path, format="PNG")
+        template = OcrTemplateFactory(
+            name="Invoice template",
+            match="Northwind",
+            matching_algorithm=MatchingModel.MATCH_ANY,
+            source_width=100,
+            source_height=100,
+        )
+        field = CustomField.objects.create(name="Invoice code", data_type="string")
+        OcrTemplateZoneFactory(
+            template=template,
+            name="Title",
+            target=OcrTemplateZone.TargetType.TITLE,
+            page=-1,
+            x=0,
+            y=0,
+            width=50,
+            height=50,
+        )
+        OcrTemplateZoneFactory(
+            template=template,
+            name="Invoice code",
+            target=OcrTemplateZone.TargetType.CUSTOM_FIELD,
+            custom_field=field,
+            page=-1,
+            x=0,
+            y=50,
+            width=50,
+            height=50,
+            order=1,
+        )
+        mocker.patch(
+            "documents.zone_ocr.subprocess.run",
+            side_effect=[mocker.Mock(stdout="After OCR"), mocker.Mock(stdout="INV42")],
+        )
 
-    backend = get_backend()
-    if entry_point != "ingestion":
-        backend.add_or_update(document)
-        assert backend.search_ids("title:before", user=None) == [document.pk]
+        backend = get_backend()
+        if entry_point != "ingestion":
+            backend.add_or_update(document)
+            assert backend.search_ids("title:before", user=None) == [document.pk]
 
-    with django_capture_on_commit_callbacks(execute=True):
-        if entry_point == "ingestion":
-            document_consumption_finished.send(sender=None, document=file_document)
-        elif entry_point == "single":
-            response = admin_client.post(f"/api/documents/{document.pk}/run-zone-ocr/")
-            assert response.status_code == status.HTTP_200_OK
-        else:
-            extract_zones(document.pk, template.pk)
+        with django_capture_on_commit_callbacks(execute=True):
+            if entry_point == "ingestion":
+                document_consumption_finished.send(sender=None, document=file_document)
+            elif entry_point == "single":
+                response = admin_client.post(
+                    f"/api/documents/{document.pk}/run-zone-ocr/",
+                )
+                assert response.status_code == status.HTTP_200_OK
+            else:
+                extract_zones(document.pk, template.pk)
 
-    document.refresh_from_db()
-    assert document.title == "After OCR"
-    if versioned:
-        file_document.refresh_from_db()
-        assert file_document.title == "Uploaded version"
-        assert not file_document.custom_fields.exists()
-    assert backend.search_ids("title:before", user=None) == []
-    assert backend.search_ids("title:after", user=None) == [document.pk]
-    assert backend.search_ids("custom_fields.value:INV42", user=None) == [document.pk]
+        document.refresh_from_db()
+        assert document.title == "After OCR"
+        if versioned:
+            file_document.refresh_from_db()
+            assert file_document.title == "Uploaded version"
+            assert not file_document.custom_fields.exists()
+        assert backend.search_ids("title:before", user=None) == []
+        assert backend.search_ids("title:after", user=None) == [document.pk]
+        assert backend.search_ids("custom_fields.value:INV42", user=None) == [
+            document.pk,
+        ]
+
+
+@pytest.mark.django_db
+@pytest.mark.usefixtures("paperless_dirs")
+class TestOcrTemplateCreate:
+    def test_create_template(
+        self,
+        admin_client: APIClient,
+        make_zone: Callable[..., dict[str, Any]],
+    ) -> None:
+        """
+        GIVEN:
+            - A document type and custom fields exist
+        WHEN:
+            - API request to create an OCR template with one zone
+        THEN:
+            - The template and zone are created
+        """
+        data = make_template_data(
+            zones=[
+                make_zone(
+                    name="Invoice Number",
+                    x=1500,
+                    y=200,
+                    width=800,
+                    height=100,
+                ),
+            ],
+        )
+        resp = admin_client.post(ENDPOINT, data, format="json")
+        assert resp.status_code == status.HTTP_201_CREATED
+
+        result = resp.json()
+        assert result["name"] == "Invoice Template"
+        assert result["match"] == "Northwind"
+        assert result["matching_algorithm"] == MatchingModel.MATCH_ANY
+        assert len(result["zones"]) == 1
+        assert result["zones"][0]["name"] == "Invoice Number"
+        assert OcrTemplate.objects.count() == 1
+        assert OcrTemplateZone.objects.count() == 1
+
+    def test_create_template_sets_owner(
+        self,
+        admin_client: APIClient,
+        admin_user: User,
+    ) -> None:
+        """
+        GIVEN:
+            - A user creating an OCR template
+        WHEN:
+            - API request to create it without an owner
+        THEN:
+            - The requesting user owns the template
+        """
+        response = admin_client.post(ENDPOINT, make_template_data(), format="json")
+
+        assert response.status_code == status.HTTP_201_CREATED
+        assert OcrTemplate.objects.get().owner == admin_user
+
+    def test_create_template_multiple_zones(
+        self,
+        admin_client: APIClient,
+        text_field: CustomField,
+        date_field: CustomField,
+    ) -> None:
+        """
+        GIVEN:
+            - Multiple custom fields exist
+        WHEN:
+            - A template with multiple zones is created
+        THEN:
+            - All zones are created
+        """
+        data = make_template_data(
+            zones=[
+                make_zone_data(text_field.pk, name="Invoice Number"),
+                make_zone_data(date_field.pk, name="Invoice Date", order=1),
+            ],
+        )
+        resp = admin_client.post(ENDPOINT, data, format="json")
+        assert resp.status_code == status.HTTP_201_CREATED
+        assert len(resp.json()["zones"]) == 2
+        assert OcrTemplateZone.objects.count() == 2
+
+    def test_create_template_no_zones(self, admin_client: APIClient) -> None:
+        """
+        GIVEN:
+            - Valid template data without zones
+        WHEN:
+            - Template is created
+        THEN:
+            - Template is created with no zones
+        """
+        resp = admin_client.post(ENDPOINT, make_template_data(), format="json")
+        assert resp.status_code == status.HTTP_201_CREATED
+        assert len(resp.json()["zones"]) == 0
+
+    def test_custom_and_builtin_zones_can_have_no_custom_field(
+        self,
+        admin_client: APIClient,
+        make_zone: Callable[..., dict[str, Any]],
+    ) -> None:
+        """
+        GIVEN:
+            - A payload with a custom zone and a title zone, neither with a
+              custom field
+        WHEN:
+            - API request to create the template
+        THEN:
+            - Both zones are created with no custom field
+            - The zone string representation names the template and zone
+        """
+        data = make_template_data(
+            zones=[
+                make_zone(custom_field=None),
+                make_zone(name="Title", target="title", custom_field=None),
+            ],
+        )
+        response = admin_client.post(ENDPOINT, data, format="json")
+        assert response.status_code == 201
+        assert [z["custom_field"] for z in response.json()["zones"]] == [None, None]
+        zone = OcrTemplateZone.objects.get(name="Title")
+        assert str(zone) == f"{zone.template.name} -> Title"
+
+    def test_template_creation_rolls_back_when_a_zone_cannot_be_saved(
+        self,
+        admin_client: APIClient,
+        make_zone: Callable[..., dict[str, Any]],
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A payload with two zones, the second of which fails to save
+        WHEN:
+            - API request to create the template
+        THEN:
+            - The error propagates
+            - Neither the template nor the first zone is persisted
+        """
+        data = make_template_data(zones=[make_zone(), make_zone(name="Broken")])
+        create = OcrTemplateZone.objects.create
+
+        def create_zone(**kwargs: Any) -> OcrTemplateZone:
+            if kwargs["name"] == "Broken":
+                raise IntegrityError("Zone save failed")
+            return create(**kwargs)
+
+        mocker.patch(
+            "documents.serialisers.OcrTemplateZone.objects.create",
+            side_effect=create_zone,
+        )
+        with pytest.raises(IntegrityError):
+            admin_client.post(ENDPOINT, data, format="json")
+        assert OcrTemplate.objects.count() == 0
+        assert OcrTemplateZone.objects.count() == 0
+
+
+@pytest.mark.django_db
+@pytest.mark.usefixtures("paperless_dirs")
+class TestOcrTemplatePermissions:
+    def test_list_only_shows_permitted_templates(
+        self,
+        rest_api_client: APIClient,
+    ) -> None:
+        """
+        GIVEN:
+            - Templates that are unowned, owned by the user, owned by another
+              user, and owned by another user but shared with the user
+        WHEN:
+            - The user lists OCR templates
+        THEN:
+            - Only the unowned, owned and shared templates are returned
+        """
+        other = UserFactory()
+        user = UserFactory()
+        grant_global(user, "view_ocrtemplate")
+
+        def template(name: str, owner: User | None = None) -> OcrTemplate:
+            return OcrTemplateFactory(
+                name=name,
+                match="Northwind",
+                matching_algorithm=MatchingModel.MATCH_ANY,
+                source_width=1000,
+                source_height=1000,
+                owner=owner,
+            )
+
+        template("Unowned")
+        template("Mine", owner=user)
+        template("Private", owner=other)
+        grant_object(user, template("Shared", owner=other), "view_ocrtemplate")
+        rest_api_client.force_authenticate(user=user)
+
+        response = rest_api_client.get(ENDPOINT)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert sorted(t["name"] for t in response.json()["results"]) == [
+            "Mine",
+            "Shared",
+            "Unowned",
+        ]
+
+    def test_cannot_change_another_users_template(
+        self,
+        rest_api_client: APIClient,
+    ) -> None:
+        """
+        GIVEN:
+            - A template owned by another user
+        WHEN:
+            - A user with global change permission tries to update it
+        THEN:
+            - The update is refused until the user is granted change on it
+        """
+        other = UserFactory()
+        user = UserFactory()
+        grant_global(user, "view_ocrtemplate", "change_ocrtemplate")
+        template = OcrTemplateFactory(
+            name="Private",
+            match="Northwind",
+            matching_algorithm=MatchingModel.MATCH_ANY,
+            source_width=1000,
+            source_height=1000,
+            owner=other,
+        )
+        grant_object(user, template, "view_ocrtemplate")
+        rest_api_client.force_authenticate(user=user)
+        url = f"{ENDPOINT}{template.pk}/"
+
+        response = rest_api_client.patch(url, {"name": "Renamed"}, format="json")
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+        grant_object(user, template, "change_ocrtemplate")
+        response = rest_api_client.patch(url, {"name": "Renamed"}, format="json")
+        assert response.status_code == status.HTTP_200_OK
+        template.refresh_from_db()
+        assert template.name == "Renamed"
+        assert template.owner == other
+
+
+@pytest.mark.django_db
+@pytest.mark.usefixtures("paperless_dirs")
+class TestOcrTemplateValidation:
+    @pytest.mark.parametrize(
+        ("template_overrides", "zone_overrides"),
+        [
+            pytest.param({"source_width": 0}, None, id="zero-source-width"),
+            pytest.param({"source_height": 0}, None, id="zero-source-height"),
+            pytest.param({}, {"width": 0}, id="zero-zone-width"),
+            pytest.param({}, {"height": 0}, id="zero-zone-height"),
+            pytest.param(
+                {"source_width": 1000},
+                {"x": 800, "width": 300},  # 800+300 > 1000
+                id="zone-exceeds-source-width",
+            ),
+            pytest.param(
+                {"source_height": 1000},
+                {"y": 900, "height": 200},  # 900+200 > 1000
+                id="zone-exceeds-source-height",
+            ),
+        ],
+    )
+    def test_create_template_rejects_invalid_dimensions(
+        self,
+        admin_client: APIClient,
+        make_zone: Callable[..., dict[str, Any]],
+        template_overrides: dict[str, Any],
+        zone_overrides: dict[str, Any] | None,
+    ) -> None:
+        """
+        GIVEN:
+            - Template data with a zero source dimension, a zero zone
+              dimension or a zone extending beyond the source image
+        WHEN:
+            - Create is attempted
+        THEN:
+            - 400 error is returned
+        """
+        zones = [] if zone_overrides is None else [make_zone(**zone_overrides)]
+        data = make_template_data(zones=zones, **template_overrides)
+        resp = admin_client.post(ENDPOINT, data, format="json")
+        assert resp.status_code == status.HTTP_400_BAD_REQUEST
+
+    def test_create_template_rejects_automatic_matching(
+        self,
+        admin_client: APIClient,
+    ) -> None:
+        """
+        GIVEN:
+            - A template payload with automatic matching
+        WHEN:
+            - API request to create it
+        THEN:
+            - The request is rejected, automatic matching needs assigned
+              documents to learn from
+        """
+        response = admin_client.post(
+            ENDPOINT,
+            make_template_data(matching_algorithm=MatchingModel.MATCH_AUTO),
+            format="json",
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert OcrTemplate.objects.count() == 0
+
+    def test_create_zone_unsupported_custom_field_type_rejected(
+        self,
+        admin_client: APIClient,
+        doclink_field: CustomField,
+    ) -> None:
+        """
+        GIVEN:
+            - A zone targeting a DOCUMENTLINK custom field, which can't be
+              populated via OCR
+        WHEN:
+            - Create is attempted
+        THEN:
+            - 400 error is returned
+        """
+        data = make_template_data(zones=[make_zone_data(doclink_field.pk)])
+        resp = admin_client.post(ENDPOINT, data, format="json")
+        assert resp.status_code == status.HTTP_400_BAD_REQUEST
+
+    def test_zone_bounds_use_the_zones_own_source_dimensions(
+        self,
+        admin_client: APIClient,
+        make_zone: Callable[..., dict[str, Any]],
+    ) -> None:
+        """
+        GIVEN:
+            - A template with a small source size and a zone that only fits
+              within its own, larger zone source size
+        WHEN:
+            - The template is created, then created again with a smaller zone
+              source width that the zone no longer fits
+        THEN:
+            - The first request succeeds, the second is rejected
+        """
+        data = make_template_data(
+            source_width=500,
+            source_height=500,
+            zones=[
+                make_zone(
+                    x=700,
+                    y=600,
+                    width=200,
+                    height=100,
+                    zone_source_width=1000,
+                    zone_source_height=1000,
+                ),
+            ],
+        )
+        response = admin_client.post(ENDPOINT, data, format="json")
+        assert response.status_code == 201
+        data["name"] = "Invalid bounds"
+        data["zones"][0]["zone_source_width"] = 800
+        response = admin_client.post(ENDPOINT, data, format="json")
+        assert response.status_code == 400
+
+    def test_changing_source_dimensions_checks_existing_zones(
+        self,
+        admin_client: APIClient,
+        make_zone: Callable[..., dict[str, Any]],
+    ) -> None:
+        """
+        GIVEN:
+            - A template with a zone
+        WHEN:
+            - The source width is patched below, then above, the zone extent
+        THEN:
+            - The smaller width is rejected, the larger one accepted
+        """
+        response = admin_client.post(
+            ENDPOINT,
+            make_template_data(zones=[make_zone()]),
+            format="json",
+        )
+        url = f"{ENDPOINT}{response.json()['id']}/"
+        response = admin_client.patch(url, {"source_width": 200}, format="json")
+        assert response.status_code == 400
+        response = admin_client.patch(url, {"source_width": 1000}, format="json")
+        assert response.status_code == 200
+
+    @pytest.mark.parametrize(
+        "changes",
+        [
+            pytest.param({"x": 900, "width": 200}, id="exceeds-width"),
+            pytest.param({"y": 990, "height": 50}, id="exceeds-height"),
+        ],
+    )
+    def test_partial_zone_replacement_uses_saved_dimensions(
+        self,
+        admin_client: APIClient,
+        admin_user: User,
+        make_zone: Callable[..., dict[str, Any]],
+        changes: dict[str, int],
+    ) -> None:
+        """
+        GIVEN:
+            - A saved 1000x1000 template
+        WHEN:
+            - A PATCH replaces zones with one extending beyond the saved
+              source dimensions
+        THEN:
+            - The request is rejected
+        """
+        template = OcrTemplateFactory(
+            name="Test",
+            matching_algorithm=MatchingModel.MATCH_ANY,
+            owner=admin_user,
+            source_width=1000,
+            source_height=1000,
+        )
+        response = admin_client.patch(
+            f"{ENDPOINT}{template.pk}/",
+            {"zones": [make_zone(**changes)]},
+            format="json",
+        )
+        assert response.status_code == 400
+
+    def test_partial_zone_replacement_within_saved_dimensions_accepted(
+        self,
+        admin_client: APIClient,
+        admin_user: User,
+        make_zone: Callable[..., dict[str, Any]],
+    ) -> None:
+        """
+        GIVEN:
+            - A saved 1000x1000 template
+        WHEN:
+            - A PATCH replaces zones with one inside the saved dimensions
+        THEN:
+            - The request succeeds
+        """
+        template = OcrTemplateFactory(
+            name="Test",
+            matching_algorithm=MatchingModel.MATCH_ANY,
+            owner=admin_user,
+            source_width=1000,
+            source_height=1000,
+        )
+        response = admin_client.patch(
+            f"{ENDPOINT}{template.pk}/",
+            {"zones": [make_zone()]},
+            format="json",
+        )
+        assert response.status_code == 200
+
+    def test_partial_zone_replacement_requires_complete_zones(
+        self,
+        admin_client: APIClient,
+        admin_user: User,
+    ) -> None:
+        """
+        GIVEN:
+            - A template with one zone
+        WHEN:
+            - A PATCH replaces zones with an incomplete zone
+        THEN:
+            - The request is rejected and the original zone is kept
+        """
+        template = OcrTemplateFactory(
+            name="Test",
+            matching_algorithm=MatchingModel.MATCH_ANY,
+            owner=admin_user,
+            source_width=1000,
+            source_height=1000,
+        )
+        zone = OcrTemplateZoneFactory(
+            template=template,
+            name="Original",
+            target=OcrTemplateZone.TargetType.CUSTOM_FIELD,
+            x=0,
+            y=0,
+            width=10,
+            height=10,
+        )
+        response = admin_client.patch(
+            f"{ENDPOINT}{template.pk}/",
+            {"zones": [{"name": "Incomplete"}]},
+            format="json",
+        )
+        assert response.status_code == 400
+        assert list(template.zones.all()) == [zone]
+
+    @pytest.mark.parametrize(
+        "page",
+        [
+            pytest.param(0, id="zero"),
+            pytest.param(-2, id="below-last-page"),
+            pytest.param("invalid", id="not-a-number"),
+        ],
+    )
+    def test_invalid_page_numbers_are_rejected(
+        self,
+        admin_client: APIClient,
+        make_zone: Callable[..., dict[str, Any]],
+        page: int | str,
+    ) -> None:
+        """
+        GIVEN:
+            - A zone with an invalid page number
+        WHEN:
+            - Create is attempted
+        THEN:
+            - 400 error is returned
+        """
+        response = admin_client.post(
+            ENDPOINT,
+            make_template_data(zones=[make_zone(page=page)]),
+            format="json",
+        )
+        assert response.status_code == 400
+
+    @pytest.mark.parametrize(
+        "formats",
+        [
+            pytest.param([], id="empty-list"),
+            pytest.param("invalid", id="string"),
+            pytest.param({"title": []}, id="list-value"),
+            pytest.param({"title": None}, id="null-value"),
+        ],
+    )
+    def test_combine_formats_must_map_keys_to_strings(
+        self,
+        admin_client: APIClient,
+        formats: Any,
+    ) -> None:
+        """
+        GIVEN:
+            - combine_formats that is not a mapping of keys to strings
+        WHEN:
+            - Create is attempted
+        THEN:
+            - 400 error is returned
+        """
+        response = admin_client.post(
+            ENDPOINT,
+            make_template_data(combine_formats=formats),
+            format="json",
+        )
+        assert response.status_code == 400
+
+    def test_combine_formats_accepts_string_values(
+        self,
+        admin_client: APIClient,
+    ) -> None:
+        """
+        GIVEN:
+            - combine_formats mapping a key to a string
+        WHEN:
+            - Create is attempted
+        THEN:
+            - The template is created and the mapping is returned unchanged
+        """
+        response = admin_client.post(
+            ENDPOINT,
+            make_template_data(combine_formats={"title": " {A} - {B} "}),
+            format="json",
+        )
+        assert response.status_code == 201
+        assert response.json()["combine_formats"] == {"title": " {A} - {B} "}
+
+
+@pytest.mark.django_db
+@pytest.mark.usefixtures("paperless_dirs")
+class TestOcrTemplateList:
+    def test_list_templates(
+        self,
+        admin_client: APIClient,
+        text_field: CustomField,
+    ) -> None:
+        """
+        GIVEN:
+            - A template with one zone
+        WHEN:
+            - The templates are listed
+        THEN:
+            - The template is returned with its zone
+        """
+        template = OcrTemplateFactory(
+            name="Test Template",
+            match="Northwind",
+            matching_algorithm=MatchingModel.MATCH_ANY,
+            source_width=2480,
+            source_height=3508,
+        )
+        OcrTemplateZoneFactory(
+            template=template,
+            name="Zone 1",
+            target=OcrTemplateZone.TargetType.CUSTOM_FIELD,
+            custom_field=text_field,
+            x=100,
+            y=100,
+            width=200,
+            height=50,
+        )
+
+        resp = admin_client.get(ENDPOINT)
+        assert resp.status_code == status.HTTP_200_OK
+        data = resp.json()
+        assert data["count"] == 1
+        assert len(data["results"][0]["zones"]) == 1
+
+    def test_list_empty(self, admin_client: APIClient) -> None:
+        """
+        GIVEN:
+            - No templates
+        WHEN:
+            - The templates are listed
+        THEN:
+            - The count is zero
+        """
+        resp = admin_client.get(ENDPOINT)
+        assert resp.status_code == status.HTTP_200_OK
+        assert resp.json()["count"] == 0
+
+
+@pytest.mark.django_db
+@pytest.mark.usefixtures("paperless_dirs")
+class TestOcrTemplateUpdate:
+    def test_update_template_replaces_zones(
+        self,
+        admin_client: APIClient,
+        text_field: CustomField,
+        date_field: CustomField,
+    ) -> None:
+        """
+        GIVEN:
+            - A template with one zone
+        WHEN:
+            - PUT with a new name and a different zone
+        THEN:
+            - The template is renamed and its zones are replaced by the new set
+        """
+        template = OcrTemplateFactory(
+            name="Old Name",
+            match="Northwind",
+            matching_algorithm=MatchingModel.MATCH_ANY,
+            source_width=2480,
+            source_height=3508,
+        )
+        OcrTemplateZoneFactory(
+            template=template,
+            name="Old Zone",
+            target=OcrTemplateZone.TargetType.CUSTOM_FIELD,
+            custom_field=text_field,
+            x=0,
+            y=0,
+            width=100,
+            height=100,
+        )
+
+        data = make_template_data(
+            name="New Name",
+            zones=[make_zone_data(date_field.pk, name="New Zone")],
+        )
+        resp = admin_client.put(f"{ENDPOINT}{template.pk}/", data, format="json")
+        assert resp.status_code == status.HTTP_200_OK
+
+        template.refresh_from_db()
+        assert template.name == "New Name"
+        assert OcrTemplateZone.objects.count() == 1
+        assert OcrTemplateZone.objects.first().name == "New Zone"
+
+    def test_template_update_rolls_back_without_losing_previous_zones(
+        self,
+        admin_client: APIClient,
+        admin_user: User,
+        make_zone: Callable[..., dict[str, Any]],
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A template with one zone and a zone save that fails
+        WHEN:
+            - PUT with a new name and zones
+        THEN:
+            - The error propagates
+            - The template name and original zones are unchanged
+        """
+        template = OcrTemplateFactory(
+            name="Original",
+            matching_algorithm=MatchingModel.MATCH_ANY,
+            owner=admin_user,
+            source_width=1000,
+            source_height=1000,
+        )
+        zone = OcrTemplateZoneFactory(
+            template=template,
+            name="Original zone",
+            target=OcrTemplateZone.TargetType.CUSTOM_FIELD,
+            x=0,
+            y=0,
+            width=10,
+            height=10,
+        )
+        data = make_template_data(name="Changed", zones=[make_zone()])
+        mocker.patch(
+            "documents.serialisers.OcrTemplateZone.objects.create",
+            side_effect=IntegrityError("Zone save failed"),
+        )
+        with pytest.raises(IntegrityError):
+            admin_client.put(f"{ENDPOINT}{template.pk}/", data, format="json")
+        template.refresh_from_db()
+        assert template.name == "Original"
+        assert list(template.zones.all()) == [zone]
+
+    def test_explicit_empty_zones_removes_all_zones(
+        self,
+        admin_client: APIClient,
+        admin_user: User,
+    ) -> None:
+        """
+        GIVEN:
+            - A template with one zone
+        WHEN:
+            - PATCH with an explicit empty zones list
+        THEN:
+            - All zones are removed
+        """
+        template = OcrTemplateFactory(
+            name="Test",
+            matching_algorithm=MatchingModel.MATCH_ANY,
+            owner=admin_user,
+            source_width=1000,
+            source_height=1000,
+        )
+        OcrTemplateZoneFactory(
+            template=template,
+            name="Zone",
+            target=OcrTemplateZone.TargetType.CUSTOM_FIELD,
+            x=0,
+            y=0,
+            width=10,
+            height=10,
+        )
+        response = admin_client.patch(
+            f"{ENDPOINT}{template.pk}/",
+            {"zones": []},
+            format="json",
+        )
+        assert response.status_code == 200
+        assert not template.zones.exists()
+
+    def test_patch_toggle_enabled(self, admin_client: APIClient) -> None:
+        """
+        GIVEN:
+            - An enabled template
+        WHEN:
+            - PATCH with enabled false
+        THEN:
+            - The template is disabled
+        """
+        template = OcrTemplateFactory(
+            name="Toggle Test",
+            match="Northwind",
+            matching_algorithm=MatchingModel.MATCH_ANY,
+            source_width=2480,
+            source_height=3508,
+            enabled=True,
+        )
+
+        resp = admin_client.patch(
+            f"{ENDPOINT}{template.pk}/",
+            {"enabled": False},
+            format="json",
+        )
+        assert resp.status_code == status.HTTP_200_OK
+        template.refresh_from_db()
+        assert not template.enabled
+
+    def test_patch_preserves_zones(
+        self,
+        admin_client: APIClient,
+        text_field: CustomField,
+    ) -> None:
+        """
+        GIVEN:
+            - A template with one zone
+        WHEN:
+            - PATCH without a zones field
+        THEN:
+            - The existing zone is not deleted
+        """
+        template = OcrTemplateFactory(
+            name="Patch Test",
+            match="Northwind",
+            matching_algorithm=MatchingModel.MATCH_ANY,
+            source_width=2480,
+            source_height=3508,
+        )
+        OcrTemplateZoneFactory(
+            template=template,
+            name="Existing Zone",
+            target=OcrTemplateZone.TargetType.CUSTOM_FIELD,
+            custom_field=text_field,
+            x=0,
+            y=0,
+            width=100,
+            height=100,
+        )
+
+        resp = admin_client.patch(
+            f"{ENDPOINT}{template.pk}/",
+            {"name": "Updated Name"},
+            format="json",
+        )
+        assert resp.status_code == status.HTTP_200_OK
+        assert OcrTemplateZone.objects.count() == 1
+
+
+@pytest.mark.django_db
+@pytest.mark.usefixtures("paperless_dirs")
+class TestOcrTemplateDelete:
+    def test_delete_template_cascades_zones(
+        self,
+        admin_client: APIClient,
+        text_field: CustomField,
+    ) -> None:
+        """
+        GIVEN:
+            - A template with one zone
+        WHEN:
+            - The template is deleted
+        THEN:
+            - The template and its zone are removed
+        """
+        template = OcrTemplateFactory(
+            name="To Delete",
+            match="Northwind",
+            matching_algorithm=MatchingModel.MATCH_ANY,
+            source_width=2480,
+            source_height=3508,
+        )
+        OcrTemplateZoneFactory(
+            template=template,
+            name="Zone",
+            target=OcrTemplateZone.TargetType.CUSTOM_FIELD,
+            custom_field=text_field,
+            x=0,
+            y=0,
+            width=100,
+            height=100,
+        )
+
+        resp = admin_client.delete(f"{ENDPOINT}{template.pk}/")
+        assert resp.status_code == status.HTTP_204_NO_CONTENT
+        assert OcrTemplate.objects.count() == 0
+        assert OcrTemplateZone.objects.count() == 0
+
+    def test_delete_nonexistent_returns_404(self, admin_client: APIClient) -> None:
+        """
+        GIVEN:
+            - No template with the requested id
+        WHEN:
+            - A delete request is made for it
+        THEN:
+            - 404 is returned
+        """
+        resp = admin_client.delete(f"{ENDPOINT}99999/")
+        assert resp.status_code == status.HTTP_404_NOT_FOUND
 
 
 class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
@@ -134,669 +1105,8 @@ class TestOcrTemplatesAPI(DirectoriesMixin, APITestCase):
             name="Invoice Date",
             data_type=CustomField.FieldDataType.DATE,
         )
-        self.custom_field_int = CustomField.objects.create(
-            name="Amount",
-            data_type=CustomField.FieldDataType.INT,
-        )
-        self.custom_field_doclink = CustomField.objects.create(
-            name="Related Docs",
-            data_type=CustomField.FieldDataType.DOCUMENTLINK,
-        )
 
         return super().setUp()
-
-    def _make_template_data(self, **overrides):
-        data = {
-            "name": "Invoice Template",
-            "match": "Northwind",
-            "matching_algorithm": MatchingModel.MATCH_ANY,
-            "default_page": 0,
-            "source_width": 2480,
-            "source_height": 3508,
-            "enabled": True,
-            "zones": [],
-        }
-        data.update(overrides)
-        return data
-
-    def _make_zone_data(self, **overrides):
-        data = {
-            "name": "Zone 1",
-            "custom_field": self.custom_field_text.pk,
-            "x": 100,
-            "y": 100,
-            "width": 200,
-            "height": 50,
-            "ocr_language": "deu+eng",
-            "transform": "strip",
-            "order": 0,
-        }
-        data.update(overrides)
-        return data
-
-    # --- Create ---
-
-    def test_create_template(self):
-        """
-        GIVEN:
-            - A document type and custom fields exist
-        WHEN:
-            - API request to create an OCR template with one zone
-        THEN:
-            - The template and zone are created
-        """
-        data = self._make_template_data(
-            zones=[
-                self._make_zone_data(
-                    name="Invoice Number",
-                    x=1500,
-                    y=200,
-                    width=800,
-                    height=100,
-                ),
-            ],
-        )
-        resp = self.client.post(
-            self.ENDPOINT,
-            data=json.dumps(data),
-            content_type="application/json",
-        )
-        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
-
-        result = resp.json()
-        self.assertEqual(result["name"], "Invoice Template")
-        self.assertEqual(result["match"], "Northwind")
-        self.assertEqual(result["matching_algorithm"], MatchingModel.MATCH_ANY)
-        self.assertEqual(len(result["zones"]), 1)
-        self.assertEqual(result["zones"][0]["name"], "Invoice Number")
-        self.assertEqual(OcrTemplate.objects.count(), 1)
-        self.assertEqual(OcrTemplateZone.objects.count(), 1)
-
-    def test_create_template_sets_owner(self):
-        """
-        GIVEN:
-            - A user creating an OCR template
-        WHEN:
-            - API request to create it without an owner
-        THEN:
-            - The requesting user owns the template
-        """
-        response = self.client.post(
-            self.ENDPOINT,
-            json.dumps(self._make_template_data()),
-            content_type="application/json",
-        )
-
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(OcrTemplate.objects.get().owner, self.user)
-
-    def test_list_only_shows_permitted_templates(self):
-        """
-        GIVEN:
-            - Templates that are unowned, owned by the user, owned by another
-              user, and owned by another user but shared with the user
-        WHEN:
-            - The user lists OCR templates
-        THEN:
-            - Only the unowned, owned and shared templates are returned
-        """
-        other = User.objects.create_user(username="other")
-        user = User.objects.create_user(username="template_viewer")
-        user.user_permissions.add(Permission.objects.get(codename="view_ocrtemplate"))
-
-        def template(name, owner=None):
-            return OcrTemplate.objects.create(
-                name=name,
-                match="Northwind",
-                source_width=1000,
-                source_height=1000,
-                owner=owner,
-            )
-
-        template("Unowned")
-        template("Mine", owner=user)
-        template("Private", owner=other)
-        grant_object(user, template("Shared", owner=other), "view_ocrtemplate")
-        self.client.force_authenticate(user=user)
-
-        response = self.client.get(self.ENDPOINT)
-
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertCountEqual(
-            [t["name"] for t in response.json()["results"]],
-            ["Unowned", "Mine", "Shared"],
-        )
-
-    def test_cannot_change_another_users_template(self):
-        """
-        GIVEN:
-            - A template owned by another user
-        WHEN:
-            - A user with global change permission tries to update it
-        THEN:
-            - The update is refused until the user is granted change on it
-        """
-        other = User.objects.create_user(username="other")
-        user = User.objects.create_user(username="template_editor")
-        user.user_permissions.add(
-            *Permission.objects.filter(
-                codename__in=["view_ocrtemplate", "change_ocrtemplate"],
-            ),
-        )
-        template = OcrTemplate.objects.create(
-            name="Private",
-            match="Northwind",
-            source_width=1000,
-            source_height=1000,
-            owner=other,
-        )
-        grant_object(user, template, "view_ocrtemplate")
-        self.client.force_authenticate(user=user)
-        url = f"{self.ENDPOINT}{template.pk}/"
-
-        response = self.client.patch(url, {"name": "Renamed"}, format="json")
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-
-        grant_object(user, template, "change_ocrtemplate")
-        response = self.client.patch(url, {"name": "Renamed"}, format="json")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        template.refresh_from_db()
-        self.assertEqual(template.name, "Renamed")
-        self.assertEqual(template.owner, other)
-
-    def test_create_template_rejects_automatic_matching(self):
-        """
-        GIVEN:
-            - A template payload with automatic matching
-        WHEN:
-            - API request to create it
-        THEN:
-            - The request is rejected, automatic matching needs assigned
-              documents to learn from
-        """
-        response = self.client.post(
-            self.ENDPOINT,
-            json.dumps(
-                self._make_template_data(matching_algorithm=MatchingModel.MATCH_AUTO),
-            ),
-            content_type="application/json",
-        )
-
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(OcrTemplate.objects.count(), 0)
-
-    def test_create_template_multiple_zones(self):
-        """
-        GIVEN:
-            - Multiple custom fields exist
-        WHEN:
-            - A template with multiple zones is created
-        THEN:
-            - All zones are created
-        """
-        data = self._make_template_data(
-            zones=[
-                self._make_zone_data(
-                    name="Invoice Number",
-                    custom_field=self.custom_field_text.pk,
-                ),
-                self._make_zone_data(
-                    name="Invoice Date",
-                    custom_field=self.custom_field_date.pk,
-                    order=1,
-                ),
-            ],
-        )
-        resp = self.client.post(
-            self.ENDPOINT,
-            data=json.dumps(data),
-            content_type="application/json",
-        )
-        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(len(resp.json()["zones"]), 2)
-        self.assertEqual(OcrTemplateZone.objects.count(), 2)
-
-    def test_create_template_no_zones(self):
-        """
-        GIVEN:
-            - Valid template data without zones
-        WHEN:
-            - Template is created
-        THEN:
-            - Template is created with no zones
-        """
-        data = self._make_template_data()
-        resp = self.client.post(
-            self.ENDPOINT,
-            data=json.dumps(data),
-            content_type="application/json",
-        )
-        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(len(resp.json()["zones"]), 0)
-
-    # --- Validation ---
-
-    def test_create_template_zero_source_width_rejected(self):
-        """
-        GIVEN:
-            - Template data with source_width=0
-        WHEN:
-            - Create is attempted
-        THEN:
-            - 400 error is returned
-        """
-        data = self._make_template_data(source_width=0)
-        resp = self.client.post(
-            self.ENDPOINT,
-            data=json.dumps(data),
-            content_type="application/json",
-        )
-        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
-
-    def test_create_template_zero_source_height_rejected(self):
-        data = self._make_template_data(source_height=0)
-        resp = self.client.post(
-            self.ENDPOINT,
-            data=json.dumps(data),
-            content_type="application/json",
-        )
-        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
-
-    def test_create_zone_zero_width_rejected(self):
-        data = self._make_template_data(
-            zones=[self._make_zone_data(width=0)],
-        )
-        resp = self.client.post(
-            self.ENDPOINT,
-            data=json.dumps(data),
-            content_type="application/json",
-        )
-        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
-
-    def test_create_zone_zero_height_rejected(self):
-        data = self._make_template_data(
-            zones=[self._make_zone_data(height=0)],
-        )
-        resp = self.client.post(
-            self.ENDPOINT,
-            data=json.dumps(data),
-            content_type="application/json",
-        )
-        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
-
-    def test_create_zone_exceeds_source_width_rejected(self):
-        """Zone that extends beyond the source image width should be rejected."""
-        data = self._make_template_data(
-            source_width=1000,
-            zones=[self._make_zone_data(x=800, width=300)],  # 800+300 > 1000
-        )
-        resp = self.client.post(
-            self.ENDPOINT,
-            data=json.dumps(data),
-            content_type="application/json",
-        )
-        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
-
-    def test_create_zone_exceeds_source_height_rejected(self):
-        data = self._make_template_data(
-            source_height=1000,
-            zones=[self._make_zone_data(y=900, height=200)],  # 900+200 > 1000
-        )
-        resp = self.client.post(
-            self.ENDPOINT,
-            data=json.dumps(data),
-            content_type="application/json",
-        )
-        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
-
-    def test_create_zone_unsupported_custom_field_type_rejected(self):
-        """DOCUMENTLINK and SELECT fields can't be populated via OCR."""
-        data = self._make_template_data(
-            zones=[self._make_zone_data(custom_field=self.custom_field_doclink.pk)],
-        )
-        resp = self.client.post(
-            self.ENDPOINT,
-            data=json.dumps(data),
-            content_type="application/json",
-        )
-        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
-
-    def test_zone_bounds_use_the_zones_own_source_dimensions(self):
-        data = self._make_template_data(
-            source_width=500,
-            source_height=500,
-            zones=[
-                self._make_zone_data(
-                    x=700,
-                    y=600,
-                    width=200,
-                    height=100,
-                    zone_source_width=1000,
-                    zone_source_height=1000,
-                ),
-            ],
-        )
-        response = self.client.post(self.ENDPOINT, data, format="json")
-        self.assertEqual(response.status_code, 201)
-        data["name"] = "Invalid bounds"
-        data["zones"][0]["zone_source_width"] = 800
-        response = self.client.post(self.ENDPOINT, data, format="json")
-        self.assertEqual(response.status_code, 400)
-
-    def test_changing_source_dimensions_checks_existing_zones(self):
-        response = self.client.post(
-            self.ENDPOINT,
-            self._make_template_data(zones=[self._make_zone_data()]),
-            format="json",
-        )
-        url = f"{self.ENDPOINT}{response.json()['id']}/"
-        response = self.client.patch(url, {"source_width": 200}, format="json")
-        self.assertEqual(response.status_code, 400)
-        response = self.client.patch(url, {"source_width": 1000}, format="json")
-        self.assertEqual(response.status_code, 200)
-
-    def test_partial_zone_replacement_uses_saved_dimensions(self):
-        template = OcrTemplate.objects.create(
-            name="Test",
-            owner=self.user,
-            source_width=1000,
-            source_height=1000,
-        )
-        url = f"{self.ENDPOINT}{template.pk}/"
-        for changes in [{"x": 900, "width": 200}, {"y": 990, "height": 50}]:
-            with self.subTest(changes=changes):
-                response = self.client.patch(
-                    url,
-                    {"zones": [self._make_zone_data(**changes)]},
-                    format="json",
-                )
-                self.assertEqual(response.status_code, 400)
-        response = self.client.patch(
-            url,
-            {"zones": [self._make_zone_data()]},
-            format="json",
-        )
-        self.assertEqual(response.status_code, 200)
-
-    def test_partial_zone_replacement_requires_complete_zones(self):
-        template = OcrTemplate.objects.create(
-            name="Test",
-            owner=self.user,
-            source_width=1000,
-            source_height=1000,
-        )
-        zone = OcrTemplateZone.objects.create(
-            template=template,
-            name="Original",
-            x=0,
-            y=0,
-            width=10,
-            height=10,
-        )
-        response = self.client.patch(
-            f"{self.ENDPOINT}{template.pk}/",
-            {"zones": [{"name": "Incomplete"}]},
-            format="json",
-        )
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(list(template.zones.all()), [zone])
-
-    def test_custom_and_builtin_zones_can_have_no_custom_field(self):
-        data = self._make_template_data(
-            zones=[
-                self._make_zone_data(custom_field=None),
-                self._make_zone_data(name="Title", target="title", custom_field=None),
-            ],
-        )
-        response = self.client.post(self.ENDPOINT, data, format="json")
-        self.assertEqual(response.status_code, 201)
-        self.assertEqual(
-            [z["custom_field"] for z in response.json()["zones"]],
-            [None, None],
-        )
-        zone = OcrTemplateZone.objects.get(name="Title")
-        self.assertEqual(str(zone), f"{zone.template.name} -> Title")
-
-    def test_invalid_page_numbers_are_rejected(self):
-        for page in [0, -2, "invalid"]:
-            with self.subTest(page=page):
-                response = self.client.post(
-                    self.ENDPOINT,
-                    self._make_template_data(zones=[self._make_zone_data(page=page)]),
-                    format="json",
-                )
-                self.assertEqual(response.status_code, 400)
-
-    def test_combine_formats_must_map_keys_to_strings(self):
-        for formats in [[], "invalid", {"title": []}, {"title": None}]:
-            with self.subTest(formats=formats):
-                response = self.client.post(
-                    self.ENDPOINT,
-                    self._make_template_data(combine_formats=formats),
-                    format="json",
-                )
-                self.assertEqual(response.status_code, 400)
-        response = self.client.post(
-            self.ENDPOINT,
-            self._make_template_data(combine_formats={"title": " {A} - {B} "}),
-            format="json",
-        )
-        self.assertEqual(response.status_code, 201)
-        self.assertEqual(response.json()["combine_formats"], {"title": " {A} - {B} "})
-
-    def test_template_creation_rolls_back_when_a_zone_cannot_be_saved(self):
-        data = self._make_template_data(
-            zones=[self._make_zone_data(), self._make_zone_data(name="Broken")],
-        )
-        create = OcrTemplateZone.objects.create
-
-        def create_zone(**kwargs):
-            if kwargs["name"] == "Broken":
-                raise IntegrityError("Zone save failed")
-            return create(**kwargs)
-
-        with patch(
-            "documents.serialisers.OcrTemplateZone.objects.create",
-            side_effect=create_zone,
-        ):
-            with self.assertRaises(IntegrityError):
-                self.client.post(self.ENDPOINT, data, format="json")
-        self.assertEqual(OcrTemplate.objects.count(), 0)
-        self.assertEqual(OcrTemplateZone.objects.count(), 0)
-
-    def test_template_update_rolls_back_without_losing_previous_zones(self):
-        template = OcrTemplate.objects.create(
-            name="Original",
-            owner=self.user,
-            source_width=1000,
-            source_height=1000,
-        )
-        zone = OcrTemplateZone.objects.create(
-            template=template,
-            name="Original zone",
-            x=0,
-            y=0,
-            width=10,
-            height=10,
-        )
-        data = self._make_template_data(name="Changed", zones=[self._make_zone_data()])
-        with patch(
-            "documents.serialisers.OcrTemplateZone.objects.create",
-            side_effect=IntegrityError("Zone save failed"),
-        ):
-            with self.assertRaises(IntegrityError):
-                self.client.put(f"{self.ENDPOINT}{template.pk}/", data, format="json")
-        template.refresh_from_db()
-        self.assertEqual(template.name, "Original")
-        self.assertEqual(list(template.zones.all()), [zone])
-
-    def test_explicit_empty_zones_removes_all_zones(self):
-        template = OcrTemplate.objects.create(
-            name="Test",
-            owner=self.user,
-            source_width=1000,
-            source_height=1000,
-        )
-        OcrTemplateZone.objects.create(
-            template=template,
-            name="Zone",
-            x=0,
-            y=0,
-            width=10,
-            height=10,
-        )
-        response = self.client.patch(
-            f"{self.ENDPOINT}{template.pk}/",
-            {"zones": []},
-            format="json",
-        )
-        self.assertEqual(response.status_code, 200)
-        self.assertFalse(template.zones.exists())
-
-    # --- List ---
-
-    def test_list_templates(self):
-        template = OcrTemplate.objects.create(
-            name="Test Template",
-            match="Northwind",
-            source_width=2480,
-            source_height=3508,
-        )
-        OcrTemplateZone.objects.create(
-            template=template,
-            name="Zone 1",
-            custom_field=self.custom_field_text,
-            x=100,
-            y=100,
-            width=200,
-            height=50,
-        )
-
-        resp = self.client.get(self.ENDPOINT)
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        data = resp.json()
-        self.assertEqual(data["count"], 1)
-        self.assertEqual(len(data["results"][0]["zones"]), 1)
-
-    def test_list_empty(self):
-        resp = self.client.get(self.ENDPOINT)
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertEqual(resp.json()["count"], 0)
-
-    # --- Update ---
-
-    def test_update_template_replaces_zones(self):
-        """PUT should replace all zones with the new set."""
-        template = OcrTemplate.objects.create(
-            name="Old Name",
-            match="Northwind",
-            source_width=2480,
-            source_height=3508,
-        )
-        OcrTemplateZone.objects.create(
-            template=template,
-            name="Old Zone",
-            custom_field=self.custom_field_text,
-            x=0,
-            y=0,
-            width=100,
-            height=100,
-        )
-
-        data = self._make_template_data(
-            name="New Name",
-            zones=[
-                self._make_zone_data(
-                    name="New Zone",
-                    custom_field=self.custom_field_date.pk,
-                ),
-            ],
-        )
-        resp = self.client.put(
-            f"{self.ENDPOINT}{template.pk}/",
-            data=json.dumps(data),
-            content_type="application/json",
-        )
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-
-        template.refresh_from_db()
-        self.assertEqual(template.name, "New Name")
-        self.assertEqual(OcrTemplateZone.objects.count(), 1)
-        self.assertEqual(OcrTemplateZone.objects.first().name, "New Zone")
-
-    # --- Delete ---
-
-    def test_delete_template_cascades_zones(self):
-        template = OcrTemplate.objects.create(
-            name="To Delete",
-            match="Northwind",
-            source_width=2480,
-            source_height=3508,
-        )
-        OcrTemplateZone.objects.create(
-            template=template,
-            name="Zone",
-            custom_field=self.custom_field_text,
-            x=0,
-            y=0,
-            width=100,
-            height=100,
-        )
-
-        resp = self.client.delete(f"{self.ENDPOINT}{template.pk}/")
-        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
-        self.assertEqual(OcrTemplate.objects.count(), 0)
-        self.assertEqual(OcrTemplateZone.objects.count(), 0)
-
-    def test_delete_nonexistent_returns_404(self):
-        resp = self.client.delete(f"{self.ENDPOINT}99999/")
-        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
-
-    # --- Patch ---
-
-    def test_patch_toggle_enabled(self):
-        template = OcrTemplate.objects.create(
-            name="Toggle Test",
-            match="Northwind",
-            source_width=2480,
-            source_height=3508,
-            enabled=True,
-        )
-
-        resp = self.client.patch(
-            f"{self.ENDPOINT}{template.pk}/",
-            data=json.dumps({"enabled": False}),
-            content_type="application/json",
-        )
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        template.refresh_from_db()
-        self.assertFalse(template.enabled)
-
-    def test_patch_preserves_zones(self):
-        """PATCH without zones field should not delete existing zones."""
-        template = OcrTemplate.objects.create(
-            name="Patch Test",
-            match="Northwind",
-            source_width=2480,
-            source_height=3508,
-        )
-        OcrTemplateZone.objects.create(
-            template=template,
-            name="Existing Zone",
-            custom_field=self.custom_field_text,
-            x=0,
-            y=0,
-            width=100,
-            height=100,
-        )
-
-        resp = self.client.patch(
-            f"{self.ENDPOINT}{template.pk}/",
-            data=json.dumps({"name": "Updated Name"}),
-            content_type="application/json",
-        )
-        self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertEqual(OcrTemplateZone.objects.count(), 1)
 
     # --- Auth ---
 
