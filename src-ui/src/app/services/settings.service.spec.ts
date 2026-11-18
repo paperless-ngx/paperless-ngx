@@ -420,7 +420,7 @@ describe('SettingsService', () => {
     expect(req.request.body.settings.whats_new.last_seen_version).toEqual(
       '3.5.1'
     )
-    expect(settingsService.unseenReleasesSince).toBeNull()
+    expect(settingsService.unseenReleasesSince()).toBeNull()
   })
 
   it('reports unseen releases and marks them seen', () => {
@@ -440,7 +440,7 @@ describe('SettingsService', () => {
       .flush(settings)
     httpTestingController.expectNone(`${environment.apiBaseUrl}ui_settings/`)
 
-    expect(settingsService.unseenReleasesSince).toEqual('3.4.2')
+    expect(settingsService.unseenReleasesSince()).toEqual('3.4.2')
 
     subscription = settingsService.markReleasesSeen().subscribe()
     const req = httpTestingController.expectOne(
@@ -449,7 +449,7 @@ describe('SettingsService', () => {
     expect(req.request.body.settings.whats_new.last_seen_version).toEqual(
       '3.5.1'
     )
-    expect(settingsService.unseenReleasesSince).toBeNull()
+    expect(settingsService.unseenReleasesSince()).toBeNull()
   })
 
   it('updates settings on complete tour', () => {

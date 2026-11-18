@@ -328,6 +328,18 @@ export class SettingsService {
     SETTINGS_KEYS.SIDEBAR_HIDDEN_ITEMS
   )
 
+  /**
+   * The last version the user saw release notes for, if the running
+   * version is newer, or null.
+   */
+  readonly unseenReleasesSince = computed<string | null>(() => {
+    this.settingsVersion()
+    const currentVersion = this.get(SETTINGS_KEYS.VERSION)
+    const lastSeen = this.get(SETTINGS_KEYS.WHATS_NEW_LAST_SEEN_VERSION)
+    if (!currentVersion || !lastSeen) return null
+    return compareVersions(currentVersion, lastSeen) > 0 ? lastSeen : null
+  })
+
   readonly allDisplayFields = signal<Array<{ id: DisplayField; name: string }>>(
     DEFAULT_DISPLAY_FIELDS
   )
@@ -733,17 +745,6 @@ export class SettingsService {
     this.storeSettings()
       .pipe(first())
       .subscribe({ error: () => {} })
-  }
-
-  /**
-   * The last version the user saw release notes for, if the running
-   * version is newer, or null.
-   */
-  public get unseenReleasesSince(): string | null {
-    const currentVersion = this.get(SETTINGS_KEYS.VERSION)
-    const lastSeen = this.get(SETTINGS_KEYS.WHATS_NEW_LAST_SEEN_VERSION)
-    if (!currentVersion || !lastSeen) return null
-    return compareVersions(currentVersion, lastSeen) > 0 ? lastSeen : null
   }
 
   public markReleasesSeen(): Observable<any> {
