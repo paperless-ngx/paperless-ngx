@@ -43,7 +43,15 @@
     }
   }
 </div>
-<div class="modal-footer">
+<div class="modal-footer justify-content-between">
+  <div class="d-flex flex-wrap gap-3 small">
+    <a class="link-secondary text-decoration-none d-flex align-items-center" [href]="releasesUrl" target="_blank" rel="noopener noreferrer">
+      <pngx-bs-icon name="clock-history" class="me-1"></pngx-bs-icon><ng-container i18n>All releases</ng-container>
+    </a>
+    <a class="link-secondary text-decoration-none d-flex align-items-center" [href]="discussionsUrl" target="_blank" rel="noopener noreferrer">
+      <pngx-bs-icon name="chat-left-text" class="me-1"></pngx-bs-icon><ng-container i18n>Need support? Ask in Discussions</ng-container>
+    </a>
+  </div>
   <button type="button" class="btn btn-outline-secondary" (click)="close()" i18n>Close</button>
 </div>
 

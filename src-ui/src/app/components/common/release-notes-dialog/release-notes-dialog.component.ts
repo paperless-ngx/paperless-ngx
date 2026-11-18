@@ -11,7 +11,9 @@ import {
 } from 'src/app/services/rest/remote-version.service'
 import { SettingsService } from 'src/app/services/settings.service'
 
-const RELEASES_URL = 'https://github.com/paperless-ngx/paperless-ngx/releases'
+const REPO_URL = 'https://github.com/paperless-ngx/paperless-ngx'
+const RELEASES_URL = `${REPO_URL}/releases`
+const DISCUSSIONS_URL = `${REPO_URL}/discussions/new/choose`
 
 /**
  * Tweak GitHub release HTML: open links in a new tab, add no referrer etc,
@@ -51,6 +53,10 @@ export class ReleaseNotesDialogComponent {
   readonly updateCheckingEnabled: boolean = this.settingsService.get(
     SETTINGS_KEYS.UPDATE_CHECKING_ENABLED
   )
+
+  readonly repoUrl = REPO_URL
+  readonly releasesUrl = RELEASES_URL
+  readonly discussionsUrl = DISCUSSIONS_URL
 
   get releaseUrl(): string {
     return this.version ? `${RELEASES_URL}/tag/v${this.version}` : RELEASES_URL
