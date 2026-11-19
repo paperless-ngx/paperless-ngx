@@ -3770,6 +3770,16 @@ class OcrTemplateZoneSerializer(serializers.ModelSerializer):
             )
         return value
 
+    def validate_validation_regex(self, value: str) -> str:
+        if value:
+            try:
+                validate_regex_pattern(value)
+            except ValueError as e:
+                raise serializers.ValidationError(
+                    f"Invalid regular expression: {e}",
+                ) from e
+        return value
+
     def validate_page(self, value):
         if value is not None and value != -1 and value < 1:
             raise serializers.ValidationError(

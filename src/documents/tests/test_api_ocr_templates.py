@@ -1057,6 +1057,61 @@ class TestOcrTemplateValidation:
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     @pytest.mark.parametrize(
+        ("pattern", "expected"),
+        [
+            pytest.param("", status.HTTP_201_CREATED, id="blank"),
+            pytest.param(r"INV-\d+", status.HTTP_201_CREATED, id="valid"),
+            pytest.param("INV-(", status.HTTP_400_BAD_REQUEST, id="unbalanced"),
+            pytest.param("[a-", status.HTTP_400_BAD_REQUEST, id="unclosed-set"),
+        ],
+    )
+    def test_validation_regex_must_compile(
+        self,
+        admin_client: APIClient,
+        text_zone_payload: Callable[..., dict[str, Any]],
+        pattern: str,
+        expected: int,
+    ) -> None:
+        """
+        GIVEN:
+            - A zone with a blank, valid or invalid validation regex
+        WHEN:
+            - Create is attempted
+        THEN:
+            - Blank and valid patterns are accepted, invalid ones are rejected
+              on the zone's validation_regex field
+        """
+        response = admin_client.post(
+            ENDPOINT,
+            template_payload(zones=[text_zone_payload(validation_regex=pattern)]),
+            format="json",
+        )
+
+        assert response.status_code == expected
+        if expected == status.HTTP_400_BAD_REQUEST:
+            assert "validation_regex" in response.json()["zones"]["0"]
+
+    def test_zone_preview_rejects_an_invalid_validation_regex(
+        self,
+        admin_client: APIClient,
+        mock_preview: MagicMock,
+    ) -> None:
+        """
+        GIVEN:
+            - A zone preview request with an invalid validation regex
+        WHEN:
+            - The preview is requested
+        THEN:
+            - 400 is returned and no extraction runs
+        """
+        document = DocumentFactory(mime_type="image/png")
+
+        response = preview_zone(admin_client, document, validation_regex="INV-(")
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        mock_preview.assert_not_called()
+
+    @pytest.mark.parametrize(
         "formats",
         [
             pytest.param([], id="empty-list"),
@@ -2223,7 +2278,6 @@ class TestZonePreview:
             pytest.param("", "123", None, id="no-regex"),
             pytest.param(r"\d+", "abc", False, id="no-match"),
             pytest.param(r"\d+", None, None, id="no-value"),
-            pytest.param("[invalid", "123", False, id="invalid-regex"),
         ],
     )
     def test_reports_regex_failures_and_empty_results(
