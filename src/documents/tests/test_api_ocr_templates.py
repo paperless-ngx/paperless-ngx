@@ -24,6 +24,8 @@ from documents.parsers import ParseError
 from documents.search import get_backend
 from documents.signals import document_consumption_finished
 from documents.tasks import extract_zones
+from documents.zone_ocr import ZoneExtraction
+from documents.zone_ocr import ZoneOcrReason
 from paperless_testing.factories import CustomFieldFactory
 from paperless_testing.factories import DocumentFactory
 from paperless_testing.factories import OcrTemplateFactory
@@ -2028,7 +2030,7 @@ class TestRunZoneOcr:
         response = admin_client.post(RUN_ZONE_OCR_URL.format(pk=document.pk))
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.json()["results"][0]["reason"] == "no_value"
+        assert response.json()["results"][0]["reason"] == ZoneOcrReason.NO_VALUE
         assert response.json()["results"][0]["value"] is None
         document.refresh_from_db()
         assert document.title == "Existing title"
@@ -2524,7 +2526,7 @@ class TestZonePreview:
             - The result includes the regex match
             - No zone is saved
         """
-        mock_preview.return_value = {"raw_text": " 123 ", "value": "123"}
+        mock_preview.return_value = ZoneExtraction(raw_text=" 123 ", value="123")
 
         response = preview_zone(
             preview_client,
@@ -2588,7 +2590,7 @@ class TestZonePreview:
             - regex_match reflects the outcome
             - Source dimensions default to 0
         """
-        mock_preview.return_value = {"raw_text": value, "value": value}
+        mock_preview.return_value = ZoneExtraction(raw_text=value, value=value)
 
         response = preview_zone(
             preview_client,
@@ -2776,7 +2778,7 @@ class TestOcrTemplatePreviewPermissions:
         grant_global(regular_user, "view_document", *template_perms)
         document = DocumentFactory(owner=None, mime_type="image/png")
         document.source_path.write_bytes(b"document contents")
-        mock_preview.return_value = {"raw_text": None, "value": None}
+        mock_preview.return_value = ZoneExtraction()
 
         if action == "document-page-image":
             response = user_client.get(preview_url(document))
@@ -2823,7 +2825,7 @@ class TestOcrTemplatePreviewPermissions:
         mock_preview.assert_not_called()
 
         grant_object(preview_user, root, "view_document")
-        mock_preview.return_value = {"raw_text": None, "value": None}
+        mock_preview.return_value = ZoneExtraction()
         assert (
             preview_client.get(preview_url(version)).status_code == status.HTTP_200_OK
         )

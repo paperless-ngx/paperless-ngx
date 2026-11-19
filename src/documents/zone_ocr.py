@@ -12,6 +12,7 @@ from datetime import date
 from datetime import datetime
 from decimal import Decimal
 from decimal import InvalidOperation
+from enum import StrEnum
 from functools import lru_cache
 from functools import partial
 from pathlib import Path
@@ -98,13 +99,36 @@ class FieldUpdate:
     custom_field: CustomField | None = None
 
 
+class ZoneOcrReason(StrEnum):
+    """Why a zone produced no value for its target."""
+
+    MISSING_FILE = "missing_file"
+    MISSING_PAGE = "missing_page"
+    NO_VALUE = "no_value"
+    TRANSFORM_FAILED = "transform_failed"
+    REGEX_MISMATCH = "regex_mismatch"
+    INCOMPLETE = "incomplete"
+    DUPLICATE_ASN = "duplicate_asn"
+    UNASSIGNED = "unassigned"
+    INVALID_VALUE = "invalid_value"
+    TEMPLATE_FAILED = "template_failed"
+
+
 @dataclass
 class ZoneOcrResult:
     template: str
     zone: str
     custom_field: str
     value: object = None
-    reason: str | None = None
+    reason: ZoneOcrReason | None = None
+
+
+# Result labels for zones that target a built-in field.
+BUILTIN_TARGET_LABELS: dict[OcrTemplateZone.TargetType, str] = {
+    OcrTemplateZone.TargetType.TITLE: "Title",
+    OcrTemplateZone.TargetType.ASN: "ASN",
+    OcrTemplateZone.TargetType.CREATED: "Created",
+}
 
 
 def _zone_result(
@@ -112,12 +136,12 @@ def _zone_result(
     zone: OcrTemplateZone,
     *,
     value: object = None,
-    reason: str | None = None,
+    reason: ZoneOcrReason | None = None,
 ) -> ZoneOcrResult:
     if zone.target == OcrTemplateZone.TargetType.CUSTOM_FIELD:
         label = zone.custom_field.name if zone.custom_field_id else "(no field)"
     else:
-        label = {"title": "Title", "asn": "ASN", "created": "Created"}[zone.target]
+        label = BUILTIN_TARGET_LABELS[zone.target]
     return ZoneOcrResult(template.name, zone.name, label, value, reason)
 
 
@@ -185,7 +209,7 @@ def run_zone_extraction(
             document.pk,
         )
         return [
-            _zone_result(template, zone, reason="missing_file")
+            _zone_result(template, zone, reason=ZoneOcrReason.MISSING_FILE)
             for template in templates
             for zone in template.zones.all()
         ]
@@ -215,7 +239,7 @@ def run_zone_extraction(
                     document.pk,
                 )
                 results.extend(
-                    _zone_result(template, zone, reason="template_failed")
+                    _zone_result(template, zone, reason=ZoneOcrReason.TEMPLATE_FAILED)
                     for zone in zones
                 )
     if reindex and any(result.reason is None for result in results):
@@ -269,7 +293,7 @@ def _process_template(
     for zone in zones:
         page_idx = _resolve_page_idx(zone.page, document.page_count)
         extracted = None
-        reason = "missing_page"
+        reason: ZoneOcrReason | None = ZoneOcrReason.MISSING_PAGE
         if page_idx in page_images:
             extraction = _extract_zone(
                 page_images[page_idx],
@@ -283,15 +307,15 @@ def _process_template(
                 reason = None
             elif extraction.raw_text:
                 # Text was read but the transform found nothing usable in it.
-                reason = "transform_failed"
+                reason = ZoneOcrReason.TRANSFORM_FAILED
             else:
-                reason = "no_value"
+                reason = ZoneOcrReason.NO_VALUE
         if (
             extracted is not None
             and zone.validation_regex
             and not safe_regex_fullmatch(zone.validation_regex, extracted)
         ):
-            reason = "regex_mismatch"
+            reason = ZoneOcrReason.REGEX_MISMATCH
         result = _zone_result(
             template,
             zone,
@@ -309,10 +333,13 @@ def _process_template(
         if not accepted:
             continue
         # An empty zone is an optional token; any other failure blocks the group.
-        if any(result.reason not in (None, "no_value") for _, result in field_zones):
+        if any(
+            result.reason not in (None, ZoneOcrReason.NO_VALUE)
+            for _, result in field_zones
+        ):
             for result in accepted:
                 result.value = None
-                result.reason = "incomplete"
+                result.reason = ZoneOcrReason.INCOMPLETE
             continue
         value = _combine_field_value(
             combine_formats.get(key, ""),
@@ -325,7 +352,7 @@ def _process_template(
             # write of this template, so only this field is dropped.
             for result in accepted:
                 result.value = None
-                result.reason = "duplicate_asn"
+                result.reason = ZoneOcrReason.DUPLICATE_ASN
             continue
         if update is not None:
             updates.append(update)
@@ -333,7 +360,9 @@ def _process_template(
             result.value = update.value if update else None
             if update is None:
                 result.reason = (
-                    "unassigned" if key == "custom_field" else "invalid_value"
+                    ZoneOcrReason.UNASSIGNED
+                    if key == "custom_field"
+                    else ZoneOcrReason.INVALID_VALUE
                 )
     _apply_field_updates(root_document, updates)
     return results
@@ -581,23 +610,22 @@ def extract_zone_preview(
     source_width: int,
     source_height: int,
     page_count: int | None,
-) -> dict:
+) -> ZoneExtraction:
     """Extract a zone without writing its value to the document."""
     page_idx = _resolve_page_idx(zone.page, page_count)
     with tempfile.TemporaryDirectory(dir=settings.SCRATCH_DIR) as tmp_dir:
         tmp_path = Path(tmp_dir)
         page_images = _render_pages(doc_path, {page_idx}, tmp_path, page_count)
         if page_idx not in page_images:
-            return {"raw_text": None, "value": None}
+            return ZoneExtraction()
 
-        result = _extract_zone(
+        return _extract_zone(
             page_images[page_idx],
             zone,
             source_width,
             source_height,
             tmp_path,
         )
-        return {"raw_text": result.raw_text, "value": result.value}
 
 
 @dataclass(frozen=True)

@@ -98,6 +98,7 @@ from documents.validators import uri_validator
 from documents.validators import url_validator
 from documents.versioning import has_prefetched_effective_content
 from documents.versioning import sort_versions_newest_first
+from documents.zone_ocr import ZoneOcrReason
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -1824,6 +1825,28 @@ class RunZoneOcrSerializer(serializers.Serializer):
             template_field.queryset = OcrTemplate.objects.filter(
                 id__in=permitted_object_ids(user, OcrTemplate, "view_ocrtemplate"),
             ).prefetch_related("zones", "zones__custom_field")
+
+
+class ZoneOcrResultSerializer(serializers.Serializer):
+    """The outcome of one zone, mirroring the ZoneOcrResult dataclass."""
+
+    template = serializers.CharField(read_only=True)
+    zone = serializers.CharField(read_only=True)
+    custom_field = serializers.CharField(read_only=True)
+    value = serializers.JSONField(
+        read_only=True,
+        allow_null=True,
+        help_text=(
+            "The value written to the target. A string, number, boolean or ISO "
+            "date string, depending on the target, or null when nothing was written."
+        ),
+    )
+    reason = serializers.ChoiceField(
+        choices=[reason.value for reason in ZoneOcrReason],
+        read_only=True,
+        allow_null=True,
+        help_text="Why no value was written, or null when one was.",
+    )
 
 
 class RunZoneOcrDocumentsSerializer(DocumentSelectionSerializer, RunZoneOcrSerializer):

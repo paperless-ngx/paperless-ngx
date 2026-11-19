@@ -5,6 +5,7 @@ from __future__ import annotations
 import shutil
 import subprocess
 from collections import Counter
+from dataclasses import asdict
 from datetime import date
 from decimal import Decimal
 from pathlib import Path
@@ -15,6 +16,7 @@ import pytest
 from babel import Locale
 from django.contrib.auth.models import Group
 from PIL import Image
+from rest_framework.renderers import JSONRenderer
 
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
@@ -23,7 +25,11 @@ from documents.models import MatchingModel
 from documents.models import OcrTemplate
 from documents.models import OcrTemplateZone
 from documents.parsers import ParseError
+from documents.serialisers import ZoneOcrResultSerializer
 from documents.zone_ocr import MAX_PARSED_TEXT_LENGTH
+from documents.zone_ocr import ZoneExtraction
+from documents.zone_ocr import ZoneOcrReason
+from documents.zone_ocr import ZoneOcrResult
 from documents.zone_ocr import _apply_transform
 from documents.zone_ocr import _combine_field_value
 from documents.zone_ocr import _convert_value
@@ -378,10 +384,7 @@ class TestZoneExtraction:
             - An empty result is returned and the reader is never run
         """
         setattr(zone, attribute, value)
-        assert extract_zone_preview(page, zone, 100, 50, 1) == {
-            "raw_text": None,
-            "value": None,
-        }
+        assert extract_zone_preview(page, zone, 100, 50, 1) == ZoneExtraction()
         mock_zone_ocr_run.assert_not_called()
 
     def test_date_transform_uses_zone_format(
@@ -485,10 +488,10 @@ class TestZoneExtraction:
             - The raw text and transformed value are returned
         """
         mock_zone_ocr_run.return_value.stdout = "account abc"
-        assert extract_zone_preview(page, zone, 0, 0, 1) == {
-            "raw_text": "account abc",
-            "value": "ACCOUNT ABC",
-        }
+        assert extract_zone_preview(page, zone, 0, 0, 1) == ZoneExtraction(
+            raw_text="account abc",
+            value="ACCOUNT ABC",
+        )
 
 
 @pytest.mark.django_db
@@ -582,8 +585,8 @@ class TestSavedZoneExtraction:
         )
 
         assert [(result.zone, result.reason) for result in results] == [
-            ("Date", "transform_failed"),
-            ("Ref", "incomplete"),
+            ("Date", ZoneOcrReason.TRANSFORM_FAILED),
+            ("Ref", ZoneOcrReason.INCOMPLETE),
         ]
         document.refresh_from_db()
         assert document.title == "Original"
@@ -887,7 +890,7 @@ class TestSavedZoneExtraction:
             paperless_dirs.scratch_dir,
         )
 
-        assert results[0].reason == "missing_page"
+        assert results[0].reason == ZoneOcrReason.MISSING_PAGE
         assert results[0].value is None
 
     def test_missing_document_file_returns_skipped_results(
@@ -908,7 +911,7 @@ class TestSavedZoneExtraction:
         results = run_zone_extraction(document, None, templates=[template])
 
         assert len(results) == 1
-        assert results[0].reason == "missing_file"
+        assert results[0].reason == ZoneOcrReason.MISSING_FILE
         assert results[0].value is None
 
     def test_empty_combination_cannot_clear_a_field(
@@ -939,7 +942,7 @@ class TestSavedZoneExtraction:
             paperless_dirs.scratch_dir,
         )
 
-        assert results[0].reason == "invalid_value"
+        assert results[0].reason == ZoneOcrReason.INVALID_VALUE
         assert results[0].value is None
         assert document.title == "Original"
 
@@ -980,10 +983,10 @@ class TestSavedZoneExtraction:
         )
 
         assert [result.reason for result in results] == [
-            "no_value",
-            "regex_mismatch",
-            "invalid_value",
-            "unassigned",
+            ZoneOcrReason.NO_VALUE,
+            ZoneOcrReason.REGEX_MISMATCH,
+            ZoneOcrReason.INVALID_VALUE,
+            ZoneOcrReason.UNASSIGNED,
         ]
         assert [result.value for result in results] == [None] * 4
         assert document.title == "Original"
@@ -1021,8 +1024,8 @@ class TestSavedZoneExtraction:
         results = run_zone_extraction(document, page, templates=[template, second])
 
         assert [result.reason for result in results] == [
-            "template_failed",
-            "template_failed",
+            ZoneOcrReason.TEMPLATE_FAILED,
+            ZoneOcrReason.TEMPLATE_FAILED,
             None,
         ]
         assert [result.value for result in results] == [None, None, "Applied"]
@@ -1073,7 +1076,7 @@ class TestSavedZoneExtraction:
 
         assert [(result.zone, result.value, result.reason) for result in results] == [
             ("Title", "New title", None),
-            ("ASN", None, "duplicate_asn"),
+            ("ASN", None, ZoneOcrReason.DUPLICATE_ASN),
         ]
         document.refresh_from_db()
         assert document.title == "New title"
@@ -1140,7 +1143,7 @@ class TestSavedZoneExtraction:
             paperless_dirs.scratch_dir,
         )
 
-        assert results[0].reason == "no_value"
+        assert results[0].reason == ZoneOcrReason.NO_VALUE
         assert results[0].value is None
         assert document.title == "Original"
 
@@ -1172,8 +1175,8 @@ class TestSavedZoneExtraction:
         def preview_and_save(raw_text: str) -> None:
             mock_zone_ocr_run.return_value.stdout = raw_text
             preview = extract_zone_preview(page, zone, 100, 50, 1)
-            assert preview["raw_text"] == raw_text
-            assert preview["value"] == raw_text.upper()
+            assert preview.raw_text == raw_text
+            assert preview.value == raw_text.upper()
             _process_template(
                 document,
                 {0: page},
@@ -1193,10 +1196,14 @@ class TestSavedZoneExtraction:
         [
             pytest.param(
                 {"validation_regex": r"\d{2}"},
-                "regex_mismatch",
+                ZoneOcrReason.REGEX_MISMATCH,
                 id="regex-mismatch",
             ),
-            pytest.param({"page": 2}, "missing_page", id="missing-page"),
+            pytest.param(
+                {"page": 2},
+                ZoneOcrReason.MISSING_PAGE,
+                id="missing-page",
+            ),
         ],
     )
     def test_failed_zone_blocks_combined_field(
@@ -1243,8 +1250,8 @@ class TestSavedZoneExtraction:
 
         assert [result.reason for result in results] == [
             expected_failure,
-            "incomplete",
-            "incomplete",
+            ZoneOcrReason.INCOMPLETE,
+            ZoneOcrReason.INCOMPLETE,
         ]
         assert [result.value for result in results] == [None] * 3
         document.refresh_from_db()
@@ -1279,7 +1286,7 @@ class TestSavedZoneExtraction:
             paperless_dirs.scratch_dir,
         )
 
-        assert [result.reason for result in results] == ["no_value", None]
+        assert [result.reason for result in results] == [ZoneOcrReason.NO_VALUE, None]
         assert results[1].value == "two"
         document.refresh_from_db()
         assert document.title == "two"
@@ -1315,7 +1322,10 @@ class TestSavedZoneExtraction:
             paperless_dirs.scratch_dir,
         )
 
-        assert [result.reason for result in results] == [None, "regex_mismatch"]
+        assert [result.reason for result in results] == [
+            None,
+            ZoneOcrReason.REGEX_MISMATCH,
+        ]
         document.refresh_from_db()
         assert document.title == "New title"
 
@@ -3602,7 +3612,7 @@ class TestRunZoneExtraction:
         results = run_zone_extraction(document, source)
 
         assert Counter((r.value, r.reason) for r in results) == Counter(
-            [(None, "template_failed"), ("extracted", None)],
+            [(None, ZoneOcrReason.TEMPLATE_FAILED), ("extracted", None)],
         )
         assert {r.template for r in results} == {"First", "Second"}
 
@@ -3627,7 +3637,7 @@ class TestRunZoneExtraction:
         results = run_zone_extraction(document, None)
 
         assert [(r.template, r.zone, r.reason) for r in results] == [
-            ("Matching", zone.name, "missing_file"),
+            ("Matching", zone.name, ZoneOcrReason.MISSING_FILE),
         ]
         mock_zone_ocr_run.assert_not_called()
 
@@ -3741,3 +3751,41 @@ class TestRealZoneOcr:
         assert [result.reason for result in results] == [None]
         document.refresh_from_db()
         assert "This is a test document" in document.title
+
+
+class TestZoneOcrResultSerializer:
+    @pytest.mark.parametrize(
+        "value",
+        [
+            pytest.param("text", id="string"),
+            pytest.param(42, id="int"),
+            pytest.param(1.5, id="float"),
+            pytest.param(True, id="bool"),
+            pytest.param(date(2025, 12, 25), id="date"),
+            pytest.param(Decimal("12.50"), id="decimal"),
+            pytest.param(None, id="none"),
+        ],
+    )
+    @pytest.mark.parametrize(
+        "reason",
+        [pytest.param(None, id="no-reason")]
+        + [pytest.param(reason, id=reason.value) for reason in ZoneOcrReason],
+    )
+    def test_wire_format_matches_dataclass(
+        self,
+        value: object,
+        reason: ZoneOcrReason | None,
+    ) -> None:
+        """
+        GIVEN:
+            - A zone result with any value type and any reason
+        WHEN:
+            - It is serialized with the result serializer and rendered as JSON
+        THEN:
+            - The JSON equals the rendering of the dataclass as a dict
+        """
+        result = ZoneOcrResult("Template", "Zone", "Title", value, reason)
+
+        assert JSONRenderer().render(
+            ZoneOcrResultSerializer(result).data,
+        ) == JSONRenderer().render(asdict(result))

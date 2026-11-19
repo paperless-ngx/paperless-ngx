@@ -10,7 +10,6 @@ from collections import deque
 from collections.abc import AsyncIterator
 from collections.abc import Callable
 from collections.abc import Generator
-from dataclasses import asdict
 from datetime import datetime
 from datetime import timedelta
 from http import HTTPStatus
@@ -244,6 +243,7 @@ from documents.serialisers import UiSettingsViewSerializer
 from documents.serialisers import WorkflowActionSerializer
 from documents.serialisers import WorkflowSerializer
 from documents.serialisers import WorkflowTriggerSerializer
+from documents.serialisers import ZoneOcrResultSerializer
 from documents.signals import document_updated
 from documents.tasks import build_share_link_bundle
 from documents.tasks import consume_file
@@ -2290,7 +2290,7 @@ class DocumentViewSet(
                     choices=["no_template"],
                     required=False,
                 ),
-                "results": serializers.ListField(child=serializers.DictField()),
+                "results": ZoneOcrResultSerializer(many=True),
             },
         ),
     )
@@ -2350,7 +2350,10 @@ class DocumentViewSet(
 
         results = run_zone_extraction(file_document, templates=templates, reindex=True)
         return Response(
-            {"status": "completed", "results": [asdict(result) for result in results]},
+            {
+                "status": "completed",
+                "results": ZoneOcrResultSerializer(results, many=True).data,
+            },
         )
 
     @extend_schema(
@@ -5923,15 +5926,15 @@ class OcrTemplateViewSet(BulkPermissionMixin, PassUserMixin, ModelViewSet[OcrTem
         )
 
         regex_match = None
-        if zone.validation_regex and result.get("value") is not None:
+        if zone.validation_regex and result.value is not None:
             regex_match = (
-                safe_regex_fullmatch(zone.validation_regex, result["value"]) is not None
+                safe_regex_fullmatch(zone.validation_regex, result.value) is not None
             )
 
         return Response(
             {
-                "raw_text": result.get("raw_text"),
-                "value": result.get("value"),
+                "raw_text": result.raw_text,
+                "value": result.value,
                 "regex": zone.validation_regex,
                 "regex_match": regex_match,
             },
