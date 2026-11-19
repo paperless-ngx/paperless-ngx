@@ -183,6 +183,7 @@ from documents.permissions import PaperlessNotePermissions
 from documents.permissions import PaperlessObjectPermissions
 from documents.permissions import TrashPermissions
 from documents.permissions import ViewDocumentsPermissions
+from documents.permissions import ViewOcrTemplatesPermissions
 from documents.permissions import annotate_document_count_for_related_queryset
 from documents.permissions import get_document_count_filter_for_user
 from documents.permissions import get_permission_grantees
@@ -5836,10 +5837,14 @@ class OcrTemplateViewSet(BulkPermissionMixin, PassUserMixin, ModelViewSet[OcrTem
     ordering_fields = ("name",)
 
     def get_permissions(self):
-        permissions = super().get_permissions()
         if self.action in {"document_page_image", "test_zone"}:
-            permissions.append(ViewDocumentsPermissions())
-        return permissions
+            # Read-only previews: viewing templates is enough, even for the POST.
+            return [
+                IsAuthenticated(),
+                ViewOcrTemplatesPermissions(),
+                ViewDocumentsPermissions(),
+            ]
+        return super().get_permissions()
 
     @action(
         detail=False,

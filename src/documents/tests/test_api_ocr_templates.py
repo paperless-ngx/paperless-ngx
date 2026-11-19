@@ -2201,6 +2201,60 @@ class TestOcrTemplatePreviewPermissions:
         assert response.status_code == status.HTTP_403_FORBIDDEN
         mock_preview.assert_not_called()
 
+    @pytest.mark.parametrize(
+        "action",
+        [
+            pytest.param("document-page-image", id="document-page-image"),
+            pytest.param("test-zone", id="test-zone"),
+        ],
+    )
+    @pytest.mark.parametrize(
+        ("template_perms", "expected"),
+        [
+            pytest.param(
+                ("view_ocrtemplate",),
+                status.HTTP_200_OK,
+                id="view-template-is-enough",
+            ),
+            pytest.param(
+                ("add_ocrtemplate", "change_ocrtemplate"),
+                status.HTTP_403_FORBIDDEN,
+                id="no-view-template",
+            ),
+        ],
+    )
+    def test_previews_require_global_template_view_permission(
+        self,
+        regular_user: User,
+        user_client: APIClient,
+        mock_preview: MagicMock,
+        action: str,
+        template_perms: tuple[str, ...],
+        expected: int,
+    ) -> None:
+        """
+        GIVEN:
+            - A user with global view document permission and either only view
+              template permission, or add and change but not view
+            - An unowned image document
+        WHEN:
+            - The user requests a page image or a zone preview
+        THEN:
+            - Viewing templates is enough for both, and without it both are
+              refused
+        """
+        grant_global(regular_user, "view_document", *template_perms)
+        document = DocumentFactory(owner=None, mime_type="image/png")
+        document.source_path.write_bytes(b"document contents")
+        mock_preview.return_value = {"raw_text": None, "value": None}
+
+        if action == "document-page-image":
+            response = user_client.get(preview_url(document))
+        else:
+            response = preview_zone(user_client, document)
+
+        assert response.status_code == expected
+
     def test_versions_are_authorized_through_the_root_document(
         self,
         preview_client: APIClient,
@@ -2281,7 +2335,7 @@ class TestOcrTemplatePreviewPermissions:
         """
         GIVEN:
             - A document owned by another user
-            - A user with global add template and view document permissions
+            - A user with global view template and view document permissions
         WHEN:
             - The user previews a zone on the document
         THEN:
@@ -2290,7 +2344,7 @@ class TestOcrTemplatePreviewPermissions:
             - No preview extraction runs
         """
         owner = UserFactory()
-        grant_global(regular_user, "add_ocrtemplate", "view_document")
+        grant_global(regular_user, "view_ocrtemplate", "view_document")
         document = DocumentFactory(owner=owner)
         response = preview_zone(user_client, document, x=0, y=0, height=100, page=1)
         assert response.status_code == status.HTTP_403_FORBIDDEN

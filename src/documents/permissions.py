@@ -699,6 +699,21 @@ class ViewDocumentsPermissions(GlobalPermissionsByMethod):
     }
 
 
+class ViewOcrTemplatesPermissions(GlobalPermissionsByMethod):
+    """
+    Requires the global permission to view OCR templates for OPTIONS, GET and
+    POST, for the template editor's read-only preview endpoints.
+    """
+
+    perms_map = {
+        "OPTIONS": ["documents.view_ocrtemplate"],
+        "GET": ["documents.view_ocrtemplate"],
+        # The zone preview is a POST only to carry the zone in the body; it
+        # creates and changes nothing, so viewing templates is enough.
+        "POST": ["documents.view_ocrtemplate"],
+    }
+
+
 class TrashPermissions(GlobalPermissionsByMethod):
     """Check the global document permission for each trash operation."""
 
