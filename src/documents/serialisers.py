@@ -7,6 +7,7 @@ from datetime import datetime
 from datetime import timedelta
 from typing import TYPE_CHECKING
 from typing import Any
+from typing import NotRequired
 from typing import TypedDict
 
 import magic
@@ -99,6 +100,7 @@ from documents.validators import url_validator
 from documents.versioning import has_prefetched_effective_content
 from documents.versioning import sort_versions_newest_first
 from documents.zone_ocr import ZoneOcrReason
+from documents.zone_ocr import ZoneOcrResult
 from documents.zone_ocr import field_key
 
 if TYPE_CHECKING:
@@ -177,28 +179,25 @@ class DocumentUpdateFieldsModelSerializer(DynamicFieldsModelSerializer):
 # an owner and match rules. A comment, not a docstring, so it stays out of the
 # API schema descriptions of every serializer built on it.
 class MatchRuleSerializer(serializers.ModelSerializer[Any]):
-    def validate(self, data):
+    def validate(self, attrs: dict[str, Any]) -> dict[str, Any]:
         # TODO: remove pending https://github.com/encode/django-rest-framework/issues/7173
-        name = data.get(
-            "name",
-            self.instance.name if hasattr(self.instance, "name") else None,
-        )
+        name = attrs.get("name", getattr(self.instance, "name", None))
         owner = (
-            data["owner"]
-            if "owner" in data
+            attrs["owner"]
+            if "owner" in attrs
             else self.user
             if hasattr(self, "user")
             else None
         )
-        pk = self.instance.pk if hasattr(self.instance, "pk") else None
-        if ("name" in data or "owner" in data) and self.Meta.model.objects.filter(
+        pk = getattr(self.instance, "pk", None)
+        if ("name" in attrs or "owner" in attrs) and self.Meta.model.objects.filter(
             name=name,
             owner=owner,
         ).exclude(pk=pk).exists():
             raise serializers.ValidationError(
                 {"error": "Object violates owner / name unique constraint"},
             )
-        return data
+        return attrs
 
     def validate_match(self, match):
         if (
@@ -1808,8 +1807,12 @@ class ReprocessDocumentsSerializer(DocumentSelectionSerializer):
     from_webui = serializers.BooleanField(required=False, default=False)
 
 
-class RunZoneOcrSerializer(serializers.Serializer):
-    template = serializers.PrimaryKeyRelatedField(
+class OcrTemplateField(serializers.PrimaryKeyRelatedField[OcrTemplate]):
+    pass
+
+
+class RunZoneOcrSerializer(serializers.Serializer[Any]):
+    template = OcrTemplateField(
         queryset=OcrTemplate.objects.none(),
         required=False,
         allow_null=True,
@@ -1828,7 +1831,7 @@ class RunZoneOcrSerializer(serializers.Serializer):
             ).prefetch_related("zones", "zones__custom_field")
 
 
-class ZoneOcrResultSerializer(serializers.Serializer):
+class ZoneOcrResultSerializer(serializers.Serializer[ZoneOcrResult]):
     """The outcome of one zone, mirroring the ZoneOcrResult dataclass."""
 
     template = serializers.CharField(read_only=True)
@@ -3767,7 +3770,27 @@ class StoragePathTestSerializer(SerializerWithPerms):
             )
 
 
-class OcrTemplateZoneSerializer(serializers.ModelSerializer):
+class ZoneData(TypedDict):
+    """Validated data of one OcrTemplateZoneSerializer."""
+
+    name: str
+    x: int
+    y: int
+    width: int
+    height: int
+    target: NotRequired[str]
+    custom_field: NotRequired[CustomField | None]
+    page: NotRequired[int | None]
+    ocr_language: NotRequired[str]
+    transform: NotRequired[str]
+    date_format: NotRequired[str]
+    order: NotRequired[int]
+    zone_source_width: NotRequired[int | None]
+    zone_source_height: NotRequired[int | None]
+    validation_regex: NotRequired[str]
+
+
+class OcrTemplateZoneSerializer(serializers.ModelSerializer[OcrTemplateZone]):
     class Meta:
         model = OcrTemplateZone
         fields = [
@@ -3789,7 +3812,10 @@ class OcrTemplateZoneSerializer(serializers.ModelSerializer):
             "validation_regex",
         ]
 
-    def validate_custom_field(self, value):
+    def validate_custom_field(
+        self,
+        value: CustomField | None,
+    ) -> CustomField | None:
         if value is None:
             return value
         if value.data_type not in OCR_SUPPORTED_FIELD_TYPES:
@@ -3840,18 +3866,18 @@ class OcrTemplateZoneSerializer(serializers.ModelSerializer):
                 ) from e
         return value
 
-    def validate_page(self, value):
+    def validate_page(self, value: int | None) -> int | None:
         if value is not None and value != -1 and value < 1:
             raise serializers.ValidationError(
                 "Page must be positive or -1 for the last page.",
             )
         return value
 
-    def validate(self, data):
+    def validate(self, attrs: ZoneData) -> ZoneData:
         # A template PATCH still replaces each zone in full.
         if self.root.partial:
             for name, field in self.fields.items():
-                if field.required and name not in data:
+                if field.required and name not in attrs:
                     raise serializers.ValidationError(
                         {name: field.error_messages["required"]},
                     )
@@ -3859,14 +3885,14 @@ class OcrTemplateZoneSerializer(serializers.ModelSerializer):
         # zones, and a zone is left unassigned when its custom field is deleted;
         # built-in targets never use a custom field.
         if (
-            data.get("target", OcrTemplateZone.TargetType.CUSTOM_FIELD)
+            attrs.get("target", OcrTemplateZone.TargetType.CUSTOM_FIELD)
             != OcrTemplateZone.TargetType.CUSTOM_FIELD
-            and data.get("custom_field") is not None
+            and attrs.get("custom_field") is not None
         ):
             raise serializers.ValidationError(
                 {"custom_field": "Only zones targeting a custom field can set one."},
             )
-        return data
+        return attrs
 
 
 class OcrTemplateZoneTestSerializer(OcrTemplateZoneSerializer):
@@ -3897,10 +3923,12 @@ class OcrTemplateZoneTestSerializer(OcrTemplateZoneSerializer):
         }
 
 
-class OcrTemplateTestSerializer(serializers.Serializer):
-    document = serializers.PrimaryKeyRelatedField(
-        queryset=Document.objects.none(),
-    )
+class DocumentField(serializers.PrimaryKeyRelatedField[Document]):
+    pass
+
+
+class OcrTemplateTestSerializer(serializers.Serializer[dict[str, Any]]):
+    document = DocumentField(queryset=Document.objects.none())
     zone = OcrTemplateZoneTestSerializer()
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
@@ -3962,26 +3990,29 @@ class OcrTemplateSerializer(MatchRuleSerializer, OwnedObjectSerializer):
         ]
         read_only_fields = ["created", "updated"]
 
-    def validate(self, data):
-        data = super().validate(data)
-        if "zones" in data:
-            names = [zone["name"] for zone in data["zones"]]
+    def validate(self, attrs: dict[str, Any]) -> dict[str, Any]:
+        attrs = super().validate(attrs)
+        zones: list[ZoneData] | None = attrs.get("zones")
+        if zones is not None:
+            names = [zone["name"] for zone in zones]
             duplicates = sorted({name for name in names if names.count(name) > 1})
             if duplicates:
                 # Combine format tokens refer to zones by name.
                 raise serializers.ValidationError(
                     {"zones": f"Zone names must be unique: {', '.join(duplicates)}"},
                 )
-        if "combine_formats" in data:
-            if "zones" in data:
+        if "combine_formats" in attrs:
+            if zones is not None:
                 keys = {
                     field_key(
                         OcrTemplateZone.TargetType(
                             zone.get("target", OcrTemplateZone.TargetType.CUSTOM_FIELD),
                         ),
-                        zone["custom_field"].pk if zone.get("custom_field") else None,
+                        custom_field.pk
+                        if (custom_field := zone.get("custom_field"))
+                        else None,
                     )
-                    for zone in data["zones"]
+                    for zone in zones
                 }
             elif self.instance:
                 keys = {
@@ -3993,7 +4024,7 @@ class OcrTemplateSerializer(MatchRuleSerializer, OwnedObjectSerializer):
                 }
             else:
                 keys = set()
-            unknown = sorted(set(data["combine_formats"]) - keys)
+            unknown = sorted(set(attrs["combine_formats"]) - keys)
             if unknown:
                 raise serializers.ValidationError(
                     {
@@ -4002,46 +4033,69 @@ class OcrTemplateSerializer(MatchRuleSerializer, OwnedObjectSerializer):
                         ),
                     },
                 )
-        zones = data.get("zones", [])
-        if (
-            self.instance
-            and "zones" not in data
-            and ("source_width" in data or "source_height" in data)
-        ):
-            zones = self.instance.zones.values()
-        source_width = data.get(
+        # Each zone's name, x, y, width, height and source size.
+        boxes: list[tuple[str, int, int, int, int, int | None, int | None]] = []
+        if zones is not None:
+            boxes = [
+                (
+                    zone["name"],
+                    zone["x"],
+                    zone["y"],
+                    zone["width"],
+                    zone["height"],
+                    zone.get("zone_source_width"),
+                    zone.get("zone_source_height"),
+                )
+                for zone in zones
+            ]
+        elif self.instance and ("source_width" in attrs or "source_height" in attrs):
+            boxes = list(
+                self.instance.zones.values_list(
+                    "name",
+                    "x",
+                    "y",
+                    "width",
+                    "height",
+                    "zone_source_width",
+                    "zone_source_height",
+                ),
+            )
+        source_width = attrs.get(
             "source_width",
             getattr(self.instance, "source_width", None),
         )
-        source_height = data.get(
+        source_height = attrs.get(
             "source_height",
             getattr(self.instance, "source_height", None),
         )
-        for zone in zones:
-            width = zone.get("zone_source_width") or source_width
-            height = zone.get("zone_source_height") or source_height
-            if (
-                zone.get("x", 0) + zone.get("width", 0) > width
-                or zone.get("y", 0) + zone.get("height", 0) > height
+        if not boxes:
+            return attrs
+        assert source_width is not None
+        assert source_height is not None
+        for name, x, y, width, height, zone_width, zone_height in boxes:
+            if x + width > (zone_width or source_width) or y + height > (
+                zone_height or source_height
             ):
                 raise serializers.ValidationError(
-                    {
-                        "zones": f"Zone '{zone.get('name', '?')}' extends beyond its source dimensions.",
-                    },
+                    {"zones": f"Zone '{name}' extends beyond its source dimensions."},
                 )
-        return data
+        return attrs
 
     @transaction.atomic
-    def create(self, validated_data):
-        zones_data = validated_data.pop("zones", [])
+    def create(self, validated_data: dict[str, Any]) -> OcrTemplate:
+        zones_data: list[ZoneData] = validated_data.pop("zones", [])
         template = super().create(validated_data)
         for zone_data in zones_data:
             OcrTemplateZone.objects.create(template=template, **zone_data)
         return template
 
     @transaction.atomic
-    def update(self, instance, validated_data):
-        zones_data = validated_data.pop("zones", None)
+    def update(
+        self,
+        instance: OcrTemplate,
+        validated_data: dict[str, Any],
+    ) -> OcrTemplate:
+        zones_data: list[ZoneData] | None = validated_data.pop("zones", None)
         instance = super().update(instance, validated_data)
 
         if zones_data is not None:
