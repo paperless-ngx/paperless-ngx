@@ -2273,6 +2273,67 @@ class TestPrepareFieldUpdate:
         assert (update.value if update else None) == expected
 
     @pytest.mark.parametrize(
+        ("data_type", "text", "expected"),
+        [
+            pytest.param(
+                CustomField.FieldDataType.STRING,
+                "x" * 128,
+                "x" * 128,
+                id="string-at-the-limit",
+            ),
+            pytest.param(
+                CustomField.FieldDataType.STRING,
+                "x" * 129,
+                None,
+                id="string-over-the-limit",
+            ),
+            pytest.param(
+                CustomField.FieldDataType.URL,
+                "https://example.com/" + "a" * 150,
+                "https://example.com/" + "a" * 150,
+                id="url-longer-than-128",
+            ),
+            pytest.param(
+                CustomField.FieldDataType.URL,
+                "https://example.com/" + "a" * 200,
+                None,
+                id="url-over-the-limit",
+            ),
+            pytest.param(
+                CustomField.FieldDataType.URL,
+                "not a url",
+                None,
+                id="not-a-url",
+            ),
+        ],
+    )
+    def test_text_values_are_kept_whole_or_rejected(
+        self,
+        data_type: str,
+        text: str,
+        expected: str | None,
+    ) -> None:
+        """
+        GIVEN:
+            - A zone targeting a string or URL custom field
+        WHEN:
+            - A field update is prepared for text within or beyond the field's
+              limits
+        THEN:
+            - Valid text is kept whole and invalid or too long text produces no
+              update, never a truncated value
+        """
+        field = CustomFieldFactory(data_type=data_type)
+        zone = OcrTemplateZoneFactory(
+            target=OcrTemplateZone.TargetType.CUSTOM_FIELD,
+            custom_field=field,
+        )
+
+        update = _prepare_field_update(zone, text)
+
+        assert (update.value if update else None) == expected
+
+    @pytest.mark.parametrize(
         "target",
         [
             pytest.param(OcrTemplateZone.TargetType.CREATED, id="created"),
@@ -2816,24 +2877,6 @@ class TestConvertValue:
             - The converted value equals the expected value exactly
         """
         assert _convert_value(value, data_type, locale, ENG_DATES) == expected
-
-    def test_string_truncation(self) -> None:
-        """
-        GIVEN:
-            - An extracted string longer than the string field limit
-        WHEN:
-            - The value is converted to a STRING field value
-        THEN:
-            - The result is truncated to 128 characters
-        """
-        result = _convert_value(
-            "x" * 200,
-            CustomField.FieldDataType.STRING,
-            EN,
-            ENG_DATES,
-        )
-        assert isinstance(result, str)
-        assert len(result) == 128
 
     @pytest.mark.parametrize(
         ("value", "locale", "expected"),

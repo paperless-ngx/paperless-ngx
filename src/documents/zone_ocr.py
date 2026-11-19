@@ -991,10 +991,10 @@ def _convert_value(
         if data_type in (
             CustomField.FieldDataType.STRING,
             CustomField.FieldDataType.URL,
+            CustomField.FieldDataType.LONG_TEXT,
         ):
-            return value[:128]
-
-        elif data_type == CustomField.FieldDataType.LONG_TEXT:
+            # Returned whole; _prepare_field_update validates length and URL
+            # format, so a value is rejected rather than truncated.
             return value
 
         elif data_type == CustomField.FieldDataType.INT:
