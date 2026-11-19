@@ -920,6 +920,7 @@ class TestSavedZoneExtraction:
 
     def test_failed_template_reports_rollback_and_next_template_still_runs(
         self,
+        mocker: MockerFixture,
         mock_zone_ocr_run: MagicMock,
         page: Path,
         document: Document,
@@ -927,7 +928,8 @@ class TestSavedZoneExtraction:
     ) -> None:
         """
         GIVEN:
-            - A template whose ASN zone conflicts with another document's ASN
+            - A template whose ASN is taken by another document after the
+              duplicate check passed, so saving it fails
             - A second template that would succeed
         WHEN:
             - Zone extraction runs over both templates
@@ -935,6 +937,7 @@ class TestSavedZoneExtraction:
             - The first template is reported as failed and rolled back, and the
               second template is still applied
         """
+        mocker.patch("documents.zone_ocr._asn_in_use", return_value=False)
         DocumentFactory(archive_serial_number=42)
         make_zone(template, "Title")
         make_zone(template, "Conflict", "asn")
@@ -956,6 +959,88 @@ class TestSavedZoneExtraction:
         document.refresh_from_db()
         assert document.title == "Applied"
         assert document.archive_serial_number is None
+
+    @pytest.mark.parametrize(
+        "deleted",
+        [
+            pytest.param(False, id="active-document"),
+            pytest.param(True, id="trashed-document"),
+        ],
+    )
+    def test_duplicate_asn_is_dropped_and_other_fields_still_written(
+        self,
+        mock_zone_ocr_run: MagicMock,
+        paperless_dirs: PaperlessDirs,
+        page: Path,
+        document: Document,
+        template: OcrTemplate,
+        deleted: bool,  # noqa: FBT001
+    ) -> None:
+        """
+        GIVEN:
+            - A template with a title zone and an ASN zone whose value is the
+              ASN of another document, active or in the trash
+        WHEN:
+            - The template is processed
+        THEN:
+            - The ASN zone is reported as duplicate_asn and the ASN is not
+              written, while the title from the same template is written
+        """
+        other = DocumentFactory(archive_serial_number=42)
+        if deleted:
+            other.delete()
+        make_zone(template, "Title")
+        make_zone(template, "ASN", "asn")
+        mock_zone_ocr_run.side_effect = ocr_outputs("New title", "42")
+
+        results = _process_template(
+            document,
+            {0: page},
+            template,
+            list(template.zones.all()),
+            paperless_dirs.scratch_dir,
+        )
+
+        assert [(result.zone, result.value, result.reason) for result in results] == [
+            ("Title", "New title", None),
+            ("ASN", None, "duplicate_asn"),
+        ]
+        document.refresh_from_db()
+        assert document.title == "New title"
+        assert document.archive_serial_number is None
+
+    def test_document_keeping_its_own_asn_is_not_a_duplicate(
+        self,
+        mock_zone_ocr_run: MagicMock,
+        paperless_dirs: PaperlessDirs,
+        page: Path,
+        document: Document,
+        template: OcrTemplate,
+    ) -> None:
+        """
+        GIVEN:
+            - A document that already has ASN 42 and an ASN zone reading 42
+        WHEN:
+            - The template is processed
+        THEN:
+            - The ASN is accepted
+        """
+        document.archive_serial_number = 42
+        document.save()
+        make_zone(template, "ASN", "asn")
+        mock_zone_ocr_run.side_effect = ocr_outputs("42")
+
+        results = _process_template(
+            document,
+            {0: page},
+            template,
+            list(template.zones.all()),
+            paperless_dirs.scratch_dir,
+        )
+
+        assert [(result.value, result.reason) for result in results] == [(42, None)]
+        document.refresh_from_db()
+        assert document.archive_serial_number == 42
 
     def test_literal_format_does_not_write_when_every_zone_failed(
         self,

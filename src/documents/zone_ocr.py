@@ -293,6 +293,7 @@ def _process_template(
         grouped.setdefault(_field_key(zone), []).append((zone, result))
 
     updates = []
+    root_document = get_root_document(document)
     combine_formats = template.combine_formats or {}
     for key, field_zones in grouped.items():
         accepted = [result for _, result in field_zones if result.reason is None]
@@ -310,6 +311,13 @@ def _process_template(
         )
         target_zone = field_zones[0][0]
         update = _prepare_field_update(target_zone, value) if value else None
+        if update is not None and _asn_in_use(update, root_document):
+            # Saving would violate the unique ASN and roll back every other
+            # write of this template, so only this field is dropped.
+            for result in accepted:
+                result.value = None
+                result.reason = "duplicate_asn"
+            continue
         if update is not None:
             updates.append(update)
         for result in accepted:
@@ -318,8 +326,21 @@ def _process_template(
                 result.reason = (
                     "unassigned" if key == "custom_field" else "invalid_value"
                 )
-    _apply_field_updates(get_root_document(document), updates)
+    _apply_field_updates(root_document, updates)
     return results
+
+
+def _asn_in_use(update: FieldUpdate, root_document: Document) -> bool:
+    """Whether an ASN update collides with another document's ASN.
+
+    Trashed documents count, matching the database constraint.
+    """
+    return (
+        update.field_name == "archive_serial_number"
+        and Document.global_objects.filter(archive_serial_number=update.value)
+        .exclude(pk=root_document.pk)
+        .exists()
+    )
 
 
 def _field_key(zone: OcrTemplateZone) -> str:
