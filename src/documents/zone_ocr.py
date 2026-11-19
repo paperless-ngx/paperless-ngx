@@ -12,6 +12,7 @@ from datetime import date
 from datetime import datetime
 from decimal import Decimal
 from decimal import InvalidOperation
+from functools import lru_cache
 from functools import partial
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -24,6 +25,7 @@ from babel import UnknownLocaleError
 from babel.numbers import NumberFormatError
 from babel.numbers import get_decimal_symbol
 from babel.numbers import get_group_symbol
+from babel.numbers import is_currency
 from babel.numbers import parse_decimal
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -42,6 +44,7 @@ from documents.parsers import rasterize_pdf_page_to_png
 from documents.permissions import permitted_object_ids
 from documents.regex import safe_regex_fullmatch
 from documents.signals.handlers import add_to_index
+from documents.validators import monetary_validator
 from documents.versioning import get_root_document
 from paperless.utils import OCR_TO_DATEPARSER_LANGUAGES
 
@@ -811,6 +814,109 @@ def _parse_number(value: str, locale: Locale) -> Decimal | None:
     return number.copy_negate() if negative else number
 
 
+@lru_cache(maxsize=32)
+def _currency_symbol_codes(locale: Locale) -> dict[str, str]:
+    """Map the unambiguous currency symbols of a locale to their currency code.
+
+    Symbols shared by several currencies, and symbols made only of letters or
+    digits (which includes plain three letter codes), are left out.
+    """
+    codes_by_symbol: dict[str, set[str]] = {}
+    for code, symbol in locale.currency_symbols.items():
+        if not symbol.isalnum():
+            codes_by_symbol.setdefault(symbol, set()).add(code)
+    return {
+        symbol: next(iter(codes))
+        for symbol, codes in codes_by_symbol.items()
+        if len(codes) == 1
+    }
+
+
+def _find_currency(text: str, locale: Locale) -> set[str]:
+    """Find the currency codes mentioned in OCR text.
+
+    Three letter uppercase tokens that are ISO 4217 codes win. Only when there
+    are none are the locale's currency symbols looked for, longest first so
+    "A$" is not also read as "$".
+    """
+    codes = {
+        code
+        for code in re.findall(r"(?<![A-Za-z])[A-Z]{3}(?![A-Za-z])", text)
+        if is_currency(code)
+    }
+    if codes:
+        return codes
+    for symbol, code in sorted(
+        _currency_symbol_codes(locale).items(),
+        key=lambda item: len(item[0]),
+        reverse=True,
+    ):
+        if symbol in text:
+            codes.add(code)
+            text = text.replace(symbol, " ")
+    return codes
+
+
+def _parse_monetary(value: str, locale: Locale) -> str | None:
+    """Parse OCR text as a monetary value in the stored custom field format.
+
+    The result is the amount with exactly two decimals, prefixed by the
+    currency code when the text names one ("USD12.50", "-12.50"). The rules are:
+
+    - The currency is an ISO 4217 code written as an uppercase word, or else a
+      currency symbol of the locale that belongs to a single currency. Text
+      naming two different currencies is rejected, and text naming none gives
+      an amount without a code. Zone crops are expected to be short, but an
+      uppercase word that happens to be an ISO code (e.g. "ALL" or "TOP") is
+      still read as a currency.
+    - A number enclosed in parentheses is negative, "(12.50)". Digits outside
+      the parentheses, as in "100 (19% VAT)", or a minus sign combined with
+      them are rejected.
+    - The amount is read like any other number of the locale, must not need
+      more than two decimals ("12.500" is fine, "12.345" is not) and has at
+      most 12 digits, with or without a currency code.
+    - The result must pass the same validation as values sent through the API.
+
+    Returns None when the text is not a valid monetary value.
+    """
+    group = re.search(r"\([^()]*\d[^()]*\)", value)
+    parenthesised = group is not None
+    text = value
+    if group is not None:
+        outside = value[: group.start()] + value[group.end() :]
+        if re.search(r"\d", outside) or re.search(
+            "[-\N{MINUS SIGN}\N{EN DASH}]",
+            value,
+        ):
+            return None
+        text = value.replace("(", " ").replace(")", " ")
+
+    currencies = _find_currency(text, locale)
+    if len(currencies) > 1:
+        return None
+
+    amount = _parse_number(text, locale)
+    if amount is None:
+        return None
+    if parenthesised:
+        amount = amount.copy_negate()
+    try:
+        rounded = amount.quantize(Decimal("0.01"))
+    except InvalidOperation:
+        return None
+    if rounded != amount or len(rounded.as_tuple().digits) > 12:
+        return None
+    if rounded.is_zero():
+        rounded = abs(rounded)
+
+    result = f"{next(iter(currencies), '')}{rounded:f}"
+    try:
+        monetary_validator(result)
+    except ValidationError:
+        return None
+    return result
+
+
 def _convert_value(
     value: str,
     data_type: str,
@@ -853,8 +959,7 @@ def _convert_value(
             return parsed.isoformat() if parsed else None
 
         elif data_type == CustomField.FieldDataType.MONETARY:
-            monetary = _parse_number(value, locale)
-            return None if monetary is None else format(monetary, "f")
+            return _parse_monetary(value, locale)
 
         elif data_type == CustomField.FieldDataType.BOOL:
             lower = value.lower().strip()

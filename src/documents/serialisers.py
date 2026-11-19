@@ -5,7 +5,6 @@ import math
 import re
 from datetime import datetime
 from datetime import timedelta
-from decimal import Decimal
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import TypedDict
@@ -16,12 +15,10 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
-from django.core.validators import DecimalValidator
 from django.core.validators import EmailValidator
 from django.core.validators import MaxLengthValidator
 from django.core.validators import MaxValueValidator
 from django.core.validators import MinValueValidator
-from django.core.validators import RegexValidator
 from django.core.validators import integer_validator
 from django.db import transaction
 from django.db.models import Count
@@ -95,6 +92,7 @@ from documents.regex import validate_regex_pattern
 from documents.templating.filepath import validate_filepath_template_and_render
 from documents.templating.utils import convert_format_str_to_template_format
 from documents.templating.workflows import validate_workflow_template
+from documents.validators import monetary_validator
 from documents.validators import uri_validator
 from documents.validators import url_validator
 from documents.versioning import has_prefetched_effective_content
@@ -908,17 +906,7 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer[CustomFieldInsta
                 field.data_type == CustomField.FieldDataType.MONETARY
                 and data["value"] != ""
             ):
-                try:
-                    # First try to validate as a number from legacy format
-                    DecimalValidator(max_digits=12, decimal_places=2)(
-                        Decimal(str(data["value"])),
-                    )
-                except Exception:
-                    # If that fails, try to validate as a monetary string
-                    RegexValidator(
-                        regex=r"^[A-Z]{3}-?\d+(\.\d{1,2})$",
-                        message="Must be a two-decimal number with optional currency code e.g. GBP123.45",
-                    )(data["value"])
+                monetary_validator(data["value"])
             elif field.data_type == CustomField.FieldDataType.STRING:
                 MaxLengthValidator(limit_value=128)(data["value"])
             elif field.data_type == CustomField.FieldDataType.SELECT:

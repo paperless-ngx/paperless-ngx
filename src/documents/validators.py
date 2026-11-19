@@ -1,6 +1,9 @@
+from decimal import Decimal
 from urllib.parse import urlparse
 
 from django.core.exceptions import ValidationError
+from django.core.validators import DecimalValidator
+from django.core.validators import RegexValidator
 from django.utils.translation import gettext_lazy as _
 
 
@@ -58,3 +61,28 @@ def url_validator(value) -> None:
         ValidationError: If the URL is invalid or not using http/https scheme
     """
     uri_validator(value, allowed_schemes={"http", "https"})
+
+
+def monetary_validator(value: str) -> None:
+    """
+    Validates the stored value of a monetary custom field.
+
+    Accepts either a plain decimal with at most 12 digits and 2 decimal places
+    (the legacy format), or a two-decimal number prefixed by a three letter
+    uppercase currency code, e.g. GBP123.45 or USD-12.50.
+
+    Args:
+        value: The monetary value to validate
+
+    Raises:
+        ValidationError: If the value matches neither format
+    """
+    try:
+        # First try to validate as a number from legacy format
+        DecimalValidator(max_digits=12, decimal_places=2)(Decimal(str(value)))
+    except Exception:
+        # If that fails, try to validate as a monetary string
+        RegexValidator(
+            regex=r"^[A-Z]{3}-?\d+(\.\d{1,2})$",
+            message="Must be a two-decimal number with optional currency code e.g. GBP123.45",
+        )(value)

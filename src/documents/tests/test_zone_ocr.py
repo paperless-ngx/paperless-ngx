@@ -31,6 +31,7 @@ from documents.zone_ocr import _detect_mime
 from documents.zone_ocr import _extract_zone
 from documents.zone_ocr import _number_locale
 from documents.zone_ocr import _parse_date
+from documents.zone_ocr import _parse_monetary
 from documents.zone_ocr import _prepare_field_update
 from documents.zone_ocr import _process_template
 from documents.zone_ocr import _render_pages
@@ -2284,6 +2285,92 @@ class TestNumberLocale:
         assert _number_locale(ocr_language) == Locale.parse(expected)
 
 
+class TestParseMonetary:
+    """Tests for the _parse_monetary function."""
+
+    @pytest.mark.parametrize(
+        ("value", "locale", "expected"),
+        [
+            pytest.param("12.50", EN, "12.50", id="plain-amount"),
+            pytest.param("12", EN, "12.00", id="whole-number-gets-two-decimals"),
+            pytest.param("12.500", EN, "12.50", id="trailing-zero-is-fine"),
+            pytest.param("USD 12.50", EN, "USD12.50", id="code-before-amount"),
+            pytest.param("12,50 EUR", DE, "EUR12.50", id="code-after-amount"),
+            pytest.param("USD12.50", EN, "USD12.50", id="code-attached-to-amount"),
+            pytest.param("$12.50", EN, "USD12.50", id="dollar-symbol-en"),
+            pytest.param("$12.50", FR, "12.50", id="dollar-symbol-fr-has-no-code"),
+            pytest.param(
+                "\N{EURO SIGN}12.50",
+                EN,
+                "EUR12.50",
+                id="euro-symbol",
+            ),
+            pytest.param(
+                "\N{POUND SIGN}12.50",
+                EN,
+                "GBP12.50",
+                id="pound-symbol",
+            ),
+            pytest.param(
+                "USD $12.50",
+                EN,
+                "USD12.50",
+                id="code-wins-over-symbol",
+            ),
+            pytest.param("INV 12.50", EN, "12.50", id="non-currency-word-ignored"),
+            pytest.param("usd 12.50", EN, "12.50", id="lowercase-code-ignored"),
+            pytest.param("(12.50)", EN, "-12.50", id="parentheses-negative"),
+            pytest.param("($12.50)", EN, "USD-12.50", id="parentheses-with-symbol"),
+            pytest.param("(12,50 EUR)", DE, "EUR-12.50", id="parentheses-with-code"),
+            pytest.param("(0.00)", EN, "0.00", id="parentheses-zero-not-negative"),
+            pytest.param("(USD) 12.50", EN, "USD12.50", id="empty-parentheses-ignored"),
+            pytest.param("USD -12.50", EN, "USD-12.50", id="code-with-negative"),
+            pytest.param("-12.50", EN, "-12.50", id="plain-negative"),
+            pytest.param("1,234.56", EN, "1234.56", id="grouped-amount"),
+            pytest.param("USD 12.50 EUR", EN, None, id="two-codes"),
+            pytest.param("$12.50 \N{EURO SIGN}", EN, None, id="two-symbols"),
+            pytest.param("(-12.50)", EN, None, id="parentheses-and-minus"),
+            pytest.param("12.345", EN, None, id="too-many-decimals"),
+            pytest.param("12345678901.12", EN, None, id="more-than-12-digits"),
+            pytest.param(
+                "USD 12345678901.12",
+                EN,
+                None,
+                id="more-than-12-digits-with-code",
+            ),
+            pytest.param("100 (19% VAT)", EN, None, id="digits-outside-parentheses"),
+            pytest.param("(12) (13)", EN, None, id="two-parenthesised-numbers"),
+            pytest.param("-0.00", EN, "0.00", id="negative-zero-not-negative"),
+            pytest.param("CHF 12", DE, "CHF12.00", id="code-in-german"),
+            pytest.param(
+                "1\N{NARROW NO-BREAK SPACE}234,56 \N{EURO SIGN}",
+                FR,
+                "EUR1234.56",
+                id="french-space-grouping",
+            ),
+            pytest.param("USD", EN, None, id="code-without-amount"),
+            pytest.param("garbage", EN, None, id="garbage"),
+            pytest.param("", EN, None, id="empty"),
+        ],
+    )
+    def test_parse_monetary(
+        self,
+        value: str,
+        locale: Locale,
+        expected: str | None,
+    ) -> None:
+        """
+        GIVEN:
+            - OCR text containing an amount, maybe with a currency or parentheses
+        WHEN:
+            - The text is parsed as a monetary value
+        THEN:
+            - The amount has two decimals and a leading currency code if one was
+              found, or None is returned when the text is not a valid value
+        """
+        assert _parse_monetary(value, locale) == expected
+
+
 class TestConvertValue:
     """Tests for the _convert_value function."""
 
@@ -2406,42 +2493,35 @@ class TestConvertValue:
             pytest.param(
                 "\u20ac1,234.56",
                 CustomField.FieldDataType.MONETARY,
-                "1234.56",
+                "EUR1234.56",
                 EN,
                 id="monetary-with-currency-symbol",
             ),
             pytest.param(
                 "12345678901234567890,12345678901234567890",
                 CustomField.FieldDataType.MONETARY,
-                "12345678901234567890.12345678901234567890",
+                None,
                 DE,
-                id="monetary-preserves-decimal-precision",
-            ),
-            pytest.param(
-                "-12345678901234567890,12345678901234567890",
-                CustomField.FieldDataType.MONETARY,
-                "-12345678901234567890.12345678901234567890",
-                DE,
-                id="monetary-negative-preserves-decimal-precision",
+                id="monetary-too-precise-returns-none",
             ),
             pytest.param(
                 "\u20ac-12.50",
                 CustomField.FieldDataType.MONETARY,
-                "-12.50",
+                "EUR-12.50",
                 EN,
                 id="monetary-sign-after-currency-symbol",
             ),
             pytest.param(
                 "-\u20ac12.50",
                 CustomField.FieldDataType.MONETARY,
-                "-12.50",
+                "EUR-12.50",
                 EN,
                 id="monetary-sign-before-currency-symbol",
             ),
             pytest.param(
                 "EUR -12.50",
                 CustomField.FieldDataType.MONETARY,
-                "-12.50",
+                "EUR-12.50",
                 EN,
                 id="monetary-sign-after-currency-code",
             ),
