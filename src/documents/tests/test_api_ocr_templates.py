@@ -1117,6 +1117,55 @@ class TestOcrTemplateValidation:
             assert "custom_field" in response.json()["zones"]["0"]
 
     @pytest.mark.parametrize(
+        ("date_format", "expected"),
+        [
+            pytest.param("", status.HTTP_201_CREATED, id="blank"),
+            pytest.param("%d.%m.%Y", status.HTTP_201_CREATED, id="day-month-year"),
+            pytest.param("%m/%d/%y", status.HTTP_201_CREATED, id="two-digit-year"),
+            pytest.param("%d %B %Y", status.HTTP_201_CREATED, id="month-name"),
+            pytest.param("%d.%m", status.HTTP_400_BAD_REQUEST, id="no-year"),
+            pytest.param(
+                "%d.%m.%%Y",
+                status.HTTP_400_BAD_REQUEST,
+                id="escaped-percent-is-not-a-year",
+            ),
+            pytest.param("%m.%Y", status.HTTP_400_BAD_REQUEST, id="no-day"),
+            pytest.param("%Y", status.HTTP_400_BAD_REQUEST, id="year-only"),
+            pytest.param("date", status.HTTP_400_BAD_REQUEST, id="no-directive"),
+            pytest.param(
+                "%d.%m.%Y %Q",
+                status.HTTP_400_BAD_REQUEST,
+                id="bad-directive",
+            ),
+        ],
+    )
+    def test_date_format_must_read_a_full_date(
+        self,
+        admin_client: APIClient,
+        text_zone_payload: Callable[..., dict[str, Any]],
+        date_format: str,
+        expected: int,
+    ) -> None:
+        """
+        GIVEN:
+            - A zone with a blank date format, one with a day, month and year,
+              or one missing a part or using an unknown directive
+        WHEN:
+            - Create is attempted
+        THEN:
+            - Only blank and complete formats are accepted
+        """
+        response = admin_client.post(
+            ENDPOINT,
+            template_payload(zones=[text_zone_payload(date_format=date_format)]),
+            format="json",
+        )
+
+        assert response.status_code == expected
+        if expected == status.HTTP_400_BAD_REQUEST:
+            assert "date_format" in response.json()["zones"]["0"]
+
+    @pytest.mark.parametrize(
         ("pattern", "expected"),
         [
             pytest.param("", status.HTTP_201_CREATED, id="blank"),

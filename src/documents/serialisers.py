@@ -3770,6 +3770,27 @@ class OcrTemplateZoneSerializer(serializers.ModelSerializer):
             )
         return value
 
+    def validate_date_format(self, value: str) -> str:
+        # The format must read back a full date: without a day, month or year
+        # strptime fills in 1 or 1900 instead of failing. A missing year is
+        # rejected before parsing, since Python deprecates parsing a day of month
+        # without one.
+        if value:
+            if not re.search(r"%[Yy]", value.replace("%%", "")):
+                raise serializers.ValidationError(
+                    "The date format must include the day, month and year.",
+                )
+            sample = datetime(2024, 3, 15)
+            try:
+                round_trip = datetime.strptime(sample.strftime(value), value)
+            except ValueError as e:
+                raise serializers.ValidationError(f"Invalid date format: {e}") from e
+            if round_trip.date() != sample.date():
+                raise serializers.ValidationError(
+                    "The date format must read back a full date (day, month and year).",
+                )
+        return value
+
     def validate_validation_regex(self, value: str) -> str:
         if value:
             try:
