@@ -1034,6 +1034,37 @@ class TestSavedZoneExtraction:
         assert document.title == "Applied"
         assert document.archive_serial_number is None
 
+    def test_unknown_stored_transform_fails_only_its_template(
+        self,
+        mock_zone_ocr_run: MagicMock,
+        page: Path,
+        document: Document,
+        template: OcrTemplate,
+    ) -> None:
+        """
+        GIVEN:
+            - A template whose zone has a transform value outside the choices
+            - A second template that would succeed
+        WHEN:
+            - Zone extraction runs over both templates
+        THEN:
+            - The first template is reported as failed and the second template
+              is still applied
+        """
+        make_zone(template, "Bogus", transform="bogus")
+        second = make_template("Second")
+        make_zone(second, "Second")
+        mock_zone_ocr_run.side_effect = ocr_outputs("Ignored", "Applied")
+
+        results = run_zone_extraction(document, page, templates=[template, second])
+
+        assert [result.reason for result in results] == [
+            ZoneOcrReason.TEMPLATE_FAILED,
+            None,
+        ]
+        document.refresh_from_db()
+        assert document.title == "Applied"
+
     @pytest.mark.parametrize(
         "deleted",
         [
@@ -1734,132 +1765,156 @@ class TestApplyTransform:
     @pytest.mark.parametrize(
         ("text", "transform", "date_format", "expected"),
         [
-            pytest.param("  hello  ", "strip", "", "hello", id="strip"),
-            pytest.param("  hello  ", "none", "", "hello", id="none-transform"),
+            pytest.param(
+                "  hello  ",
+                OcrTemplateZone.TransformType.STRIP,
+                "",
+                "hello",
+                id="strip",
+            ),
+            pytest.param(
+                "  hello  ",
+                OcrTemplateZone.TransformType.NONE,
+                "",
+                "hello",
+                id="none-transform",
+            ),
             pytest.param(
                 "hello world",
-                "uppercase",
+                OcrTemplateZone.TransformType.UPPERCASE,
                 "",
                 "HELLO WORLD",
                 id="uppercase",
             ),
             pytest.param(
                 "HELLO WORLD",
-                "lowercase",
+                OcrTemplateZone.TransformType.LOWERCASE,
                 "",
                 "hello world",
                 id="lowercase",
             ),
             pytest.param(
                 "Invoice 2026-001",
-                "numeric",
+                OcrTemplateZone.TransformType.NUMERIC,
                 "",
                 "2026-001",
                 id="numeric-basic",
             ),
             pytest.param(
                 "\u20ac1,234.56",
-                "numeric",
+                OcrTemplateZone.TransformType.NUMERIC,
                 "",
                 "1,234.56",
                 id="numeric-with-currency",
             ),
             pytest.param(
                 "abc",
-                "numeric",
+                OcrTemplateZone.TransformType.NUMERIC,
                 "",
                 "",
                 id="numeric-without-digits-is-empty",
             ),
             pytest.param(
                 "a-b.c",
-                "numeric",
+                OcrTemplateZone.TransformType.NUMERIC,
                 "",
                 "",
                 id="numeric-punctuation-only-is-empty",
             ),
             pytest.param(
                 "13.04.2026",
-                "date",
+                OcrTemplateZone.TransformType.DATE,
                 "%d.%m.%Y",
                 "2026-04-13",
                 id="date-with-format-dotted",
             ),
             pytest.param(
                 "01/12/2025",
-                "date",
+                OcrTemplateZone.TransformType.DATE,
                 "%d/%m/%Y",
                 "2025-12-01",
                 id="date-with-format-slashed",
             ),
             pytest.param(
                 "13.04.26",
-                "date",
+                OcrTemplateZone.TransformType.DATE,
                 "%d.%m.%y",
                 "2026-04-13",
                 id="date-two-digit-year",
             ),
             pytest.param(
                 "2026-04-13",
-                "date",
+                OcrTemplateZone.TransformType.DATE,
                 "",
                 "2026-04-13",
                 id="date-auto-detect-iso",
             ),
             pytest.param(
                 "2026/04/13",
-                "date",
+                OcrTemplateZone.TransformType.DATE,
                 "",
                 "2026-04-13",
                 id="date-auto-detect-slashed",
             ),
             pytest.param(
                 "13 April 2026",
-                "date",
+                OcrTemplateZone.TransformType.DATE,
                 "",
                 "2026-04-13",
                 id="date-auto-detect-month-name",
             ),
             pytest.param(
                 "2026-04-13",
-                "date",
+                OcrTemplateZone.TransformType.DATE,
                 "%d.%m.%Y",
                 "2026-04-13",
                 id="date-format-mismatch-falls-back-to-auto-detect",
             ),
             pytest.param(
                 "32.13.2026",
-                "date",
+                OcrTemplateZone.TransformType.DATE,
                 "%d.%m.%Y",
                 "",
                 id="date-invalid-with-format-is-empty",
             ),
             pytest.param(
                 "2026-13-32",
-                "date",
+                OcrTemplateZone.TransformType.DATE,
                 "",
                 "",
                 id="date-invalid-auto-detect-is-empty",
             ),
             pytest.param(
                 "not a date",
-                "date",
+                OcrTemplateZone.TransformType.DATE,
                 "",
                 "",
                 id="date-not-a-date-is-empty",
             ),
-            pytest.param("", "strip", "", "", id="empty-string"),
-            pytest.param("   ", "strip", "", "", id="whitespace-only"),
+            pytest.param(
+                "",
+                OcrTemplateZone.TransformType.STRIP,
+                "",
+                "",
+                id="empty-string",
+            ),
+            pytest.param(
+                "   ",
+                OcrTemplateZone.TransformType.STRIP,
+                "",
+                "",
+                id="whitespace-only",
+            ),
             pytest.param(
                 "  hello  ",
-                "unknown",
+                OcrTemplateZone.TransformType.QR_CODE,
                 "",
                 "hello",
-                id="unknown-transform-strips",
+                id="qr-code-strips",
             ),
             pytest.param(
                 " -- Account #123. -- ",
-                "strip_punctuation",
+                OcrTemplateZone.TransformType.STRIP_PUNCTUATION,
                 "",
                 "Account #123",
                 id="strip-punctuation",
@@ -1869,7 +1924,7 @@ class TestApplyTransform:
     def test_apply_transform(
         self,
         text: str,
-        transform: str,
+        transform: OcrTemplateZone.TransformType,
         date_format: str,
         expected: str,
     ) -> None:
@@ -1895,7 +1950,14 @@ class TestApplyTransform:
             - An empty string is returned
         """
         mocker.patch("documents.zone_ocr.dateparser.parse", side_effect=OverflowError)
-        assert _apply_transform("unparsable", "date", _date_rules("eng")) == ""
+        assert (
+            _apply_transform(
+                "unparsable",
+                OcrTemplateZone.TransformType.DATE,
+                _date_rules("eng"),
+            )
+            == ""
+        )
 
 
 class TestZoneLanguage:
@@ -2326,16 +2388,17 @@ class TestParseDate:
 class TestPrepareFieldUpdate:
     """Tests for converting extracted values into field updates."""
 
-    def test_unknown_target_cannot_produce_a_field_update(self) -> None:
+    def test_unknown_target_raises(self) -> None:
         """
         GIVEN:
             - A zone whose target is not a known target
         WHEN:
             - A field update is prepared for it
         THEN:
-            - No field update is produced
+            - A ValueError is raised
         """
-        assert _prepare_field_update(OcrTemplateZone(target="unknown"), "value") is None
+        with pytest.raises(ValueError, match="unknown"):
+            _prepare_field_update(OcrTemplateZone(target="unknown"), "value")
 
     @pytest.mark.parametrize(
         ("ocr_language", "expected"),
@@ -2406,7 +2469,7 @@ class TestPrepareFieldUpdate:
     )
     def test_text_values_are_kept_whole_or_rejected(
         self,
-        data_type: str,
+        data_type: CustomField.FieldDataType,
         text: str,
         expected: str | None,
     ) -> None:
@@ -2961,7 +3024,7 @@ class TestConvertValue:
     def test_converts_to_exact_value(
         self,
         value: str,
-        data_type: str,
+        data_type: CustomField.FieldDataType,
         expected: object,
         locale: Locale,
     ) -> None:
@@ -3161,7 +3224,12 @@ class TestConvertValue:
             ),
         ],
     )
-    def test_returns_none(self, value: str, data_type: str, locale: Locale) -> None:
+    def test_returns_none(
+        self,
+        value: str,
+        data_type: CustomField.FieldDataType,
+        locale: Locale,
+    ) -> None:
         """
         GIVEN:
             - A value that cannot be converted to the given data type in a locale
@@ -3193,7 +3261,7 @@ class TestConvertValue:
     )
     def test_numeric_types_reject_malformed_numbers(
         self,
-        data_type: str,
+        data_type: CustomField.FieldDataType,
         value: str,
     ) -> None:
         """

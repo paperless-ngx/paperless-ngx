@@ -18,6 +18,7 @@ from functools import partial
 from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import TypeAlias
+from typing import assert_never
 
 import dateparser
 import magic
@@ -143,10 +144,12 @@ def _zone_result(
     *,
     reason: ZoneOcrReason | None = None,
 ) -> ZoneOcrResult:
-    if zone.target == OcrTemplateZone.TargetType.CUSTOM_FIELD:
-        label = zone.custom_field.name if zone.custom_field_id else "(no field)"
+    target = OcrTemplateZone.TargetType(zone.target)
+    if target == OcrTemplateZone.TargetType.CUSTOM_FIELD:
+        custom_field = zone.custom_field
+        label = custom_field.name if custom_field is not None else "(no field)"
     else:
-        label = BUILTIN_TARGET_LABELS[zone.target]
+        label = BUILTIN_TARGET_LABELS[target]
     return ZoneOcrResult(
         template=template.name,
         zone=zone.name,
@@ -606,7 +609,7 @@ def _extract_zone(
         raw_text=raw_text,
         value=_apply_transform(
             raw_text or "",
-            zone.transform,
+            OcrTemplateZone.TransformType(zone.transform),
             _date_rules(zone.ocr_language, zone.date_format),
         )
         or None,
@@ -729,7 +732,7 @@ def _parse_date(text: str, rules: DateRules) -> date | None:
 
 def _apply_transform(
     text: str,
-    transform: str,
+    transform: OcrTemplateZone.TransformType,
     dates: DateRules,
 ) -> str:
     """Apply post-processing transform to extracted text.
@@ -741,21 +744,27 @@ def _apply_transform(
     if not text:
         return text
 
-    if transform in ("strip", "none"):
-        return text
-    elif transform == "date":
-        parsed = _parse_date(text, dates)
-        return parsed.isoformat() if parsed else ""
-    elif transform == "uppercase":
-        return text.upper()
-    elif transform == "lowercase":
-        return text.lower()
-    elif transform == "numeric":
-        numeric = re.sub(r"[^\d.,\-]", "", text)
-        return numeric if re.search(r"\d", numeric) else ""
-    elif transform == "strip_punctuation":
-        return text.strip(string.punctuation + " \t\r\n")
-    return text
+    match transform:
+        case (
+            OcrTemplateZone.TransformType.NONE
+            | OcrTemplateZone.TransformType.STRIP
+            | OcrTemplateZone.TransformType.QR_CODE
+        ):
+            return text
+        case OcrTemplateZone.TransformType.DATE:
+            parsed = _parse_date(text, dates)
+            return parsed.isoformat() if parsed else ""
+        case OcrTemplateZone.TransformType.UPPERCASE:
+            return text.upper()
+        case OcrTemplateZone.TransformType.LOWERCASE:
+            return text.lower()
+        case OcrTemplateZone.TransformType.NUMERIC:
+            numeric = re.sub(r"[^\d.,\-]", "", text)
+            return numeric if re.search(r"\d", numeric) else ""
+        case OcrTemplateZone.TransformType.STRIP_PUNCTUATION:
+            return text.strip(string.punctuation + " \t\r\n")
+        case unreachable:
+            assert_never(unreachable)
 
 
 def _prepare_field_update(
@@ -765,37 +774,41 @@ def _prepare_field_update(
     """Convert extracted text and enforce the destination field's constraints."""
     custom_field = None
     typed_value: ZoneValue | None
-    if zone.target == OcrTemplateZone.TargetType.CUSTOM_FIELD:
-        if not zone.custom_field_id:
-            return None
-        custom_field = zone.custom_field
-        field_name = CustomFieldInstance.get_value_field_name(custom_field.data_type)
-        typed_value = _convert_value(
-            value,
-            custom_field.data_type,
-            _number_locale(zone.ocr_language),
-            _date_rules(zone.ocr_language, zone.date_format),
-        )
-        model = CustomFieldInstance
-    elif zone.target == OcrTemplateZone.TargetType.TITLE:
-        field_name, typed_value = "title", value[:128]
-        model = Document
-    elif zone.target == OcrTemplateZone.TargetType.ASN:
-        digits = re.sub(r"[^\d]", "", value)
-        field_name = "archive_serial_number"
-        typed_value = int(digits) if digits else None
-        model = Document
-    elif zone.target == OcrTemplateZone.TargetType.CREATED:
-        field_name, typed_value = (
-            "created",
-            _parse_date(
+    model: type[Document | CustomFieldInstance]
+    target = OcrTemplateZone.TargetType(zone.target)
+    match target:
+        case OcrTemplateZone.TargetType.CUSTOM_FIELD:
+            custom_field = zone.custom_field
+            if custom_field is None:
+                return None
+            data_type = CustomField.FieldDataType(custom_field.data_type)
+            field_name = CustomFieldInstance.get_value_field_name(data_type)
+            typed_value = _convert_value(
                 value,
+                data_type,
+                _number_locale(zone.ocr_language),
                 _date_rules(zone.ocr_language, zone.date_format),
-            ),
-        )
-        model = Document
-    else:
-        return None
+            )
+            model = CustomFieldInstance
+        case OcrTemplateZone.TargetType.TITLE:
+            field_name, typed_value = "title", value[:128]
+            model = Document
+        case OcrTemplateZone.TargetType.ASN:
+            digits = re.sub(r"[^\d]", "", value)
+            field_name = "archive_serial_number"
+            typed_value = int(digits) if digits else None
+            model = Document
+        case OcrTemplateZone.TargetType.CREATED:
+            field_name, typed_value = (
+                "created",
+                _parse_date(
+                    value,
+                    _date_rules(zone.ocr_language, zone.date_format),
+                ),
+            )
+            model = Document
+        case unreachable:
+            assert_never(unreachable)
     if typed_value is None:
         return None
     field = model._meta.get_field(field_name)
@@ -1027,7 +1040,7 @@ def _parse_monetary(value: str, locale: Locale) -> str | None:
 
 def _convert_value(
     value: str,
-    data_type: str,
+    data_type: CustomField.FieldDataType,
     locale: Locale,
     dates: DateRules,
 ) -> ZoneValue | None:
@@ -1040,49 +1053,56 @@ def _convert_value(
         return None
 
     try:
-        if data_type in (
-            CustomField.FieldDataType.STRING,
-            CustomField.FieldDataType.URL,
-            CustomField.FieldDataType.LONG_TEXT,
-        ):
-            # Returned whole; _prepare_field_update validates length and URL
-            # format, so a value is rejected rather than truncated.
-            return value
+        match data_type:
+            case (
+                CustomField.FieldDataType.STRING
+                | CustomField.FieldDataType.URL
+                | CustomField.FieldDataType.LONG_TEXT
+            ):
+                # Returned whole; _prepare_field_update validates length and URL
+                # format, so a value is rejected rather than truncated.
+                return value
 
-        elif data_type == CustomField.FieldDataType.INT:
-            integer = _parse_number(value, locale)
-            if integer is None or integer != integer.to_integral_value():
+            case CustomField.FieldDataType.INT:
+                integer = _parse_number(value, locale)
+                if integer is None or integer != integer.to_integral_value():
+                    return None
+                return int(integer)
+
+            case CustomField.FieldDataType.FLOAT:
+                decimal = _parse_number(value, locale)
+                if decimal is None:
+                    return None
+                number = float(decimal)
+                return number if math.isfinite(number) else None
+
+            case CustomField.FieldDataType.DATE:
+                parsed = _parse_date(value, dates)
+                return parsed.isoformat() if parsed else None
+
+            case CustomField.FieldDataType.MONETARY:
+                return _parse_monetary(value, locale)
+
+            case CustomField.FieldDataType.BOOL:
+                lower = value.lower().strip()
+                if lower in ("true", "yes", "1", "ja", "oui", "si", "x"):
+                    return True
+                elif lower in ("false", "no", "0", "nein", "non"):
+                    return False
                 return None
-            return int(integer)
 
-        elif data_type == CustomField.FieldDataType.FLOAT:
-            decimal = _parse_number(value, locale)
-            if decimal is None:
+            case (
+                CustomField.FieldDataType.SELECT
+                | CustomField.FieldDataType.DOCUMENTLINK
+            ):
+                logger.debug(
+                    "Zone OCR: unsupported custom field type %s for OCR extraction",
+                    data_type,
+                )
                 return None
-            number = float(decimal)
-            return number if math.isfinite(number) else None
 
-        elif data_type == CustomField.FieldDataType.DATE:
-            parsed = _parse_date(value, dates)
-            return parsed.isoformat() if parsed else None
-
-        elif data_type == CustomField.FieldDataType.MONETARY:
-            return _parse_monetary(value, locale)
-
-        elif data_type == CustomField.FieldDataType.BOOL:
-            lower = value.lower().strip()
-            if lower in ("true", "yes", "1", "ja", "oui", "si", "x"):
-                return True
-            elif lower in ("false", "no", "0", "nein", "non"):
-                return False
-            return None
-
-        else:
-            logger.debug(
-                "Zone OCR: unsupported custom field type %s for OCR extraction",
-                data_type,
-            )
-            return None
+            case unreachable:
+                assert_never(unreachable)
 
     except (ValueError, InvalidOperation):
         logger.info("Zone OCR: could not convert value to %s", data_type)
