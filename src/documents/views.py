@@ -10,6 +10,7 @@ from collections import deque
 from collections.abc import AsyncIterator
 from collections.abc import Callable
 from collections.abc import Generator
+from collections.abc import Sequence
 from datetime import datetime
 from datetime import timedelta
 from http import HTTPStatus
@@ -22,6 +23,7 @@ from typing import TYPE_CHECKING
 from typing import Any
 from typing import Final
 from typing import NamedTuple
+from typing import cast
 from unicodedata import normalize
 from urllib.parse import quote
 from urllib.parse import urlparse
@@ -2300,7 +2302,7 @@ class DocumentViewSet(
         url_path="run-zone-ocr",
         permission_classes=[IsAuthenticated],
     )
-    def run_zone_ocr(self, request, pk=None):
+    def run_zone_ocr(self, request: Request, pk: str | None = None) -> HttpResponse:
         """
         Run zone-based OCR extraction on this document, with the given template
         or with every template that matches it.
@@ -2312,13 +2314,14 @@ class DocumentViewSet(
         serializer.is_valid(raise_exception=True)
         template = serializer.validated_data.get("template")
 
-        document = get_object_or_404(
+        document: Document = get_object_or_404(
             Document.objects.select_related("root_document__owner"),
             pk=pk,
         )
-        if not request.user.has_perm(
+        user = cast("User", request.user)
+        if not user.has_perm(
             "documents.change_document",
-        ) or not has_perms_owner_aware(request.user, "change_document", document):
+        ) or not has_perms_owner_aware(user, "change_document", document):
             return HttpResponseForbidden("Insufficient permissions")
 
         from documents.zone_ocr import get_templates_for_document
@@ -2334,7 +2337,7 @@ class DocumentViewSet(
         templates = (
             [template]
             if template is not None
-            else get_templates_for_document(file_document, requester=request.user)
+            else get_templates_for_document(file_document, requester=user)
         )
         if not templates:
             return Response(
@@ -2342,7 +2345,7 @@ class DocumentViewSet(
             )
 
         doc_path = file_document.archive_path or file_document.source_path
-        if not doc_path or not Path(doc_path).is_file():
+        if not doc_path.is_file():
             return Response(
                 {"error": "Document file not found"},
                 status=status.HTTP_404_NOT_FOUND,
@@ -3491,7 +3494,7 @@ class ReprocessDocumentsView(DocumentOperationPermissionMixin):
 class RunZoneOcrDocumentsView(DocumentOperationPermissionMixin):
     serializer_class = RunZoneOcrDocumentsSerializer
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request: Request, *args: Any, **kwargs: Any) -> HttpResponse:
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         template = serializer.validated_data.get("template")
@@ -5829,7 +5832,7 @@ class OcrTemplateViewSet(BulkPermissionMixin, PassUserMixin, ModelViewSet[OcrTem
     )
     ordering_fields = ("name",)
 
-    def get_permissions(self):
+    def get_permissions(self) -> Sequence[Any]:
         if self.action in {"document_page_image", "test_zone"}:
             # Read-only previews: viewing templates is enough, even for the POST.
             return [
@@ -5844,9 +5847,14 @@ class OcrTemplateViewSet(BulkPermissionMixin, PassUserMixin, ModelViewSet[OcrTem
         methods=["get"],
         url_path=r"document-page-image/(?P<doc_id>[0-9]+)/(?P<page>[0-9]+)",
     )
-    def document_page_image(self, request, doc_id=None, page=None):
+    def document_page_image(
+        self,
+        request: Request,
+        doc_id: str,
+        page: str,
+    ) -> HttpResponse:
         """Render a page for the template editor's zone overlay."""
-        document = get_object_or_404(
+        document: Document = get_object_or_404(
             Document.objects.select_related("root_document__owner"),
             pk=doc_id,
         )
@@ -5897,7 +5905,7 @@ class OcrTemplateViewSet(BulkPermissionMixin, PassUserMixin, ModelViewSet[OcrTem
 
     @extend_schema(request=OcrTemplateTestSerializer)
     @action(detail=False, methods=["post"], url_path="test-zone")
-    def test_zone(self, request):
+    def test_zone(self, request: Request) -> HttpResponse:
         """Extract an ad-hoc zone without changing the document."""
         from documents.zone_ocr import extract_zone_preview
 
@@ -5906,10 +5914,10 @@ class OcrTemplateViewSet(BulkPermissionMixin, PassUserMixin, ModelViewSet[OcrTem
             context={"request": request},
         )
         serializer.is_valid(raise_exception=True)
-        document = serializer.validated_data["document"]
+        document: Document = serializer.validated_data["document"]
 
         doc_path = document.archive_path or document.source_path
-        if not doc_path or not Path(doc_path).is_file():
+        if not doc_path.is_file():
             return Response(
                 {"error": "Document file not found"},
                 status=status.HTTP_404_NOT_FOUND,
@@ -5918,7 +5926,7 @@ class OcrTemplateViewSet(BulkPermissionMixin, PassUserMixin, ModelViewSet[OcrTem
         zone = OcrTemplateZone(**serializer.validated_data["zone"])
 
         result = extract_zone_preview(
-            Path(doc_path),
+            doc_path,
             zone,
             zone.zone_source_width or 0,
             zone.zone_source_height or 0,

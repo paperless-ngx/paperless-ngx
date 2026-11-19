@@ -39,7 +39,7 @@ def _compile_or_none(
     flags: int,
     *,
     log: Callable[..., None],
-) -> regex.Pattern | None:
+) -> regex.Pattern[str] | None:
     """Validate and compile a pattern, logging and returning None on failure."""
     try:
         validate_regex_pattern(pattern)
@@ -93,7 +93,12 @@ def safe_regex_match(pattern: str, text: str, *, flags: int = 0):
     return _run_with_timeout(pattern, "matching", compiled.match, text)
 
 
-def safe_regex_fullmatch(pattern: str, text: str, *, flags: int = 0):
+def safe_regex_fullmatch(
+    pattern: str,
+    text: str,
+    *,
+    flags: int = 0,
+) -> regex.Match[str] | None:
     """
     Run a regex full match with a timeout. Returns a match object or None.
     Validation errors and timeouts are logged and treated as no match.

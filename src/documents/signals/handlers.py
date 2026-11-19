@@ -1466,7 +1466,12 @@ def close_connection_pool_on_worker_init(**kwargs) -> None:
             conn.close_pool()
 
 
-def run_zone_ocr_extraction(sender, document, original_file=None, **kwargs):
+def run_zone_ocr_extraction(
+    sender: Any,
+    document: Document,
+    original_file: Path | None = None,
+    **kwargs: Any,
+) -> None:
     """Apply matching templates without failing consumption if extraction fails."""
     try:
         from documents.zone_ocr import run_zone_extraction

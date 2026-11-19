@@ -165,7 +165,7 @@ def match_storage_paths(document: Document, classifier: DocumentClassifier, user
 def matches(
     matching_model: MatchingModel | WorkflowTrigger | OcrTemplate,
     document: Document,
-):
+) -> bool:
     search_flags = 0
 
     document_content = document.get_effective_content() or ""

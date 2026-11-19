@@ -189,16 +189,18 @@ def get_templates_for_document(
         "zones",
         "zones__custom_field",
     )
+    match_document = document
     if document.root_document_id is None and templates:
         # The original file can be selected even when newer versions exist.
-        document = (
+        annotated = (
             Document.objects.filter(pk=document.pk)
             .annotate(effective_content=F("content"))
             .first()
         )
-        if document is None:
+        if annotated is None:
             return []
-    return [template for template in templates if matches(template, document)]
+        match_document = annotated
+    return [template for template in templates if matches(template, match_document)]
 
 
 def run_zone_extraction(
@@ -277,7 +279,7 @@ def _resolve_doc_path(
     original_file: Path | None,
 ) -> Path | None:
     """Prefer the archive, then the source, then the ingestion signal's file."""
-    candidates = []
+    candidates: list[Path | None] = []
     if document.has_archive_version:
         candidates.append(document.archive_path)
     candidates.append(document.source_path)
@@ -924,7 +926,7 @@ def _parse_number(value: str, locale: Locale) -> Decimal | None:
         else None
     )
     negative = sign is not None
-    if negative:
+    if sign is not None:
         text = text[: sign.start()] + text[sign.end() :]
     if re.search(r"\d\D*-|(?<!\w)-", text):
         return None
