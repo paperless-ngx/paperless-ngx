@@ -1,8 +1,6 @@
 # Please see the documentation for all configuration options:
 # https://docs.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
 version: 2
-# Required for uv support for now
-enable-beta-ecosystems: true
 updates:
   # Enable version updates for pnpm
   - package-ecosystem: "npm"
