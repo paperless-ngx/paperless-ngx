@@ -8,6 +8,8 @@ import factory
 from django.contrib.auth.models import User
 
 from documents.models import Correspondent
+from documents.models import CustomField
+from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentBarcode
 from documents.models import DocumentType
@@ -68,6 +70,22 @@ class DocumentFactory(TypedModelFactory[Document]):
     correspondent = None
     document_type = None
     storage_path = None
+
+
+class CustomFieldFactory(TypedModelFactory[CustomField]):
+    class Meta:
+        model = CustomField
+
+    name = factory.Sequence(lambda n: f"field {n}")
+    data_type = CustomField.FieldDataType.STRING
+
+
+class CustomFieldInstanceFactory(TypedModelFactory[CustomFieldInstance]):
+    class Meta:
+        model = CustomFieldInstance
+
+    field = factory.SubFactory(CustomFieldFactory)
+    document = factory.SubFactory(DocumentFactory)
 
 
 class DocumentBarcodeFactory(TypedModelFactory[DocumentBarcode]):

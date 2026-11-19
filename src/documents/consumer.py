@@ -15,7 +15,6 @@ from django.db import transaction
 from django.db.models import Max
 from django.db.models import Q
 from django.utils import timezone
-from filelock import FileLock
 from rest_framework.reverse import reverse
 
 from documents.barcodes import read_barcode_values
@@ -27,7 +26,10 @@ from documents.file_handling import create_source_path_directory
 from documents.file_handling import generate_filename
 from documents.file_handling import generate_unique_filename
 from documents.file_handling import validate_path_in_root
+from documents.file_moves import defer_file_moves
+from documents.file_moves import flush_pending_file_moves
 from documents.loggers import LoggingMixin
+from documents.media_lock import media_lock
 from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
@@ -605,7 +607,13 @@ class ConsumerPlugin(
                 # now that everything is done, we can start to store the document
                 # in the system. This will be a transaction and reasonably fast.
                 try:
-                    with transaction.atomic():
+                    # File moves requested in here run after commit and after
+                    # media.lock is released. media.lock is taken before the
+                    # transaction: the version path locks the root row with
+                    # select_for_update, and workflow email actions and file
+                    # placement below re-enter media.lock instead of waiting
+                    # on it while rows are locked.
+                    with defer_file_moves(), media_lock(), transaction.atomic():
                         # store the document.
                         if self.input_doc.root_document_id:
                             # If this is a new version of an existing document, we need
@@ -691,7 +699,7 @@ class ConsumerPlugin(
 
                         # After everything is in the database, copy the files into
                         # place. If this fails, we'll also rollback the transaction.
-                        with FileLock(settings.MEDIA_LOCK):
+                        with media_lock():
                             generated_filename = generate_unique_filename(document)
                             if (
                                 len(str(generated_filename))
@@ -755,10 +763,9 @@ class ConsumerPlugin(
                                     document.archive_path,
                                 )
 
-                        # Don't save with the lock active. Saving will cause the file
-                        # renaming logic to acquire the lock as well.
-                        # This triggers things like file renaming
-                        document.save()
+                        # Any filename follow-up from this save is deferred by
+                        # the scope above until after commit.
+                        document.save(write_file_paths=True)
 
                         if document.root_document_id:
                             document_updated.send(
@@ -799,6 +806,11 @@ class ConsumerPlugin(
                         exception=e,
                     )
 
+        # The storage scope above nests under the consume task's scope, so its
+        # moves are still pending; place the file before the script reads its path.
+        flush_pending_file_moves()
+        document.refresh_from_db()
+
         self.run_post_consume_script(document)
 
         self.log.info(f"Document {document} consumption finished")
@@ -810,9 +822,6 @@ class ConsumerPlugin(
             ConsumerStatusShortMessage.FINISHED,
             document.id,
         )
-
-        # Return the most up to date fields
-        document.refresh_from_db()
 
         return ConsumeFileSuccessResult(document_id=document.pk)
 
