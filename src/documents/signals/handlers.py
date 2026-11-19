@@ -45,6 +45,8 @@ from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
+from documents.models import OcrTemplate
+from documents.models import OcrTemplateZone
 from documents.models import PaperlessTask
 from documents.models import SavedView
 from documents.models import StoragePath
@@ -717,7 +719,8 @@ def check_paths_and_prune_custom_fields(
 @receiver(models.signals.post_delete, sender=CustomField)
 def cleanup_custom_field_deletion(sender, instance: CustomField, **kwargs) -> None:
     """
-    When a custom field is deleted, ensure no saved views reference it.
+    When a custom field is deleted, ensure no saved views reference it and no
+    OCR template keeps a combine format for it.
     """
     field_identifier = SavedView.DisplayFields.CUSTOM_FIELD % instance.pk
     # remove field from display_fields of all saved views
@@ -739,6 +742,15 @@ def cleanup_custom_field_deletion(sender, instance: CustomField, **kwargs) -> No
         logger.debug(
             f"Removing custom field {instance} from sort field of {views_with_sort_updated} views",
         )
+
+    # zone_ocr imports this module, so it cannot be imported at module level
+    from documents.zone_ocr import field_key
+
+    combine_key = field_key(OcrTemplateZone.TargetType.CUSTOM_FIELD, instance.pk)
+    for template in OcrTemplate.objects.only("pk", "combine_formats"):
+        if combine_key in template.combine_formats:
+            del template.combine_formats[combine_key]
+            template.save(update_fields=["combine_formats"])
 
 
 @receiver(models.signals.post_save, sender=Document)

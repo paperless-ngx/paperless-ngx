@@ -1709,6 +1709,84 @@ class TestOcrTemplateDelete:
         assert zone.custom_field is None
         assert OcrTemplate.objects.filter(pk=template.pk).exists()
 
+    @pytest.mark.parametrize(
+        ("formats", "expected"),
+        [
+            pytest.param(
+                {"{deleted}": "{A}", "{other}": "{B}", "title": "{C}"},
+                {"{other}": "{B}", "title": "{C}"},
+                id="removes-only-the-deleted-key",
+            ),
+            pytest.param(
+                {"{other}": "{B}", "title": "{C}"},
+                {"{other}": "{B}", "title": "{C}"},
+                id="without-the-key-is-unchanged",
+            ),
+        ],
+    )
+    def test_deleting_a_custom_field_drops_its_combine_format(
+        self,
+        formats: dict[str, str],
+        expected: dict[str, str],
+    ) -> None:
+        """
+        GIVEN:
+            - A template with combine formats for a custom field, another
+              custom field and the title target, or without the first key
+        WHEN:
+            - The first custom field is deleted
+        THEN:
+            - Only that custom field's key is removed from combine_formats
+        """
+        deleted = CustomFieldFactory()
+        other = CustomFieldFactory()
+        resolve = {"{deleted}": str(deleted.pk), "{other}": str(other.pk)}
+        template = OcrTemplateFactory(
+            combine_formats={resolve.get(key, key): v for key, v in formats.items()},
+        )
+
+        deleted.delete()
+
+        template.refresh_from_db()
+        assert template.combine_formats == {
+            resolve.get(key, key): v for key, v in expected.items()
+        }
+
+    def test_template_can_be_saved_after_its_custom_field_is_deleted(
+        self,
+        admin_client: APIClient,
+        text_field: CustomField,
+    ) -> None:
+        """
+        GIVEN:
+            - A template with a custom field zone and a combine format for it
+        WHEN:
+            - The custom field is deleted and the template is saved again
+              with its stored combine_formats
+        THEN:
+            - The save succeeds, as the stale key was removed
+        """
+        template = OcrTemplateFactory(
+            match="Northwind",
+            combine_formats={str(text_field.pk): "{A}"},
+        )
+        OcrTemplateZoneFactory(
+            template=template,
+            target=OcrTemplateZone.TargetType.CUSTOM_FIELD,
+            custom_field=text_field,
+        )
+        text_field.delete()
+        template.refresh_from_db()
+
+        response = admin_client.patch(
+            detail_url(template.pk),
+            {"combine_formats": template.combine_formats},
+            format="json",
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()["combine_formats"] == {}
+
     def test_nonexistent_returns_404(self, admin_client: APIClient) -> None:
         """
         GIVEN:
