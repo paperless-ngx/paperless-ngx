@@ -52,6 +52,7 @@ from documents.zone_ocr import _render_pages
 from documents.zone_ocr import _resolve_doc_path
 from documents.zone_ocr import _zone_language
 from documents.zone_ocr import extract_zone_preview
+from documents.zone_ocr import get_templates_for_content
 from documents.zone_ocr import get_templates_for_document
 from documents.zone_ocr import run_zone_extraction
 from paperless_testing.factories import CustomFieldFactory
@@ -1706,6 +1707,39 @@ class TestTemplateVisibility:
         assert Counter(
             get_templates_for_document(document, requester=other),
         ) == Counter([unowned, private])
+
+    @pytest.mark.parametrize(
+        ("has_owner", "expected_names"),
+        [
+            pytest.param(True, {"Mine", "Unowned"}, id="owner"),
+            pytest.param(False, {"Mine", "Unowned", "Private"}, id="no-owner"),
+        ],
+    )
+    @pytest.mark.usefixtures("mine", "unowned", "private")
+    def test_content_selection_follows_the_owner_rule(
+        self,
+        owner: User,
+        has_owner: bool,  # noqa: FBT001
+        expected_names: set[str],
+    ) -> None:
+        """
+        GIVEN:
+            - Templates owned by two users and an unowned template, all
+              matching "Northwind", and one matching only other text
+        WHEN:
+            - Templates are selected for unsaved text, with or without an owner
+        THEN:
+            - Only matching templates apply
+            - An owner sees owned and unowned templates, no owner sees all
+        """
+        make_visible_template("Other sender", match="Contoso")
+
+        templates = get_templates_for_content(
+            "Northwind Power & Light statement",
+            owner if has_owner else None,
+        )
+
+        assert {template.name for template in templates} == expected_names
 
     @pytest.mark.usefixtures("private")
     def test_versions_use_the_root_documents_owner(

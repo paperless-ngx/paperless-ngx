@@ -57,6 +57,7 @@ if TYPE_CHECKING:
     from typing import Any
 
     from django.contrib.auth.models import User
+    from django.db.models import QuerySet
 
 logger = logging.getLogger("paperless.zone_ocr")
 
@@ -146,6 +147,25 @@ class ZoneOcrResult:
     reason: ZoneOcrReason | None = None
 
 
+@dataclass(kw_only=True, slots=True)
+class PlannedUpdate:
+    """A field update and the accepted zone results it was combined from."""
+
+    key: FieldKey
+    update: FieldUpdate
+    results: list[ZoneOcrResult]
+
+
+@dataclass(kw_only=True, slots=True)
+class TemplatePlan:
+    """A template's zone results and the field updates they produce, unwritten."""
+
+    template: OcrTemplate
+    zones: list[OcrTemplateZone]
+    results: list[ZoneOcrResult]
+    updates: list[PlannedUpdate]
+
+
 # Result labels for zones that target a built-in field.
 BUILTIN_TARGET_LABELS: dict[OcrTemplateZone.TargetType, str] = {
     OcrTemplateZone.TargetType.TITLE: "Title",
@@ -187,20 +207,7 @@ def get_templates_for_document(
     view, so a user editing someone else's document never runs or sees that
     owner's private templates.
     """
-    owner = get_root_document(document).owner
-    templates = OcrTemplate.objects.filter(enabled=True)
-    if owner is not None:
-        templates = templates.filter(
-            id__in=permitted_object_ids(owner, OcrTemplate, "view_ocrtemplate"),
-        )
-    if requester is not None:
-        templates = templates.filter(
-            id__in=permitted_object_ids(requester, OcrTemplate, "view_ocrtemplate"),
-        )
-    templates = templates.order_by("name", "pk").prefetch_related(
-        "zones",
-        "zones__custom_field",
-    )
+    templates = _visible_templates(get_root_document(document).owner, requester)
     match_document = document
     if document.root_document_id is None and templates:
         # The original file can be selected even when newer versions exist.
@@ -213,6 +220,43 @@ def get_templates_for_document(
             return []
         match_document = annotated
     return [template for template in templates if matches(template, match_document)]
+
+
+def get_templates_for_content(
+    content: str,
+    owner: User | None,
+    *,
+    title: str = "",
+) -> list[OcrTemplate]:
+    """
+    The enabled templates that match the given text and that the owner can view,
+    for a document that is not saved yet. A missing owner considers every
+    template, as get_templates_for_document does. The title only labels the
+    matching log messages.
+    """
+    templates = _visible_templates(owner, None)
+    match_document = Document(title=title, content=content)
+    return [template for template in templates if matches(template, match_document)]
+
+
+def _visible_templates(
+    owner: User | None,
+    requester: User | None,
+) -> QuerySet[OcrTemplate]:
+    """The enabled templates both the owner and the requester can view, if given."""
+    templates = OcrTemplate.objects.filter(enabled=True)
+    if owner is not None:
+        templates = templates.filter(
+            id__in=permitted_object_ids(owner, OcrTemplate, "view_ocrtemplate"),
+        )
+    if requester is not None:
+        templates = templates.filter(
+            id__in=permitted_object_ids(requester, OcrTemplate, "view_ocrtemplate"),
+        )
+    return templates.order_by("name", "pk").prefetch_related(
+        "zones",
+        "zones__custom_field",
+    )
 
 
 def run_zone_extraction(
@@ -232,51 +276,137 @@ def run_zone_extraction(
     if not templates:
         return []
 
-    doc_path = _resolve_doc_path(document, original_file)
-    if doc_path is None:
-        logger.warning(
-            "Zone OCR: no accessible file for document %d",
-            document.pk,
-        )
-        return [
-            _zone_result(template, zone, reason=ZoneOcrReason.MISSING_FILE)
-            for template in templates
-            for zone in template.zones.all()
-        ]
-
-    template_zones = [(template, list(template.zones.all())) for template in templates]
-    pages = {
-        _resolve_page_idx(zone.page, document.page_count)
-        for _, zones in template_zones
-        for zone in zones
-    }
-    if not pages:
-        return []
-    results = []
-    with tempfile.TemporaryDirectory(dir=settings.SCRATCH_DIR) as tmp_dir:
-        tmp_path = Path(tmp_dir)
-        page_images = _render_pages(doc_path, pages, tmp_path, document.page_count)
-        for template, zones in template_zones:
-            try:
-                results.extend(
-                    _process_template(document, page_images, template, zones, tmp_path),
-                )
-            except Exception:
-                # One failed template must not prevent the remaining templates from running.
-                logger.exception(
-                    "Zone OCR: error processing template '%s' for document %d",
-                    template.name,
-                    document.pk,
-                )
-                results.extend(
-                    _zone_result(template, zone, reason=ZoneOcrReason.TEMPLATE_FAILED)
-                    for zone in zones
-                )
+    label = f"document {document.pk}"
+    plans = plan_zone_extraction(
+        _resolve_doc_path(document, original_file),
+        document.page_count,
+        templates,
+        label=label,
+    )
+    results = apply_zone_plans(get_root_document(document), plans, label=label)
     if zone_results_written(results):
         Document.objects.filter(pk=get_root_document(document).pk).update(
             modified=timezone.now(),
         )
     return results
+
+
+def plan_zone_extraction(
+    doc_path: Path | None,
+    page_count: int | None,
+    templates: list[OcrTemplate],
+    *,
+    label: str,
+) -> list[TemplatePlan]:
+    """
+    Render the zones' pages from doc_path and compute each template's field
+    updates without writing anything. A template that fails yields only
+    TEMPLATE_FAILED results, and a missing file yields MISSING_FILE results for
+    every zone. The label names the document in log messages.
+    """
+    template_zones = [(template, list(template.zones.all())) for template in templates]
+    if doc_path is None:
+        logger.warning("Zone OCR: no accessible file for %s", label)
+        return [
+            _failed_plan(template, zones, ZoneOcrReason.MISSING_FILE)
+            for template, zones in template_zones
+        ]
+
+    pages = {
+        _resolve_page_idx(zone.page, page_count)
+        for _, zones in template_zones
+        for zone in zones
+    }
+    if not pages:
+        return []
+    plans = []
+    with tempfile.TemporaryDirectory(dir=settings.SCRATCH_DIR) as tmp_dir:
+        tmp_path = Path(tmp_dir)
+        page_images = _render_pages(doc_path, pages, tmp_path, page_count)
+        for template, zones in template_zones:
+            try:
+                plans.append(
+                    _plan_template(page_count, page_images, template, zones, tmp_path),
+                )
+            except Exception:
+                # One failed template must not prevent the remaining templates
+                # from running.
+                logger.exception(
+                    "Zone OCR: error processing template '%s' for %s",
+                    template.name,
+                    label,
+                )
+                plans.append(
+                    _failed_plan(template, zones, ZoneOcrReason.TEMPLATE_FAILED),
+                )
+    return plans
+
+
+def apply_zone_plans(
+    root_document: Document,
+    plans: list[TemplatePlan],
+    *,
+    label: str,
+    protected: frozenset[FieldKey] = frozenset(),
+) -> list[ZoneOcrResult]:
+    """
+    Write each template's planned updates to the root document, each template
+    in its own atomic block, and return the zone results. Fields whose key is in
+    protected are not written, and the results of every zone targeting them are
+    left out. A template whose writes fail gets TEMPLATE_FAILED results and the
+    others still apply.
+    """
+    results: list[ZoneOcrResult] = []
+    for plan in plans:
+        for planned in plan.updates:
+            if planned.key in protected:
+                logger.info(
+                    "Zone OCR: template '%s' kept the supplied %s of %s",
+                    plan.template.name,
+                    planned.update.field_name,
+                    label,
+                )
+        updates = [planned for planned in plan.updates if planned.key not in protected]
+        try:
+            if updates:
+                _apply_template_updates(root_document, updates)
+            plan_results = plan.results
+        except Exception:
+            logger.exception(
+                "Zone OCR: error processing template '%s' for %s",
+                plan.template.name,
+                label,
+            )
+            plan_results = _failed_plan(
+                plan.template,
+                plan.zones,
+                ZoneOcrReason.TEMPLATE_FAILED,
+            ).results
+        # Each zone has exactly one result, in zone order.
+        results.extend(
+            result
+            for zone, result in zip(plan.zones, plan_results, strict=True)
+            if _zone_key(zone) not in protected
+        )
+    return results
+
+
+def _zone_key(zone: OcrTemplateZone) -> FieldKey:
+    """The combine_formats key of the field a zone fills."""
+    return field_key(OcrTemplateZone.TargetType(zone.target), zone.custom_field_id)
+
+
+def _failed_plan(
+    template: OcrTemplate,
+    zones: list[OcrTemplateZone],
+    reason: ZoneOcrReason,
+) -> TemplatePlan:
+    return TemplatePlan(
+        template=template,
+        zones=zones,
+        results=[_zone_result(template, zone, reason=reason) for zone in zones],
+        updates=[],
+    )
 
 
 def zone_results_written(results: list[ZoneOcrResult]) -> bool:
@@ -288,7 +418,7 @@ def _resolve_doc_path(
     document: Document,
     original_file: Path | None,
 ) -> Path | None:
-    """Prefer the archive, then the source, then the ingestion signal's file."""
+    """Prefer the archive, then the source, then the given file."""
     candidates: list[Path | None] = []
     if document.has_archive_version:
         candidates.append(document.archive_path)
@@ -316,7 +446,21 @@ def _process_template(
     zones: list[OcrTemplateZone],
     tmp_path: Path,
 ) -> list[ZoneOcrResult]:
-    """Extract and combine zone values before applying a template's updates."""
+    """Extract and combine zone values, then apply a template's updates."""
+    plan = _plan_template(document.page_count, page_images, template, zones, tmp_path)
+    if plan.updates:
+        _apply_template_updates(get_root_document(document), plan.updates)
+    return plan.results
+
+
+def _plan_template(
+    page_count: int | None,
+    page_images: dict[int, Path],
+    template: OcrTemplate,
+    zones: list[OcrTemplateZone],
+    tmp_path: Path,
+) -> TemplatePlan:
+    """Extract and combine zone values into a template's updates, unwritten."""
     # Each zone's result and its accepted text, by target field.
     grouped: dict[
         FieldKey,
@@ -324,7 +468,7 @@ def _process_template(
     ] = {}
     results = []
     for zone in zones:
-        page_idx = _resolve_page_idx(zone.page, document.page_count)
+        page_idx = _resolve_page_idx(zone.page, page_count)
         extracted = None
         reason: ZoneOcrReason | None = ZoneOcrReason.MISSING_PAGE
         if page_idx in page_images:
@@ -351,16 +495,12 @@ def _process_template(
             reason = ZoneOcrReason.REGEX_MISMATCH
         result = _zone_result(template, zone, reason=reason)
         results.append(result)
-        key = field_key(
-            OcrTemplateZone.TargetType(zone.target),
-            zone.custom_field_id,
-        )
+        key = _zone_key(zone)
         grouped.setdefault(key, []).append(
             (zone, result, extracted if reason is None else None),
         )
 
     updates = []
-    root_document = get_root_document(document)
     combine_formats: dict[FieldKey, str] = template.combine_formats or {}
     for key, field_zones in grouped.items():
         accepted = [result for _, result, _ in field_zones if result.reason is None]
@@ -381,15 +521,8 @@ def _process_template(
         )
         target_zone = field_zones[0][0]
         update = _prepare_field_update(target_zone, value) if value else None
-        if update is not None and _asn_in_use(update, root_document):
-            # Saving would violate the unique ASN and roll back every other
-            # write of this template, so only this field is dropped.
-            for result in accepted:
-                result.value = None
-                result.reason = ZoneOcrReason.DUPLICATE_ASN
-            continue
         if update is not None:
-            updates.append(update)
+            updates.append(PlannedUpdate(key=key, update=update, results=accepted))
         for result in accepted:
             result.value = update.value if update else None
             if update is None:
@@ -398,8 +531,57 @@ def _process_template(
                     if key == UNASSIGNED_FIELD_KEY
                     else ZoneOcrReason.INVALID_VALUE
                 )
-    _apply_field_updates(root_document, updates)
-    return results
+    return TemplatePlan(
+        template=template,
+        zones=zones,
+        results=results,
+        updates=updates,
+    )
+
+
+def _apply_template_updates(
+    root_document: Document,
+    updates: list[PlannedUpdate],
+) -> None:
+    """Write one template's updates to the root document in one atomic block.
+
+    The ASN duplicate check and the custom field existence check run here, at
+    write time, so they see the database as it is when the values are saved.
+    """
+    field_ids = {
+        planned.update.custom_field.pk
+        for planned in updates
+        if planned.update.custom_field is not None
+    }
+    with transaction.atomic():
+        existing_field_ids = (
+            set(
+                CustomField.objects.filter(pk__in=field_ids).values_list(
+                    "pk",
+                    flat=True,
+                ),
+            )
+            if field_ids
+            else set()
+        )
+        writable = []
+        for planned in updates:
+            custom_field = planned.update.custom_field
+            if custom_field is not None and custom_field.pk not in existing_field_ids:
+                # The field was deleted after the values were planned.
+                for result in planned.results:
+                    result.value = None
+                    result.reason = ZoneOcrReason.UNASSIGNED
+                continue
+            if _asn_in_use(planned.update, root_document):
+                # Saving would violate the unique ASN and roll back every other
+                # write of this template, so only this field is dropped.
+                for result in planned.results:
+                    result.value = None
+                    result.reason = ZoneOcrReason.DUPLICATE_ASN
+                continue
+            writable.append(planned.update)
+        _apply_field_updates(root_document, writable)
 
 
 def _asn_in_use(update: FieldUpdate, root_document: Document) -> bool:

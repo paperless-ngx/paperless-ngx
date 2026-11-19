@@ -29,6 +29,8 @@ from documents.tasks import bulk_update_documents
 from documents.zone_ocr import ZoneExtraction
 from documents.zone_ocr import ZoneOcrReason
 from documents.zone_ocr import ZoneOcrResult
+from documents.zone_ocr import apply_zone_plans
+from documents.zone_ocr import plan_zone_extraction
 from paperless_testing.factories import CustomFieldFactory
 from paperless_testing.factories import DocumentFactory
 from paperless_testing.factories import OcrTemplateFactory
@@ -323,6 +325,14 @@ class TestZoneOcrIndexing:
         )
         with django_capture_on_commit_callbacks(execute=True):
             if entry_point == "ingestion":
+                # The consumer writes the planned values, then sends the signal.
+                plans = plan_zone_extraction(
+                    file_document.source_path,
+                    file_document.page_count,
+                    [template],
+                    label="ingestion",
+                )
+                apply_zone_plans(document, plans, label="ingestion")
                 document_consumption_finished.send(sender=None, document=file_document)
             elif entry_point == "single":
                 response = admin_client.post(

@@ -872,10 +872,18 @@ is left empty, the values are joined with spaces in zone order.
 
 ### When templates run
 
-When a document is added, every enabled template that matches its content runs automatically. A template is
-only used for a document if the document's owner can view the template, so users' templates apply to their own
-documents, and unowned templates apply to everyone's. Templates run in name order, so if two templates fill the
-same field, the later one wins.
+When a document is added, every enabled template that matches its content runs automatically, reading the
+zones from the archived file, or from the original PDF or image when there is no archived file. A template is
+only used if the document's owner can view it, so users' templates apply to their own documents, and unowned
+templates apply to everyone's. The owner here is the one set by the upload, the mail rule or a consumption
+workflow. A document without an owner at that point, for example from the consume folder or a mail rule
+without an owner, considers every enabled template. An owner assigned later by a "Document Added" workflow
+does not change which templates ran. Templates run in name order, so if two templates fill the same field, the
+later one wins.
+
+Zone OCR keeps values supplied when the document is consumed: an uploaded title, ASN, created date or custom
+field value, a mail rule's title, a barcode ASN, and values assigned by a consumption workflow. Zones fill the
+remaining fields before "Document Added" workflows run, so those workflows can use or overwrite the values.
 
 Turn off **Enabled** to pause a template without deleting it. Disabled templates never run automatically, but
 can still be run manually.
@@ -897,7 +905,8 @@ the latest version of each document and are processed in the background.
 
 !!! warning
 
-    Zone OCR overwrites the fields it fills. A zone that finds no value leaves its field unchanged.
+    Running zone OCR manually or in bulk overwrites the fields it fills. A zone that finds no value leaves its
+    field unchanged.
 
 Managing OCR templates requires the OCR template permissions. Running zone OCR on documents requires
 permission to change them, and choosing a template requires permission to view it.
