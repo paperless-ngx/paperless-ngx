@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-17 00:24+0000\n"
-"PO-Revision-Date: 2026-11-17 00:26\n"
+"POT-Creation-Date: 2026-11-17 20:48+0000\n"
+"PO-Revision-Date: 2026-11-17 20:49\n"
 "Last-Translator: \n"
 "Language-Team: Italian\n"
 "Language: it_IT\n"
@@ -1652,8 +1652,8 @@ msgid "workflow runs"
 msgstr "esecuzioni del flusso di lavoro"
 
 #: documents/serialisers.py:483 documents/serialisers.py:844
-#: documents/serialisers.py:2893 documents/views.py:356 documents/views.py:622
-#: documents/views.py:2761 paperless_mail/serialisers.py:145
+#: documents/serialisers.py:2893 documents/views.py:359 documents/views.py:625
+#: documents/views.py:2783 paperless_mail/serialisers.py:145
 msgid "Insufficient permissions."
 msgstr "Autorizzazioni insufficienti."
 
@@ -1692,7 +1692,7 @@ msgstr "Variabile non valida rilevata."
 msgid "Duplicate document identifiers are not allowed."
 msgstr "Non sono consentiti identificatori di documenti duplicati."
 
-#: documents/serialisers.py:2979 documents/views.py:4748
+#: documents/serialisers.py:2979 documents/views.py:4770
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr "Documenti non trovati: %(ids)s"
@@ -1933,40 +1933,40 @@ msgstr "Come ultimo passo, compila il seguente modulo:"
 msgid ", "
 msgstr ", "
 
-#: documents/views.py:311
+#: documents/views.py:314
 msgid "Specify only one of text, title_search, query, or more_like_id."
 msgstr "Specificare solo uno tra text, title_search, query o more_like_id."
 
-#: documents/views.py:349 documents/views.py:2758
+#: documents/views.py:352 documents/views.py:2780
 msgid "Invalid more_like_id"
 msgstr "more_like_id non valido"
 
-#: documents/views.py:1681
+#: documents/views.py:1684
 msgid "Invalid AI configuration."
 msgstr "Configurazione AI non valida."
 
-#: documents/views.py:1692
+#: documents/views.py:1695
 msgid "AI backend request timed out."
 msgstr "Richiesta di backend AI scaduta."
 
-#: documents/views.py:1704
+#: documents/views.py:1707
 msgid "AI backend rejected the request. Check logs for details."
 msgstr "Il backend IA ha rifiutato la richiesta. Controlla i log per i dettagli."
 
-#: documents/views.py:4764
+#: documents/views.py:4786
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr "Autorizzazioni insufficienti per condividere il documento %(id)s."
 
-#: documents/views.py:4811
+#: documents/views.py:4833
 msgid "Bundle is already being processed."
 msgstr "Il pacchetto è già in fase di elaborazione."
 
-#: documents/views.py:4877
+#: documents/views.py:4899
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr "Il pacchetto di link di condivisione è ancora in fase di preparazione. Riprova più tardi."
 
-#: documents/views.py:4891
+#: documents/views.py:4913
 msgid "The share link bundle is unavailable."
 msgstr "Il pacchetto di link di condivisione non è disponibile."
 
