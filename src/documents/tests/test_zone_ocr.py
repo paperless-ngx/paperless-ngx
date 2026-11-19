@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import shutil
 import subprocess
 from collections import Counter
 from datetime import date
@@ -1507,7 +1508,7 @@ class TestTemplateVisibility:
 
     def test_extraction_never_processes_private_templates(
         self,
-        mocker: MockerFixture,
+        mock_zone_ocr_run: MagicMock,
         document: Document,
         mine: OcrTemplate,
         unowned: OcrTemplate,
@@ -1516,12 +1517,12 @@ class TestTemplateVisibility:
         """
         GIVEN:
             - Owned, unowned and private templates each with a zone
+            - A blank image as the document's file
         WHEN:
             - Zone extraction runs for the document
         THEN:
-            - Only the owned and unowned templates are processed
+            - Only the owned and unowned templates report results
         """
-        mock_process = mocker.patch("documents.zone_ocr._process_template")
         for template in (mine, unowned, private):
             OcrTemplateZoneFactory(
                 template=template,
@@ -1529,12 +1530,20 @@ class TestTemplateVisibility:
                 width=20,
                 height=20,
             )
-        document.source_path.write_bytes(b"test PDF")
+        document.mime_type = "image/png"
+        with Image.new("RGB", (100, 100), "white") as image:
+            image.save(document.source_path, format="PNG")
+        mock_zone_ocr_run.return_value = subprocess.CompletedProcess(
+            args=[],
+            returncode=0,
+            stdout="extracted",
+            stderr="",
+        )
 
-        run_zone_extraction(document, None)
+        results = run_zone_extraction(document, None)
 
-        assert Counter(call.args[2] for call in mock_process.call_args_list) == Counter(
-            [mine, unowned],
+        assert Counter(result.template for result in results) == Counter(
+            [mine.name, unowned.name],
         )
 
 
@@ -3044,18 +3053,24 @@ class TestRunZoneExtraction:
         return DocumentFactory(
             title="Test",
             content="test",
-            mime_type="application/pdf",
+            mime_type="image/png",
         )
 
     @pytest.fixture
-    def pdf(self, tmp_path: Path) -> Path:
-        pdf = tmp_path / "document.pdf"
-        pdf.write_bytes(b"%PDF-1.4 fake")
-        return pdf
+    def source(self, paperless_dirs: PaperlessDirs) -> Path:
+        source = paperless_dirs.scratch_dir / "document.png"
+        with Image.new("RGB", (200, 200), "white") as image:
+            image.save(source)
+        return source
 
-    @pytest.fixture
-    def mock_process(self, mocker: MockerFixture) -> MagicMock:
-        return mocker.patch("documents.zone_ocr._process_template")
+    @pytest.fixture(autouse=True)
+    def ocr_reads_text(self, mock_zone_ocr_run: MagicMock) -> None:
+        mock_zone_ocr_run.return_value = subprocess.CompletedProcess(
+            args=[],
+            returncode=0,
+            stdout="extracted",
+            stderr="",
+        )
 
     @pytest.fixture
     def template_with_zone(self) -> Callable[..., OcrTemplate]:
@@ -3078,10 +3093,10 @@ class TestRunZoneExtraction:
     )
     def test_skips_ineligible_template(
         self,
-        mock_process: MagicMock,
+        mock_zone_ocr_run: MagicMock,
         template_with_zone: Callable[..., OcrTemplate],
         document: Document,
-        pdf: Path,
+        source: Path,
         template_name: str,
         template_kwargs: dict[str, Any],
     ) -> None:
@@ -3092,19 +3107,22 @@ class TestRunZoneExtraction:
         WHEN:
             - Zone extraction runs against a real document file
         THEN:
-            - The template is not processed
+            - No results are returned, no text is read and the title is unchanged
         """
         template_with_zone(template_name, **template_kwargs)
 
-        run_zone_extraction(document, pdf)
+        results = run_zone_extraction(document, source)
 
-        mock_process.assert_not_called()
+        assert results == []
+        mock_zone_ocr_run.assert_not_called()
+        document.refresh_from_db()
+        assert document.title == "Test"
 
     def test_skips_template_with_no_zones(
         self,
-        mock_process: MagicMock,
+        mock_zone_ocr_run: MagicMock,
         document: Document,
-        pdf: Path,
+        source: Path,
     ) -> None:
         """
         GIVEN:
@@ -3112,49 +3130,59 @@ class TestRunZoneExtraction:
         WHEN:
             - Zone extraction runs
         THEN:
-            - No results are returned and the template is not processed
+            - No results are returned, no text is read and the title is unchanged
         """
         OcrTemplateFactory(
             name="Empty",
             match="test",
         )
 
-        results = run_zone_extraction(document, pdf)
+        results = run_zone_extraction(document, source)
 
         assert results == []
-        mock_process.assert_not_called()
+        mock_zone_ocr_run.assert_not_called()
+        document.refresh_from_db()
+        assert document.title == "Test"
 
     def test_handles_process_exception_gracefully(
         self,
-        mock_process: MagicMock,
+        mock_zone_ocr_run: MagicMock,
         template_with_zone: Callable[..., OcrTemplate],
         document: Document,
-        pdf: Path,
+        source: Path,
     ) -> None:
         """
         GIVEN:
-            - A matching template whose processing raises
+            - Two matching templates, where reading the first one's text raises
+              an unexpected error
         WHEN:
             - Zone extraction runs
         THEN:
-            - The error does not propagate, every zone of the failing template
-              is reported as template_failed and the template was attempted
-              once
+            - The error does not propagate, the failing template's zone is
+              reported as template_failed and the other template still runs
         """
-        mock_process.side_effect = RuntimeError("test error")
-        template = template_with_zone("Failing", enabled=True)
-        zone = template.zones.get()
-
-        results = run_zone_extraction(document, pdf)
-
-        assert [(r.template, r.zone, r.value, r.reason) for r in results] == [
-            ("Failing", zone.name, None, "template_failed"),
+        mock_zone_ocr_run.side_effect = [
+            RuntimeError("test error"),
+            subprocess.CompletedProcess(
+                args=[],
+                returncode=0,
+                stdout="extracted",
+                stderr="",
+            ),
         ]
-        mock_process.assert_called_once()
+        template_with_zone("First", enabled=True)
+        template_with_zone("Second", enabled=True)
+
+        results = run_zone_extraction(document, source)
+
+        assert Counter((r.value, r.reason) for r in results) == Counter(
+            [(None, "template_failed"), ("extracted", None)],
+        )
+        assert {r.template for r in results} == {"First", "Second"}
 
     def test_handles_none_original_file(
         self,
-        mock_process: MagicMock,
+        mock_zone_ocr_run: MagicMock,
         template_with_zone: Callable[..., OcrTemplate],
         document: Document,
     ) -> None:
@@ -3165,7 +3193,7 @@ class TestRunZoneExtraction:
         WHEN:
             - Zone extraction runs
         THEN:
-            - Each zone is reported as missing_file and nothing is processed
+            - Each zone is reported as missing_file and no text is read
         """
         template = template_with_zone("Matching", enabled=True)
         zone = template.zones.get()
@@ -3175,7 +3203,7 @@ class TestRunZoneExtraction:
         assert [(r.template, r.zone, r.reason) for r in results] == [
             ("Matching", zone.name, "missing_file"),
         ]
-        mock_process.assert_not_called()
+        mock_zone_ocr_run.assert_not_called()
 
     @pytest.mark.parametrize(
         "template_names",
@@ -3189,10 +3217,9 @@ class TestRunZoneExtraction:
     )
     def test_processes_every_enabled_template(
         self,
-        mock_process: MagicMock,
         template_with_zone: Callable[..., OcrTemplate],
         document: Document,
-        pdf: Path,
+        source: Path,
         template_names: list[str],
     ) -> None:
         """
@@ -3201,13 +3228,90 @@ class TestRunZoneExtraction:
         WHEN:
             - Zone extraction runs
         THEN:
-            - Each template is processed exactly once
+            - Each template reports exactly one successful result
         """
         for name in template_names:
             template_with_zone(name, enabled=True)
 
-        run_zone_extraction(document, pdf)
+        results = run_zone_extraction(document, source)
 
-        processed = [call.args[2].name for call in mock_process.call_args_list]
-        assert mock_process.call_count == len(template_names)
-        assert sorted(processed) == sorted(template_names)
+        assert sorted((r.template, r.reason) for r in results) == [
+            (name, None) for name in sorted(template_names)
+        ]
+
+
+@pytest.mark.django_db
+@pytest.mark.usefixtures("paperless_dirs")
+class TestRealZoneOcr:
+    """End to end zone extraction using the real pdftoppm and tesseract."""
+
+    @pytest.fixture
+    def template(self) -> OcrTemplate:
+        template = make_template("Whole page", match="test", source_height=100)
+        OcrTemplateZoneFactory(
+            template=template,
+            name="Title",
+            target=OcrTemplateZone.TargetType.TITLE,
+            x=0,
+            y=0,
+            width=100,
+            height=100,
+            page=1,
+        )
+        return template
+
+    @pytest.mark.usefixtures("template")
+    def test_pdf_page_is_rendered_and_read(
+        self,
+        simple_digital_pdf_file: Path,
+    ) -> None:
+        """
+        GIVEN:
+            - A one page PDF containing text
+            - A template with a title zone covering the whole page
+        WHEN:
+            - Zone extraction runs without any mocks
+        THEN:
+            - The page text is read and written to the document title
+        """
+        document = DocumentFactory(
+            title="Original",
+            content="This is a test document.",
+            mime_type="application/pdf",
+            page_count=1,
+        )
+        shutil.copy(simple_digital_pdf_file, document.source_path)
+
+        results = run_zone_extraction(document, None)
+
+        assert [result.reason for result in results] == [None]
+        document.refresh_from_db()
+        assert "This is a test document" in document.title
+
+    @pytest.mark.usefixtures("template")
+    def test_image_is_read_without_rendering(self) -> None:
+        """
+        GIVEN:
+            - An image containing text as the document's file
+            - A template with a title zone covering the whole image
+        WHEN:
+            - Zone extraction runs without any mocks
+        THEN:
+            - The image text is read and written to the document title
+        """
+        document = DocumentFactory(
+            title="Original",
+            content="This is a test document.",
+            mime_type="image/png",
+            page_count=1,
+        )
+        shutil.copy(
+            Path(__file__).parent / "samples" / "simple.png",
+            document.source_path,
+        )
+
+        results = run_zone_extraction(document, None)
+
+        assert [result.reason for result in results] == [None]
+        document.refresh_from_db()
+        assert "This is a test document" in document.title
