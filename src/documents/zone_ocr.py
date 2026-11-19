@@ -128,15 +128,18 @@ def get_templates_for_document(
 ) -> list[OcrTemplate]:
     """
     The enabled templates that match the selected file's content and that the
-    root document's owner can view. For a manual run, the templates are further
-    limited to those the requester can view, so a user editing someone else's
-    document never runs or sees that owner's private templates.
+    root document's owner can view. A document without an owner considers every
+    template, as matching does for tags, correspondents and the like. For a
+    manual run, the templates are further limited to those the requester can
+    view, so a user editing someone else's document never runs or sees that
+    owner's private templates.
     """
     owner = get_root_document(document).owner
-    templates = OcrTemplate.objects.filter(
-        enabled=True,
-        id__in=permitted_object_ids(owner, OcrTemplate, "view_ocrtemplate"),
-    )
+    templates = OcrTemplate.objects.filter(enabled=True)
+    if owner is not None:
+        templates = templates.filter(
+            id__in=permitted_object_ids(owner, OcrTemplate, "view_ocrtemplate"),
+        )
     if requester is not None:
         templates = templates.filter(
             id__in=permitted_object_ids(requester, OcrTemplate, "view_ocrtemplate"),

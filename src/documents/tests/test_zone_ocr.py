@@ -1534,22 +1534,33 @@ class TestTemplateVisibility:
         assert private in get_templates_for_document(document)
 
     @pytest.mark.usefixtures("mine", "private")
-    def test_unowned_documents_only_use_unowned_templates(
+    def test_unowned_documents_consider_every_template(
         self,
+        other: User,
         document: Document,
+        mine: OcrTemplate,
         unowned: OcrTemplate,
+        private: OcrTemplate,
     ) -> None:
         """
         GIVEN:
             - A document with no owner
+            - Templates owned by two users and an unowned template
         WHEN:
-            - Templates are selected for the document
+            - Templates are selected for consumption, and for a manual run by
+              one of the users
         THEN:
-            - Only unowned templates apply
+            - Consumption considers every template
+            - The manual run is limited to templates the requester can view
         """
         document.owner = None
 
-        assert get_templates_for_document(document) == [unowned]
+        assert Counter(get_templates_for_document(document)) == Counter(
+            [mine, unowned, private],
+        )
+        assert Counter(
+            get_templates_for_document(document, requester=other),
+        ) == Counter([unowned, private])
 
     @pytest.mark.usefixtures("private")
     def test_versions_use_the_root_documents_owner(
