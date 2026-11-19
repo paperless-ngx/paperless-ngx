@@ -17,6 +17,7 @@ from functools import lru_cache
 from functools import partial
 from pathlib import Path
 from typing import TYPE_CHECKING
+from typing import NewType
 from typing import TypeAlias
 from typing import assert_never
 
@@ -91,6 +92,9 @@ MAX_PARSED_TEXT_LENGTH = 256
 
 # A converted zone value, as stored on a document or custom field instance.
 ZoneValue: TypeAlias = str | int | float | bool | date
+
+# A key of OcrTemplate.combine_formats, naming the field a zone writes to.
+FieldKey = NewType("FieldKey", str)
 
 
 @dataclass(frozen=True, kw_only=True, slots=True)
@@ -302,7 +306,10 @@ def _process_template(
 ) -> list[ZoneOcrResult]:
     """Extract and combine zone values before applying a template's updates."""
     # Each zone's result and its accepted text, by target field.
-    grouped: dict[str, list[tuple[OcrTemplateZone, ZoneOcrResult, str | None]]] = {}
+    grouped: dict[
+        FieldKey,
+        list[tuple[OcrTemplateZone, ZoneOcrResult, str | None]],
+    ] = {}
     results = []
     for zone in zones:
         page_idx = _resolve_page_idx(zone.page, document.page_count)
@@ -332,13 +339,17 @@ def _process_template(
             reason = ZoneOcrReason.REGEX_MISMATCH
         result = _zone_result(template, zone, reason=reason)
         results.append(result)
-        grouped.setdefault(_field_key(zone), []).append(
+        key = field_key(
+            OcrTemplateZone.TargetType(zone.target),
+            zone.custom_field_id,
+        )
+        grouped.setdefault(key, []).append(
             (zone, result, extracted if reason is None else None),
         )
 
     updates = []
     root_document = get_root_document(document)
-    combine_formats = template.combine_formats or {}
+    combine_formats: dict[FieldKey, str] = template.combine_formats or {}
     for key, field_zones in grouped.items():
         accepted = [result for _, result, _ in field_zones if result.reason is None]
         if not accepted:
@@ -372,7 +383,7 @@ def _process_template(
             if update is None:
                 result.reason = (
                     ZoneOcrReason.UNASSIGNED
-                    if key == "custom_field"
+                    if key == UNASSIGNED_FIELD_KEY
                     else ZoneOcrReason.INVALID_VALUE
                 )
     _apply_field_updates(root_document, updates)
@@ -393,12 +404,18 @@ def _asn_in_use(update: FieldUpdate, root_document: Document) -> bool:
     )
 
 
-def _field_key(zone: OcrTemplateZone) -> str:
-    """Use the same target keys as the editor's combination formats."""
-    target = zone.target
-    if target == OcrTemplateZone.TargetType.CUSTOM_FIELD and zone.custom_field_id:
-        return str(zone.custom_field_id)
-    return target
+def field_key(
+    target: OcrTemplateZone.TargetType,
+    custom_field_id: int | None,
+) -> FieldKey:
+    """The combine_formats key of a zone: its custom field id or its target."""
+    if target == OcrTemplateZone.TargetType.CUSTOM_FIELD and custom_field_id:
+        return FieldKey(str(custom_field_id))
+    return FieldKey(target)
+
+
+# The key shared by custom field zones without a custom field.
+UNASSIGNED_FIELD_KEY = field_key(OcrTemplateZone.TargetType.CUSTOM_FIELD, None)
 
 
 def _combine_field_value(

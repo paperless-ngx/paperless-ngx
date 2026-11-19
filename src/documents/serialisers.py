@@ -99,6 +99,7 @@ from documents.validators import url_validator
 from documents.versioning import has_prefetched_effective_content
 from documents.versioning import sort_versions_newest_first
 from documents.zone_ocr import ZoneOcrReason
+from documents.zone_ocr import field_key
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -3915,17 +3916,6 @@ class OcrTemplateTestSerializer(serializers.Serializer):
             )
 
 
-def _zone_field_key(zone: dict[str, Any]) -> str:
-    """The combine_formats key of a zone: its custom field id or its target."""
-    custom_field = zone.get("custom_field")
-    if isinstance(custom_field, CustomField):
-        custom_field = custom_field.pk
-    target = zone.get("target", OcrTemplateZone.TargetType.CUSTOM_FIELD)
-    if target == OcrTemplateZone.TargetType.CUSTOM_FIELD and custom_field:
-        return str(custom_field)
-    return target
-
-
 class OcrTemplateSerializer(MatchRuleSerializer, OwnedObjectSerializer):
     zones = OcrTemplateZoneSerializer(many=True, required=False)
     combine_formats = serializers.DictField(
@@ -3984,12 +3974,25 @@ class OcrTemplateSerializer(MatchRuleSerializer, OwnedObjectSerializer):
                 )
         if "combine_formats" in data:
             if "zones" in data:
-                zones = data["zones"]
+                keys = {
+                    field_key(
+                        OcrTemplateZone.TargetType(
+                            zone.get("target", OcrTemplateZone.TargetType.CUSTOM_FIELD),
+                        ),
+                        zone["custom_field"].pk if zone.get("custom_field") else None,
+                    )
+                    for zone in data["zones"]
+                }
             elif self.instance:
-                zones = list(self.instance.zones.values("target", "custom_field"))
+                keys = {
+                    field_key(OcrTemplateZone.TargetType(target), custom_field_id)
+                    for target, custom_field_id in self.instance.zones.values_list(
+                        "target",
+                        "custom_field",
+                    )
+                }
             else:
-                zones = []
-            keys = {_zone_field_key(zone) for zone in zones}
+                keys = set()
             unknown = sorted(set(data["combine_formats"]) - keys)
             if unknown:
                 raise serializers.ValidationError(
