@@ -30,6 +30,7 @@ from documents.zone_ocr import MAX_PARSED_TEXT_LENGTH
 from documents.zone_ocr import ZoneExtraction
 from documents.zone_ocr import ZoneOcrReason
 from documents.zone_ocr import ZoneOcrResult
+from documents.zone_ocr import ZoneValue
 from documents.zone_ocr import _apply_transform
 from documents.zone_ocr import _combine_field_value
 from documents.zone_ocr import _convert_value
@@ -3762,7 +3763,6 @@ class TestZoneOcrResultSerializer:
             pytest.param(1.5, id="float"),
             pytest.param(True, id="bool"),
             pytest.param(date(2025, 12, 25), id="date"),
-            pytest.param(Decimal("12.50"), id="decimal"),
             pytest.param(None, id="none"),
         ],
     )
@@ -3773,7 +3773,7 @@ class TestZoneOcrResultSerializer:
     )
     def test_wire_format_matches_dataclass(
         self,
-        value: object,
+        value: ZoneValue | None,
         reason: ZoneOcrReason | None,
     ) -> None:
         """
@@ -3784,7 +3784,13 @@ class TestZoneOcrResultSerializer:
         THEN:
             - The JSON equals the rendering of the dataclass as a dict
         """
-        result = ZoneOcrResult("Template", "Zone", "Title", value, reason)
+        result = ZoneOcrResult(
+            template="Template",
+            zone="Zone",
+            custom_field="Title",
+            value=value,
+            reason=reason,
+        )
 
         assert JSONRenderer().render(
             ZoneOcrResultSerializer(result).data,

@@ -17,6 +17,7 @@ from functools import lru_cache
 from functools import partial
 from pathlib import Path
 from typing import TYPE_CHECKING
+from typing import TypeAlias
 
 import dateparser
 import magic
@@ -32,6 +33,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.db.models import F
+from django.db.models import Field
 from PIL import Image
 
 from documents.matching import matches
@@ -86,16 +88,20 @@ MIN_ZONE_DATE_YEAR = 1900
 MAX_PARSED_TEXT_LENGTH = 256
 
 
-@dataclass(frozen=True)
+# A converted zone value, as stored on a document or custom field instance.
+ZoneValue: TypeAlias = str | int | float | bool | date
+
+
+@dataclass(frozen=True, kw_only=True, slots=True)
 class ZoneExtraction:
     raw_text: str | None = None
     value: str | None = None
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, kw_only=True, slots=True)
 class FieldUpdate:
     field_name: str
-    value: object
+    value: ZoneValue
     custom_field: CustomField | None = None
 
 
@@ -114,12 +120,12 @@ class ZoneOcrReason(StrEnum):
     TEMPLATE_FAILED = "template_failed"
 
 
-@dataclass
+@dataclass(kw_only=True, slots=True)
 class ZoneOcrResult:
     template: str
     zone: str
     custom_field: str
-    value: object = None
+    value: ZoneValue | None = None
     reason: ZoneOcrReason | None = None
 
 
@@ -135,14 +141,18 @@ def _zone_result(
     template: OcrTemplate,
     zone: OcrTemplateZone,
     *,
-    value: object = None,
     reason: ZoneOcrReason | None = None,
 ) -> ZoneOcrResult:
     if zone.target == OcrTemplateZone.TargetType.CUSTOM_FIELD:
         label = zone.custom_field.name if zone.custom_field_id else "(no field)"
     else:
         label = BUILTIN_TARGET_LABELS[zone.target]
-    return ZoneOcrResult(template.name, zone.name, label, value, reason)
+    return ZoneOcrResult(
+        template=template.name,
+        zone=zone.name,
+        custom_field=label,
+        reason=reason,
+    )
 
 
 def get_templates_for_document(
@@ -288,7 +298,8 @@ def _process_template(
     tmp_path: Path,
 ) -> list[ZoneOcrResult]:
     """Extract and combine zone values before applying a template's updates."""
-    grouped: dict[str, list[tuple[OcrTemplateZone, ZoneOcrResult]]] = {}
+    # Each zone's result and its accepted text, by target field.
+    grouped: dict[str, list[tuple[OcrTemplateZone, ZoneOcrResult, str | None]]] = {}
     results = []
     for zone in zones:
         page_idx = _resolve_page_idx(zone.page, document.page_count)
@@ -316,26 +327,23 @@ def _process_template(
             and not safe_regex_fullmatch(zone.validation_regex, extracted)
         ):
             reason = ZoneOcrReason.REGEX_MISMATCH
-        result = _zone_result(
-            template,
-            zone,
-            value=extracted if reason is None else None,
-            reason=reason,
-        )
+        result = _zone_result(template, zone, reason=reason)
         results.append(result)
-        grouped.setdefault(_field_key(zone), []).append((zone, result))
+        grouped.setdefault(_field_key(zone), []).append(
+            (zone, result, extracted if reason is None else None),
+        )
 
     updates = []
     root_document = get_root_document(document)
     combine_formats = template.combine_formats or {}
     for key, field_zones in grouped.items():
-        accepted = [result for _, result in field_zones if result.reason is None]
+        accepted = [result for _, result, _ in field_zones if result.reason is None]
         if not accepted:
             continue
         # An empty zone is an optional token; any other failure blocks the group.
         if any(
             result.reason not in (None, ZoneOcrReason.NO_VALUE)
-            for _, result in field_zones
+            for _, result, _ in field_zones
         ):
             for result in accepted:
                 result.value = None
@@ -343,7 +351,7 @@ def _process_template(
             continue
         value = _combine_field_value(
             combine_formats.get(key, ""),
-            [(zone.name, result.value) for zone, result in field_zones],
+            [(zone.name, text) for zone, _, text in field_zones],
         )
         target_zone = field_zones[0][0]
         update = _prepare_field_update(target_zone, value) if value else None
@@ -375,6 +383,7 @@ def _asn_in_use(update: FieldUpdate, root_document: Document) -> bool:
     """
     return (
         update.field_name == "archive_serial_number"
+        and isinstance(update.value, int)
         and Document.global_objects.filter(archive_serial_number=update.value)
         .exclude(pk=root_document.pk)
         .exists()
@@ -755,6 +764,7 @@ def _prepare_field_update(
 ) -> FieldUpdate | None:
     """Convert extracted text and enforce the destination field's constraints."""
     custom_field = None
+    typed_value: ZoneValue | None
     if zone.target == OcrTemplateZone.TargetType.CUSTOM_FIELD:
         if not zone.custom_field_id:
             return None
@@ -788,12 +798,14 @@ def _prepare_field_update(
         return None
     if typed_value is None:
         return None
+    field = model._meta.get_field(field_name)
+    assert isinstance(field, Field)
     try:
-        typed_value = model._meta.get_field(field_name).clean(typed_value, None)
+        cleaned: ZoneValue = field.clean(typed_value, None)
     except ValidationError:
         logger.info("Zone OCR: invalid value for zone '%s'", zone.name)
         return None
-    return FieldUpdate(field_name, typed_value, custom_field)
+    return FieldUpdate(field_name=field_name, value=cleaned, custom_field=custom_field)
 
 
 def _apply_field_updates(document: Document, updates: list[FieldUpdate]) -> None:
@@ -1018,7 +1030,7 @@ def _convert_value(
     data_type: str,
     locale: Locale,
     dates: DateRules,
-) -> object | None:
+) -> ZoneValue | None:
     """Convert an extracted OCR string to the appropriate type for the custom field.
 
     Numeric types are read with the number format of the given locale and
