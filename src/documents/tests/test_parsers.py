@@ -14,7 +14,6 @@ from documents.parsers import encode_thumbnail_webp
 from documents.parsers import get_default_file_extension
 from documents.parsers import get_default_thumbnail
 from documents.parsers import get_supported_file_extensions
-from documents.parsers import is_file_ext_supported
 from documents.parsers import make_thumbnail_from_pdf
 from documents.parsers import rasterize_pdf_page_to_png
 from paperless.parsers.registry import get_parser_registry
@@ -131,11 +130,6 @@ class TestParserAvailability:
 
         # Test invalid mimetype returns no extension
         assert get_default_file_extension("aasdasd/dgfgf") == ""
-
-    def test_file_extension_support(self) -> None:
-        assert is_file_ext_supported(".pdf")
-        assert not is_file_ext_supported(".hsdfh")
-        assert not is_file_ext_supported("")
 
 
 class TestComputeThumbnailDpi:

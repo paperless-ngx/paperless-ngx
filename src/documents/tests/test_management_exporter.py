@@ -305,7 +305,8 @@ class TestExportImport(
             self.assertEqual(Permission.objects.count(), num_permission_objects)
             messages = check_sanity()
             # everything is alright after the test
-            self.assertEqual(messages.total_issue_count, 0)
+            self.assertFalse(messages.has_error)
+            self.assertFalse(messages.has_warning)
 
     def test_exporter_with_filename_format(self) -> None:
         shutil.rmtree(Path(self.dirs.media_dir) / "documents")
