@@ -125,6 +125,19 @@ class ZoneOcrReason(StrEnum):
     TEMPLATE_FAILED = "template_failed"
 
 
+class ZoneOcrRunStatus(StrEnum):
+    """The overall outcome of a zone OCR run on one document."""
+
+    COMPLETED = "completed"
+    SKIPPED = "skipped"
+
+
+class ZoneOcrSkipReason(StrEnum):
+    """Why a zone OCR run on one document was skipped."""
+
+    NO_TEMPLATE = "no_template"
+
+
 @dataclass(kw_only=True, slots=True)
 class ZoneOcrResult:
     template: str

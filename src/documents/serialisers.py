@@ -101,6 +101,8 @@ from documents.versioning import has_prefetched_effective_content
 from documents.versioning import sort_versions_newest_first
 from documents.zone_ocr import ZoneOcrReason
 from documents.zone_ocr import ZoneOcrResult
+from documents.zone_ocr import ZoneOcrRunStatus
+from documents.zone_ocr import ZoneOcrSkipReason
 from documents.zone_ocr import field_key
 
 if TYPE_CHECKING:
@@ -1851,6 +1853,28 @@ class ZoneOcrResultSerializer(serializers.Serializer[ZoneOcrResult]):
         allow_null=True,
         help_text="Why no value was written, or null when one was.",
     )
+
+
+class RunZoneOcrResponseSerializer(serializers.Serializer[dict[str, Any]]):
+    """The response of running zone OCR on one document."""
+
+    status = serializers.ChoiceField(
+        choices=[status.value for status in ZoneOcrRunStatus],
+        read_only=True,
+    )
+    reason = serializers.ChoiceField(
+        choices=[reason.value for reason in ZoneOcrSkipReason],
+        read_only=True,
+        required=False,
+        help_text="Present only when the run was skipped.",
+    )
+    results = ZoneOcrResultSerializer(many=True, read_only=True)
+
+
+class OcrErrorSerializer(serializers.Serializer[dict[str, Any]]):
+    """The body of an error response from the OCR template actions."""
+
+    error = serializers.CharField(read_only=True)
 
 
 class RunZoneOcrDocumentsSerializer(DocumentSelectionSerializer, RunZoneOcrSerializer):
@@ -3942,6 +3966,19 @@ class OcrTemplateTestSerializer(serializers.Serializer[dict[str, Any]]):
             document_field.queryset = Document.objects.filter(
                 id__in=permitted_document_ids(user),
             )
+
+
+class OcrTemplateTestResultSerializer(serializers.Serializer[dict[str, Any]]):
+    """The extraction preview returned for an ad-hoc zone."""
+
+    raw_text = serializers.CharField(read_only=True, allow_null=True)
+    value = serializers.CharField(read_only=True, allow_null=True)
+    regex = serializers.CharField(read_only=True, allow_null=True)
+    regex_match = serializers.BooleanField(
+        read_only=True,
+        allow_null=True,
+        help_text="Whether the value fully matches the regex, or null when not checked.",
+    )
 
 
 class OcrTemplateSerializer(MatchRuleSerializer, OwnedObjectSerializer):

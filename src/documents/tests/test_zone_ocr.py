@@ -25,11 +25,15 @@ from documents.models import MatchingModel
 from documents.models import OcrTemplate
 from documents.models import OcrTemplateZone
 from documents.parsers import ParseError
+from documents.serialisers import OcrTemplateTestResultSerializer
+from documents.serialisers import RunZoneOcrResponseSerializer
 from documents.serialisers import ZoneOcrResultSerializer
 from documents.zone_ocr import MAX_PARSED_TEXT_LENGTH
 from documents.zone_ocr import ZoneExtraction
 from documents.zone_ocr import ZoneOcrReason
 from documents.zone_ocr import ZoneOcrResult
+from documents.zone_ocr import ZoneOcrRunStatus
+from documents.zone_ocr import ZoneOcrSkipReason
 from documents.zone_ocr import ZoneValue
 from documents.zone_ocr import _apply_transform
 from documents.zone_ocr import _combine_field_value
@@ -3863,3 +3867,79 @@ class TestZoneOcrResultSerializer:
         assert JSONRenderer().render(
             ZoneOcrResultSerializer(result).data,
         ) == JSONRenderer().render(asdict(result))
+
+
+class TestRunZoneOcrResponseSerializer:
+    @pytest.mark.parametrize(
+        "body",
+        [
+            pytest.param(
+                {
+                    "status": ZoneOcrRunStatus.SKIPPED,
+                    "reason": ZoneOcrSkipReason.NO_TEMPLATE,
+                    "results": [],
+                },
+                id="skipped",
+            ),
+            pytest.param(
+                {
+                    "status": ZoneOcrRunStatus.COMPLETED,
+                    "results": [
+                        {
+                            "template": "Template",
+                            "zone": "Zone",
+                            "custom_field": "Title",
+                            "value": "text",
+                            "reason": None,
+                        },
+                    ],
+                },
+                id="completed",
+            ),
+        ],
+    )
+    def test_renders_body_unchanged(self, body: dict[str, Any]) -> None:
+        """
+        GIVEN:
+            - A response body with the run status and results fields
+        WHEN:
+            - The body is rendered through the response serializer as JSON
+        THEN:
+            - The JSON equals the body rendered directly
+        """
+        assert JSONRenderer().render(
+            RunZoneOcrResponseSerializer(body).data,
+        ) == JSONRenderer().render(body)
+
+
+class TestOcrTemplateTestResultSerializer:
+    @pytest.mark.parametrize(
+        "body",
+        [
+            pytest.param(
+                {
+                    "raw_text": "abc",
+                    "value": "abc",
+                    "regex": "a.*",
+                    "regex_match": True,
+                },
+                id="matched",
+            ),
+            pytest.param(
+                {"raw_text": None, "value": None, "regex": None, "regex_match": None},
+                id="all-null",
+            ),
+        ],
+    )
+    def test_renders_body_unchanged(self, body: dict[str, Any]) -> None:
+        """
+        GIVEN:
+            - A response body with the OCR template test result fields
+        WHEN:
+            - The body is rendered through the result serializer as JSON
+        THEN:
+            - The JSON equals the body rendered directly
+        """
+        assert JSONRenderer().render(
+            OcrTemplateTestResultSerializer(body).data,
+        ) == JSONRenderer().render(body)

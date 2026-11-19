@@ -220,7 +220,9 @@ from documents.serialisers import MergeDocumentsAsVersionsSerializer
 from documents.serialisers import MergeDocumentsSerializer
 from documents.serialisers import NoteCreateSerializer
 from documents.serialisers import NotesSerializer
+from documents.serialisers import OcrErrorSerializer
 from documents.serialisers import OcrTemplateSerializer
+from documents.serialisers import OcrTemplateTestResultSerializer
 from documents.serialisers import OcrTemplateTestSerializer
 from documents.serialisers import PostDocumentSerializer
 from documents.serialisers import RemovePasswordDocumentsSerializer
@@ -228,6 +230,7 @@ from documents.serialisers import ReprocessDocumentsSerializer
 from documents.serialisers import RotateDocumentsSerializer
 from documents.serialisers import RunTaskSerializer
 from documents.serialisers import RunZoneOcrDocumentsSerializer
+from documents.serialisers import RunZoneOcrResponseSerializer
 from documents.serialisers import RunZoneOcrSerializer
 from documents.serialisers import SavedViewSerializer
 from documents.serialisers import SearchResultSerializer
@@ -2284,17 +2287,10 @@ class DocumentViewSet(
             ),
         ],
         request=RunZoneOcrSerializer,
-        responses=inline_serializer(
-            name="RunZoneOcrResult",
-            fields={
-                "status": serializers.ChoiceField(choices=["completed", "skipped"]),
-                "reason": serializers.ChoiceField(
-                    choices=["no_template"],
-                    required=False,
-                ),
-                "results": ZoneOcrResultSerializer(many=True),
-            },
-        ),
+        responses={
+            (200, "application/json"): RunZoneOcrResponseSerializer,
+            (404, "application/json"): OcrErrorSerializer,
+        },
     )
     @action(
         methods=["post"],
@@ -2324,6 +2320,8 @@ class DocumentViewSet(
         ) or not has_perms_owner_aware(user, "change_document", document):
             return HttpResponseForbidden("Insufficient permissions")
 
+        from documents.zone_ocr import ZoneOcrRunStatus
+        from documents.zone_ocr import ZoneOcrSkipReason
         from documents.zone_ocr import get_templates_for_document
         from documents.zone_ocr import run_zone_extraction
 
@@ -2341,7 +2339,11 @@ class DocumentViewSet(
         )
         if not templates:
             return Response(
-                {"status": "skipped", "reason": "no_template", "results": []},
+                {
+                    "status": ZoneOcrRunStatus.SKIPPED,
+                    "reason": ZoneOcrSkipReason.NO_TEMPLATE,
+                    "results": [],
+                },
             )
 
         doc_path = file_document.archive_path or file_document.source_path
@@ -2354,7 +2356,7 @@ class DocumentViewSet(
         results = run_zone_extraction(file_document, templates=templates, reindex=True)
         return Response(
             {
-                "status": "completed",
+                "status": ZoneOcrRunStatus.COMPLETED,
                 "results": ZoneOcrResultSerializer(results, many=True).data,
             },
         )
@@ -5903,7 +5905,13 @@ class OcrTemplateViewSet(BulkPermissionMixin, PassUserMixin, ModelViewSet[OcrTem
 
         return HttpResponse(content, content_type="image/png")
 
-    @extend_schema(request=OcrTemplateTestSerializer)
+    @extend_schema(
+        request=OcrTemplateTestSerializer,
+        responses={
+            (200, "application/json"): OcrTemplateTestResultSerializer,
+            (404, "application/json"): OcrErrorSerializer,
+        },
+    )
     @action(detail=False, methods=["post"], url_path="test-zone")
     def test_zone(self, request: Request) -> HttpResponse:
         """Extract an ad-hoc zone without changing the document."""
