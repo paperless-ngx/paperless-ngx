@@ -5318,6 +5318,8 @@ class CustomFieldViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet[Custom
 class SystemStatusView(PassUserMixin):
     permission_classes = (IsAuthenticated,)
     TASK_SUMMARY_DAYS = 30
+    # Seconds to wait on the broker before reporting it as unreachable
+    BROKER_SOCKET_TIMEOUT = 5
 
     def get(self, request, format=None):
         if not has_system_status_permission(request.user):
@@ -5363,7 +5365,11 @@ class SystemStatusView(PassUserMixin):
         if redis_url_parsed.hostname is not None:
             redis_constructed_url += f":{redis_url_parsed.port}"
         redis_error = None
-        with Redis.from_url(url=redis_url) as client:
+        with Redis.from_url(
+            url=redis_url,
+            socket_timeout=self.BROKER_SOCKET_TIMEOUT,
+            socket_connect_timeout=self.BROKER_SOCKET_TIMEOUT,
+        ) as client:
             try:
                 client.ping()
                 redis_status = "OK"
@@ -5378,12 +5384,22 @@ class SystemStatusView(PassUserMixin):
         celery_url = None
         try:
             celery_ping = None
-            for ping_attempt in range(3):
-                celery_ping = celery_app.control.inspect().ping()
-                if celery_ping:
-                    break
-                if ping_attempt < 2:
-                    sleep(0.25)
+            # Use a dedicated connection with socket timeouts. Without them a
+            # stalled broker blocks this request (and its DB connection) forever
+            with celery_app.connection_for_read(
+                transport_options={
+                    "socket_timeout": self.BROKER_SOCKET_TIMEOUT,
+                    "socket_connect_timeout": self.BROKER_SOCKET_TIMEOUT,
+                },
+            ) as celery_connection:
+                for ping_attempt in range(3):
+                    celery_ping = celery_app.control.inspect(
+                        connection=celery_connection,
+                    ).ping()
+                    if celery_ping:
+                        break
+                    if ping_attempt < 2:
+                        sleep(0.25)
 
             if not celery_ping:
                 celery_active = "WARNING"
