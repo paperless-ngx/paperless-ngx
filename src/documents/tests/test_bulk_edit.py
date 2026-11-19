@@ -1942,7 +1942,7 @@ class TestBulkEditRunZoneOcr:
 
     @pytest.fixture
     def mock_extract_zones(self, mocker: MockerFixture) -> mock.MagicMock:
-        return mocker.patch("documents.bulk_edit.extract_zones")
+        return mocker.patch("documents.bulk_edit.extract_zones", return_value=None)
 
     def test_runs_every_selected_document_in_the_current_task(
         self,
@@ -1995,6 +1995,71 @@ class TestBulkEditRunZoneOcr:
             requester=None,
         )
         mock_extract_zones.apply_async.assert_not_called()
+
+    def test_finishes_once_for_documents_with_a_write(
+        self,
+        mock_extract_zones: mock.MagicMock,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - Three selected documents, the second of which had nothing written
+              and the third reporting the same root as the first
+        WHEN:
+            - run_zone_ocr is called
+        THEN:
+            - bulk_update_documents runs once with the distinct written ids
+        """
+        docs = DocumentFactory.create_batch(3)
+        finish = mocker.patch("documents.bulk_edit.bulk_update_documents")
+        mock_extract_zones.side_effect = [docs[0].pk, None, docs[0].pk]
+
+        bulk_edit.run_zone_ocr([doc.pk for doc in docs])
+
+        finish.assert_called_once_with([docs[0].pk])
+
+    def test_finishes_written_documents_when_a_later_one_raises(
+        self,
+        mock_extract_zones: mock.MagicMock,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - Two selected documents, the second of which raises during extraction
+        WHEN:
+            - run_zone_ocr is called
+        THEN:
+            - The exception propagates
+            - bulk_update_documents still runs with the first document's id
+        """
+        docs = DocumentFactory.create_batch(2)
+        finish = mocker.patch("documents.bulk_edit.bulk_update_documents")
+        mock_extract_zones.side_effect = [docs[0].pk, RuntimeError("boom")]
+
+        with pytest.raises(RuntimeError, match="boom"):
+            bulk_edit.run_zone_ocr([doc.pk for doc in docs])
+
+        finish.assert_called_once_with([docs[0].pk])
+
+    def test_does_not_finish_when_nothing_was_written(
+        self,
+        mock_extract_zones: mock.MagicMock,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - Selected documents with no successful write
+        WHEN:
+            - run_zone_ocr is called
+        THEN:
+            - bulk_update_documents is not run
+        """
+        docs = DocumentFactory.create_batch(2)
+        finish = mocker.patch("documents.bulk_edit.bulk_update_documents")
+
+        bulk_edit.run_zone_ocr([doc.pk for doc in docs])
+
+        finish.assert_not_called()
 
 
 @pytest.mark.django_db

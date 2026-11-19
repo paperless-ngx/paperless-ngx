@@ -66,6 +66,7 @@ if TYPE_CHECKING:
     from unittest.mock import MagicMock
 
     from django.contrib.auth.models import User
+    from pytest_django.fixtures import DjangoCaptureOnCommitCallbacks
     from pytest_django.fixtures import SettingsWrapper
     from pytest_mock import MockerFixture
 
@@ -780,6 +781,104 @@ class TestSavedZoneExtraction:
 
         document.refresh_from_db()
         assert document.title == "Second"
+
+    @pytest.mark.parametrize(
+        "target",
+        [
+            pytest.param("title", id="builtin-field"),
+            pytest.param("custom_field", id="custom-field-only"),
+        ],
+    )
+    def test_successful_write_bumps_modified_of_the_root(
+        self,
+        mock_zone_ocr_run: MagicMock,
+        page: Path,
+        document: Document,
+        template: OcrTemplate,
+        target: str,
+    ) -> None:
+        """
+        GIVEN:
+            - A document and a template with a zone for a built-in field or
+              only for a custom field
+        WHEN:
+            - Zone extraction writes the value
+        THEN:
+            - The root document's modified time is later than before the run
+        """
+        field = CustomFieldFactory(name="Code", data_type="string")
+        if target == "title":
+            make_zone(template, "Title")
+        else:
+            make_zone(template, "Code", "custom_field", custom_field=field)
+        mock_zone_ocr_run.return_value = subprocess.CompletedProcess(
+            [],
+            0,
+            stdout="value",
+        )
+        before = Document.objects.get(pk=document.pk).modified
+
+        results = run_zone_extraction(document, page, templates=[template])
+
+        assert [result.reason for result in results] == [None]
+        assert Document.objects.get(pk=document.pk).modified > before
+
+    def test_without_a_write_leaves_modified_untouched(
+        self,
+        mock_zone_ocr_run: MagicMock,
+        page: Path,
+        document: Document,
+        template: OcrTemplate,
+    ) -> None:
+        """
+        GIVEN:
+            - A template whose only zone reads no text
+        WHEN:
+            - Zone extraction runs
+        THEN:
+            - Nothing is written and modified is unchanged
+        """
+        make_zone(template, "Title")
+        mock_zone_ocr_run.return_value = subprocess.CompletedProcess(
+            [],
+            0,
+            stdout="",
+        )
+        before = Document.objects.get(pk=document.pk).modified
+
+        results = run_zone_extraction(document, page, templates=[template])
+
+        assert [result.reason for result in results] == [ZoneOcrReason.NO_VALUE]
+        assert Document.objects.get(pk=document.pk).modified == before
+
+    def test_successful_write_does_not_reindex_per_document(
+        self,
+        django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks,
+        mock_zone_ocr_run: MagicMock,
+        page: Path,
+        document: Document,
+        template: OcrTemplate,
+    ) -> None:
+        """
+        GIVEN:
+            - A template that writes the title
+        WHEN:
+            - Zone extraction runs
+        THEN:
+            - No on-commit callbacks are registered; finishing is left to the
+              caller
+        """
+        make_zone(template, "Title")
+        mock_zone_ocr_run.return_value = subprocess.CompletedProcess(
+            [],
+            0,
+            stdout="value",
+        )
+
+        with django_capture_on_commit_callbacks() as callbacks:
+            run_zone_extraction(document, page, templates=[template])
+
+        assert callbacks == []
 
     def test_document_run_renders_each_page_once_across_templates(
         self,

@@ -72,10 +72,12 @@ from documents.utils import IterWrapper
 from documents.utils import compute_checksum
 from documents.utils import identity
 from documents.versioning import annotate_effective_content
+from documents.versioning import get_root_document
 from documents.versioning import latest_version
 from documents.workflows.utils import get_workflows_for_trigger
 from documents.zone_ocr import get_templates_for_document
 from documents.zone_ocr import run_zone_extraction
+from documents.zone_ocr import zone_results_written
 from paperless.config import AIConfig
 from paperless.config import BarcodeConfig
 from paperless.config import RemoteOCRConfig
@@ -379,11 +381,14 @@ def extract_zones(
     document_id: int,
     template_id: int | None = None,
     requester: User | None = None,
-) -> None:
+) -> int | None:
     """
     Run an OCR template against a stored document, or every template that
     matches it when no template is given. Matched templates are limited to
     those the requester can view.
+
+    Returns the root document's id when any value was written, otherwise None.
+    The caller finishes the edit, for example with bulk_update_documents.
     """
     document = latest_version(Document.objects.get(id=document_id))
     if template_id is None:
@@ -399,10 +404,13 @@ def extract_zones(
                 "OCR template %s no longer exists, not running zone OCR",
                 template_id,
             )
-            return
+            return None
         templates = [template]
 
-    run_zone_extraction(document, templates=templates, reindex=True)
+    results = run_zone_extraction(document, templates=templates)
+    if zone_results_written(results):
+        return get_root_document(document).pk
+    return None
 
 
 @shared_task

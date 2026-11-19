@@ -2324,6 +2324,7 @@ class DocumentViewSet(
         from documents.zone_ocr import ZoneOcrSkipReason
         from documents.zone_ocr import get_templates_for_document
         from documents.zone_ocr import run_zone_extraction
+        from documents.zone_ocr import zone_results_written
 
         resolution = resolve_effective_document(document, request)
         if resolution.error == VersionResolutionError.INVALID:
@@ -2353,7 +2354,12 @@ class DocumentViewSet(
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        results = run_zone_extraction(file_document, templates=templates, reindex=True)
+        results = run_zone_extraction(file_document, templates=templates)
+        if zone_results_written(results):
+            bulk_edit.bulk_update_documents.apply_async(
+                kwargs={"document_ids": [get_root_document(file_document).pk]},
+                headers={"trigger_source": PaperlessTask.TriggerSource.SYSTEM},
+            )
         return Response(
             {
                 "status": ZoneOcrRunStatus.COMPLETED,

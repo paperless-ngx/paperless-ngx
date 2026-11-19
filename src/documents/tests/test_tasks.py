@@ -23,6 +23,8 @@ from documents.sanity_checker import SanityCheckFailedException
 from documents.sanity_checker import SanityCheckMessages
 from documents.tasks import extract_zones
 from documents.tests.helpers import dummy_preprocess
+from documents.zone_ocr import ZoneOcrReason
+from documents.zone_ocr import ZoneOcrResult
 from paperless_testing.assertions import FileSystemAssertsMixin
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import DocumentFactory
@@ -676,11 +678,7 @@ class TestExtractZonesTask:
         extract_zones(doc.id, requester=user)
 
         select.assert_called_once_with(doc, requester=user)
-        extract.assert_called_once_with(
-            doc,
-            templates=select.return_value,
-            reindex=True,
-        )
+        extract.assert_called_once_with(doc, templates=select.return_value)
 
     def test_task_runs_the_chosen_template(self, mocker: MockerFixture) -> None:
         """
@@ -697,7 +695,42 @@ class TestExtractZonesTask:
 
         extract_zones(doc.id, template.pk)
 
-        extract.assert_called_once_with(doc, templates=[template], reindex=True)
+        extract.assert_called_once_with(doc, templates=[template])
+
+    @pytest.mark.parametrize(
+        ("reason", "returns_root"),
+        [
+            pytest.param(None, True, id="written"),
+            pytest.param(ZoneOcrReason.NO_VALUE, False, id="nothing-written"),
+        ],
+    )
+    def test_task_reports_the_root_when_a_value_was_written(
+        self,
+        mocker: MockerFixture,
+        reason: ZoneOcrReason | None,
+        returns_root: bool,  # noqa: FBT001
+    ) -> None:
+        """
+        GIVEN:
+            - A document version whose extraction does or does not write a value
+        WHEN:
+            - The task runs
+        THEN:
+            - The root document id is returned only when a value was written
+        """
+        root = DocumentFactory()
+        DocumentFactory(root_document=root, version_index=1)
+        template = OcrTemplateFactory()
+        mocker.patch(
+            "documents.tasks.run_zone_extraction",
+            return_value=[
+                ZoneOcrResult(template="t", zone="z", custom_field="", reason=reason),
+            ],
+        )
+
+        result = extract_zones(root.pk, template.pk)
+
+        assert result == (root.pk if returns_root else None)
 
     def test_task_skips_a_deleted_template(self, mocker: MockerFixture) -> None:
         """

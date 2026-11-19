@@ -14,18 +14,21 @@ from django.utils import timezone
 from PIL import Image
 from rest_framework import status
 
+from documents import bulk_edit
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import MatchingModel
 from documents.models import OcrTemplate
 from documents.models import OcrTemplateZone
+from documents.models import PaperlessTask
 from documents.parsers import ParseError
 from documents.search import get_backend
 from documents.signals import document_consumption_finished
-from documents.tasks import extract_zones
+from documents.tasks import bulk_update_documents
 from documents.zone_ocr import ZoneExtraction
 from documents.zone_ocr import ZoneOcrReason
+from documents.zone_ocr import ZoneOcrResult
 from paperless_testing.factories import CustomFieldFactory
 from paperless_testing.factories import DocumentFactory
 from paperless_testing.factories import OcrTemplateFactory
@@ -149,6 +152,13 @@ def mock_extract(mocker: MockerFixture) -> MagicMock:
 
 
 @pytest.fixture
+def mock_finish(mocker: MockerFixture) -> MagicMock:
+    return mocker.patch(
+        "documents.views.bulk_edit.bulk_update_documents.apply_async",
+    )
+
+
+@pytest.fixture
 def mock_preview(mocker: MockerFixture) -> MagicMock:
     return mocker.patch("documents.zone_ocr.extract_zone_preview")
 
@@ -232,6 +242,7 @@ class TestZoneOcrIndexing:
         admin_client: APIClient,
         django_capture_on_commit_callbacks: DjangoCaptureOnCommitCallbacks,
         mock_zone_ocr_run: MagicMock,
+        mocker: MockerFixture,
     ) -> None:
         """
         GIVEN:
@@ -305,6 +316,11 @@ class TestZoneOcrIndexing:
             backend.add_or_update(document)
             assert backend.search_ids("title:before", user=None) == [document.pk]
 
+        # The single-document finish is a queued task, run it inline here.
+        mocker.patch(
+            "documents.views.bulk_edit.bulk_update_documents.apply_async",
+            side_effect=lambda kwargs, **_: bulk_update_documents(**kwargs),
+        )
         with django_capture_on_commit_callbacks(execute=True):
             if entry_point == "ingestion":
                 document_consumption_finished.send(sender=None, document=file_document)
@@ -314,7 +330,7 @@ class TestZoneOcrIndexing:
                 )
                 assert response.status_code == status.HTTP_200_OK
             else:
-                extract_zones(document.pk, template.pk)
+                bulk_edit.run_zone_ocr([document.pk], template=template.pk)
 
         document.refresh_from_db()
         assert document.title == "After OCR"
@@ -1801,7 +1817,7 @@ class TestOcrTemplateDelete:
 
 
 @pytest.mark.django_db
-@pytest.mark.usefixtures("paperless_dirs")
+@pytest.mark.usefixtures("paperless_dirs", "mock_finish")
 class TestRunZoneOcr:
     """Running zone OCR on documents through the run-zone-ocr endpoint."""
 
@@ -1873,11 +1889,60 @@ class TestRunZoneOcr:
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json()["status"] == "completed"
-        mock_extract.assert_called_once_with(
-            document,
-            templates=[template],
-            reindex=True,
+        mock_extract.assert_called_once_with(document, templates=[template])
+
+    @pytest.mark.parametrize(
+        ("reason", "finishes"),
+        [
+            pytest.param(None, True, id="written"),
+            pytest.param(ZoneOcrReason.NO_VALUE, False, id="nothing-written"),
+        ],
+    )
+    def test_finishes_the_edit_only_when_a_value_was_written(
+        self,
+        admin_client: APIClient,
+        mock_extract: MagicMock,
+        mock_finish: MagicMock,
+        reason: ZoneOcrReason | None,
+        finishes: bool,  # noqa: FBT001
+    ) -> None:
+        """
+        GIVEN:
+            - A document with a version and a template whose run does or does
+              not write a value
+        WHEN:
+            - Zone OCR is run on the version through the detail endpoint
+        THEN:
+            - The shared document update task is queued once for the root
+              document only when a value was written
+            - No per-document search reindex is requested directly
+        """
+        document = DocumentFactory(content=CONTENT)
+        version = DocumentFactory(
+            root_document=document,
+            version_index=1,
+            content=CONTENT,
         )
+        version.source_path.write_bytes(b"test PDF")
+        template = OcrTemplateFactory(name="Northwind", match="Northwind")
+        mock_extract.return_value = [
+            ZoneOcrResult(template="t", zone="z", custom_field="", reason=reason),
+        ]
+
+        response = admin_client.post(
+            f"{RUN_ZONE_OCR_URL.format(pk=document.pk)}?version={version.pk}",
+            {"template": template.pk},
+            format="json",
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        if finishes:
+            mock_finish.assert_called_once_with(
+                kwargs={"document_ids": [document.pk]},
+                headers={"trigger_source": PaperlessTask.TriggerSource.SYSTEM},
+            )
+        else:
+            mock_finish.assert_not_called()
 
     @pytest.mark.parametrize(
         "version",
@@ -1923,11 +1988,7 @@ class TestRunZoneOcr:
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json()["status"] == "completed"
-        mock_extract.assert_called_once_with(
-            file_document,
-            templates=[template],
-            reindex=True,
-        )
+        mock_extract.assert_called_once_with(file_document, templates=[template])
 
     @pytest.mark.parametrize(
         "version",
@@ -2190,7 +2251,7 @@ class TestRunZoneOcr:
 
 
 @pytest.mark.django_db
-@pytest.mark.usefixtures("paperless_dirs")
+@pytest.mark.usefixtures("paperless_dirs", "mock_finish")
 class TestRunZoneOcrPermissions:
     """Permission checks for the run-zone-ocr endpoint."""
 

@@ -14,7 +14,6 @@ from decimal import Decimal
 from decimal import InvalidOperation
 from enum import StrEnum
 from functools import lru_cache
-from functools import partial
 from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import NewType
@@ -36,6 +35,7 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.db.models import F
 from django.db.models import Field
+from django.utils import timezone
 from PIL import Image
 
 from documents.matching import matches
@@ -48,7 +48,6 @@ from documents.parsers import ParseError
 from documents.parsers import rasterize_pdf_page_to_png
 from documents.permissions import permitted_object_ids
 from documents.regex import safe_regex_fullmatch
-from documents.signals.handlers import add_to_index
 from documents.validators import monetary_validator
 from documents.versioning import get_root_document
 from paperless.utils import OCR_TO_DATEPARSER_LANGUAGES
@@ -220,14 +219,13 @@ def run_zone_extraction(
     document: Document,
     original_file: Path | None = None,
     templates: list[OcrTemplate] | None = None,
-    *,
-    reindex: bool = False,
 ) -> list[ZoneOcrResult]:
     """
     Extract zones from the selected file version and update its root document.
     Run all matching templates when no templates are given.
 
-    Manual runs can request a search refresh after successful writes commit.
+    The root document's modified time is bumped when any value was written.
+    Callers finish the edit (index, signals) themselves; see zone_results_written.
     """
     if templates is None:
         templates = get_templates_for_document(document)
@@ -274,17 +272,16 @@ def run_zone_extraction(
                     _zone_result(template, zone, reason=ZoneOcrReason.TEMPLATE_FAILED)
                     for zone in zones
                 )
-    if reindex and any(result.reason is None for result in results):
-        # queue a reindex of the document after the transaction commits
-        root_document = get_root_document(document)
-        transaction.on_commit(partial(_reindex_document, root_document.pk))
+    if zone_results_written(results):
+        Document.objects.filter(pk=get_root_document(document).pk).update(
+            modified=timezone.now(),
+        )
     return results
 
 
-def _reindex_document(document_id: int) -> None:
-    document = Document.objects.filter(pk=document_id).first()
-    if document is not None:
-        add_to_index(sender=None, document=document)
+def zone_results_written(results: list[ZoneOcrResult]) -> bool:
+    """Whether at least one zone's value was written to the root document."""
+    return any(result.reason is None for result in results)
 
 
 def _resolve_doc_path(

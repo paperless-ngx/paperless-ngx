@@ -1264,8 +1264,23 @@ def run_zone_ocr(
     template: int | None = None,
     user: User | None = None,
 ) -> Literal["OK"]:
-    """Run zone OCR within the tracked bulk operation task."""
-    for document_id in doc_ids:
-        extract_zones(document_id=document_id, template_id=template, requester=user)
+    """
+    Run zone OCR within the tracked bulk operation task, then finish once for
+    the root documents that had a value written.
+    """
+    written_ids: list[int] = []
+    try:
+        for document_id in doc_ids:
+            written_id = extract_zones(
+                document_id=document_id,
+                template_id=template,
+                requester=user,
+            )
+            if written_id is not None:
+                written_ids.append(written_id)
+    finally:
+        # Documents already written are finished even if a later one raises.
+        if written_ids:
+            bulk_update_documents(list(dict.fromkeys(written_ids)))
 
     return "OK"

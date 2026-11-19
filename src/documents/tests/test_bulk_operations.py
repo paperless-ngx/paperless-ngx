@@ -97,7 +97,10 @@ class TestRunZoneOcrBulkOperation:
         """
         template = OcrTemplateFactory()
         enqueue = mocker.patch("documents.views.execute_bulk_operation.apply_async")
-        extract = mocker.patch("documents.bulk_edit.extract_zones")
+        extract = mocker.patch(
+            "documents.bulk_edit.extract_zones",
+            return_value=None,
+        )
         enqueue.return_value.id = "zone-ocr-task"
         response = admin_client.post(
             RUN_ZONE_OCR_BULK_URL,
@@ -137,7 +140,10 @@ class TestRunZoneOcrBulkOperation:
             - The result reports the operation and document count
         """
         template = OcrTemplateFactory()
-        extract = mocker.patch("documents.bulk_edit.extract_zones")
+        extract = mocker.patch(
+            "documents.bulk_edit.extract_zones",
+            return_value=None,
+        )
         result = execute_bulk_operation(
             "run_zone_ocr",
             [document.pk],
@@ -151,6 +157,30 @@ class TestRunZoneOcrBulkOperation:
         )
         extract.apply_async.assert_not_called()
         assert result == {"operation": "run_zone_ocr", "document_count": 1}
+
+    def test_finishes_with_the_ids_that_were_written(
+        self,
+        mocker: MockerFixture,
+        admin_user: User,
+        document: Document,
+    ) -> None:
+        """
+        GIVEN:
+            - A queued zone OCR run whose extraction reports a written document
+        WHEN:
+            - The tracked task executes it
+        THEN:
+            - bulk_update_documents runs once with that document id
+        """
+        mocker.patch(
+            "documents.bulk_edit.extract_zones",
+            return_value=document.pk,
+        )
+        finish = mocker.patch("documents.bulk_edit.bulk_update_documents")
+
+        execute_bulk_operation("run_zone_ocr", [document.pk], {}, admin_user.pk)
+
+        finish.assert_called_once_with([document.pk])
 
     def test_without_template_selects_for_the_requester(
         self,
@@ -167,7 +197,10 @@ class TestRunZoneOcrBulkOperation:
             - Extraction receives the requesting user so templates are limited to
               those they can view
         """
-        extract = mocker.patch("documents.bulk_edit.extract_zones")
+        extract = mocker.patch(
+            "documents.bulk_edit.extract_zones",
+            return_value=None,
+        )
         execute_bulk_operation("run_zone_ocr", [document.pk], {}, admin_user.pk)
         extract.assert_called_once_with(
             document_id=document.pk,
@@ -223,7 +256,10 @@ class TestRunZoneOcrBulkOperation:
             template.save(update_fields=["owner"])
         else:
             User.objects.filter(pk=regular_user.pk).update(is_active=False)
-        extract = mocker.patch("documents.bulk_edit.extract_zones")
+        extract = mocker.patch(
+            "documents.bulk_edit.extract_zones",
+            return_value=None,
+        )
         with pytest.raises(PermissionDenied):
             execute_bulk_operation(**enqueue.call_args.kwargs["kwargs"])
         extract.assert_not_called()
@@ -244,7 +280,10 @@ class TestRunZoneOcrBulkOperation:
               template matching
             - Extraction never runs
         """
-        extract = mocker.patch("documents.bulk_edit.extract_zones")
+        extract = mocker.patch(
+            "documents.bulk_edit.extract_zones",
+            return_value=None,
+        )
         with pytest.raises(OcrTemplate.DoesNotExist):
             execute_bulk_operation(
                 "run_zone_ocr",
