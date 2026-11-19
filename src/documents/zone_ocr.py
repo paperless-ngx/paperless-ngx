@@ -276,7 +276,13 @@ def _process_template(
                 tmp_path,
             )
             extracted = extraction.value
-            reason = None if extracted else "no_value"
+            if extracted:
+                reason = None
+            elif extraction.raw_text:
+                # Text was read but the transform found nothing usable in it.
+                reason = "transform_failed"
+            else:
+                reason = "no_value"
         if (
             extracted is not None
             and zone.validation_regex
@@ -558,12 +564,11 @@ def _extract_zone(
     return ZoneExtraction(
         raw_text=raw_text,
         value=_apply_transform(
-            raw_text,
+            raw_text or "",
             zone.transform,
             _date_rules(zone.ocr_language, zone.date_format),
         )
-        if raw_text
-        else None,
+        or None,
     )
 
 
@@ -687,7 +692,11 @@ def _apply_transform(
     transform: str,
     dates: DateRules,
 ) -> str:
-    """Apply post-processing transform to extracted text."""
+    """Apply post-processing transform to extracted text.
+
+    A date or numeric transform that finds no date or digit returns an empty
+    string instead of passing the raw text on.
+    """
     text = text.strip()
     if not text:
         return text
@@ -696,14 +705,14 @@ def _apply_transform(
         return text
     elif transform == "date":
         parsed = _parse_date(text, dates)
-        return parsed.isoformat() if parsed else text
+        return parsed.isoformat() if parsed else ""
     elif transform == "uppercase":
         return text.upper()
     elif transform == "lowercase":
         return text.lower()
     elif transform == "numeric":
-        result = re.sub(r"[^\d.,\-]", "", text)
-        return result if result else text
+        numeric = re.sub(r"[^\d.,\-]", "", text)
+        return numeric if re.search(r"\d", numeric) else ""
     elif transform == "strip_punctuation":
         return text.strip(string.punctuation + " \t\r\n")
     return text

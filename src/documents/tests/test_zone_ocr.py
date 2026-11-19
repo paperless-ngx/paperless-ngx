@@ -406,6 +406,36 @@ class TestZoneExtraction:
         assert result.raw_text == "25/12/2025"
         assert result.value == "2025-12-25"
 
+    @pytest.mark.parametrize(
+        ("transform", "text"),
+        [
+            pytest.param("date", "not a date", id="date"),
+            pytest.param("numeric", "abc", id="numeric"),
+        ],
+    )
+    def test_failed_transform_yields_no_value(
+        self,
+        page: Path,
+        zone: OcrTemplateZone,
+        tmp_path: Path,
+        mock_zone_ocr_run: MagicMock,
+        transform: str,
+        text: str,
+    ) -> None:
+        """
+        GIVEN:
+            - A date or numeric zone reading text with no date or number
+        WHEN:
+            - The zone is extracted
+        THEN:
+            - The raw text is retained for the preview and there is no value
+        """
+        zone.transform = transform
+        mock_zone_ocr_run.return_value.stdout = text
+        result = _extract_zone(page, zone, 100, 50, tmp_path)
+        assert result.raw_text == text
+        assert result.value is None
+
     def test_barcode_extraction_bypasses_tesseract(
         self,
         mocker: MockerFixture,
@@ -517,6 +547,46 @@ class TestSavedZoneExtraction:
         document.refresh_from_db()
         assert document.title == "two / one"
         save.assert_called_once_with(update_fields=["title"])
+
+    def test_failed_transform_blocks_the_combined_field(
+        self,
+        mock_zone_ocr_run: MagicMock,
+        paperless_dirs: PaperlessDirs,
+        page: Path,
+        document: Document,
+        template: OcrTemplate,
+    ) -> None:
+        """
+        GIVEN:
+            - Two title zones combined as "{Date} {Ref}", where the date zone
+              reads text that is not a date
+        WHEN:
+            - The template is processed
+        THEN:
+            - The date zone is reported as transform_failed, the other zone as
+              incomplete, and the title is not written
+        """
+        zones = [
+            make_zone(template, "Date", transform="date"),
+            make_zone(template, "Ref"),
+        ]
+        template.combine_formats = {"title": "{Date} {Ref}"}
+        mock_zone_ocr_run.side_effect = ocr_outputs("not a date", "R-1")
+
+        results = _process_template(
+            document,
+            {0: page},
+            template,
+            zones,
+            paperless_dirs.scratch_dir,
+        )
+
+        assert [(result.zone, result.reason) for result in results] == [
+            ("Date", "transform_failed"),
+            ("Ref", "incomplete"),
+        ]
+        document.refresh_from_db()
+        assert document.title == "Original"
 
     def test_converts_custom_and_builtin_fields_before_saving(
         self,
@@ -1676,8 +1746,15 @@ class TestApplyTransform:
                 "abc",
                 "numeric",
                 "",
-                "abc",
-                id="numeric-empty-result-falls-back",
+                "",
+                id="numeric-without-digits-is-empty",
+            ),
+            pytest.param(
+                "a-b.c",
+                "numeric",
+                "",
+                "",
+                id="numeric-punctuation-only-is-empty",
             ),
             pytest.param(
                 "13.04.2026",
@@ -1732,22 +1809,22 @@ class TestApplyTransform:
                 "32.13.2026",
                 "date",
                 "%d.%m.%Y",
-                "32.13.2026",
-                id="date-invalid-with-format-returns-text",
+                "",
+                id="date-invalid-with-format-is-empty",
             ),
             pytest.param(
                 "2026-13-32",
                 "date",
                 "",
-                "2026-13-32",
-                id="date-invalid-auto-detect-returns-text",
+                "",
+                id="date-invalid-auto-detect-is-empty",
             ),
             pytest.param(
                 "not a date",
                 "date",
                 "",
-                "not a date",
-                id="date-not-a-date-returns-text",
+                "",
+                id="date-not-a-date-is-empty",
             ),
             pytest.param("", "strip", "", "", id="empty-string"),
             pytest.param("   ", "strip", "", "", id="whitespace-only"),
@@ -1786,19 +1863,17 @@ class TestApplyTransform:
         rules = _date_rules("eng", date_format)
         assert _apply_transform(text, transform, rules) == expected
 
-    def test_unparseable_date_preserves_text(self, mocker: MockerFixture) -> None:
+    def test_dateparser_error_gives_empty_text(self, mocker: MockerFixture) -> None:
         """
         GIVEN:
             - dateparser raises OverflowError for the input
         WHEN:
             - A date transform is applied
         THEN:
-            - The original text is returned unchanged
+            - An empty string is returned
         """
         mocker.patch("documents.zone_ocr.dateparser.parse", side_effect=OverflowError)
-        assert (
-            _apply_transform("unparsable", "date", _date_rules("eng")) == "unparsable"
-        )
+        assert _apply_transform("unparsable", "date", _date_rules("eng")) == ""
 
 
 class TestZoneLanguage:
