@@ -1680,6 +1680,33 @@ class TestOcrTemplateDelete:
         assert OcrTemplate.objects.count() == 0
         assert OcrTemplateZone.objects.count() == 0
 
+    def test_deleting_a_custom_field_keeps_its_zones(
+        self,
+        text_field: CustomField,
+    ) -> None:
+        """
+        GIVEN:
+            - A template with a zone targeting a custom field
+        WHEN:
+            - The custom field is deleted
+        THEN:
+            - The zone is kept with no custom field assigned
+        """
+        template = OcrTemplateFactory(name="Keeps Zones", match="Northwind")
+        zone = OcrTemplateZoneFactory(
+            template=template,
+            name="Zone",
+            target=OcrTemplateZone.TargetType.CUSTOM_FIELD,
+            custom_field=text_field,
+            height=100,
+        )
+
+        text_field.delete()
+
+        zone.refresh_from_db()
+        assert zone.custom_field is None
+        assert OcrTemplate.objects.filter(pk=template.pk).exists()
+
     def test_nonexistent_returns_404(self, admin_client: APIClient) -> None:
         """
         GIVEN:
@@ -2585,7 +2612,7 @@ class TestZonePreview:
             pytest.param({"page": 0}, id="page-zero"),
             pytest.param({"page": -2}, id="page-below-last"),
             pytest.param({"transform": "invalid"}, id="unknown-transform"),
-            pytest.param({"ocr_language": "x" * 21}, id="language-too-long"),
+            pytest.param({"ocr_language": "x" * 33}, id="language-too-long"),
             pytest.param(
                 {"zone_source_width": "invalid"},
                 id="non-numeric-source-width",

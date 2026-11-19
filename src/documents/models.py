@@ -2218,8 +2218,21 @@ class WorkflowRun(SoftDeleteModel):
         return f"WorkflowRun of {self.workflow} at {self.run_at} on {self.document}"
 
 
-class OcrTemplate(MatchingModel):
+class OcrTemplate(ModelWithOwner):
     """Matching rules and extraction zones for documents with a common layout."""
+
+    name = models.CharField(_("name"), max_length=128)
+
+    match = models.CharField(_("match"), max_length=256, blank=True)
+
+    # Templates are never assigned by the classifier, so there is no auto matching.
+    matching_algorithm = models.PositiveSmallIntegerField(
+        _("matching algorithm"),
+        choices=WorkflowTrigger.WorkflowTriggerMatching.choices,
+        default=MatchingModel.MATCH_ANY,
+    )
+
+    is_insensitive = models.BooleanField(_("is insensitive"), default=True)
 
     source_width = models.PositiveIntegerField(
         _("source width"),
@@ -2268,9 +2281,25 @@ class OcrTemplate(MatchingModel):
         auto_now=True,
     )
 
-    class Meta(MatchingModel.Meta):
+    class Meta(ModelWithOwner.Meta):
+        abstract = False
         verbose_name = _("OCR template")
         verbose_name_plural = _("OCR templates")
+        ordering = ("name",)
+        constraints = [
+            models.UniqueConstraint(
+                fields=["name", "owner"],
+                name="%(app_label)s_%(class)s_unique_name_owner",
+            ),
+            models.UniqueConstraint(
+                name="%(app_label)s_%(class)s_name_uniq",
+                fields=["name"],
+                condition=models.Q(owner__isnull=True),
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return self.name
 
 
 class OcrTemplateZone(models.Model):
@@ -2308,7 +2337,7 @@ class OcrTemplateZone(models.Model):
 
     custom_field = models.ForeignKey(
         "documents.CustomField",
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         related_name="ocr_zones",
         verbose_name=_("custom field"),
         null=True,
@@ -2320,7 +2349,7 @@ class OcrTemplateZone(models.Model):
         _("page"),
         null=True,
         blank=True,
-        help_text=_("Page (1 = first, -1 = last; blank uses the template default)"),
+        help_text=_("Page (1 = first, -1 = last; blank = first page)"),
     )
 
     x = models.PositiveIntegerField(_("x"), help_text=_("Left edge (px)"))
@@ -2358,7 +2387,7 @@ class OcrTemplateZone(models.Model):
 
     ocr_language = models.CharField(
         _("OCR language"),
-        max_length=20,
+        max_length=32,
         default="eng",
         help_text=_("Tesseract language code(s), e.g. 'deu+eng'"),
     )
@@ -2400,7 +2429,7 @@ class OcrTemplateZone(models.Model):
         blank=True,
         default="",
         help_text=_(
-            "Optional regex pattern — extracted text is only accepted if it matches",
+            "Optional regex pattern. Extracted text is only accepted if it fully matches.",
         ),
     )
 

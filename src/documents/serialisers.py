@@ -171,14 +171,10 @@ class DocumentUpdateFieldsModelSerializer(DynamicFieldsModelSerializer):
         return instance
 
 
-class MatchingModelSerializer(serializers.ModelSerializer[Any]):
-    document_count = serializers.IntegerField(read_only=True)
-
-    def get_slug(self, obj) -> str:
-        return slugify(obj.name)
-
-    slug = SerializerMethodField()
-
+# Name and owner uniqueness and match regex validation for models with a name,
+# an owner and match rules. A comment, not a docstring, so it stays out of the
+# API schema descriptions of every serializer built on it.
+class MatchRuleSerializer(serializers.ModelSerializer[Any]):
     def validate(self, data):
         # TODO: remove pending https://github.com/encode/django-rest-framework/issues/7173
         name = data.get(
@@ -215,6 +211,15 @@ class MatchingModelSerializer(serializers.ModelSerializer[Any]):
                     "Invalid regular expression, see log for details.",
                 )
         return match
+
+
+class MatchingModelSerializer(MatchRuleSerializer):
+    document_count = serializers.IntegerField(read_only=True)
+
+    def get_slug(self, obj) -> str:
+        return slugify(obj.name)
+
+    slug = SerializerMethodField()
 
 
 class SetPermissionsMixin:
@@ -3827,7 +3832,8 @@ class OcrTemplateZoneSerializer(serializers.ModelSerializer):
                         {name: field.error_messages["required"]},
                     )
         # A custom field target may be left unassigned, as the editor creates new
-        # zones; built-in targets never use a custom field.
+        # zones, and a zone is left unassigned when its custom field is deleted;
+        # built-in targets never use a custom field.
         if (
             data.get("target", OcrTemplateZone.TargetType.CUSTOM_FIELD)
             != OcrTemplateZone.TargetType.CUSTOM_FIELD
@@ -3897,16 +3903,12 @@ def _zone_field_key(zone: dict[str, Any]) -> str:
     return target
 
 
-class OcrTemplateSerializer(MatchingModelSerializer, OwnedObjectSerializer):
+class OcrTemplateSerializer(MatchRuleSerializer, OwnedObjectSerializer):
     zones = OcrTemplateZoneSerializer(many=True, required=False)
     combine_formats = serializers.DictField(
         child=serializers.CharField(allow_blank=True, trim_whitespace=False),
         required=False,
     )
-
-    # Templates are never assigned to documents
-    slug = None
-    document_count = None
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
@@ -3946,13 +3948,6 @@ class OcrTemplateSerializer(MatchingModelSerializer, OwnedObjectSerializer):
             "set_permissions",
         ]
         read_only_fields = ["created", "updated"]
-
-    def validate_matching_algorithm(self, value):
-        if value == MatchingModel.MATCH_AUTO:
-            raise serializers.ValidationError(
-                "Automatic matching is not supported for OCR templates.",
-            )
-        return value
 
     def validate(self, data):
         data = super().validate(data)
