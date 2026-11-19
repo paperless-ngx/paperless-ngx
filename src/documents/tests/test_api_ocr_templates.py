@@ -1057,6 +1057,66 @@ class TestOcrTemplateValidation:
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     @pytest.mark.parametrize(
+        ("target", "use_field", "expected"),
+        [
+            pytest.param(
+                "custom_field",
+                True,
+                status.HTTP_201_CREATED,
+                id="custom-field-with-field",
+            ),
+            pytest.param(
+                "custom_field",
+                False,
+                status.HTTP_201_CREATED,
+                id="custom-field-unassigned",
+            ),
+            pytest.param("title", False, status.HTTP_201_CREATED, id="title"),
+            pytest.param(
+                "title",
+                True,
+                status.HTTP_400_BAD_REQUEST,
+                id="title-with-field",
+            ),
+            pytest.param(
+                "created",
+                True,
+                status.HTTP_400_BAD_REQUEST,
+                id="created-with-field",
+            ),
+        ],
+    )
+    def test_only_custom_field_targets_set_a_custom_field(
+        self,
+        admin_client: APIClient,
+        text_field: CustomField,
+        target: str,
+        use_field: bool,  # noqa: FBT001
+        expected: int,
+    ) -> None:
+        """
+        GIVEN:
+            - A zone with a custom field or built-in target, with or without a
+              custom field
+        WHEN:
+            - Create is attempted
+        THEN:
+            - A custom field target is accepted with or without a field
+            - A built-in target is rejected when it sets a custom field
+        """
+        zone = zone_payload(text_field.pk if use_field else None, target=target)
+
+        response = admin_client.post(
+            ENDPOINT,
+            template_payload(zones=[zone]),
+            format="json",
+        )
+
+        assert response.status_code == expected
+        if expected == status.HTTP_400_BAD_REQUEST:
+            assert "custom_field" in response.json()["zones"]["0"]
+
+    @pytest.mark.parametrize(
         ("pattern", "expected"),
         [
             pytest.param("", status.HTTP_201_CREATED, id="blank"),

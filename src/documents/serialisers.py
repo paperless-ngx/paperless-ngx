@@ -3795,6 +3795,16 @@ class OcrTemplateZoneSerializer(serializers.ModelSerializer):
                     raise serializers.ValidationError(
                         {name: field.error_messages["required"]},
                     )
+        # A custom field target may be left unassigned, as the editor creates new
+        # zones; built-in targets never use a custom field.
+        if (
+            data.get("target", OcrTemplateZone.TargetType.CUSTOM_FIELD)
+            != OcrTemplateZone.TargetType.CUSTOM_FIELD
+            and data.get("custom_field") is not None
+        ):
+            raise serializers.ValidationError(
+                {"custom_field": "Only zones targeting a custom field can set one."},
+            )
         return data
 
 
