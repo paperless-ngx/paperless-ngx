@@ -79,6 +79,11 @@ SEPARATOR_ONLY_RE = re.compile(r"[\s\-/.,;:|]*")
 # Earlier dates are far more likely OCR noise than a real document date.
 MIN_ZONE_DATE_YEAR = 1900
 
+# Longest OCR text read as a number, amount or date. Longer numbers and amounts
+# are not parsed, and dates are only searched for in the leading text, which
+# bounds parsing time when a zone covers a large region.
+MAX_PARSED_TEXT_LENGTH = 256
+
 
 @dataclass(frozen=True)
 class ZoneExtraction:
@@ -633,8 +638,19 @@ def _parse_date(text: str, rules: DateRules) -> date | None:
     month name and year), and the first token dateparser accepts is used. Bare
     numbers and two-digit years in surrounding text are never read as dates, so
     version or article numbers like "1.2.34" are ignored. Dates before
-    MIN_ZONE_DATE_YEAR are treated as OCR noise.
+    MIN_ZONE_DATE_YEAR are treated as OCR noise. Only the first
+    MAX_PARSED_TEXT_LENGTH characters are read, without a word the cut splits.
     """
+    if len(text) > MAX_PARSED_TEXT_LENGTH:
+        head = text[:MAX_PARSED_TEXT_LENGTH]
+        if not text[MAX_PARSED_TEXT_LENGTH].isspace():
+            # Drop the word split by the cut, so a truncated token cannot match
+            # as a different date.
+            kept = re.match(r".*\s", head, re.DOTALL)
+            head = kept.group() if kept else ""
+        text = head
+        if not text.strip():
+            return None
     return next(
         (
             candidate
@@ -779,8 +795,11 @@ def _parse_number(value: str, locale: Locale) -> Decimal | None:
     when it comes before the first digit and does not directly follow a letter
     or digit, so "-5", "EUR -5" and "$-5" are negative while "INV-123" is
     just 123. Any other dash makes the text invalid. Returns None when the
-    text is not a well-formed number in the locale.
+    text is not a well-formed number in the locale or is longer than
+    MAX_PARSED_TEXT_LENGTH.
     """
+    if len(value) > MAX_PARSED_TEXT_LENGTH:
+        return None
     text = "".join(
         str(unicodedata.digit(char))
         if unicodedata.category(char) == UNICODE_DECIMAL_DIGIT
@@ -793,8 +812,15 @@ def _parse_number(value: str, locale: Locale) -> Decimal | None:
         .replace("\N{ARABIC DECIMAL SEPARATOR}", ".")
         .replace("\N{ARABIC THOUSANDS SEPARATOR}", ",")
     )
-    sign = re.search(r"(?<!\w)-(?=\D*\d)", text)
-    negative = sign is not None and not re.search(r"\d", text[: sign.start()])
+    # Only a dash before the first digit can be a sign. Searching that prefix
+    # (instead of a lookahead for a later digit) keeps this linear.
+    first_digit = re.search(r"\d", text)
+    sign = (
+        re.search(r"(?<!\w)-", text[: first_digit.start()])
+        if first_digit is not None
+        else None
+    )
+    negative = sign is not None
     if negative:
         text = text[: sign.start()] + text[sign.end() :]
     if re.search(r"\d\D*-|(?<!\w)-", text):
@@ -866,9 +892,8 @@ def _parse_monetary(value: str, locale: Locale) -> str | None:
     - The currency is an ISO 4217 code written as an uppercase word, or else a
       currency symbol of the locale that belongs to a single currency. Text
       naming two different currencies is rejected, and text naming none gives
-      an amount without a code. Zone crops are expected to be short, but an
-      uppercase word that happens to be an ISO code (e.g. "ALL" or "TOP") is
-      still read as a currency.
+      an amount without a code. Any uppercase word that is an ISO code
+      (e.g. "ALL" or "TOP") is read as a currency.
     - A number enclosed in parentheses is negative, "(12.50)". Digits outside
       the parentheses, as in "100 (19% VAT)", or a minus sign combined with
       them are rejected.
@@ -877,9 +902,19 @@ def _parse_monetary(value: str, locale: Locale) -> str | None:
       most 12 digits, with or without a currency code.
     - The result must pass the same validation as values sent through the API.
 
-    Returns None when the text is not a valid monetary value.
+    Returns None when the text is not a valid monetary value or is longer than
+    MAX_PARSED_TEXT_LENGTH.
     """
-    group = re.search(r"\([^()]*\d[^()]*\)", value)
+    if len(value) > MAX_PARSED_TEXT_LENGTH:
+        return None
+    group = next(
+        (
+            match
+            for match in re.finditer(r"\([^()]*\)", value)
+            if re.search(r"\d", match.group())
+        ),
+        None,
+    )
     parenthesised = group is not None
     text = value
     if group is not None:

@@ -6,6 +6,7 @@ import shutil
 import subprocess
 from collections import Counter
 from datetime import date
+from decimal import Decimal
 from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Any
@@ -22,6 +23,7 @@ from documents.models import MatchingModel
 from documents.models import OcrTemplate
 from documents.models import OcrTemplateZone
 from documents.parsers import ParseError
+from documents.zone_ocr import MAX_PARSED_TEXT_LENGTH
 from documents.zone_ocr import _apply_transform
 from documents.zone_ocr import _combine_field_value
 from documents.zone_ocr import _convert_value
@@ -32,6 +34,7 @@ from documents.zone_ocr import _extract_zone
 from documents.zone_ocr import _number_locale
 from documents.zone_ocr import _parse_date
 from documents.zone_ocr import _parse_monetary
+from documents.zone_ocr import _parse_number
 from documents.zone_ocr import _prepare_field_update
 from documents.zone_ocr import _process_template
 from documents.zone_ocr import _render_pages
@@ -2369,6 +2372,135 @@ class TestParseMonetary:
               found, or None is returned when the text is not a valid value
         """
         assert _parse_monetary(value, locale) == expected
+
+
+class TestParsedTextLength:
+    """Tests for the length cap on text read as a number, amount or date."""
+
+    @pytest.mark.parametrize(
+        ("parse", "value", "expected"),
+        [
+            pytest.param(
+                lambda text: _parse_number(text, EN),
+                "12.50",
+                Decimal("12.50"),
+                id="number",
+            ),
+            pytest.param(
+                lambda text: _parse_monetary(text, EN),
+                "USD 12.50",
+                "USD12.50",
+                id="monetary",
+            ),
+        ],
+    )
+    def test_text_longer_than_the_cap_is_not_read(
+        self,
+        parse: Callable[[str], object],
+        value: str,
+        expected: object,
+    ) -> None:
+        """
+        GIVEN:
+            - A valid number or amount padded with spaces to exactly the length
+              cap, and the same value padded one character past it
+        WHEN:
+            - Each text is parsed
+        THEN:
+            - The text at the cap is read and the longer text is not
+        """
+        at_cap = value.rjust(MAX_PARSED_TEXT_LENGTH)
+
+        assert parse(at_cap) == expected
+        assert parse(f" {at_cap}") is None
+
+    @pytest.mark.parametrize(
+        ("text", "expected"),
+        [
+            pytest.param(
+                "Datum: 13.04.2026 " + "x" * 300,
+                date(2026, 4, 13),
+                id="date-near-the-start",
+            ),
+            pytest.param(
+                "x" * 300 + " Datum: 13.04.2026",
+                None,
+                id="date-past-the-cap",
+            ),
+            pytest.param(
+                "x " * 118 + "xxxx Date 2026-04-131 more",
+                None,
+                id="token-split-by-the-cut",
+            ),
+            pytest.param(
+                "x" * 246 + "2026-04-13" + "1" * 50,
+                None,
+                id="cut-inside-text-without-spaces",
+            ),
+            pytest.param(
+                "x " * 118 + "xxxx Date 2026-04-13 more",
+                date(2026, 4, 13),
+                id="cut-on-a-space-keeps-the-last-word",
+            ),
+            pytest.param(" " * 300, None, id="whitespace-only"),
+        ],
+    )
+    def test_long_text_is_searched_for_dates_up_to_the_cap(
+        self,
+        text: str,
+        expected: date | None,
+    ) -> None:
+        """
+        GIVEN:
+            - Text longer than the cap with a date before it, after it, or with a
+              non-date token that the cut would turn into a date
+        WHEN:
+            - The text is parsed as a date
+        THEN:
+            - Only whole words within the cap are searched
+        """
+        assert _parse_date(text, ENG_DATES) == expected
+
+    @pytest.mark.parametrize(
+        ("parse", "value"),
+        [
+            pytest.param(
+                lambda text: _parse_number(text, EN),
+                "- " * 128,
+                id="number-dashes-without-digit",
+            ),
+            pytest.param(
+                lambda text: _parse_number(text, EN),
+                "- " * 127 + "1",
+                id="number-dashes-before-digit",
+            ),
+            pytest.param(
+                lambda text: _parse_monetary(text, EN),
+                "- " * 128,
+                id="monetary-dashes-without-digit",
+            ),
+            pytest.param(
+                lambda text: _parse_monetary(text, EN),
+                "(" + "1 " * 127,
+                id="monetary-unclosed-parenthesis",
+            ),
+        ],
+    )
+    def test_malformed_text_at_the_cap_is_rejected(
+        self,
+        parse: Callable[[str], object],
+        value: str,
+    ) -> None:
+        """
+        GIVEN:
+            - Malformed text at the length cap, made of dash runs or an
+              unclosed parenthesis
+        WHEN:
+            - The text is parsed
+        THEN:
+            - No value is read
+        """
+        assert parse(value) is None
 
 
 class TestConvertValue:
