@@ -732,6 +732,69 @@ class TestExtractZonesTask:
 
         assert result == (root.pk if returns_root else None)
 
+    def test_task_runs_a_version_and_reports_the_root(
+        self,
+        mocker: MockerFixture,
+    ) -> None:
+        """
+        GIVEN:
+            - A root document with two versions and a template
+        WHEN:
+            - The task runs for the older version id
+        THEN:
+            - Extraction runs on that version, not the newest
+            - The root document id is returned when a value was written
+        """
+        root = DocumentFactory()
+        older = DocumentFactory(root_document=root, version_index=1)
+        DocumentFactory(root_document=root, version_index=2)
+        template = OcrTemplateFactory()
+        extract = mocker.patch(
+            "documents.tasks.run_zone_extraction",
+            return_value=[
+                ZoneOcrResult(template="t", zone="z", custom_field="", reason=None),
+            ],
+        )
+
+        result = extract_zones(older.pk, template.pk)
+
+        extract.assert_called_once_with(older, templates=[template])
+        assert result == root.pk
+
+    @pytest.mark.parametrize(
+        ("resolve_latest", "processes_root"),
+        [
+            pytest.param(True, False, id="resolves-latest"),
+            pytest.param(False, True, id="exact-document"),
+        ],
+    )
+    def test_task_resolves_latest_only_when_asked(
+        self,
+        mocker: MockerFixture,
+        resolve_latest: bool,  # noqa: FBT001
+        processes_root: bool,  # noqa: FBT001
+    ) -> None:
+        """
+        GIVEN:
+            - A root document with a newer version and a template
+        WHEN:
+            - The task runs for the root id with resolve_latest on or off
+        THEN:
+            - The newest version is processed when resolve_latest is on
+            - The root document itself is processed when it is off
+        """
+        root = DocumentFactory()
+        newest = DocumentFactory(root_document=root, version_index=1)
+        template = OcrTemplateFactory()
+        extract = mocker.patch("documents.tasks.run_zone_extraction", return_value=[])
+
+        extract_zones(root.pk, template.pk, resolve_latest=resolve_latest)
+
+        extract.assert_called_once_with(
+            root if processes_root else newest,
+            templates=[template],
+        )
+
     def test_task_skips_a_deleted_template(self, mocker: MockerFixture) -> None:
         """
         GIVEN:

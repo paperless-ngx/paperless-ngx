@@ -154,6 +154,7 @@ class TestRunZoneOcrBulkOperation:
             document_id=document.pk,
             template_id=template.pk,
             requester=admin_user,
+            resolve_latest=True,
         )
         extract.apply_async.assert_not_called()
         assert result == {"operation": "run_zone_ocr", "document_count": 1}
@@ -206,6 +207,7 @@ class TestRunZoneOcrBulkOperation:
             document_id=document.pk,
             template_id=None,
             requester=admin_user,
+            resolve_latest=True,
         )
 
     @pytest.mark.parametrize(

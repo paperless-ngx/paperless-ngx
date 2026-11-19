@@ -5,6 +5,7 @@ from __future__ import annotations
 import functools
 import subprocess
 from io import BytesIO
+from types import SimpleNamespace
 from typing import TYPE_CHECKING
 from typing import Any
 
@@ -15,8 +16,8 @@ from PIL import Image
 from rest_framework import status
 
 from documents import bulk_edit
+from documents.bulk_operations import execute_bulk_operation
 from documents.models import CustomField
-from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import MatchingModel
 from documents.models import OcrTemplate
@@ -25,10 +26,7 @@ from documents.models import PaperlessTask
 from documents.parsers import ParseError
 from documents.search import get_backend
 from documents.signals import document_consumption_finished
-from documents.tasks import bulk_update_documents
 from documents.zone_ocr import ZoneExtraction
-from documents.zone_ocr import ZoneOcrReason
-from documents.zone_ocr import ZoneOcrResult
 from documents.zone_ocr import apply_zone_plans
 from documents.zone_ocr import plan_zone_extraction
 from paperless_testing.factories import CustomFieldFactory
@@ -57,7 +55,8 @@ CONTENT = "Northwind Power & Light statement"
 ENDPOINT = "/api/ocr_templates/"
 RUN_ZONE_OCR_URL = "/api/documents/{pk}/run-zone-ocr/"
 PREVIEW_ZONE_URL = f"{ENDPOINT}test-zone/"
-SKIPPED_NO_TEMPLATE = {"status": "skipped", "reason": "no_template", "results": []}
+SKIPPED_NO_TEMPLATE = {"result": "skipped", "reason": "no_template"}
+TASK_ID = "zone-ocr-task"
 
 
 def template_payload(**overrides: Any) -> dict[str, Any]:
@@ -149,14 +148,11 @@ def title_template(
 
 
 @pytest.fixture
-def mock_extract(mocker: MockerFixture) -> MagicMock:
-    return mocker.patch("documents.zone_ocr.run_zone_extraction")
-
-
-@pytest.fixture
-def mock_finish(mocker: MockerFixture) -> MagicMock:
+def mock_enqueue(mocker: MockerFixture) -> MagicMock:
+    """Replace queueing of the bulk operation task, returning a fixed task id."""
     return mocker.patch(
-        "documents.views.bulk_edit.bulk_update_documents.apply_async",
+        "documents.views.execute_bulk_operation.apply_async",
+        return_value=SimpleNamespace(id=TASK_ID),
     )
 
 
@@ -251,8 +247,8 @@ class TestZoneOcrIndexing:
             - A document (optionally with an uploaded version) indexed for search
             - An OCR template with a title zone and a custom field zone
         WHEN:
-            - Zone OCR runs through ingestion, the single-document API or the
-              bulk task
+            - Zone OCR runs through ingestion, the single-document API (queued
+              as a bulk operation and run inline) or the bulk task
         THEN:
             - The root document title and custom field are updated
             - The search index reflects the new title and custom field value
@@ -318,10 +314,14 @@ class TestZoneOcrIndexing:
             backend.add_or_update(document)
             assert backend.search_ids("title:before", user=None) == [document.pk]
 
-        # The single-document finish is a queued task, run it inline here.
+        # The single-document run is a queued bulk operation, run it inline here.
+        def run_inline(kwargs: dict[str, Any], **_: Any) -> SimpleNamespace:
+            execute_bulk_operation(**kwargs)
+            return SimpleNamespace(id="inline")
+
         mocker.patch(
-            "documents.views.bulk_edit.bulk_update_documents.apply_async",
-            side_effect=lambda kwargs, **_: bulk_update_documents(**kwargs),
+            "documents.views.execute_bulk_operation.apply_async",
+            side_effect=run_inline,
         )
         with django_capture_on_commit_callbacks(execute=True):
             if entry_point == "ingestion":
@@ -1827,9 +1827,9 @@ class TestOcrTemplateDelete:
 
 
 @pytest.mark.django_db
-@pytest.mark.usefixtures("paperless_dirs", "mock_finish")
+@pytest.mark.usefixtures("paperless_dirs")
 class TestRunZoneOcr:
-    """Running zone OCR on documents through the run-zone-ocr endpoint."""
+    """Queueing zone OCR on one document through the run-zone-ocr endpoint."""
 
     @pytest.mark.parametrize(
         "template_kwargs_list",
@@ -1848,7 +1848,7 @@ class TestRunZoneOcr:
     def test_without_enabled_matching_template_is_skipped(
         self,
         admin_client: APIClient,
-        mock_extract: MagicMock,
+        mock_enqueue: MagicMock,
         template_kwargs_list: list[dict[str, Any]],
     ) -> None:
         """
@@ -1856,9 +1856,9 @@ class TestRunZoneOcr:
             - A document and either no templates, only a matching disabled
               template, or only a template that does not match the document
         WHEN:
-            - Zone OCR is run on the document
+            - Zone OCR is run on the document without choosing a template
         THEN:
-            - The run is skipped with reason no_template and nothing is extracted
+            - The run is skipped with reason no_template and nothing is queued
         """
         document = DocumentFactory(content=CONTENT)
         for template_kwargs in template_kwargs_list:
@@ -1868,12 +1868,13 @@ class TestRunZoneOcr:
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == SKIPPED_NO_TEMPLATE
-        mock_extract.assert_not_called()
+        mock_enqueue.assert_not_called()
 
-    def test_applies_a_chosen_template(
+    def test_queues_a_chosen_template(
         self,
         admin_client: APIClient,
-        mock_extract: MagicMock,
+        admin_user: User,
+        mock_enqueue: MagicMock,
     ) -> None:
         """
         GIVEN:
@@ -1881,7 +1882,10 @@ class TestRunZoneOcr:
         WHEN:
             - Zone OCR is run on the document with that template chosen
         THEN:
-            - The template is applied anyway, since it was chosen explicitly
+            - The bulk zone OCR operation is queued for the document and the
+              template, as the requesting user, even though the template does
+              not match
+            - The task id is returned
         """
         document = DocumentFactory(content=CONTENT, mime_type="application/pdf")
         document.source_path.write_bytes(b"test PDF")
@@ -1898,107 +1902,137 @@ class TestRunZoneOcr:
         )
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.json()["status"] == "completed"
-        mock_extract.assert_called_once_with(document, templates=[template])
+        assert response.json() == {"result": "OK", "task_id": TASK_ID}
+        mock_enqueue.assert_called_once_with(
+            kwargs={
+                "operation": "run_zone_ocr",
+                "document_ids": [document.pk],
+                "parameters": {"template": template.pk, "resolve_latest": False},
+                "user_id": admin_user.pk,
+                "trigger_source": PaperlessTask.TriggerSource.API_UPLOAD,
+            },
+            headers={"trigger_source": PaperlessTask.TriggerSource.API_UPLOAD},
+        )
 
     @pytest.mark.parametrize(
-        ("reason", "finishes"),
+        ("from_webui", "trigger_source"),
         [
-            pytest.param(None, True, id="written"),
-            pytest.param(ZoneOcrReason.NO_VALUE, False, id="nothing-written"),
+            pytest.param(True, PaperlessTask.TriggerSource.WEB_UI, id="web-ui"),
+            pytest.param(False, PaperlessTask.TriggerSource.API_UPLOAD, id="api"),
         ],
     )
-    def test_finishes_the_edit_only_when_a_value_was_written(
+    def test_queues_every_matching_template_when_none_is_chosen(
         self,
         admin_client: APIClient,
-        mock_extract: MagicMock,
-        mock_finish: MagicMock,
-        reason: ZoneOcrReason | None,
-        finishes: bool,  # noqa: FBT001
+        mock_enqueue: MagicMock,
+        from_webui: bool,  # noqa: FBT001
+        trigger_source: PaperlessTask.TriggerSource,
     ) -> None:
         """
         GIVEN:
-            - A document with a version and a template whose run does or does
-              not write a value
+            - A document with a matching template and a stored file
         WHEN:
-            - Zone OCR is run on the version through the detail endpoint
+            - Zone OCR is run on the document without choosing a template,
+              with or without the web UI flag
         THEN:
-            - The shared document update task is queued once for the root
-              document only when a value was written
-            - No per-document search reindex is requested directly
+            - The bulk operation is queued with no template, so the task
+              picks the matching templates, and with exact document processing
+            - The trigger source follows the web UI flag
         """
-        document = DocumentFactory(content=CONTENT)
-        version = DocumentFactory(
-            root_document=document,
-            version_index=1,
-            content=CONTENT,
-        )
-        version.source_path.write_bytes(b"test PDF")
-        template = OcrTemplateFactory(name="Northwind", match="Northwind")
-        mock_extract.return_value = [
-            ZoneOcrResult(template="t", zone="z", custom_field="", reason=reason),
-        ]
+        document = DocumentFactory(content=CONTENT, mime_type="application/pdf")
+        document.source_path.write_bytes(b"test PDF")
+        OcrTemplateFactory(name="Northwind", match="Northwind")
 
         response = admin_client.post(
-            f"{RUN_ZONE_OCR_URL.format(pk=document.pk)}?version={version.pk}",
-            {"template": template.pk},
+            RUN_ZONE_OCR_URL.format(pk=document.pk),
+            {"from_webui": from_webui},
             format="json",
         )
 
         assert response.status_code == status.HTTP_200_OK
-        if finishes:
-            mock_finish.assert_called_once_with(
-                kwargs={"document_ids": [document.pk]},
-                headers={"trigger_source": PaperlessTask.TriggerSource.SYSTEM},
-            )
-        else:
-            mock_finish.assert_not_called()
+        kwargs = mock_enqueue.call_args.kwargs
+        assert kwargs["kwargs"]["document_ids"] == [document.pk]
+        assert kwargs["kwargs"]["parameters"] == {"resolve_latest": False}
+        assert kwargs["kwargs"]["trigger_source"] == trigger_source
+        assert kwargs["headers"] == {"trigger_source": trigger_source}
 
     @pytest.mark.parametrize(
-        "version",
+        ("version", "queued"),
         [
-            pytest.param("root", id="root-version"),
-            pytest.param("older", id="older-version"),
+            pytest.param("older", True, id="requested-older-version"),
+            pytest.param(None, False, id="latest-version-by-default"),
         ],
     )
-    def test_matches_the_requested_file_version(
+    def test_matches_and_queues_the_resolved_file_version(
         self,
         admin_client: APIClient,
-        mock_extract: MagicMock,
-        version: str,
+        mock_enqueue: MagicMock,
+        version: str | None,
+        queued: bool,  # noqa: FBT001
     ) -> None:
         """
         GIVEN:
-            - A document with two versions, the newest not matching the template
+            - A document with an older version matching the template and a
+              newest version that does not
         WHEN:
-            - Zone OCR is run for the root document or an older version
+            - Zone OCR is run for the older version, or without a version
         THEN:
-            - The template is applied to the requested file document
+            - Templates are matched against the resolved file
+            - The older version is queued by its own id when requested
+            - Without a version the latest does not match, so the run is skipped
         """
-        mock_extract.return_value = []
-        document = DocumentFactory(content=CONTENT)
+        document = DocumentFactory(content="Contoso")
         older = DocumentFactory(
             root_document=document,
             version_index=1,
             content=CONTENT,
         )
         DocumentFactory(root_document=document, version_index=2, content="Contoso")
-        template = OcrTemplateFactory(
-            name="Northwind",
-            match="Northwind",
-            source_width=100,
-            source_height=100,
-        )
-        file_document = {"root": document, "older": older}[version]
-        file_document.source_path.write_bytes(b"test PDF")
+        older.source_path.write_bytes(b"test PDF")
+        OcrTemplateFactory(name="Northwind", match="Northwind")
+        url = RUN_ZONE_OCR_URL.format(pk=document.pk)
+        if version is not None:
+            url = f"{url}?version={older.pk}"
+
+        response = admin_client.post(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        if queued:
+            assert response.json() == {"result": "OK", "task_id": TASK_ID}
+            assert mock_enqueue.call_args.kwargs["kwargs"]["document_ids"] == [
+                older.pk,
+            ]
+        else:
+            assert response.json() == SKIPPED_NO_TEMPLATE
+            mock_enqueue.assert_not_called()
+
+    def test_queues_the_root_file_exactly_when_requested(
+        self,
+        admin_client: APIClient,
+        mock_enqueue: MagicMock,
+    ) -> None:
+        """
+        GIVEN:
+            - A document with a newer version and a stored original file
+        WHEN:
+            - Zone OCR is run with the root document id as the version
+        THEN:
+            - The root id is queued with resolve_latest off, so the original
+              file is processed instead of the newest version
+        """
+        document = DocumentFactory(content=CONTENT)
+        DocumentFactory(root_document=document, version_index=1, content="Contoso")
+        document.source_path.write_bytes(b"test PDF")
+        OcrTemplateFactory(name="Northwind", match="Northwind")
 
         response = admin_client.post(
-            f"{RUN_ZONE_OCR_URL.format(pk=document.pk)}?version={file_document.pk}",
+            f"{RUN_ZONE_OCR_URL.format(pk=document.pk)}?version={document.pk}",
         )
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.json()["status"] == "completed"
-        mock_extract.assert_called_once_with(file_document, templates=[template])
+        queued = mock_enqueue.call_args.kwargs["kwargs"]
+        assert queued["document_ids"] == [document.pk]
+        assert queued["parameters"] == {"resolve_latest": False}
 
     @pytest.mark.parametrize(
         "version",
@@ -2011,7 +2045,7 @@ class TestRunZoneOcr:
     def test_rejects_invalid_or_unavailable_versions(
         self,
         admin_client: APIClient,
-        mock_extract: MagicMock,
+        mock_enqueue: MagicMock,
         version: str,
     ) -> None:
         """
@@ -2020,7 +2054,7 @@ class TestRunZoneOcr:
         WHEN:
             - Zone OCR is run with an invalid or unavailable version
         THEN:
-            - 404 is returned and nothing is extracted
+            - 404 is returned and nothing is queued
         """
         document = DocumentFactory()
         unrelated = DocumentFactory()
@@ -2040,16 +2074,20 @@ class TestRunZoneOcr:
         )
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
-        mock_extract.assert_not_called()
+        mock_enqueue.assert_not_called()
 
-    def test_rejects_an_unknown_template(self, admin_client: APIClient) -> None:
+    def test_rejects_an_unknown_template(
+        self,
+        admin_client: APIClient,
+        mock_enqueue: MagicMock,
+    ) -> None:
         """
         GIVEN:
             - A document
         WHEN:
             - Zone OCR is run with a template id that does not exist
         THEN:
-            - 400 is returned
+            - 400 is returned and nothing is queued
         """
         document = DocumentFactory(content=CONTENT)
 
@@ -2060,24 +2098,30 @@ class TestRunZoneOcr:
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
+        mock_enqueue.assert_not_called()
 
-    def test_missing_document_is_an_error(self, admin_client: APIClient) -> None:
+    def test_missing_document_is_an_error(
+        self,
+        admin_client: APIClient,
+        mock_enqueue: MagicMock,
+    ) -> None:
         """
         GIVEN:
             - No document with the requested id
         WHEN:
             - Zone OCR is run on it
         THEN:
-            - 404 is returned
+            - 404 is returned and nothing is queued
         """
         response = admin_client.post(RUN_ZONE_OCR_URL.format(pk=99999))
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
+        mock_enqueue.assert_not_called()
 
     def test_missing_file_is_an_error(
         self,
         admin_client: APIClient,
-        mock_extract: MagicMock,
+        mock_enqueue: MagicMock,
     ) -> None:
         """
         GIVEN:
@@ -2085,7 +2129,7 @@ class TestRunZoneOcr:
         WHEN:
             - Zone OCR is run on the document
         THEN:
-            - 404 is returned with a file not found error and nothing is extracted
+            - 404 is returned with a file not found error and nothing is queued
         """
         document = DocumentFactory(content=CONTENT)
         OcrTemplateFactory(
@@ -2097,171 +2141,34 @@ class TestRunZoneOcr:
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
         assert response.json() == {"error": "Document file not found"}
-        mock_extract.assert_not_called()
+        mock_enqueue.assert_not_called()
 
-    def test_reports_completed_results(
+    def test_queueing_failure_is_a_bad_request(
         self,
         admin_client: APIClient,
-        mock_zone_ocr_run: MagicMock,
+        mock_enqueue: MagicMock,
     ) -> None:
         """
         GIVEN:
-            - A document and a matching template with a title zone
+            - A document with a matching template and a stored file
+            - A task queue that raises when the task is queued
         WHEN:
             - Zone OCR is run on the document
         THEN:
-            - The completed result lists the extracted title value
+            - 400 is returned
         """
-        document = DocumentFactory(
-            content=CONTENT,
-            mime_type="application/pdf",
-        )
-        write_blank_png(document.source_path)
-        mock_zone_ocr_run.return_value.stdout = "Extracted title"
-        template = OcrTemplateFactory(
-            name="Template",
-            match="Northwind",
-        )
-        OcrTemplateZoneFactory(
-            template=template,
-            name="Title zone",
-            height=100,
-        )
+        document = DocumentFactory(content=CONTENT, mime_type="application/pdf")
+        document.source_path.write_bytes(b"test PDF")
+        OcrTemplateFactory(name="Northwind", match="Northwind")
+        mock_enqueue.side_effect = RuntimeError("broker down")
 
         response = admin_client.post(RUN_ZONE_OCR_URL.format(pk=document.pk))
 
-        assert response.status_code == status.HTTP_200_OK
-        assert response.json() == {
-            "status": "completed",
-            "results": [
-                {
-                    "template": template.name,
-                    "zone": "Title zone",
-                    "custom_field": "Title",
-                    "value": "Extracted title",
-                    "reason": None,
-                },
-            ],
-        }
-        mock_zone_ocr_run.assert_called_once()
-
-    def test_does_not_report_an_old_title_when_extraction_is_empty(
-        self,
-        admin_client: APIClient,
-        mock_zone_ocr_run: MagicMock,
-    ) -> None:
-        """
-        GIVEN:
-            - A document with a title and a template whose title zone extracts
-              nothing
-        WHEN:
-            - Zone OCR is run on the document
-        THEN:
-            - The result has reason no_value and no value
-            - The document title is unchanged
-        """
-        document = DocumentFactory(title="Existing title", content=CONTENT)
-        write_blank_png(document.source_path)
-        template = OcrTemplateFactory(
-            name="Template",
-            match="Northwind",
-            source_width=100,
-            source_height=100,
-        )
-        OcrTemplateZoneFactory(
-            template=template,
-            name="Title",
-            width=20,
-            height=20,
-        )
-        mock_zone_ocr_run.return_value.stdout = ""
-
-        response = admin_client.post(RUN_ZONE_OCR_URL.format(pk=document.pk))
-
-        assert response.status_code == status.HTTP_200_OK
-        assert response.json()["results"][0]["reason"] == ZoneOcrReason.NO_VALUE
-        assert response.json()["results"][0]["value"] is None
-        document.refresh_from_db()
-        assert document.title == "Existing title"
-
-    def test_reports_all_target_types_and_missing_values(
-        self,
-        admin_client: APIClient,
-        mock_zone_ocr_run: MagicMock,
-        text_field: CustomField,
-        date_field: CustomField,
-    ) -> None:
-        """
-        GIVEN:
-            - A document with an existing custom field value and ASN
-            - A template with zones for every target type, some extracting nothing
-        WHEN:
-            - Zone OCR is run with that template chosen
-        THEN:
-            - Each zone reports the value for its target, or None when missing
-        """
-        document = DocumentFactory(content=CONTENT, archive_serial_number=123)
-        write_blank_png(document.source_path)
-        mock_zone_ocr_run.side_effect = [
-            subprocess.CompletedProcess(args=[], returncode=0, stdout=value, stderr="")
-            for value in [
-                "New invoice",
-                "",
-                "orphan",
-                "New title",
-                "456",
-                "2026-04-13",
-            ]
-        ]
-        template = OcrTemplateFactory(
-            name="Test",
-            source_width=100,
-            source_height=100,
-        )
-        CustomFieldInstance.objects.create(
-            document=document,
-            field=text_field,
-            value_text="INV-123",
-        )
-        for name, target, field in [
-            ("Present", "custom_field", text_field),
-            ("Missing", "custom_field", date_field),
-            ("Unassigned", "custom_field", None),
-            ("Title", "title", None),
-            ("ASN", "asn", None),
-            ("Created", "created", None),
-        ]:
-            OcrTemplateZoneFactory(
-                template=template,
-                name=name,
-                target=target,
-                custom_field=field,
-                width=10,
-                height=10,
-            )
-
-        response = admin_client.post(
-            RUN_ZONE_OCR_URL.format(pk=document.pk),
-            {"template": template.pk},
-            format="json",
-        )
-
-        assert response.status_code == status.HTTP_200_OK
-        values = {
-            result["zone"]: result["value"] for result in response.json()["results"]
-        }
-        assert values == {
-            "Present": "New invoice",
-            "Missing": None,
-            "Unassigned": None,
-            "Title": "New title",
-            "ASN": 456,
-            "Created": "2026-04-13",
-        }
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
 @pytest.mark.django_db
-@pytest.mark.usefixtures("paperless_dirs", "mock_finish")
+@pytest.mark.usefixtures("paperless_dirs")
 class TestRunZoneOcrPermissions:
     """Permission checks for the run-zone-ocr endpoint."""
 
@@ -2269,7 +2176,7 @@ class TestRunZoneOcrPermissions:
         self,
         regular_user: User,
         user_client: APIClient,
-        mock_extract: MagicMock,
+        mock_enqueue: MagicMock,
     ) -> None:
         """
         GIVEN:
@@ -2279,7 +2186,7 @@ class TestRunZoneOcrPermissions:
             - The editor runs zone OCR choosing that template
         THEN:
             - 400 is returned, naming the template field, and nothing is
-              extracted
+              queued
         """
         grant_global(regular_user, "view_document", "change_document")
         document = DocumentFactory(content=CONTENT, owner=regular_user)
@@ -2296,13 +2203,13 @@ class TestRunZoneOcrPermissions:
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert "template" in response.json()
-        mock_extract.assert_not_called()
+        mock_enqueue.assert_not_called()
 
     def test_requires_change_permission_on_the_document(
         self,
         regular_user: User,
         user_client: APIClient,
-        mock_extract: MagicMock,
+        mock_enqueue: MagicMock,
     ) -> None:
         """
         GIVEN:
@@ -2311,7 +2218,7 @@ class TestRunZoneOcrPermissions:
         WHEN:
             - The user runs zone OCR on the document
         THEN:
-            - 403 is returned and nothing is extracted
+            - 403 is returned and nothing is queued
         """
         owner = UserFactory()
         grant_global(regular_user, "view_document", "change_document")
@@ -2320,13 +2227,48 @@ class TestRunZoneOcrPermissions:
         response = user_client.post(RUN_ZONE_OCR_URL.format(pk=document.pk))
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
-        mock_extract.assert_not_called()
+        mock_enqueue.assert_not_called()
+
+    def test_a_version_path_id_is_authorized_through_its_root(
+        self,
+        regular_user: User,
+        user_client: APIClient,
+        mock_enqueue: MagicMock,
+    ) -> None:
+        """
+        GIVEN:
+            - A root document owned by another user and shared for editing
+              with the user, and one of its versions
+        WHEN:
+            - The user runs zone OCR using the version id in the path
+        THEN:
+            - The request is authorized through the root and the version is
+              queued
+        """
+        owner = UserFactory()
+        grant_global(regular_user, "view_document", "change_document")
+        root = DocumentFactory(content=CONTENT, owner=owner)
+        version = DocumentFactory(
+            root_document=root,
+            version_index=1,
+            content=CONTENT,
+        )
+        version.source_path.write_bytes(b"test PDF")
+        grant_object(regular_user, root, "view_document", "change_document")
+        OcrTemplateFactory(name="Northwind", match="Northwind", owner=None)
+
+        response = user_client.post(RUN_ZONE_OCR_URL.format(pk=version.pk))
+
+        assert response.status_code == status.HTTP_200_OK
+        assert mock_enqueue.call_args.kwargs["kwargs"]["document_ids"] == [
+            version.pk,
+        ]
 
     def test_requires_global_change_permission(
         self,
         regular_user: User,
         user_client: APIClient,
-        mock_extract: MagicMock,
+        mock_enqueue: MagicMock,
     ) -> None:
         """
         GIVEN:
@@ -2335,7 +2277,7 @@ class TestRunZoneOcrPermissions:
         WHEN:
             - The user runs zone OCR on the document
         THEN:
-            - 403 is returned and nothing is extracted
+            - 403 is returned and nothing is queued
         """
         grant_global(regular_user, "view_document", "add_document")
         document = DocumentFactory(content=CONTENT, owner=regular_user)
@@ -2343,13 +2285,13 @@ class TestRunZoneOcrPermissions:
         response = user_client.post(RUN_ZONE_OCR_URL.format(pk=document.pk))
 
         assert response.status_code == status.HTTP_403_FORBIDDEN
-        mock_extract.assert_not_called()
+        mock_enqueue.assert_not_called()
 
     def test_does_not_require_document_upload_permission(
         self,
         regular_user: User,
         user_client: APIClient,
-        mock_extract: MagicMock,
+        mock_enqueue: MagicMock,
     ) -> None:
         """
         GIVEN:
@@ -2358,7 +2300,7 @@ class TestRunZoneOcrPermissions:
         WHEN:
             - The user runs zone OCR on the document
         THEN:
-            - The request succeeds and extraction runs
+            - The request succeeds and the run is queued as that user
         """
         grant_global(regular_user, "change_document")
         document = DocumentFactory(owner=regular_user, content=CONTENT)
@@ -2374,13 +2316,14 @@ class TestRunZoneOcrPermissions:
         response = user_client.post(RUN_ZONE_OCR_URL.format(pk=document.pk))
 
         assert response.status_code == status.HTTP_200_OK
-        mock_extract.assert_called_once()
+        mock_enqueue.assert_called_once()
+        assert mock_enqueue.call_args.kwargs["kwargs"]["user_id"] == regular_user.pk
 
     def test_skips_templates_private_to_the_requester(
         self,
         admin_client: APIClient,
         admin_user: User,
-        mock_extract: MagicMock,
+        mock_enqueue: MagicMock,
     ) -> None:
         """
         GIVEN:
@@ -2389,7 +2332,7 @@ class TestRunZoneOcrPermissions:
         WHEN:
             - The requester runs zone OCR on the document
         THEN:
-            - The run is skipped with reason no_template and nothing is extracted
+            - The run is skipped with reason no_template and nothing is queued
         """
         owner = UserFactory()
         document = DocumentFactory(content=CONTENT, owner=owner)
@@ -2405,96 +2348,34 @@ class TestRunZoneOcrPermissions:
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == SKIPPED_NO_TEMPLATE
-        mock_extract.assert_not_called()
+        mock_enqueue.assert_not_called()
 
-    def test_reports_only_templates_visible_to_the_document_owner(
-        self,
-        admin_client: APIClient,
-        admin_user: User,
-        mock_zone_ocr_run: MagicMock,
-    ) -> None:
-        """
-        GIVEN:
-            - A document owned by another user
-            - Templates owned by the document owner, unowned, shared with the
-              document owner, and private to the requester
-        WHEN:
-            - The requester runs zone OCR on the document
-        THEN:
-            - Only templates visible to the document owner run and are reported
-        """
-        owner = UserFactory()
-        document = DocumentFactory(content=CONTENT, owner=owner)
-        write_blank_png(document.source_path)
-        mock_zone_ocr_run.return_value.stdout = "extracted"
-        for name, template_owner in [
-            ("Owned", owner),
-            ("Unowned", None),
-            ("Shared", admin_user),
-            ("Private", admin_user),
-        ]:
-            template = title_template(
-                name,
-                template_owner,
-                source_width=100,
-                source_height=100,
-            )
-            if name == "Shared":
-                grant_object(owner, template, "view_ocrtemplate")
-
-        response = admin_client.post(RUN_ZONE_OCR_URL.format(pk=document.pk))
-
-        assert response.status_code == status.HTTP_200_OK
-        assert sorted(result["template"] for result in response.json()["results"]) == [
-            "Owned",
-            "Shared",
-            "Unowned",
-        ]
-        assert mock_zone_ocr_run.call_count == 3
-
-    def test_hides_the_owners_private_templates_from_an_editor(
+    def test_skips_when_only_the_owners_private_templates_match(
         self,
         regular_user: User,
         user_client: APIClient,
-        mock_zone_ocr_run: MagicMock,
+        mock_enqueue: MagicMock,
     ) -> None:
         """
         GIVEN:
             - A document shared for editing with another user
-            - Templates private to the owner, unowned, and shared with both
+            - A matching template private to the document owner
         WHEN:
             - The editor runs zone OCR without choosing a template
         THEN:
-            - Only templates the editor can also view run and are reported
+            - The run is skipped with reason no_template and nothing is queued
         """
         owner = UserFactory()
         grant_global(regular_user, "view_document", "change_document")
         document = DocumentFactory(content=CONTENT, owner=owner)
         grant_object(regular_user, document, "view_document", "change_document")
-        write_blank_png(document.source_path)
-        mock_zone_ocr_run.return_value.stdout = "extracted"
-        for name, template_owner in [
-            ("Owner private", owner),
-            ("Unowned", None),
-            ("Shared", owner),
-        ]:
-            template = title_template(
-                name,
-                template_owner,
-                source_width=100,
-                source_height=100,
-            )
-            if name == "Shared":
-                grant_object(regular_user, template, "view_ocrtemplate")
+        title_template("Owner private", owner, source_width=100, source_height=100)
 
         response = user_client.post(RUN_ZONE_OCR_URL.format(pk=document.pk))
 
         assert response.status_code == status.HTTP_200_OK
-        assert sorted(result["template"] for result in response.json()["results"]) == [
-            "Shared",
-            "Unowned",
-        ]
-        assert mock_zone_ocr_run.call_count == 2
+        assert response.json() == SKIPPED_NO_TEMPLATE
+        mock_enqueue.assert_not_called()
 
 
 @pytest.mark.django_db

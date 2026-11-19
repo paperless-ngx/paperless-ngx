@@ -898,7 +898,9 @@ details page:
   instead. A template you choose runs even if it does not match the document or is disabled.
 
 Both actions use the file version selected in document details. The latest version is selected by default.
-Extracted values update the document's metadata, which is shared across its versions.
+Extracted values update the document's metadata, which is shared across its versions. If no template
+applies to the document, nothing is run. Otherwise the run is processed in the background and appears in the
+task list. The document shows the extracted values once the task finishes.
 
 The bulk editor's **Run Zone OCR** action opens the same dialog for the selected documents. Bulk runs use
 the latest version of each document and are processed in the background.

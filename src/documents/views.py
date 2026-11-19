@@ -248,7 +248,6 @@ from documents.serialisers import UiSettingsViewSerializer
 from documents.serialisers import WorkflowActionSerializer
 from documents.serialisers import WorkflowSerializer
 from documents.serialisers import WorkflowTriggerSerializer
-from documents.serialisers import ZoneOcrResultSerializer
 from documents.signals import document_updated
 from documents.tasks import build_share_link_bundle
 from documents.tasks import consume_file
@@ -2300,8 +2299,11 @@ class DocumentViewSet(
     )
     def run_zone_ocr(self, request: Request, pk: str | None = None) -> HttpResponse:
         """
-        Run zone-based OCR extraction on this document, with the given template
-        or with every template that matches it.
+        Queue zone-based OCR extraction on this document, with the given
+        template or with every template that matches it. The file version
+        given by the version parameter is run when it is not the root
+        document. Responds with the task id, or skipped when no template
+        applies.
         """
         serializer = RunZoneOcrSerializer(
             data=request.data,
@@ -2320,11 +2322,8 @@ class DocumentViewSet(
         ) or not has_perms_owner_aware(user, "change_document", document):
             return HttpResponseForbidden("Insufficient permissions")
 
-        from documents.zone_ocr import ZoneOcrRunStatus
         from documents.zone_ocr import ZoneOcrSkipReason
         from documents.zone_ocr import get_templates_for_document
-        from documents.zone_ocr import run_zone_extraction
-        from documents.zone_ocr import zone_results_written
 
         resolution = resolve_effective_document(document, request)
         if resolution.error == VersionResolutionError.INVALID:
@@ -2333,17 +2332,14 @@ class DocumentViewSet(
         if file_document is None:
             raise Http404
 
-        templates = (
-            [template]
-            if template is not None
-            else get_templates_for_document(file_document, requester=user)
-        )
-        if not templates:
+        if template is None and not get_templates_for_document(
+            file_document,
+            requester=user,
+        ):
             return Response(
                 {
-                    "status": ZoneOcrRunStatus.SKIPPED,
+                    "result": "skipped",
                     "reason": ZoneOcrSkipReason.NO_TEMPLATE,
-                    "results": [],
                 },
             )
 
@@ -2354,18 +2350,22 @@ class DocumentViewSet(
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        results = run_zone_extraction(file_document, templates=templates)
-        if zone_results_written(results):
-            bulk_edit.bulk_update_documents.apply_async(
-                kwargs={"document_ids": [get_root_document(file_document).pk]},
-                headers={"trigger_source": PaperlessTask.TriggerSource.SYSTEM},
+        parameters: dict[str, Any] = {"resolve_latest": False}
+        if template is not None:
+            parameters["template"] = template.pk
+        try:
+            return queue_bulk_operation(
+                user,
+                bulk_edit.run_zone_ocr,
+                [file_document.pk],
+                parameters,
+                from_webui=serializer.validated_data["from_webui"],
             )
-        return Response(
-            {
-                "status": ZoneOcrRunStatus.COMPLETED,
-                "results": ZoneOcrResultSerializer(results, many=True).data,
-            },
-        )
+        except Exception as e:
+            logger.warning(f"An error occurred performing document zone OCR: {e!s}")
+            return HttpResponseBadRequest(
+                "Error performing document zone OCR, check logs for more detail.",
+            )
 
     @extend_schema(
         operation_id="documents_delete_version",
@@ -3101,35 +3101,56 @@ class DocumentSelectionMixin:
         return list(filtered_documents.values_list("pk", flat=True))
 
 
+def queue_bulk_operation(
+    user: User,
+    method: Callable[..., Any],
+    documents: list[int],
+    parameters: dict[str, Any],
+    *,
+    from_webui: bool,
+) -> Response:
+    """
+    Validate the parameters against the bulk edit method, queue it as a tracked
+    bulk operation task and return the task id.
+    """
+    if "update_callback" in parameters:
+        raise ValueError("Unsupported bulk operation parameter: update_callback")
+    trigger_source = (
+        PaperlessTask.TriggerSource.WEB_UI
+        if from_webui
+        else PaperlessTask.TriggerSource.API_UPLOAD
+    )
+    final_parameters = parameters.copy()
+    if method.__name__ in USER_OPERATIONS:
+        final_parameters["user"] = user
+    if method.__name__ in TRIGGER_SOURCE_OPERATIONS:
+        final_parameters["trigger_source"] = trigger_source
+    signature(method).bind(documents, **final_parameters)
+    task = execute_bulk_operation.apply_async(
+        kwargs={
+            "operation": method.__name__,
+            "document_ids": documents,
+            "parameters": parameters,
+            "user_id": user.pk,
+            "trigger_source": trigger_source,
+        },
+        headers={"trigger_source": trigger_source},
+    )
+    return Response({"result": "OK", "task_id": task.id})
+
+
 class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
     permission_classes = (IsAuthenticated,)
     parser_classes = (parsers.JSONParser,)
 
     def _queue_bulk_operation(self, method, documents, parameters, from_webui):
-        if "update_callback" in parameters:
-            raise ValueError("Unsupported bulk operation parameter: update_callback")
-        trigger_source = (
-            PaperlessTask.TriggerSource.WEB_UI
-            if from_webui
-            else PaperlessTask.TriggerSource.API_UPLOAD
+        return queue_bulk_operation(
+            cast("User", self.request.user),
+            method,
+            documents,
+            parameters,
+            from_webui=from_webui,
         )
-        final_parameters = parameters.copy()
-        if method.__name__ in USER_OPERATIONS:
-            final_parameters["user"] = self.request.user
-        if method.__name__ in TRIGGER_SOURCE_OPERATIONS:
-            final_parameters["trigger_source"] = trigger_source
-        signature(method).bind(documents, **final_parameters)
-        task = execute_bulk_operation.apply_async(
-            kwargs={
-                "operation": method.__name__,
-                "document_ids": documents,
-                "parameters": parameters,
-                "user_id": self.request.user.pk,
-                "trigger_source": trigger_source,
-            },
-            headers={"trigger_source": trigger_source},
-        )
-        return Response({"result": "OK", "task_id": task.id})
 
     def _has_document_permissions(
         self,

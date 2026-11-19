@@ -99,9 +99,6 @@ from documents.validators import uri_validator
 from documents.validators import url_validator
 from documents.versioning import has_prefetched_effective_content
 from documents.versioning import sort_versions_newest_first
-from documents.zone_ocr import ZoneOcrReason
-from documents.zone_ocr import ZoneOcrResult
-from documents.zone_ocr import ZoneOcrRunStatus
 from documents.zone_ocr import ZoneOcrSkipReason
 from documents.zone_ocr import field_key
 
@@ -1819,6 +1816,7 @@ class RunZoneOcrSerializer(serializers.Serializer[Any]):
         required=False,
         allow_null=True,
     )
+    from_webui = serializers.BooleanField(required=False, default=False)
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
@@ -1833,34 +1831,18 @@ class RunZoneOcrSerializer(serializers.Serializer[Any]):
             ).prefetch_related("zones", "zones__custom_field")
 
 
-class ZoneOcrResultSerializer(serializers.Serializer[ZoneOcrResult]):
-    """The outcome of one zone, mirroring the ZoneOcrResult dataclass."""
-
-    template = serializers.CharField(read_only=True)
-    zone = serializers.CharField(read_only=True)
-    custom_field = serializers.CharField(read_only=True)
-    value = serializers.JSONField(
-        read_only=True,
-        allow_null=True,
-        help_text=(
-            "The value written to the target. A string, number, boolean or ISO "
-            "date string, depending on the target, or null when nothing was written."
-        ),
-    )
-    reason = serializers.ChoiceField(
-        choices=[reason.value for reason in ZoneOcrReason],
-        read_only=True,
-        allow_null=True,
-        help_text="Why no value was written, or null when one was.",
-    )
-
-
 class RunZoneOcrResponseSerializer(serializers.Serializer[dict[str, Any]]):
-    """The response of running zone OCR on one document."""
+    """The response of queueing zone OCR on one document."""
 
-    status = serializers.ChoiceField(
-        choices=[status.value for status in ZoneOcrRunStatus],
+    result = serializers.ChoiceField(
+        choices=["OK", "skipped"],
         read_only=True,
+        help_text="OK when the run was queued, skipped when it was not.",
+    )
+    task_id = serializers.CharField(
+        read_only=True,
+        required=False,
+        help_text="The queued task. Absent when the run was skipped.",
     )
     reason = serializers.ChoiceField(
         choices=[reason.value for reason in ZoneOcrSkipReason],
@@ -1868,7 +1850,6 @@ class RunZoneOcrResponseSerializer(serializers.Serializer[dict[str, Any]]):
         required=False,
         help_text="Present only when the run was skipped.",
     )
-    results = ZoneOcrResultSerializer(many=True, read_only=True)
 
 
 class OcrErrorSerializer(serializers.Serializer[dict[str, Any]]):
@@ -1878,7 +1859,7 @@ class OcrErrorSerializer(serializers.Serializer[dict[str, Any]]):
 
 
 class RunZoneOcrDocumentsSerializer(DocumentSelectionSerializer, RunZoneOcrSerializer):
-    from_webui = serializers.BooleanField(required=False, default=False)
+    pass
 
 
 class BulkEditSerializer(

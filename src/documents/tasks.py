@@ -381,16 +381,23 @@ def extract_zones(
     document_id: int,
     template_id: int | None = None,
     requester: User | None = None,
+    *,
+    resolve_latest: bool = True,
 ) -> int | None:
     """
     Run an OCR template against a stored document, or every template that
     matches it when no template is given. Matched templates are limited to
     those the requester can view.
 
+    A root document id is mapped to its newest version unless resolve_latest
+    is False, in which case exactly the given document is processed.
+
     Returns the root document's id when any value was written, otherwise None.
     The caller finishes the edit, for example with bulk_update_documents.
     """
-    document = latest_version(Document.objects.get(id=document_id))
+    document = Document.objects.get(id=document_id)
+    if resolve_latest:
+        document = latest_version(document)
     if template_id is None:
         templates = get_templates_for_document(document, requester=requester)
     else:

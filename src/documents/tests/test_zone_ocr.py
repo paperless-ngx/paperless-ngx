@@ -5,7 +5,6 @@ from __future__ import annotations
 import shutil
 import subprocess
 from collections import Counter
-from dataclasses import asdict
 from datetime import date
 from decimal import Decimal
 from pathlib import Path
@@ -27,14 +26,10 @@ from documents.models import OcrTemplateZone
 from documents.parsers import ParseError
 from documents.serialisers import OcrTemplateTestResultSerializer
 from documents.serialisers import RunZoneOcrResponseSerializer
-from documents.serialisers import ZoneOcrResultSerializer
 from documents.zone_ocr import MAX_PARSED_TEXT_LENGTH
 from documents.zone_ocr import ZoneExtraction
 from documents.zone_ocr import ZoneOcrReason
-from documents.zone_ocr import ZoneOcrResult
-from documents.zone_ocr import ZoneOcrRunStatus
 from documents.zone_ocr import ZoneOcrSkipReason
-from documents.zone_ocr import ZoneValue
 from documents.zone_ocr import _apply_transform
 from documents.zone_ocr import _combine_field_value
 from documents.zone_ocr import _convert_value
@@ -3959,82 +3954,24 @@ class TestRealZoneOcr:
         assert "This is a test document" in document.title
 
 
-class TestZoneOcrResultSerializer:
-    @pytest.mark.parametrize(
-        "value",
-        [
-            pytest.param("text", id="string"),
-            pytest.param(42, id="int"),
-            pytest.param(1.5, id="float"),
-            pytest.param(True, id="bool"),
-            pytest.param(date(2025, 12, 25), id="date"),
-            pytest.param(None, id="none"),
-        ],
-    )
-    @pytest.mark.parametrize(
-        "reason",
-        [pytest.param(None, id="no-reason")]
-        + [pytest.param(reason, id=reason.value) for reason in ZoneOcrReason],
-    )
-    def test_wire_format_matches_dataclass(
-        self,
-        value: ZoneValue | None,
-        reason: ZoneOcrReason | None,
-    ) -> None:
-        """
-        GIVEN:
-            - A zone result with any value type and any reason
-        WHEN:
-            - It is serialized with the result serializer and rendered as JSON
-        THEN:
-            - The JSON equals the rendering of the dataclass as a dict
-        """
-        result = ZoneOcrResult(
-            template="Template",
-            zone="Zone",
-            custom_field="Title",
-            value=value,
-            reason=reason,
-        )
-
-        assert JSONRenderer().render(
-            ZoneOcrResultSerializer(result).data,
-        ) == JSONRenderer().render(asdict(result))
-
-
 class TestRunZoneOcrResponseSerializer:
     @pytest.mark.parametrize(
         "body",
         [
             pytest.param(
-                {
-                    "status": ZoneOcrRunStatus.SKIPPED,
-                    "reason": ZoneOcrSkipReason.NO_TEMPLATE,
-                    "results": [],
-                },
+                {"result": "skipped", "reason": ZoneOcrSkipReason.NO_TEMPLATE},
                 id="skipped",
             ),
             pytest.param(
-                {
-                    "status": ZoneOcrRunStatus.COMPLETED,
-                    "results": [
-                        {
-                            "template": "Template",
-                            "zone": "Zone",
-                            "custom_field": "Title",
-                            "value": "text",
-                            "reason": None,
-                        },
-                    ],
-                },
-                id="completed",
+                {"result": "OK", "task_id": "abc-123"},
+                id="queued",
             ),
         ],
     )
     def test_renders_body_unchanged(self, body: dict[str, Any]) -> None:
         """
         GIVEN:
-            - A response body with the run status and results fields
+            - A response body for a skipped or a queued run
         WHEN:
             - The body is rendered through the response serializer as JSON
         THEN:

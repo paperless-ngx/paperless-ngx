@@ -1966,7 +1966,12 @@ class TestBulkEditRunZoneOcr:
 
         assert result == "OK"
         assert mock_extract_zones.call_args_list == [
-            mocker.call(document_id=doc.id, template_id=None, requester=user)
+            mocker.call(
+                document_id=doc.id,
+                template_id=None,
+                requester=user,
+                resolve_latest=True,
+            )
             for doc in docs
         ]
         mock_extract_zones.apply_async.assert_not_called()
@@ -1993,6 +1998,7 @@ class TestBulkEditRunZoneOcr:
             document_id=doc.id,
             template_id=template.pk,
             requester=None,
+            resolve_latest=True,
         )
         mock_extract_zones.apply_async.assert_not_called()
 

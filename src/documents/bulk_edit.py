@@ -1263,10 +1263,12 @@ def run_zone_ocr(
     *,
     template: int | None = None,
     user: User | None = None,
+    resolve_latest: bool = True,
 ) -> Literal["OK"]:
     """
     Run zone OCR within the tracked bulk operation task, then finish once for
-    the root documents that had a value written.
+    the root documents that had a value written. Root documents are run on
+    their newest version unless resolve_latest is False.
     """
     written_ids: list[int] = []
     try:
@@ -1275,6 +1277,7 @@ def run_zone_ocr(
                 document_id=document_id,
                 template_id=template,
                 requester=user,
+                resolve_latest=resolve_latest,
             )
             if written_id is not None:
                 written_ids.append(written_id)
