@@ -1214,11 +1214,120 @@ class TestOcrTemplateValidation:
         """
         response = admin_client.post(
             ENDPOINT,
-            template_payload(combine_formats={"title": " {A} - {B} "}),
+            template_payload(
+                zones=[
+                    zone_payload(None, name="A", target="title"),
+                    zone_payload(None, name="B", target="title"),
+                ],
+                combine_formats={"title": " {A} - {B} "},
+            ),
             format="json",
         )
         assert response.status_code == status.HTTP_201_CREATED
         assert response.json()["combine_formats"] == {"title": " {A} - {B} "}
+
+    def test_zone_names_must_be_unique(
+        self,
+        admin_client: APIClient,
+        text_zone_payload: Callable[..., dict[str, Any]],
+    ) -> None:
+        """
+        GIVEN:
+            - Two zones with the same name
+        WHEN:
+            - Create is attempted
+        THEN:
+            - 400 is returned naming the duplicate
+        """
+        response = admin_client.post(
+            ENDPOINT,
+            template_payload(
+                zones=[
+                    text_zone_payload(name="Total"),
+                    text_zone_payload(name="Total"),
+                ],
+            ),
+            format="json",
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert "Total" in str(response.json()["zones"])
+
+    @pytest.mark.parametrize(
+        ("keys", "expected"),
+        [
+            pytest.param(["title"], status.HTTP_201_CREATED, id="title-zone"),
+            pytest.param(["field"], status.HTTP_201_CREATED, id="custom-field-zone"),
+            pytest.param(["asn"], status.HTTP_400_BAD_REQUEST, id="no-asn-zone"),
+            pytest.param(["999"], status.HTTP_400_BAD_REQUEST, id="unknown-field"),
+        ],
+    )
+    def test_combine_format_keys_must_be_zone_targets(
+        self,
+        admin_client: APIClient,
+        text_field: CustomField,
+        keys: list[str],
+        expected: int,
+    ) -> None:
+        """
+        GIVEN:
+            - A template with a title zone and a custom field zone, and a
+              combine format keyed by a target that may or may not be used
+        WHEN:
+            - Create is attempted
+        THEN:
+            - Keys of the zones' targets are accepted and others are rejected
+              on combine_formats
+        """
+        formats = {
+            (str(text_field.pk) if key == "field" else key): "{Title}" for key in keys
+        }
+
+        response = admin_client.post(
+            ENDPOINT,
+            template_payload(
+                zones=[
+                    zone_payload(None, name="Title", target="title"),
+                    zone_payload(text_field.pk, name="Number"),
+                ],
+                combine_formats=formats,
+            ),
+            format="json",
+        )
+
+        assert response.status_code == expected
+        if expected == status.HTTP_400_BAD_REQUEST:
+            assert "combine_formats" in response.json()
+
+    def test_combine_formats_patch_checks_saved_zones(
+        self,
+        admin_client: APIClient,
+    ) -> None:
+        """
+        GIVEN:
+            - A saved template with only a title zone
+        WHEN:
+            - combine_formats is patched without zones, keyed by title and then
+              by asn
+        THEN:
+            - The title key is accepted and the asn key is rejected
+        """
+        template = OcrTemplateFactory(match="Northwind")
+        OcrTemplateZoneFactory(template=template, target="title")
+
+        response = admin_client.patch(
+            detail_url(template.pk),
+            {"combine_formats": {"title": "{A}"}},
+            format="json",
+        )
+        assert response.status_code == status.HTTP_200_OK
+
+        response = admin_client.patch(
+            detail_url(template.pk),
+            {"combine_formats": {"asn": "{A}"}},
+            format="json",
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
 @pytest.mark.django_db

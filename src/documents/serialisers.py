@@ -3855,6 +3855,17 @@ class OcrTemplateTestSerializer(serializers.Serializer):
             )
 
 
+def _zone_field_key(zone: dict[str, Any]) -> str:
+    """The combine_formats key of a zone: its custom field id or its target."""
+    custom_field = zone.get("custom_field")
+    if isinstance(custom_field, CustomField):
+        custom_field = custom_field.pk
+    target = zone.get("target", OcrTemplateZone.TargetType.CUSTOM_FIELD)
+    if target == OcrTemplateZone.TargetType.CUSTOM_FIELD and custom_field:
+        return str(custom_field)
+    return target
+
+
 class OcrTemplateSerializer(MatchingModelSerializer, OwnedObjectSerializer):
     zones = OcrTemplateZoneSerializer(many=True, required=False)
     combine_formats = serializers.DictField(
@@ -3914,6 +3925,31 @@ class OcrTemplateSerializer(MatchingModelSerializer, OwnedObjectSerializer):
 
     def validate(self, data):
         data = super().validate(data)
+        if "zones" in data:
+            names = [zone["name"] for zone in data["zones"]]
+            duplicates = sorted({name for name in names if names.count(name) > 1})
+            if duplicates:
+                # Combine format tokens refer to zones by name.
+                raise serializers.ValidationError(
+                    {"zones": f"Zone names must be unique: {', '.join(duplicates)}"},
+                )
+        if "combine_formats" in data:
+            if "zones" in data:
+                zones = data["zones"]
+            elif self.instance:
+                zones = list(self.instance.zones.values("target", "custom_field"))
+            else:
+                zones = []
+            keys = {_zone_field_key(zone) for zone in zones}
+            unknown = sorted(set(data["combine_formats"]) - keys)
+            if unknown:
+                raise serializers.ValidationError(
+                    {
+                        "combine_formats": (
+                            "Keys must match the field of a zone: " + ", ".join(unknown)
+                        ),
+                    },
+                )
         zones = data.get("zones", [])
         if (
             self.instance
