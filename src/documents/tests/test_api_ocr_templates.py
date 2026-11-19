@@ -1117,6 +1117,50 @@ class TestOcrTemplateValidation:
             assert "custom_field" in response.json()["zones"]["0"]
 
     @pytest.mark.parametrize(
+        ("ocr_language", "expected"),
+        [
+            pytest.param("eng", status.HTTP_201_CREATED, id="single"),
+            pytest.param("deu+eng", status.HTTP_201_CREATED, id="several"),
+            pytest.param("chi_sim", status.HTTP_201_CREATED, id="underscore"),
+            pytest.param(
+                "script/Latin+eng",
+                status.HTTP_201_CREATED,
+                id="script-model",
+            ),
+            pytest.param("/tmp/x", status.HTTP_400_BAD_REQUEST, id="absolute-path"),
+            pytest.param("../eng", status.HTTP_400_BAD_REQUEST, id="parent-path"),
+            pytest.param("", status.HTTP_400_BAD_REQUEST, id="blank"),
+            pytest.param("deu eng", status.HTTP_400_BAD_REQUEST, id="space"),
+            pytest.param("deu+", status.HTTP_400_BAD_REQUEST, id="trailing-plus"),
+            pytest.param("deu,eng", status.HTTP_400_BAD_REQUEST, id="comma"),
+        ],
+    )
+    def test_ocr_language_must_be_tesseract_codes(
+        self,
+        admin_client: APIClient,
+        text_zone_payload: Callable[..., dict[str, Any]],
+        ocr_language: str,
+        expected: int,
+    ) -> None:
+        """
+        GIVEN:
+            - A zone with well-formed or malformed Tesseract language codes
+        WHEN:
+            - Create is attempted
+        THEN:
+            - Only codes joined by "+" are accepted
+        """
+        response = admin_client.post(
+            ENDPOINT,
+            template_payload(zones=[text_zone_payload(ocr_language=ocr_language)]),
+            format="json",
+        )
+
+        assert response.status_code == expected
+        if expected == status.HTTP_400_BAD_REQUEST:
+            assert "ocr_language" in response.json()["zones"]["0"]
+
+    @pytest.mark.parametrize(
         ("date_format", "expected"),
         [
             pytest.param("", status.HTTP_201_CREATED, id="blank"),

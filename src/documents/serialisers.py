@@ -3770,6 +3770,16 @@ class OcrTemplateZoneSerializer(serializers.ModelSerializer):
             )
         return value
 
+    def validate_ocr_language(self, value: str) -> str:
+        # Tesseract language codes joined by "+", e.g. "deu+eng", "chi_sim" or
+        # "script/Latin".
+        code = r"[A-Za-z0-9_]+(/[A-Za-z0-9_]+)?"
+        if not re.fullmatch(rf"{code}(\+{code})*", value):
+            raise serializers.ValidationError(
+                "Use Tesseract language codes joined by '+', e.g. 'deu+eng'.",
+            )
+        return value
+
     def validate_date_format(self, value: str) -> str:
         # The format must read back a full date: without a day, month or year
         # strptime fills in 1 or 1900 instead of failing. A missing year is
