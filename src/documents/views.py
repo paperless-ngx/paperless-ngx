@@ -2305,7 +2305,10 @@ class DocumentViewSet(
         Run zone-based OCR extraction on this document, with the given template
         or with every template that matches it.
         """
-        serializer = RunZoneOcrSerializer(data=request.data)
+        serializer = RunZoneOcrSerializer(
+            data=request.data,
+            context={"request": request},
+        )
         serializer.is_valid(raise_exception=True)
         template = serializer.validated_data.get("template")
 
@@ -2316,13 +2319,6 @@ class DocumentViewSet(
         if not request.user.has_perm(
             "documents.change_document",
         ) or not has_perms_owner_aware(request.user, "change_document", document):
-            return HttpResponseForbidden("Insufficient permissions")
-
-        if template is not None and not has_perms_owner_aware(
-            request.user,
-            "view_ocrtemplate",
-            template,
-        ):
             return HttpResponseForbidden("Insufficient permissions")
 
         from documents.zone_ocr import get_templates_for_document
@@ -3496,12 +3492,6 @@ class RunZoneOcrDocumentsView(DocumentOperationPermissionMixin):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         template = serializer.validated_data.get("template")
-        if template is not None and not has_perms_owner_aware(
-            request.user,
-            "view_ocrtemplate",
-            template,
-        ):
-            return HttpResponseForbidden("Insufficient permissions")
         if template is not None:
             serializer.validated_data["template"] = template.pk
         return self._execute_document_action(
@@ -5908,12 +5898,12 @@ class OcrTemplateViewSet(BulkPermissionMixin, PassUserMixin, ModelViewSet[OcrTem
         """Extract an ad-hoc zone without changing the document."""
         from documents.zone_ocr import extract_zone_preview
 
-        serializer = OcrTemplateTestSerializer(data=request.data)
+        serializer = OcrTemplateTestSerializer(
+            data=request.data,
+            context={"request": request},
+        )
         serializer.is_valid(raise_exception=True)
         document = serializer.validated_data["document"]
-
-        if not has_perms_owner_aware(request.user, "view_document", document):
-            return HttpResponseForbidden("Insufficient permissions")
 
         doc_path = document.archive_path or document.source_path
         if not doc_path or not Path(doc_path).is_file():

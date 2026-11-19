@@ -622,6 +622,191 @@ class TestOcrTemplatePermissions:
 
 @pytest.mark.django_db
 @pytest.mark.usefixtures("paperless_dirs")
+class TestOcrTemplateSampleDocument:
+    """The sample document of a template is limited to what the user can see."""
+
+    @pytest.fixture
+    def editor(self, regular_user: User) -> User:
+        grant_global(
+            regular_user,
+            "view_ocrtemplate",
+            "add_ocrtemplate",
+            "change_ocrtemplate",
+            "view_document",
+        )
+        return regular_user
+
+    @pytest.mark.usefixtures("editor")
+    def test_create_rejects_an_invisible_sample_document(
+        self,
+        user_client: APIClient,
+    ) -> None:
+        """
+        GIVEN:
+            - A document owned by another user and not shared with the editor
+        WHEN:
+            - The editor creates a template using it as the sample document
+        THEN:
+            - 400 is returned on the sample_document field and no template is
+              created
+        """
+        document = DocumentFactory(owner=UserFactory())
+
+        response = user_client.post(
+            ENDPOINT,
+            template_payload(sample_document=document.pk),
+            format="json",
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert "sample_document" in response.json()
+        assert not OcrTemplate.objects.exists()
+
+    def test_update_rejects_an_invisible_sample_document(
+        self,
+        editor: User,
+        user_client: APIClient,
+    ) -> None:
+        """
+        GIVEN:
+            - A template owned by the editor
+            - A document owned by another user and not shared with the editor
+        WHEN:
+            - The editor patches the template to use it as the sample document
+        THEN:
+            - 400 is returned on the sample_document field and the template
+              is unchanged
+        """
+        document = DocumentFactory(owner=UserFactory())
+        template = OcrTemplateFactory(owner=editor, match="Northwind")
+
+        response = user_client.patch(
+            detail_url(template.pk),
+            {"sample_document": document.pk},
+            format="json",
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert "sample_document" in response.json()
+        template.refresh_from_db()
+        assert template.sample_document is None
+
+    def test_accepts_visible_sample_documents_and_clearing(
+        self,
+        editor: User,
+        user_client: APIClient,
+    ) -> None:
+        """
+        GIVEN:
+            - A document owned by the editor and one shared with the editor
+        WHEN:
+            - The editor creates a template with the owned document, patches in
+              the shared document, then clears it
+        THEN:
+            - Each request succeeds and the template stores the value
+        """
+        owned = DocumentFactory(owner=editor)
+        shared = DocumentFactory(owner=UserFactory())
+        grant_object(editor, shared, "view_document")
+
+        response = user_client.post(
+            ENDPOINT,
+            template_payload(sample_document=owned.pk),
+            format="json",
+        )
+        assert response.status_code == status.HTTP_201_CREATED
+        assert response.json()["sample_document"] == owned.pk
+        url = detail_url(response.json()["id"])
+
+        for value in (shared.pk, None):
+            response = user_client.patch(
+                url,
+                {"sample_document": value},
+                format="json",
+            )
+            assert response.status_code == status.HTTP_200_OK
+            assert response.json()["sample_document"] == value
+
+    def test_collaborator_can_save_a_template_keeping_its_sample_document(
+        self,
+        editor: User,
+        user_client: APIClient,
+    ) -> None:
+        """
+        GIVEN:
+            - A template owned by another user and shared with the editor for
+              view and change, whose sample document the editor cannot see
+        WHEN:
+            - The editor saves the template as retrieved with a new name, and
+              then tries to switch to another document they cannot see
+        THEN:
+            - The save succeeds and keeps the stored sample document
+            - The switch is rejected with 400
+        """
+        owner = UserFactory()
+        sample = DocumentFactory(owner=owner)
+        template = OcrTemplateFactory(
+            owner=owner,
+            match="Northwind",
+            sample_document=sample,
+        )
+        grant_object(editor, template, "view_ocrtemplate", "change_ocrtemplate")
+
+        payload = user_client.get(detail_url(template.pk)).json()
+        payload["name"] = "Renamed"
+        response = user_client.put(detail_url(template.pk), payload, format="json")
+
+        assert response.status_code == status.HTTP_200_OK
+        template.refresh_from_db()
+        assert template.name == "Renamed"
+        assert template.sample_document == sample
+
+        other = DocumentFactory(owner=owner)
+        response = user_client.patch(
+            detail_url(template.pk),
+            {"sample_document": other.pk},
+            format="json",
+        )
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert "sample_document" in response.json()
+        template.refresh_from_db()
+        assert template.sample_document == sample
+
+    def test_reading_shows_a_sample_document_the_viewer_cannot_see(
+        self,
+        regular_user: User,
+        user_client: APIClient,
+    ) -> None:
+        """
+        GIVEN:
+            - A template visible to the user whose stored sample document
+              belongs to another user
+        WHEN:
+            - The user retrieves and lists templates
+        THEN:
+            - Both return 200 with the stored sample document pk
+        """
+        grant_global(regular_user, "view_ocrtemplate")
+        document = DocumentFactory(owner=UserFactory())
+        template = OcrTemplateFactory(
+            owner=regular_user,
+            match="Northwind",
+            sample_document=document,
+        )
+
+        response = user_client.get(detail_url(template.pk))
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()["sample_document"] == document.pk
+
+        response = user_client.get(ENDPOINT)
+        assert response.status_code == status.HTTP_200_OK
+        assert [t["sample_document"] for t in response.json()["results"]] == [
+            document.pk,
+        ]
+
+
+@pytest.mark.django_db
+@pytest.mark.usefixtures("paperless_dirs")
 class TestOcrTemplateValidation:
     """Validation of OCR template and zone payloads."""
 
@@ -1598,7 +1783,8 @@ class TestRunZoneOcrPermissions:
         WHEN:
             - The editor runs zone OCR choosing that template
         THEN:
-            - 403 is returned and nothing is extracted
+            - 400 is returned, naming the template field, and nothing is
+              extracted
         """
         grant_global(regular_user, "view_document", "change_document")
         document = DocumentFactory(content=CONTENT, owner=regular_user)
@@ -1613,7 +1799,8 @@ class TestRunZoneOcrPermissions:
             format="json",
         )
 
-        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert "template" in response.json()
         mock_extract.assert_not_called()
 
     def test_requires_change_permission_on_the_document(
@@ -2269,7 +2456,8 @@ class TestOcrTemplatePreviewPermissions:
         WHEN:
             - The user requests a page image and a zone preview of the version
         THEN:
-            - Both are refused until the user is granted view on the root
+            - The page image is refused with 403 and the zone preview with 400
+              until the user is granted view on the root
             - Afterwards both succeed
         """
         other = UserFactory()
@@ -2286,7 +2474,7 @@ class TestOcrTemplatePreviewPermissions:
         )
         assert (
             preview_zone(preview_client, version).status_code
-            == status.HTTP_403_FORBIDDEN
+            == status.HTTP_400_BAD_REQUEST
         )
         mock_render.assert_not_called()
         mock_preview.assert_not_called()
@@ -2339,18 +2527,20 @@ class TestOcrTemplatePreviewPermissions:
         WHEN:
             - The user previews a zone on the document
         THEN:
-            - The request is refused until the user is granted view on the document
-            - Afterwards it passes the permission check and reaches the missing file
+            - The request is rejected with 400 until the user is granted view
+              on the document
+            - Afterwards it passes validation and reaches the missing file
             - No preview extraction runs
         """
         owner = UserFactory()
         grant_global(regular_user, "view_ocrtemplate", "view_document")
         document = DocumentFactory(owner=owner)
         response = preview_zone(user_client, document, x=0, y=0, height=100, page=1)
-        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert "document" in response.json()
 
         grant_object(regular_user, document, "view_document")
         response = preview_zone(user_client, document, x=0, y=0, height=100, page=1)
-        # Past the permission check; the factory document has no file on disk.
+        # Past validation; the factory document has no file on disk.
         assert response.status_code == status.HTTP_404_NOT_FOUND
         mock_preview.assert_not_called()

@@ -2970,7 +2970,7 @@ class TestRunZoneOcrBulkEditAPI:
         WHEN:
             - API is called with that template
         THEN:
-            - The whole request is refused
+            - The whole request is rejected with 400 on the template field
         """
         user = UserFactory(username="editor")
         grant_global(user, "view_document", "change_document")
@@ -2986,5 +2986,6 @@ class TestRunZoneOcrBulkEditAPI:
             format="json",
         )
 
-        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert "template" in response.json()
         mock_run_zone_ocr.assert_not_called()

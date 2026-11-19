@@ -86,6 +86,7 @@ from documents.permissions import get_document_count_filter_for_user
 from documents.permissions import get_permission_grantees
 from documents.permissions import has_perms_owner_aware
 from documents.permissions import permitted_document_ids
+from documents.permissions import permitted_object_ids
 from documents.permissions import restrict_queryset_to_visible
 from documents.permissions import set_permissions_for_objects
 from documents.regex import validate_regex_pattern
@@ -1802,10 +1803,22 @@ class ReprocessDocumentsSerializer(DocumentSelectionSerializer):
 
 class RunZoneOcrSerializer(serializers.Serializer):
     template = serializers.PrimaryKeyRelatedField(
-        queryset=OcrTemplate.objects.prefetch_related("zones", "zones__custom_field"),
+        queryset=OcrTemplate.objects.none(),
         required=False,
         allow_null=True,
     )
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        request = self.context.get("request")
+        user = getattr(request, "user", None) if request else None
+        if user is not None and user.is_authenticated:
+            template_field = self.fields.get("template")
+            if not isinstance(template_field, serializers.PrimaryKeyRelatedField):
+                return
+            template_field.queryset = OcrTemplate.objects.filter(
+                id__in=permitted_object_ids(user, OcrTemplate, "view_ocrtemplate"),
+            ).prefetch_related("zones", "zones__custom_field")
 
 
 class RunZoneOcrDocumentsSerializer(DocumentSelectionSerializer, RunZoneOcrSerializer):
@@ -3805,9 +3818,21 @@ class OcrTemplateZoneTestSerializer(OcrTemplateZoneSerializer):
 
 class OcrTemplateTestSerializer(serializers.Serializer):
     document = serializers.PrimaryKeyRelatedField(
-        queryset=Document.objects.select_related("root_document__owner"),
+        queryset=Document.objects.none(),
     )
     zone = OcrTemplateZoneTestSerializer()
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        request = self.context.get("request")
+        user = getattr(request, "user", None) if request else None
+        if user is not None and user.is_authenticated:
+            document_field = self.fields.get("document")
+            if not isinstance(document_field, serializers.PrimaryKeyRelatedField):
+                return
+            document_field.queryset = Document.objects.filter(
+                id__in=permitted_document_ids(user),
+            )
 
 
 class OcrTemplateSerializer(MatchingModelSerializer, OwnedObjectSerializer):
@@ -3820,6 +3845,22 @@ class OcrTemplateSerializer(MatchingModelSerializer, OwnedObjectSerializer):
     # Templates are never assigned to documents
     slug = None
     document_count = None
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        # Writes accept documents the user can view, plus the sample document
+        # the template already stores, so saving a template unchanged keeps it.
+        # Reads serialize the stored pk regardless of the queryset.
+        sample_field = self.fields.get("sample_document")
+        if not isinstance(sample_field, serializers.PrimaryKeyRelatedField):
+            return
+        if self.user is None:
+            sample_field.queryset = Document.objects.none()
+            return
+        allowed = Q(id__in=permitted_document_ids(self.user))
+        if isinstance(self.instance, OcrTemplate) and self.instance.sample_document_id:
+            allowed |= Q(id=self.instance.sample_document_id)
+        sample_field.queryset = Document.objects.filter(allowed)
 
     class Meta:
         model = OcrTemplate
