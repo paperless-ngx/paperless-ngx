@@ -4317,50 +4317,102 @@ class UiSettingsView(GenericAPIView[Any]):
 GITHUB_CACHE_KEY = "github_data:%s"
 
 
-def get_github_releases(
-    current_version: packaging_version.Version,
-) -> list[dict[str, Any]] | None:
-    """
-    Fetch recent pngx releases from GitHub, newest first.
-    """
-    releases = cache.get(GITHUB_CACHE_KEY % current_version)
-    if releases is not None:
-        return releases
+GITHUB_RELEASES_URL = (
+    "https://api.github.com/repos/paperless-ngx/paperless-ngx/releases"
+)
+GITHUB_RELEASES_PER_PAGE = 10
+# Caps how far back a range can walk, e.g. for a bad `since`
+GITHUB_RELEASES_MAX_PAGES = 3
+
+
+def _fetch_github_releases_json(url: str, params: dict | None = None) -> Any | None:
     try:
         resp = httpx.get(
-            "https://api.github.com/repos/paperless-ngx/paperless-ngx/releases",
-            params={"per_page": 10},
+            url,
+            params=params,
             # GitHub renders release bodies as HTML
             headers={"Accept": "application/vnd.github.html+json"},
         )
         resp.raise_for_status()
-        releases = []
-        for release in resp.json():
-            if release.get("draft") or release.get("prerelease"):
-                continue
-            try:
-                # Some early tags used ngx-x.y.z
-                release_version = packaging_version.parse(
-                    release["tag_name"].removeprefix("ngx-"),
-                )
-            except packaging_version.InvalidVersion:
-                continue
-            releases.append(
-                {
-                    "version": str(release_version),
-                    "name": release.get("name") or release["tag_name"],
-                    "body_html": release.get("body_html") or "",
-                    "html_url": release["html_url"],
-                    "published_at": release.get("published_at"),
-                },
-            )
-    except (ValueError, KeyError, TypeError) as e:
+        return resp.json()
+    except ValueError as e:
         logger.debug(f"An error occurred parsing GitHub releases json: {e}")
-        return None
     except httpx.HTTPError as e:
         logger.debug(f"An error occurred fetching GitHub releases: {e}")
+    return None
+
+
+def _parse_github_release(release: dict[str, Any]) -> dict[str, Any] | None:
+    if release.get("draft") or release.get("prerelease"):
         return None
-    cache.set(GITHUB_CACHE_KEY % current_version, releases, 60 * 60)
+    try:
+        # Some early tags used ngx-x.y.z
+        release_version = packaging_version.parse(
+            release["tag_name"].removeprefix("ngx-"),
+        )
+    except packaging_version.InvalidVersion:
+        return None
+    return {
+        "version": str(release_version),
+        "name": release.get("name") or release["tag_name"],
+        "body_html": release.get("body_html") or "",
+        "html_url": release["html_url"],
+        "published_at": release.get("published_at"),
+    }
+
+
+def get_github_release(version_str: str) -> dict[str, Any] | None:
+    """
+    Fetch a single pngx release from GitHub by version.
+    """
+    cache_key = GITHUB_CACHE_KEY % f"release:{version_str}"
+    release = cache.get(cache_key)
+    if release is not None:
+        return release
+    data = _fetch_github_releases_json(f"{GITHUB_RELEASES_URL}/tags/v{version_str}")
+    if data is None:
+        return None
+    try:
+        release = _parse_github_release(data)
+    except (KeyError, TypeError, AttributeError) as e:
+        logger.debug(f"An error occurred parsing GitHub release json: {e}")
+        return None
+    if release is not None:
+        cache.set(cache_key, release, 60 * 60)
+    return release
+
+
+def get_github_releases(
+    current_version: packaging_version.Version,
+    since: packaging_version.Version,
+) -> list[dict[str, Any]] | None:
+    """
+    Fetch pngx releases from GitHub, newest first, back to `since`.
+    """
+    cache_key = GITHUB_CACHE_KEY % f"releases:{current_version}:{since}"
+    releases = cache.get(cache_key)
+    if releases is not None:
+        return releases
+    releases = []
+    # Releases are listed newest first, so stop paging once we reach `since`
+    for page in range(1, GITHUB_RELEASES_MAX_PAGES + 1):
+        data = _fetch_github_releases_json(
+            GITHUB_RELEASES_URL,
+            params={"per_page": GITHUB_RELEASES_PER_PAGE, "page": page},
+        )
+        if data is None:
+            return None
+        try:
+            batch = [r for r in map(_parse_github_release, data) if r is not None]
+        except (KeyError, TypeError, AttributeError) as e:
+            logger.debug(f"An error occurred parsing GitHub releases json: {e}")
+            return None
+        releases.extend(batch)
+        if len(data) < GITHUB_RELEASES_PER_PAGE or any(
+            packaging_version.parse(r["version"]) <= since for r in batch
+        ):
+            break
+    cache.set(cache_key, releases, 60 * 60)
     return releases
 
 
@@ -4472,18 +4524,20 @@ class ReleaseNotesView(GenericAPIView[Any]):
         # Newer releases can be requested e.g. for "update available"
         until = until or current_version
 
-        releases = get_github_releases(current_version) or []
-
-        def in_range(release_version: str) -> bool:
-            v = packaging_version.parse(release_version)
-            if since is None:
-                return v == until
-            return since < v <= until
+        if since is None:
+            release = get_github_release(str(until))
+            releases = [release] if release else []
+        else:
+            releases = [
+                r
+                for r in get_github_releases(current_version, since) or []
+                if since < packaging_version.parse(r["version"]) <= until
+            ]
 
         return Response(
             {
                 "version": version.__full_version_str__,
-                "releases": [r for r in releases if in_range(r["version"])],
+                "releases": releases,
                 "stars": get_github_stars(),
             },
         )

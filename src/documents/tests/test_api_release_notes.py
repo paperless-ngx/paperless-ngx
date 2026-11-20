@@ -9,7 +9,15 @@ from rest_framework.test import APIClient
 from paperless import version
 
 REPO_URL = "https://api.github.com/repos/paperless-ngx/paperless-ngx"
-RELEASES_URL = f"{REPO_URL}/releases?per_page=10"
+RELEASES_URL = f"{REPO_URL}/releases?per_page=10&page=1"
+
+
+def _page_url(page: int) -> str:
+    return f"{REPO_URL}/releases?per_page=10&page={page}"
+
+
+def _tag_url(version_str: str) -> str:
+    return f"{REPO_URL}/releases/tags/v{version_str}"
 
 
 def _release(tag: str, **kwargs) -> dict:
@@ -57,6 +65,15 @@ class TestApiReleaseNotes:
         return httpx_mock
 
     @pytest.fixture
+    def current_release(self, httpx_mock: HTTPXMock) -> HTTPXMock:
+        httpx_mock.add_response(
+            url=_tag_url(CURRENT),
+            match_headers={"Accept": "application/vnd.github.html+json"},
+            json=_release(f"v{CURRENT}"),
+        )
+        return httpx_mock
+
+    @pytest.fixture
     def stars(self, httpx_mock: HTTPXMock) -> HTTPXMock:
         httpx_mock.add_response(url=REPO_URL, json={"stargazers_count": 1234})
         return httpx_mock
@@ -91,26 +108,98 @@ class TestApiReleaseNotes:
         )
 
     @pytest.mark.usefixtures("stars")
-    def test_without_since_returns_current_only(
+    def test_without_since_fetches_current_only(
         self,
         rest_api_client: APIClient,
-        releases: HTTPXMock,
+        current_release: HTTPXMock,
     ) -> None:
+        """
+        GIVEN:
+            - A GitHub release for the running version
+        WHEN:
+            - Release notes are requested without `since`
+        THEN:
+            - Only that release is fetched, by tag, and returned
+        """
         response = rest_api_client.get(self.ENDPOINT)
 
         assert response.status_code == status.HTTP_200_OK
         assert [r["version"] for r in response.data["releases"]] == [CURRENT]
+        assert len(current_release.get_requests(url=_tag_url(CURRENT))) == 1
 
     @pytest.mark.usefixtures("stars")
+    def test_since_pages_back_to_since(
+        self,
+        rest_api_client: APIClient,
+        httpx_mock: HTTPXMock,
+    ) -> None:
+        """
+        GIVEN:
+            - More releases since `since` than fit on one page
+        WHEN:
+            - Release notes are requested since that version
+        THEN:
+            - GitHub is paged until `since` is reached and all releases are returned
+        """
+        major, minor, _ = version.__version__
+        page_one = [f"{major}.{minor - 1}.{patch}" for patch in range(10, 0, -1)]
+        httpx_mock.add_response(
+            url=_page_url(1),
+            json=[_release(f"v{v}") for v in page_one],
+        )
+        httpx_mock.add_response(
+            url=_page_url(2),
+            json=[_release(f"v{PREVIOUS}"), _release(f"v{OLDER}")],
+        )
+
+        response = rest_api_client.get(self.ENDPOINT, {"since": OLDER})
+
+        assert [r["version"] for r in response.data["releases"]] == [
+            *page_one,
+            PREVIOUS,
+        ]
+
+    @pytest.mark.usefixtures("stars")
+    def test_since_paging_is_capped(
+        self,
+        rest_api_client: APIClient,
+        httpx_mock: HTTPXMock,
+    ) -> None:
+        """
+        GIVEN:
+            - Full pages of releases that never reach `since`
+        WHEN:
+            - Release notes are requested since a very old version
+        THEN:
+            - Paging stops after the page cap
+        """
+        major, minor, _ = version.__version__
+        for page in range(1, 4):
+            httpx_mock.add_response(
+                url=_page_url(page),
+                json=[
+                    _release(f"v{major}.{minor}.{page * 100 + patch}")
+                    for patch in range(10)
+                ],
+            )
+
+        rest_api_client.get(self.ENDPOINT, {"since": "0.1.0"})
+
+        assert len(httpx_mock.get_requests()) == 4  # 3 pages + stars
+
+    @pytest.mark.usefixtures("stars")
+    @pytest.mark.usefixtures("current_release")
     def test_releases_are_cached(
         self,
         rest_api_client: APIClient,
         releases: HTTPXMock,
     ) -> None:
-        rest_api_client.get(self.ENDPOINT, {"since": OLDER})
-        rest_api_client.get(self.ENDPOINT)
+        for _ in range(2):
+            rest_api_client.get(self.ENDPOINT, {"since": OLDER})
+            rest_api_client.get(self.ENDPOINT)
 
         assert len(releases.get_requests(url=RELEASES_URL)) == 1
+        assert len(releases.get_requests(url=_tag_url(CURRENT))) == 1
         assert len(releases.get_requests(url=REPO_URL)) == 1
 
     @pytest.mark.usefixtures("stars")
@@ -130,9 +219,9 @@ class TestApiReleaseNotes:
         upgraded = _bump(patch=1)
         releases.add_response(url=RELEASES_URL, json=[_release(f"v{upgraded}")])
 
-        rest_api_client.get(self.ENDPOINT)
+        rest_api_client.get(self.ENDPOINT, {"since": OLDER})
         with mock.patch.object(version, "__full_version_str__", upgraded):
-            response = rest_api_client.get(self.ENDPOINT)
+            response = rest_api_client.get(self.ENDPOINT, {"since": CURRENT})
 
         assert len(releases.get_requests(url=RELEASES_URL)) == 2
         assert [r["version"] for r in response.data["releases"]] == [upgraded]
@@ -190,8 +279,8 @@ class TestApiReleaseNotes:
         httpx_mock: HTTPXMock,
         mock_kwargs: dict,
     ) -> None:
-        httpx_mock.add_response(url=RELEASES_URL, **mock_kwargs)
-        httpx_mock.add_response(url=RELEASES_URL, json=[_release(f"v{CURRENT}")])
+        httpx_mock.add_response(url=_tag_url(CURRENT), **mock_kwargs)
+        httpx_mock.add_response(url=_tag_url(CURRENT), json=_release(f"v{CURRENT}"))
         httpx_mock.add_response(
             url=REPO_URL,
             json={"stargazers_count": 1234},
@@ -205,7 +294,7 @@ class TestApiReleaseNotes:
         response = rest_api_client.get(self.ENDPOINT)
         assert [r["version"] for r in response.data["releases"]] == [CURRENT]
 
-    @pytest.mark.usefixtures("releases", "stars")
+    @pytest.mark.usefixtures("current_release", "stars")
     def test_stars_are_returned_and_cached(
         self,
         rest_api_client: APIClient,
@@ -226,7 +315,7 @@ class TestApiReleaseNotes:
         assert response.data["stars"] == 1234
         assert len(httpx_mock.get_requests(url=REPO_URL)) == 1
 
-    @pytest.mark.usefixtures("releases")
+    @pytest.mark.usefixtures("current_release")
     def test_stars_failure_returns_none_and_is_not_cached(
         self,
         rest_api_client: APIClient,
