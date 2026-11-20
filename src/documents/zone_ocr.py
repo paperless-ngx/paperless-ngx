@@ -134,7 +134,10 @@ def resolve_zone_source(document: Document) -> ZoneSourceFile | None:
 
 
 class ZoneOcrReason(StrEnum):
-    """Why a zone produced no value for its target."""
+    """
+    Why a zone produced no value for its target. SUPERSEDED means an earlier
+    template already wrote the field.
+    """
 
     MISSING_FILE = "missing_file"
     MISSING_PAGE = "missing_page"
@@ -146,6 +149,7 @@ class ZoneOcrReason(StrEnum):
     UNASSIGNED = "unassigned"
     INVALID_VALUE = "invalid_value"
     TEMPLATE_FAILED = "template_failed"
+    SUPERSEDED = "superseded"
 
 
 class ZoneOcrSkipReason(StrEnum):
@@ -382,9 +386,11 @@ def apply_zone_plans(
     in its own atomic block, and return the zone results. Fields whose key is in
     protected are not written, and the results of every zone targeting them are
     left out. A template whose writes fail gets TEMPLATE_FAILED results and the
-    others still apply.
+    others still apply. A field an earlier template wrote is not written by a
+    later one, and the zones targeting it get SUPERSEDED results.
     """
     results: list[ZoneOcrResult] = []
+    written: set[FieldKey] = set()
     for plan in plans:
         for planned in plan.updates:
             if planned.key in protected:
@@ -394,11 +400,31 @@ def apply_zone_plans(
                     planned.update.field_name,
                     label,
                 )
-        updates = [planned for planned in plan.updates if planned.key not in protected]
+        superseded: set[FieldKey] = set()
+        for planned in plan.updates:
+            if planned.key in written:
+                superseded.add(planned.key)
+                logger.warning(
+                    "Zone OCR: template '%s' did not write %s of %s, an earlier "
+                    "template already did",
+                    plan.template.name,
+                    planned.update.field_name,
+                    label,
+                )
+        updates = [
+            planned
+            for planned in plan.updates
+            if planned.key not in protected and planned.key not in superseded
+        ]
         try:
             if updates:
                 _apply_template_updates(root_document, updates)
             plan_results = plan.results
+            written.update(
+                planned.key
+                for planned in updates
+                if all(result.reason is None for result in planned.results)
+            )
         except Exception:
             logger.exception(
                 "Zone OCR: error processing template '%s' for %s",
@@ -410,12 +436,16 @@ def apply_zone_plans(
                 plan.zones,
                 ZoneOcrReason.TEMPLATE_FAILED,
             ).results
+            superseded = set()
         # Each zone has exactly one result, in zone order.
-        results.extend(
-            result
-            for zone, result in zip(plan.zones, plan_results, strict=True)
-            if _zone_key(zone) not in protected
-        )
+        for zone, result in zip(plan.zones, plan_results, strict=True):
+            key = _zone_key(zone)
+            if key in protected:
+                continue
+            if key in superseded:
+                result.value = None
+                result.reason = ZoneOcrReason.SUPERSEDED
+            results.append(result)
     return results
 
 

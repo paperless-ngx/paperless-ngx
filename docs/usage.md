@@ -845,7 +845,8 @@ decides which documents it automatically applies to (or not), based on their con
 
 Zones are positioned relative to the sample document's page, so templates work best when the documents they
 match have an identical layout. Keep the matching specific enough that it only catches documents with that
-layout.
+layout. When more than one template applies to a document, the first one by name fills a field and later
+templates do not overwrite it.
 
 ### Zone settings
 

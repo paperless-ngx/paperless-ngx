@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 import shutil
 import subprocess
 from collections import Counter
@@ -52,6 +53,7 @@ from documents.zone_ocr import get_templates_for_content
 from documents.zone_ocr import get_templates_for_document
 from documents.zone_ocr import resolve_zone_source
 from documents.zone_ocr import run_zone_extraction
+from documents.zone_ocr import zone_results_written
 from paperless_testing.factories import CustomFieldFactory
 from paperless_testing.factories import DocumentFactory
 from paperless_testing.factories import OcrTemplateFactory
@@ -846,7 +848,7 @@ class TestSavedZoneExtraction:
         assert document.title == "Original"
         assert not document.custom_fields.exists()
 
-    def test_last_successful_template_wins(
+    def test_first_template_with_an_accepted_value_wins(
         self,
         mock_zone_ocr_run: MagicMock,
         page: Path,
@@ -855,21 +857,21 @@ class TestSavedZoneExtraction:
     ) -> None:
         """
         GIVEN:
-            - Three templates writing the title, the last of which rejects its value
+            - Three templates writing the title, the first of which rejects its value
         WHEN:
             - Zone extraction runs over all of them
         THEN:
-            - The title comes from the last template that produced a value
+            - The title comes from the first template that produced a value
         """
-        make_zone(template, "First")
+        make_zone(template, "First", validation_regex="accepted")
         second = make_template("Second")
         make_zone(second, "Second")
         third = make_template("Third")
-        make_zone(third, "Third", validation_regex="accepted")
+        make_zone(third, "Third")
         templates = list(OcrTemplate.objects.order_by("pk"))
         mock_zone_ocr_run.side_effect = [
             subprocess.CompletedProcess(args=[], returncode=0, stdout=value, stderr="")
-            for value in ["First", "Second", "rejected"]
+            for value in ["rejected", "Second", "Third"]
         ]
 
         run_zone_extraction(document, templates=templates)
@@ -1019,7 +1021,11 @@ class TestSavedZoneExtraction:
         results = run_zone_extraction(document, templates=[template, second])
 
         assert [call.kwargs["page"] for call in mock_rasterize.call_args_list] == [1, 2]
-        assert [result.reason for result in results] == [None, None, None]
+        assert [result.reason for result in results] == [
+            None,
+            None,
+            ZoneOcrReason.SUPERSEDED,
+        ]
         assert not any(path.exists() for path in rendered)
 
     def test_zone_dimensions_override_template_dimensions(
@@ -1262,6 +1268,166 @@ class TestSavedZoneExtraction:
         ]
         document.refresh_from_db()
         assert document.title == "Applied"
+
+    def test_first_template_wins_a_field_written_by_both(
+        self,
+        caplog: pytest.LogCaptureFixture,
+        mock_zone_ocr_run: MagicMock,
+        paperless_dirs: PaperlessDirs,
+        page: Path,
+        document: Document,
+        template: OcrTemplate,
+    ) -> None:
+        """
+        GIVEN:
+            - Two matching templates whose title zones both read a value
+        WHEN:
+            - Zone extraction runs
+        THEN:
+            - The first template by name sets the title, the second template's
+              zone is reported as superseded with a warning, and the run still
+              counts as having written
+        """
+        make_zone(template, "First title")
+        second = make_template("Second")
+        make_zone(second, "Second title")
+        mock_zone_ocr_run.side_effect = ocr_outputs("From first", "From second")
+
+        with caplog.at_level(logging.WARNING, logger="paperless.zone_ocr"):
+            results = run_zone_extraction(document, templates=[template, second])
+
+        assert [(r.template, r.value, r.reason) for r in results] == [
+            ("Account", "From first", None),
+            ("Second", None, ZoneOcrReason.SUPERSEDED),
+        ]
+        assert zone_results_written(results)
+        assert any(
+            "Second" in message and "title" in message for message in caplog.messages
+        )
+        document.refresh_from_db()
+        assert document.title == "From first"
+
+    def test_single_template_logs_no_superseded_warning(
+        self,
+        caplog: pytest.LogCaptureFixture,
+        mock_zone_ocr_run: MagicMock,
+        paperless_dirs: PaperlessDirs,
+        page: Path,
+        document: Document,
+        template: OcrTemplate,
+    ) -> None:
+        """
+        GIVEN:
+            - One matching template with a title zone
+        WHEN:
+            - Zone extraction runs
+        THEN:
+            - The title is written and no warning is logged
+        """
+        make_zone(template, "Title")
+        mock_zone_ocr_run.side_effect = ocr_outputs("Only")
+
+        with caplog.at_level(logging.WARNING, logger="paperless.zone_ocr"):
+            run_zone_extraction(document, templates=[template])
+
+        assert caplog.messages == []
+
+    def test_field_dropped_after_planning_stays_available_to_later_templates(
+        self,
+        mock_zone_ocr_run: MagicMock,
+        paperless_dirs: PaperlessDirs,
+        page: Path,
+        document: Document,
+        template: OcrTemplate,
+    ) -> None:
+        """
+        GIVEN:
+            - Two matching templates with ASN zones, where the first template's
+              ASN is the ASN of another document
+        WHEN:
+            - Zone extraction runs
+        THEN:
+            - The first template's ASN is reported as duplicate_asn and the
+              second template's ASN is written
+        """
+        DocumentFactory(archive_serial_number=42)
+        make_zone(template, "First ASN", "asn")
+        second = make_template("Second")
+        make_zone(second, "Second ASN", "asn")
+        mock_zone_ocr_run.side_effect = ocr_outputs("42", "43")
+
+        results = run_zone_extraction(document, templates=[template, second])
+
+        assert [r.reason for r in results] == [ZoneOcrReason.DUPLICATE_ASN, None]
+        document.refresh_from_db()
+        assert document.archive_serial_number == 43
+
+    def test_field_the_first_template_did_not_write_stays_available(
+        self,
+        mock_zone_ocr_run: MagicMock,
+        paperless_dirs: PaperlessDirs,
+        page: Path,
+        document: Document,
+        template: OcrTemplate,
+    ) -> None:
+        """
+        GIVEN:
+            - Two matching templates, where the first template's title zone
+              reads nothing
+        WHEN:
+            - Zone extraction runs
+        THEN:
+            - The second template's title is written
+        """
+        make_zone(template, "First title")
+        second = make_template("Second")
+        make_zone(second, "Second title")
+        mock_zone_ocr_run.side_effect = ocr_outputs("", "From second")
+
+        results = run_zone_extraction(document, templates=[template, second])
+
+        assert [r.reason for r in results] == [ZoneOcrReason.NO_VALUE, None]
+        document.refresh_from_db()
+        assert document.title == "From second"
+
+    def test_later_template_writes_only_the_fields_still_free(
+        self,
+        mock_zone_ocr_run: MagicMock,
+        paperless_dirs: PaperlessDirs,
+        page: Path,
+        document: Document,
+        template: OcrTemplate,
+    ) -> None:
+        """
+        GIVEN:
+            - A first template writing the title and a second template with a
+              title zone and an ASN zone
+        WHEN:
+            - Zone extraction runs
+        THEN:
+            - Only the second template's ASN is written, its title zone is
+              reported as superseded
+        """
+        make_zone(template, "First title")
+        second = make_template("Second")
+        make_zone(second, "Second title")
+        make_zone(second, "Second ASN", "asn")
+        mock_zone_ocr_run.side_effect = ocr_outputs(
+            "From first",
+            "From second",
+            "17",
+        )
+
+        results = run_zone_extraction(document, templates=[template, second])
+
+        assert [(r.zone, r.reason) for r in results] == [
+            ("First title", None),
+            ("Second title", ZoneOcrReason.SUPERSEDED),
+            ("Second ASN", None),
+        ]
+        document.refresh_from_db()
+        assert document.title == "From first"
+        assert document.archive_serial_number == 17
 
     @pytest.mark.parametrize(
         "deleted",
@@ -4110,7 +4276,8 @@ class TestRunZoneExtraction:
         WHEN:
             - Zone extraction runs
         THEN:
-            - Each template reports exactly one successful result
+            - Each template reports exactly one result, and only the first
+              template by name writes the shared title
         """
         for name in template_names:
             template_with_zone(name, enabled=True)
@@ -4118,7 +4285,8 @@ class TestRunZoneExtraction:
         results = run_zone_extraction(document)
 
         assert sorted((r.template, r.reason) for r in results) == [
-            (name, None) for name in sorted(template_names)
+            (name, None if index == 0 else ZoneOcrReason.SUPERSEDED)
+            for index, name in enumerate(sorted(template_names))
         ]
 
 
