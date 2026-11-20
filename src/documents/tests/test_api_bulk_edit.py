@@ -2989,3 +2989,73 @@ class TestRunZoneOcrBulkEditAPI:
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert "template" in response.json()
         mock_run_zone_ocr.assert_not_called()
+
+    def test_rejects_owned_document_without_global_change_permission(
+        self,
+        rest_api_client: APIClient,
+        mock_run_zone_ocr: mock.MagicMock,
+    ) -> None:
+        """
+        GIVEN:
+            - A user without the global change_document permission
+            - A document owned by that user
+        WHEN:
+            - API is called with that document
+        THEN:
+            - The request is rejected with 403 and nothing is run
+        """
+        user = UserFactory(username="viewer")
+        grant_global(user, "view_document")
+        document = DocumentFactory(owner=user)
+        rest_api_client.force_authenticate(user=user)
+
+        response = rest_api_client.post(
+            RUN_ZONE_OCR_BULK_URL,
+            {"documents": [document.id]},
+            format="json",
+        )
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+        mock_run_zone_ocr.assert_not_called()
+
+    def test_object_change_permission_required_for_foreign_document(
+        self,
+        rest_api_client: APIClient,
+        mock_run_zone_ocr: mock.MagicMock,
+    ) -> None:
+        """
+        GIVEN:
+            - A user with global change_document permission
+            - A document owned by someone else, with no object permission for the user
+        WHEN:
+            - API is called with that document
+            - API is called again after the user is granted change on the document
+        THEN:
+            - The first request is rejected with 403 and nothing is run
+            - The second request is accepted and run_zone_ocr is called
+        """
+        user = UserFactory(username="editor")
+        grant_global(user, "view_document", "change_document")
+        document = DocumentFactory(owner=UserFactory(username="other"))
+        rest_api_client.force_authenticate(user=user)
+
+        denied = rest_api_client.post(
+            RUN_ZONE_OCR_BULK_URL,
+            {"documents": [document.id]},
+            format="json",
+        )
+
+        assert denied.status_code == status.HTTP_403_FORBIDDEN
+        mock_run_zone_ocr.assert_not_called()
+
+        grant_object(user, document, "change_document")
+
+        allowed = rest_api_client.post(
+            RUN_ZONE_OCR_BULK_URL,
+            {"documents": [document.id]},
+            format="json",
+        )
+
+        assert allowed.status_code == status.HTTP_200_OK
+        mock_run_zone_ocr.assert_called_once()
+        assert mock_run_zone_ocr.call_args.args[0] == [document.id]
