@@ -177,6 +177,47 @@ class TestZoneExtraction:
             assert cropped.getpixel((0, 0)) == (255, 255, 255)
             assert cropped.getpixel((19, 9)) == (0, 0, 0)
 
+    @pytest.mark.parametrize(
+        ("orientation", "source_size", "zone_origin", "expected_colour"),
+        [
+            pytest.param(6, (100, 200), (10, 120), (0, 0, 255), id="rotated-bottom"),
+            pytest.param(6, (100, 200), (10, 20), (255, 0, 0), id="rotated-top"),
+            pytest.param(None, (200, 100), (120, 10), (0, 0, 255), id="untagged"),
+        ],
+    )
+    def test_crop_applies_exif_orientation(
+        self,
+        zone: OcrTemplateZone,
+        tmp_path: Path,
+        orientation: int | None,
+        source_size: tuple[int, int],
+        zone_origin: tuple[int, int],
+        expected_colour: tuple[int, int, int],
+    ) -> None:
+        """
+        GIVEN:
+            - A 200x100 image, red on the left and blue on the right, with an
+              EXIF orientation of 6 (displayed rotated clockwise) or no tag
+            - A zone in the coordinates of the displayed image
+        WHEN:
+            - The zone is cropped
+        THEN:
+            - The crop is taken from the displayed image, not the stored pixels
+        """
+        page = tmp_path / "oriented.png"
+        with Image.new("RGB", (200, 100), (255, 0, 0)) as image:
+            image.paste((0, 0, 255), (100, 0, 200, 100))
+            exif = Image.Exif()
+            if orientation is not None:
+                exif[0x0112] = orientation
+            image.save(page, exif=exif)
+        zone.x, zone.y = zone_origin
+        zone.width, zone.height = 50, 40
+
+        with _crop_zone(page, zone, *source_size) as cropped:
+            assert cropped.size == (50, 40)
+            assert cropped.getcolors() == [(2000, expected_colour)]
+
     def test_crop_clamps_to_image(
         self,
         page: Path,

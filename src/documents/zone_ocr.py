@@ -34,6 +34,7 @@ from django.db.models import F
 from django.db.models import Field
 from django.utils import timezone
 from PIL import Image
+from PIL import ImageOps
 
 from documents.matching import matches
 from documents.models import CustomField
@@ -756,7 +757,7 @@ def _crop_zone(
 ) -> Image.Image | None:
     """Crop a zone from the page image and return the PIL Image."""
     try:
-        with Image.open(page_img) as img:
+        with Image.open(page_img) as opened, ImageOps.exif_transpose(opened) as img:
             img_width, img_height = img.size
             if not source_width or not source_height:
                 source_width, source_height = img.size
