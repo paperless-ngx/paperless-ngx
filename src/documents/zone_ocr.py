@@ -47,6 +47,7 @@ from documents.permissions import permitted_object_ids
 from documents.regex import safe_regex_fullmatch
 from documents.validators import monetary_validator
 from documents.versioning import get_root_document
+from paperless.parsers.utils import get_page_count_for_pdf
 from paperless.utils import OCR_TO_DATEPARSER_LANGUAGES
 
 if TYPE_CHECKING:
@@ -329,13 +330,15 @@ def plan_zone_extraction(
             for template, zones in template_zones
         ]
 
+    if not any(zones for _, zones in template_zones):
+        return []
+    page_count = _effective_page_count(doc_path, page_count, is_image=is_image)
     pages = {
-        _resolve_page_idx(zone.page, page_count)
+        page_idx
         for _, zones in template_zones
         for zone in zones
+        if (page_idx := _resolve_page_idx(zone.page, page_count)) is not None
     }
-    if not pages:
-        return []
     plans = []
     settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(dir=settings.SCRATCH_DIR) as tmp_dir:
@@ -438,13 +441,30 @@ def zone_results_written(results: list[ZoneOcrResult]) -> bool:
     return any(result.reason is None for result in results)
 
 
-def _resolve_page_idx(page_value: int | None, page_count: int | None) -> int:
+def _effective_page_count(
+    doc_path: Path,
+    page_count: int | None,
+    *,
+    is_image: bool,
+) -> int | None:
+    """The stored page count, else 1 for an image, else the pages in the PDF."""
+    if page_count:
+        return page_count
+    if is_image:
+        return 1
+    return get_page_count_for_pdf(doc_path)
+
+
+def _resolve_page_idx(page_value: int | None, page_count: int | None) -> int | None:
     """
     Resolve a zone's 1-based page or -1 (last page) to a 0-based index, defaulting
-    to the first page. Without a page count, the last page resolves to the first.
+    to the first page. The last page without a known page count resolves to None,
+    meaning the zone cannot be located.
     """
     if page_value == -1:
-        return max((page_count or 1) - 1, 0)
+        if not page_count:
+            return None
+        return page_count - 1
     return max((page_value or 1) - 1, 0)
 
 
@@ -480,7 +500,7 @@ def _plan_template(
         page_idx = _resolve_page_idx(zone.page, page_count)
         extracted = None
         reason: ZoneOcrReason | None = ZoneOcrReason.MISSING_PAGE
-        if page_idx in page_images:
+        if page_idx is not None and page_idx in page_images:
             extraction = _extract_zone(
                 page_images[page_idx],
                 zone,
@@ -852,18 +872,19 @@ def extract_zone_preview(
     is_image: bool,
 ) -> ZoneExtraction:
     """Extract a zone without writing its value to the document."""
+    page_count = _effective_page_count(doc_path, page_count, is_image=is_image)
     page_idx = _resolve_page_idx(zone.page, page_count)
     settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(dir=settings.SCRATCH_DIR) as tmp_dir:
         tmp_path = Path(tmp_dir)
         page_images = _render_pages(
             doc_path,
-            {page_idx},
+            set() if page_idx is None else {page_idx},
             tmp_path,
             page_count,
             is_image=is_image,
         )
-        if page_idx not in page_images:
+        if page_idx is None or page_idx not in page_images:
             return ZoneExtraction()
 
         return _extract_zone(

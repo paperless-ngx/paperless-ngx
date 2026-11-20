@@ -850,7 +850,7 @@ layout.
 ### Zone settings
 
 - **Page**: the page the zone is on. Turn on **Last page** for zones that are always on the final page,
-  regardless of how many pages a document has.
+  regardless of how many pages a document has. If the number of pages cannot be determined, the zone is skipped.
 - **OCR language**: the Tesseract languages used to read the zone. Languages other than the defaults must be
   installed, see [`PAPERLESS_OCR_LANGUAGES`](configuration.md#PAPERLESS_OCR_LANGUAGES).
 - **Transform**: post-processing applied to the text, such as stripping whitespace, keeping only numbers,

@@ -44,6 +44,7 @@ from documents.zone_ocr import _parse_number
 from documents.zone_ocr import _prepare_field_update
 from documents.zone_ocr import _process_template
 from documents.zone_ocr import _render_pages
+from documents.zone_ocr import _resolve_page_idx
 from documents.zone_ocr import _zone_language
 from documents.zone_ocr import extract_zone_preview
 from documents.zone_ocr import get_templates_for_content
@@ -3704,6 +3705,38 @@ class TestResolveZoneSource:
         )
 
 
+class TestResolvePageIdx:
+    """Tests for _resolve_page_idx."""
+
+    @pytest.mark.parametrize(
+        ("page_value", "page_count", "expected"),
+        [
+            pytest.param(None, 4, 0, id="blank-first-page"),
+            pytest.param(1, 4, 0, id="page-1"),
+            pytest.param(3, 4, 2, id="page-3"),
+            pytest.param(-1, 4, 3, id="last-page-with-count"),
+            pytest.param(-1, None, None, id="last-page-count-unknown"),
+            pytest.param(-1, 0, None, id="last-page-count-zero"),
+        ],
+    )
+    def test_resolves_page_to_index(
+        self,
+        page_value: int | None,
+        page_count: int | None,
+        expected: int | None,
+    ) -> None:
+        """
+        GIVEN:
+            - A zone page value and a document page count
+        WHEN:
+            - The page is resolved to a 0-based index
+        THEN:
+            - Pages are 1-based, blank is the first page, and the last page
+              without a known page count cannot be located
+        """
+        assert _resolve_page_idx(page_value, page_count) == expected
+
+
 @pytest.mark.django_db
 @pytest.mark.usefixtures("paperless_dirs")
 class TestRunZoneExtraction:
@@ -3883,6 +3916,63 @@ class TestRunZoneExtraction:
             [(None, ZoneOcrReason.TEMPLATE_FAILED), ("extracted", None)],
         )
         assert {r.template for r in results} == {"First", "Second"}
+
+    def test_last_page_zone_without_page_count_is_missing_page(
+        self,
+        mock_zone_ocr_run: MagicMock,
+        document: Document,
+        source: Path,
+    ) -> None:
+        """
+        GIVEN:
+            - A matching template with a last-page zone and a PDF document whose
+              page count is unknown and cannot be read from the file
+        WHEN:
+            - Zone extraction runs
+        THEN:
+            - The zone is reported as missing_page, no text is read and the
+              document is not changed
+        """
+        document.page_count = None
+        document.mime_type = "application/pdf"
+        document.save()
+        document.source_path.write_bytes(b"not a pdf")
+        template = OcrTemplateFactory(name="Matching", match="test")
+        zone = make_zone(template, "Last", page=-1)
+
+        results = run_zone_extraction(document, templates=[template])
+
+        assert [(r.template, r.zone, r.reason) for r in results] == [
+            ("Matching", zone.name, ZoneOcrReason.MISSING_PAGE),
+        ]
+        mock_zone_ocr_run.assert_not_called()
+        document.refresh_from_db()
+        assert document.title == "Test"
+
+    def test_last_page_zone_on_an_image_without_page_count_reads_the_image(
+        self,
+        document: Document,
+        source: Path,
+    ) -> None:
+        """
+        GIVEN:
+            - A matching template with a last-page title zone and an image
+              document whose page count is unknown
+        WHEN:
+            - Zone extraction runs
+        THEN:
+            - The image is read as its only page and the title is written
+        """
+        document.page_count = None
+        document.save()
+        template = OcrTemplateFactory(name="Matching", match="test")
+        make_zone(template, "Last", page=-1)
+
+        results = run_zone_extraction(document, templates=[template])
+
+        assert [r.reason for r in results] == [None]
+        document.refresh_from_db()
+        assert document.title == "extracted"
 
     def test_reports_missing_file_when_document_has_no_file(
         self,
