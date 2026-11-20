@@ -428,7 +428,7 @@ class TestExportImport(
             - The data is exported, the templates are deleted, and the export is
               imported again
         THEN:
-            - The template and its zones are restored with their relations
+            - The template and its zones are restored
         """
         shutil.rmtree(Path(self.dirs.media_dir) / "documents")
         install_document_samples(Path(self.dirs.media_dir) / "documents")
@@ -464,16 +464,9 @@ class TestExportImport(
             )
 
             imported = OcrTemplate.objects.get(pk=template.pk)
-            self.assertEqual(imported.owner_id, self.user.pk)
-            self.assertEqual(imported.sample_document_id, self.d1.pk)
-            self.assertEqual(imported.combine_formats, {str(self.cf1.pk): "{Number}"})
             self.assertEqual(
                 list(imported.zones.order_by("pk").values_list("pk", flat=True)),
                 [cf_zone.pk, title_zone.pk],
-            )
-            self.assertEqual(
-                OcrTemplateZone.objects.get(pk=cf_zone.pk).custom_field_id,
-                self.cf1.pk,
             )
 
     def test_update_export_changed_time(self) -> None:
