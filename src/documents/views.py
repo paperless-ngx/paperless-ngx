@@ -4315,6 +4315,7 @@ class UiSettingsView(GenericAPIView[Any]):
 
 
 GITHUB_CACHE_KEY = "github_data:%s"
+GITHUB_RELEASES_CACHE_TIMEOUT = 60 * 60 * 12
 
 
 GITHUB_RELEASES_URL = (
@@ -4378,18 +4379,21 @@ def get_github_release(version_str: str) -> dict[str, Any] | None:
         logger.debug(f"An error occurred parsing GitHub release json: {e}")
         return None
     if release is not None:
-        cache.set(cache_key, release, 60 * 60)
+        cache.set(cache_key, release, GITHUB_RELEASES_CACHE_TIMEOUT)
     return release
 
 
 def get_github_releases(
-    current_version: packaging_version.Version,
     since: packaging_version.Version,
+    until: packaging_version.Version,
 ) -> list[dict[str, Any]] | None:
     """
-    Fetch pngx releases from GitHub, newest first, back to `since`.
+    Fetch pngx releases from GitHub after `since` up to and including `until`,
+    newest first.
     """
-    cache_key = GITHUB_CACHE_KEY % f"releases:{current_version}:{since}"
+    # Keyed on the range so an upgrade (pill) or a newly detected release
+    # (update available) changes `until` and gets a fresh fetch
+    cache_key = GITHUB_CACHE_KEY % f"releases:{since}:{until}"
     releases = cache.get(cache_key)
     if releases is not None:
         return releases
@@ -4412,7 +4416,10 @@ def get_github_releases(
             packaging_version.parse(r["version"]) <= since for r in batch
         ):
             break
-    cache.set(cache_key, releases, 60 * 60)
+    releases = [
+        r for r in releases if since < packaging_version.parse(r["version"]) <= until
+    ]
+    cache.set(cache_key, releases, GITHUB_RELEASES_CACHE_TIMEOUT)
     return releases
 
 
@@ -4528,11 +4535,7 @@ class ReleaseNotesView(GenericAPIView[Any]):
             release = get_github_release(str(until))
             releases = [release] if release else []
         else:
-            releases = [
-                r
-                for r in get_github_releases(current_version, since) or []
-                if since < packaging_version.parse(r["version"]) <= until
-            ]
+            releases = get_github_releases(since, until) or []
 
         return Response(
             {
