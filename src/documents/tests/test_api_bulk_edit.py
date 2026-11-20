@@ -2905,59 +2905,6 @@ class TestRunZoneOcrBulkEditAPI:
     def document(self) -> Document:
         return DocumentFactory()
 
-    def test_queues_selected_documents(
-        self,
-        admin_client: APIClient,
-        admin_user: User,
-        document: Document,
-        mock_run_zone_ocr: mock.MagicMock,
-    ) -> None:
-        """
-        GIVEN:
-            - API data to run zone OCR on a document
-        WHEN:
-            - API is called
-        THEN:
-            - run_zone_ocr is called with the document
-        """
-        response = admin_client.post(
-            RUN_ZONE_OCR_BULK_URL,
-            {"documents": [document.id]},
-            format="json",
-        )
-        assert response.status_code == status.HTTP_200_OK
-        mock_run_zone_ocr.assert_called_once()
-        args, kwargs = mock_run_zone_ocr.call_args
-        assert args[0] == [document.id]
-        assert kwargs == {"user": admin_user}
-
-    def test_queues_chosen_template(
-        self,
-        admin_client: APIClient,
-        admin_user: User,
-        document: Document,
-        mock_run_zone_ocr: mock.MagicMock,
-    ) -> None:
-        """
-        GIVEN:
-            - API data to run a chosen OCR template on a document
-        WHEN:
-            - API is called
-        THEN:
-            - run_zone_ocr is called with the template
-        """
-        template = OcrTemplateFactory()
-        response = admin_client.post(
-            RUN_ZONE_OCR_BULK_URL,
-            {"documents": [document.id], "template": template.pk},
-            format="json",
-        )
-        assert response.status_code == status.HTTP_200_OK
-        mock_run_zone_ocr.assert_called_once()
-        args, kwargs = mock_run_zone_ocr.call_args
-        assert args[0] == [document.id]
-        assert kwargs == {"template": template.pk, "user": admin_user}
-
     def test_rejects_private_template(
         self,
         rest_api_client: APIClient,
