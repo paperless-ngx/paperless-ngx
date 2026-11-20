@@ -741,6 +741,29 @@ describe('AppFrameComponent', () => {
     httpTestingController.expectNone(`${environment.apiBaseUrl}ui_settings/`)
   })
 
+  it('should open available release notes from update available', () => {
+    jest
+      .spyOn(remoteVersionService, 'checkForUpdates')
+      .mockReturnValue(of({ version: '3.6.0', update_available: true }))
+    settingsService.set(SETTINGS_KEYS.VERSION, '3.5.1')
+    settingsService.set(SETTINGS_KEYS.UPDATE_CHECKING_ENABLED, true)
+    component.ngOnInit()
+    fixture.detectChanges()
+    const modalSpy = jest.spyOn(modalService, 'open')
+    const saveSpy = jest.spyOn(settingsService, 'markReleasesSeen')
+
+    const updateButton = fixture.debugElement
+      .queryAll(By.css('button'))
+      .find((b) => b.nativeElement.textContent.includes('Update available'))
+    updateButton.nativeElement.click()
+
+    const dialog = modalSpy.mock.results[0].value
+      .componentInstance as ReleaseNotesDialogComponent
+    expect(dialog.since()).toEqual('3.5.1')
+    expect(dialog.until()).toEqual('3.6.0')
+    expect(saveSpy).not.toHaveBeenCalled()
+  })
+
   it('should save update checking chosen in the release notes dialog', () => {
     const setUpdateCheckingSpy = jest
       .spyOn(component, 'setUpdateChecking')

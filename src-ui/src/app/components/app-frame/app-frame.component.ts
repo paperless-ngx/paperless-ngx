@@ -552,22 +552,37 @@ export class AppFrameComponent
       })
   }
 
-  showReleaseNotes() {
-    const since = this.settingsService.unseenReleasesSince()
+  private openReleaseNotes(
+    since: string | null,
+    until: string | null = null
+  ): void {
     const modal = this.modalService.open(ReleaseNotesDialogComponent, {
       size: 'lg',
       scrollable: true,
     })
-    modal.componentInstance.load(since)
+    modal.componentInstance.load(since, until)
     modal.componentInstance.updateCheckingChosen.subscribe((enable: boolean) =>
       this.setUpdateChecking(enable)
     )
+  }
+
+  showReleaseNotes() {
+    const since = this.settingsService.unseenReleasesSince()
+    this.openReleaseNotes(since)
     if (since) {
       this.settingsService
         .markReleasesSeen()
         .pipe(first())
         .subscribe({ error: () => {} })
     }
+  }
+
+  /** Notes for releases newer than the running version, not yet installed */
+  showAvailableReleaseNotes() {
+    this.openReleaseNotes(
+      this.settingsService.get(SETTINGS_KEYS.VERSION),
+      this.appRemoteVersion()?.version
+    )
   }
 
   setUpdateChecking(enable: boolean) {

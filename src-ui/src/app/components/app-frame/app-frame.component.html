@@ -415,15 +415,14 @@
                     </ng-template>
                     @if (settingsService.updateCheckingIsSet) {
                       @if (appRemoteVersion().update_available) {
-                        <a class="small text-decoration-none" target="_blank" rel="noopener noreferrer"
-                          href="https://github.com/paperless-ngx/paperless-ngx/releases"
+                        <button type="button" class="bg-transparent border-0 p-0 small text-primary" (click)="showAvailableReleaseNotes()"
                           [ngbPopover]="updateAvailablePopContent" popoverClass="shadow" triggers="mouseenter:mouseleave"
                           container="body">
                           <pngx-bs-icon width="1.2em" height="1.2em" name="info-circle" class="me-1"></pngx-bs-icon>
                           @if (appRemoteVersion()?.update_available) {
                             <ng-container i18n>Update available</ng-container>
                           }
-                        </a>
+                        </button>
                       }
                     } @else {
                       <a  *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.UISettings }" class="small text-decoration-none" routerLink="/settings" fragment="update-checking" aria-label="Configure update checking" i18n-aria-label
