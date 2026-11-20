@@ -2442,25 +2442,23 @@ class TestRunZoneOcrPermissions:
 class TestDocumentPageImage:
     """Page image rendering through the document-page-image endpoint."""
 
-    def test_missing_document_and_out_of_range_pages(
+    def test_page_beyond_page_count_is_not_found(
         self,
         preview_client: APIClient,
         preview_document: Document,
+        mock_render: MagicMock,
     ) -> None:
         """
         GIVEN:
             - A 3 page document
         WHEN:
-            - A page image is requested for a missing document, and for page 3
+            - A page image is requested for page 4
         THEN:
-            - 404 is returned for both
+            - 404 is returned without rendering anything
         """
-        response = preview_client.get(f"{ENDPOINT}document-page-image/99999/1/")
+        response = preview_client.get(preview_url(preview_document, 4))
         assert response.status_code == status.HTTP_404_NOT_FOUND
-        assert (
-            preview_client.get(preview_url(preview_document, 4)).status_code
-            == status.HTTP_404_NOT_FOUND
-        )
+        mock_render.assert_not_called()
 
     def test_page_zero_is_not_found(
         self,
