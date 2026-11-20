@@ -53,7 +53,6 @@ if settings.AUDIT_LOG_ENABLED:
 from documents import bulk_edit
 from documents.data_models import DocumentSource
 from documents.filters import CustomFieldQueryParser
-from documents.models import OCR_SUPPORTED_FIELD_TYPES
 from documents.models import Correspondent
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
@@ -99,6 +98,7 @@ from documents.validators import uri_validator
 from documents.validators import url_validator
 from documents.versioning import has_prefetched_effective_content
 from documents.versioning import sort_versions_newest_first
+from documents.zone_ocr import OCR_SUPPORTED_FIELD_TYPES
 from documents.zone_ocr import ZoneOcrSkipReason
 from documents.zone_ocr import field_key
 
@@ -3824,9 +3824,14 @@ class OcrTemplateZoneSerializer(serializers.ModelSerializer[OcrTemplateZone]):
         if value is None:
             return value
         if value.data_type not in OCR_SUPPORTED_FIELD_TYPES:
+            supported = ", ".join(
+                str(data_type.label).lower()
+                for data_type in CustomField.FieldDataType
+                if data_type in OCR_SUPPORTED_FIELD_TYPES
+            )
             raise serializers.ValidationError(
                 f"Custom field type '{value.data_type}' is not supported for OCR extraction. "
-                f"Use string, integer, float, date, monetary, boolean, URL, or long text.",
+                f"Use one of: {supported}.",
             )
         return value
 

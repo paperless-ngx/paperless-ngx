@@ -1325,6 +1325,21 @@ def _parse_monetary(value: str, locale: Locale) -> str | None:
     return result
 
 
+# Document links and select fields require object references, not OCR text.
+OCR_SUPPORTED_FIELD_TYPES = frozenset(
+    {
+        CustomField.FieldDataType.STRING,
+        CustomField.FieldDataType.URL,
+        CustomField.FieldDataType.DATE,
+        CustomField.FieldDataType.INT,
+        CustomField.FieldDataType.FLOAT,
+        CustomField.FieldDataType.MONETARY,
+        CustomField.FieldDataType.LONG_TEXT,
+        CustomField.FieldDataType.BOOL,
+    },
+)
+
+
 def _convert_value(
     value: str,
     data_type: CustomField.FieldDataType,
