@@ -1824,7 +1824,10 @@ class RunZoneOcrSerializer(serializers.Serializer[Any]):
         user = getattr(request, "user", None) if request else None
         if user is not None and user.is_authenticated:
             template_field = self.fields.get("template")
-            if not isinstance(template_field, serializers.PrimaryKeyRelatedField):
+            if not isinstance(
+                template_field,
+                serializers.PrimaryKeyRelatedField,
+            ):  # pragma: no cover
                 return
             template_field.queryset = OcrTemplate.objects.filter(
                 id__in=permitted_object_ids(user, OcrTemplate, "view_ocrtemplate"),
@@ -3951,7 +3954,10 @@ class OcrTemplateTestSerializer(serializers.Serializer[dict[str, Any]]):
         user = getattr(request, "user", None) if request else None
         if user is not None and user.is_authenticated:
             document_field = self.fields.get("document")
-            if not isinstance(document_field, serializers.PrimaryKeyRelatedField):
+            if not isinstance(
+                document_field,
+                serializers.PrimaryKeyRelatedField,
+            ):  # pragma: no cover
                 return
             document_field.queryset = Document.objects.filter(
                 id__in=permitted_document_ids(user),
@@ -3984,7 +3990,10 @@ class OcrTemplateSerializer(MatchRuleSerializer, OwnedObjectSerializer):
         # the template already stores, so saving a template unchanged keeps it.
         # Reads serialize the stored pk regardless of the queryset.
         sample_field = self.fields.get("sample_document")
-        if not isinstance(sample_field, serializers.PrimaryKeyRelatedField):
+        if not isinstance(
+            sample_field,
+            serializers.PrimaryKeyRelatedField,
+        ):  # pragma: no cover
             return
         if self.user is None:
             sample_field.queryset = Document.objects.none()

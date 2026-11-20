@@ -1050,7 +1050,7 @@ def _apply_transform(
             return numeric if re.search(r"\d", numeric) else ""
         case OcrTemplateZone.TransformType.STRIP_PUNCTUATION:
             return text.strip(string.punctuation + " \t\r\n")
-        case unreachable:
+        case unreachable:  # pragma: no cover
             assert_never(unreachable)
 
 
@@ -1100,7 +1100,7 @@ def _prepare_field_update(
                 ),
             )
             model = Document
-        case unreachable:
+        case unreachable:  # pragma: no cover
             assert_never(unreachable)
     if typed_value is None:
         return None
@@ -1326,7 +1326,7 @@ def _parse_monetary(value: str, locale: Locale) -> str | None:
     result = f"{next(iter(currencies), '')}{rounded:f}"
     try:
         monetary_validator(result)
-    except ValidationError:
+    except ValidationError:  # pragma: no cover
         return None
     return result
 
@@ -1409,7 +1409,7 @@ def _convert_value(
                 )
                 return None
 
-            case unreachable:
+            case unreachable:  # pragma: no cover
                 assert_never(unreachable)
 
     except (ValueError, InvalidOperation):

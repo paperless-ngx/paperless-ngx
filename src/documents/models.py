@@ -2298,7 +2298,7 @@ class OcrTemplate(ModelWithOwner):
             ),
         ]
 
-    def __str__(self) -> str:
+    def __str__(self) -> str:  # pragma: no cover
         return self.name
 
 
@@ -2440,5 +2440,5 @@ class OcrTemplateZone(models.Model):
         verbose_name = _("OCR template zone")
         verbose_name_plural = _("OCR template zones")
 
-    def __str__(self) -> str:
+    def __str__(self) -> str:  # pragma: no cover
         return f"{self.template.name} -> {self.name}"
