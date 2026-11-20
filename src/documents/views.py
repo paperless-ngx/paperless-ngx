@@ -4421,12 +4421,18 @@ class RemoteVersionView(GenericAPIView[Any]):
     get=extend_schema(
         description=(
             "Get release notes from GitHub for releases newer than `since`, "
-            "up to and including the running version. Without `since`, only "
-            "the running version's notes are returned."
+            "up to and including `until` (default: the running version). "
+            "Without `since`, only the `until` version's notes are returned."
         ),
         parameters=[
             OpenApiParameter(
                 name="since",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.QUERY,
+                required=False,
+            ),
+            OpenApiParameter(
+                name="until",
                 type=OpenApiTypes.STR,
                 location=OpenApiParameter.QUERY,
                 required=False,
@@ -4440,21 +4446,24 @@ class RemoteVersionView(GenericAPIView[Any]):
 class ReleaseNotesView(GenericAPIView[Any]):
     def get(self, request, format=None):
         current_version = packaging_version.parse(version.__full_version_str__)
-        since_param = request.query_params.get("since")
-        since = None
-        if since_param:
-            try:
+        since = until = None
+        try:
+            if since_param := request.query_params.get("since"):
                 since = packaging_version.parse(since_param)
-            except packaging_version.InvalidVersion:
-                return HttpResponseBadRequest("Invalid since version")
+            if until_param := request.query_params.get("until"):
+                until = packaging_version.parse(until_param)
+        except packaging_version.InvalidVersion:
+            return HttpResponseBadRequest("Invalid version")
+        # Newer releases can be requested e.g. for "update available"
+        until = until or current_version
 
         releases = get_github_releases(current_version) or []
 
         def in_range(release_version: str) -> bool:
             v = packaging_version.parse(release_version)
             if since is None:
-                return v == current_version
-            return since < v <= current_version
+                return v == until
+            return since < v <= until
 
         return Response(
             {

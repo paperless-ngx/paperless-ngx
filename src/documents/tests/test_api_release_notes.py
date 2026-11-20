@@ -111,11 +111,37 @@ class TestApiReleaseNotes:
         assert len(releases.get_requests(url=RELEASES_URL)) == 1
         assert len(releases.get_requests(url=REPO_URL)) == 1
 
-    def test_invalid_since(
+    @pytest.mark.usefixtures("stars")
+    def test_until_returns_newer_releases(
         self,
         rest_api_client: APIClient,
+        releases: HTTPXMock,
     ) -> None:
-        response = rest_api_client.get(self.ENDPOINT, {"since": "not-a-version"})
+        """
+        GIVEN:
+            - A GitHub release newer than the running version
+        WHEN:
+            - Release notes are requested from the running version until the newer one
+        THEN:
+            - Only the newer release is returned, excluding prereleases
+        """
+        response = rest_api_client.get(
+            self.ENDPOINT,
+            {"since": CURRENT, "until": _bump(minor=1)},
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert [r["version"] for r in response.data["releases"]] == [
+            _bump(patch=1),
+        ]
+
+    @pytest.mark.parametrize("param", ["since", "until"])
+    def test_invalid_version(
+        self,
+        rest_api_client: APIClient,
+        param: str,
+    ) -> None:
+        response = rest_api_client.get(self.ENDPOINT, {param: "not-a-version"})
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
