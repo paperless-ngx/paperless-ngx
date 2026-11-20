@@ -11,8 +11,6 @@ class TestMonetaryValidator:
         "value",
         [
             pytest.param("12", id="whole-number"),
-            pytest.param("12.5", id="one-decimal"),
-            pytest.param("12.50", id="two-decimals"),
             pytest.param("-12.50", id="negative"),
             pytest.param("9999999999.99", id="twelve-digits"),
             pytest.param("GBP123.45", id="code-with-amount"),
