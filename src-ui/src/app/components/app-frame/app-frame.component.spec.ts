@@ -723,6 +723,30 @@ describe('AppFrameComponent', () => {
     ).toBeUndefined()
   })
 
+  it('should dismiss new release pill without opening release notes', () => {
+    settingsService.set(SETTINGS_KEYS.VERSION, '3.5.1')
+    settingsService.set(SETTINGS_KEYS.WHATS_NEW_LAST_SEEN_VERSION, '3.4.2')
+    fixture.detectChanges()
+    const modalSpy = jest.spyOn(modalService, 'open')
+
+    fixture.debugElement
+      .query(By.css('button[aria-label="Dismiss"]'))
+      .nativeElement.click()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}ui_settings/`
+    )
+    expect(req.request.body.settings.whats_new.last_seen_version).toEqual(
+      '3.5.1'
+    )
+    req.flush({ success: true })
+    fixture.detectChanges()
+
+    expect(modalSpy).not.toHaveBeenCalled()
+    expect(
+      fixture.debugElement.query(By.css('button[aria-label="Dismiss"]'))
+    ).toBeNull()
+  })
+
   it('should open current release notes from the version without marking seen', () => {
     settingsService.set(SETTINGS_KEYS.VERSION, '3.5.1')
     settingsService.set(SETTINGS_KEYS.WHATS_NEW_LAST_SEEN_VERSION, '3.5.1')

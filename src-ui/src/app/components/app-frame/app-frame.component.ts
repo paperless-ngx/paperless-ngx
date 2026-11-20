@@ -570,11 +570,16 @@ export class AppFrameComponent
     const since = this.settingsService.unseenReleasesSince()
     this.openReleaseNotes(since)
     if (since) {
-      this.settingsService
-        .markReleasesSeen()
-        .pipe(first())
-        .subscribe({ error: () => {} })
+      this.dismissReleaseNotes()
     }
+  }
+
+  /** Mark the running version's release notes seen, hiding "New" */
+  dismissReleaseNotes() {
+    this.settingsService
+      .markReleasesSeen()
+      .pipe(first())
+      .subscribe({ error: () => {} })
   }
 
   /** Notes for releases newer than the running version, not yet installed */

@@ -389,8 +389,14 @@
                     {{ versionString }}
                   </button>
                   @if (settingsService.unseenReleasesSince()) {
-                    <button type="button" class="btn btn-whats-new rounded-pill smaller ms-1 py-1 px-2 fw-bold lh-sm align-baseline" (click)="showReleaseNotes()"
-                      title="See what's new in this version" i18n-title i18n>New</button>
+                    <div class="btn-group ms-2 align-baseline">
+                      <button type="button" class="btn btn-whats-new rounded-start-pill smaller py-1 px-2 fw-bold lh-sm" (click)="showReleaseNotes()"
+                        title="See what's new in this version" i18n-title i18n>New</button>
+                      <button type="button" class="btn btn-whats-new rounded-end-pill smaller py-1 px-1 lh-sm d-flex align-items-center" (click)="dismissReleaseNotes()"
+                        title="Dismiss" i18n-title aria-label="Dismiss" i18n-aria-label>
+                        <pngx-bs-icon name="x" class="d-flex" width="1em" height="1em"></pngx-bs-icon>
+                      </button>
+                    </div>
                   }
                 </div>
                 @if (!settingsService.updateCheckingIsSet || appRemoteVersion()) {
