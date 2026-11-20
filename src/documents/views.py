@@ -5895,7 +5895,10 @@ class OcrTemplateViewSet(BulkPermissionMixin, PassUserMixin, ModelViewSet[OcrTem
         doc_id: str,
         page: str,
     ) -> HttpResponse:
-        """Render a page for the template editor's zone overlay."""
+        """
+        Render a page for the template editor's zone overlay. The page in the URL is
+        0-based, unlike a zone's page, which is 1-based.
+        """
         from documents.zone_ocr import resolve_zone_source
 
         document: Document = get_object_or_404(

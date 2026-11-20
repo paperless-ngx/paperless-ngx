@@ -439,7 +439,10 @@ def zone_results_written(results: list[ZoneOcrResult]) -> bool:
 
 
 def _resolve_page_idx(page_value: int | None, page_count: int | None) -> int:
-    """Resolve a 1-based page or -1 (last page), defaulting to the first page."""
+    """
+    Resolve a zone's 1-based page or -1 (last page) to a 0-based index, defaulting
+    to the first page. Without a page count, the last page resolves to the first.
+    """
     if page_value == -1:
         return max((page_count or 1) - 1, 0)
     return max((page_value or 1) - 1, 0)
