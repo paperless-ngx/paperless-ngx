@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import logging
 import math
 import re
@@ -30,7 +31,6 @@ from babel.numbers import parse_decimal
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import transaction
-from django.db.models import F
 from django.db.models import Field
 from django.utils import timezone
 from PIL import Image
@@ -230,15 +230,10 @@ def get_templates_for_document(
     templates = _visible_templates(get_root_document(document).owner, requester)
     match_document = document
     if document.root_document_id is None and templates:
-        # The original file can be selected even when newer versions exist.
-        annotated = (
-            Document.objects.filter(pk=document.pk)
-            .annotate(effective_content=F("content"))
-            .first()
-        )
-        if annotated is None:
-            return []
-        match_document = annotated
+        # The original file can be selected even when newer versions exist, so
+        # match on its own content, not the latest version's.
+        match_document = copy.copy(document)
+        match_document.effective_content = document.content
     return [template for template in templates if matches(template, match_document)]
 
 
