@@ -57,4 +57,11 @@ describe('RemoteVersionService', () => {
     )
     expect(req.request.method).toEqual('GET')
   })
+
+  it('should pass until to release notes endpoint', () => {
+    subscription = service.getReleaseNotes('3.5.1', '3.6.0').subscribe()
+    httpTestingController.expectOne(
+      `${environment.apiBaseUrl}release_notes/?since=3.5.1&until=3.6.0`
+    )
+  })
 })

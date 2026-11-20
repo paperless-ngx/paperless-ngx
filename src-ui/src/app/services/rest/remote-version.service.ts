@@ -34,10 +34,16 @@ export class RemoteVersionService {
     )
   }
 
-  public getReleaseNotes(since?: string): Observable<AppReleaseNotes> {
+  public getReleaseNotes(
+    since?: string,
+    until?: string
+  ): Observable<AppReleaseNotes> {
     let params = new HttpParams()
     if (since) {
       params = params.set('since', since)
+    }
+    if (until) {
+      params = params.set('until', until)
     }
     return this.http.get<AppReleaseNotes>(
       `${environment.apiBaseUrl}release_notes/`,
