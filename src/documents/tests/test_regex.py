@@ -81,6 +81,7 @@ class TestSafeRegexSearchAndMatch:
         [
             pytest.param(safe_regex_search, id="search"),
             pytest.param(safe_regex_match, id="match"),
+            pytest.param(safe_regex_fullmatch, id="fullmatch"),
         ],
     )
     def test_invalid_pattern_returns_none(self, func) -> None:
