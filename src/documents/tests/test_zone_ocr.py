@@ -497,14 +497,15 @@ class TestZoneExtraction:
         WHEN:
             - The zone is extracted from text in that format
         THEN:
-            - The raw text is retained and the value is an ISO date
+            - The raw text is retained and the value is an ISO date read in the
+              zone's format, not the day/month order the language would assume
         """
         zone.transform = "date"
         zone.date_format = "%d/%m/%Y"
-        mock_zone_ocr_run.return_value.stdout = "25/12/2025"
+        mock_zone_ocr_run.return_value.stdout = "03/04/2025"
         result = _extract_zone(page, zone, 100, 50, tmp_path)
-        assert result.raw_text == "25/12/2025"
-        assert result.value == "2025-12-25"
+        assert result.raw_text == "03/04/2025"
+        assert result.value == "2025-04-03"
 
     @pytest.mark.parametrize(
         ("transform", "text"),
@@ -2779,6 +2780,24 @@ class TestParseDate:
             - No date is returned
         """
         assert _parse_date(text, _date_rules("deu")) is None
+
+    @pytest.mark.parametrize(
+        ("text", "expected"),
+        [
+            pytest.param("1900-01-01", date(1900, 1, 1), id="iso"),
+            pytest.param("01.01.1900", date(1900, 1, 1), id="locale-numeric"),
+        ],
+    )
+    def test_year_1900_is_accepted(self, text: str, expected: date) -> None:
+        """
+        GIVEN:
+            - A valid calendar date in the year 1900, the earliest accepted year
+        WHEN:
+            - The date is parsed
+        THEN:
+            - The date is returned
+        """
+        assert _parse_date(text, _date_rules("deu")) == expected
 
 
 @pytest.mark.django_db
