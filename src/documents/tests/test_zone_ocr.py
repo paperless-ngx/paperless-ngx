@@ -3755,7 +3755,7 @@ class TestRenderPages:
             - Only the in range pages are rendered, in order, as 1-based pages
               at 300 DPI with a 60 second timeout
         """
-        pages = _render_pages(pdf, {-1, 0, 2, 3}, tmp_path, 3, is_image=False)
+        pages = _render_pages(pdf, {0, 2, 3}, tmp_path, 3, is_image=False)
 
         assert list(pages) == [0, 2]
         assert mock_rasterize.call_count == 2

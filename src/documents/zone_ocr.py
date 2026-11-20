@@ -753,7 +753,7 @@ def _render_pages(
         return result
 
     for actual_page in sorted(pages):
-        if actual_page < 0 or (page_count and actual_page >= page_count):
+        if page_count and actual_page >= page_count:
             continue
 
         rendered = tmp_dir / f"page_{actual_page}.png"
