@@ -588,6 +588,64 @@ class TestOcrTemplatePermissions:
         assert template.name == "Renamed"
         assert template.owner == other
 
+    def test_cannot_delete_another_users_template(
+        self,
+        regular_user: User,
+        user_client: APIClient,
+    ) -> None:
+        """
+        GIVEN:
+            - A template with a zone owned by another user
+            - A user with global view and delete permission but no object
+              permission on it
+        WHEN:
+            - The user deletes the template
+        THEN:
+            - The delete is refused and the template and zone remain
+            - Once delete is granted on the template, the delete succeeds and
+              the template and zone are gone
+        """
+        other = UserFactory()
+        grant_global(regular_user, "view_ocrtemplate", "delete_ocrtemplate")
+        template = title_template("Private", owner=other)
+        grant_object(regular_user, template, "view_ocrtemplate")
+        template_pk = template.pk
+        url = detail_url(template_pk)
+
+        response = user_client.delete(url)
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert OcrTemplate.objects.filter(pk=template_pk).exists()
+        assert OcrTemplateZone.objects.filter(template_id=template_pk).count() == 1
+
+        grant_object(regular_user, template, "delete_ocrtemplate")
+        response = user_client.delete(url)
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+        assert not OcrTemplate.objects.filter(pk=template_pk).exists()
+        assert not OcrTemplateZone.objects.filter(template_id=template_pk).exists()
+
+    def test_owner_without_global_delete_permission_cannot_delete(
+        self,
+        regular_user: User,
+        user_client: APIClient,
+    ) -> None:
+        """
+        GIVEN:
+            - A template owned by the user
+            - The user can view templates but lacks global delete permission
+        WHEN:
+            - The user deletes the template
+        THEN:
+            - The delete is refused because the global check runs before the
+              owner short-circuit, and the template remains
+        """
+        grant_global(regular_user, "view_ocrtemplate")
+        template = title_template("Mine", owner=regular_user)
+
+        response = user_client.delete(detail_url(template.pk))
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert OcrTemplate.objects.filter(pk=template.pk).exists()
+
     def test_unauthenticated_rejected(self, rest_api_client: APIClient) -> None:
         """
         GIVEN:
