@@ -85,6 +85,24 @@ describe('ReleaseNotesDialogComponent', () => {
     ).toEqual('1 change')
   })
 
+  it('should load release notes for an available update', () => {
+    create(true)
+    component.load('3.5.1', '3.6.0')
+    httpTestingController
+      .expectOne(
+        `${environment.apiBaseUrl}release_notes/?since=3.5.1&until=3.6.0`
+      )
+      .flush({ version: '3.5.1', releases: [] })
+    fixture.detectChanges()
+
+    const text = fixture.nativeElement.textContent
+    expect(text).toContain('Paperless-ngx 3.6.0 is available')
+    expect(text).toContain('You are running 3.5.1')
+    expect(component.releaseUrl).toEqual(
+      'https://github.com/paperless-ngx/paperless-ngx/releases/tag/v3.6.0'
+    )
+  })
+
   it('should open release note links safely and drop svg icons', () => {
     const html = prepareReleaseHtml(
       '<div class="markdown-alert"><p class="markdown-alert-title"><svg><path d="M0"></path></svg>Note</p></div>' +
