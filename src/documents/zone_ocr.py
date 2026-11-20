@@ -1160,7 +1160,7 @@ def _number_locale(ocr_language: str) -> Locale:
     if code is not None:
         try:
             return Locale.parse(code)
-        except (UnknownLocaleError, ValueError):
+        except (UnknownLocaleError, ValueError):  # pragma: no cover
             pass
     return Locale.parse("en")
 
@@ -1412,6 +1412,6 @@ def _convert_value(
             case unreachable:  # pragma: no cover
                 assert_never(unreachable)
 
-    except (ValueError, InvalidOperation):
+    except (ValueError, InvalidOperation):  # pragma: no cover
         logger.info("Zone OCR: could not convert value to %s", data_type)
         return None
