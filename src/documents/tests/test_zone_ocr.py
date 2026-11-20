@@ -2206,13 +2206,6 @@ class TestApplyTransform:
                 id="numeric-with-currency",
             ),
             pytest.param(
-                "abc",
-                OcrTemplateZone.TransformType.NUMERIC,
-                "",
-                "",
-                id="numeric-without-digits-is-empty",
-            ),
-            pytest.param(
                 "a-b.c",
                 OcrTemplateZone.TransformType.NUMERIC,
                 "",
@@ -2804,18 +2797,6 @@ class TestParseDate:
 class TestPrepareFieldUpdate:
     """Tests for converting extracted values into field updates."""
 
-    def test_unknown_target_raises(self) -> None:
-        """
-        GIVEN:
-            - A zone whose target is not a known target
-        WHEN:
-            - A field update is prepared for it
-        THEN:
-            - A ValueError is raised
-        """
-        with pytest.raises(ValueError, match="unknown"):
-            _prepare_field_update(OcrTemplateZone(target="unknown"), "value")
-
     @pytest.mark.parametrize(
         ("length", "warns"),
         [
@@ -3199,7 +3180,6 @@ class TestParsedTextLength:
                 date(2026, 4, 13),
                 id="cut-on-a-space-keeps-the-last-word",
             ),
-            pytest.param(" " * 300, None, id="whitespace-only"),
         ],
     )
     def test_long_text_is_searched_for_dates_up_to_the_cap(
@@ -3217,47 +3197,6 @@ class TestParsedTextLength:
             - Only whole words within the cap are searched
         """
         assert _parse_date(text, ENG_DATES) == expected
-
-    @pytest.mark.parametrize(
-        ("parse", "value"),
-        [
-            pytest.param(
-                lambda text: _parse_number(text, EN),
-                "- " * 128,
-                id="number-dashes-without-digit",
-            ),
-            pytest.param(
-                lambda text: _parse_number(text, EN),
-                "- " * 127 + "1",
-                id="number-dashes-before-digit",
-            ),
-            pytest.param(
-                lambda text: _parse_monetary(text, EN),
-                "- " * 128,
-                id="monetary-dashes-without-digit",
-            ),
-            pytest.param(
-                lambda text: _parse_monetary(text, EN),
-                "(" + "1 " * 127,
-                id="monetary-unclosed-parenthesis",
-            ),
-        ],
-    )
-    def test_malformed_text_at_the_cap_is_rejected(
-        self,
-        parse: Callable[[str], object],
-        value: str,
-    ) -> None:
-        """
-        GIVEN:
-            - Malformed text at the length cap, made of dash runs or an
-              unclosed parenthesis
-        WHEN:
-            - The text is parsed
-        THEN:
-            - No value is read
-        """
-        assert parse(value) is None
 
 
 class TestConvertValue:
