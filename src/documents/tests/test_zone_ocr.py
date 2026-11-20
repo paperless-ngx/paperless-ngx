@@ -1561,6 +1561,12 @@ class TestCombineFieldValue:
                 id="middle-empty-token-drops-one-separator",
             ),
             pytest.param(
+                "{A}{B}",
+                [("A", "a"), ("B", None)],
+                "a",
+                id="trailing-empty-token-after-a-value-has-nothing-to-drop",
+            ),
+            pytest.param(
                 "{A} / {B} / {C}",
                 [("A", None), ("B", "b"), ("C", "c")],
                 "b / c",
@@ -2647,6 +2653,7 @@ class TestParseMonetary:
             pytest.param("(-12.50)", EN, None, id="parentheses-and-minus"),
             pytest.param("12.345", EN, None, id="too-many-decimals"),
             pytest.param("12345678901.12", EN, None, id="more-than-12-digits"),
+            pytest.param("9" * 30, EN, None, id="beyond-decimal-precision"),
             pytest.param("100 (19% VAT)", EN, None, id="digits-outside-parentheses"),
             pytest.param(
                 "1\N{NARROW NO-BREAK SPACE}234,56 \N{EURO SIGN}",
@@ -3483,6 +3490,28 @@ class TestRunZoneExtraction:
             return template
 
         return _make
+
+    def test_returns_nothing_without_applicable_templates(
+        self,
+        mocker: MockerFixture,
+        mock_zone_ocr_run: MagicMock,
+        document: Document,
+        source: Path,
+    ) -> None:
+        """
+        GIVEN:
+            - A document that no template matches
+        WHEN:
+            - Zone extraction runs without explicit templates
+        THEN:
+            - No results are returned, nothing is planned and no text is read
+        """
+        plan = mocker.patch("documents.zone_ocr.plan_zone_extraction")
+
+        assert run_zone_extraction(document) == []
+
+        plan.assert_not_called()
+        mock_zone_ocr_run.assert_not_called()
 
     def test_skips_template_with_no_zones(
         self,
