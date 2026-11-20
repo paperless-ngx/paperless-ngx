@@ -2920,3 +2920,246 @@ class TestOcrTemplatePreviewPermissions:
         # Past validation; the factory document has no file on disk.
         assert response.status_code == status.HTTP_404_NOT_FOUND
         mock_preview.assert_not_called()
+
+
+@pytest.fixture
+def versioned_document(
+    preview_user: User,
+    paperless_dirs: PaperlessDirs,
+) -> SimpleNamespace:
+    """A root image document with an older and a newer version, each with its own file."""
+    root = DocumentFactory(owner=preview_user, mime_type="image/png", page_count=1)
+    older = DocumentFactory(
+        owner=preview_user,
+        root_document=root,
+        mime_type="image/png",
+        page_count=1,
+        version_index=1,
+    )
+    newer = DocumentFactory(
+        owner=preview_user,
+        root_document=root,
+        mime_type="image/png",
+        page_count=1,
+        version_index=2,
+    )
+    for doc, contents in ((root, b"root"), (older, b"older"), (newer, b"newer")):
+        doc.source_path.write_bytes(contents)
+    return SimpleNamespace(root=root, older=older, newer=newer)
+
+
+@pytest.mark.django_db
+@pytest.mark.usefixtures("paperless_dirs")
+class TestZoneEditorVersions:
+    """The page image and test-zone endpoints read the version zone OCR runs on."""
+
+    @pytest.mark.parametrize(
+        ("which", "query", "expected"),
+        [
+            pytest.param("root", "", "newer", id="root-uses-latest-version"),
+            pytest.param("older", "", "older", id="version-uses-itself"),
+            pytest.param(
+                "root",
+                "?version={older}",
+                "older",
+                id="query-selects-version",
+            ),
+            pytest.param(
+                "newer",
+                "?version={older}",
+                "older",
+                id="query-overrides-version-id",
+            ),
+        ],
+    )
+    def test_page_image_serves_the_effective_version(
+        self,
+        preview_client: APIClient,
+        versioned_document: SimpleNamespace,
+        which: str,
+        query: str,
+        expected: str,
+    ) -> None:
+        """
+        GIVEN:
+            - A root document with an older and a newer version
+        WHEN:
+            - A page image is requested by root id, by version id, or with ?version=
+        THEN:
+            - The file of the effective version is served
+        """
+        document: Document = getattr(versioned_document, which)
+
+        response = preview_client.get(
+            preview_url(document) + query.format(older=versioned_document.older.pk),
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.content == expected.encode()
+
+    @pytest.mark.parametrize(
+        ("which", "query", "expected"),
+        [
+            pytest.param("root", "", "newer", id="root-uses-latest-version"),
+            pytest.param("older", "", "older", id="version-uses-itself"),
+            pytest.param(
+                "root",
+                "?version={older}",
+                "older",
+                id="query-selects-version",
+            ),
+        ],
+    )
+    def test_test_zone_extracts_from_the_effective_version(
+        self,
+        preview_client: APIClient,
+        versioned_document: SimpleNamespace,
+        mock_preview: MagicMock,
+        which: str,
+        query: str,
+        expected: str,
+    ) -> None:
+        """
+        GIVEN:
+            - A root document with an older and a newer version
+        WHEN:
+            - A zone test is posted for the root id, a version id, or with ?version=
+        THEN:
+            - Extraction reads the file of the effective version
+        """
+        mock_preview.return_value = ZoneExtraction()
+        document: Document = getattr(versioned_document, which)
+        effective = {
+            "newer": versioned_document.newer,
+            "older": versioned_document.older,
+        }[expected]
+
+        response = preview_client.post(
+            PREVIEW_ZONE_URL + query.format(older=versioned_document.older.pk),
+            {"document": document.pk, "zone": {"width": 100, "height": 50}},
+            format="json",
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert mock_preview.call_args.args[0] == effective.source_path
+
+    def test_page_image_uses_the_effective_versions_page_count(
+        self,
+        preview_client: APIClient,
+        versioned_document: SimpleNamespace,
+    ) -> None:
+        """
+        GIVEN:
+            - A root with one page and a newer version with three pages
+        WHEN:
+            - Page 2 is requested by the root id
+        THEN:
+            - The range check uses the version's page count and the file is served
+        """
+        Document.objects.filter(pk=versioned_document.newer.pk).update(page_count=3)
+
+        response = preview_client.get(preview_url(versioned_document.root, 2))
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.content == b"newer"
+
+    @pytest.mark.parametrize("endpoint", ["page-image", "test-zone"])
+    @pytest.mark.parametrize("version", ["abc", "999999", "foreign"])
+    def test_bad_version_param_is_not_found(
+        self,
+        preview_client: APIClient,
+        preview_user: User,
+        versioned_document: SimpleNamespace,
+        mock_preview: MagicMock,
+        endpoint: str,
+        version: str,
+    ) -> None:
+        """
+        GIVEN:
+            - A root document with versions, and a version of an unrelated document
+        WHEN:
+            - ?version= is non-numeric, missing, or belongs to another document
+        THEN:
+            - 404 is returned and nothing is extracted
+        """
+        if version == "foreign":
+            other = DocumentFactory(owner=preview_user)
+            version = str(DocumentFactory(owner=preview_user, root_document=other).pk)
+        query = f"?version={version}"
+
+        if endpoint == "page-image":
+            response = preview_client.get(preview_url(versioned_document.root) + query)
+        else:
+            response = preview_client.post(
+                PREVIEW_ZONE_URL + query,
+                {
+                    "document": versioned_document.root.pk,
+                    "zone": {"width": 100, "height": 50},
+                },
+                format="json",
+            )
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+        mock_preview.assert_not_called()
+
+    def test_trashed_latest_version_falls_back_to_the_older_version(
+        self,
+        preview_client: APIClient,
+        versioned_document: SimpleNamespace,
+    ) -> None:
+        """
+        GIVEN:
+            - A root document whose newest version is in the trash
+        WHEN:
+            - A page image is requested by root id, and by the trashed version
+        THEN:
+            - The root serves the newest live version
+            - The trashed version is not found
+        """
+        versioned_document.newer.delete()
+
+        by_root = preview_client.get(preview_url(versioned_document.root))
+        by_version = preview_client.get(
+            preview_url(versioned_document.root)
+            + f"?version={versioned_document.newer.pk}",
+        )
+
+        assert by_root.status_code == status.HTTP_200_OK
+        assert by_root.content == b"older"
+        assert by_version.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_test_zone_image_flag_follows_the_effective_version(
+        self,
+        preview_client: APIClient,
+        versioned_document: SimpleNamespace,
+        mock_preview: MagicMock,
+    ) -> None:
+        """
+        GIVEN:
+            - An image root document whose latest version is a PDF with an archive
+        WHEN:
+            - A zone test is posted for the root id
+        THEN:
+            - Extraction reads the version's archive and does not treat it as an image
+        """
+        newer = versioned_document.newer
+        Document.objects.filter(pk=newer.pk).update(
+            mime_type="application/pdf",
+            archive_filename="newer.pdf",
+        )
+        newer.refresh_from_db()
+        newer.archive_path.write_bytes(b"archive")
+        mock_preview.return_value = ZoneExtraction()
+
+        response = preview_client.post(
+            PREVIEW_ZONE_URL,
+            {
+                "document": versioned_document.root.pk,
+                "zone": {"width": 100, "height": 50},
+            },
+            format="json",
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert mock_preview.call_args.args[0] == newer.archive_path
+        assert mock_preview.call_args.kwargs["is_image"] is False

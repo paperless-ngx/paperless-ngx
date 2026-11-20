@@ -5861,6 +5861,19 @@ class OcrTemplateViewSet(BulkPermissionMixin, PassUserMixin, ModelViewSet[OcrTem
     )
     ordering_fields = ("name",)
 
+    @staticmethod
+    def _resolve_file_document(document: Document, request: Request) -> Document:
+        """The version whose file zone OCR reads for this request."""
+        resolution = resolve_effective_document(document, request)
+        if resolution.error == VersionResolutionError.INVALID:
+            raise NotFound("Invalid version parameter")
+        if resolution.document is None:
+            raise Http404
+        resolved = resolution.document
+        if resolved.get_deferred_fields():
+            return Document.objects.get(pk=resolved.pk)
+        return resolved
+
     def get_permissions(self) -> Sequence[Any]:
         if self.action in {"document_page_image", "test_zone"}:
             # Read-only previews: viewing templates is enough, even for the POST.
@@ -5891,20 +5904,25 @@ class OcrTemplateViewSet(BulkPermissionMixin, PassUserMixin, ModelViewSet[OcrTem
         if not has_perms_owner_aware(request.user, "view_document", document):
             return HttpResponseForbidden("Insufficient permissions")
 
+        file_doc = self._resolve_file_document(document, request)
+
         page_num = int(page)
 
-        if document.page_count and page_num >= document.page_count:
+        if file_doc.page_count and page_num >= file_doc.page_count:
             raise Http404(
-                f"Page {page_num} out of range (document has {document.page_count} pages)",
+                f"Page {page_num} out of range (document has {file_doc.page_count} pages)",
             )
 
-        archive_path = document.archive_path
-        doc_path = archive_path or document.source_path
+        archive_path = file_doc.archive_path
+        doc_path = archive_path or file_doc.source_path
         if not doc_path.is_file():
             raise Http404("Document file not found")
 
-        if archive_path is None and document.mime_type.startswith("image/"):
-            return HttpResponse(doc_path.read_bytes(), content_type=document.mime_type)
+        if archive_path is None and file_doc.mime_type.startswith("image/"):
+            return HttpResponse(
+                doc_path.read_bytes(),
+                content_type=file_doc.mime_type,
+            )
 
         with tempfile.TemporaryDirectory(dir=settings.SCRATCH_DIR) as tmp_dir:
             rendered = Path(tmp_dir) / "page.png"
@@ -5920,7 +5938,7 @@ class OcrTemplateViewSet(BulkPermissionMixin, PassUserMixin, ModelViewSet[OcrTem
                 logger.warning(
                     "Failed to render page %s of document %s: %s",
                     page_num,
-                    document.pk,
+                    file_doc.pk,
                     error,
                 )
                 raise Http404("Failed to render page") from error
@@ -5951,7 +5969,9 @@ class OcrTemplateViewSet(BulkPermissionMixin, PassUserMixin, ModelViewSet[OcrTem
         serializer.is_valid(raise_exception=True)
         document: Document = serializer.validated_data["document"]
 
-        doc_path = document.archive_path or document.source_path
+        file_doc = self._resolve_file_document(document, request)
+
+        doc_path = file_doc.archive_path or file_doc.source_path
         if not doc_path.is_file():
             return Response(
                 {"error": "Document file not found"},
@@ -5965,9 +5985,9 @@ class OcrTemplateViewSet(BulkPermissionMixin, PassUserMixin, ModelViewSet[OcrTem
             zone,
             zone.zone_source_width or 0,
             zone.zone_source_height or 0,
-            document.page_count,
-            is_image=document.archive_path is None
-            and document.mime_type.startswith("image/"),
+            file_doc.page_count,
+            is_image=file_doc.archive_path is None
+            and file_doc.mime_type.startswith("image/"),
         )
 
         regex_match = None
