@@ -779,6 +779,9 @@ describe('AppFrameComponent', () => {
     const updateButton = fixture.debugElement
       .queryAll(By.css('button'))
       .find((b) => b.nativeElement.textContent.includes('Update available'))
+    expect(updateButton.nativeElement.title).toEqual(
+      'Paperless-ngx 3.6.0 is available'
+    )
     updateButton.nativeElement.click()
 
     const dialog = modalSpy.mock.results[0].value

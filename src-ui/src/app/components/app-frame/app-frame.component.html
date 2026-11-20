@@ -401,10 +401,6 @@
                 </div>
                 @if (!settingsService.updateCheckingIsSet || appRemoteVersion()) {
                   <div class="version-check d-flex align-items-center">
-                    <ng-template #updateAvailablePopContent>
-                      <span class="small">Paperless-ngx {{ appRemoteVersion().version }} <ng-container i18n>is
-                          available.</ng-container><br /><ng-container i18n>Click to view.</ng-container></span>
-                    </ng-template>
                     <ng-template #updateCheckingNotEnabledPopContent>
                       <p class="small mb-2">
                         <ng-container i18n>Paperless-ngx can automatically check for updates</ng-container>
@@ -422,8 +418,7 @@
                     @if (settingsService.updateCheckingIsSet) {
                       @if (appRemoteVersion().update_available) {
                         <button type="button" class="bg-transparent border-0 p-0 small text-primary" (click)="showAvailableReleaseNotes()"
-                          [ngbPopover]="updateAvailablePopContent" popoverClass="shadow" triggers="mouseenter:mouseleave"
-                          container="body">
+                          title="Paperless-ngx {{ appRemoteVersion().version }} is available" i18n-title>
                           <pngx-bs-icon width="1.2em" height="1.2em" name="info-circle" class="me-1"></pngx-bs-icon>
                           @if (appRemoteVersion()?.update_available) {
                             <ng-container i18n>Update available</ng-container>
