@@ -1,8 +1,13 @@
 <div class="modal-header">
   <div>
-    <h4 class="modal-title" i18n>What's new in Paperless-ngx</h4>
-    @if (since()) {
-      <p class="text-muted small mb-0" i18n>Updated from {{ since() }} to {{ version }}</p>
+    @if (until()) {
+      <h4 class="modal-title" i18n>Paperless-ngx {{ until() }} is available</h4>
+      <p class="text-muted small mb-0" i18n>You are running {{ version }}</p>
+    } @else {
+      <h4 class="modal-title" i18n>What's new in Paperless-ngx</h4>
+      @if (since()) {
+        <p class="text-muted small mb-0" i18n>Updated from {{ since() }} to {{ version }}</p>
+      }
     }
   </div>
   <div class="d-flex align-items-center gap-3 ms-auto">

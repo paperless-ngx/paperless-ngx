@@ -57,6 +57,7 @@ export class ReleaseNotesDialogComponent {
   private readonly permissionsService = inject(PermissionsService)
 
   readonly since = signal<string | null>(null)
+  readonly until = signal<string | null>(null)
   readonly releases = signal<AppRelease[] | null>(null)
   readonly stars = signal<number | null>(null)
   readonly loading = signal(false)
@@ -80,19 +81,21 @@ export class ReleaseNotesDialogComponent {
   readonly discussionsUrl = DISCUSSIONS_URL
 
   get releaseUrl(): string {
-    return this.version ? `${RELEASES_URL}/tag/v${this.version}` : RELEASES_URL
+    const version = this.until() ?? this.version
+    return version ? `${RELEASES_URL}/tag/v${version}` : RELEASES_URL
   }
 
   /**
-   * Load notes for releases after `since`, or the running version's
-   * notes if `since` is null.
+   * Load notes for releases after `since` up to `until` (default: the
+   * running version), or just the `until` version's notes if `since` is null.
    */
-  load(since: string | null): void {
+  load(since: string | null, until: string | null = null): void {
     this.since.set(since)
+    this.until.set(until)
     if (!this.updateCheckingEnabled()) return
     this.loading.set(true)
     this.remoteVersionService
-      .getReleaseNotes(since ?? undefined)
+      .getReleaseNotes(since ?? undefined, until ?? undefined)
       .pipe(first())
       .subscribe({
         next: (notes) => {
@@ -116,7 +119,7 @@ export class ReleaseNotesDialogComponent {
     this.updateCheckingIsSet.set(true)
     this.updateCheckingEnabled.set(enable)
     this.updateCheckingChosen.emit(enable)
-    if (enable) this.load(this.since())
+    if (enable) this.load(this.since(), this.until())
   }
 
   close(): void {
