@@ -35,7 +35,6 @@ from documents.zone_ocr import _combine_field_value
 from documents.zone_ocr import _convert_value
 from documents.zone_ocr import _crop_zone
 from documents.zone_ocr import _date_rules
-from documents.zone_ocr import _detect_mime
 from documents.zone_ocr import _extract_zone
 from documents.zone_ocr import _number_locale
 from documents.zone_ocr import _parse_date
@@ -386,7 +385,10 @@ class TestZoneExtraction:
             - An empty result is returned and the reader is never run
         """
         setattr(zone, attribute, value)
-        assert extract_zone_preview(page, zone, 100, 50, 1) == ZoneExtraction()
+        assert (
+            extract_zone_preview(page, zone, 100, 50, 1, is_image=True)
+            == ZoneExtraction()
+        )
         mock_zone_ocr_run.assert_not_called()
 
     def test_date_transform_uses_zone_format(
@@ -490,7 +492,14 @@ class TestZoneExtraction:
             - The raw text and transformed value are returned
         """
         mock_zone_ocr_run.return_value.stdout = "account abc"
-        assert extract_zone_preview(page, zone, 0, 0, 1) == ZoneExtraction(
+        assert extract_zone_preview(
+            page,
+            zone,
+            0,
+            0,
+            1,
+            is_image=True,
+        ) == ZoneExtraction(
             raw_text="account abc",
             value="ACCOUNT ABC",
         )
@@ -510,7 +519,7 @@ class TestSavedZoneExtraction:
 
     @pytest.fixture
     def document(self) -> Document:
-        return DocumentFactory(title="Original")
+        return DocumentFactory(title="Original", mime_type="image/png")
 
     @pytest.fixture
     def template(self) -> OcrTemplate:
@@ -894,6 +903,7 @@ class TestSavedZoneExtraction:
             - Each page is rendered only once and the rendered files are removed
         """
         document.page_count = 2
+        document.mime_type = "application/pdf"
         make_zone(template, "First", page=1)
         make_zone(template, "Last", page=-1)
         second = make_template("Second")
@@ -1305,7 +1315,7 @@ class TestSavedZoneExtraction:
 
         def preview_and_save(raw_text: str) -> None:
             mock_zone_ocr_run.return_value.stdout = raw_text
-            preview = extract_zone_preview(page, zone, 100, 50, 1)
+            preview = extract_zone_preview(page, zone, 100, 50, 1, is_image=True)
             assert preview.raw_text == raw_text
             assert preview.value == raw_text.upper()
             _process_template(
@@ -3490,7 +3500,7 @@ class TestRenderPages:
             - Only the in range pages are rendered, in order, as 1-based pages
               at 300 DPI with a 60 second timeout
         """
-        pages = _render_pages(pdf, {-1, 0, 2, 3}, tmp_path, 3)
+        pages = _render_pages(pdf, {-1, 0, 2, 3}, tmp_path, 3, is_image=False)
 
         assert list(pages) == [0, 2]
         assert mock_rasterize.call_count == 2
@@ -3514,7 +3524,7 @@ class TestRenderPages:
         """
         mock_rasterize.side_effect = None
 
-        assert _render_pages(pdf, {0}, tmp_path, None) == {}
+        assert _render_pages(pdf, {0}, tmp_path, None, is_image=False) == {}
 
     @pytest.mark.parametrize(
         "error",
@@ -3549,7 +3559,7 @@ class TestRenderPages:
 
         mock_rasterize.side_effect = render
 
-        assert list(_render_pages(pdf, {0, 1}, tmp_path, 2)) == [1]
+        assert list(_render_pages(pdf, {0, 1}, tmp_path, 2, is_image=False)) == [1]
 
     def test_image_is_used_directly_only_for_first_page(
         self,
@@ -3568,34 +3578,11 @@ class TestRenderPages:
         image_path = tmp_path / "image.png"
         with Image.new("RGB", (10, 10)) as image:
             image.save(image_path)
-        assert _render_pages(image_path, {0}, tmp_path, 1) == {0: image_path}
-        assert _render_pages(image_path, {1}, tmp_path, 1) == {}
+        assert _render_pages(image_path, {0}, tmp_path, 1, is_image=True) == {
+            0: image_path,
+        }
+        assert _render_pages(image_path, {1}, tmp_path, 1, is_image=True) == {}
         mock_rasterize.assert_not_called()
-
-
-class TestDetectMime:
-    """Tests for _detect_mime."""
-
-    @pytest.mark.parametrize(
-        ("filename", "expected"),
-        [
-            pytest.param("test.pdf", "application/pdf", id="pdf-extension"),
-            pytest.param("test.png", "image/png", id="png-extension"),
-            pytest.param("test.jpg", "image/jpeg", id="jpg-extension"),
-            pytest.param("test.xyz", None, id="unknown-extension"),
-            pytest.param("test.webp", "image/webp", id="webp-extension"),
-        ],
-    )
-    def test_detect_mime(self, filename: str, expected: str | None) -> None:
-        """
-        GIVEN:
-            - A path with a given file extension
-        WHEN:
-            - The MIME type is detected
-        THEN:
-            - The expected MIME type, or None for an unknown extension, is returned
-        """
-        assert _detect_mime(Path(filename)) == expected
 
 
 class TestResolveDocPath:
@@ -3708,6 +3695,50 @@ class TestRunZoneExtraction:
             stdout="extracted",
             stderr="",
         )
+
+    @pytest.mark.parametrize(
+        ("mime_type", "has_archive", "expected_is_image"),
+        [
+            pytest.param("image/png", False, True, id="image-original"),
+            pytest.param("image/png", True, False, id="image-with-archive"),
+            pytest.param("application/pdf", False, False, id="pdf-original"),
+        ],
+    )
+    def test_tells_the_planner_whether_the_file_is_an_image(
+        self,
+        mocker: MockerFixture,
+        paperless_dirs: PaperlessDirs,
+        template_with_zone: Callable[..., OcrTemplate],
+        mime_type: str,
+        *,
+        has_archive: bool,
+        expected_is_image: bool,
+    ) -> None:
+        """
+        GIVEN:
+            - A stored document with an original file and optionally an archive
+        WHEN:
+            - Zone extraction runs for it
+        THEN:
+            - The archive is never treated as an image, the original is when
+              its mime type is an image
+        """
+        document = DocumentFactory(
+            mime_type=mime_type,
+            filename="original.bin",
+            archive_filename="archive.pdf" if has_archive else None,
+        )
+        document.source_path.parent.mkdir(parents=True, exist_ok=True)
+        document.source_path.write_bytes(b"original")
+        if has_archive:
+            document.archive_path.parent.mkdir(parents=True, exist_ok=True)
+            document.archive_path.write_bytes(b"archive")
+        plan = mocker.patch("documents.zone_ocr.plan_zone_extraction", return_value=[])
+        mocker.patch("documents.zone_ocr.apply_zone_plans", return_value=[])
+
+        run_zone_extraction(document, templates=[template_with_zone("T")])
+
+        assert plan.call_args.kwargs["is_image"] is expected_is_image
 
     @pytest.fixture
     def template_with_zone(self) -> Callable[..., OcrTemplate]:

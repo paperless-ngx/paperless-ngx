@@ -5966,6 +5966,8 @@ class OcrTemplateViewSet(BulkPermissionMixin, PassUserMixin, ModelViewSet[OcrTem
             zone.zone_source_width or 0,
             zone.zone_source_height or 0,
             document.page_count,
+            is_image=document.archive_path is None
+            and document.mime_type.startswith("image/"),
         )
 
         regex_match = None

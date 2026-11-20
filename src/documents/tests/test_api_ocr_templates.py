@@ -331,6 +331,7 @@ class TestZoneOcrIndexing:
                     file_document.page_count,
                     [template],
                     label="ingestion",
+                    is_image=True,
                 )
                 apply_zone_plans(document, plans, label="ingestion")
                 document_consumption_finished.send(sender=None, document=file_document)

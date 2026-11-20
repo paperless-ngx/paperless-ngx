@@ -1040,10 +1040,12 @@ class ConsumerPlugin(
             )
             if not templates:
                 return []
+            is_image = False
             if archive_path is not None and Path(archive_path).is_file():
                 doc_path: Path | None = Path(archive_path)
             elif mime_type == "application/pdf" or mime_type.startswith("image/"):
                 doc_path = self.working_copy
+                is_image = mime_type.startswith("image/")
             else:
                 doc_path = None
             return plan_zone_extraction(
@@ -1051,6 +1053,7 @@ class ConsumerPlugin(
                 page_count,
                 templates,
                 label=self.filename,
+                is_image=is_image,
             )
         except Exception:
             self.log.exception(

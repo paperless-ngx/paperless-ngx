@@ -21,7 +21,6 @@ from typing import TypeAlias
 from typing import assert_never
 
 import dateparser
-import magic
 import zxingcpp
 from babel import Locale
 from babel import UnknownLocaleError
@@ -270,11 +269,14 @@ def run_zone_extraction(
         return []
 
     label = f"document {document.pk}"
+    doc_path = _resolve_doc_path(document, original_file)
+    is_archive = doc_path is not None and doc_path == document.archive_path
     plans = plan_zone_extraction(
-        _resolve_doc_path(document, original_file),
+        doc_path,
         document.page_count,
         templates,
         label=label,
+        is_image=not is_archive and document.mime_type.startswith("image/"),
     )
     results = apply_zone_plans(get_root_document(document), plans, label=label)
     if zone_results_written(results):
@@ -290,12 +292,14 @@ def plan_zone_extraction(
     templates: list[OcrTemplate],
     *,
     label: str,
+    is_image: bool,
 ) -> list[TemplatePlan]:
     """
     Render the zones' pages from doc_path and compute each template's field
     updates without writing anything. A template that fails yields only
     TEMPLATE_FAILED results, and a missing file yields MISSING_FILE results for
-    every zone. The label names the document in log messages.
+    every zone. The label names the document in log messages. is_image says
+    doc_path is an image rather than a PDF.
     """
     template_zones = [(template, list(template.zones.all())) for template in templates]
     if doc_path is None:
@@ -315,7 +319,13 @@ def plan_zone_extraction(
     plans = []
     with tempfile.TemporaryDirectory(dir=settings.SCRATCH_DIR) as tmp_dir:
         tmp_path = Path(tmp_dir)
-        page_images = _render_pages(doc_path, pages, tmp_path, page_count)
+        page_images = _render_pages(
+            doc_path,
+            pages,
+            tmp_path,
+            page_count,
+            is_image=is_image,
+        )
         for template, zones in template_zones:
             try:
                 plans.append(
@@ -671,12 +681,16 @@ def _render_pages(
     pages: set[int],
     tmp_dir: Path,
     page_count: int | None,
+    *,
+    is_image: bool,
 ) -> dict[int, Path]:
-    """Render specific PDF pages as PNG images using pdftoppm (poppler-utils)."""
+    """
+    Render specific PDF pages as PNG images using pdftoppm (poppler-utils).
+    An image file is used as-is for page 0 only.
+    """
     result: dict[int, Path] = {}
-    mime = _detect_mime(doc_path)
 
-    if mime and mime.startswith("image/"):
+    if is_image:
         if 0 in pages:
             result[0] = doc_path
         return result
@@ -826,12 +840,20 @@ def extract_zone_preview(
     source_width: int,
     source_height: int,
     page_count: int | None,
+    *,
+    is_image: bool,
 ) -> ZoneExtraction:
     """Extract a zone without writing its value to the document."""
     page_idx = _resolve_page_idx(zone.page, page_count)
     with tempfile.TemporaryDirectory(dir=settings.SCRATCH_DIR) as tmp_dir:
         tmp_path = Path(tmp_dir)
-        page_images = _render_pages(doc_path, {page_idx}, tmp_path, page_count)
+        page_images = _render_pages(
+            doc_path,
+            {page_idx},
+            tmp_path,
+            page_count,
+            is_image=is_image,
+        )
         if page_idx not in page_images:
             return ZoneExtraction()
 
@@ -1311,24 +1333,3 @@ def _convert_value(
     except (ValueError, InvalidOperation):
         logger.info("Zone OCR: could not convert value to %s", data_type)
         return None
-
-
-def _detect_mime(path: Path) -> str | None:
-    """Detect MIME type of a file."""
-    try:
-        return magic.from_file(str(path), mime=True)
-    except (OSError, magic.MagicException):
-        logger.debug("Zone OCR: magic failed for %s, falling back to extension", path)
-
-    suffix = path.suffix.lower()
-    return {
-        ".pdf": "application/pdf",
-        ".png": "image/png",
-        ".jpg": "image/jpeg",
-        ".jpeg": "image/jpeg",
-        ".tiff": "image/tiff",
-        ".tif": "image/tiff",
-        ".webp": "image/webp",
-        ".bmp": "image/bmp",
-        ".gif": "image/gif",
-    }.get(suffix)
