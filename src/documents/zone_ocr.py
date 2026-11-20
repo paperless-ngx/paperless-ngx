@@ -20,8 +20,6 @@ from typing import NewType
 from typing import TypeAlias
 from typing import assert_never
 
-import dateparser
-import zxingcpp
 from babel import Locale
 from babel import UnknownLocaleError
 from babel.numbers import NumberFormatError
@@ -766,6 +764,8 @@ def _crop_zone(
 
 def _read_barcode(cropped: Image.Image, zone_name: str) -> str | None:
     """Read QR/barcode from a cropped image using zxingcpp."""
+    import zxingcpp
+
     try:
         results = zxingcpp.read_barcodes(cropped)
         return results[0].text if results else None
@@ -886,6 +886,8 @@ def _date_rules(ocr_language: str, date_format: str = "") -> DateRules:
 
 def _dateparser_date(text: str, rules: DateRules) -> date | None:
     """Read a whole-text absolute date with dateparser in the zone's language."""
+    import dateparser
+
     # Only absolute dates: dateparser would also read "now" or "yesterday"
     date_settings: dict[str, Any] = {
         "PARSERS": ["custom-formats", "absolute-time"],

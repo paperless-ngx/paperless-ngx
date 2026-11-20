@@ -2090,7 +2090,7 @@ class TestApplyTransform:
         THEN:
             - An empty string is returned
         """
-        mocker.patch("documents.zone_ocr.dateparser.parse", side_effect=OverflowError)
+        mocker.patch("dateparser.parse", side_effect=OverflowError)
         assert (
             _apply_transform(
                 "unparsable",
