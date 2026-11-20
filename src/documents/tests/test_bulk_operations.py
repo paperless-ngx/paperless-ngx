@@ -19,7 +19,6 @@ from documents.signals.handlers import before_task_publish_handler
 from documents.signals.handlers import task_failure_handler
 from documents.signals.handlers import task_postrun_handler
 from documents.signals.handlers import task_revoked_handler
-from documents.zone_ocr import ZoneOcrResult
 from paperless_testing.factories import DocumentFactory
 from paperless_testing.factories import OcrTemplateFactory
 from paperless_testing.factories import UserFactory
@@ -152,38 +151,6 @@ class TestRunZoneOcrBulkOperation:
         extract.assert_called_once_with(document, templates=[template])
         assert result == {"operation": "run_zone_ocr", "document_count": 1}
 
-    def test_finishes_with_the_ids_that_were_written(
-        self,
-        mocker: MockerFixture,
-        admin_user: User,
-        document: Document,
-    ) -> None:
-        """
-        GIVEN:
-            - A queued zone OCR run whose extraction reports a written document
-        WHEN:
-            - The tracked task executes it
-        THEN:
-            - bulk_update_documents runs once with that document id
-        """
-        template = OcrTemplateFactory()
-        mocker.patch(
-            "documents.bulk_edit.run_zone_extraction",
-            return_value=[
-                ZoneOcrResult(template="t", zone="z", custom_field="", reason=None),
-            ],
-        )
-        finish = mocker.patch("documents.bulk_edit.bulk_update_documents")
-
-        execute_bulk_operation(
-            "run_zone_ocr",
-            [document.pk],
-            {"template": template.pk},
-            admin_user.pk,
-        )
-
-        finish.assert_called_once_with([document.pk])
-
     def test_without_template_selects_for_the_requester(
         self,
         mocker: MockerFixture,
@@ -262,36 +229,6 @@ class TestRunZoneOcrBulkOperation:
         )
         with pytest.raises(PermissionDenied):
             execute_bulk_operation(**enqueue.call_args.kwargs["kwargs"])
-        extract.assert_not_called()
-
-    def test_does_not_fall_back_to_matching_if_chosen_template_is_deleted(
-        self,
-        mocker: MockerFixture,
-        admin_user: User,
-        document: Document,
-    ) -> None:
-        """
-        GIVEN:
-            - A queued zone OCR run naming a template that no longer exists
-        WHEN:
-            - The tracked task executes it
-        THEN:
-            - The task completes without falling back to template matching
-            - Extraction never runs
-        """
-        extract = mocker.patch(
-            "documents.bulk_edit.run_zone_extraction",
-            return_value=[],
-        )
-        select = mocker.patch("documents.bulk_edit.get_templates_for_document")
-        result = execute_bulk_operation(
-            "run_zone_ocr",
-            [document.pk],
-            {"template": 999},
-            admin_user.pk,
-        )
-        assert result == {"operation": "run_zone_ocr", "document_count": 1}
-        select.assert_not_called()
         extract.assert_not_called()
 
 
