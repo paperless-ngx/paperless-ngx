@@ -897,13 +897,6 @@
       "severity": "error"
     },
     {
-      "column": 9,
-      "path": "src/documents/serialisers.py",
-      "name": "bad-override-param-name",
-      "concise_description": "Class member `MatchingModelSerializer.validate` overrides parent class `ModelSerializer` in an inconsistent manner",
-      "severity": "error"
-    },
-    {
       "column": 62,
       "path": "src/documents/serialisers.py",
       "name": "unsupported-operation",
@@ -950,13 +943,6 @@
       "path": "src/documents/serialisers.py",
       "name": "unsupported-operation",
       "concise_description": "Cannot set item in `Mapping[str, Any]`",
-      "severity": "error"
-    },
-    {
-      "column": 9,
-      "path": "src/documents/serialisers.py",
-      "name": "bad-override-param-name",
-      "concise_description": "Class member `TagSerializer.validate` overrides parent class `MatchingModelSerializer` in an inconsistent manner",
       "severity": "error"
     },
     {

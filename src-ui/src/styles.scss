@@ -691,6 +691,12 @@ table.table {
   }
 }
 
+@media (min-width: 992px) {
+  .modal-xxl {
+    --bs-modal-width: min(1440px, calc(100vw - 2 * var(--bs-modal-margin)));
+  }
+}
+
 .toast {
   --bs-toast-max-width: var(--pngx-toast-max-width);
 }

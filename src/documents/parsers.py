@@ -90,18 +90,31 @@ def rasterize_pdf_page_to_png(
     out_path: Path,
     *,
     dpi: float,
+    page: int = 1,
+    timeout: float | None = None,
     logging_group=None,
 ) -> None:
     """
-    Rasterizes the first page of a PDF to a PNG with pdftoppm.
+    Rasterizes one page of a PDF to a PNG with pdftoppm.
+
+    Args:
+        in_path: The PDF to render.
+        out_path: Where to write the PNG. Exactly this one file is written.
+        dpi: Resolution, which may be fractional.
+        page: The 1-based page number to render, the first page by default.
+        timeout: Seconds to allow pdftoppm to run, no limit by default.
+        logging_group: Group attached to the debug log record.
+
+    Raises:
+        ParseError: pdftoppm failed, timed out or could not render the page.
     """
     args = [
         "pdftoppm",
-        # Only the first page is needed, first and last page are both 1
+        # Only the requested page is needed, first and last page are the same
         "-f",
-        "1",
+        str(page),
         "-l",
-        "1",
+        str(page),
         # Resolution in DPI, which may be fractional
         "-r",
         str(dpi),
@@ -121,9 +134,11 @@ def rasterize_pdf_page_to_png(
     logger.debug("Execute: " + " ".join(args), extra={"group": logging_group})
 
     try:
-        run_subprocess(args, logger=logger)
+        run_subprocess(args, logger=logger, timeout=timeout)
     except subprocess.CalledProcessError as e:
         raise ParseError(f"pdftoppm failed at {args}") from e
+    except subprocess.TimeoutExpired as e:
+        raise ParseError(f"pdftoppm timed out after {timeout}s at {args}") from e
     except Exception as e:  # pragma: no cover
         raise ParseError("Unknown error running pdftoppm") from e
 

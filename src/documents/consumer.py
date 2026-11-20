@@ -34,6 +34,7 @@ from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentBarcode
 from documents.models import DocumentType
+from documents.models import OcrTemplateZone
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.models import WorkflowTrigger
@@ -56,6 +57,13 @@ from documents.utils import compute_checksum
 from documents.utils import copy_basic_file_stats
 from documents.utils import copy_file_with_basic_stats
 from documents.utils import run_subprocess
+from documents.versioning import get_root_document
+from documents.zone_ocr import FieldKey
+from documents.zone_ocr import TemplatePlan
+from documents.zone_ocr import apply_zone_plans
+from documents.zone_ocr import field_key
+from documents.zone_ocr import get_templates_for_content
+from documents.zone_ocr import plan_zone_extraction
 from paperless.config import BarcodeConfig
 from paperless.config import OcrConfig
 from paperless.config import RemoteOCRConfig
@@ -588,6 +596,16 @@ class ConsumerPlugin(
                         exception=e,
                     )
 
+                # Zone OCR renders and reads pages, so it runs here, before the
+                # transaction opens. Its values are written once the document
+                # is stored.
+                zone_plans = self._plan_zone_ocr(
+                    text=text,
+                    archive_path=archive_path,
+                    mime_type=mime_type,
+                    page_count=page_count,
+                )
+
                 # Prepare the document classifier.
 
                 # TODO: I don't really like to do this here, but this way we avoid
@@ -671,6 +689,11 @@ class ConsumerPlugin(
                                 page_count=page_count,
                                 mime_type=mime_type,
                             )
+
+                        # Before the consumption finished signal, so DOCUMENT_ADDED
+                        # workflows and the other handlers of that signal see the
+                        # zone values.
+                        self._apply_zone_ocr(document, zone_plans)
 
                         # If we get here, it was successful. Proceed with post-consume
                         # hooks. If they fail, nothing will get changed.
@@ -985,6 +1008,110 @@ class ConsumerPlugin(
                 CustomFieldInstance.objects.create(**args)  # adds to document
 
         self._store_barcodes(document)
+
+    def _plan_zone_ocr(
+        self,
+        *,
+        text: str | None,
+        archive_path: Path | None,
+        mime_type: str,
+        page_count: int | None,
+    ) -> list[TemplatePlan]:
+        """
+        Select the OCR templates matching the parsed text and compute their zone
+        values, without writing anything. Zones are read from the archive, the
+        file the template editor draws on, or from the working copy of a PDF or
+        image without one. Any error is logged and yields no zone values.
+        """
+        try:
+            if self.input_doc.root_document_id is not None:
+                root_doc = Document.objects.select_related("owner").get(
+                    pk=self.input_doc.root_document_id,
+                )
+                owner = get_root_document(root_doc).owner
+            elif self.metadata.owner_id is not None:
+                owner = User.objects.get(pk=self.metadata.owner_id)
+            else:
+                owner = None
+            templates = get_templates_for_content(
+                text or "",
+                owner,
+                title=self.filename,
+            )
+            if not templates:
+                return []
+            is_image = False
+            if archive_path is not None and Path(archive_path).is_file():
+                doc_path: Path | None = Path(archive_path)
+            elif mime_type == "application/pdf" or mime_type.startswith("image/"):
+                doc_path = self.working_copy
+                is_image = mime_type.startswith("image/")
+            else:
+                doc_path = None
+            return plan_zone_extraction(
+                doc_path,
+                page_count,
+                templates,
+                label=self.filename,
+                is_image=is_image,
+            )
+        except Exception:
+            self.log.exception(
+                f"Zone OCR failed for {self.filename}, continuing without zone values",
+            )
+            return []
+
+    def _apply_zone_ocr(self, document: Document, plans: list[TemplatePlan]) -> None:
+        """
+        Write the planned zone values to the stored document, or to the root of a
+        new version. For a new document, a value supplied explicitly in the
+        metadata overrides is kept rather than replaced by a zone.
+        """
+        if not plans:
+            return
+        try:
+            protected = (
+                frozenset()
+                if self.input_doc.root_document_id is not None
+                else self._explicit_zone_targets()
+            )
+            root_doc = get_root_document(document)
+            results = apply_zone_plans(
+                root_doc,
+                plans,
+                label=f"document {root_doc.pk}",
+                protected=protected,
+            )
+        except Exception:
+            self.log.exception(
+                f"Zone OCR could not write values for {self.filename}",
+            )
+            return
+        for result in results:
+            self.log.debug(
+                f"Zone OCR: template '{result.template}' zone '{result.zone}' "
+                f"for {result.custom_field}: "
+                f"{result.reason if result.reason is not None else 'written'}",
+            )
+
+    def _explicit_zone_targets(self) -> frozenset[FieldKey]:
+        """The zone targets given a value by the metadata overrides.
+
+        A custom field listed without a value is not a supplied value.
+        """
+        targets = set()
+        if self.metadata.title is not None:
+            targets.add(field_key(OcrTemplateZone.TargetType.TITLE, None))
+        if self.metadata.asn is not None:
+            targets.add(field_key(OcrTemplateZone.TargetType.ASN, None))
+        if self.metadata.created is not None:
+            targets.add(field_key(OcrTemplateZone.TargetType.CREATED, None))
+        for field_id, value in (self.metadata.custom_fields or {}).items():
+            if value is not None:
+                targets.add(
+                    field_key(OcrTemplateZone.TargetType.CUSTOM_FIELD, int(field_id)),
+                )
+        return frozenset(targets)
 
     def _read_version_barcodes(self, mime_type: str, work_dir: Path) -> None:
         barcode_settings = BarcodeConfig()

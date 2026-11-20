@@ -323,6 +323,27 @@ describe(`DocumentService`, () => {
     })
   })
 
+  it.each([null, 3])('should queue zone OCR with template %s', (template) => {
+    const queued = jest.fn()
+    subscription = service
+      .runZoneOcrDocuments({ documents: [1, 2] }, template)
+      .subscribe(queued)
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}${endpoint}/run_zone_ocr/`
+    )
+    expect(req.request.method).toBe('POST')
+    expect(req.request.body).toEqual({
+      documents: [1, 2],
+      ...(template ? { template } : {}),
+      from_webui: true,
+    })
+    req.flush({ result: 'OK', task_id: 'zone-ocr-task' })
+    expect(queued).toHaveBeenCalledWith({
+      result: 'OK',
+      task_id: 'zone-ocr-task',
+    })
+  })
+
   it('should call appropriate api endpoint for rotate documents', () => {
     const ids = [1, 2, 3]
     subscription = service.rotateDocuments({ documents: ids }, 90).subscribe()
@@ -573,6 +594,20 @@ describe(`DocumentService`, () => {
     expect(body.get('document')).toBeInstanceOf(File)
 
     req.flush('task-id')
+  })
+
+  it('should call appropriate api endpoint for running zone OCR', () => {
+    const url = `${environment.apiBaseUrl}${endpoint}/${documents[0].id}/run-zone-ocr/`
+    subscription = service.runZoneOcr(documents[0].id).subscribe()
+    let req = httpTestingController.expectOne(url)
+    expect(req.request.method).toEqual('POST')
+    expect(req.request.body).toEqual({ from_webui: true })
+    req.flush({ result: 'OK', task_id: 'zone-ocr-1' })
+
+    subscription = service.runZoneOcr(documents[0].id, 3, 10).subscribe()
+    req = httpTestingController.expectOne(`${url}?version=10`)
+    expect(req.request.body).toEqual({ template: 3, from_webui: true })
+    req.flush({ result: 'OK', task_id: 'zone-ocr-2' })
   })
 })
 

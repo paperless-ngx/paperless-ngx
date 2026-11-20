@@ -10,6 +10,7 @@ from collections import deque
 from collections.abc import AsyncIterator
 from collections.abc import Callable
 from collections.abc import Generator
+from collections.abc import Sequence
 from datetime import datetime
 from datetime import timedelta
 from http import HTTPStatus
@@ -22,6 +23,7 @@ from typing import TYPE_CHECKING
 from typing import Any
 from typing import Final
 from typing import NamedTuple
+from typing import cast
 from unicodedata import normalize
 from urllib.parse import quote
 from urllib.parse import urlparse
@@ -162,6 +164,8 @@ from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import Note
+from documents.models import OcrTemplate
+from documents.models import OcrTemplateZone
 from documents.models import PaperlessTask
 from documents.models import SavedView
 from documents.models import ShareLink
@@ -172,12 +176,15 @@ from documents.models import UiSettings
 from documents.models import Workflow
 from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
+from documents.parsers import ParseError
+from documents.parsers import rasterize_pdf_page_to_png
 from documents.permissions import AcknowledgeTasksPermissions
 from documents.permissions import PaperlessAdminPermissions
 from documents.permissions import PaperlessNotePermissions
 from documents.permissions import PaperlessObjectPermissions
 from documents.permissions import TrashPermissions
 from documents.permissions import ViewDocumentsPermissions
+from documents.permissions import ViewOcrTemplatesPermissions
 from documents.permissions import annotate_document_count_for_related_queryset
 from documents.permissions import get_document_count_filter_for_user
 from documents.permissions import get_permission_grantees
@@ -191,6 +198,7 @@ from documents.permissions import restrict_queryset_to_visible
 from documents.permissions import set_permissions_for_objects
 from documents.permissions import user_is_unrestricted
 from documents.plugins.date_parsing import get_date_parser
+from documents.regex import safe_regex_fullmatch
 from documents.schema import generate_object_with_permissions_schema
 from documents.search import SearchHit
 from documents.serialisers import AcknowledgeTasksViewSerializer
@@ -212,11 +220,18 @@ from documents.serialisers import MergeDocumentsAsVersionsSerializer
 from documents.serialisers import MergeDocumentsSerializer
 from documents.serialisers import NoteCreateSerializer
 from documents.serialisers import NotesSerializer
+from documents.serialisers import OcrErrorSerializer
+from documents.serialisers import OcrTemplateSerializer
+from documents.serialisers import OcrTemplateTestResultSerializer
+from documents.serialisers import OcrTemplateTestSerializer
 from documents.serialisers import PostDocumentSerializer
 from documents.serialisers import RemovePasswordDocumentsSerializer
 from documents.serialisers import ReprocessDocumentsSerializer
 from documents.serialisers import RotateDocumentsSerializer
 from documents.serialisers import RunTaskSerializer
+from documents.serialisers import RunZoneOcrDocumentsSerializer
+from documents.serialisers import RunZoneOcrResponseSerializer
+from documents.serialisers import RunZoneOcrSerializer
 from documents.serialisers import SavedViewSerializer
 from documents.serialisers import SearchResultSerializer
 from documents.serialisers import SerializerWithPerms
@@ -248,6 +263,7 @@ from documents.versioning import get_latest_version_for_root
 from documents.versioning import get_request_version_param
 from documents.versioning import get_root_document
 from documents.versioning import latest_version_content_prefetch
+from documents.versioning import resolve_effective_document
 from documents.versioning import resolve_requested_version_for_root
 from documents.versioning import versions_newest_first
 from paperless import version
@@ -2260,6 +2276,98 @@ class DocumentViewSet(
         return version_doc
 
     @extend_schema(
+        operation_id="documents_run_zone_ocr",
+        parameters=[
+            OpenApiParameter(
+                name="version",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.QUERY,
+                description="File version ID. Defaults to the latest version.",
+            ),
+        ],
+        request=RunZoneOcrSerializer,
+        responses={
+            (200, "application/json"): RunZoneOcrResponseSerializer,
+            (404, "application/json"): OcrErrorSerializer,
+        },
+    )
+    @action(
+        methods=["post"],
+        detail=True,
+        url_path="run-zone-ocr",
+        permission_classes=[IsAuthenticated],
+    )
+    def run_zone_ocr(self, request: Request, pk: str | None = None) -> HttpResponse:
+        """
+        Queue zone-based OCR extraction on this document, with the given
+        template or with every template that matches it. The file version
+        given by the version parameter is run when it is not the root
+        document. Responds with the task id, or skipped when no template
+        applies.
+        """
+        serializer = RunZoneOcrSerializer(
+            data=request.data,
+            context={"request": request},
+        )
+        serializer.is_valid(raise_exception=True)
+        template = serializer.validated_data.get("template")
+
+        document: Document = get_object_or_404(
+            Document.objects.select_related("root_document__owner"),
+            pk=pk,
+        )
+        user = cast("User", request.user)
+        if not user.has_perm(
+            "documents.change_document",
+        ) or not has_perms_owner_aware(user, "change_document", document):
+            return HttpResponseForbidden("Insufficient permissions")
+
+        from documents.zone_ocr import ZoneOcrSkipReason
+        from documents.zone_ocr import get_templates_for_document
+        from documents.zone_ocr import resolve_zone_source
+
+        resolution = resolve_effective_document(document, request)
+        if resolution.error == VersionResolutionError.INVALID:
+            raise NotFound("Invalid version parameter")
+        file_document = resolution.document
+        if file_document is None:
+            raise Http404
+
+        if template is None and not get_templates_for_document(
+            file_document,
+            requester=user,
+        ):
+            return Response(
+                {
+                    "result": "skipped",
+                    "reason": ZoneOcrSkipReason.NO_TEMPLATE,
+                },
+            )
+
+        if resolve_zone_source(file_document) is None:
+            return Response(
+                {"error": "Document file not found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        parameters: dict[str, Any] = {"resolve_latest": False}
+        if template is not None:
+            parameters["template"] = template.pk
+        try:
+            return queue_bulk_operation(
+                user,
+                bulk_edit.run_zone_ocr,
+                [file_document.pk],
+                parameters,
+                from_webui=serializer.validated_data["from_webui"],
+            )
+        except Exception as e:
+            logger.warning(f"An error occurred performing document zone OCR: {e!s}")
+            return HttpResponseBadRequest(
+                "Error performing document zone OCR, check logs for more detail.",
+            )
+
+    @extend_schema(
         operation_id="documents_delete_version",
         parameters=[
             OpenApiParameter(
@@ -2993,35 +3101,56 @@ class DocumentSelectionMixin:
         return list(filtered_documents.values_list("pk", flat=True))
 
 
+def queue_bulk_operation(
+    user: User,
+    method: Callable[..., Any],
+    documents: list[int],
+    parameters: dict[str, Any],
+    *,
+    from_webui: bool,
+) -> Response:
+    """
+    Validate the parameters against the bulk edit method, queue it as a tracked
+    bulk operation task and return the task id.
+    """
+    if "update_callback" in parameters:
+        raise ValueError("Unsupported bulk operation parameter: update_callback")
+    trigger_source = (
+        PaperlessTask.TriggerSource.WEB_UI
+        if from_webui
+        else PaperlessTask.TriggerSource.API_UPLOAD
+    )
+    final_parameters = parameters.copy()
+    if method.__name__ in USER_OPERATIONS:
+        final_parameters["user"] = user
+    if method.__name__ in TRIGGER_SOURCE_OPERATIONS:
+        final_parameters["trigger_source"] = trigger_source
+    signature(method).bind(documents, **final_parameters)
+    task = execute_bulk_operation.apply_async(
+        kwargs={
+            "operation": method.__name__,
+            "document_ids": documents,
+            "parameters": parameters,
+            "user_id": user.pk,
+            "trigger_source": trigger_source,
+        },
+        headers={"trigger_source": trigger_source},
+    )
+    return Response({"result": "OK", "task_id": task.id})
+
+
 class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
     permission_classes = (IsAuthenticated,)
     parser_classes = (parsers.JSONParser,)
 
     def _queue_bulk_operation(self, method, documents, parameters, from_webui):
-        if "update_callback" in parameters:
-            raise ValueError("Unsupported bulk operation parameter: update_callback")
-        trigger_source = (
-            PaperlessTask.TriggerSource.WEB_UI
-            if from_webui
-            else PaperlessTask.TriggerSource.API_UPLOAD
+        return queue_bulk_operation(
+            cast("User", self.request.user),
+            method,
+            documents,
+            parameters,
+            from_webui=from_webui,
         )
-        final_parameters = parameters.copy()
-        if method.__name__ in USER_OPERATIONS:
-            final_parameters["user"] = self.request.user
-        if method.__name__ in TRIGGER_SOURCE_OPERATIONS:
-            final_parameters["trigger_source"] = trigger_source
-        signature(method).bind(documents, **final_parameters)
-        task = execute_bulk_operation.apply_async(
-            kwargs={
-                "operation": method.__name__,
-                "document_ids": documents,
-                "parameters": parameters,
-                "user_id": self.request.user.pk,
-                "trigger_source": trigger_source,
-            },
-            headers={"trigger_source": trigger_source},
-        )
-        return Response({"result": "OK", "task_id": task.id})
 
     def _has_document_permissions(
         self,
@@ -3373,6 +3502,37 @@ class ReprocessDocumentsView(DocumentOperationPermissionMixin):
             method=bulk_edit.reprocess,
             validated_data=serializer.validated_data,
             operation_label="document reprocess",
+        )
+
+
+@extend_schema_view(
+    post=extend_schema(
+        operation_id="documents_run_zone_ocr_bulk",
+        description="Run OCR template zone extraction on selected documents",
+        responses={
+            200: inline_serializer(
+                name="RunZoneOcrDocumentsResult",
+                fields={
+                    "result": serializers.CharField(),
+                    "task_id": serializers.CharField(),
+                },
+            ),
+        },
+    ),
+)
+class RunZoneOcrDocumentsView(DocumentOperationPermissionMixin):
+    serializer_class = RunZoneOcrDocumentsSerializer
+
+    def post(self, request: Request, *args: Any, **kwargs: Any) -> HttpResponse:
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        template = serializer.validated_data.get("template")
+        if template is not None:
+            serializer.validated_data["template"] = template.pk
+        return self._execute_document_action(
+            method=bulk_edit.run_zone_ocr,
+            validated_data=serializer.validated_data,
+            operation_label="document zone OCR",
         )
 
 
@@ -5693,3 +5853,178 @@ def serve_logo(request: HttpRequest, filename: str | None = None) -> FileRespons
         filename=logo_name,
         as_attachment=True,
     )
+
+
+class OcrTemplateViewSet(BulkPermissionMixin, PassUserMixin, ModelViewSet[OcrTemplate]):
+    """CRUD for OCR templates with zone definitions."""
+
+    model = OcrTemplate
+
+    queryset = (
+        OcrTemplate.objects.select_related("owner")
+        .prefetch_related(
+            "zones",
+            "zones__custom_field",
+        )
+        .order_by("name")
+    )
+    serializer_class = OcrTemplateSerializer
+    pagination_class = StandardPagination
+    permission_classes = (IsAuthenticated, PaperlessObjectPermissions)
+    filter_backends = (
+        OrderingFilter,
+        PermittedObjectsFilter,
+    )
+    ordering_fields = ("name",)
+
+    @staticmethod
+    def _resolve_file_document(document: Document, request: Request) -> Document:
+        """The version whose file zone OCR reads for this request."""
+        resolution = resolve_effective_document(document, request)
+        if resolution.error == VersionResolutionError.INVALID:
+            raise NotFound("Invalid version parameter")
+        if resolution.document is None:
+            raise Http404
+        resolved = resolution.document
+        if resolved.get_deferred_fields():
+            return Document.objects.get(pk=resolved.pk)
+        return resolved
+
+    def get_permissions(self) -> Sequence[Any]:
+        if self.action in {"document_page_image", "test_zone"}:
+            # Read-only previews: viewing templates is enough, even for the POST.
+            return [
+                IsAuthenticated(),
+                ViewOcrTemplatesPermissions(),
+                ViewDocumentsPermissions(),
+            ]
+        return super().get_permissions()
+
+    @action(
+        detail=False,
+        methods=["get"],
+        url_path=r"document-page-image/(?P<doc_id>[0-9]+)/(?P<page>[0-9]+)",
+    )
+    def document_page_image(
+        self,
+        request: Request,
+        doc_id: str,
+        page: str,
+    ) -> HttpResponse:
+        """
+        Render a page for the template editor's zone overlay. The page in the URL is
+        1-based, like a zone's page.
+        """
+        from documents.zone_ocr import resolve_zone_source
+
+        document: Document = get_object_or_404(
+            Document.objects.select_related("root_document__owner"),
+            pk=doc_id,
+        )
+
+        if not has_perms_owner_aware(request.user, "view_document", document):
+            return HttpResponseForbidden("Insufficient permissions")
+
+        file_doc = self._resolve_file_document(document, request)
+
+        page_number = int(page)
+        if page_number < 1:
+            raise Http404("Page numbers start at 1")
+
+        if file_doc.page_count and page_number > file_doc.page_count:
+            raise Http404(
+                f"Page {page_number} out of range (document has {file_doc.page_count} pages)",
+            )
+
+        source = resolve_zone_source(file_doc)
+        if source is None:
+            raise Http404("Document file not found")
+        doc_path = source.path
+
+        if source.is_image:
+            return HttpResponse(
+                doc_path.read_bytes(),
+                content_type=file_doc.mime_type,
+            )
+
+        settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=settings.SCRATCH_DIR) as tmp_dir:
+            rendered = Path(tmp_dir) / "page.png"
+            try:
+                rasterize_pdf_page_to_png(
+                    doc_path,
+                    rendered,
+                    dpi=150,
+                    page=page_number,
+                    timeout=30,
+                )
+            except ParseError as error:
+                logger.warning(
+                    "Failed to render page %s of document %s: %s",
+                    page_number,
+                    file_doc.pk,
+                    error,
+                )
+                raise Http404("Failed to render page") from error
+
+            if not rendered.is_file():
+                raise Http404("No rendered page found")
+
+            content = rendered.read_bytes()
+
+        return HttpResponse(content, content_type="image/png")
+
+    @extend_schema(
+        request=OcrTemplateTestSerializer,
+        responses={
+            (200, "application/json"): OcrTemplateTestResultSerializer,
+            (404, "application/json"): OcrErrorSerializer,
+        },
+    )
+    @action(detail=False, methods=["post"], url_path="test-zone")
+    def test_zone(self, request: Request) -> HttpResponse:
+        """Extract an ad-hoc zone without changing the document."""
+        from documents.zone_ocr import extract_zone_preview
+        from documents.zone_ocr import resolve_zone_source
+
+        serializer = OcrTemplateTestSerializer(
+            data=request.data,
+            context={"request": request},
+        )
+        serializer.is_valid(raise_exception=True)
+        document: Document = serializer.validated_data["document"]
+
+        file_doc = self._resolve_file_document(document, request)
+
+        source = resolve_zone_source(file_doc)
+        if source is None:
+            return Response(
+                {"error": "Document file not found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        zone = OcrTemplateZone(**serializer.validated_data["zone"])
+
+        result = extract_zone_preview(
+            source.path,
+            zone,
+            zone.zone_source_width or 0,
+            zone.zone_source_height or 0,
+            file_doc.page_count,
+            is_image=source.is_image,
+        )
+
+        regex_match = None
+        if zone.validation_regex and result.value is not None:
+            regex_match = (
+                safe_regex_fullmatch(zone.validation_regex, result.value) is not None
+            )
+
+        return Response(
+            {
+                "raw_text": result.raw_text,
+                "value": result.value,
+                "regex": zone.validation_regex,
+                "regex_match": regex_match,
+            },
+        )
