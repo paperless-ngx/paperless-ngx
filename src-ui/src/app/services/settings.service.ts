@@ -20,6 +20,7 @@ import {
   hexToHsl,
 } from 'src/app/utils/color'
 import { DEFAULT_APP_TITLE, environment } from 'src/environments/environment'
+import { compareVersions } from 'src/app/utils/version'
 import { DEFAULT_DISPLAY_FIELDS, DisplayField } from '../data/document'
 import { RemoteOCRModeConfig } from '../data/paperless-config'
 import { SavedView } from '../data/saved-view'
@@ -327,6 +328,18 @@ export class SettingsService {
     SETTINGS_KEYS.SIDEBAR_HIDDEN_ITEMS
   )
 
+  /**
+   * The last version the user saw release notes for, if the running
+   * version is newer, or null.
+   */
+  readonly unseenReleasesSince = computed<string | null>(() => {
+    this.settingsVersion()
+    const currentVersion = this.get(SETTINGS_KEYS.VERSION)
+    const lastSeen = this.get(SETTINGS_KEYS.WHATS_NEW_LAST_SEEN_VERSION)
+    if (!currentVersion || !lastSeen) return null
+    return compareVersions(currentVersion, lastSeen) > 0 ? lastSeen : null
+  })
+
   readonly allDisplayFields = signal<Array<{ id: DisplayField; name: string }>>(
     DEFAULT_DISPLAY_FIELDS
   )
@@ -384,6 +397,7 @@ export class SettingsService {
           uisettings.permissions,
           this.currentUser()
         )
+        this.maybeSeedLastSeenVersion()
 
         this.initializeDisplayFields()
       })
@@ -711,6 +725,34 @@ export class SettingsService {
 
   get updateCheckingIsSet(): boolean {
     return this.settingIsSet(SETTINGS_KEYS.UPDATE_CHECKING_ENABLED)
+  }
+
+  /**
+   * Record the baseline version for "what's new" tracking.
+   */
+  private maybeSeedLastSeenVersion() {
+    const currentVersion = this.get(SETTINGS_KEYS.VERSION)
+    if (
+      !currentVersion ||
+      this.get(SETTINGS_KEYS.WHATS_NEW_LAST_SEEN_VERSION) ||
+      !this.permissionsService.currentUserCan(
+        PermissionAction.Change,
+        PermissionType.UISettings
+      )
+    )
+      return
+    this.set(SETTINGS_KEYS.WHATS_NEW_LAST_SEEN_VERSION, currentVersion)
+    this.storeSettings()
+      .pipe(first())
+      .subscribe({ error: () => {} })
+  }
+
+  public markReleasesSeen(): Observable<any> {
+    this.set(
+      SETTINGS_KEYS.WHATS_NEW_LAST_SEEN_VERSION,
+      this.get(SETTINGS_KEYS.VERSION)
+    )
+    return this.storeSettings()
   }
 
   /**

@@ -4314,6 +4314,139 @@ class UiSettingsView(GenericAPIView[Any]):
         )
 
 
+GITHUB_CACHE_KEY = "github_data:%s"
+GITHUB_RELEASES_CACHE_TIMEOUT = 60 * 60 * 12
+GITHUB_REQUEST_TIMEOUT = 5
+
+
+GITHUB_RELEASES_URL = (
+    "https://api.github.com/repos/paperless-ngx/paperless-ngx/releases"
+)
+GITHUB_RELEASES_PER_PAGE = 10
+# Caps how far back a range can walk, e.g. for a bad `since`
+GITHUB_RELEASES_MAX_PAGES = 3
+
+
+def _fetch_github_releases_json(url: str, params: dict | None = None) -> Any | None:
+    try:
+        resp = httpx.get(
+            url,
+            params=params,
+            # GitHub renders release bodies as HTML
+            headers={"Accept": "application/vnd.github.html+json"},
+            timeout=GITHUB_REQUEST_TIMEOUT,
+        )
+        resp.raise_for_status()
+        return resp.json()
+    except ValueError as e:
+        logger.debug(f"An error occurred parsing GitHub releases json: {e}")
+    except httpx.HTTPError as e:
+        logger.debug(f"An error occurred fetching GitHub releases: {e}")
+    return None
+
+
+def _parse_github_release(release: dict[str, Any]) -> dict[str, Any] | None:
+    if release.get("draft") or release.get("prerelease"):
+        return None
+    try:
+        # Some early tags used ngx-x.y.z
+        release_version = packaging_version.parse(
+            release["tag_name"].removeprefix("ngx-"),
+        )
+    except packaging_version.InvalidVersion:
+        return None
+    return {
+        "version": str(release_version),
+        "name": release.get("name") or release["tag_name"],
+        "body_html": release.get("body_html") or "",
+        "html_url": release["html_url"],
+        "published_at": release.get("published_at"),
+    }
+
+
+def get_github_release(version_str: str) -> dict[str, Any] | None:
+    """
+    Fetch a single pngx release from GitHub by version.
+    """
+    cache_key = GITHUB_CACHE_KEY % f"release:{version_str}"
+    release = cache.get(cache_key)
+    if release is not None:
+        return release
+    data = _fetch_github_releases_json(f"{GITHUB_RELEASES_URL}/tags/v{version_str}")
+    if data is None:
+        return None
+    try:
+        release = _parse_github_release(data)
+    except (KeyError, TypeError, AttributeError) as e:
+        logger.debug(f"An error occurred parsing GitHub release json: {e}")
+        return None
+    if release is not None:
+        cache.set(cache_key, release, GITHUB_RELEASES_CACHE_TIMEOUT)
+    return release
+
+
+def get_github_releases(
+    since: packaging_version.Version,
+    until: packaging_version.Version,
+) -> list[dict[str, Any]] | None:
+    """
+    Fetch pngx releases from GitHub after `since` up to and including `until`,
+    newest first.
+    """
+    # Keyed on the range so an upgrade (pill) or a newly detected release
+    # (update available) changes `until` and gets a fresh fetch
+    cache_key = GITHUB_CACHE_KEY % f"releases:{since}:{until}"
+    releases = cache.get(cache_key)
+    if releases is not None:
+        return releases
+    releases = []
+    # Releases are listed newest first, so stop paging once we reach `since`
+    for page in range(1, GITHUB_RELEASES_MAX_PAGES + 1):
+        data = _fetch_github_releases_json(
+            GITHUB_RELEASES_URL,
+            params={"per_page": GITHUB_RELEASES_PER_PAGE, "page": page},
+        )
+        if data is None:
+            return None
+        try:
+            batch = [r for r in map(_parse_github_release, data) if r is not None]
+        except (KeyError, TypeError, AttributeError) as e:
+            logger.debug(f"An error occurred parsing GitHub releases json: {e}")
+            return None
+        releases.extend(batch)
+        if len(data) < GITHUB_RELEASES_PER_PAGE or any(
+            packaging_version.parse(r["version"]) <= since for r in batch
+        ):
+            break
+    releases = [
+        r for r in releases if since < packaging_version.parse(r["version"]) <= until
+    ]
+    cache.set(cache_key, releases, GITHUB_RELEASES_CACHE_TIMEOUT)
+    return releases
+
+
+def get_github_stars() -> int | None:
+    """
+    Fetch the number of stars for the Paperless-NGX repository from GitHub.
+    """
+    count = cache.get(GITHUB_CACHE_KEY % "stars")
+    if count is not None:
+        return count
+    try:
+        resp = httpx.get(
+            "https://api.github.com/repos/paperless-ngx/paperless-ngx",
+            headers={"Accept": "application/vnd.github+json"},
+            timeout=GITHUB_REQUEST_TIMEOUT,
+        )
+        resp.raise_for_status()
+        count = resp.json()["stargazers_count"]
+    except Exception as e:
+        logger.debug(f"An error occurred fetching GitHub stars: {e}")
+        return None
+    cache.set(GITHUB_CACHE_KEY % "stars", count, 60 * 60)
+    return count
+
+
 @extend_schema_view(
     get=extend_schema(
         description="Get the current version of the Paperless-NGX server",
@@ -4357,6 +4490,61 @@ class RemoteVersionView(GenericAPIView[Any]):
             {
                 "version": remote_version,
                 "update_available": is_greater_than_current,
+            },
+        )
+
+
+@extend_schema_view(
+    get=extend_schema(
+        description=(
+            "Get release notes from GitHub for releases newer than `since`, "
+            "up to and including `until` (default: the running version). "
+            "Without `since`, only the `until` version's notes are returned."
+        ),
+        parameters=[
+            OpenApiParameter(
+                name="since",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.QUERY,
+                required=False,
+            ),
+            OpenApiParameter(
+                name="until",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.QUERY,
+                required=False,
+            ),
+        ],
+        responses={
+            (200, "application/json"): OpenApiTypes.OBJECT,
+        },
+    ),
+)
+class ReleaseNotesView(GenericAPIView[Any]):
+    def get(self, request, format=None):
+        current_version = packaging_version.parse(version.__full_version_str__)
+        since = until = None
+        try:
+            if since_param := request.query_params.get("since"):
+                since = packaging_version.parse(since_param)
+            if until_param := request.query_params.get("until"):
+                until = packaging_version.parse(until_param)
+        except packaging_version.InvalidVersion:
+            return HttpResponseBadRequest("Invalid version")
+        # Newer releases can be requested e.g. for "update available"
+        until = until or current_version
+
+        if since is None:
+            release = get_github_release(str(until))
+            releases = [release] if release else []
+        else:
+            releases = get_github_releases(since, until) or []
+
+        return Response(
+            {
+                "version": version.__full_version_str__,
+                "releases": releases,
+                "stars": get_github_stars(),
             },
         )
 

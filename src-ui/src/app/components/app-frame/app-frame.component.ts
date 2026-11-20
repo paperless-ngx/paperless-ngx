@@ -68,6 +68,7 @@ import { SwitchComponent } from '../common/input/switch/switch.component'
 import { BrandMarkComponent } from '../common/logo/brand-mark/brand-mark.component'
 import { LogoComponent } from '../common/logo/logo.component'
 import { ProfileEditDialogComponent } from '../common/profile-edit-dialog/profile-edit-dialog.component'
+import { ReleaseNotesDialogComponent } from '../common/release-notes-dialog/release-notes-dialog.component'
 import { UploadStatusTrayComponent } from '../common/upload-status-tray/upload-status-tray.component'
 import { DocumentDetailComponent } from '../document-detail/document-detail.component'
 import { ComponentWithPermissions } from '../with-permissions/with-permissions.component'
@@ -549,6 +550,44 @@ export class AppFrameComponent
       .subscribe((appRemoteVersion: AppRemoteVersion) => {
         this.appRemoteVersion.set(appRemoteVersion)
       })
+  }
+
+  private openReleaseNotes(
+    since: string | null,
+    until: string | null = null
+  ): void {
+    const modal = this.modalService.open(ReleaseNotesDialogComponent, {
+      size: 'lg',
+      scrollable: true,
+    })
+    modal.componentInstance.load(since, until)
+    modal.componentInstance.updateCheckingChosen.subscribe((enable: boolean) =>
+      this.setUpdateChecking(enable)
+    )
+  }
+
+  showReleaseNotes() {
+    const since = this.settingsService.unseenReleasesSince()
+    this.openReleaseNotes(since)
+    if (since) {
+      this.dismissReleaseNotes()
+    }
+  }
+
+  /** Mark the running version's release notes seen, hiding "New" */
+  dismissReleaseNotes() {
+    this.settingsService
+      .markReleasesSeen()
+      .pipe(first())
+      .subscribe({ error: () => {} })
+  }
+
+  /** Notes for releases newer than the running version, not yet installed */
+  showAvailableReleaseNotes() {
+    this.openReleaseNotes(
+      this.settingsService.get(SETTINGS_KEYS.VERSION),
+      this.appRemoteVersion()?.version
+    )
   }
 
   setUpdateChecking(enable: boolean) {
