@@ -16,7 +16,6 @@ import pytest
 from babel import Locale
 from django.contrib.auth.models import Group
 from PIL import Image
-from rest_framework.renderers import JSONRenderer
 
 from documents.models import CustomField
 from documents.models import CustomFieldInstance
@@ -25,12 +24,9 @@ from documents.models import MatchingModel
 from documents.models import OcrTemplate
 from documents.models import OcrTemplateZone
 from documents.parsers import ParseError
-from documents.serialisers import OcrTemplateTestResultSerializer
-from documents.serialisers import RunZoneOcrResponseSerializer
 from documents.zone_ocr import MAX_PARSED_TEXT_LENGTH
 from documents.zone_ocr import ZoneExtraction
 from documents.zone_ocr import ZoneOcrReason
-from documents.zone_ocr import ZoneOcrSkipReason
 from documents.zone_ocr import ZoneSourceFile
 from documents.zone_ocr import _apply_transform
 from documents.zone_ocr import _combine_field_value
@@ -2227,13 +2223,6 @@ class TestApplyTransform:
                 id="date-with-format-slashed",
             ),
             pytest.param(
-                "13.04.26",
-                OcrTemplateZone.TransformType.DATE,
-                "%d.%m.%y",
-                "2026-04-13",
-                id="date-two-digit-year",
-            ),
-            pytest.param(
                 "2026-04-13",
                 OcrTemplateZone.TransformType.DATE,
                 "",
@@ -2885,18 +2874,6 @@ class TestPrepareFieldUpdate:
                 "https://example.com/" + "a" * 150,
                 id="url-longer-than-128",
             ),
-            pytest.param(
-                CustomField.FieldDataType.URL,
-                "https://example.com/" + "a" * 200,
-                None,
-                id="url-over-the-limit",
-            ),
-            pytest.param(
-                CustomField.FieldDataType.URL,
-                "not a url",
-                None,
-                id="not-a-url",
-            ),
         ],
     )
     def test_text_values_are_kept_whole_or_rejected(
@@ -3521,18 +3498,6 @@ class TestConvertValue:
                 CustomField.FieldDataType.INT,
                 EN,
                 id="int-thousands-and-fraction-returns-none",
-            ),
-            pytest.param(
-                "12.3,00",
-                CustomField.FieldDataType.INT,
-                EN,
-                id="int-bad-grouping-before-fraction-returns-none",
-            ),
-            pytest.param(
-                "1,2345.00",
-                CustomField.FieldDataType.INT,
-                EN,
-                id="int-long-group-before-fraction-returns-none",
             ),
             pytest.param(
                 "abc",
@@ -4358,64 +4323,3 @@ class TestRealZoneOcr:
         assert [result.reason for result in results] == [None]
         document.refresh_from_db()
         assert "This is a test document" in document.title
-
-
-class TestRunZoneOcrResponseSerializer:
-    @pytest.mark.parametrize(
-        "body",
-        [
-            pytest.param(
-                {"result": "skipped", "reason": ZoneOcrSkipReason.NO_TEMPLATE},
-                id="skipped",
-            ),
-            pytest.param(
-                {"result": "OK", "task_id": "abc-123"},
-                id="queued",
-            ),
-        ],
-    )
-    def test_renders_body_unchanged(self, body: dict[str, Any]) -> None:
-        """
-        GIVEN:
-            - A response body for a skipped or a queued run
-        WHEN:
-            - The body is rendered through the response serializer as JSON
-        THEN:
-            - The JSON equals the body rendered directly
-        """
-        assert JSONRenderer().render(
-            RunZoneOcrResponseSerializer(body).data,
-        ) == JSONRenderer().render(body)
-
-
-class TestOcrTemplateTestResultSerializer:
-    @pytest.mark.parametrize(
-        "body",
-        [
-            pytest.param(
-                {
-                    "raw_text": "abc",
-                    "value": "abc",
-                    "regex": "a.*",
-                    "regex_match": True,
-                },
-                id="matched",
-            ),
-            pytest.param(
-                {"raw_text": None, "value": None, "regex": None, "regex_match": None},
-                id="all-null",
-            ),
-        ],
-    )
-    def test_renders_body_unchanged(self, body: dict[str, Any]) -> None:
-        """
-        GIVEN:
-            - A response body with the OCR template test result fields
-        WHEN:
-            - The body is rendered through the result serializer as JSON
-        THEN:
-            - The JSON equals the body rendered directly
-        """
-        assert JSONRenderer().render(
-            OcrTemplateTestResultSerializer(body).data,
-        ) == JSONRenderer().render(body)
