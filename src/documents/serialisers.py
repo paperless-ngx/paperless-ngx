@@ -3859,7 +3859,10 @@ class OcrTemplateZoneSerializer(serializers.ModelSerializer[OcrTemplateZone]):
             try:
                 round_trip = datetime.strptime(sample.strftime(value), value)
             except ValueError as e:
-                raise serializers.ValidationError(f"Invalid date format: {e}") from e
+                logger.debug(f"Invalid zone date format {value!r}: {e!s}")
+                raise serializers.ValidationError(
+                    "Invalid date format, see log for details.",
+                ) from e
             if round_trip.date() != sample.date():
                 raise serializers.ValidationError(
                     "The date format must read back a full date (day, month and year).",
@@ -3871,8 +3874,9 @@ class OcrTemplateZoneSerializer(serializers.ModelSerializer[OcrTemplateZone]):
             try:
                 validate_regex_pattern(value)
             except ValueError as e:
+                logger.debug(f"Invalid regular expression: {e!s}")
                 raise serializers.ValidationError(
-                    f"Invalid regular expression: {e}",
+                    "Invalid regular expression, see log for details.",
                 ) from e
         return value
 
