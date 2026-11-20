@@ -2798,6 +2798,41 @@ class TestPrepareFieldUpdate:
             _prepare_field_update(OcrTemplateZone(target="unknown"), "value")
 
     @pytest.mark.parametrize(
+        ("length", "warns"),
+        [
+            pytest.param(128, False, id="at-the-limit"),
+            pytest.param(129, True, id="over-the-limit"),
+        ],
+    )
+    def test_title_is_cut_to_128_characters_with_a_warning(
+        self,
+        caplog: pytest.LogCaptureFixture,
+        length: int,
+        *,
+        warns: bool,
+    ) -> None:
+        """
+        GIVEN:
+            - A zone targeting the title and extracted text at or over 128 characters
+        WHEN:
+            - A field update is prepared for it
+        THEN:
+            - At most the first 128 characters are kept
+            - A warning is logged only when the text was cut
+        """
+        zone = OcrTemplateZoneFactory(
+            target=OcrTemplateZone.TargetType.TITLE,
+            name="Heading",
+        )
+
+        with caplog.at_level(logging.WARNING, logger="paperless.zone_ocr"):
+            update = _prepare_field_update(zone, "x" * length)
+
+        assert update is not None
+        assert update.value == "x" * 128
+        assert any("Heading" in message for message in caplog.messages) is warns
+
+    @pytest.mark.parametrize(
         ("ocr_language", "expected"),
         [
             pytest.param("deu", 1234, id="german-reads-dot-as-thousands"),

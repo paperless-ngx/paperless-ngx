@@ -1078,6 +1078,12 @@ def _prepare_field_update(
             )
             model = CustomFieldInstance
         case OcrTemplateZone.TargetType.TITLE:
+            if len(value) > 128:
+                logger.warning(
+                    "Zone OCR: title from zone '%s' is %d characters, keeping the first 128",
+                    zone.name,
+                    len(value),
+                )
             field_name, typed_value = "title", value[:128]
             model = Document
         case OcrTemplateZone.TargetType.ASN:
