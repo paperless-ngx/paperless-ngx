@@ -38,6 +38,7 @@ from documents.zone_ocr import _crop_zone
 from documents.zone_ocr import _date_rules
 from documents.zone_ocr import _extract_zone
 from documents.zone_ocr import _number_locale
+from documents.zone_ocr import _ocr_text
 from documents.zone_ocr import _parse_date
 from documents.zone_ocr import _parse_monetary
 from documents.zone_ocr import _parse_number
@@ -314,6 +315,53 @@ class TestZoneExtraction:
         assert result.value == "ACCOUNT ABC"
         assert mock_zone_ocr_run.call_args.args[0][-4:] == ["-l", "eng", "--psm", "6"]
         assert mock_zone_ocr_run.call_args.kwargs["timeout"] == 30
+
+    @pytest.mark.parametrize(
+        ("mode", "expected_mode"),
+        [
+            pytest.param("CMYK", "RGB", id="cmyk-is-converted"),
+            pytest.param("I;16", "I;16", id="16-bit-is-kept"),
+        ],
+    )
+    def test_ocr_accepts_crops_png_cannot_store_directly(
+        self,
+        zone: OcrTemplateZone,
+        tmp_path: Path,
+        mock_zone_ocr_run: MagicMock,
+        mode: str,
+        expected_mode: str,
+    ) -> None:
+        """
+        GIVEN:
+            - A cropped zone image in a mode and a reader returning text
+        WHEN:
+            - The crop is OCRed
+        THEN:
+            - The reader's text is returned instead of an exception being raised
+            - The file handed to the reader is a readable PNG, converted to RGB only
+              when PNG cannot store the mode
+        """
+
+        def read_crop(
+            args: list[str],
+            **kwargs: Any,
+        ) -> subprocess.CompletedProcess[str]:
+            with Image.open(args[1]) as crop:
+                assert crop.format == "PNG"
+                assert crop.size == (40, 20)
+                assert crop.mode == expected_mode
+                crop.load()
+            return subprocess.CompletedProcess(
+                args=[],
+                returncode=0,
+                stdout="ACCOUNT 123\n",
+                stderr="",
+            )
+
+        mock_zone_ocr_run.side_effect = read_crop
+        with Image.new(mode, (40, 20)) as cropped:
+            assert _ocr_text(cropped, zone, tmp_path) == "ACCOUNT 123"
+        mock_zone_ocr_run.assert_called_once()
 
     def test_no_text_returns_no_value(
         self,

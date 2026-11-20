@@ -801,6 +801,9 @@ def _read_barcode(cropped: Image.Image, zone_name: str) -> str | None:
 def _ocr_text(cropped: Image.Image, zone: OcrTemplateZone, tmp_dir: Path) -> str | None:
     """OCR a cropped image with Tesseract."""
     crop_path = tmp_dir / f"zone_{zone.pk}.png"
+    # PNG cannot store every mode (e.g. CMYK from a CMYK JPEG or TIFF), so convert the others to RGB.
+    if cropped.mode not in ("1", "L", "LA", "P", "RGB", "RGBA", "I;16", "I;16B"):
+        cropped = cropped.convert("RGB")
     cropped.save(crop_path)
 
     try:
