@@ -4316,6 +4316,7 @@ class UiSettingsView(GenericAPIView[Any]):
 
 GITHUB_CACHE_KEY = "github_data:%s"
 GITHUB_RELEASES_CACHE_TIMEOUT = 60 * 60 * 12
+GITHUB_REQUEST_TIMEOUT = 5
 
 
 GITHUB_RELEASES_URL = (
@@ -4333,6 +4334,7 @@ def _fetch_github_releases_json(url: str, params: dict | None = None) -> Any | N
             params=params,
             # GitHub renders release bodies as HTML
             headers={"Accept": "application/vnd.github.html+json"},
+            timeout=GITHUB_REQUEST_TIMEOUT,
         )
         resp.raise_for_status()
         return resp.json()
@@ -4434,6 +4436,7 @@ def get_github_stars() -> int | None:
         resp = httpx.get(
             "https://api.github.com/repos/paperless-ngx/paperless-ngx",
             headers={"Accept": "application/vnd.github+json"},
+            timeout=GITHUB_REQUEST_TIMEOUT,
         )
         resp.raise_for_status()
         count = resp.json()["stargazers_count"]
