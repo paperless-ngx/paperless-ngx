@@ -494,20 +494,6 @@ def _resolve_page_idx(page_value: int | None, page_count: int | None) -> int | N
     return max((page_value or 1) - 1, 0)
 
 
-def _process_template(
-    document: Document,
-    page_images: dict[int, Path],
-    template: OcrTemplate,
-    zones: list[OcrTemplateZone],
-    tmp_path: Path,
-) -> list[ZoneOcrResult]:
-    """Extract and combine zone values, then apply a template's updates."""
-    plan = _plan_template(document.page_count, page_images, template, zones, tmp_path)
-    if plan.updates:
-        _apply_template_updates(get_root_document(document), plan.updates)
-    return plan.results
-
-
 def _plan_template(
     page_count: int | None,
     page_images: dict[int, Path],

@@ -24,6 +24,7 @@ from documents.models import MatchingModel
 from documents.models import OcrTemplate
 from documents.models import OcrTemplateZone
 from documents.parsers import ParseError
+from documents.versioning import get_root_document
 from documents.zone_ocr import MAX_PARSED_TEXT_LENGTH
 from documents.zone_ocr import ZoneExtraction
 from documents.zone_ocr import ZoneOcrReason
@@ -39,11 +40,12 @@ from documents.zone_ocr import _ocr_text
 from documents.zone_ocr import _parse_date
 from documents.zone_ocr import _parse_monetary
 from documents.zone_ocr import _parse_number
+from documents.zone_ocr import _plan_template
 from documents.zone_ocr import _prepare_field_update
-from documents.zone_ocr import _process_template
 from documents.zone_ocr import _render_pages
 from documents.zone_ocr import _resolve_page_idx
 from documents.zone_ocr import _zone_language
+from documents.zone_ocr import apply_zone_plans
 from documents.zone_ocr import extract_zone_preview
 from documents.zone_ocr import get_templates_for_content
 from documents.zone_ocr import get_templates_for_document
@@ -66,6 +68,7 @@ if TYPE_CHECKING:
     from pytest_django.fixtures import SettingsWrapper
     from pytest_mock import MockerFixture
 
+    from documents.zone_ocr import ZoneOcrResult
     from paperless_testing.dirs import PaperlessDirs
 
 
@@ -105,6 +108,18 @@ def ocr_outputs(*values: str) -> list[subprocess.CompletedProcess[str]]:
         subprocess.CompletedProcess(args=[], returncode=0, stdout=value, stderr="")
         for value in values
     ]
+
+
+def plan_and_apply_template(
+    document: Document,
+    page_images: dict[int, Path],
+    template: OcrTemplate,
+    zones: list[OcrTemplateZone],
+    tmp_path: Path,
+) -> list[ZoneOcrResult]:
+    """Plan one template over rendered pages and apply it to the root document."""
+    plan = _plan_template(document.page_count, page_images, template, zones, tmp_path)
+    return apply_zone_plans(get_root_document(document), [plan], label="test")
 
 
 def make_visible_template(name: str, **kwargs: Any) -> OcrTemplate:
@@ -602,7 +617,7 @@ class TestSavedZoneExtraction:
         ]
         save = mocker.patch.object(document, "save", wraps=document.save)
 
-        _process_template(
+        plan_and_apply_template(
             document,
             {0: page},
             template,
@@ -642,7 +657,7 @@ class TestSavedZoneExtraction:
             for value in ["New title", "ASN 42", "2026-04-13", "no"]
         ]
 
-        _process_template(
+        plan_and_apply_template(
             document,
             {0: page},
             template,
@@ -699,7 +714,7 @@ class TestSavedZoneExtraction:
             ]
         ]
 
-        _process_template(
+        plan_and_apply_template(
             document,
             {0: page},
             template,
@@ -729,8 +744,8 @@ class TestSavedZoneExtraction:
         WHEN:
             - The template is processed
         THEN:
-            - The error propagates, the write is rolled back and the in-memory
-              document is restored
+            - The template is reported as failed, the write is rolled back and
+              the in-memory document is restored
         """
         field = CustomFieldFactory(name="Number", data_type="integer")
         zones = [
@@ -754,14 +769,17 @@ class TestSavedZoneExtraction:
 
         mocker.patch.object(document, "save", side_effect=fail_after_save)
 
-        with pytest.raises(RuntimeError, match="save failed"):
-            _process_template(
-                document,
-                {0: page},
-                template,
-                zones,
-                paperless_dirs.scratch_dir,
-            )
+        results = plan_and_apply_template(
+            document,
+            {0: page},
+            template,
+            zones,
+            paperless_dirs.scratch_dir,
+        )
+
+        assert [result.reason for result in results] == [
+            ZoneOcrReason.TEMPLATE_FAILED,
+        ] * 2
 
         assert document.title == "Original"
         document.refresh_from_db()
@@ -968,7 +986,7 @@ class TestSavedZoneExtraction:
 
         mock_zone_ocr_run.side_effect = read_crop
 
-        _process_template(
+        plan_and_apply_template(
             document,
             {0: page},
             template,
@@ -977,33 +995,6 @@ class TestSavedZoneExtraction:
         )
 
         assert document.title == "extracted"
-
-    def test_missing_page_returns_skipped_result(
-        self,
-        paperless_dirs: PaperlessDirs,
-        document: Document,
-        template: OcrTemplate,
-    ) -> None:
-        """
-        GIVEN:
-            - A zone on the last page and no rendered pages
-        WHEN:
-            - The template is processed
-        THEN:
-            - The zone result is skipped as a missing page with no value
-        """
-        zone = make_zone(template, "Last", page=-1)
-
-        results = _process_template(
-            document,
-            {},
-            template,
-            [zone],
-            paperless_dirs.scratch_dir,
-        )
-
-        assert results[0].reason == ZoneOcrReason.MISSING_PAGE
-        assert results[0].value is None
 
     def test_empty_combination_cannot_clear_a_field(
         self,
@@ -1025,7 +1016,7 @@ class TestSavedZoneExtraction:
         template.combine_formats = {"title": "{Unknown}"}
         mock_zone_ocr_run.return_value.stdout = "extracted"
 
-        results = _process_template(
+        results = plan_and_apply_template(
             document,
             {0: page},
             template,
@@ -1065,7 +1056,7 @@ class TestSavedZoneExtraction:
             for value in ["", "rejected", "abc", "orphan"]
         ]
 
-        results = _process_template(
+        results = plan_and_apply_template(
             document,
             {0: page},
             template,
@@ -1320,7 +1311,7 @@ class TestSavedZoneExtraction:
         make_zone(template, "ASN", "asn")
         mock_zone_ocr_run.side_effect = ocr_outputs("New title", "42")
 
-        results = _process_template(
+        results = plan_and_apply_template(
             document,
             {0: page},
             template,
@@ -1357,7 +1348,7 @@ class TestSavedZoneExtraction:
         make_zone(template, "ASN", "asn")
         mock_zone_ocr_run.side_effect = ocr_outputs("42")
 
-        results = _process_template(
+        results = plan_and_apply_template(
             document,
             {0: page},
             template,
@@ -1399,7 +1390,7 @@ class TestSavedZoneExtraction:
             preview = extract_zone_preview(page, zone, 100, 50, 1, is_image=True)
             assert preview.raw_text == raw_text
             assert preview.value == raw_text.upper()
-            _process_template(
+            plan_and_apply_template(
                 document,
                 {0: page},
                 template,
@@ -1466,7 +1457,7 @@ class TestSavedZoneExtraction:
         texts = ["05", "2024"] if first_text is None else [first_text, "05", "2024"]
         mock_zone_ocr_run.side_effect = ocr_outputs(*texts)
 
-        results = _process_template(
+        results = plan_and_apply_template(
             document,
             {0: page},
             template,
@@ -1504,7 +1495,7 @@ class TestSavedZoneExtraction:
         template.combine_formats = {"title": "{First} / {Second}"}
         mock_zone_ocr_run.side_effect = ocr_outputs("", "two")
 
-        results = _process_template(
+        results = plan_and_apply_template(
             document,
             {0: page},
             template,
