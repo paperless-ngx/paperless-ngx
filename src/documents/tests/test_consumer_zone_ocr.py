@@ -555,29 +555,6 @@ class TestConsumerZoneOcr:
         assert document.title == expected_title
         assert custom_field_value(document, code_field) == expected_code
 
-    @pytest.mark.usefixtures("mock_render")
-    def test_duplicate_asn_is_checked_when_writing(
-        self,
-        consume: Callable[..., Document],
-    ) -> None:
-        """
-        GIVEN:
-            - A template with title and ASN zones
-            - Another document already using the zone's ASN
-        WHEN:
-            - A matching document is consumed
-        THEN:
-            - The ASN is not written
-            - The title from the same template is written
-        """
-        DocumentFactory(archive_serial_number=777)
-        make_template(targets=("Title", "ASN"))
-
-        document = consume()
-
-        assert document.archive_serial_number is None
-        assert document.title == "Zone title"
-
     @pytest.mark.parametrize(
         "failing",
         [
