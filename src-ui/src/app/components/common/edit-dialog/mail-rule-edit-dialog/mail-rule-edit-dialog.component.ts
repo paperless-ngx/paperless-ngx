@@ -9,6 +9,7 @@ import {
 import { catchError, map, of } from 'rxjs'
 import { EditDialogComponent } from 'src/app/components/common/edit-dialog/edit-dialog.component'
 import { Correspondent } from 'src/app/data/correspondent'
+import { CustomFieldDataType } from 'src/app/data/custom-field'
 import { DocumentType } from 'src/app/data/document-type'
 import { MailAccount } from 'src/app/data/mail-account'
 import {
@@ -20,7 +21,12 @@ import {
   MailRuleConsumptionScope,
   MailRulePdfLayout,
 } from 'src/app/data/mail-rule'
+import {
+  PermissionAction,
+  PermissionType,
+} from 'src/app/services/permissions.service'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
+import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { MailAccountService } from 'src/app/services/rest/mail-account.service'
 import { MailRuleService } from 'src/app/services/rest/mail-rule.service'
@@ -158,6 +164,7 @@ const METADATA_CORRESPONDENT_OPTIONS = [
 export class MailRuleEditDialogComponent extends EditDialogComponent<MailRule> {
   private readonly accountService = inject(MailAccountService)
   private readonly correspondentService = inject(CorrespondentService)
+  private readonly customFieldsService = inject(CustomFieldsService)
   private readonly documentTypeService = inject(DocumentTypeService)
   private readonly toastService = inject(ToastService)
 
@@ -200,6 +207,29 @@ export class MailRuleEditDialogComponent extends EditDialogComponent<MailRule> {
     ),
     { initialValue: undefined as DocumentType[] }
   )
+  protected readonly canViewCustomFields =
+    this.permissionsService.currentUserCan(
+      PermissionAction.View,
+      PermissionType.CustomField
+    )
+  readonly documentLinkFields = toSignal(
+    this.canViewCustomFields
+      ? this.customFieldsService.listAll().pipe(
+          map(({ results }) =>
+            results.filter(
+              (field) => field.data_type === CustomFieldDataType.DocumentLink
+            )
+          ),
+          catchError((error) => {
+            this.toastService.showError(
+              $localize`Error retrieving custom fields`,
+              error
+            )
+            return of([])
+          })
+        )
+      : of([])
+  )
 
   constructor() {
     super()
@@ -238,6 +268,7 @@ export class MailRuleEditDialogComponent extends EditDialogComponent<MailRule> {
       assign_title_from: new FormControl(MailMetadataTitleOption.FromSubject),
       assign_tags: new FormControl([]),
       assign_document_type: new FormControl(null),
+      same_email_link_field: new FormControl<number | null>(null),
       assign_correspondent_from: new FormControl(
         MailMetadataCorrespondentOption.FromNothing
       ),

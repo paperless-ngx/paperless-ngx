@@ -66,6 +66,9 @@
       <div class="col-md-6">
         <pngx-input-tags [horizontal]="true" [allowCreate]="false" formControlName="assign_tags"></pngx-input-tags>
         <pngx-input-select [horizontal]="true" i18n-title title="Assign document type" [items]="documentTypes()" [allowNull]="true" formControlName="assign_document_type"></pngx-input-select>
+        @if (canViewCustomFields) {
+          <pngx-input-select [horizontal]="true" i18n-title title="Link documents from the same email" [items]="documentLinkFields()" [allowNull]="true" formControlName="same_email_link_field"></pngx-input-select>
+        }
         <pngx-input-select [horizontal]="true" i18n-title title="Assign correspondent from" [items]="metadataCorrespondentOptions" formControlName="assign_correspondent_from"></pngx-input-select>
         @if (showCorrespondentField) {
           <pngx-input-select [horizontal]="true" i18n-title title="Assign correspondent" [items]="correspondents()" [allowNull]="true" formControlName="assign_correspondent"></pngx-input-select>

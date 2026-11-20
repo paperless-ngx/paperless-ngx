@@ -282,6 +282,17 @@ class MailRule(document_models.ModelWithOwner):
         verbose_name=_("assign this document type"),
     )
 
+    same_email_link_field = models.ForeignKey(
+        document_models.CustomField,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        limit_choices_to={
+            "data_type": document_models.CustomField.FieldDataType.DOCUMENTLINK,
+        },
+        verbose_name=_("same email link field"),
+    )
+
     assign_correspondent_from = models.PositiveSmallIntegerField(
         _("assign correspondent from"),
         choices=CorrespondentSource.choices,

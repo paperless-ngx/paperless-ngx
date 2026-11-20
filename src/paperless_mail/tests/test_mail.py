@@ -21,6 +21,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from documents.models import Correspondent
+from documents.models import CustomField
 from documents.models import MatchingModel
 from paperless_mail import tasks
 from paperless_mail.mail import APPLE_MAIL_TAG_COLORS
@@ -42,8 +43,10 @@ from paperless_mail.tests.helpers import fake_magic_from_buffer
 from paperless_testing.assertions import FileSystemAssertsMixin
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import CorrespondentFactory
+from paperless_testing.factories import DocumentFactory
 from paperless_testing.factories import UserFactory
 from paperless_testing.permissions import grant_global
+from paperless_testing.samples import SIMPLE_DIGITAL_PDF
 
 
 def reset_bogus_mailbox(
@@ -1798,6 +1801,140 @@ class TestPostConsumeAction(TestCase):
         processed_mail = ProcessedMail.objects.get(uid=self.message_uid)
         self.assertEqual(processed_mail.status, "SUCCESS")
 
+    def test_post_consume_links_email_and_quote_in_both_directions(self) -> None:
+        link_field = CustomField.objects.create(
+            name="同封邮件",
+            data_type=CustomField.FieldDataType.DOCUMENTLINK,
+        )
+        self.rule.consumption_scope = MailRule.ConsumptionScope.EVERYTHING
+        self.rule.same_email_link_field = link_field
+        self.rule.save(update_fields=["consumption_scope", "same_email_link_field"])
+
+        email = DocumentFactory(title="报价邮件", mime_type="message/rfc822")
+        quote = DocumentFactory(title="报价单", mime_type="application/pdf")
+        self.assertFalse(email.custom_fields.filter(field=link_field).exists())
+        self.assertFalse(quote.custom_fields.filter(field=link_field).exists())
+
+        with (
+            mock.patch("paperless_mail.mail.get_mailbox"),
+            mock.patch("paperless_mail.mail.mailbox_login"),
+        ):
+            apply_mail_action(
+                result=[{"document_id": email.pk}, {"document_id": quote.pk}],
+                rule_id=self.rule.pk,
+                same_email_link_field_id=link_field.pk,
+                message_uid=self.message_uid,
+                message_subject=self.message_subject,
+                message_date=self.message_date,
+            )
+
+        processed = ProcessedMail.objects.get(rule=self.rule, uid=self.message_uid)
+        self.assertEqual(processed.status, "SUCCESS")
+        self.assertEqual(email.custom_fields.get(field=link_field).value, [quote.pk])
+        self.assertEqual(quote.custom_fields.get(field=link_field).value, [email.pk])
+
+    @pytest.mark.usefixtures("paperless_dirs")
+    def test_queued_email_keeps_link_field_when_rule_is_cleared(self) -> None:
+        link_field = CustomField.objects.create(
+            name="同封邮件",
+            data_type=CustomField.FieldDataType.DOCUMENTLINK,
+        )
+        self.rule.consumption_scope = MailRule.ConsumptionScope.EVERYTHING
+        self.rule.same_email_link_field = link_field
+        self.rule.save(update_fields=["consumption_scope", "same_email_link_field"])
+        message = MessageBuilder().create_message(
+            subject="Q17",
+            attachments=[
+                _AttachmentDef(
+                    filename="quote.pdf",
+                    maintype="application",
+                    content=SIMPLE_DIGITAL_PDF.read_bytes(),
+                ),
+            ],
+        )
+        with mock.patch("paperless_mail.mail.chord") as chord:
+            MailAccountHandler()._handle_message(message, self.rule)
+        chord.assert_called_once()
+        body = chord.call_args.kwargs["body"]
+
+        self.rule.same_email_link_field = None
+        self.rule.save(update_fields=["same_email_link_field"])
+
+        email = DocumentFactory(title="Q17", mime_type="message/rfc822")
+        quote = DocumentFactory(title="报价单", mime_type="application/pdf")
+        with (
+            mock.patch("paperless_mail.mail.get_mailbox"),
+            mock.patch("paperless_mail.mail.mailbox_login"),
+        ):
+            body([{"document_id": email.pk}, {"document_id": quote.pk}])
+
+        processed = ProcessedMail.objects.get(rule=self.rule, uid=message.uid)
+        self.assertEqual(processed.status, "SUCCESS")
+        self.assertEqual(email.custom_fields.get(field=link_field).value, [quote.pk])
+        self.assertEqual(quote.custom_fields.get(field=link_field).value, [email.pk])
+
+    def test_duplicate_quote_revision_links_new_email_to_quote_root(self) -> None:
+        link_field = CustomField.objects.create(
+            name="同封邮件",
+            data_type=CustomField.FieldDataType.DOCUMENTLINK,
+        )
+        self.rule.consumption_scope = MailRule.ConsumptionScope.EVERYTHING
+        self.rule.same_email_link_field = link_field
+        self.rule.save(update_fields=["consumption_scope", "same_email_link_field"])
+
+        first_email = DocumentFactory(title="原报价邮件", mime_type="message/rfc822")
+        quote = DocumentFactory(
+            title="Q17 报价单",
+            content="金额 100",
+            mime_type="application/pdf",
+        )
+        first_email.custom_fields.create(
+            field=link_field,
+            value_document_ids=[quote.pk],
+        )
+        quote.custom_fields.create(
+            field=link_field,
+            value_document_ids=[first_email.pk],
+        )
+
+        revision = DocumentFactory(
+            root_document=quote,
+            version_index=1,
+            content="金额 120",
+            mime_type="application/pdf",
+        )
+        new_email = DocumentFactory(title="修订报价邮件", mime_type="message/rfc822")
+        with (
+            mock.patch("paperless_mail.mail.get_mailbox"),
+            mock.patch("paperless_mail.mail.mailbox_login"),
+        ):
+            apply_mail_action(
+                result=[
+                    {"document_id": new_email.pk},
+                    {"duplicate_of": revision.pk, "duplicate_in_trash": False},
+                ],
+                rule_id=self.rule.pk,
+                same_email_link_field_id=link_field.pk,
+                message_uid=self.message_uid,
+                message_subject=self.message_subject,
+                message_date=self.message_date,
+            )
+
+        processed = ProcessedMail.objects.get(rule=self.rule, uid=self.message_uid)
+        self.assertEqual(processed.status, "SUCCESS")
+        self.assertCountEqual(
+            quote.custom_fields.get(field=link_field).value,
+            [first_email.pk, new_email.pk],
+        )
+        self.assertEqual(
+            new_email.custom_fields.get(field=link_field).value,
+            [quote.pk],
+        )
+        self.assertEqual(
+            first_email.custom_fields.get(field=link_field).value,
+            [quote.pk],
+        )
+
     @mock.patch("paperless_mail.mail.get_mailbox")
     @mock.patch("paperless_mail.mail.mailbox_login")
     @mock.patch("paperless_mail.mail.get_rule_action")
@@ -1832,6 +1969,70 @@ class TestPostConsumeAction(TestCase):
         processed_mail = ProcessedMail.objects.get(uid=self.message_uid)
         self.assertEqual(processed_mail.status, "FAILED")
         self.assertIn("Test Exception", processed_mail.error)
+
+
+class TestMailLinkQueue(MailMocker):
+    def test_linked_rule_queues_email_and_pdf_in_one_batch(self) -> None:
+        field = CustomField.objects.create(
+            name="同封邮件",
+            data_type=CustomField.FieldDataType.DOCUMENTLINK,
+        )
+        rule = MailRuleFactory(
+            consumption_scope=MailRule.ConsumptionScope.EVERYTHING,
+            same_email_link_field=field,
+        )
+        message = self.messageBuilder.create_message(
+            subject="Q17",
+            attachments=[
+                _AttachmentDef(
+                    filename="quote.pdf",
+                    maintype="application",
+                    content=SIMPLE_DIGITAL_PDF.read_bytes(),
+                ),
+            ],
+        )
+
+        MailAccountHandler()._handle_message(message, rule)
+
+        self.assert_queue_consumption_tasks_call_args([[{}, {}]])
+        tasks = self._queue_consumption_tasks_mock.call_args.kwargs["consume_tasks"]
+        self.assertCountEqual(
+            [task.kwargs["overrides"].filename for task in tasks],
+            ["Q17.eml", "quote.pdf"],
+        )
+
+    def test_linked_rule_cleans_up_eml_when_attachment_preparation_fails(self) -> None:
+        field = CustomField.objects.create(
+            name="同封邮件",
+            data_type=CustomField.FieldDataType.DOCUMENTLINK,
+        )
+        rule = MailRuleFactory(
+            consumption_scope=MailRule.ConsumptionScope.EVERYTHING,
+            same_email_link_field=field,
+        )
+        message = self.messageBuilder.create_message(
+            subject="Q17",
+            attachments=[
+                _AttachmentDef(
+                    filename="quote.pdf",
+                    maintype="application",
+                    content=SIMPLE_DIGITAL_PDF.read_bytes(),
+                ),
+            ],
+        )
+        handler = MailAccountHandler()
+
+        with (
+            mock.patch(
+                "paperless_mail.mail.tempfile.mkdtemp",
+                side_effect=OSError("Cannot create attachment directory"),
+            ),
+            self.assertRaisesRegex(OSError, "Cannot create attachment directory"),
+        ):
+            handler._handle_message(message, rule)
+
+        self._queue_consumption_tasks_mock.assert_not_called()
+        self.assertEqual(list(self.dirs.scratch_dir.rglob("*.eml")), [])
 
 
 @pytest.mark.django_db

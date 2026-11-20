@@ -279,6 +279,18 @@ different means. These are as follows:
 Paperless is set up to check your mails every 10 minutes. This can be
 configured via [`PAPERLESS_EMAIL_TASK_CRON`](configuration.md#PAPERLESS_EMAIL_TASK_CRON)
 
+#### Linking documents from the same email
+
+Choose a **Document Link** custom field under **Link documents from the same email**
+in the mail rule. You can use an existing field or [create one](#custom-fields)
+with a descriptive name such as “Same email”.
+
+For example, if a rule imports an email, a quote and an item list, you can open
+both the saved email and the item list directly from the quote. If the rule
+imports only the attachments, the quote and item list link to each other.
+Clearing the selection turns off automatic linking for future emails processed
+by this rule. Existing links are preserved.
+
 #### Processed Mail
 
 Paperless keeps track of emails it has processed in order to avoid processing the same mail multiple times. This uses the message `UID` provided by the mail server, which should be unique for each message. You can view and manage processed mails from the web UI under Mail > Processed Mails. If you need to re-process a message, you can delete the corresponding processed mail entry, which will allow Paperless-ngx to process the email again the next time the mail fetch task runs.

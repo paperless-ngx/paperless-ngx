@@ -98,6 +98,7 @@ class MailRuleSerializer(OwnedObjectSerializer):
             "assign_correspondent_from",
             "assign_correspondent",
             "assign_document_type",
+            "same_email_link_field",
             "assign_owner_from_rule",
             "order",
             "attachment_type",

@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+from documents.models import CustomField
 from paperless_mail.models import MailAccount
 from paperless_mail.models import MailRule
 from paperless_mail.models import ProcessedMail
@@ -590,6 +591,34 @@ class TestAPIMailRules(DirectoriesMixin, APITestCase):
         returned_rule1 = MailRule.objects.get(pk=rule1.pk)
         self.assertEqual(returned_rule1.name, "Updated Name 1")
         self.assertEqual(returned_rule1.action, MailRule.MailAction.DELETE)
+
+    def test_save_and_clear_same_email_link_field(self) -> None:
+        rule = MailRuleFactory()
+        url = f"{self.ENDPOINT}{rule.pk}/"
+        link_field = CustomField.objects.create(
+            name="同封邮件",
+            data_type=CustomField.FieldDataType.DOCUMENTLINK,
+        )
+
+        saved = self.client.patch(
+            url,
+            data={"same_email_link_field": link_field.pk},
+            format="json",
+        )
+        self.assertEqual(saved.status_code, status.HTTP_200_OK)
+        detail = self.client.get(url)
+        self.assertEqual(detail.status_code, status.HTTP_200_OK)
+        self.assertEqual(detail.data["same_email_link_field"], link_field.pk)
+
+        cleared = self.client.patch(
+            url,
+            data={"same_email_link_field": None},
+            format="json",
+        )
+        self.assertEqual(cleared.status_code, status.HTTP_200_OK)
+        detail = self.client.get(url)
+        self.assertEqual(detail.status_code, status.HTTP_200_OK)
+        self.assertIsNone(detail.data["same_email_link_field"])
 
     def test_create_mail_rule_scopes_accounts(self) -> None:
         other_user = UserFactory(username="mail-owner")

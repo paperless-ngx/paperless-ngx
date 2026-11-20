@@ -2,6 +2,7 @@ import datetime
 import imaplib
 import itertools
 import logging
+import os
 import socket
 import ssl
 import tempfile
@@ -10,6 +11,7 @@ import unicodedata
 from datetime import date
 from datetime import timedelta
 from fnmatch import fnmatch
+from functools import partial
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -20,6 +22,7 @@ from celery import shared_task
 from celery.canvas import Signature
 from django.conf import settings
 from django.db import DatabaseError
+from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
 from django.utils.timezone import is_naive
@@ -37,14 +40,20 @@ from imap_tools.mailbox import MailBoxStartTls
 from imap_tools.query import LogicOperator
 from imap_tools.utils import check_command_status
 
+from documents.bulk_edit import reflect_doclinks
 from documents.data_models import ConsumableDocument
 from documents.data_models import DocumentMetadataOverrides
 from documents.data_models import DocumentSource
 from documents.loggers import LoggingMixin
 from documents.models import Correspondent
+from documents.models import CustomField
+from documents.models import CustomFieldInstance
+from documents.models import Document
 from documents.models import PaperlessTask
 from documents.parsers import is_mime_type_supported
+from documents.permissions import permitted_document_ids
 from documents.tasks import consume_file
+from documents.versioning import root_document_ids
 from paperless.network import is_public_ip
 from paperless.network import resolve_hostname_ips
 from paperless_mail.models import MailAccount
@@ -250,6 +259,87 @@ def mailbox_login(mailbox: MailBox, account: MailAccount) -> None:
         ) from e
 
 
+def _mail_link_root_ids(results: list) -> set[int]:
+    if not results:
+        raise MailError("No document import results were provided.")
+
+    source_ids: set[int] = set()
+    for result in results:
+        if not isinstance(result, dict):
+            raise MailError("Expected a document import result.")
+        if result.keys() == {"document_id"}:
+            source_id = result["document_id"]
+        elif result.keys() == {"duplicate_of", "duplicate_in_trash"}:
+            if result["duplicate_in_trash"] is not False:
+                raise MailError("The duplicate's trash status must be false.")
+            source_id = result["duplicate_of"]
+        else:
+            raise MailError("Expected a newly created document or a duplicate.")
+        if type(source_id) is not int or source_id <= 0:
+            raise MailError("The import result has an invalid document ID.")
+        source_ids.add(source_id)
+
+    roots = set(root_document_ids(source_ids))
+    # Several versions may share a root. Check existence against the source IDs.
+    if Document.objects.filter(pk__in=source_ids).count() != len(source_ids):
+        raise MailError("Some imported documents no longer exist or are in the trash.")
+    return roots
+
+
+@transaction.atomic
+def _link_consumed_documents(rule: MailRule, results: list, field_id: int) -> None:
+    field = CustomField.objects.get(pk=field_id)
+    if field.data_type != CustomField.FieldDataType.DOCUMENTLINK:
+        raise MailError("The selected custom field must be a document link field.")
+
+    document_ids = _mail_link_root_ids(results)
+    editable_ids = permitted_document_ids(rule.owner, perm="change_document")
+    documents = list(
+        Document.objects.select_for_update()
+        .filter(pk__in=document_ids, root_document__isnull=True)
+        .filter(pk__in=editable_ids)
+        .only("pk")
+        .order_by("pk"),
+    )
+    if len(documents) != len(document_ids):
+        raise MailError("Some import results do not identify editable root documents.")
+    if len(documents) < 2:
+        return
+
+    for document in documents:
+        existing_ids = (
+            document.custom_fields.filter(field=field)
+            .values_list(
+                "value_document_ids",
+                flat=True,
+            )
+            .first()
+            or []
+        )
+        missing_ids = [
+            peer.pk
+            for peer in documents
+            if peer.pk != document.pk and peer.pk not in existing_ids
+        ]
+        if not missing_ids:
+            continue
+
+        # Reflecting a full list also updates its existing targets.
+        if existing_ids and editable_ids.filter(pk__in=existing_ids).count() != len(
+            set(existing_ids),
+        ):
+            raise MailError(
+                "The rule cannot update all existing document link targets.",
+            )
+        target_ids = existing_ids + missing_ids
+        reflect_doclinks(document, field, target_ids)
+        CustomFieldInstance.objects.update_or_create(
+            document=document,
+            field=field,
+            defaults={"value_document_ids": target_ids},
+        )
+
+
 @shared_task
 def apply_mail_action(
     result: list,
@@ -258,6 +348,7 @@ def apply_mail_action(
     message_subject: str,
     message_date: datetime.datetime,
     uid_validity: str | None = None,
+    same_email_link_field_id: int | None = None,
 ) -> None:
     """
     This shared task applies the mail action of a particular mail rule to the
@@ -273,6 +364,9 @@ def apply_mail_action(
         message_date = make_aware(message_date)
 
     try:
+        if same_email_link_field_id is not None:
+            _link_consumed_documents(rule, result, same_email_link_field_id)
+
         with get_mailbox(
             server=account.imap_server,
             port=account.imap_port,
@@ -374,6 +468,7 @@ def queue_consumption_tasks(
         message_subject=message.subject,
         message_date=message.date,
         uid_validity=uid_validity,
+        same_email_link_field_id=rule.same_email_link_field_id,
     )
     chord(header=consume_tasks, body=mail_action_task).on_error(
         error_callback.s(
@@ -893,8 +988,6 @@ class MailAccountHandler(LoggingMixin):
     def _handle_message(self, message, rule: MailRule) -> int:
         message = self._preprocess_message(message)
 
-        processed_elements = 0
-
         # Skip Message handling when only attachments are to be processed but
         # message doesn't have any.
         if (
@@ -902,7 +995,7 @@ class MailAccountHandler(LoggingMixin):
             and rule.consumption_scope == MailRule.ConsumptionScope.ATTACHMENTS_ONLY
         ):
             self._record_processed_without_consumption(message, rule)
-            return processed_elements
+            return 0
 
         self.log.debug(
             f"Rule {rule}: "
@@ -912,30 +1005,57 @@ class MailAccountHandler(LoggingMixin):
 
         tag_ids: list[int] = [tag.id for tag in rule.assign_tags.all()]
         doc_type = rule.assign_document_type
+        queue_for_message = partial(
+            queue_consumption_tasks,
+            rule=rule,
+            message=message,
+            uid_validity=self._current_uid_validity,
+        )
+        pending_tasks: list[Signature] = []
+        queued_separately = 0
 
         if (
             rule.consumption_scope == MailRule.ConsumptionScope.EML_ONLY
             or rule.consumption_scope == MailRule.ConsumptionScope.EVERYTHING
         ):
-            processed_elements += self._process_eml(
-                message,
-                rule,
-                tag_ids,
-                doc_type,
-            )
+            eml_task = self._prepare_eml_task(message, rule, tag_ids, doc_type)
+            if rule.same_email_link_field_id is None:
+                queue_for_message(consume_tasks=[eml_task])
+                queued_separately = 1
+            else:
+                pending_tasks.append(eml_task)
 
         if (
             rule.consumption_scope == MailRule.ConsumptionScope.ATTACHMENTS_ONLY
             or rule.consumption_scope == MailRule.ConsumptionScope.EVERYTHING
         ):
-            processed_elements += self._process_attachments(
-                message,
-                rule,
-                tag_ids,
-                doc_type,
-            )
+            try:
+                attachment_tasks = self._prepare_attachment_tasks(
+                    message,
+                    rule,
+                    tag_ids,
+                    doc_type,
+                )
+            except Exception:
+                # A deferred EML still belongs to this handler until it is queued.
+                for task in pending_tasks:
+                    eml_path = task.kwargs["input_doc"].original_file
+                    try:
+                        eml_path.unlink(missing_ok=True)
+                    except OSError:
+                        self.log.warning(
+                            "Could not remove unqueued email file %s",
+                            eml_path,
+                            exc_info=True,
+                        )
+                raise
+            pending_tasks.extend(attachment_tasks)
+            if not pending_tasks:
+                self._record_processed_without_consumption(message, rule)
 
-        return processed_elements
+        if pending_tasks:
+            queue_for_message(consume_tasks=pending_tasks)
+        return queued_separately + len(pending_tasks)
 
     def _record_processed_without_consumption(
         self,
@@ -994,16 +1114,14 @@ class MailAccountHandler(LoggingMixin):
                     return True
         return False
 
-    def _process_attachments(
+    def _prepare_attachment_tasks(
         self,
         message: MailMessage,
         rule: MailRule,
         tag_ids,
         doc_type,
-    ):
-        processed_attachments = 0
-
-        consume_tasks = []
+    ) -> list[Signature]:
+        consume_tasks: list[Signature] = []
 
         for att in message.attachments:
             if (
@@ -1104,8 +1222,6 @@ class MailAccountHandler(LoggingMixin):
                 )
 
                 consume_tasks.append(consume_task)
-
-                processed_attachments += 1
             else:
                 self.log.debug(
                     f"Rule {rule}: "
@@ -1114,33 +1230,22 @@ class MailAccountHandler(LoggingMixin):
                     f"by paperless",
                 )
 
-        if len(consume_tasks) > 0:
-            queue_consumption_tasks(
-                consume_tasks=consume_tasks,
-                rule=rule,
-                message=message,
-                uid_validity=self._current_uid_validity,
-            )
-        else:
-            # No files to consume, just mark as processed if it wasn't by .eml processing
-            self._record_processed_without_consumption(message, rule)
+        return consume_tasks
 
-        return processed_attachments
-
-    def _process_eml(
+    def _prepare_eml_task(
         self,
         message: MailMessage,
         rule: MailRule,
         tag_ids,
         doc_type,
-    ):
+    ) -> Signature:
         settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
-        _, temp_filename = tempfile.mkstemp(
+        fd, temp_filename = tempfile.mkstemp(
             prefix="paperless-mail-",
             dir=settings.SCRATCH_DIR,
             suffix=".eml",
         )
-        with Path(temp_filename).open("wb") as f:
+        with os.fdopen(fd, "wb") as f:
             # Move "From"-header to beginning of file
             # TODO: This ugly workaround is needed because the parser is
             #   chosen only by the mime_type detected via magic
@@ -1191,17 +1296,7 @@ class MailAccountHandler(LoggingMixin):
             owner_id=rule.owner.id if rule.owner else None,
         )
 
-        consume_task = consume_file.s(
+        return consume_file.s(
             input_doc=input_doc,
             overrides=doc_overrides,
         ).set(headers={"trigger_source": PaperlessTask.TriggerSource.EMAIL_CONSUME})
-
-        queue_consumption_tasks(
-            consume_tasks=[consume_task],
-            rule=rule,
-            message=message,
-            uid_validity=self._current_uid_validity,
-        )
-
-        processed_elements = 1
-        return processed_elements

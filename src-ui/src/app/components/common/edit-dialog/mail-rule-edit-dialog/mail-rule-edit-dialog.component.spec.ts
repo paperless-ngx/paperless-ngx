@@ -2,16 +2,20 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { By } from '@angular/platform-browser'
 import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap'
-import { NgSelectModule } from '@ng-select/ng-select'
+import { NgSelectComponent, NgSelectModule } from '@ng-select/ng-select'
 import { of, throwError } from 'rxjs'
+import { CustomFieldDataType } from 'src/app/data/custom-field'
 import {
   MailAction,
   MailMetadataCorrespondentOption,
 } from 'src/app/data/mail-rule'
 import { IfOwnerDirective } from 'src/app/directives/if-owner.directive'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
+import { PermissionsService } from 'src/app/services/permissions.service'
 import { CorrespondentService } from 'src/app/services/rest/correspondent.service'
+import { CustomFieldsService } from 'src/app/services/rest/custom-fields.service'
 import { DocumentTypeService } from 'src/app/services/rest/document-type.service'
 import { MailAccountService } from 'src/app/services/rest/mail-account.service'
 import { SettingsService } from 'src/app/services/settings.service'
@@ -127,6 +131,76 @@ describe('MailRuleEditDialogComponent', () => {
     component.dialogMode.set(EditDialogMode.EDIT)
     fixture.detectChanges()
     expect(editTitleSpy).toHaveBeenCalled()
+  })
+
+  it('should offer only document link fields when editing a mail rule', () => {
+    TestBed.inject(PermissionsService).initialize(
+      ['view_mailrule', 'change_mailrule', 'view_customfield'],
+      settingsService.currentUser()
+    )
+    const listFields = jest.spyOn(
+      TestBed.inject(CustomFieldsService),
+      'listAll'
+    )
+    for (const linkFieldName of ['同封邮件', '相关单据']) {
+      listFields.mockReturnValue(
+        of({
+          count: 2,
+          results: [
+            {
+              id: 1,
+              name: linkFieldName,
+              data_type: CustomFieldDataType.DocumentLink,
+            },
+            { id: 2, name: '备注', data_type: CustomFieldDataType.String },
+          ],
+        })
+      )
+      const dialog = TestBed.createComponent(MailRuleEditDialogComponent)
+      dialog.componentInstance.dialogMode.set(EditDialogMode.EDIT)
+      dialog.detectChanges()
+
+      const picker = dialog.debugElement.query(
+        By.css('[formControlName="same_email_link_field"]')
+      )
+      expect(picker).not.toBeNull()
+      picker.query(By.directive(NgSelectComponent)).componentInstance.open()
+      dialog.detectChanges()
+      const options = picker
+        .queryAll(By.css('.ng-option'))
+        .map((option) => option.nativeElement.textContent.trim())
+      expect(options).toContain(linkFieldName)
+      expect(options).not.toContain('备注')
+      dialog.destroy()
+    }
+  })
+
+  it('should not fetch or show custom fields for a rule editor without view permission', () => {
+    const editor = settingsService.currentUser()
+    TestBed.inject(PermissionsService).initialize(
+      ['view_mailrule', 'change_mailrule'],
+      editor
+    )
+    const listFields = jest
+      .spyOn(TestBed.inject(CustomFieldsService), 'listAll')
+      .mockReturnValue(throwError(() => new Error('Forbidden')))
+    const dialog = TestBed.createComponent(MailRuleEditDialogComponent)
+    dialog.componentInstance.dialogMode.set(EditDialogMode.EDIT)
+    dialog.componentInstance.object = {
+      ...dialog.componentInstance.objectForm.getRawValue(),
+      id: 1,
+      name: 'Existing rule',
+      owner: editor.id,
+      same_email_link_field: null,
+    }
+    dialog.detectChanges()
+
+    expect(listFields).not.toHaveBeenCalled()
+    expect(
+      dialog.debugElement.query(
+        By.css('[formControlName="same_email_link_field"]')
+      )
+    ).toBeNull()
   })
 
   it('should support optional fields', () => {
