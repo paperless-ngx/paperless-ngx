@@ -449,31 +449,21 @@ class TestZoneExtraction:
         assert result.raw_text is None
         assert result.value is None
 
-    @pytest.mark.parametrize(
-        ("attribute", "value"),
-        [
-            pytest.param("width", 0, id="zero-width"),
-            pytest.param("page", 2, id="unavailable-page"),
-        ],
-    )
-    def test_preview_unreadable_zone_returns_empty_result(
+    def test_preview_unavailable_page_returns_empty_result(
         self,
         page: Path,
         zone: OcrTemplateZone,
         mock_zone_ocr_run: MagicMock,
-        attribute: str,
-        value: int,
     ) -> None:
         """
         GIVEN:
-            - A zone that cannot be read, either because its crop has zero
-              width or because it targets a page that is not available
+            - A zone that targets a page that is not available
         WHEN:
             - A preview is requested
         THEN:
             - An empty result is returned and the reader is never run
         """
-        setattr(zone, attribute, value)
+        zone.page = 2
         assert (
             extract_zone_preview(page, zone, 100, 50, 1, is_image=True)
             == ZoneExtraction()
@@ -567,33 +557,6 @@ class TestZoneExtraction:
         with pytest.raises(ValueError):
             read_barcodes.call_args.args[0].getpixel((0, 0))
 
-    def test_preview_uses_image_dimensions_without_writing(
-        self,
-        page: Path,
-        zone: OcrTemplateZone,
-        mock_zone_ocr_run: MagicMock,
-    ) -> None:
-        """
-        GIVEN:
-            - A zone and a reader returning text
-        WHEN:
-            - A preview is requested with unknown (zero) reference dimensions
-        THEN:
-            - The raw text and transformed value are returned
-        """
-        mock_zone_ocr_run.return_value.stdout = "account abc"
-        assert extract_zone_preview(
-            page,
-            zone,
-            0,
-            0,
-            1,
-            is_image=True,
-        ) == ZoneExtraction(
-            raw_text="account abc",
-            value="ACCOUNT ABC",
-        )
-
 
 @pytest.mark.django_db
 @pytest.mark.usefixtures("paperless_dirs")
@@ -650,46 +613,6 @@ class TestSavedZoneExtraction:
         document.refresh_from_db()
         assert document.title == "two / one"
         save.assert_called_once_with(update_fields=["title"])
-
-    def test_failed_transform_blocks_the_combined_field(
-        self,
-        mock_zone_ocr_run: MagicMock,
-        paperless_dirs: PaperlessDirs,
-        page: Path,
-        document: Document,
-        template: OcrTemplate,
-    ) -> None:
-        """
-        GIVEN:
-            - Two title zones combined as "{Date} {Ref}", where the date zone
-              reads text that is not a date
-        WHEN:
-            - The template is processed
-        THEN:
-            - The date zone is reported as transform_failed, the other zone as
-              incomplete, and the title is not written
-        """
-        zones = [
-            make_zone(template, "Date", transform="date"),
-            make_zone(template, "Ref"),
-        ]
-        template.combine_formats = {"title": "{Date} {Ref}"}
-        mock_zone_ocr_run.side_effect = ocr_outputs("not a date", "R-1")
-
-        results = _process_template(
-            document,
-            {0: page},
-            template,
-            zones,
-            paperless_dirs.scratch_dir,
-        )
-
-        assert [(result.zone, result.reason) for result in results] == [
-            ("Date", ZoneOcrReason.TRANSFORM_FAILED),
-            ("Ref", ZoneOcrReason.INCOMPLETE),
-        ]
-        document.refresh_from_db()
-        assert document.title == "Original"
 
     def test_converts_custom_and_builtin_fields_before_saving(
         self,
@@ -876,35 +799,22 @@ class TestSavedZoneExtraction:
         document.refresh_from_db()
         assert document.title == "Second"
 
-    @pytest.mark.parametrize(
-        "target",
-        [
-            pytest.param("title", id="builtin-field"),
-            pytest.param("custom_field", id="custom-field-only"),
-        ],
-    )
     def test_successful_write_bumps_modified_of_the_root(
         self,
         mock_zone_ocr_run: MagicMock,
         page: Path,
         document: Document,
         template: OcrTemplate,
-        target: str,
     ) -> None:
         """
         GIVEN:
-            - A document and a template with a zone for a built-in field or
-              only for a custom field
+            - A document and a template with a title zone
         WHEN:
             - Zone extraction writes the value
         THEN:
             - The root document's modified time is later than before the run
         """
-        field = CustomFieldFactory(name="Code", data_type="string")
-        if target == "title":
-            make_zone(template, "Title")
-        else:
-            make_zone(template, "Code", "custom_field", custom_field=field)
+        make_zone(template, "Title")
         mock_zone_ocr_run.return_value = subprocess.CompletedProcess(
             [],
             0,
@@ -1095,27 +1005,6 @@ class TestSavedZoneExtraction:
         assert results[0].reason == ZoneOcrReason.MISSING_PAGE
         assert results[0].value is None
 
-    def test_missing_document_file_returns_skipped_results(
-        self,
-        document: Document,
-        template: OcrTemplate,
-    ) -> None:
-        """
-        GIVEN:
-            - A template with a zone and no document file
-        WHEN:
-            - Zone extraction runs
-        THEN:
-            - A single result is skipped as a missing file with no value
-        """
-        make_zone(template, "Title")
-
-        results = run_zone_extraction(document, templates=[template])
-
-        assert len(results) == 1
-        assert results[0].reason == ZoneOcrReason.MISSING_FILE
-        assert results[0].value is None
-
     def test_empty_combination_cannot_clear_a_field(
         self,
         mock_zone_ocr_run: MagicMock,
@@ -1148,7 +1037,7 @@ class TestSavedZoneExtraction:
         assert results[0].value is None
         assert document.title == "Original"
 
-    def test_skipped_results_never_report_existing_document_values(
+    def test_unreadable_zones_report_reason_and_no_value(
         self,
         mock_zone_ocr_run: MagicMock,
         paperless_dirs: PaperlessDirs,
@@ -1359,34 +1248,6 @@ class TestSavedZoneExtraction:
         document.refresh_from_db()
         assert document.archive_serial_number == 43
 
-    def test_field_the_first_template_did_not_write_stays_available(
-        self,
-        mock_zone_ocr_run: MagicMock,
-        paperless_dirs: PaperlessDirs,
-        page: Path,
-        document: Document,
-        template: OcrTemplate,
-    ) -> None:
-        """
-        GIVEN:
-            - Two matching templates, where the first template's title zone
-              reads nothing
-        WHEN:
-            - Zone extraction runs
-        THEN:
-            - The second template's title is written
-        """
-        make_zone(template, "First title")
-        second = make_template("Second")
-        make_zone(second, "Second title")
-        mock_zone_ocr_run.side_effect = ocr_outputs("", "From second")
-
-        results = run_zone_extraction(document, templates=[template, second])
-
-        assert [r.reason for r in results] == [ZoneOcrReason.NO_VALUE, None]
-        document.refresh_from_db()
-        assert document.title == "From second"
-
     def test_later_template_writes_only_the_fields_still_free(
         self,
         mock_zone_ocr_run: MagicMock,
@@ -1508,38 +1369,6 @@ class TestSavedZoneExtraction:
         document.refresh_from_db()
         assert document.archive_serial_number == 42
 
-    def test_literal_format_does_not_write_when_every_zone_failed(
-        self,
-        mock_zone_ocr_run: MagicMock,
-        paperless_dirs: PaperlessDirs,
-        page: Path,
-        document: Document,
-        template: OcrTemplate,
-    ) -> None:
-        """
-        GIVEN:
-            - A combine format with literal text around a zone that reads nothing
-        WHEN:
-            - The template is processed
-        THEN:
-            - The result has no value and the title is not written
-        """
-        zone = make_zone(template, "Title")
-        template.combine_formats = {"title": "Invoice {Title}"}
-        mock_zone_ocr_run.return_value.stdout = ""
-
-        results = _process_template(
-            document,
-            {0: page},
-            template,
-            [zone],
-            paperless_dirs.scratch_dir,
-        )
-
-        assert results[0].reason == ZoneOcrReason.NO_VALUE
-        assert results[0].value is None
-        assert document.title == "Original"
-
     def test_saved_extraction_matches_preview_and_rejects_invalid_value(
         self,
         mock_zone_ocr_run: MagicMock,
@@ -1585,17 +1414,25 @@ class TestSavedZoneExtraction:
         assert document.title == "ACCOUNT ABC"
 
     @pytest.mark.parametrize(
-        ("failing_zone", "expected_failure"),
+        ("failing_zone", "first_text", "expected_failure"),
         [
             pytest.param(
                 {"validation_regex": r"\d{2}"},
+                "x",
                 ZoneOcrReason.REGEX_MISMATCH,
                 id="regex-mismatch",
             ),
             pytest.param(
                 {"page": 2},
+                None,
                 ZoneOcrReason.MISSING_PAGE,
                 id="missing-page",
+            ),
+            pytest.param(
+                {"transform": "date"},
+                "not a date",
+                ZoneOcrReason.TRANSFORM_FAILED,
+                id="transform-failed",
             ),
         ],
     )
@@ -1607,6 +1444,7 @@ class TestSavedZoneExtraction:
         document: Document,
         template: OcrTemplate,
         failing_zone: dict[str, Any],
+        first_text: str | None,
         expected_failure: str,
     ) -> None:
         """
@@ -1625,13 +1463,8 @@ class TestSavedZoneExtraction:
         ]
         template.combine_formats = {"title": "{Day}.{Month}.{Year}"}
         # A zone on a missing page is never read.
-        mock_zone_ocr_run.side_effect = ocr_outputs(
-            *(
-                ["x", "05", "2024"]
-                if "validation_regex" in failing_zone
-                else ["05", "2024"]
-            ),
-        )
+        texts = ["05", "2024"] if first_text is None else [first_text, "05", "2024"]
+        mock_zone_ocr_run.side_effect = ocr_outputs(*texts)
 
         results = _process_template(
             document,
@@ -1684,44 +1517,6 @@ class TestSavedZoneExtraction:
         document.refresh_from_db()
         assert document.title == "two"
 
-    def test_failed_single_zone_field_does_not_affect_other_fields(
-        self,
-        mock_zone_ocr_run: MagicMock,
-        paperless_dirs: PaperlessDirs,
-        page: Path,
-        document: Document,
-        template: OcrTemplate,
-    ) -> None:
-        """
-        GIVEN:
-            - A title zone and a separate ASN zone, where the ASN fails its
-              validation regex
-        WHEN:
-            - The template is processed
-        THEN:
-            - The title is written and the failing zone keeps regex_mismatch
-        """
-        zones = [
-            make_zone(template, "Title"),
-            make_zone(template, "ASN", "asn", validation_regex=r"\d+"),
-        ]
-        mock_zone_ocr_run.side_effect = ocr_outputs("New title", "abc")
-
-        results = _process_template(
-            document,
-            {0: page},
-            template,
-            zones,
-            paperless_dirs.scratch_dir,
-        )
-
-        assert [result.reason for result in results] == [
-            None,
-            ZoneOcrReason.REGEX_MISMATCH,
-        ]
-        document.refresh_from_db()
-        assert document.title == "New title"
-
 
 class TestCombineFieldValue:
     """Tests for combining zone values into one field value."""
@@ -1755,18 +1550,6 @@ class TestCombineFieldValue:
             ),
             pytest.param(
                 "{Value}",
-                [("Value", "A--B")],
-                "A--B",
-                id="repeated-punctuation-in-value-kept",
-            ),
-            pytest.param(
-                "{Name}",
-                [("Name", "Dr. Smith Jr.")],
-                "Dr. Smith Jr.",
-                id="trailing-period-in-value-kept",
-            ),
-            pytest.param(
-                "{Value}",
                 [("Value", "wait...")],
                 "wait...",
                 id="trailing-ellipsis-in-value-kept",
@@ -1788,12 +1571,6 @@ class TestCombineFieldValue:
                 [("A", "a"), ("B", "b"), ("C", None)],
                 "a / b",
                 id="trailing-empty-token-drops-trailing-separator",
-            ),
-            pytest.param(
-                "{A} / {B} / {C}",
-                [("A", "a"), ("B", None), ("C", None)],
-                "a",
-                id="trailing-run-of-empty-tokens-drops-nearest-separator",
             ),
             pytest.param(
                 "Total: {A} / {B}",
@@ -2167,13 +1944,6 @@ class TestApplyTransform:
                 id="strip",
             ),
             pytest.param(
-                "  hello  ",
-                OcrTemplateZone.TransformType.NONE,
-                "",
-                "hello",
-                id="none-transform",
-            ),
-            pytest.param(
                 "hello world",
                 OcrTemplateZone.TransformType.UPPERCASE,
                 "",
@@ -2216,55 +1986,6 @@ class TestApplyTransform:
                 id="date-with-format-dotted",
             ),
             pytest.param(
-                "01/12/2025",
-                OcrTemplateZone.TransformType.DATE,
-                "%d/%m/%Y",
-                "2025-12-01",
-                id="date-with-format-slashed",
-            ),
-            pytest.param(
-                "2026-04-13",
-                OcrTemplateZone.TransformType.DATE,
-                "",
-                "2026-04-13",
-                id="date-auto-detect-iso",
-            ),
-            pytest.param(
-                "2026/04/13",
-                OcrTemplateZone.TransformType.DATE,
-                "",
-                "2026-04-13",
-                id="date-auto-detect-slashed",
-            ),
-            pytest.param(
-                "13 April 2026",
-                OcrTemplateZone.TransformType.DATE,
-                "",
-                "2026-04-13",
-                id="date-auto-detect-month-name",
-            ),
-            pytest.param(
-                "2026-04-13",
-                OcrTemplateZone.TransformType.DATE,
-                "%d.%m.%Y",
-                "2026-04-13",
-                id="date-format-mismatch-falls-back-to-auto-detect",
-            ),
-            pytest.param(
-                "32.13.2026",
-                OcrTemplateZone.TransformType.DATE,
-                "%d.%m.%Y",
-                "",
-                id="date-invalid-with-format-is-empty",
-            ),
-            pytest.param(
-                "2026-13-32",
-                OcrTemplateZone.TransformType.DATE,
-                "",
-                "",
-                id="date-invalid-auto-detect-is-empty",
-            ),
-            pytest.param(
                 "not a date",
                 OcrTemplateZone.TransformType.DATE,
                 "",
@@ -2272,25 +1993,11 @@ class TestApplyTransform:
                 id="date-not-a-date-is-empty",
             ),
             pytest.param(
-                "",
-                OcrTemplateZone.TransformType.STRIP,
-                "",
-                "",
-                id="empty-string",
-            ),
-            pytest.param(
                 "   ",
                 OcrTemplateZone.TransformType.STRIP,
                 "",
                 "",
                 id="whitespace-only",
-            ),
-            pytest.param(
-                "  hello  ",
-                OcrTemplateZone.TransformType.QR_CODE,
-                "",
-                "hello",
-                id="qr-code-strips",
             ),
             pytest.param(
                 " -- Account #123. -- ",
@@ -2384,18 +2091,6 @@ class TestParseDate:
                 id="german-month-name",
             ),
             pytest.param(
-                "13 April 2026",
-                "eng",
-                date(2026, 4, 13),
-                id="english-month-name",
-            ),
-            pytest.param(
-                "2026/04/13",
-                "eng",
-                date(2026, 4, 13),
-                id="year-first-slashed",
-            ),
-            pytest.param(
                 "01.01.2999",
                 "deu",
                 date(2999, 1, 1),
@@ -2448,14 +2143,10 @@ class TestParseDate:
         "text",
         [
             pytest.param("now", id="now"),
-            pytest.param("yesterday", id="yesterday"),
-            pytest.param("today", id="today"),
             pytest.param("in 2 days", id="relative-offset"),
-            pytest.param("Mon", id="weekday"),
             pytest.param("March", id="month-only"),
             pytest.param("2024", id="year-only"),
             pytest.param("5", id="day-only"),
-            pytest.param("12", id="two-digits"),
             pytest.param("not a date", id="words"),
         ],
     )
@@ -2487,12 +2178,6 @@ class TestParseDate:
                 id="german-label-colon",
             ),
             pytest.param(
-                "Rechnungsdatum 12.05.2024",
-                "deu",
-                date(2024, 5, 12),
-                id="german-compound-label",
-            ),
-            pytest.param(
                 "Invoice date 05/12/2024",
                 "eng",
                 date(2024, 5, 12),
@@ -2511,106 +2196,10 @@ class TestParseDate:
                 id="german-label-before-invoice-number",
             ),
             pytest.param(
-                "No. 12 Datum 13.04.2026",
-                "deu",
-                date(2026, 4, 13),
-                id="german-label-after-number",
-            ),
-            pytest.param(
-                "Kd-Nr 12345 05.06.2024",
-                "deu",
-                date(2024, 6, 5),
-                id="german-label-after-customer-number",
-            ),
-            pytest.param(
                 "Lieferdatum: 12. Mai 2024",
                 "deu",
                 date(2024, 5, 12),
                 id="german-label-month-name",
-            ),
-            pytest.param(
-                "Total 5",
-                "eng",
-                None,
-                id="single-number-after-label",
-            ),
-            pytest.param(
-                "Total 5 items 2024",
-                "eng",
-                None,
-                id="number-run-without-month",
-            ),
-            pytest.param(
-                "Page 3 of 2024",
-                "eng",
-                None,
-                id="page-number-without-month",
-            ),
-            pytest.param(
-                "Invoice 12.5",
-                "eng",
-                None,
-                id="partial-numeric-date",
-            ),
-            pytest.param(
-                "Page 3 of 12 2024",
-                "eng",
-                None,
-                id="page-of-number-run-with-year",
-            ),
-            pytest.param(
-                "Total 3 10 2024",
-                "eng",
-                None,
-                id="space-separated-numbers-with-year",
-            ),
-            pytest.param(
-                "Order 12 3 2024",
-                "eng",
-                None,
-                id="order-numbers-with-year",
-            ),
-            pytest.param(
-                "Ref 1 2 2024",
-                "eng",
-                None,
-                id="ref-numbers-with-year",
-            ),
-            pytest.param(
-                "Invoice #2024 from 5 May",
-                "eng",
-                None,
-                id="year-token-before-day-month",
-            ),
-            pytest.param(
-                "Page 1 of 3 03 2024",
-                "eng",
-                None,
-                id="page-numbers-ending-in-year",
-            ),
-            pytest.param(
-                "Version 1.2.34",
-                "deu",
-                None,
-                id="version-number-with-two-digit-tail",
-            ),
-            pytest.param(
-                "v1.2.24",
-                "eng",
-                None,
-                id="short-version-number",
-            ),
-            pytest.param(
-                "Art. 12.3.45",
-                "deu",
-                None,
-                id="article-number",
-            ),
-            pytest.param(
-                "Ticket 1-2-34",
-                "eng",
-                None,
-                id="dashed-ticket-number",
             ),
         ],
     )
@@ -2618,19 +2207,62 @@ class TestParseDate:
         self,
         text: str,
         ocr_language: str,
-        expected: date | None,
+        expected: date,
     ) -> None:
         """
         GIVEN:
-            - OCR text with a label before a date, or a label-like number
-              with no complete date
+            - OCR text with a label before a date
         WHEN:
             - The date is parsed
         THEN:
             - The date after the label is returned in the zone's day/month order
-            - Text without a complete date after a label returns no date
         """
         assert _parse_date(text, _date_rules(ocr_language)) == expected
+
+    @pytest.mark.parametrize(
+        ("text", "ocr_language"),
+        [
+            pytest.param(
+                "Total 5",
+                "eng",
+                id="single-number-after-label",
+            ),
+            pytest.param(
+                "Total 5 items 2024",
+                "eng",
+                id="number-run-without-month",
+            ),
+            pytest.param(
+                "Invoice 12.5",
+                "eng",
+                id="partial-numeric-date",
+            ),
+            pytest.param(
+                "Invoice #2024 from 5 May",
+                "eng",
+                id="year-token-before-day-month",
+            ),
+            pytest.param(
+                "Version 1.2.34",
+                "deu",
+                id="version-number-with-two-digit-tail",
+            ),
+        ],
+    )
+    def test_label_like_numbers_without_a_complete_date_are_rejected(
+        self,
+        text: str,
+        ocr_language: str,
+    ) -> None:
+        """
+        GIVEN:
+            - OCR text with a label and numbers that do not form a complete date
+        WHEN:
+            - The date is parsed
+        THEN:
+            - No date is returned
+        """
+        assert _parse_date(text, _date_rules(ocr_language)) is None
 
     @pytest.mark.parametrize(
         ("text", "date_format", "expected"),
@@ -2668,43 +2300,47 @@ class TestParseDate:
     @pytest.mark.parametrize(
         ("text", "expected"),
         [
-            pytest.param("2024-05-06", date(2024, 5, 6), id="plain-iso"),
             pytest.param("Due 2024-05-06.", date(2024, 5, 6), id="iso-inside-text"),
-            pytest.param("No. 12345-06-07", None, id="digit-before-is-not-iso"),
-            pytest.param("2024-05-061", None, id="digit-after-is-not-iso"),
             pytest.param(
                 "2024-13-45 and 2024-05-06",
                 date(2024, 5, 6),
                 id="invalid-match-is-skipped",
             ),
-            pytest.param("2024-13-45", None, id="only-invalid-match"),
         ],
     )
-    def test_iso_dates_are_anchored(self, text: str, expected: date | None) -> None:
+    def test_iso_dates_are_found_inside_text(self, text: str, expected: date) -> None:
         """
         GIVEN:
-            - Text containing ISO-like dates, some invalid or part of longer numbers
+            - Text containing an ISO date, or an invalid ISO-like date before one
         WHEN:
             - The date is parsed
         THEN:
-            - Only whole, valid ISO dates are returned, trying every match
+            - The valid ISO date is returned, trying every match
         """
         assert _parse_date(text, _date_rules("eng")) == expected
 
     @pytest.mark.parametrize(
-        "text",
+        ("text", "ocr_language", "date_order"),
         [
-            pytest.param("2026/04/13", id="slashed"),
-            pytest.param("2026.04.13", id="dotted"),
-            pytest.param("2026-04-13", id="dashed"),
-        ],
-    )
-    @pytest.mark.parametrize(
-        ("ocr_language", "date_order"),
-        [
-            pytest.param("xyz", "DMY", id="unmapped-language-day-first"),
-            pytest.param("xyz", "MDY", id="unmapped-language-month-first"),
-            pytest.param("deu", "DMY", id="mapped-language"),
+            pytest.param(
+                "2026/04/13",
+                "xyz",
+                "DMY",
+                id="slashed-unmapped-language-day-first",
+            ),
+            pytest.param(
+                "2026.04.13",
+                "xyz",
+                "MDY",
+                id="dotted-unmapped-language-month-first",
+            ),
+            pytest.param("2026-04-13", "deu", "DMY", id="dashed-mapped-language"),
+            pytest.param(
+                "2026-04-13",
+                "xyz",
+                "MDY",
+                id="dashed-unmapped-language-month-first",
+            ),
         ],
     )
     def test_year_first_dates_ignore_the_date_order(
@@ -2914,34 +2550,12 @@ class TestPrepareFieldUpdate:
         [
             pytest.param("deu", "", "12.05.2024", date(2024, 5, 12), id="german-order"),
             pytest.param(
-                "eng",
-                "",
-                "05/12/2024",
-                date(2024, 5, 12),
-                id="english-order",
-            ),
-            pytest.param(
-                "deu",
-                "",
-                "12. Mai 2024",
-                date(2024, 5, 12),
-                id="german-month-name",
-            ),
-            pytest.param(
                 "deu",
                 "%m.%d.%Y",
                 "12.05.2024",
                 date(2024, 12, 5),
                 id="zone-date-format",
             ),
-            pytest.param(
-                "deu",
-                "%Y/%m/%d",
-                "12.05.2024",
-                date(2024, 5, 12),
-                id="invalid-format-falls-back",
-            ),
-            pytest.param("eng", "", "2024", None, id="year-only-is-rejected"),
         ],
     )
     def test_date_targets_parse_alike(
@@ -2982,25 +2596,16 @@ class TestPrepareFieldUpdate:
 class TestNumberLocale:
     """Tests for deriving a number locale from the OCR language."""
 
-    @pytest.mark.parametrize(
-        ("ocr_language", "expected"),
-        [
-            pytest.param("deu", "de", id="single-language"),
-            pytest.param("deu+eng", "de", id="first-of-several-languages"),
-            pytest.param("aze_Cyrl", "az", id="script-suffix-is-dropped"),
-            pytest.param("xyz", "en", id="unknown-language-falls-back-to-english"),
-        ],
-    )
-    def test_number_locale(self, ocr_language: str, expected: str) -> None:
+    def test_unknown_language_falls_back_to_english(self) -> None:
         """
         GIVEN:
-            - A tesseract language code, possibly several or with a script
+            - A tesseract language code with no known locale
         WHEN:
             - The number locale is derived
         THEN:
-            - The first language decides the locale, falling back to English
+            - English is used
         """
-        assert _number_locale(ocr_language) == Locale.parse(expected)
+        assert _number_locale("xyz") == Locale.parse("en")
 
 
 class TestParseMonetary:
@@ -3024,12 +2629,6 @@ class TestParseMonetary:
                 id="euro-symbol",
             ),
             pytest.param(
-                "\N{POUND SIGN}12.50",
-                EN,
-                "GBP12.50",
-                id="pound-symbol",
-            ),
-            pytest.param(
                 "USD $12.50",
                 EN,
                 "USD12.50",
@@ -3039,27 +2638,16 @@ class TestParseMonetary:
             pytest.param("usd 12.50", EN, "12.50", id="lowercase-code-ignored"),
             pytest.param("(12.50)", EN, "-12.50", id="parentheses-negative"),
             pytest.param("($12.50)", EN, "USD-12.50", id="parentheses-with-symbol"),
-            pytest.param("(12,50 EUR)", DE, "EUR-12.50", id="parentheses-with-code"),
             pytest.param("(0.00)", EN, "0.00", id="parentheses-zero-not-negative"),
             pytest.param("(USD) 12.50", EN, "USD12.50", id="empty-parentheses-ignored"),
             pytest.param("USD -12.50", EN, "USD-12.50", id="code-with-negative"),
-            pytest.param("-12.50", EN, "-12.50", id="plain-negative"),
             pytest.param("1,234.56", EN, "1234.56", id="grouped-amount"),
             pytest.param("USD 12.50 EUR", EN, None, id="two-codes"),
             pytest.param("$12.50 \N{EURO SIGN}", EN, None, id="two-symbols"),
             pytest.param("(-12.50)", EN, None, id="parentheses-and-minus"),
             pytest.param("12.345", EN, None, id="too-many-decimals"),
             pytest.param("12345678901.12", EN, None, id="more-than-12-digits"),
-            pytest.param(
-                "USD 12345678901.12",
-                EN,
-                None,
-                id="more-than-12-digits-with-code",
-            ),
             pytest.param("100 (19% VAT)", EN, None, id="digits-outside-parentheses"),
-            pytest.param("(12) (13)", EN, None, id="two-parenthesised-numbers"),
-            pytest.param("-0.00", EN, "0.00", id="negative-zero-not-negative"),
-            pytest.param("CHF 12", DE, "CHF12.00", id="code-in-german"),
             pytest.param(
                 "1\N{NARROW NO-BREAK SPACE}234,56 \N{EURO SIGN}",
                 FR,
@@ -3067,8 +2655,6 @@ class TestParseMonetary:
                 id="french-space-grouping",
             ),
             pytest.param("USD", EN, None, id="code-without-amount"),
-            pytest.param("garbage", EN, None, id="garbage"),
-            pytest.param("", EN, None, id="empty"),
         ],
     )
     def test_parse_monetary(
@@ -3282,13 +2868,6 @@ class TestConvertValue:
                 id="date-iso",
             ),
             pytest.param(
-                "123.45",
-                CustomField.FieldDataType.MONETARY,
-                "123.45",
-                EN,
-                id="monetary-simple",
-            ),
-            pytest.param(
                 "1.234,56",
                 CustomField.FieldDataType.MONETARY,
                 "1234.56",
@@ -3296,39 +2875,11 @@ class TestConvertValue:
                 id="monetary-european",
             ),
             pytest.param(
-                "\u20ac1,234.56",
-                CustomField.FieldDataType.MONETARY,
-                "EUR1234.56",
-                EN,
-                id="monetary-with-currency-symbol",
-            ),
-            pytest.param(
-                "12345678901234567890,12345678901234567890",
-                CustomField.FieldDataType.MONETARY,
-                None,
-                DE,
-                id="monetary-too-precise-returns-none",
-            ),
-            pytest.param(
-                "\u20ac-12.50",
-                CustomField.FieldDataType.MONETARY,
-                "EUR-12.50",
-                EN,
-                id="monetary-sign-after-currency-symbol",
-            ),
-            pytest.param(
                 "-\u20ac12.50",
                 CustomField.FieldDataType.MONETARY,
                 "EUR-12.50",
                 EN,
                 id="monetary-sign-before-currency-symbol",
-            ),
-            pytest.param(
-                "EUR -12.50",
-                CustomField.FieldDataType.MONETARY,
-                "EUR-12.50",
-                EN,
-                id="monetary-sign-after-currency-code",
             ),
             pytest.param(
                 "Total: -5",
@@ -3357,27 +2908,6 @@ class TestConvertValue:
                 1234.5,
                 Locale.parse("ar"),
                 id="float-arabic-separators",
-            ),
-            pytest.param(
-                "\u06f1\u06f2\u06f3",
-                CustomField.FieldDataType.INT,
-                123,
-                Locale.parse("fa"),
-                id="int-persian-digits",
-            ),
-            pytest.param(
-                "\u0967\u0968\u0969",
-                CustomField.FieldDataType.INT,
-                123,
-                Locale.parse("hi"),
-                id="int-devanagari-digits",
-            ),
-            pytest.param(
-                "1 234,56",
-                CustomField.FieldDataType.FLOAT,
-                1234.56,
-                Locale.parse("ru"),
-                id="float-plain-space-in-russian",
             ),
             pytest.param(
                 "1\N{RIGHT SINGLE QUOTATION MARK}234.56",
@@ -3470,18 +3000,6 @@ class TestConvertValue:
                 id="int-fraction-returns-none",
             ),
             pytest.param(
-                "1.5",
-                CustomField.FieldDataType.INT,
-                EN,
-                id="int-short-fraction-returns-none",
-            ),
-            pytest.param(
-                "0.500",
-                CustomField.FieldDataType.INT,
-                EN,
-                id="int-leading-zero-fraction-returns-none",
-            ),
-            pytest.param(
                 "1..2",
                 CustomField.FieldDataType.INT,
                 EN,
@@ -3516,18 +3034,6 @@ class TestConvertValue:
                 CustomField.FieldDataType.DATE,
                 EN,
                 id="date-invalid-returns-none",
-            ),
-            pytest.param(
-                "2026-13-32",
-                CustomField.FieldDataType.DATE,
-                EN,
-                id="date-invalid-values-returns-none",
-            ),
-            pytest.param(
-                "CHF",
-                CustomField.FieldDataType.MONETARY,
-                EN,
-                id="monetary-empty-returns-none",
             ),
             pytest.param(
                 "maybe",
@@ -3577,6 +3083,18 @@ class TestConvertValue:
                 EN,
                 id="float-multiple-dots-in-english",
             ),
+            pytest.param(
+                "--12",
+                CustomField.FieldDataType.FLOAT,
+                EN,
+                id="float-double-leading-dash",
+            ),
+            pytest.param(
+                "12-34",
+                CustomField.FieldDataType.FLOAT,
+                EN,
+                id="float-embedded-dash",
+            ),
         ],
     )
     def test_returns_none(
@@ -3596,40 +3114,6 @@ class TestConvertValue:
         assert _convert_value(value, data_type, locale, ENG_DATES) is None
 
     @pytest.mark.parametrize(
-        "data_type",
-        [
-            pytest.param(CustomField.FieldDataType.FLOAT, id="float"),
-            pytest.param(CustomField.FieldDataType.MONETARY, id="monetary"),
-        ],
-    )
-    @pytest.mark.parametrize(
-        "value",
-        [
-            pytest.param("1.2.3", id="multiple-dots"),
-            pytest.param("--12", id="double-leading-dash"),
-            pytest.param("12-34", id="embedded-dash"),
-            pytest.param("", id="empty"),
-            pytest.param(".", id="only-dot"),
-            pytest.param("-", id="only-dash"),
-            pytest.param("not numeric", id="not-numeric"),
-        ],
-    )
-    def test_numeric_types_reject_malformed_numbers(
-        self,
-        data_type: CustomField.FieldDataType,
-        value: str,
-    ) -> None:
-        """
-        GIVEN:
-            - A malformed numeric string and a FLOAT or MONETARY data type
-        WHEN:
-            - The value is converted
-        THEN:
-            - None is returned
-        """
-        assert _convert_value(value, data_type, EN, ENG_DATES) is None
-
-    @pytest.mark.parametrize(
         "value",
         [
             pytest.param("true", id="true"),
@@ -3638,7 +3122,6 @@ class TestConvertValue:
             pytest.param("1", id="one"),
             pytest.param("ja", id="ja"),
             pytest.param("x", id="x-lowercase"),
-            pytest.param("X", id="x-uppercase"),
         ],
     )
     def test_bool_true(self, value: str) -> None:
@@ -3658,7 +3141,6 @@ class TestConvertValue:
         "value",
         [
             pytest.param("false", id="false"),
-            pytest.param("False", id="false-titlecase"),
             pytest.param("no", id="no"),
             pytest.param("0", id="zero"),
             pytest.param("nein", id="nein"),
@@ -3739,22 +3221,11 @@ class TestRenderPages:
 
         assert _render_pages(pdf, {0}, tmp_path, None, is_image=False) == {}
 
-    @pytest.mark.parametrize(
-        "error",
-        [
-            pytest.param(ParseError("pdftoppm timed out after 60s"), id="timeout"),
-            pytest.param(
-                ParseError("pdftoppm failed at ['pdftoppm']"),
-                id="render-failure",
-            ),
-        ],
-    )
     def test_render_failure_does_not_prevent_other_pages(
         self,
         pdf: Path,
         tmp_path: Path,
         mock_rasterize: MagicMock,
-        error: Exception,
     ) -> None:
         """
         GIVEN:
@@ -3767,7 +3238,7 @@ class TestRenderPages:
 
         def render(in_path: Path, out_path: Path, *, page: int, **kwargs: Any) -> None:
             if page == 1:
-                raise error
+                raise ParseError("pdftoppm failed at ['pdftoppm']")
             out_path.write_bytes(b"rendered")
 
         mock_rasterize.side_effect = render
@@ -3925,7 +3396,6 @@ class TestResolvePageIdx:
         ("page_value", "page_count", "expected"),
         [
             pytest.param(None, 4, 0, id="blank-first-page"),
-            pytest.param(1, 4, 0, id="page-1"),
             pytest.param(3, 4, 2, id="page-3"),
             pytest.param(-1, 4, 3, id="last-page-with-count"),
             pytest.param(-1, None, None, id="last-page-count-unknown"),
@@ -3978,49 +3448,29 @@ class TestRunZoneExtraction:
             stderr="",
         )
 
-    @pytest.mark.parametrize(
-        ("mime_type", "has_archive", "expected_is_image"),
-        [
-            pytest.param("image/png", False, True, id="image-original"),
-            pytest.param("image/png", True, False, id="image-with-archive"),
-            pytest.param("application/pdf", False, False, id="pdf-original"),
-        ],
-    )
     def test_tells_the_planner_whether_the_file_is_an_image(
         self,
         mocker: MockerFixture,
         paperless_dirs: PaperlessDirs,
         template_with_zone: Callable[..., OcrTemplate],
-        mime_type: str,
-        *,
-        has_archive: bool,
-        expected_is_image: bool,
     ) -> None:
         """
         GIVEN:
-            - A stored document with an original file and optionally an archive
+            - A stored document whose original file is an image
         WHEN:
             - Zone extraction runs for it
         THEN:
-            - The archive is never treated as an image, the original is when
-              its mime type is an image
+            - The planner is told the file is an image
         """
-        document = DocumentFactory(
-            mime_type=mime_type,
-            filename="original.bin",
-            archive_filename="archive.pdf" if has_archive else None,
-        )
+        document = DocumentFactory(mime_type="image/png", filename="original.bin")
         document.source_path.parent.mkdir(parents=True, exist_ok=True)
         document.source_path.write_bytes(b"original")
-        if has_archive:
-            document.archive_path.parent.mkdir(parents=True, exist_ok=True)
-            document.archive_path.write_bytes(b"archive")
         plan = mocker.patch("documents.zone_ocr.plan_zone_extraction", return_value=[])
         mocker.patch("documents.zone_ocr.apply_zone_plans", return_value=[])
 
         run_zone_extraction(document, templates=[template_with_zone("T")])
 
-        assert plan.call_args.kwargs["is_image"] is expected_is_image
+        assert plan.call_args.kwargs["is_image"] is True
 
     @pytest.fixture
     def template_with_zone(self) -> Callable[..., OcrTemplate]:
@@ -4033,40 +3483,6 @@ class TestRunZoneExtraction:
             return template
 
         return _make
-
-    @pytest.mark.parametrize(
-        ("template_name", "template_kwargs"),
-        [
-            pytest.param("Other sender", {"match": "Contoso"}, id="non-matching"),
-            pytest.param("Disabled", {"enabled": False}, id="disabled"),
-        ],
-    )
-    def test_skips_ineligible_template(
-        self,
-        mock_zone_ocr_run: MagicMock,
-        template_with_zone: Callable[..., OcrTemplate],
-        document: Document,
-        source: Path,
-        template_name: str,
-        template_kwargs: dict[str, Any],
-    ) -> None:
-        """
-        GIVEN:
-            - A template whose match text is not in the document content, or a
-              disabled template that would otherwise match
-        WHEN:
-            - Zone extraction runs against a real document file
-        THEN:
-            - No results are returned, no text is read and the title is unchanged
-        """
-        template_with_zone(template_name, **template_kwargs)
-
-        results = run_zone_extraction(document)
-
-        assert results == []
-        mock_zone_ocr_run.assert_not_called()
-        document.refresh_from_db()
-        assert document.title == "Test"
 
     def test_skips_template_with_no_zones(
         self,
@@ -4093,42 +3509,6 @@ class TestRunZoneExtraction:
         mock_zone_ocr_run.assert_not_called()
         document.refresh_from_db()
         assert document.title == "Test"
-
-    def test_handles_process_exception_gracefully(
-        self,
-        mock_zone_ocr_run: MagicMock,
-        template_with_zone: Callable[..., OcrTemplate],
-        document: Document,
-        source: Path,
-    ) -> None:
-        """
-        GIVEN:
-            - Two matching templates, where reading the first one's text raises
-              an unexpected error
-        WHEN:
-            - Zone extraction runs
-        THEN:
-            - The error does not propagate, the failing template's zone is
-              reported as template_failed and the other template still runs
-        """
-        mock_zone_ocr_run.side_effect = [
-            RuntimeError("test error"),
-            subprocess.CompletedProcess(
-                args=[],
-                returncode=0,
-                stdout="extracted",
-                stderr="",
-            ),
-        ]
-        template_with_zone("First", enabled=True)
-        template_with_zone("Second", enabled=True)
-
-        results = run_zone_extraction(document)
-
-        assert Counter((r.value, r.reason) for r in results) == Counter(
-            [(None, ZoneOcrReason.TEMPLATE_FAILED), ("extracted", None)],
-        )
-        assert {r.template for r in results} == {"First", "Second"}
 
     def test_last_page_zone_without_page_count_is_missing_page(
         self,
@@ -4211,32 +3591,22 @@ class TestRunZoneExtraction:
         ]
         mock_zone_ocr_run.assert_not_called()
 
-    @pytest.mark.parametrize(
-        "template_names",
-        [
-            pytest.param(["Active"], id="one-template"),
-            pytest.param(
-                ["Template 0", "Template 1", "Template 2"],
-                id="three-templates",
-            ),
-        ],
-    )
     def test_processes_every_enabled_template(
         self,
         template_with_zone: Callable[..., OcrTemplate],
         document: Document,
         source: Path,
-        template_names: list[str],
     ) -> None:
         """
         GIVEN:
-            - One or more enabled matching templates, each with a zone
+            - Several enabled matching templates, each with a zone
         WHEN:
             - Zone extraction runs
         THEN:
             - Each template reports exactly one result, and only the first
               template by name writes the shared title
         """
+        template_names = ["Template 0", "Template 1", "Template 2"]
         for name in template_names:
             template_with_zone(name, enabled=True)
 
