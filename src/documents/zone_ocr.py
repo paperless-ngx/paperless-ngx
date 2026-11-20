@@ -109,6 +109,30 @@ class FieldUpdate:
     custom_field: CustomField | None = None
 
 
+@dataclass(frozen=True, kw_only=True, slots=True)
+class ZoneSourceFile:
+    path: Path
+    is_image: bool
+
+
+def resolve_zone_source(document: Document) -> ZoneSourceFile | None:
+    """
+    Pick the stored file zone OCR reads: the archive PDF when it exists on disk,
+    else the source file when it exists, else None.
+    """
+    if document.has_archive_version:
+        archive_path = document.archive_path
+        if archive_path is not None and archive_path.is_file():
+            return ZoneSourceFile(path=archive_path, is_image=False)
+    source_path = document.source_path
+    if source_path.is_file():
+        return ZoneSourceFile(
+            path=source_path,
+            is_image=document.mime_type.startswith("image/"),
+        )
+    return None
+
+
 class ZoneOcrReason(StrEnum):
     """Why a zone produced no value for its target."""
 
@@ -253,7 +277,6 @@ def _visible_templates(
 
 def run_zone_extraction(
     document: Document,
-    original_file: Path | None = None,
     templates: list[OcrTemplate] | None = None,
 ) -> list[ZoneOcrResult]:
     """
@@ -269,14 +292,13 @@ def run_zone_extraction(
         return []
 
     label = f"document {document.pk}"
-    doc_path = _resolve_doc_path(document, original_file)
-    is_archive = doc_path is not None and doc_path == document.archive_path
+    source = resolve_zone_source(document)
     plans = plan_zone_extraction(
-        doc_path,
+        source.path if source else None,
         document.page_count,
         templates,
         label=label,
-        is_image=not is_archive and document.mime_type.startswith("image/"),
+        is_image=source.is_image if source else False,
     )
     results = apply_zone_plans(get_root_document(document), plans, label=label)
     if zone_results_written(results):
@@ -415,24 +437,6 @@ def _failed_plan(
 def zone_results_written(results: list[ZoneOcrResult]) -> bool:
     """Whether at least one zone's value was written to the root document."""
     return any(result.reason is None for result in results)
-
-
-def _resolve_doc_path(
-    document: Document,
-    original_file: Path | None,
-) -> Path | None:
-    """Prefer the archive, then the source, then the given file."""
-    candidates: list[Path | None] = []
-    if document.has_archive_version:
-        candidates.append(document.archive_path)
-    candidates.append(document.source_path)
-    if original_file is not None:
-        candidates.append(original_file)
-
-    for path in candidates:
-        if path is not None and Path(path).is_file():
-            return Path(path)
-    return None
 
 
 def _resolve_page_idx(page_value: int | None, page_count: int | None) -> int:

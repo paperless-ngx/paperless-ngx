@@ -2324,6 +2324,7 @@ class DocumentViewSet(
 
         from documents.zone_ocr import ZoneOcrSkipReason
         from documents.zone_ocr import get_templates_for_document
+        from documents.zone_ocr import resolve_zone_source
 
         resolution = resolve_effective_document(document, request)
         if resolution.error == VersionResolutionError.INVALID:
@@ -2343,8 +2344,7 @@ class DocumentViewSet(
                 },
             )
 
-        doc_path = file_document.archive_path or file_document.source_path
-        if not doc_path.is_file():
+        if resolve_zone_source(file_document) is None:
             return Response(
                 {"error": "Document file not found"},
                 status=status.HTTP_404_NOT_FOUND,
@@ -5896,6 +5896,8 @@ class OcrTemplateViewSet(BulkPermissionMixin, PassUserMixin, ModelViewSet[OcrTem
         page: str,
     ) -> HttpResponse:
         """Render a page for the template editor's zone overlay."""
+        from documents.zone_ocr import resolve_zone_source
+
         document: Document = get_object_or_404(
             Document.objects.select_related("root_document__owner"),
             pk=doc_id,
@@ -5913,12 +5915,12 @@ class OcrTemplateViewSet(BulkPermissionMixin, PassUserMixin, ModelViewSet[OcrTem
                 f"Page {page_num} out of range (document has {file_doc.page_count} pages)",
             )
 
-        archive_path = file_doc.archive_path
-        doc_path = archive_path or file_doc.source_path
-        if not doc_path.is_file():
+        source = resolve_zone_source(file_doc)
+        if source is None:
             raise Http404("Document file not found")
+        doc_path = source.path
 
-        if archive_path is None and file_doc.mime_type.startswith("image/"):
+        if source.is_image:
             return HttpResponse(
                 doc_path.read_bytes(),
                 content_type=file_doc.mime_type,
@@ -5961,6 +5963,7 @@ class OcrTemplateViewSet(BulkPermissionMixin, PassUserMixin, ModelViewSet[OcrTem
     def test_zone(self, request: Request) -> HttpResponse:
         """Extract an ad-hoc zone without changing the document."""
         from documents.zone_ocr import extract_zone_preview
+        from documents.zone_ocr import resolve_zone_source
 
         serializer = OcrTemplateTestSerializer(
             data=request.data,
@@ -5971,8 +5974,8 @@ class OcrTemplateViewSet(BulkPermissionMixin, PassUserMixin, ModelViewSet[OcrTem
 
         file_doc = self._resolve_file_document(document, request)
 
-        doc_path = file_doc.archive_path or file_doc.source_path
-        if not doc_path.is_file():
+        source = resolve_zone_source(file_doc)
+        if source is None:
             return Response(
                 {"error": "Document file not found"},
                 status=status.HTTP_404_NOT_FOUND,
@@ -5981,13 +5984,12 @@ class OcrTemplateViewSet(BulkPermissionMixin, PassUserMixin, ModelViewSet[OcrTem
         zone = OcrTemplateZone(**serializer.validated_data["zone"])
 
         result = extract_zone_preview(
-            doc_path,
+            source.path,
             zone,
             zone.zone_source_width or 0,
             zone.zone_source_height or 0,
             file_doc.page_count,
-            is_image=file_doc.archive_path is None
-            and file_doc.mime_type.startswith("image/"),
+            is_image=source.is_image,
         )
 
         regex_match = None

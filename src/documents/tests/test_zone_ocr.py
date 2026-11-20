@@ -30,6 +30,7 @@ from documents.zone_ocr import MAX_PARSED_TEXT_LENGTH
 from documents.zone_ocr import ZoneExtraction
 from documents.zone_ocr import ZoneOcrReason
 from documents.zone_ocr import ZoneOcrSkipReason
+from documents.zone_ocr import ZoneSourceFile
 from documents.zone_ocr import _apply_transform
 from documents.zone_ocr import _combine_field_value
 from documents.zone_ocr import _convert_value
@@ -43,11 +44,11 @@ from documents.zone_ocr import _parse_number
 from documents.zone_ocr import _prepare_field_update
 from documents.zone_ocr import _process_template
 from documents.zone_ocr import _render_pages
-from documents.zone_ocr import _resolve_doc_path
 from documents.zone_ocr import _zone_language
 from documents.zone_ocr import extract_zone_preview
 from documents.zone_ocr import get_templates_for_content
 from documents.zone_ocr import get_templates_for_document
+from documents.zone_ocr import resolve_zone_source
 from documents.zone_ocr import run_zone_extraction
 from paperless_testing.factories import CustomFieldFactory
 from paperless_testing.factories import DocumentFactory
@@ -511,15 +512,14 @@ class TestSavedZoneExtraction:
     """Tests for extracting zones from a saved template and writing the results."""
 
     @pytest.fixture
-    def page(self, paperless_dirs: PaperlessDirs) -> Path:
-        page = paperless_dirs.scratch_dir / "page.png"
-        with Image.new("RGB", (200, 100), "white") as image:
-            image.save(page)
-        return page
-
-    @pytest.fixture
     def document(self) -> Document:
         return DocumentFactory(title="Original", mime_type="image/png")
+
+    @pytest.fixture
+    def page(self, document: Document) -> Path:
+        with Image.new("RGB", (200, 100), "white") as image:
+            image.save(document.source_path, format="PNG")
+        return document.source_path
 
     @pytest.fixture
     def template(self) -> OcrTemplate:
@@ -782,7 +782,7 @@ class TestSavedZoneExtraction:
             for value in ["First", "Second", "rejected"]
         ]
 
-        run_zone_extraction(document, page, templates=templates)
+        run_zone_extraction(document, templates=templates)
 
         document.refresh_from_db()
         assert document.title == "Second"
@@ -823,7 +823,7 @@ class TestSavedZoneExtraction:
         )
         before = Document.objects.get(pk=document.pk).modified
 
-        results = run_zone_extraction(document, page, templates=[template])
+        results = run_zone_extraction(document, templates=[template])
 
         assert [result.reason for result in results] == [None]
         assert Document.objects.get(pk=document.pk).modified > before
@@ -851,7 +851,7 @@ class TestSavedZoneExtraction:
         )
         before = Document.objects.get(pk=document.pk).modified
 
-        results = run_zone_extraction(document, page, templates=[template])
+        results = run_zone_extraction(document, templates=[template])
 
         assert [result.reason for result in results] == [ZoneOcrReason.NO_VALUE]
         assert Document.objects.get(pk=document.pk).modified == before
@@ -881,7 +881,7 @@ class TestSavedZoneExtraction:
         )
 
         with django_capture_on_commit_callbacks() as callbacks:
-            run_zone_extraction(document, page, templates=[template])
+            run_zone_extraction(document, templates=[template])
 
         assert callbacks == []
 
@@ -908,8 +908,7 @@ class TestSavedZoneExtraction:
         make_zone(template, "Last", page=-1)
         second = make_template("Second")
         make_zone(second, "Last again", page=2)
-        pdf = paperless_dirs.scratch_dir / "document.pdf"
-        pdf.write_bytes(b"%PDF-1.4")
+        document.source_path.write_bytes(b"%PDF-1.4")
         rendered = []
 
         def render(in_path: Path, out_path: Path, **kwargs: Any) -> None:
@@ -927,7 +926,7 @@ class TestSavedZoneExtraction:
             stdout="extracted",
         )
 
-        results = run_zone_extraction(document, pdf, templates=[template, second])
+        results = run_zone_extraction(document, templates=[template, second])
 
         assert [call.kwargs["page"] for call in mock_rasterize.call_args_list] == [1, 2]
         assert [result.reason for result in results] == [None, None, None]
@@ -1018,7 +1017,7 @@ class TestSavedZoneExtraction:
         """
         make_zone(template, "Title")
 
-        results = run_zone_extraction(document, None, templates=[template])
+        results = run_zone_extraction(document, templates=[template])
 
         assert len(results) == 1
         assert results[0].reason == ZoneOcrReason.MISSING_FILE
@@ -1131,7 +1130,7 @@ class TestSavedZoneExtraction:
             for value in ["Rolled back", "42", "Applied"]
         ]
 
-        results = run_zone_extraction(document, page, templates=[template, second])
+        results = run_zone_extraction(document, templates=[template, second])
 
         assert [result.reason for result in results] == [
             ZoneOcrReason.TEMPLATE_FAILED,
@@ -1165,7 +1164,7 @@ class TestSavedZoneExtraction:
         make_zone(second, "Second")
         mock_zone_ocr_run.side_effect = ocr_outputs("Ignored", "Applied")
 
-        results = run_zone_extraction(document, page, templates=[template, second])
+        results = run_zone_extraction(document, templates=[template, second])
 
         assert [result.reason for result in results] == [
             ZoneOcrReason.TEMPLATE_FAILED,
@@ -1894,7 +1893,7 @@ class TestTemplateVisibility:
             stderr="",
         )
 
-        results = run_zone_extraction(document, None)
+        results = run_zone_extraction(document)
 
         assert Counter(result.template for result in results) == Counter(
             [mine.name, unowned.name],
@@ -3585,86 +3584,124 @@ class TestRenderPages:
         mock_rasterize.assert_not_called()
 
 
-class TestResolveDocPath:
-    """Tests for _resolve_doc_path."""
+class TestResolveZoneSource:
+    """Tests for resolve_zone_source."""
 
     @pytest.fixture
-    def document(self, mocker: MockerFixture) -> MagicMock:
-        doc = mocker.MagicMock()
-        doc.has_archive_version = False
-        doc.source_path = Path("/nonexistent/source.pdf")
-        return doc
+    def source(self, tmp_path: Path) -> Path:
+        path = tmp_path / "source.png"
+        path.touch()
+        return path
 
-    def test_returns_none_when_no_files_exist(self, document: MagicMock) -> None:
+    @pytest.fixture
+    def archive(self, tmp_path: Path) -> Path:
+        path = tmp_path / "archive.pdf"
+        path.touch()
+        return path
+
+    def test_returns_none_when_no_files_exist(self, mocker: MockerFixture) -> None:
         """
         GIVEN:
             - A document with no archive version and a missing source file
         WHEN:
-            - The document path is resolved without an original file
+            - The zone source is resolved
         THEN:
             - None is returned
         """
-        assert _resolve_doc_path(document, None) is None
+        document = mocker.MagicMock(
+            has_archive_version=False,
+            source_path=Path("/nonexistent/source.pdf"),
+        )
 
-    def test_prefers_archive_and_falls_back_to_source(
+        assert resolve_zone_source(document) is None
+
+    def test_prefers_archive_and_never_treats_it_as_an_image(
         self,
         mocker: MockerFixture,
-        tmp_path: Path,
+        source: Path,
+        archive: Path,
     ) -> None:
         """
         GIVEN:
-            - A document with existing archive and source files
+            - A document with an image original and an existing archive
         WHEN:
-            - The path is resolved, then the archive file is removed and it is
-              resolved again
+            - The zone source is resolved
         THEN:
-            - The archive path is returned first, then the source path
+            - The archive is returned and is not an image
         """
-        source = tmp_path / "source.pdf"
-        archive = tmp_path / "archive.pdf"
-        source.touch()
-        archive.touch()
         document = mocker.MagicMock(
             has_archive_version=True,
             archive_path=archive,
             source_path=source,
+            mime_type="image/png",
         )
-        assert _resolve_doc_path(document, None) == archive
+
+        assert resolve_zone_source(document) == ZoneSourceFile(
+            path=archive,
+            is_image=False,
+        )
+
+    @pytest.mark.parametrize(
+        ("mime_type", "expected_is_image"),
+        [
+            pytest.param("image/png", True, id="image"),
+            pytest.param("application/pdf", False, id="pdf"),
+        ],
+    )
+    def test_uses_source_with_image_flag_from_mime_type(
+        self,
+        mocker: MockerFixture,
+        source: Path,
+        mime_type: str,
+        *,
+        expected_is_image: bool,
+    ) -> None:
+        """
+        GIVEN:
+            - A document without an archive version
+        WHEN:
+            - The zone source is resolved
+        THEN:
+            - The source file is returned, flagged as an image only for image
+              mime types
+        """
+        document = mocker.MagicMock(
+            has_archive_version=False,
+            source_path=source,
+            mime_type=mime_type,
+        )
+
+        assert resolve_zone_source(document) == ZoneSourceFile(
+            path=source,
+            is_image=expected_is_image,
+        )
+
+    def test_falls_back_to_source_when_archive_is_missing_on_disk(
+        self,
+        mocker: MockerFixture,
+        source: Path,
+        archive: Path,
+    ) -> None:
+        """
+        GIVEN:
+            - A document flagged as having an archive whose file was removed
+        WHEN:
+            - The zone source is resolved
+        THEN:
+            - The source file is returned
+        """
         archive.unlink()
-        assert _resolve_doc_path(document, None) == source
+        document = mocker.MagicMock(
+            has_archive_version=True,
+            archive_path=archive,
+            source_path=source,
+            mime_type="image/png",
+        )
 
-    def test_returns_original_file_as_fallback(
-        self,
-        document: MagicMock,
-        tmp_path: Path,
-    ) -> None:
-        """
-        GIVEN:
-            - A document whose own files are missing and an existing original file
-        WHEN:
-            - The document path is resolved with the original file
-        THEN:
-            - The original file path is returned
-        """
-        original = tmp_path / "original.pdf"
-        original.touch()
-        assert _resolve_doc_path(document, original) == original
-
-    def test_returns_none_for_missing_original_file(
-        self,
-        document: MagicMock,
-        tmp_path: Path,
-    ) -> None:
-        """
-        GIVEN:
-            - A document whose own files are missing and an original file path
-              that does not exist
-        WHEN:
-            - The document path is resolved with the original file
-        THEN:
-            - None is returned
-        """
-        assert _resolve_doc_path(document, tmp_path / "missing.pdf") is None
+        assert resolve_zone_source(document) == ZoneSourceFile(
+            path=source,
+            is_image=True,
+        )
 
 
 @pytest.mark.django_db
@@ -3681,11 +3718,10 @@ class TestRunZoneExtraction:
         )
 
     @pytest.fixture
-    def source(self, paperless_dirs: PaperlessDirs) -> Path:
-        source = paperless_dirs.scratch_dir / "document.png"
+    def source(self, document: Document) -> Path:
         with Image.new("RGB", (200, 200), "white") as image:
-            image.save(source)
-        return source
+            image.save(document.source_path, format="PNG")
+        return document.source_path
 
     @pytest.fixture(autouse=True)
     def ocr_reads_text(self, mock_zone_ocr_run: MagicMock) -> None:
@@ -3779,7 +3815,7 @@ class TestRunZoneExtraction:
         """
         template_with_zone(template_name, **template_kwargs)
 
-        results = run_zone_extraction(document, source)
+        results = run_zone_extraction(document)
 
         assert results == []
         mock_zone_ocr_run.assert_not_called()
@@ -3805,7 +3841,7 @@ class TestRunZoneExtraction:
             match="test",
         )
 
-        results = run_zone_extraction(document, source)
+        results = run_zone_extraction(document)
 
         assert results == []
         mock_zone_ocr_run.assert_not_called()
@@ -3841,14 +3877,14 @@ class TestRunZoneExtraction:
         template_with_zone("First", enabled=True)
         template_with_zone("Second", enabled=True)
 
-        results = run_zone_extraction(document, source)
+        results = run_zone_extraction(document)
 
         assert Counter((r.value, r.reason) for r in results) == Counter(
             [(None, ZoneOcrReason.TEMPLATE_FAILED), ("extracted", None)],
         )
         assert {r.template for r in results} == {"First", "Second"}
 
-    def test_handles_none_original_file(
+    def test_reports_missing_file_when_document_has_no_file(
         self,
         mock_zone_ocr_run: MagicMock,
         template_with_zone: Callable[..., OcrTemplate],
@@ -3856,8 +3892,7 @@ class TestRunZoneExtraction:
     ) -> None:
         """
         GIVEN:
-            - A matching template, a document with no accessible file and no
-              original file
+            - A matching template and a document with no accessible file
         WHEN:
             - Zone extraction runs
         THEN:
@@ -3866,7 +3901,7 @@ class TestRunZoneExtraction:
         template = template_with_zone("Matching", enabled=True)
         zone = template.zones.get()
 
-        results = run_zone_extraction(document, None)
+        results = run_zone_extraction(document)
 
         assert [(r.template, r.zone, r.reason) for r in results] == [
             ("Matching", zone.name, ZoneOcrReason.MISSING_FILE),
@@ -3901,7 +3936,7 @@ class TestRunZoneExtraction:
         for name in template_names:
             template_with_zone(name, enabled=True)
 
-        results = run_zone_extraction(document, source)
+        results = run_zone_extraction(document)
 
         assert sorted((r.template, r.reason) for r in results) == [
             (name, None) for name in sorted(template_names)
@@ -3950,7 +3985,7 @@ class TestRealZoneOcr:
         )
         shutil.copy(simple_digital_pdf_file, document.source_path)
 
-        results = run_zone_extraction(document, None)
+        results = run_zone_extraction(document)
 
         assert [result.reason for result in results] == [None]
         document.refresh_from_db()
@@ -3978,7 +4013,7 @@ class TestRealZoneOcr:
             document.source_path,
         )
 
-        results = run_zone_extraction(document, None)
+        results = run_zone_extraction(document)
 
         assert [result.reason for result in results] == [None]
         document.refresh_from_db()

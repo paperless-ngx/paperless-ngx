@@ -3163,3 +3163,25 @@ class TestZoneEditorVersions:
         assert response.status_code == status.HTTP_200_OK
         assert mock_preview.call_args.args[0] == newer.archive_path
         assert mock_preview.call_args.kwargs["is_image"] is False
+
+    def test_page_image_falls_back_to_the_source_when_the_archive_is_missing(
+        self,
+        preview_client: APIClient,
+        versioned_document: SimpleNamespace,
+    ) -> None:
+        """
+        GIVEN:
+            - An image document that has an archive filename but no archive file
+        WHEN:
+            - A page image is requested
+        THEN:
+            - The source image is served
+        """
+        Document.objects.filter(pk=versioned_document.newer.pk).update(
+            archive_filename="missing.pdf",
+        )
+
+        response = preview_client.get(preview_url(versioned_document.root))
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.content == b"newer"
