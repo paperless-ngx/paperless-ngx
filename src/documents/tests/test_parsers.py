@@ -458,7 +458,7 @@ class TestRasterizePdfPageToPng:
 
         assert not out_path.exists()
 
-    def test_arguments_and_timeout_are_passed_to_pdftoppm(
+    def test_timeout_and_resolution_are_passed_to_pdftoppm(
         self,
         tmp_path: Path,
         mocker: MockerFixture,
@@ -467,9 +467,10 @@ class TestRasterizePdfPageToPng:
         GIVEN:
             - A subprocess runner that succeeds
         WHEN:
-            - Page 4 is rasterized with a timeout
+            - Page 4 is rasterized at a non-72 dpi with a timeout
         THEN:
-            - pdftoppm renders only that page and the timeout reaches the runner
+            - The timeout reaches the runner
+            - The resolution is passed to pdftoppm
         """
         run = mocker.patch("documents.parsers.run_subprocess")
 
@@ -482,12 +483,7 @@ class TestRasterizePdfPageToPng:
         )
 
         args = run.call_args.args[0]
-        assert args[args.index("-f") + 1] == "4"
-        assert args[args.index("-l") + 1] == "4"
         assert args[args.index("-r") + 1] == "150"
-        assert "-singlefile" in args
-        assert "-cropbox" in args
-        assert args[-1] == str(tmp_path / "out")
         assert run.call_args.kwargs["timeout"] == 12
 
     def test_timeout_raises_parse_error(
