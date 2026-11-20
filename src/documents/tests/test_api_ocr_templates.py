@@ -1324,6 +1324,27 @@ class TestOcrTemplateValidation:
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
+    def test_combine_formats_create_without_zones_is_rejected(
+        self,
+        admin_client: APIClient,
+    ) -> None:
+        """
+        GIVEN:
+            - No saved template and a create payload with no zones key
+        WHEN:
+            - Create is attempted with a combine format
+        THEN:
+            - The combine format has no zone targets to match and is rejected
+              on combine_formats
+        """
+        payload = template_payload(combine_formats={"title": "{A}"})
+        del payload["zones"]
+
+        response = admin_client.post(ENDPOINT, payload, format="json")
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert "combine_formats" in response.json()
+
 
 @pytest.mark.django_db
 @pytest.mark.usefixtures("paperless_dirs")
