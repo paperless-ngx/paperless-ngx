@@ -73,7 +73,15 @@
       <pngx-bs-icon name="chat-left-text" class="me-1"></pngx-bs-icon><ng-container i18n>Need support? Ask in Discussions</ng-container>
     </a>
   </div>
-  <button type="button" class="btn btn-outline-secondary" (click)="close()" i18n>Close</button>
+  <div class="d-flex gap-3">
+    <button type="button" class="btn btn-outline-secondary" (click)="close()" i18n>Close</button>
+    @if (until()) {
+      <a class="btn btn-primary d-flex align-items-center" [href]="updatingDocsUrl" target="_blank" rel="noopener noreferrer">
+        <ng-container i18n>How to update</ng-container>
+        <pngx-bs-icon name="box-arrow-up-right" class="ms-2" width=".8rem"></pngx-bs-icon>
+      </a>
+    }
+  </div>
 </div>
 
 <ng-template #githubLink>

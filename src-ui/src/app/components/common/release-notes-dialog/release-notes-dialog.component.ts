@@ -19,6 +19,8 @@ import { SettingsService } from 'src/app/services/settings.service'
 const REPO_URL = 'https://github.com/paperless-ngx/paperless-ngx'
 const RELEASES_URL = `${REPO_URL}/releases`
 const DISCUSSIONS_URL = `${REPO_URL}/discussions/new/choose`
+const UPDATING_DOCS_URL =
+  'https://docs.paperless-ngx.com/administration/#updating'
 
 /**
  * Tweak GitHub release HTML: open links in a new tab, add no referrer etc,
@@ -79,6 +81,7 @@ export class ReleaseNotesDialogComponent {
   readonly repoUrl = REPO_URL
   readonly releasesUrl = RELEASES_URL
   readonly discussionsUrl = DISCUSSIONS_URL
+  readonly updatingDocsUrl = UPDATING_DOCS_URL
 
   get releaseUrl(): string {
     const version = this.until() ?? this.version

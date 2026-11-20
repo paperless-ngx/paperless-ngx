@@ -80,6 +80,9 @@ describe('ReleaseNotesDialogComponent', () => {
     expect(text).toContain('Updated from 3.4.2 to 3.5.1')
     expect(text).toContain('Bug Fixes')
     expect(
+      fixture.nativeElement.querySelector('.modal-footer a.btn-primary')
+    ).toBeNull()
+    expect(
       fixture.nativeElement.querySelector('.release-notes-body details summary')
         .textContent
     ).toEqual('1 change')
@@ -101,6 +104,11 @@ describe('ReleaseNotesDialogComponent', () => {
     expect(component.releaseUrl).toEqual(
       'https://github.com/paperless-ngx/paperless-ngx/releases/tag/v3.6.0'
     )
+    expect(
+      fixture.nativeElement
+        .querySelector('.modal-footer a.btn-primary')
+        .getAttribute('href')
+    ).toEqual('https://docs.paperless-ngx.com/administration/#updating')
   })
 
   it('should open release note links safely and drop svg icons', () => {
