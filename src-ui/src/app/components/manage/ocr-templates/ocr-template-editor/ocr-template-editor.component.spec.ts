@@ -225,7 +225,7 @@ describe('OcrTemplateEditorComponent', () => {
     component.previewPageDisplay = 2
     expect(component.previewPage).toBe(1)
     expect(component.previewPageDisplay).toBe(2)
-    expect(component.pageImageUrl).toContain('/5/1/')
+    expect(component.pageImageUrl).toContain('/5/2/')
     component.pageLoaded.set(true)
     component.goToPage(1)
     expect(component.pageLoaded()).toBe(true)
@@ -523,7 +523,7 @@ describe('OcrTemplateEditorComponent', () => {
     expect(component.dialogTitle).toEqual('Edit OCR Template')
     expect(component.previewDocId).toEqual(5)
     expect(component.previewPageCount()).toEqual(3)
-    expect(component.pageImageUrl).toContain('document-page-image/5/0/')
+    expect(component.pageImageUrl).toContain('document-page-image/5/1/')
     expect(component.template.match).toEqual('Northwind')
     expect(component.isDirty).toBeFalsy()
 

@@ -170,7 +170,7 @@ def detail_url(pk: int) -> str:
     return f"{ENDPOINT}{pk}/"
 
 
-def preview_url(document: Document, page: int = 0) -> str:
+def preview_url(document: Document, page: int = 1) -> str:
     return f"{ENDPOINT}document-page-image/{document.pk}/{page}/"
 
 
@@ -2397,12 +2397,31 @@ class TestDocumentPageImage:
         THEN:
             - 404 is returned for both
         """
-        response = preview_client.get(f"{ENDPOINT}document-page-image/99999/0/")
+        response = preview_client.get(f"{ENDPOINT}document-page-image/99999/1/")
         assert response.status_code == status.HTTP_404_NOT_FOUND
         assert (
-            preview_client.get(preview_url(preview_document, 3)).status_code
+            preview_client.get(preview_url(preview_document, 4)).status_code
             == status.HTTP_404_NOT_FOUND
         )
+
+    def test_page_zero_is_not_found(
+        self,
+        preview_client: APIClient,
+        preview_document: Document,
+        mock_render: MagicMock,
+    ) -> None:
+        """
+        GIVEN:
+            - A 3 page PDF document
+        WHEN:
+            - Page 0 is requested, which is not a valid 1-based page
+        THEN:
+            - 404 is returned and no page is rendered
+        """
+        response = preview_client.get(preview_url(preview_document, 0))
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+        mock_render.assert_not_called()
 
     def test_serves_image_documents_without_running_poppler(
         self,
@@ -2481,7 +2500,7 @@ class TestDocumentPageImage:
 
         mock_render.side_effect = render_page
 
-        response = preview_client.get(preview_url(preview_document, 1))
+        response = preview_client.get(preview_url(preview_document, 2))
 
         assert response.status_code == status.HTTP_200_OK
         assert response["Content-Type"] == "image/png"

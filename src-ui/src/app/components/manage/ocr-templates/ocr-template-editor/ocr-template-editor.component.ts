@@ -241,7 +241,7 @@ export class OcrTemplateEditorComponent implements OnInit, OnDestroy {
     return this.previewDocId
       ? this.templateService.getPageImageUrl(
           this.previewDocId,
-          this.previewPage
+          this.previewPage + 1
         )
       : null
   }

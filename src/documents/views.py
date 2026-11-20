@@ -5897,7 +5897,7 @@ class OcrTemplateViewSet(BulkPermissionMixin, PassUserMixin, ModelViewSet[OcrTem
     ) -> HttpResponse:
         """
         Render a page for the template editor's zone overlay. The page in the URL is
-        0-based, unlike a zone's page, which is 1-based.
+        1-based, like a zone's page.
         """
         from documents.zone_ocr import resolve_zone_source
 
@@ -5911,11 +5911,13 @@ class OcrTemplateViewSet(BulkPermissionMixin, PassUserMixin, ModelViewSet[OcrTem
 
         file_doc = self._resolve_file_document(document, request)
 
-        page_num = int(page)
+        page_number = int(page)
+        if page_number < 1:
+            raise Http404("Page numbers start at 1")
 
-        if file_doc.page_count and page_num >= file_doc.page_count:
+        if file_doc.page_count and page_number > file_doc.page_count:
             raise Http404(
-                f"Page {page_num} out of range (document has {file_doc.page_count} pages)",
+                f"Page {page_number} out of range (document has {file_doc.page_count} pages)",
             )
 
         source = resolve_zone_source(file_doc)
@@ -5937,13 +5939,13 @@ class OcrTemplateViewSet(BulkPermissionMixin, PassUserMixin, ModelViewSet[OcrTem
                     doc_path,
                     rendered,
                     dpi=150,
-                    page=page_num + 1,
+                    page=page_number,
                     timeout=30,
                 )
             except ParseError as error:
                 logger.warning(
                     "Failed to render page %s of document %s: %s",
-                    page_num,
+                    page_number,
                     file_doc.pk,
                     error,
                 )
