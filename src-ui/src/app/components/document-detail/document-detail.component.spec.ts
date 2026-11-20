@@ -41,6 +41,7 @@ import {
   FILTER_STORAGE_PATH,
 } from 'src/app/data/filter-rule-type'
 import { StoragePath } from 'src/app/data/storage-path'
+import { PaperlessTaskStatus } from 'src/app/data/paperless-task'
 import { Tag } from 'src/app/data/tag'
 import { SETTINGS_KEYS, SuggestionSource } from 'src/app/data/ui-settings'
 import { PermissionsGuard } from 'src/app/guards/permissions.guard'
@@ -59,6 +60,7 @@ import { TagService } from 'src/app/services/rest/tag.service'
 import { UserService } from 'src/app/services/rest/user.service'
 import { SettingsService } from 'src/app/services/settings.service'
 import { ToastService } from 'src/app/services/toast.service'
+import { TaskNotificationService } from 'src/app/services/task-notification.service'
 import { TrashService } from 'src/app/services/trash.service'
 import { WebsocketStatusService } from 'src/app/services/websocket-status.service'
 import { environment } from 'src/environments/environment'
@@ -1965,23 +1967,21 @@ describe('DocumentDetailComponent', () => {
     expect(toastSpy).toHaveBeenCalledWith('Document reloaded.')
   })
 
-  it('should run a chosen zone OCR template on the selected version and reload', () => {
+  it('should queue a chosen zone OCR template on the selected version', () => {
     component.documentId.set(doc.id)
     component.document.set({ ...doc, versions: docVersions })
     component.selectedVersionId.set(10)
-    jest.spyOn(documentService, 'runZoneOcr').mockReturnValue(
-      of({
-        results: [
-          { zone: 'Total', value: '102.10' },
-          { zone: 'Due', value: '' },
-        ],
-      } as any)
-    )
+    jest
+      .spyOn(documentService, 'runZoneOcr')
+      .mockReturnValue(of({ result: 'OK', task_id: 'zone-ocr-task' }))
     const loadSpy = jest
       .spyOn(component as any, 'loadDocument')
       .mockImplementation(() => {})
     const notifySpy = jest.spyOn(component.docChangeNotifier, 'next')
-    const toastSpy = jest.spyOn(toastService, 'showInfo')
+    const queued = jest.spyOn(
+      TestBed.inject(TaskNotificationService),
+      'showQueued'
+    )
     const modalSpy = jest.spyOn(modalService, 'open')
 
     component.runZoneOcrWithOptions()
@@ -1993,45 +1993,126 @@ describe('DocumentDetailComponent', () => {
     dialog.confirmClicked.emit()
 
     expect(documentService.runZoneOcr).toHaveBeenCalledWith(doc.id, 3, 10)
-    expect(toastSpy).toHaveBeenCalledWith(
-      'Filled 1 of 2 fields. No value found for: Due'
-    )
-    expect(notifySpy).toHaveBeenCalledWith(doc.id)
-    expect(loadSpy).toHaveBeenCalledWith(doc.id, true, expect.any(Function))
-    expect(component.zoneOcrRunning()).toBe(true)
-    loadSpy.mock.calls[0][2]()
+    expect(queued).toHaveBeenCalledWith('zone-ocr-task', 'Zone OCR queued.', {
+      content: 'Zone OCR completed.',
+    })
+    expect(notifySpy).not.toHaveBeenCalled()
+    expect(loadSpy).not.toHaveBeenCalled()
     expect(component.zoneOcrRunning()).toBe(false)
     expect(component.networkActive()).toBe(false)
   })
 
-  it('should summarize zone OCR results', () => {
+  it('should queue matching templates on the latest version without a dialog', () => {
     component.documentId.set(doc.id)
     component.document.set({ ...doc, versions: docVersions })
     component.selectedVersionId.set(12)
     jest.spyOn(component as any, 'loadDocument').mockImplementation(() => {})
     const runSpy = jest.spyOn(documentService, 'runZoneOcr')
-    const toastSpy = jest.spyOn(toastService, 'showInfo')
+    const queued = jest.spyOn(
+      TestBed.inject(TaskNotificationService),
+      'showQueued'
+    )
     const modalSpy = jest.spyOn(modalService, 'open')
 
-    runSpy.mockReturnValueOnce(of({ status: 'completed', results: [] }))
+    runSpy.mockReturnValueOnce(
+      of({ result: 'OK', task_id: 'matching-zone-ocr' })
+    )
     component.runZoneOcr()
     expect(modalSpy).not.toHaveBeenCalled()
     expect(runSpy).toHaveBeenCalledWith(doc.id, null, null)
-    expect(toastSpy).toHaveBeenLastCalledWith(
-      'Zone OCR found no fields to fill.'
+    expect(queued).toHaveBeenCalledWith(
+      'matching-zone-ocr',
+      'Zone OCR queued.',
+      { content: 'Zone OCR completed.' }
     )
+    expect(component.zoneOcrRunning()).toBe(false)
+    expect(component.networkActive()).toBe(false)
+  })
 
-    component.networkActive.set(false)
-    runSpy.mockReturnValueOnce(
-      of({
-        status: 'completed',
-        results: [
-          { template: 'T', zone: 'Total', custom_field: 'Amount', value: 0 },
-        ],
+  it('should discard confirmed local edits after OCR is queued', () => {
+    component.documentId.set(doc.id)
+    component.document.set({ ...doc, __changedFields: ['title'] })
+    component.documentForm.patchValue({ title: 'Unsaved title' })
+    jest
+      .spyOn(documentService, 'runZoneOcr')
+      .mockReturnValue(of({ result: 'OK', task_id: 'zone-ocr-task' }))
+    const modalSpy = jest.spyOn(modalService, 'open')
+    const load = jest
+      .spyOn(component as any, 'loadDocument')
+      .mockImplementation(() => {})
+    component.runZoneOcr()
+    modalSpy.mock.results[0].value.componentInstance.confirm()
+    expect(load).toHaveBeenCalledWith(doc.id, true, expect.any(Function))
+    load.mock.calls[0][2]()
+    expect(component.zoneOcrRunning()).toBe(false)
+    expect(component.networkActive()).toBe(false)
+  })
+
+  it('should handle task completion before the queue response', () => {
+    jest.useFakeTimers()
+    component.documentId.set(doc.id)
+    component.document.set({ ...doc, __changedFields: [] })
+    const pending = new Subject<any>()
+    jest.spyOn(documentService, 'runZoneOcr').mockReturnValue(pending)
+    const notifications = TestBed.inject(TaskNotificationService)
+    const toast = jest.spyOn(toastService, 'show')
+    component.runZoneOcr()
+    notifications.complete({
+      task_id: 'fast-zone-ocr',
+      operation: 'run_zone_ocr',
+      status: PaperlessTaskStatus.Success,
+    })
+    pending.next({ result: 'OK', task_id: 'fast-zone-ocr' })
+    expect(toast).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        id: 'task-fast-zone-ocr',
+        content: 'Zone OCR completed.',
       })
     )
+    expect(component.networkActive()).toBe(false)
+    pending.complete()
+  })
+
+  it('should refresh queued OCR changes through document update events', () => {
+    initNormally()
+    jest
+      .spyOn(documentService, 'runZoneOcr')
+      .mockReturnValue(of({ result: 'OK', task_id: 'zone-ocr-task' }))
+    const load = jest
+      .spyOn(component as any, 'loadDocument')
+      .mockImplementation(() => {})
     component.runZoneOcr()
-    expect(toastSpy).toHaveBeenLastCalledWith('Filled 1 of 1 fields.')
+    expect(load).not.toHaveBeenCalled()
+    expect(component.networkActive()).toBe(false)
+
+    TestBed.inject(WebsocketStatusService).onDocumentUpdated().next({
+      document_id: doc.id,
+      modified: '2026-02-17T00:00:00Z',
+    })
+    expect(load).toHaveBeenCalledWith(doc.id, true)
+  })
+
+  it('should protect edits made after OCR was queued from its document update', () => {
+    initNormally()
+    jest
+      .spyOn(documentService, 'runZoneOcr')
+      .mockReturnValue(of({ result: 'OK', task_id: 'zone-ocr-task' }))
+    component.runZoneOcr()
+    component.documentForm.patchValue({ title: 'New local edit' })
+    jest.spyOn(openDocumentsService, 'isDirty').mockReturnValue(true)
+    const conflict = jest
+      .spyOn(component as any, 'showIncomingUpdateModal')
+      .mockImplementation(() => {})
+    const load = jest
+      .spyOn(component as any, 'loadDocument')
+      .mockImplementation(() => {})
+    TestBed.inject(WebsocketStatusService).onDocumentUpdated().next({
+      document_id: doc.id,
+      modified: '2026-02-17T00:00:00Z',
+    })
+    expect(conflict).toHaveBeenCalled()
+    expect(load).not.toHaveBeenCalled()
+    expect(component.documentForm.get('title').value).toBe('New local edit')
   })
 
   it('should confirm before running zone OCR over unsaved changes', () => {
@@ -2072,7 +2153,7 @@ describe('DocumentDetailComponent', () => {
     expect(modalSpy).toHaveBeenCalledTimes(1)
   })
 
-  it('should not allow saving or a second zone OCR run while one is running', () => {
+  it('should not allow saving or a second zone OCR request while queueing', () => {
     component.documentId.set(doc.id)
     component.document.set({
       ...doc,
@@ -2113,7 +2194,7 @@ describe('DocumentDetailComponent', () => {
 
     component.runZoneOcr()
     component.documentId.set(99)
-    pending.next({ results: [] })
+    pending.next({ result: 'OK', task_id: 'zone-ocr-task' })
 
     expect(loadSpy).not.toHaveBeenCalled()
     expect(component.zoneOcrRunning()).toBe(false)
@@ -2127,7 +2208,7 @@ describe('DocumentDetailComponent', () => {
     const modalSpy = jest.spyOn(modalService, 'open')
     jest
       .spyOn(documentService, 'runZoneOcr')
-      .mockReturnValue(of({ status: 'skipped', results: [] }))
+      .mockReturnValue(of({ result: 'skipped', reason: 'no_template' }))
     const loadSpy = jest.spyOn(component as any, 'loadDocument')
     const infoSpy = jest.spyOn(toastService, 'showInfo')
 

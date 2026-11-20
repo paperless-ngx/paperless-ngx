@@ -601,13 +601,13 @@ describe(`DocumentService`, () => {
     subscription = service.runZoneOcr(documents[0].id).subscribe()
     let req = httpTestingController.expectOne(url)
     expect(req.request.method).toEqual('POST')
-    expect(req.request.body).toEqual({})
-    req.flush({ status: 'completed', results: [] })
+    expect(req.request.body).toEqual({ from_webui: true })
+    req.flush({ result: 'OK', task_id: 'zone-ocr-1' })
 
     subscription = service.runZoneOcr(documents[0].id, 3, 10).subscribe()
     req = httpTestingController.expectOne(`${url}?version=10`)
-    expect(req.request.body).toEqual({ template: 3 })
-    req.flush({ status: 'completed', results: [] })
+    expect(req.request.body).toEqual({ template: 3, from_webui: true })
+    req.flush({ result: 'OK', task_id: 'zone-ocr-2' })
   })
 })
 

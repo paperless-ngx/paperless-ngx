@@ -64,7 +64,6 @@ import {
   FILTER_STORAGE_PATH,
 } from 'src/app/data/filter-rule-type'
 import { ObjectWithId } from 'src/app/data/object-with-id'
-import { OcrZoneRunResult } from 'src/app/data/ocr-template'
 import { StoragePath } from 'src/app/data/storage-path'
 import { Tag } from 'src/app/data/tag'
 import { SETTINGS_KEYS, SuggestionSource } from 'src/app/data/ui-settings'
@@ -1698,38 +1697,33 @@ export class DocumentDetailComponent
       .pipe(takeUntil(this.unsubscribeNotifier))
       .subscribe({
         next: (response) => {
-          if (
-            this.documentId() !== documentId ||
-            response.status === 'skipped'
-          ) {
+          if (response.result === 'skipped') {
             this.finishZoneOcr()
-            if (response.status === 'skipped') {
-              this.toastService.showInfo(
-                $localize`No OCR template applies to this document.`
-              )
-            }
+            this.toastService.showInfo(
+              $localize`No OCR template applies to this document.`
+            )
             return
           }
-          this.toastService.showInfo(this.zoneOcrSummary(response.results))
-          this.docChangeNotifier.next(documentId)
-          this.loadDocument(documentId, true, () => this.finishZoneOcr())
+          this.taskNotifications.showQueued(
+            response.task_id,
+            $localize`Zone OCR queued.`,
+            { content: $localize`Zone OCR completed.` }
+          )
+          if (
+            this.documentId() === documentId &&
+            this.hasLocalEdits(this.document())
+          ) {
+            this.docChangeNotifier.next(documentId)
+            this.loadDocument(documentId, true, () => this.finishZoneOcr())
+          } else {
+            this.finishZoneOcr()
+          }
         },
         error: (error) => {
           this.finishZoneOcr()
           this.toastService.showError($localize`Error running zone OCR.`, error)
         },
       })
-  }
-
-  private zoneOcrSummary(results: OcrZoneRunResult[]): string {
-    if (!results.length) return $localize`Zone OCR found no fields to fill.`
-    const missed = results
-      .filter((result) => !`${result.value ?? ''}`.trim())
-      .map((result) => result.zone)
-    const filled = results.length - missed.length
-    return missed.length
-      ? $localize`Filled ${filled} of ${results.length} fields. No value found for: ${missed.join(', ')}`
-      : $localize`Filled ${filled} of ${results.length} fields.`
   }
 
   private finishZoneOcr() {

@@ -100,16 +100,6 @@ export interface OcrZoneTestResult {
   error?: string
 }
 
-export interface OcrZoneRunResult {
-  template: string
-  zone: string
-  custom_field: string
-  value: string | number | boolean | null
-  reason?: string | null
-}
-
-export interface OcrZoneRunResponse {
-  status: 'completed' | 'skipped'
-  reason?: 'no_template'
-  results: OcrZoneRunResult[]
-}
+export type OcrZoneRunResponse =
+  | { result: 'OK'; task_id: string }
+  | { result: 'skipped'; reason: 'no_template' }
