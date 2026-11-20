@@ -26,6 +26,8 @@ from documents.models import Tag
 from documents.pdf_ops import PageSpec
 from documents.permissions import PermissionsSpec
 from documents.permissions import set_permissions_for_objects
+from documents.zone_ocr import ZoneOcrReason
+from documents.zone_ocr import ZoneOcrResult
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import DocumentFactory
 from paperless_testing.factories import OcrTemplateFactory
@@ -1936,17 +1938,34 @@ class TestPDFActions(DirectoriesMixin, TestCase):
         self.assertIn("Error removing password from document", cm.output[0])
 
 
+def _written_result() -> ZoneOcrResult:
+    return ZoneOcrResult(template="t", zone="z", custom_field="", reason=None)
+
+
+def _unwritten_result() -> ZoneOcrResult:
+    return ZoneOcrResult(
+        template="t",
+        zone="z",
+        custom_field="",
+        reason=ZoneOcrReason.NO_VALUE,
+    )
+
+
 @pytest.mark.django_db
 class TestBulkEditRunZoneOcr:
     """Bulk run_zone_ocr runs zone extraction for each selected document."""
 
     @pytest.fixture
-    def mock_extract_zones(self, mocker: MockerFixture) -> mock.MagicMock:
-        return mocker.patch("documents.bulk_edit.extract_zones", return_value=None)
+    def mock_extract(self, mocker: MockerFixture) -> mock.MagicMock:
+        return mocker.patch("documents.bulk_edit.run_zone_extraction", return_value=[])
 
-    def test_runs_every_selected_document_in_the_current_task(
+    @pytest.fixture
+    def mock_finish(self, mocker: MockerFixture) -> mock.MagicMock:
+        return mocker.patch("documents.bulk_edit.bulk_update_documents")
+
+    def test_selects_templates_for_the_requester(
         self,
-        mock_extract_zones: mock.MagicMock,
+        mock_extract: mock.MagicMock,
         mocker: MockerFixture,
     ) -> None:
         """
@@ -1955,102 +1974,157 @@ class TestBulkEditRunZoneOcr:
         WHEN:
             - run_zone_ocr is called for the documents without a template
         THEN:
-            - Extraction runs inline for each document with the requester
-            - Nothing is queued
+            - Templates are selected for each document with the requester
+            - Extraction runs inline for each document
         """
+        select = mocker.patch("documents.bulk_edit.get_templates_for_document")
         docs = DocumentFactory.create_batch(2)
-
         user = UserFactory()
 
         result = bulk_edit.run_zone_ocr([doc.id for doc in docs], user=user)
 
         assert result == "OK"
-        assert mock_extract_zones.call_args_list == [
-            mocker.call(
-                document_id=doc.id,
-                template_id=None,
-                requester=user,
-                resolve_latest=True,
-            )
-            for doc in docs
+        assert select.call_args_list == [
+            mocker.call(doc, requester=user) for doc in docs
         ]
-        mock_extract_zones.apply_async.assert_not_called()
+        assert mock_extract.call_args_list == [
+            mocker.call(doc, templates=select.return_value) for doc in docs
+        ]
 
     def test_runs_the_chosen_template(
         self,
-        mock_extract_zones: mock.MagicMock,
+        mock_extract: mock.MagicMock,
+        mocker: MockerFixture,
     ) -> None:
         """
         GIVEN:
-            - A document and an OCR template
+            - Two documents and an OCR template
         WHEN:
-            - run_zone_ocr is called for the document with the template
+            - run_zone_ocr is called for the documents with the template
         THEN:
-            - Extraction runs inline with the template and no requester
-            - Nothing is queued
+            - Extraction runs for each document with only that template
+            - Template matching is not used
         """
-        doc = DocumentFactory()
+        select = mocker.patch("documents.bulk_edit.get_templates_for_document")
+        docs = DocumentFactory.create_batch(2)
         template = OcrTemplateFactory()
 
-        bulk_edit.run_zone_ocr([doc.id], template=template.pk)
+        bulk_edit.run_zone_ocr([doc.id for doc in docs], template=template.pk)
 
-        mock_extract_zones.assert_called_once_with(
-            document_id=doc.id,
-            template_id=template.pk,
-            requester=None,
-            resolve_latest=True,
-        )
-        mock_extract_zones.apply_async.assert_not_called()
+        select.assert_not_called()
+        assert mock_extract.call_args_list == [
+            mocker.call(doc, templates=[template]) for doc in docs
+        ]
 
-    def test_finishes_once_for_documents_with_a_write(
+    def test_deleted_template_runs_nothing(
         self,
-        mock_extract_zones: mock.MagicMock,
+        mock_extract: mock.MagicMock,
+        mock_finish: mock.MagicMock,
+    ) -> None:
+        """
+        GIVEN:
+            - A chosen template that no longer exists
+        WHEN:
+            - run_zone_ocr is called
+        THEN:
+            - OK is returned without running extraction or finishing
+        """
+        doc = DocumentFactory()
+
+        result = bulk_edit.run_zone_ocr([doc.pk], template=999)
+
+        assert result == "OK"
+        mock_extract.assert_not_called()
+        mock_finish.assert_not_called()
+
+    def test_missing_document_does_not_abort_the_others(
+        self,
+        mock_extract: mock.MagicMock,
+        mock_finish: mock.MagicMock,
         mocker: MockerFixture,
     ) -> None:
         """
         GIVEN:
-            - Three selected documents, the second of which had nothing written
-              and the third reporting the same root as the first
+            - A selection holding a nonexistent id and a trashed document
+              alongside a live document
         WHEN:
             - run_zone_ocr is called
         THEN:
-            - bulk_update_documents runs once with the distinct written ids
+            - Only the live document is extracted
+            - The live document is finished
+        """
+        live = DocumentFactory()
+        trashed = DocumentFactory()
+        trashed.delete()
+        template = OcrTemplateFactory()
+        mock_extract.return_value = [_written_result()]
+
+        bulk_edit.run_zone_ocr([999999, trashed.pk, live.pk], template=template.pk)
+
+        mock_extract.assert_called_once_with(live, templates=[template])
+        mock_finish.assert_called_once_with([live.pk])
+
+    def test_failing_document_does_not_abort_the_others(
+        self,
+        mock_extract: mock.MagicMock,
+        mock_finish: mock.MagicMock,
+    ) -> None:
+        """
+        GIVEN:
+            - Three selected documents, the second of which raises during extraction
+        WHEN:
+            - run_zone_ocr is called
+        THEN:
+            - The failure is logged and the remaining document still runs
+            - bulk_update_documents runs once with the written documents
+            - The task then fails, naming the number of failed documents
         """
         docs = DocumentFactory.create_batch(3)
-        finish = mocker.patch("documents.bulk_edit.bulk_update_documents")
-        mock_extract_zones.side_effect = [docs[0].pk, None, docs[0].pk]
+        template = OcrTemplateFactory()
+        mock_extract.side_effect = [
+            [_written_result()],
+            RuntimeError("boom"),
+            [_written_result()],
+        ]
 
-        bulk_edit.run_zone_ocr([doc.pk for doc in docs])
+        with pytest.raises(RuntimeError, match="1 of 3 documents"):
+            bulk_edit.run_zone_ocr([d.pk for d in docs], template=template.pk)
 
-        finish.assert_called_once_with([docs[0].pk])
+        assert mock_extract.call_count == 3
+        mock_finish.assert_called_once_with([docs[0].pk, docs[2].pk])
 
-    def test_finishes_written_documents_when_a_later_one_raises(
+    def test_finishes_each_root_once(
         self,
-        mock_extract_zones: mock.MagicMock,
-        mocker: MockerFixture,
+        mock_extract: mock.MagicMock,
+        mock_finish: mock.MagicMock,
     ) -> None:
         """
         GIVEN:
-            - Two selected documents, the second of which raises during extraction
+            - Two documents whose extraction writes, one being a version of the other
+              when not resolving the latest version
         WHEN:
-            - run_zone_ocr is called
+            - run_zone_ocr is called without resolving the latest version
         THEN:
-            - The exception propagates
-            - bulk_update_documents still runs with the first document's id
+            - bulk_update_documents runs once with the root id listed once
         """
-        docs = DocumentFactory.create_batch(2)
-        finish = mocker.patch("documents.bulk_edit.bulk_update_documents")
-        mock_extract_zones.side_effect = [docs[0].pk, RuntimeError("boom")]
+        root = DocumentFactory()
+        version = DocumentFactory(root_document=root, version_index=1)
+        template = OcrTemplateFactory()
+        mock_extract.return_value = [_written_result()]
 
-        with pytest.raises(RuntimeError, match="boom"):
-            bulk_edit.run_zone_ocr([doc.pk for doc in docs])
+        bulk_edit.run_zone_ocr(
+            [root.pk, version.pk],
+            template=template.pk,
+            resolve_latest=False,
+        )
 
-        finish.assert_called_once_with([docs[0].pk])
+        assert mock_extract.call_count == 2
+        mock_finish.assert_called_once_with([root.pk])
 
     def test_does_not_finish_when_nothing_was_written(
         self,
-        mock_extract_zones: mock.MagicMock,
-        mocker: MockerFixture,
+        mock_extract: mock.MagicMock,
+        mock_finish: mock.MagicMock,
     ) -> None:
         """
         GIVEN:
@@ -2061,11 +2135,122 @@ class TestBulkEditRunZoneOcr:
             - bulk_update_documents is not run
         """
         docs = DocumentFactory.create_batch(2)
-        finish = mocker.patch("documents.bulk_edit.bulk_update_documents")
+        template = OcrTemplateFactory()
+        mock_extract.return_value = [_unwritten_result()]
 
-        bulk_edit.run_zone_ocr([doc.pk for doc in docs])
+        bulk_edit.run_zone_ocr([d.pk for d in docs], template=template.pk)
 
-        finish.assert_not_called()
+        mock_finish.assert_not_called()
+
+    def test_finishes_written_documents_when_the_run_is_interrupted(
+        self,
+        mock_extract: mock.MagicMock,
+        mock_finish: mock.MagicMock,
+    ) -> None:
+        """
+        GIVEN:
+            - Two selected documents, the second of which raises an exception
+              that is not an Exception subclass
+        WHEN:
+            - run_zone_ocr is called
+        THEN:
+            - The interruption propagates
+            - bulk_update_documents still runs with the first document's id
+        """
+        docs = DocumentFactory.create_batch(2)
+        template = OcrTemplateFactory()
+        mock_extract.side_effect = [[_written_result()], KeyboardInterrupt()]
+
+        with pytest.raises(KeyboardInterrupt):
+            bulk_edit.run_zone_ocr([d.pk for d in docs], template=template.pk)
+
+        mock_finish.assert_called_once_with([docs[0].pk])
+
+    @pytest.mark.parametrize(
+        ("resolve_latest", "processes_root"),
+        [
+            pytest.param(True, False, id="resolves-latest"),
+            pytest.param(False, True, id="exact-document"),
+        ],
+    )
+    def test_resolves_latest_only_when_asked(
+        self,
+        mock_extract: mock.MagicMock,
+        resolve_latest: bool,  # noqa: FBT001
+        processes_root: bool,  # noqa: FBT001
+    ) -> None:
+        """
+        GIVEN:
+            - A root document with a newer version and a template
+        WHEN:
+            - run_zone_ocr runs for the root id with resolve_latest on or off
+        THEN:
+            - The newest version is processed when resolve_latest is on
+            - The root document itself is processed when it is off
+        """
+        root = DocumentFactory()
+        newest = DocumentFactory(root_document=root, version_index=1)
+        template = OcrTemplateFactory()
+
+        bulk_edit.run_zone_ocr(
+            [root.pk],
+            template=template.pk,
+            resolve_latest=resolve_latest,
+        )
+
+        mock_extract.assert_called_once_with(
+            root if processes_root else newest,
+            templates=[template],
+        )
+
+    def test_root_and_its_version_are_processed_once(
+        self,
+        mock_extract: mock.MagicMock,
+        mock_finish: mock.MagicMock,
+    ) -> None:
+        """
+        GIVEN:
+            - A root document with a version, both listed in the selection
+        WHEN:
+            - run_zone_ocr runs with resolve_latest on
+        THEN:
+            - The newest version is extracted once
+            - The root is finished once
+        """
+        root = DocumentFactory()
+        version = DocumentFactory(root_document=root, version_index=1)
+        template = OcrTemplateFactory()
+        mock_extract.return_value = [_written_result()]
+
+        bulk_edit.run_zone_ocr([root.pk, version.pk], template=template.pk)
+
+        mock_extract.assert_called_once_with(version, templates=[template])
+        mock_finish.assert_called_once_with([root.pk])
+
+    def test_a_version_reports_its_root(
+        self,
+        mock_extract: mock.MagicMock,
+        mock_finish: mock.MagicMock,
+    ) -> None:
+        """
+        GIVEN:
+            - A root with two versions and the older version selected
+        WHEN:
+            - run_zone_ocr runs without resolving the latest version
+        THEN:
+            - Extraction runs on that version, not the newest
+            - The root is finished
+        """
+        root = DocumentFactory()
+        older = DocumentFactory(root_document=root, version_index=1)
+        DocumentFactory(root_document=root, version_index=2)
+        template = OcrTemplateFactory()
+        mock_extract.return_value = [_written_result()]
+
+        bulk_edit.run_zone_ocr([older.pk], template=template.pk, resolve_latest=False)
+
+        mock_extract.assert_called_once_with(older, templates=[template])
+        mock_finish.assert_called_once_with([root.pk])
 
 
 @pytest.mark.django_db

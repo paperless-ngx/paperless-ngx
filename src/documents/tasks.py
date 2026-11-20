@@ -11,7 +11,6 @@ from tempfile import mkstemp
 from celery import Task
 from celery import shared_task
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sessions.models import Session
 from django.db import models
@@ -49,7 +48,6 @@ from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentBarcode
 from documents.models import DocumentType
-from documents.models import OcrTemplate
 from documents.models import PaperlessTask
 from documents.models import ShareLink
 from documents.models import ShareLinkBundle
@@ -72,12 +70,7 @@ from documents.utils import IterWrapper
 from documents.utils import compute_checksum
 from documents.utils import identity
 from documents.versioning import annotate_effective_content
-from documents.versioning import get_root_document
-from documents.versioning import latest_version
 from documents.workflows.utils import get_workflows_for_trigger
-from documents.zone_ocr import get_templates_for_document
-from documents.zone_ocr import run_zone_extraction
-from documents.zone_ocr import zone_results_written
 from paperless.config import AIConfig
 from paperless.config import BarcodeConfig
 from paperless.config import RemoteOCRConfig
@@ -374,50 +367,6 @@ def _read_barcodes_for_reprocess(document: Document) -> list[StoredBarcode] | No
     except Exception as e:
         logger.warning(f"Could not read barcodes of document {document}: {e}")
         return None
-
-
-@shared_task
-def extract_zones(
-    document_id: int,
-    template_id: int | None = None,
-    requester: User | None = None,
-    *,
-    resolve_latest: bool = True,
-) -> int | None:
-    """
-    Run an OCR template against a stored document, or every template that
-    matches it when no template is given. Matched templates are limited to
-    those the requester can view.
-
-    A root document id is mapped to its newest version unless resolve_latest
-    is False, in which case exactly the given document is processed.
-
-    Returns the root document's id when any value was written, otherwise None.
-    The caller finishes the edit, for example with bulk_update_documents.
-    """
-    document = Document.objects.get(id=document_id)
-    if resolve_latest:
-        document = latest_version(document)
-    if template_id is None:
-        templates = get_templates_for_document(document, requester=requester)
-    else:
-        try:
-            template = OcrTemplate.objects.prefetch_related(
-                "zones",
-                "zones__custom_field",
-            ).get(id=template_id)
-        except OcrTemplate.DoesNotExist:
-            logger.warning(
-                "OCR template %s no longer exists, not running zone OCR",
-                template_id,
-            )
-            return None
-        templates = [template]
-
-    results = run_zone_extraction(document, templates=templates)
-    if zone_results_written(results):
-        return get_root_document(document).pk
-    return None
 
 
 @shared_task

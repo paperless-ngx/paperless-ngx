@@ -33,6 +33,7 @@ from documents.models import CustomField
 from documents.models import CustomFieldInstance
 from documents.models import Document
 from documents.models import DocumentType
+from documents.models import OcrTemplate
 from documents.models import PaperlessTask
 from documents.models import StoragePath
 from documents.models import Tag
@@ -41,13 +42,16 @@ from documents.permissions import set_permissions_for_objects
 from documents.plugins.helpers import DocumentsStatusManager
 from documents.tasks import bulk_update_documents
 from documents.tasks import consume_file
-from documents.tasks import extract_zones
 from documents.tasks import remove_document_from_index
 from documents.tasks import run_workflows_for_documents
 from documents.tasks import update_document_content_maybe_archive_file
 from documents.versioning import get_latest_version_for_root
 from documents.versioning import get_root_document
+from documents.versioning import latest_version
 from documents.versioning import versions_newest_first
+from documents.zone_ocr import get_templates_for_document
+from documents.zone_ocr import run_zone_extraction
+from documents.zone_ocr import zone_results_written
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -443,7 +447,7 @@ def reprocess(doc_ids: list[int], *, remote_ocr: bool = False) -> Literal["OK"]:
     A root document with versions reprocesses its latest version, which is the
     file whose content, archive and thumbnail are shown for it.
     """
-    latest_version = versions_newest_first(
+    newest_version_id = versions_newest_first(
         Document.objects.filter(root_document=OuterRef("pk")),
     ).values("id")[:1]
     source_ids = (
@@ -451,7 +455,7 @@ def reprocess(doc_ids: list[int], *, remote_ocr: bool = False) -> Literal["OK"]:
         .annotate(
             source_id=Case(
                 When(root_document__isnull=False, then=F("id")),
-                default=Coalesce(Subquery(latest_version), F("id")),
+                default=Coalesce(Subquery(newest_version_id), F("id")),
             ),
         )
         .order_by()
@@ -1268,22 +1272,61 @@ def run_zone_ocr(
     """
     Run zone OCR within the tracked bulk operation task, then finish once for
     the root documents that had a value written. Root documents are run on
-    their newest version unless resolve_latest is False.
+    their newest version unless resolve_latest is False. Without a template,
+    every template matching the document that the user can view is run.
+
+    A failing document is logged and the rest still run; the task then fails.
     """
-    written_ids: list[int] = []
-    try:
-        for document_id in doc_ids:
-            written_id = extract_zones(
-                document_id=document_id,
-                template_id=template,
-                requester=user,
-                resolve_latest=resolve_latest,
+    selected_template: OcrTemplate | None = None
+    if template is not None:
+        selected_template = (
+            OcrTemplate.objects.filter(pk=template)
+            .prefetch_related("zones", "zones__custom_field")
+            .first()
+        )
+        if selected_template is None:
+            logger.warning(
+                "OCR template %s no longer exists, not running zone OCR",
+                template,
             )
-            if written_id is not None:
-                written_ids.append(written_id)
+            return "OK"
+
+    documents = {d.pk: d for d in Document.objects.filter(pk__in=doc_ids)}
+    missing_ids = [pk for pk in dict.fromkeys(doc_ids) if pk not in documents]
+    if missing_ids:
+        logger.warning("Documents %s not found, skipping zone OCR", missing_ids)
+
+    targets: dict[int, Document] = {}
+    for document_id in doc_ids:
+        document = documents.get(document_id)
+        if document is None:
+            continue
+        if resolve_latest:
+            document = latest_version(document)
+        targets.setdefault(document.pk, document)
+
+    written_ids: list[int] = []
+    failed_ids: list[int] = []
+    try:
+        for document in targets.values():
+            try:
+                templates = (
+                    [selected_template]
+                    if selected_template is not None
+                    else get_templates_for_document(document, requester=user)
+                )
+                results = run_zone_extraction(document, templates=templates)
+                if zone_results_written(results):
+                    written_ids.append(get_root_document(document).pk)
+            except Exception:
+                logger.exception("Zone OCR failed for document %s", document.pk)
+                failed_ids.append(document.pk)
     finally:
-        # Documents already written are finished even if a later one raises.
         if written_ids:
             bulk_update_documents(list(dict.fromkeys(written_ids)))
 
+    if failed_ids:
+        raise RuntimeError(
+            f"Zone OCR failed for {len(failed_ids)} of {len(targets)} documents",
+        )
     return "OK"

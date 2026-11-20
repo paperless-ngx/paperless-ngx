@@ -11,7 +11,6 @@ from django.test import TestCase
 from django.test import override_settings
 from django.test.utils import CaptureQueriesContext
 from django.utils import timezone
-from pytest_mock import MockerFixture
 
 from documents import tasks
 from documents.models import Correspondent
@@ -21,15 +20,10 @@ from documents.models import Tag
 from documents.models import WorkflowAction
 from documents.sanity_checker import SanityCheckFailedException
 from documents.sanity_checker import SanityCheckMessages
-from documents.tasks import extract_zones
 from documents.tests.helpers import dummy_preprocess
-from documents.zone_ocr import ZoneOcrReason
-from documents.zone_ocr import ZoneOcrResult
 from paperless_testing.assertions import FileSystemAssertsMixin
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import DocumentFactory
-from paperless_testing.factories import OcrTemplateFactory
-from paperless_testing.factories import UserFactory
 from paperless_testing.samples import SIMPLE_DIGITAL_PDF
 
 
@@ -654,159 +648,3 @@ class TestClearExpiredSessions:
 
         assert set(Session.objects.values_list("session_key", flat=True)) == {"valid"}
         assert sum(query["sql"].startswith("DELETE FROM") for query in queries) == 2
-
-
-@pytest.mark.django_db
-class TestExtractZonesTask:
-    """Tests for the extract_zones task."""
-
-    def test_task_runs_extraction(self, mocker: MockerFixture) -> None:
-        """
-        GIVEN:
-            - A queued zone OCR task
-        WHEN:
-            - The task runs
-        THEN:
-            - Templates are selected for the requester and extraction runs on
-              the stored document
-        """
-        extract = mocker.patch("documents.tasks.run_zone_extraction")
-        select = mocker.patch("documents.tasks.get_templates_for_document")
-        doc = DocumentFactory()
-        user = UserFactory()
-
-        extract_zones(doc.id, requester=user)
-
-        select.assert_called_once_with(doc, requester=user)
-        extract.assert_called_once_with(doc, templates=select.return_value)
-
-    def test_task_runs_the_chosen_template(self, mocker: MockerFixture) -> None:
-        """
-        GIVEN:
-            - A queued zone OCR task with a chosen template
-        WHEN:
-            - The task runs
-        THEN:
-            - Zone extraction runs with only that template
-        """
-        extract = mocker.patch("documents.tasks.run_zone_extraction")
-        doc = DocumentFactory()
-        template = OcrTemplateFactory()
-
-        extract_zones(doc.id, template.pk)
-
-        extract.assert_called_once_with(doc, templates=[template])
-
-    @pytest.mark.parametrize(
-        ("reason", "returns_root"),
-        [
-            pytest.param(None, True, id="written"),
-            pytest.param(ZoneOcrReason.NO_VALUE, False, id="nothing-written"),
-        ],
-    )
-    def test_task_reports_the_root_when_a_value_was_written(
-        self,
-        mocker: MockerFixture,
-        reason: ZoneOcrReason | None,
-        returns_root: bool,  # noqa: FBT001
-    ) -> None:
-        """
-        GIVEN:
-            - A document version whose extraction does or does not write a value
-        WHEN:
-            - The task runs
-        THEN:
-            - The root document id is returned only when a value was written
-        """
-        root = DocumentFactory()
-        DocumentFactory(root_document=root, version_index=1)
-        template = OcrTemplateFactory()
-        mocker.patch(
-            "documents.tasks.run_zone_extraction",
-            return_value=[
-                ZoneOcrResult(template="t", zone="z", custom_field="", reason=reason),
-            ],
-        )
-
-        result = extract_zones(root.pk, template.pk)
-
-        assert result == (root.pk if returns_root else None)
-
-    def test_task_runs_a_version_and_reports_the_root(
-        self,
-        mocker: MockerFixture,
-    ) -> None:
-        """
-        GIVEN:
-            - A root document with two versions and a template
-        WHEN:
-            - The task runs for the older version id
-        THEN:
-            - Extraction runs on that version, not the newest
-            - The root document id is returned when a value was written
-        """
-        root = DocumentFactory()
-        older = DocumentFactory(root_document=root, version_index=1)
-        DocumentFactory(root_document=root, version_index=2)
-        template = OcrTemplateFactory()
-        extract = mocker.patch(
-            "documents.tasks.run_zone_extraction",
-            return_value=[
-                ZoneOcrResult(template="t", zone="z", custom_field="", reason=None),
-            ],
-        )
-
-        result = extract_zones(older.pk, template.pk)
-
-        extract.assert_called_once_with(older, templates=[template])
-        assert result == root.pk
-
-    @pytest.mark.parametrize(
-        ("resolve_latest", "processes_root"),
-        [
-            pytest.param(True, False, id="resolves-latest"),
-            pytest.param(False, True, id="exact-document"),
-        ],
-    )
-    def test_task_resolves_latest_only_when_asked(
-        self,
-        mocker: MockerFixture,
-        resolve_latest: bool,  # noqa: FBT001
-        processes_root: bool,  # noqa: FBT001
-    ) -> None:
-        """
-        GIVEN:
-            - A root document with a newer version and a template
-        WHEN:
-            - The task runs for the root id with resolve_latest on or off
-        THEN:
-            - The newest version is processed when resolve_latest is on
-            - The root document itself is processed when it is off
-        """
-        root = DocumentFactory()
-        newest = DocumentFactory(root_document=root, version_index=1)
-        template = OcrTemplateFactory()
-        extract = mocker.patch("documents.tasks.run_zone_extraction", return_value=[])
-
-        extract_zones(root.pk, template.pk, resolve_latest=resolve_latest)
-
-        extract.assert_called_once_with(
-            root if processes_root else newest,
-            templates=[template],
-        )
-
-    def test_task_skips_a_deleted_template(self, mocker: MockerFixture) -> None:
-        """
-        GIVEN:
-            - A template deleted between queueing and running
-        WHEN:
-            - The task runs
-        THEN:
-            - Nothing is extracted
-        """
-        extract = mocker.patch("documents.tasks.run_zone_extraction")
-        doc = DocumentFactory()
-
-        extract_zones(doc.id, 999)
-
-        extract.assert_not_called()

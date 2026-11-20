@@ -118,8 +118,12 @@ def execute_bulk_operation(
         raise PermissionDenied("Insufficient permissions to run this workflow")
 
     if operation == "run_zone_ocr" and parameters.get("template") is not None:
-        template = OcrTemplate.objects.get(pk=parameters["template"])
-        if not has_perms_owner_aware(user, "view_ocrtemplate", template):
+        template = OcrTemplate.objects.filter(pk=parameters["template"]).first()
+        if template is not None and not has_perms_owner_aware(
+            user,
+            "view_ocrtemplate",
+            template,
+        ):
             raise PermissionDenied("Insufficient permissions to run this OCR template")
 
     actor_context = set_actor(user) if settings.AUDIT_LOG_ENABLED else nullcontext()
