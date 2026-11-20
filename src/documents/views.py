@@ -5926,6 +5926,7 @@ class OcrTemplateViewSet(BulkPermissionMixin, PassUserMixin, ModelViewSet[OcrTem
                 content_type=file_doc.mime_type,
             )
 
+        settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
         with tempfile.TemporaryDirectory(dir=settings.SCRATCH_DIR) as tmp_dir:
             rendered = Path(tmp_dir) / "page.png"
             try:

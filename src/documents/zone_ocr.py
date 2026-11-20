@@ -339,6 +339,7 @@ def plan_zone_extraction(
     if not pages:
         return []
     plans = []
+    settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(dir=settings.SCRATCH_DIR) as tmp_dir:
         tmp_path = Path(tmp_dir)
         page_images = _render_pages(
@@ -849,6 +850,7 @@ def extract_zone_preview(
 ) -> ZoneExtraction:
     """Extract a zone without writing its value to the document."""
     page_idx = _resolve_page_idx(zone.page, page_count)
+    settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(dir=settings.SCRATCH_DIR) as tmp_dir:
         tmp_path = Path(tmp_dir)
         page_images = _render_pages(
