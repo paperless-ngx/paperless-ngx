@@ -4394,16 +4394,31 @@ def get_github_stars() -> int | None:
     ),
 )
 class RemoteVersionView(GenericAPIView[Any]):
+    cache_key = "remote_version_view_latest_release"
+
     def get(self, request, format=None):
         current_version = packaging_version.parse(version.__full_version_str__)
-        releases = get_github_releases(current_version)
-        remote_version = (
-            max(releases, key=lambda r: packaging_version.parse(r["version"]))[
-                "version"
-            ]
-            if releases
-            else "0.0.0"
-        )
+        remote_version = cache.get(self.cache_key)
+        if remote_version is None:
+            try:
+                resp = httpx.get(
+                    "https://api.github.com/repos/paperless-ngx/paperless-ngx/releases/latest",
+                    headers={"Accept": "application/json"},
+                )
+                resp.raise_for_status()
+                data = resp.json()
+                remote_version = data["tag_name"]
+                # Some early tags used ngx-x.y.z
+                remote_version = remote_version.removeprefix("ngx-")
+            except ValueError as e:
+                logger.debug(f"An error occurred parsing remote version json: {e}")
+            except httpx.HTTPError as e:
+                logger.debug(f"An error occurred checking for available updates: {e}")
+
+            if remote_version:
+                cache.set(self.cache_key, remote_version, 60 * 15)
+            else:
+                remote_version = "0.0.0"
 
         is_greater_than_current = (
             packaging_version.parse(remote_version) > current_version

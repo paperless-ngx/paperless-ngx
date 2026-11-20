@@ -1,3 +1,5 @@
+from unittest import mock
+
 import pytest
 from django.core.cache import cache
 from pytest_httpx import HTTPXMock
@@ -110,6 +112,30 @@ class TestApiReleaseNotes:
 
         assert len(releases.get_requests(url=RELEASES_URL)) == 1
         assert len(releases.get_requests(url=REPO_URL)) == 1
+
+    @pytest.mark.usefixtures("stars")
+    def test_new_running_version_refetches_releases(
+        self,
+        rest_api_client: APIClient,
+        releases: HTTPXMock,
+    ) -> None:
+        """
+        GIVEN:
+            - GitHub releases cached for the running version
+        WHEN:
+            - The running version changes (i.e. paperless was upgraded)
+        THEN:
+            - The cached releases are not reused and GitHub is queried again
+        """
+        upgraded = _bump(patch=1)
+        releases.add_response(url=RELEASES_URL, json=[_release(f"v{upgraded}")])
+
+        rest_api_client.get(self.ENDPOINT)
+        with mock.patch.object(version, "__full_version_str__", upgraded):
+            response = rest_api_client.get(self.ENDPOINT)
+
+        assert len(releases.get_requests(url=RELEASES_URL)) == 2
+        assert [r["version"] for r in response.data["releases"]] == [upgraded]
 
     @pytest.mark.usefixtures("stars")
     def test_until_returns_newer_releases(
