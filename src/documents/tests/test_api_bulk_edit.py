@@ -1242,6 +1242,31 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_api_bulk_edit_rejects_update_callback_parameter(self) -> None:
+        with mock.patch(
+            "documents.views.execute_bulk_operation.apply_async",
+            return_value=mock.Mock(id="test-bulk-operation"),
+        ) as enqueue:
+            response = self.client.post(
+                "/api/documents/bulk_edit/",
+                json.dumps(
+                    {
+                        "documents": [self.doc2.id],
+                        "method": "modify_tags",
+                        "parameters": {
+                            "add_tags": [self.t2.id],
+                            "remove_tags": [],
+                            "update_callback": "x",
+                        },
+                    },
+                ),
+                content_type="application/json",
+            )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        enqueue.assert_not_called()
+        self.async_task.assert_not_called()
+        self.assertEqual(list(self.doc2.tags.all()), [self.t1])
+
     def test_api_modify_tags_no_tags(self) -> None:
         response = self.client.post(
             "/api/documents/bulk_edit/",
