@@ -624,23 +624,23 @@ class TestConsumerZoneOcr:
         """
         GIVEN:
             - A template matching the consumed document's text
-            - Writing the template's values raising an error
+            - Applying the planned zone values raising an error
         WHEN:
             - The document is consumed
         THEN:
             - The document is stored without the template's values
-            - The failed template is logged
+            - The failure is logged
         """
         make_template()
         mocker.patch(
-            "documents.zone_ocr._apply_field_updates",
+            "documents.consumer.apply_zone_plans",
             side_effect=RuntimeError("write failed"),
         )
 
         document = consume()
 
         assert document.title == "upload"
-        assert "error processing template 'Invoice'" in caplog.text
+        assert "Zone OCR could not write values for upload.pdf" in caplog.text
 
     @pytest.mark.usefixtures("mock_render")
     def test_version_values_are_written_to_the_root(
