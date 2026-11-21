@@ -143,14 +143,15 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
    * as segments of their descendant's badge.
    */
   isImplied(id: number): boolean {
-    if (
-      !this.preserveHierarchy ||
-      !this.tags ||
-      !this.value ||
-      !this.settingsService.get(SETTINGS_KEYS.TAGS_SHOW_HIERARCHY)
-    )
-      return false
+    if (!this.showsHierarchy || !this.tags || !this.value) return false
     return !collapseImpliedAncestors(this.value, this.tagsById).includes(id)
+  }
+
+  private get showsHierarchy(): boolean {
+    return (
+      this.preserveHierarchy &&
+      !!this.settingsService.get(SETTINGS_KEYS.TAGS_SHOW_HIERARCHY)
+    )
   }
 
   /**
@@ -170,6 +171,26 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
     } else {
       return null
     }
+  }
+
+  /**
+   * Remove a whole badge i.e. the tag plus any ancestors that no other selected
+   * tag still needs.
+   */
+  removeBadge(tagID: number) {
+    if (this.disabled) return
+    if (!this.showsHierarchy) return this.removeTag(tagID)
+
+    const ancestors = new Set(this.getParentChain(tagID).map((t) => t.id))
+    const needed = new Set(
+      this.value
+        .filter((id) => id !== tagID && !ancestors.has(id))
+        .flatMap((id) => this.getParentChain(id).map((t) => t.id))
+    )
+    this.value = this.value.filter(
+      (id) => id !== tagID && (!ancestors.has(id) || needed.has(id))
+    )
+    this.onChange(this.value)
   }
 
   removeTag(tagID: number) {

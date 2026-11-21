@@ -301,6 +301,23 @@ describe('TagsComponent', () => {
       expect(component.isImplied(1)).toBe(false)
     })
 
+    it('should remove a whole badge, keeping ancestors other tags still need', () => {
+      component.removeBadge(3)
+      expect(component.value).toEqual([4])
+
+      const sibling: Tag = { id: 5, name: 'sibling', parent: 1 }
+      component.tags = [root, mid, leaf, other, sibling]
+      component.value = [3, 2, 1, 5, 4]
+      component.removeBadge(3)
+      expect(component.value).toEqual([1, 5, 4])
+    })
+
+    it('should remove only the tag itself from a badge when hierarchy is not shown', () => {
+      component.preserveHierarchy = false
+      component.removeBadge(3)
+      expect(component.value).toEqual([2, 1, 4])
+    })
+
     it('should remove the last visible tag on backspace, not a hidden ancestor', () => {
       const backspace = new KeyboardEvent('keydown', { key: 'Backspace' })
       expect(component.onKeyDown(backspace)).toBe(false)
