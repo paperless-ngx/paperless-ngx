@@ -278,4 +278,59 @@ describe('TagsComponent', () => {
     component.tags = [lone]
     expect(component.getParentChain(5)).toEqual([])
   })
+
+  describe('hierarchy', () => {
+    const root: Tag = { id: 1, name: 'root' }
+    const mid: Tag = { id: 2, name: 'mid', parent: 1 }
+    const leaf: Tag = { id: 3, name: 'leaf', parent: 2 }
+    const other: Tag = { id: 4, name: 'other' }
+
+    beforeEach(() => {
+      component.tags = [root, mid, leaf, other]
+      component.value = [3, 2, 1, 4]
+    })
+
+    it('should treat ancestors of another selected tag as implied', () => {
+      expect([1, 2, 3, 4].map((id) => component.isImplied(id))).toEqual([
+        true,
+        true,
+        false,
+        false,
+      ])
+      component.preserveHierarchy = false
+      expect(component.isImplied(1)).toBe(false)
+    })
+
+    it('should remove a whole badge, keeping ancestors other tags still need', () => {
+      component.removeBadge(3)
+      expect(component.value).toEqual([4])
+
+      const sibling: Tag = { id: 5, name: 'sibling', parent: 1 }
+      component.tags = [root, mid, leaf, other, sibling]
+      component.value = [3, 2, 1, 5, 4]
+      component.removeBadge(3)
+      expect(component.value).toEqual([1, 5, 4])
+    })
+
+    it('should remove only the tag itself from a badge when hierarchy is not shown', () => {
+      component.preserveHierarchy = false
+      component.removeBadge(3)
+      expect(component.value).toEqual([2, 1, 4])
+    })
+
+    it('should remove the last visible tag on backspace, not a hidden ancestor', () => {
+      const backspace = new KeyboardEvent('keydown', { key: 'Backspace' })
+      expect(component.onKeyDown(backspace)).toBe(false)
+      expect(component.value).toEqual([3, 2, 1])
+      expect(component.onKeyDown(backspace)).toBe(false)
+      expect(component.value).toEqual([2, 1])
+
+      // nothing hidden: leave it to ng-select
+      component.value = [4]
+      expect(component.onKeyDown(backspace)).toBe(true)
+      expect(
+        component.onKeyDown(new KeyboardEvent('keydown', { key: 'a' }))
+      ).toBe(true)
+    })
+  })
 })

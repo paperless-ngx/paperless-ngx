@@ -103,7 +103,8 @@ a {
   line-height: 1;
 
   &.tags-no-wrap {
-    ::ng-deep .badge {
+    // split-pill parents clip to a stub instead (see TagComponent)
+    ::ng-deep .badge:not(.split-parent) {
       display: inline-block;
       max-width: 100%;
       white-space: nowrap;

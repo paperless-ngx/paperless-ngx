@@ -4,6 +4,9 @@ import { provideHttpClientTesting } from '@angular/common/http/testing'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { By } from '@angular/platform-browser'
 import { RouterTestingModule } from '@angular/router/testing'
+import { of } from 'rxjs'
+import { PermissionsService } from 'src/app/services/permissions.service'
+import { TagService } from 'src/app/services/rest/tag.service'
 import { TagComponent } from '../../common/tag/tag.component'
 import { DocumentCardSmallComponent } from './document-card-small.component'
 
@@ -97,8 +100,36 @@ describe('DocumentCardSmallComponent', () => {
     ).toHaveLength(6)
   })
 
+  it('should hide parent tags implied by a child and count pills for the hidden tag counter', () => {
+    jest
+      .spyOn(TestBed.inject(PermissionsService), 'currentUserCan')
+      .mockReturnValue(true)
+    jest.spyOn(TestBed.inject(TagService), 'listAll').mockReturnValue(
+      of({
+        count: 8,
+        all: [1, 2, 3, 4, 5, 6, 7, 8],
+        results: [
+          { id: 1, name: 'Parent' },
+          { id: 2, name: 'Child', parent: 1 },
+          ...[3, 4, 5, 6, 7, 8].map((id) => ({ id, name: `Tag ${id}` })),
+        ],
+      })
+    )
+    fixture.componentRef.setInput('document', {
+      ...component.document(),
+      tags: [1, 2, 3, 4, 5, 6, 7, 8],
+    })
+    fixture.detectChanges()
+
+    const tags = fixture.debugElement.queryAll(By.directive(TagComponent))
+    expect(tags.map((t) => t.componentInstance.tagID())).toEqual([
+      2, 3, 4, 5, 6,
+    ])
+    expect(fixture.nativeElement.textContent).toContain('+ 2')
+  })
+
   it('should clear hidden tag counter when tag count falls below the limit', () => {
-    expect(component.moreTags).toEqual(3)
+    expect(component.getMoreTags(component.document().tags)).toEqual(3)
 
     fixture.componentRef.setInput('document', {
       ...component.document(),
@@ -106,7 +137,7 @@ describe('DocumentCardSmallComponent', () => {
     })
     fixture.detectChanges()
 
-    expect(component.moreTags).toBeNull()
+    expect(component.getMoreTags(component.document().tags)).toBeNull()
     expect(fixture.nativeElement.textContent).not.toContain('+ 3')
   })
 

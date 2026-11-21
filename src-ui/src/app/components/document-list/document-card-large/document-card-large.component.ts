@@ -20,6 +20,7 @@ import {
   Document,
 } from 'src/app/data/document'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { CollapseTagsPipe } from 'src/app/pipes/collapse-tags.pipe'
 import { CorrespondentNamePipe } from 'src/app/pipes/correspondent-name.pipe'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
@@ -45,6 +46,7 @@ import { LoadingComponentWithPermissions } from '../../loading-component/loading
     TagComponent,
     CustomFieldDisplayComponent,
     AsyncPipe,
+    CollapseTagsPipe,
     NgOptimizedImage,
     UsernamePipe,
     CorrespondentNamePipe,
