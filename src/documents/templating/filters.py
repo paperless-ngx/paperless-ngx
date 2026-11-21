@@ -27,7 +27,10 @@ def localize_date(value: date | datetime | str, format: str, locale: str) -> str
         TypeError: If `value` is not a date, datetime or str instance.
     """
     if isinstance(value, str):
-        value = parse_datetime(value)
+        value = parse_datetime(value) or parse_date(value)
+
+    if locale == "ar_AR":
+        locale = "ar"
 
     try:
         Locale.parse(locale)

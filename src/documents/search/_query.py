@@ -59,6 +59,12 @@ _CJK_RE: Final = regex.compile(
 )
 
 
+_ARABIC_PRES_RE: Final = regex.compile(r"[\uFB50-\uFDFF\uFE70-\uFEFF]+")
+_ARABIC_DIACRITICS_RE: Final = regex.compile(r"[\u0640\u064B-\u065F\u0670]")
+_ARABIC_ALEF_RE: Final = regex.compile(r"[أإآٱ]")
+_EASTERN_DIGITS_MAP: Final = str.maketrans("٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹", "01234567890123456789")
+
+
 def normalize_search_text(text: str) -> str:
     """Put text into the one Unicode normal form the index is built in.
 
@@ -66,10 +72,17 @@ def normalize_search_text(text: str) -> str:
     bigram is a pair of codepoints: NFD がっこう is four where NFC is three,
     so an unnormalized document never matches a normalized query.
 
-    NFC, not NFKC: folding ﾊﾟﾝ to パン would be a search-behavior decision
-    rather than an encoding one.
+    NFC, not NFKC globally (so halfwidth katakana ﾊﾟﾝ stays ﾊﾟﾝ), while
+    explicitly folding Arabic Presentation Forms-A/B (U+FB50..U+FEFF) via NFKC,
+    stripping Arabic Tatweel/Tashkeel, normalizing Alef variants, and mapping
+    Eastern-Arabic numerals to ASCII digits.
     """
-    return unicodedata.normalize("NFC", text)
+    out = unicodedata.normalize("NFC", text)
+    if _ARABIC_PRES_RE.search(out):
+        out = _ARABIC_PRES_RE.sub(lambda m: unicodedata.normalize("NFKC", m.group(0)), out)
+    out = _ARABIC_DIACRITICS_RE.sub("", out)
+    out = _ARABIC_ALEF_RE.sub("ا", out)
+    return out.translate(_EASTERN_DIGITS_MAP)
 
 
 def _user_facing_emit_message(d: Diagnostic) -> str:

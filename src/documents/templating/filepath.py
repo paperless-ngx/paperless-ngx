@@ -99,13 +99,17 @@ class MatchingModelContext:
         return self.name
 
 
+def unicode_slugify(value: object, allow_unicode: bool = True) -> str:
+    return django_slugify(value, allow_unicode=allow_unicode)
+
+
 _template_environment.undefined = _LogStrictUndefined
 
 _template_environment.filters["get_cf_value"] = get_cf_value
 
 _template_environment.filters["datetime"] = format_datetime
 
-_template_environment.filters["slugify"] = django_slugify
+_template_environment.filters["slugify"] = unicode_slugify
 
 _template_environment.filters["localize_date"] = localize_date
 

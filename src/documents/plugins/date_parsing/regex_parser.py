@@ -19,7 +19,7 @@ class RegexDateParserPlugin(DateParserPluginBase):
     DATE_REGEX = regex.compile(
         r"(\b|(?!=([_-])))(\d{1,2})[\.\/-](\d{1,2})[\.\/-](\d{4}|\d{2})(\b|(?=([_-])))|"
         r"(\b|(?!=([_-])))(\d{4}|\d{2})[\.\/-](\d{1,2})[\.\/-](\d{1,2})(\b|(?=([_-])))|"
-        r"(\b|(?!=([_-])))(\d{1,2}[\. ]+[a-zéûäëčžúřěáíóńźçŞğü]{3,9} \d{4}|[a-zéûäëčžúřěáíóńźçŞğü]{3,9} \d{1,2}, \d{4})(\b|(?=([_-])))|"
+        r"(\b|(?!=([_-])))(\d{1,2}[\. ]+[^\W\d_]{3,12} \d{4}|[^\W\d_]{3,12} \d{1,2},? \d{4})(\b|(?=([_-])))|"
         r"(\b|(?!=([_-])))([^\W\d_]{3,9} \d{1,2}, (\d{4}))(\b|(?=([_-])))|"
         r"(\b|(?!=([_-])))([^\W\d_]{3,9} \d{4})(\b|(?=([_-])))|"
         r"(\b|(?!=([_-])))(\d{1,2}[^ 0-9]{2}[\. ]+[^ ]{3,9}[ \.\/-]\d{4})(\b|(?=([_-])))|"
@@ -39,6 +39,29 @@ class RegexDateParserPlugin(DateParserPluginBase):
         date = self._parse_string(date_string, date_order)
         return self._filter_date(date)
 
+    _EASTERN_DIGITS = str.maketrans("٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹", "01234567890123456789")
+    _SYRIAC_ARABIC_MONTHS = (
+        ("كانون الثاني", "يناير"),
+        ("شباط", "فبراير"),
+        ("آذار", "مارس"),
+        ("نيسان", "أبريل"),
+        ("أيار", "مايو"),
+        ("حزيران", "يونيو"),
+        ("تموز", "يوليو"),
+        ("آب", "أغسطس"),
+        ("أيلول", "سبتمبر"),
+        ("تشرين الأول", "أكتوبر"),
+        ("تشرين الثاني", "نوفمبر"),
+        ("كانون الأول", "ديسمبر"),
+    )
+
+    @classmethod
+    def normalize_arabic_date_text(cls, text: str) -> str:
+        out = text.translate(cls._EASTERN_DIGITS)
+        for src, dst in cls._SYRIAC_ARABIC_MONTHS:
+            out = out.replace(src, dst)
+        return out
+
     def _process_content(
         self,
         content: str,
@@ -47,7 +70,8 @@ class RegexDateParserPlugin(DateParserPluginBase):
         """
         Finds all regex matches in content and yields valid dates.
         """
-        for m in safe_regex_finditer(self.DATE_REGEX, content):
+        norm_content = self.normalize_arabic_date_text(content)
+        for m in safe_regex_finditer(self.DATE_REGEX, norm_content):
             date = self._process_match(m, date_order)
             if date is not None:
                 yield date
