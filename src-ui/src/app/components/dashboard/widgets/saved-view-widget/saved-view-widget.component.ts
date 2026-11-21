@@ -38,6 +38,7 @@ import {
 } from 'src/app/data/filter-rule-type'
 import { SavedView } from 'src/app/data/saved-view'
 import { IfPermissionsDirective } from 'src/app/directives/if-permissions.directive'
+import { CollapseTagsPipe } from 'src/app/pipes/collapse-tags.pipe'
 import { CorrespondentNamePipe } from 'src/app/pipes/correspondent-name.pipe'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
@@ -75,6 +76,7 @@ import { WidgetFrameComponent } from '../widget-frame/widget-frame.component'
     DocumentTypeNamePipe,
     StoragePathNamePipe,
     AsyncPipe,
+    CollapseTagsPipe,
     DocumentTitlePipe,
     CustomDatePipe,
     NgClass,
