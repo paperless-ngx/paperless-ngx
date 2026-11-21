@@ -21,7 +21,13 @@ import { NgSelectComponent, NgSelectModule } from '@ng-select/ng-select'
 import { first, firstValueFrom, tap } from 'rxjs'
 import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { Tag } from 'src/app/data/tag'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { TagService } from 'src/app/services/rest/tag.service'
+import { SettingsService } from 'src/app/services/settings.service'
+import {
+  collapseImpliedAncestors,
+  getTagAncestors,
+} from 'src/app/utils/collapse-tags'
 import { matchesSearchText } from 'src/app/utils/text-search'
 import { EditDialogMode } from '../../edit-dialog/edit-dialog.component'
 import { TagEditDialogComponent } from '../../edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
@@ -50,6 +56,7 @@ import { TagComponent } from '../../tag/tag.component'
 export class TagsComponent implements OnInit, ControlValueAccessor {
   private tagService = inject(TagService)
   private modalService = inject(NgbModal)
+  private readonly settingsService = inject(SettingsService)
   private readonly changeDetector = inject(ChangeDetectorRef)
 
   constructor() {
@@ -130,6 +137,21 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
         .join(' '),
       term
     )
+
+  /**
+   * Selected tags that are ancestors of another selected tag which are shown
+   * as segments of their descendant's badge.
+   */
+  isImplied(id: number): boolean {
+    if (
+      !this.preserveHierarchy ||
+      !this.tags ||
+      !this.value ||
+      !this.settingsService.get(SETTINGS_KEYS.TAGS_SHOW_HIERARCHY)
+    )
+      return false
+    return !collapseImpliedAncestors(this.value, this.tagsById).includes(id)
+  }
 
   getTag(id: number) {
     if (this.tags) {
@@ -235,18 +257,17 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
   }
 
   getParentChain(id: number): Tag[] {
-    // Returns ancestors from root → immediate parent for a tag id
-    const chain: Tag[] = []
-    let current = this.getTag(id)
-    const guard = new Set<number>()
-    while (current?.parent) {
-      if (guard.has(current.parent)) break
-      guard.add(current.parent)
-      const parent = this.getTag(current.parent)
-      if (!parent) break
-      chain.unshift(parent)
-      current = parent
+    return getTagAncestors(id, this.tagsById)
+  }
+
+  private tagsByIdSource: Tag[]
+  private tagsByIdCache: Map<number, Tag>
+
+  private get tagsById(): Map<number, Tag> {
+    if (this.tagsByIdSource !== this.tags) {
+      this.tagsByIdSource = this.tags
+      this.tagsByIdCache = new Map(this.tags?.map((t) => [t.id, t]))
     }
-    return chain
+    return this.tagsByIdCache
   }
 }

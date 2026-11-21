@@ -7,6 +7,11 @@
   font-size: 1rem;
 }
 
+// ancestors of another selected tag render inside that tag's badge
+::ng-deep .paperless-input-tags .ng-value:has(> .implied-tag) {
+  display: none !important;
+}
+
 .paperless-input-select.disabled {
   .input-group {
       cursor: not-allowed;

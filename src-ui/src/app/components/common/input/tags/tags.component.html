@@ -21,12 +21,16 @@
           (change)="onChange(value)">
 
           <ng-template ng-label-tmp let-item="item">
-            <button class="tag-wrap btn p-0 d-flex align-items-center" (click)="removeTag(item.id)" (mousedown)="$event.stopImmediatePropagation()" type="button" title="Remove tag" i18n-title>
-              <pngx-bs-icon name="x" style="margin-inline-end: 1px;"></pngx-bs-icon>
-              @if (item.id && tags) {
-                <pngx-tag style="background-color: none;" [tag]="getTag(item.id)"></pngx-tag>
-              }
-            </button>
+            @if (isImplied(item.id)) {
+              <span class="implied-tag"></span>
+            } @else {
+              <button class="tag-wrap btn p-0 d-flex align-items-center mw-100" (click)="removeTag(item.id)" (mousedown)="$event.stopImmediatePropagation()" type="button" title="Remove tag" i18n-title>
+                <pngx-bs-icon name="x" style="margin-inline-end: 1px;"></pngx-bs-icon>
+                @if (item.id && tags) {
+                  <pngx-tag class="mw-100 overflow-hidden" style="background-color: none;" [tag]="getTag(item.id)" [split]="preserveHierarchy" (parentClick)="removeTag($event)"></pngx-tag>
+                }
+              </button>
+            }
           </ng-template>
           <ng-template ng-option-tmp let-item="item" let-index="index" let-search="searchTerm">
             <div class="tag-option-row d-flex align-items-center" [class.w-auto]="!getTag(item.id)?.parent">
