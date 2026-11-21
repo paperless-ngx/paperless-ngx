@@ -17,6 +17,7 @@
           [searchFn]="searchFn"
           addTagText="Add tag"
           i18n-addTagText
+          [keyDownFn]="onKeyDown"
           (add)="onAdd($event)"
           (change)="onChange(value)">
 

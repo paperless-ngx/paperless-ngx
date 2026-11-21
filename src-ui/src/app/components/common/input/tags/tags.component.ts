@@ -153,6 +153,17 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
     return !collapseImpliedAncestors(this.value, this.tagsById).includes(id)
   }
 
+  /**
+   * Remove the last visible tag (in case its actually a hidden ancestor)
+   */
+  readonly onKeyDown = (event: KeyboardEvent): boolean => {
+    if (event.key !== 'Backspace' || this.select?.searchTerm) return true
+    const visible = this.value?.filter((id) => !this.isImplied(id)) ?? []
+    if (visible.length === (this.value?.length ?? 0)) return true
+    this.removeTag(visible.at(-1))
+    return false
+  }
+
   getTag(id: number) {
     if (this.tags) {
       return this.tags.find((tag) => tag.id == id)
