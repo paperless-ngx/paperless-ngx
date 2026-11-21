@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-11-17 20:48+0000\n"
-"PO-Revision-Date: 2026-11-17 20:49\n"
+"PO-Revision-Date: 2026-11-21 12:15\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -23,7 +23,7 @@ msgstr "المستندات"
 
 #: documents/filters.py:349
 msgid "Expected a date or a relative date such as \"today\" or \"in 30 days\"."
-msgstr ""
+msgstr "كان متوقعا إدخال تاريخ أو تاريخ نسبي مثل «اليوم» أو «بعد 30 يوما»"
 
 #: documents/filters.py:527
 msgid "Value must be valid JSON."
@@ -39,7 +39,7 @@ msgstr "قائمة عبارة خاطئة."
 
 #: documents/filters.py:579
 msgid "Invalid logical operator {op!r}"
-msgstr ""
+msgstr "عملية منطقية غير صالحة"
 
 #: documents/filters.py:593
 msgid "Maximum number of query conditions exceeded."
@@ -290,7 +290,7 @@ msgstr "أرشيف"
 
 #: documents/models.py:629
 msgid "Bank"
-msgstr ""
+msgstr "بنك"
 
 #: documents/models.py:630
 msgid "Basket"
@@ -298,15 +298,15 @@ msgstr ""
 
 #: documents/models.py:631
 msgid "Bell"
-msgstr ""
+msgstr "جرس"
 
 #: documents/models.py:632
 msgid "Bookmark"
-msgstr ""
+msgstr "المفضلة"
 
 #: documents/models.py:633
 msgid "Boxes"
-msgstr ""
+msgstr "الصناديق"
 
 #: documents/models.py:634
 msgid "Briefcase"
@@ -318,15 +318,15 @@ msgstr ""
 
 #: documents/models.py:636
 msgid "Calculator"
-msgstr ""
+msgstr "الحاسبة"
 
 #: documents/models.py:637
 msgid "Calendar"
-msgstr ""
+msgstr "التقويم"
 
 #: documents/models.py:638
 msgid "Camera"
-msgstr ""
+msgstr "كاميرة"
 
 #: documents/models.py:639
 msgid "Checklist"
@@ -334,11 +334,11 @@ msgstr ""
 
 #: documents/models.py:640
 msgid "Cash"
-msgstr ""
+msgstr "نقذي"
 
 #: documents/models.py:641
 msgid "Chat"
-msgstr ""
+msgstr "الدردشة"
 
 #: documents/models.py:642
 msgid "Check"
@@ -350,7 +350,7 @@ msgstr ""
 
 #: documents/models.py:644
 msgid "Clock"
-msgstr ""
+msgstr "الساعة"
 
 #: documents/models.py:645
 msgid "Credit card"
@@ -358,7 +358,7 @@ msgstr ""
 
 #: documents/models.py:646
 msgid "Download"
-msgstr ""
+msgstr "تحميل"
 
 #: documents/models.py:647
 msgid "Envelope"
@@ -366,11 +366,11 @@ msgstr ""
 
 #: documents/models.py:648
 msgid "Warning"
-msgstr ""
+msgstr "تحذير"
 
 #: documents/models.py:649
 msgid "File"
-msgstr ""
+msgstr "ملف"
 
 #: documents/models.py:650
 msgid "Checked file"

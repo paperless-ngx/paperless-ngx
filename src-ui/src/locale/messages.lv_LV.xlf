@@ -17,7 +17,7 @@
           <context context-type="linenumber">386,393</context>
         </context-group>
         <note priority="1" from="description">Currently selected slide number read by screen reader</note>
-        <target state="needs-translation"> Slide <x id="INTERPOLATION" equiv-text="source?: NgbSli"/> of <x id="INTERPOLATION_1" equiv-text="s._cycleToSelec"/> </target>
+        <target state="translated"> Slaids <x id="INTERPOLATION" equiv-text="source?: NgbSli"/> no <x id="INTERPOLATION_1" equiv-text="s._cycleToSelec"/> </target>
       </trans-unit>
       <trans-unit id="ngb.carousel.previous" datatype="html">
         <source>Previous</source>
@@ -275,7 +275,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">78</context>
         </context-group>
-        <target state="needs-translation">Document <x id="PH" equiv-text="status.filename"/> was added to Paperless-ngx.</target>
+        <target state="translated">Dokuments <x id="PH" equiv-text="status.filename"/> tika pievienots Paperless-ngx.</target>
       </trans-unit>
       <trans-unit id="1931214133925051574" datatype="html">
         <source>Open document</source>
@@ -427,7 +427,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">140</context>
         </context-group>
-        <target state="needs-translation">The dashboard can be used to show saved views, such as an 'Inbox'. Views are found under Manage &gt; Saved Views once you have created some.</target>
+        <target state="translated">Infopanelī var attēlot saglabātos skatus, piemēram, “Iesūtne”. Kad būsiet izveidojis kādu skatu, tos varēsiet atrast sadaļā Pārvaldīt &gt; Saglabātie skati.</target>
       </trans-unit>
       <trans-unit id="9075755296812854717" datatype="html">
         <source>Drag-and-drop documents here to start uploading or place them in the consume folder. You can also drag-and-drop documents anywhere on all other pages of the web app. Once you do, Paperless-ngx will start training its machine learning algorithms.</source>
@@ -435,7 +435,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">147</context>
         </context-group>
-        <target state="needs-translation">Drag-and-drop documents here to start uploading or place them in the consume folder. You can also drag-and-drop documents anywhere on all other pages of the web app. Once you do, Paperless-ngx will start training its machine learning algorithms.</target>
+        <target state="translated">Velciet un nometiet dokumentus šeit, vai ievietojiet tos ielādes mapē, lai sāktu augšupielādi. Dokumentus var vilkt un nomest arī jebkurā citā lietotnes lapā. Tiklīdz to izdarīsiet, Paperless-ngx sāks apmācīt savus mašīnmācīšanās algoritmus.</target>
       </trans-unit>
       <trans-unit id="7495498057594070122" datatype="html">
         <source>The documents list shows all of your documents and allows for filtering as well as bulk-editing. There are three different view styles: list, small cards and large cards. A list of documents currently opened for editing is shown in the sidebar.</source>
@@ -443,7 +443,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">152</context>
         </context-group>
-        <target state="needs-translation">The documents list shows all of your documents and allows for filtering as well as bulk-editing. There are three different view styles: list, small cards and large cards. A list of documents currently opened for editing is shown in the sidebar.</target>
+        <target state="translated">Dokumentu sarakstā ir redzami visi jūsu dokumenti, kur tos iespējams filtrēt un masveidā rediģēt. Ir pieejami trīs dažādi skata stili: saraksts, mazas kartītes un lielas kartītes. Sānu joslā ir redzami dokumenti, kas pašlaik atvērti rediģēšanai.</target>
       </trans-unit>
       <trans-unit id="1334220418719920556" datatype="html">
         <source>The filtering tools allow you to quickly find documents using various searches, dates, tags, etc.</source>
@@ -451,7 +451,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">159</context>
         </context-group>
-        <target state="needs-translation">The filtering tools allow you to quickly find documents using various searches, dates, tags, etc.</target>
+        <target state="translated">Filtrēšanas rīki ļauj ātri atrast dokumentus, izmantojot dažādus meklējumus, datumus, birkas u. c.</target>
       </trans-unit>
       <trans-unit id="5427326625898532358" datatype="html">
         <source>Any combination of filters can be saved as a &apos;view&apos; which can then be displayed on the dashboard and / or sidebar.</source>
@@ -459,7 +459,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">165</context>
         </context-group>
-        <target state="needs-translation">Any combination of filters can be saved as a 'view' which can then be displayed on the dashboard and / or sidebar.</target>
+        <target state="translated">Jebkuru filtru kombināciju var saglabāta kā atsevišķu skatu, ko pēc tam attēlot infopanelī un/vai sānu joslā.</target>
       </trans-unit>
       <trans-unit id="5010312032259162639" datatype="html">
         <source>Attributes like tags, correspondents, document types, storage paths and custom fields can all be managed here. They can also be created from the document edit view.</source>
@@ -467,7 +467,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">170</context>
         </context-group>
-        <target state="needs-translation">Attributes like tags, correspondents, document types, storage paths and custom fields can all be managed here. They can also be created from the document edit view.</target>
+        <target state="translated">Šeit var pārvaldīt tādus atribūtus kā birkas, korespondentus, dokumentu veidus, glabāšanas ceļus un pielāgotos laukus. Tos var izveidot arī dokumenta rediģēšanas skatā.</target>
       </trans-unit>
       <trans-unit id="7851939076947092983" datatype="html">
         <source>Manage e-mail accounts and rules for automatically importing documents.</source>
@@ -479,7 +479,7 @@
           <context context-type="sourcefile">src/app/components/manage/mail/mail.component.html</context>
           <context context-type="linenumber">4,5</context>
         </context-group>
-        <target state="needs-translation">Manage e-mail accounts and rules for automatically importing documents.</target>
+        <target state="translated">Pārvaldīt e-pasta kontus un nosacījumus automātiskai dokumentu importēšanai.</target>
       </trans-unit>
       <trans-unit id="2258659358902319601" datatype="html">
         <source>Workflows give you more control over the document pipeline.</source>
@@ -487,7 +487,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">186</context>
         </context-group>
-        <target state="needs-translation">Workflows give you more control over the document pipeline.</target>
+        <target state="translated">Darbplūsmas sniedz lielāku kontroli pār dokumentu apstrādes procesu.</target>
       </trans-unit>
       <trans-unit id="2685141468866020893" datatype="html">
         <source>Tasks helps you track background work, what needs attention, and what recently completed.</source>
@@ -495,7 +495,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">194</context>
         </context-group>
-        <target state="needs-translation">Tasks helps you track background work, what needs attention, and what recently completed.</target>
+        <target state="translated">Uzdevumi palīdz sekot līdzi fonā notiekošajiem procesiem, to problēmām un izpildes statusam.</target>
       </trans-unit>
       <trans-unit id="2755033621682206902" datatype="html">
         <source>Check out the settings for various tweaks to the web app.</source>
@@ -503,7 +503,7 @@
           <context context-type="sourcefile">src/app/app.component.ts</context>
           <context context-type="linenumber">202</context>
         </context-group>
-        <target state="needs-translation">Check out the settings for various tweaks to the web app.</target>
+        <target state="translated">Apskatiet iestatījumus dažādiem lietotnes pielāgojumiem.</target>
       </trans-unit>
       <trans-unit id="7172877665285340082" datatype="html">
         <source>Thank you! 🙏</source>
@@ -2875,7 +2875,7 @@
           <context context-type="sourcefile">src/app/components/admin/tasks/tasks.component.ts</context>
           <context context-type="linenumber">94</context>
         </context-group>
-        <target state="needs-translation">Check Workflows</target>
+        <target state="translated">Apskatīt darbplūsmas</target>
       </trans-unit>
       <trans-unit id="2065831805515896240" datatype="html">
         <source>Bulk Update</source>
@@ -4319,7 +4319,7 @@
           <context context-type="sourcefile">src/app/components/app-frame/global-search/global-search.component.html</context>
           <context context-type="linenumber">160,161</context>
         </context-group>
-        <target state="needs-translation">Workflows</target>
+        <target state="translated">Darbplūsmas</target>
       </trans-unit>
       <trans-unit id="83507137894716798" datatype="html">
         <source>Successfully updated object.</source>
@@ -4799,7 +4799,7 @@
           <context context-type="sourcefile">src/app/components/common/confirm-dialog/run-workflow-confirm-dialog/run-workflow-confirm-dialog.component.html</context>
           <context context-type="linenumber">11,12</context>
         </context-group>
-        <target state="needs-translation">Workflow</target>
+        <target state="translated">Darbplūsma</target>
       </trans-unit>
       <trans-unit id="6185505570283812140" datatype="html">
         <source>Select a workflow</source>
@@ -4807,7 +4807,7 @@
           <context context-type="sourcefile">src/app/components/common/confirm-dialog/run-workflow-confirm-dialog/run-workflow-confirm-dialog.component.html</context>
           <context context-type="linenumber">13,14</context>
         </context-group>
-        <target state="needs-translation">Select a workflow</target>
+        <target state="translated">Izvēlies darbplūsmu</target>
       </trans-unit>
       <trans-unit id="261810320774538615" datatype="html">
         <source>Run on this document regardless of trigger filters</source>
@@ -4823,7 +4823,7 @@
           <context context-type="sourcefile">src/app/components/common/confirm-dialog/run-workflow-confirm-dialog/run-workflow-confirm-dialog.component.html</context>
           <context context-type="linenumber">23,24</context>
         </context-group>
-        <target state="needs-translation">Ignore the workflow's trigger filters for this document.</target>
+        <target state="translated">Ignorēt darbplūsmas palaišanas filtrus dokumentam</target>
       </trans-unit>
       <trans-unit id="4512110365422311821" datatype="html">
         <source>Run on all selected documents</source>
@@ -4839,7 +4839,7 @@
           <context context-type="sourcefile">src/app/components/common/confirm-dialog/run-workflow-confirm-dialog/run-workflow-confirm-dialog.component.html</context>
           <context context-type="linenumber">26,27</context>
         </context-group>
-        <target state="needs-translation">Ignore the workflow's trigger filters and run on every selected document.</target>
+        <target state="translated">Ignorēt darbplūsmas palaišanas filtrus un izpildīt katram atlasītajam dokumentam.</target>
       </trans-unit>
       <trans-unit id="2509141182388535183" datatype="html">
         <source>View</source>
@@ -6639,7 +6639,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">31,32</context>
         </context-group>
-        <target state="needs-translation">Trigger Workflow On:</target>
+        <target state="translated">Palaist darbplūsmu:</target>
       </trans-unit>
       <trans-unit id="3901427285052969410" datatype="html">
         <source>Add Trigger</source>
@@ -6855,7 +6855,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">195,196</context>
         </context-group>
-        <target state="needs-translation">No advanced workflow filters defined.</target>
+        <target state="translated">Nav definēts neviens papildu darbplūsmas filtrs.</target>
       </trans-unit>
       <trans-unit id="6892734625735572404" datatype="html">
         <source> Complete the custom field query configuration. </source>
@@ -6887,7 +6887,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">264</context>
         </context-group>
-        <target state="needs-translation">Can include some placeholders, see &lt;a target='_blank' href='https://docs.paperless-ngx.com/usage/#workflows'&gt;documentation&lt;/a&gt;.</target>
+        <target state="translated">Var iekļaut dažus vietturus, skatīt&lt;a target='_blank' href='https://docs.paperless-ngx.com/usage/#workflows'&gt;dokumentāciju&lt;/a&gt;.</target>
       </trans-unit>
       <trans-unit id="6528897010417701530" datatype="html">
         <source>Assign tags</source>
@@ -7135,7 +7135,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">438</context>
         </context-group>
-        <target state="needs-translation"> One password per line. The workflow will try them in order until one succeeds. </target>
+        <target state="translated"> Pa vienai parolei katrā rindā. Darbplūsma tās mēģinās norādītajā secībā, līdz kāda no tām derēs. </target>
       </trans-unit>
       <trans-unit id="3853121441237751087" datatype="html">
         <source>Passwords</source>
@@ -7159,7 +7159,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">455,456</context>
         </context-group>
-        <target state="needs-translation">The document will be moved to the trash at the end of the workflow run.</target>
+        <target state="translated">Dokuments tiks pārvietots uz atkritni pēc darbplūsmas izpildes.</target>
       </trans-unit>
       <trans-unit id="7532958562244845095" datatype="html">
         <source>The document will be sent to the configured remote OCR service. May incur costs.</source>
@@ -7183,7 +7183,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.html</context>
           <context context-type="linenumber">470,471</context>
         </context-group>
-        <target state="needs-translation">This action runs in the background, so the suggestions may be applied after the other actions of this workflow have finished.</target>
+        <target state="translated">Šī darbība notiek fonā, tāpēc ieteikumus var piemērot pēc tam, kad pārējās šīs darbplūsmas darbības ir pabeigtas.</target>
       </trans-unit>
       <trans-unit id="3473589590476379802" datatype="html">
         <source>Apply suggestions for</source>
@@ -7503,7 +7503,7 @@
           <context context-type="sourcefile">src/app/components/common/edit-dialog/workflow-edit-dialog/workflow-edit-dialog.component.ts</context>
           <context context-type="linenumber">574</context>
         </context-group>
-        <target state="needs-translation">Some workflow options could not be loaded.</target>
+        <target state="translated">Neizdevās ielādēt dažas darbplūsmas opcijas.</target>
       </trans-unit>
       <trans-unit id="3138206142174978019" datatype="html">
         <source>Create new workflow</source>
@@ -9703,7 +9703,7 @@
           <context context-type="sourcefile">src/app/utils/document-operation.ts</context>
           <context context-type="linenumber">12</context>
         </context-group>
-        <target state="needs-translation">Run workflow</target>
+        <target state="translated">Palaist darbplūsmu</target>
       </trans-unit>
       <trans-unit id="7049887240439736400" datatype="html">
         <source>Print</source>
@@ -10331,7 +10331,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">1591</context>
         </context-group>
-        <target state="needs-translation">Run a workflow on "<x id="PH" equiv-text="this.document().title"/>".</target>
+        <target state="translated">Palaist darbplūsmu dokumentam "<x id="PH" equiv-text="this.document().title"/>".</target>
       </trans-unit>
       <trans-unit id="3759965007855499397" datatype="html">
         <source>Run</source>
@@ -10351,7 +10351,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">1607</context>
         </context-group>
-        <target state="needs-translation">Workflow queued.</target>
+        <target state="translated">Darbplūsma pievienota izpildei.</target>
       </trans-unit>
       <trans-unit id="3321568156074471424" datatype="html">
         <source>Workflow completed.</source>
@@ -10359,7 +10359,7 @@
           <context context-type="sourcefile">src/app/components/document-detail/document-detail.component.ts</context>
           <context context-type="linenumber">1609</context>
         </context-group>
-        <target state="needs-translation">Workflow completed.</target>
+        <target state="translated">Darbplūsma izpildīta.</target>
       </trans-unit>
       <trans-unit id="6030453331794586802" datatype="html">
         <source>Error downloading document</source>
@@ -10831,7 +10831,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">316</context>
         </context-group>
-        <target state="needs-translation">Run a workflow on <x id="PH" equiv-text="this.getSelectionSize()"/> selected document(s).</target>
+        <target state="translated">Palaist darbplūsmu <x id="PH" equiv-text="this.getSelectionSize()"/> atlasītajiem dokumentiem.</target>
       </trans-unit>
       <trans-unit id="8161885405686762788" datatype="html">
         <source>Workflow will run on the selected documents in the background.</source>
@@ -10839,7 +10839,7 @@
           <context context-type="sourcefile">src/app/components/document-list/bulk-editor/bulk-editor.component.ts</context>
           <context context-type="linenumber">333</context>
         </context-group>
-        <target state="needs-translation">Workflow will run on the selected documents in the background.</target>
+        <target state="translated">Darbplūsma fonā apstrādās atlasītos dokumentus.</target>
       </trans-unit>
       <trans-unit id="6198773644658556874" datatype="html">
         <source>Bulk operation &apos;<x id="PH" equiv-text="label"/>&apos; submitted for processing.</source>
@@ -13283,7 +13283,7 @@
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.html</context>
           <context context-type="linenumber">4,5</context>
         </context-group>
-        <target state="needs-translation">Use workflows to customize the behavior of Paperless-ngx when events 'trigger' a workflow.</target>
+        <target state="translated">Izmanto darbplūsmas, lai pielāgotu Paperless-ngx rīcību, kad darbība tās palaiž.</target>
       </trans-unit>
       <trans-unit id="2437630016855517844" datatype="html">
         <source>Add Workflow</source>
@@ -13291,7 +13291,7 @@
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.html</context>
           <context context-type="linenumber">9</context>
         </context-group>
-        <target state="needs-translation">Add Workflow</target>
+        <target state="translated">Pievienot darbplūsmu</target>
       </trans-unit>
       <trans-unit id="1624023882313260402" datatype="html">
         <source>No workflows defined.</source>
@@ -13299,7 +13299,7 @@
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.html</context>
           <context context-type="linenumber">80,82</context>
         </context-group>
-        <target state="needs-translation">No workflows defined.</target>
+        <target state="translated">Nav definēta neviena darbplūsma.</target>
       </trans-unit>
       <trans-unit id="4200688335642457098" datatype="html">
         <source>Saved workflow &quot;<x id="PH" equiv-text="newWorkflow.name"/>&quot;.</source>
@@ -13307,7 +13307,7 @@
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.ts</context>
           <context context-type="linenumber">90</context>
         </context-group>
-        <target state="needs-translation">Saved workflow "<x id="PH" equiv-text="newWorkflow.name"/>".</target>
+        <target state="translated">Saglabāt darbplūsmu "<x id="PH" equiv-text="newWorkflow.name"/>".</target>
       </trans-unit>
       <trans-unit id="7593065565369163325" datatype="html">
         <source>Error saving workflow.</source>
@@ -13315,7 +13315,7 @@
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.ts</context>
           <context context-type="linenumber">98</context>
         </context-group>
-        <target state="needs-translation">Error saving workflow.</target>
+        <target state="translated">Neizdevās saglabāt darbplūsmu.</target>
       </trans-unit>
       <trans-unit id="563460864902055482" datatype="html">
         <source>Confirm delete workflow</source>
@@ -13323,7 +13323,7 @@
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.ts</context>
           <context context-type="linenumber">131</context>
         </context-group>
-        <target state="needs-translation">Confirm delete workflow</target>
+        <target state="translated">Apstiprināt darbplūsmas dzēšanu</target>
       </trans-unit>
       <trans-unit id="6874008462443189248" datatype="html">
         <source>This operation will permanently delete this workflow.</source>
@@ -13331,7 +13331,7 @@
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.ts</context>
           <context context-type="linenumber">132</context>
         </context-group>
-        <target state="needs-translation">This operation will permanently delete this workflow.</target>
+        <target state="translated">Šī darbība neatgriezeniski izdzēsīs darbplūsmu.</target>
       </trans-unit>
       <trans-unit id="1284828901551483140" datatype="html">
         <source>Deleted workflow &quot;<x id="PH" equiv-text="workflow.name"/>&quot;.</source>
@@ -13339,7 +13339,7 @@
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.ts</context>
           <context context-type="linenumber">142</context>
         </context-group>
-        <target state="needs-translation">Deleted workflow "<x id="PH" equiv-text="workflow.name"/>".</target>
+        <target state="translated">Izdzēstā darbplūsma "<x id="PH" equiv-text="workflow.name"/>".</target>
       </trans-unit>
       <trans-unit id="1427555175623563103" datatype="html">
         <source>Error deleting workflow &quot;<x id="PH" equiv-text="workflow.name"/>&quot;.</source>
@@ -13347,7 +13347,7 @@
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.ts</context>
           <context context-type="linenumber">149</context>
         </context-group>
-        <target state="needs-translation">Error deleting workflow "<x id="PH" equiv-text="workflow.name"/>".</target>
+        <target state="translated">Neizdevās izdzēst darbplūsmu "<x id="PH" equiv-text="workflow.name"/>".</target>
       </trans-unit>
       <trans-unit id="3737192425004139518" datatype="html">
         <source>Enabled workflow &quot;<x id="PH" equiv-text="workflow.name"/>&quot;</source>
@@ -13355,7 +13355,7 @@
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.ts</context>
           <context context-type="linenumber">162</context>
         </context-group>
-        <target state="needs-translation">Enabled workflow "<x id="PH" equiv-text="workflow.name"/>"</target>
+        <target state="translated">Iespējota darbplūsma "<x id="PH" equiv-text="workflow.name"/>"</target>
       </trans-unit>
       <trans-unit id="7404075898344576079" datatype="html">
         <source>Disabled workflow &quot;<x id="PH" equiv-text="workflow.name"/>&quot;</source>
@@ -13363,7 +13363,7 @@
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.ts</context>
           <context context-type="linenumber">163</context>
         </context-group>
-        <target state="needs-translation">Disabled workflow "<x id="PH" equiv-text="workflow.name"/>"</target>
+        <target state="translated">Atspējota darbplūsma "<x id="PH" equiv-text="workflow.name"/>"</target>
       </trans-unit>
       <trans-unit id="6597823365851861961" datatype="html">
         <source>Error toggling workflow &quot;<x id="PH" equiv-text="workflow.name"/>&quot;.</source>
@@ -13371,7 +13371,7 @@
           <context context-type="sourcefile">src/app/components/manage/workflows/workflows.component.ts</context>
           <context context-type="linenumber">170</context>
         </context-group>
-        <target state="needs-translation">Error toggling workflow "<x id="PH" equiv-text="workflow.name"/>".</target>
+        <target state="translated">Neizdevās pārslēgt darbplūsmu "<x id="PH" equiv-text="workflow.name"/>".</target>
       </trans-unit>
       <trans-unit id="2649252321173430744" datatype="html">
         <source>Not Found</source>
@@ -13836,7 +13836,7 @@
           <context context-type="sourcefile">src/app/data/paperless-config.ts</context>
           <context context-type="linenumber">233</context>
         </context-group>
-        <target state="needs-translation">Which documents are sent to the remote engine. Use 'workflow_only' to keep remote OCR off unless a workflow enables it for a document.</target>
+        <target state="translated">Kuri dokumenti tiek nosūtīti attālinātajam dzinējam. Izmantojiet “workflow_only”, lai attālinātā teksta atpazīšana (OCR) būtu izslēgta, ja vien kāda darbplūsma to neiespējo konkrētam dokumentam.</target>
       </trans-unit>
       <trans-unit id="7106327322456204362" datatype="html">
         <source>Application Logo</source>

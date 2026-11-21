@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-11-17 20:48+0000\n"
-"PO-Revision-Date: 2026-11-17 20:50\n"
+"PO-Revision-Date: 2026-11-20 12:17\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
@@ -802,7 +802,7 @@ msgstr "búsqueda simple por texto"
 
 #: documents/models.py:808
 msgid "has duplicates"
-msgstr ""
+msgstr "tiene Duplicados"
 
 #: documents/models.py:818
 msgid "rule type"
@@ -874,7 +874,7 @@ msgstr "Verificar flujos de trabajo"
 
 #: documents/models.py:869
 msgid "Bulk Update"
-msgstr ""
+msgstr "Actualización Masiva"
 
 #: documents/models.py:870
 msgid "Reprocess Document"
@@ -890,7 +890,7 @@ msgstr "Borrado masivo"
 
 #: documents/models.py:873
 msgid "Apply AI Suggestions"
-msgstr ""
+msgstr "Aplicar sugerencias de IA"
 
 #: documents/models.py:882 documents/models.py:1545
 msgid "Scheduled"
@@ -902,7 +902,7 @@ msgstr "Interfaz de usuario web"
 
 #: documents/models.py:884
 msgid "API Upload"
-msgstr ""
+msgstr "Subir API"
 
 #: documents/models.py:885
 msgid "Folder Consume"
@@ -910,7 +910,7 @@ msgstr ""
 
 #: documents/models.py:886
 msgid "Email Consume"
-msgstr ""
+msgstr "Consume Email"
 
 #: documents/models.py:887
 msgid "System"
