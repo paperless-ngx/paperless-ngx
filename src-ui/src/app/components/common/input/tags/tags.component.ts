@@ -28,7 +28,7 @@ import {
   collapseImpliedAncestors,
   getTagAncestors,
   partitionTags,
-} from 'src/app/utils/collapse-tags'
+} from 'src/app/utils/tag-display'
 import { matchesSearchText } from 'src/app/utils/text-search'
 import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.component'
 import { HiddenTagsBadgeComponent } from '../../hidden-tags-badge/hidden-tags-badge.component'

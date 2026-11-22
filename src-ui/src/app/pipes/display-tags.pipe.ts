@@ -9,7 +9,7 @@ import {
 } from '../services/permissions.service'
 import { TagService } from '../services/rest/tag.service'
 import { SettingsService } from '../services/settings.service'
-import { partitionTags, TagPartition } from '../utils/collapse-tags'
+import { partitionTags, TagPartition } from '../utils/tag-display'
 
 /**
  * Splits a document's tag IDs into regular ones vs those the

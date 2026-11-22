@@ -3,7 +3,7 @@ import {
   collapseImpliedAncestors,
   getTagAncestors,
   partitionTags,
-} from './collapse-tags'
+} from './tag-display'
 
 const tags: Tag[] = [
   { id: 1, name: 'Finance' },
