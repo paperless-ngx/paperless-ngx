@@ -458,8 +458,8 @@ def _get_allowed_hosts() -> list[str]:
     else:
         allowed_hosts = ["*"]
     if allowed_hosts != ["*"]:
-        # Always allow localhost for the Docker health check.
-        allowed_hosts.append("localhost")
+        # Allow local access and health checks via loopback hostnames and addresses.
+        allowed_hosts.extend(["localhost", "127.0.0.1", "[::1]"])
     return allowed_hosts
 
 

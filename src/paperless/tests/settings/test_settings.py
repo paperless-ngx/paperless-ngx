@@ -177,11 +177,17 @@ class TestPaperlessURLSettings(TestCase):
     ("url", "allowed_hosts", "expected", "accepted_host", "rejected_host"),
     [
         (None, None, ["*"], "other.example.com", None),
-        (None, "", ["localhost"], "localhost:8000", "other.example.com"),
+        (
+            None,
+            "",
+            ["localhost", "127.0.0.1", "[::1]"],
+            "localhost:8000",
+            "other.example.com",
+        ),
         (
             None,
             "lan.example.com",
-            ["lan.example.com", "localhost"],
+            ["lan.example.com", "localhost", "127.0.0.1", "[::1]"],
             "lan.example.com",
             "other.example.com",
         ),
@@ -189,29 +195,29 @@ class TestPaperlessURLSettings(TestCase):
         (
             "https://example.com:8443",
             None,
-            ["localhost", "example.com"],
+            ["localhost", "127.0.0.1", "[::1]", "example.com"],
             "example.com:8443",
             "other.example.com",
         ),
         (
             "https://example.com.",
             "",
-            ["localhost", "example.com"],
+            ["localhost", "127.0.0.1", "[::1]", "example.com"],
             "example.com.",
             "other.example.com",
         ),
         (
-            "http://[::1]:8000",
+            "http://[2001:db8::1]:8000",
             None,
-            ["localhost", "[::1]"],
-            "[::1]:8000",
+            ["localhost", "127.0.0.1", "[::1]", "[2001:db8::1]"],
+            "[2001:db8::1]:8000",
             "other.example.com",
         ),
         ("https://example.com", "*", ["*", "example.com"], "other.example.com", None),
         (
             "https://example.com",
             "lan.example.com",
-            ["lan.example.com", "localhost", "example.com"],
+            ["lan.example.com", "localhost", "127.0.0.1", "[::1]", "example.com"],
             "lan.example.com",
             "other.example.com",
         ),
@@ -241,9 +247,10 @@ def test_allowed_hosts_at_startup(
     assert expected == paperless_settings.ALLOWED_HOSTS
 
     request = HttpRequest()
-    with override_settings(ALLOWED_HOSTS=expected):
-        request.META["HTTP_HOST"] = accepted_host
-        assert request.get_host() == accepted_host
+    with override_settings(ALLOWED_HOSTS=paperless_settings.ALLOWED_HOSTS):
+        for host in (accepted_host, "localhost:8000", "127.0.0.1:30070", "[::1]:8000"):
+            request.META["HTTP_HOST"] = host
+            assert request.get_host() == host
         if rejected_host:
             request.META["HTTP_HOST"] = rejected_host
             with pytest.raises(DisallowedHost):
