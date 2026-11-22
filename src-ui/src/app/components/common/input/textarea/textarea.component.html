@@ -18,7 +18,8 @@
           [class.font-monospace]="monospace"
           [(ngModel)]="value"
           [ngModelOptions]="{standalone: true}"
-          (change)="onChange(value)"
+          (ngModelChange)="onChange($event)"
+          (blur)="onTouched()"
           [disabled]="disabled"
           [placeholder]="placeholder"
           rows="4">
