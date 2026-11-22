@@ -24,11 +24,7 @@ import { Tag } from 'src/app/data/tag'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { TagService } from 'src/app/services/rest/tag.service'
 import { SettingsService } from 'src/app/services/settings.service'
-import {
-  collapseImpliedAncestors,
-  getTagAncestors,
-  partitionTags,
-} from 'src/app/utils/tag-display'
+import { getTagAncestors, partitionTags } from 'src/app/utils/tag-display'
 import { matchesSearchText } from 'src/app/utils/text-search'
 import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.component'
 import { HiddenTagsBadgeComponent } from '../../hidden-tags-badge/hidden-tags-badge.component'
@@ -150,8 +146,7 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
    * as segments of their descendant's badge.
    */
   isImplied(id: number): boolean {
-    if (!this.showsHierarchy || !this.tags || !this.value) return false
-    return !collapseImpliedAncestors(this.value, this.tagsById).includes(id)
+    return !!this.value?.includes(id) && !this.display.shown.has(id)
   }
 
   private get showsHierarchy(): boolean {
@@ -162,15 +157,58 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
   }
 
   isHidden(id: number): boolean {
-    return this.hiddenTagIds.includes(id)
+    return this.display.hiddenSet.has(id)
   }
 
   /**
    * Tags that are hidden from the current user.
    */
   get hiddenTagIds(): number[] {
-    if (!this.tagsLoaded) return []
-    return partitionTags(this.value, this.tagsById, this.showsHierarchy).hidden
+    return this.display.hidden
+  }
+
+  private displayCache: {
+    value: number[]
+    tagsById: Map<number, Tag>
+    showsHierarchy: boolean
+    tagsLoaded: boolean
+    shown: Set<number>
+    hidden: number[]
+    hiddenSet: Set<number>
+  }
+
+  /**
+   * Partition of the current value, recomputed only when the value, tags or
+   * hierarchy setting change.
+   */
+  private get display() {
+    const tagsById = this.tagsById
+    const showsHierarchy = this.showsHierarchy
+    const cached = this.displayCache
+    if (
+      cached?.value === this.value &&
+      cached.tagsById === tagsById &&
+      cached.showsHierarchy === showsHierarchy &&
+      cached.tagsLoaded === this.tagsLoaded
+    ) {
+      return cached
+    }
+    const { visible, hidden } = partitionTags(
+      this.value,
+      tagsById,
+      showsHierarchy
+    )
+    const hiddenIds = this.tagsLoaded ? hidden : []
+    this.displayCache = {
+      value: this.value,
+      tagsById,
+      showsHierarchy,
+      tagsLoaded: this.tagsLoaded,
+      shown: new Set([...visible, ...hidden]),
+      hidden: hiddenIds,
+      hiddenSet: new Set(hiddenIds),
+    }
+    return this.displayCache
   }
 
   /**

@@ -355,6 +355,15 @@ describe('TagsComponent', () => {
       expect(visible[1].textContent).toContain('2 hidden')
     })
 
+    it('should only recompute hidden tags when the value or tags change', () => {
+      const first = component.hiddenTagIds
+      expect(component.hiddenTagIds).toBe(first)
+      component.value = [1, 99]
+      expect(component.hiddenTagIds).toEqual([99])
+      component.tags = [...tags, { id: 99, name: 'now visible' }]
+      expect(component.hiddenTagIds).toEqual([])
+    })
+
     it('should not treat tags as hidden before tags load', () => {
       ;(component as any).tagsLoaded = false
       expect(component.hiddenTagIds).toEqual([])
