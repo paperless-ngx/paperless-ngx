@@ -42,6 +42,19 @@ describe('DocumentCardSmallComponent', () => {
       ],
     }).compileComponents()
 
+    jest
+      .spyOn(TestBed.inject(PermissionsService), 'currentUserCan')
+      .mockReturnValue(true)
+    jest.spyOn(TestBed.inject(TagService), 'listAll').mockReturnValue(
+      of({
+        count: 8,
+        all: [1, 2, 3, 4, 5, 6, 7, 8],
+        results: [1, 2, 3, 4, 5, 6, 7, 8].map((id) => ({
+          id,
+          name: `Tag ${id}`,
+        })),
+      })
+    )
     fixture = TestBed.createComponent(DocumentCardSmallComponent)
     component = fixture.componentInstance
     fixture.componentRef.setInput('document', Object.assign({}, doc))
@@ -147,5 +160,34 @@ describe('DocumentCardSmallComponent', () => {
     } as any
     component.mouseLeaveCard()
     expect(component.popupPreview.close).toHaveBeenCalled()
+  })
+
+  it('should show hidden tags last, only when visible tags leave a slot free', () => {
+    fixture.componentRef.setInput('document', {
+      ...component.document(),
+      tags: [1, 2, 3, 98, 99],
+    })
+    fixture.detectChanges()
+    const tagsEl = () => fixture.nativeElement.querySelector('.tags')
+    expect(tagsEl().lastElementChild.textContent).toContain('2 hidden')
+
+    // 6 visible tags fill the limit (document has notes)
+    fixture.componentRef.setInput('document', {
+      ...component.document(),
+      tags: [1, 2, 3, 4, 5, 6, 98, 99],
+    })
+    fixture.detectChanges()
+    expect(tagsEl().textContent).not.toContain('hidden')
+    expect(
+      fixture.debugElement.queryAll(By.directive(TagComponent))
+    ).toHaveLength(6)
+
+    fixture.componentRef.setInput('document', {
+      ...component.document(),
+      tags: [1, 2, 3, 4, 5, 6, 7, 98],
+    })
+    fixture.detectChanges()
+    expect(tagsEl().textContent).toContain('+ 2')
+    expect(tagsEl().textContent).not.toContain('hidden')
   })
 })

@@ -76,8 +76,12 @@
                       }
                     }
                     @case (DisplayField.TAGS) {
-                      @for (tagID of doc.tags | collapseTags | async; track tagID) {
+                      @let tags = doc.tags | displayTags | async;
+                      @for (tagID of tags?.visible; track tagID) {
                         <pngx-tag [tagID]="tagID" [split]="true" class="ms-1 fs-6" (click)="clickTag(tagID, $event)" (parentClick)="clickTag($event)" [clickable]="true" linkTitle="Filter by tag" i18n-title></pngx-tag>
+                      }
+                      @if (tags?.hidden.length) {
+                        <pngx-hidden-tags-badge [count]="tags.hidden.length" class="ms-1 fs-6"></pngx-hidden-tags-badge>
                       }
                     }
                     @case (DisplayField.DOCUMENT_TYPE) {

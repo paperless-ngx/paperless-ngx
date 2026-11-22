@@ -1,3 +1,4 @@
+import { HiddenTagsBadgeComponent } from 'src/app/components/common/hidden-tags-badge/hidden-tags-badge.component'
 import { AsyncPipe, NgOptimizedImage } from '@angular/common'
 import {
   AfterViewInit,
@@ -20,7 +21,7 @@ import {
   Document,
 } from 'src/app/data/document'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
-import { CollapseTagsPipe } from 'src/app/pipes/collapse-tags.pipe'
+import { DisplayTagsPipe } from 'src/app/pipes/display-tags.pipe'
 import { CorrespondentNamePipe } from 'src/app/pipes/correspondent-name.pipe'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
@@ -46,7 +47,8 @@ import { LoadingComponentWithPermissions } from '../../loading-component/loading
     TagComponent,
     CustomFieldDisplayComponent,
     AsyncPipe,
-    CollapseTagsPipe,
+    DisplayTagsPipe,
+    HiddenTagsBadgeComponent,
     NgOptimizedImage,
     UsernamePipe,
     CorrespondentNamePipe,

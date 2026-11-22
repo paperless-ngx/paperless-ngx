@@ -1,3 +1,5 @@
+import { TagPartition } from 'src/app/utils/tag-display'
+import { HiddenTagsBadgeComponent } from 'src/app/components/common/hidden-tags-badge/hidden-tags-badge.component'
 import { AsyncPipe, NgOptimizedImage } from '@angular/common'
 import {
   AfterViewInit,
@@ -20,7 +22,7 @@ import {
   Document,
 } from 'src/app/data/document'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
-import { CollapseTagsPipe } from 'src/app/pipes/collapse-tags.pipe'
+import { DisplayTagsPipe } from 'src/app/pipes/display-tags.pipe'
 import { CorrespondentNamePipe } from 'src/app/pipes/correspondent-name.pipe'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
@@ -46,7 +48,8 @@ import { LoadingComponentWithPermissions } from '../../loading-component/loading
     TagComponent,
     CustomFieldDisplayComponent,
     AsyncPipe,
-    CollapseTagsPipe,
+    DisplayTagsPipe,
+    HiddenTagsBadgeComponent,
     NgOptimizedImage,
     UsernamePipe,
     CorrespondentNamePipe,
@@ -94,6 +97,13 @@ export class DocumentCardSmallComponent
 
   private get tagLimit(): number {
     return this.document()?.notes.length > 0 ? 6 : 7
+  }
+
+  /**
+   * The hidden tags badge only fills a slot the visible tags leave free.
+   */
+  showHiddenTags(tags: TagPartition): boolean {
+    return tags?.hidden.length > 0 && tags.visible.length < this.tagLimit
   }
 
   getMoreTags(tagIDs: number[]): number {

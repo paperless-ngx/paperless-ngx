@@ -1,3 +1,4 @@
+import { HiddenTagsBadgeComponent } from 'src/app/components/common/hidden-tags-badge/hidden-tags-badge.component'
 import { AsyncPipe, NgClass, NgTemplateOutlet } from '@angular/common'
 import {
   Component,
@@ -39,7 +40,7 @@ import {
   SortableDirective,
   SortEvent,
 } from 'src/app/directives/sortable.directive'
-import { CollapseTagsPipe } from 'src/app/pipes/collapse-tags.pipe'
+import { DisplayTagsPipe } from 'src/app/pipes/display-tags.pipe'
 import { CorrespondentNamePipe } from 'src/app/pipes/correspondent-name.pipe'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
@@ -97,7 +98,8 @@ import { SaveViewConfigDialogComponent } from './save-view-config-dialog/save-vi
     StoragePathNamePipe,
     BootstrapIconComponent,
     AsyncPipe,
-    CollapseTagsPipe,
+    DisplayTagsPipe,
+    HiddenTagsBadgeComponent,
     FormsModule,
     ReactiveFormsModule,
     NgTemplateOutlet,
