@@ -76,8 +76,8 @@
                       }
                     }
                     @case (DisplayField.TAGS) {
-                      @for (tagID of doc.tags; track tagID) {
-                        <pngx-tag [tagID]="tagID" class="ms-1 fs-6" (click)="clickTag(tagID, $event)" [clickable]="true" linkTitle="Filter by tag" i18n-title></pngx-tag>
+                      @for (tagID of doc.tags | collapseTags | async; track tagID) {
+                        <pngx-tag [tagID]="tagID" [split]="true" class="ms-1 fs-6" (click)="clickTag(tagID, $event)" (parentClick)="clickTag($event)" [clickable]="true" linkTitle="Filter by tag" i18n-title></pngx-tag>
                       }
                     }
                     @case (DisplayField.DOCUMENT_TYPE) {

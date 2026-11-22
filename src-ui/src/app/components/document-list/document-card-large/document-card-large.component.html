@@ -36,8 +36,8 @@
                 {{document().title | documentTitle}}
               }
               @if (displayFields().includes(DisplayField.TAGS)) {
-                @for (tagID of document().tags; track tagID) {
-                  <pngx-tag [tagID]="tagID" linkTitle="Filter by tag" i18n-linkTitle class="ms-1" (click)="clickTag.emit(tagID);$event.stopPropagation()" [clickable]="clickTag.observers.length"></pngx-tag>
+                @for (tagID of document().tags | collapseTags | async; track tagID) {
+                  <pngx-tag [tagID]="tagID" [split]="true" linkTitle="Filter by tag" i18n-linkTitle class="ms-1" (click)="clickTag.emit(tagID);$event.stopPropagation()" (parentClick)="clickTag.emit($event)" [clickable]="clickTag.observers.length"></pngx-tag>
                 }
               }
             } @else {

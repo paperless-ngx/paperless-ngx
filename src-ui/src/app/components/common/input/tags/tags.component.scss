@@ -7,6 +7,21 @@
   font-size: 1rem;
 }
 
+// ancestors of another selected tag render inside that tag's badge
+::ng-deep .paperless-input-tags .ng-value:has(> .implied-tag) {
+  display: none !important;
+}
+
+// let a long (nowrap) split badge shrink to the field instead of widening it
+ng-select,
+::ng-deep .paperless-input-tags .ng-value-container {
+  min-width: 0 !important;
+}
+
+::ng-deep .paperless-input-tags .ng-value {
+  max-width: 100%;
+}
+
 .paperless-input-select.disabled {
   .input-group {
       cursor: not-allowed;

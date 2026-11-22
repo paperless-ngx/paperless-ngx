@@ -305,7 +305,7 @@ describe('SettingsComponent', () => {
     expect(toastErrorSpy).toHaveBeenCalled()
     expect(storeSpy).toHaveBeenCalled()
     expect(appearanceSettingsSpy).not.toHaveBeenCalled()
-    expect(setSpy).toHaveBeenCalledTimes(33)
+    expect(setSpy).toHaveBeenCalledTimes(34)
     expect(setSpy).toHaveBeenCalledWith(SETTINGS_KEYS.SIDEBAR_HIDDEN_ITEMS, [
       HideableSidebarItemID.Workflows,
     ])

@@ -11,3 +11,46 @@ a, span {
     opacity: .5;
     font-style: italic;
 }
+
+.split-parent,
+.split-child {
+    overflow: hidden;
+    white-space: nowrap;
+    transition: color .2s ease;
+}
+
+.split-parent {
+    min-width: 1.5em;
+    max-width: 10em;
+    padding-inline: .4em;
+    text-overflow: clip;
+
+    &:nth-last-child(2) { flex-shrink: 1e12; }
+    &:nth-last-child(3) { flex-shrink: 1e18; }
+    &:nth-last-child(4) { flex-shrink: 1e24; }
+    &:nth-last-child(5) { flex-shrink: 1e30; }
+
+    &.collapsed {
+        color: transparent !important;
+    }
+}
+
+.split-child {
+    flex-shrink: 1e6;
+    min-width: 2em;
+    max-width: 20em; // nowrap, so very long names would otherwise widen e.g. table columns
+    text-overflow: ellipsis;
+}
+
+// Hovered segment gets priority, other parents can shrink to a sliver
+.split-pill {
+    > .split-parent.focused,
+    > .split-child.focused {
+        flex-shrink: 1;
+        text-overflow: ellipsis;
+    }
+
+    &:has(> .focused) > .split-parent:not(.focused) {
+        min-width: 0;
+    }
+}
