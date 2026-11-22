@@ -7,7 +7,7 @@
     }
     <div class="position-relative" [class.col-md-9]="horizontal">
       <div class="input-group flex-nowrap">
-        <ng-select #tagSelect name="tags" [items]="tags" bindLabel="name" bindValue="id" [(ngModel)]="value" [ngModelOptions]="{standalone: true}"
+        <ng-select #tagSelect name="tags" [items]="tags" bindLabel="name" bindValue="id" [ngModel]="value" (ngModelChange)="onModelChange($event)" [ngModelOptions]="{standalone: true}"
           [disabled]="disabled"
           [multiple]="multiple"
           [closeOnSelect]="false"
@@ -24,11 +24,23 @@
           <ng-template ng-label-tmp let-item="item">
             @if (isImplied(item.id)) {
               <span class="implied-tag"></span>
+            } @else if (isHidden(item.id)) {
+              @if (item.id === hiddenTagIds[0]) {
+                <button class="tag-wrap btn p-0 d-flex align-items-center mw-100" (click)="removeHiddenTags()" (mousedown)="$event.stopImmediatePropagation()" type="button" title="Remove tags you don't have access to" i18n-title>
+                  <pngx-bs-icon name="x" style="margin-inline-end: 1px;"></pngx-bs-icon>
+                  <span class="badge text-bg-secondary d-inline-flex align-items-center gap-1">
+                    <pngx-bs-icon name="eye-slash" width=".8em" height=".8em"></pngx-bs-icon>
+                    <ng-container i18n>{{hiddenTagIds.length}} hidden</ng-container>
+                  </span>
+                </button>
+              } @else {
+                <span class="implied-tag"></span>
+              }
             } @else {
               <button class="tag-wrap btn p-0 d-flex align-items-center mw-100" (click)="removeBadge(item.id)" (mousedown)="$event.stopImmediatePropagation()" type="button" title="Remove tag" i18n-title>
                 <pngx-bs-icon name="x" style="margin-inline-end: 1px;"></pngx-bs-icon>
                 @if (item.id && tags) {
-                  <pngx-tag class="mw-100 overflow-hidden" [tag]="getTag(item.id)" [split]="preserveHierarchy" (click)="removeTag(item.id); $event.stopPropagation()" (parentClick)="removeTag($event)"></pngx-tag>
+                  <pngx-tag class="mw-100 overflow-hidden d-flex" [tag]="getTag(item.id)" [split]="preserveHierarchy" (click)="removeTag(item.id); $event.stopPropagation()" (parentClick)="removeTag($event)"></pngx-tag>
                 }
               </button>
             }

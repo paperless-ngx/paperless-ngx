@@ -29,6 +29,7 @@ import {
   getTagAncestors,
 } from 'src/app/utils/collapse-tags'
 import { matchesSearchText } from 'src/app/utils/text-search'
+import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.component'
 import { EditDialogMode } from '../../edit-dialog/edit-dialog.component'
 import { TagEditDialogComponent } from '../../edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
 import { TagComponent } from '../../tag/tag.component'
@@ -85,6 +86,7 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
   ngOnInit(): void {
     this.tagService.listAll().subscribe((result) => {
       this.tags = result.results
+      this.tagsLoaded = true
       this.changeDetector.markForCheck()
     })
   }
@@ -128,6 +130,8 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
 
   tags: Tag[] = []
 
+  private tagsLoaded = false
+
   public createTagRef: (name) => void
 
   public searchFn = (term: string, tag: Tag): boolean =>
@@ -154,15 +158,57 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
     )
   }
 
+  isHidden(id: number): boolean {
+    return this.tagsLoaded && !this.tagsById.has(id) && !this.isImplied(id)
+  }
+
   /**
-   * Remove the last visible tag (in case its actually a hidden ancestor)
+   * Tags that are hidden from the current user.
+   */
+  get hiddenTagIds(): number[] {
+    return this.value?.filter((id) => this.isHidden(id)) ?? []
+  }
+
+  /**
+   * Remove the last visible tag (in case its actually a hidden ancestor or a
+   * tag the user cannot view)
    */
   readonly onKeyDown = (event: KeyboardEvent): boolean => {
     if (event.key !== 'Backspace' || this.select?.searchTerm) return true
-    const visible = this.value?.filter((id) => !this.isImplied(id)) ?? []
+    const visible =
+      this.value?.filter((id) => !this.isImplied(id) && !this.isHidden(id)) ??
+      []
     if (visible.length === (this.value?.length ?? 0)) return true
-    this.removeTag(visible.at(-1))
+    if (visible.length) this.removeTag(visible.at(-1))
     return false
+  }
+
+  /**
+   * Changes from ng-select itself (e.g. clear all) never drop hidden tags,
+   * those are only removed via their own badge.
+   */
+  onModelChange(newValue: number[]) {
+    const kept = this.hiddenTagIds.filter((id) => !newValue?.includes(id))
+    this.value = [...(newValue ?? []), ...kept]
+  }
+
+  removeHiddenTags() {
+    if (this.disabled) return
+    const hidden = new Set(this.hiddenTagIds)
+    if (!hidden.size) return
+    const modal = this.modalService.open(ConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.title = $localize`Remove hidden tags`
+    modal.componentInstance.messageBold = $localize`Remove ${hidden.size} tag(s) you don't have access to?`
+    modal.componentInstance.message = $localize`You will not be able to add them back.`
+    modal.componentInstance.btnClass = 'btn-danger'
+    modal.componentInstance.btnCaption = $localize`Remove`
+    modal.componentInstance.confirmClicked.pipe(first()).subscribe(() => {
+      modal.close()
+      this.value = this.value.filter((id) => !hidden.has(id))
+      this.onChange(this.value)
+    })
   }
 
   getTag(id: number) {
