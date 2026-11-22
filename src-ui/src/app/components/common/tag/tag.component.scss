@@ -38,6 +38,7 @@ a, span {
 .split-child {
     flex-shrink: 1e6;
     min-width: 2em;
+    max-width: 20em; // nowrap, so very long names would otherwise widen e.g. table columns
     text-overflow: ellipsis;
 }
 
