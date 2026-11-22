@@ -30,6 +30,7 @@ import {
 } from 'src/app/utils/collapse-tags'
 import { matchesSearchText } from 'src/app/utils/text-search'
 import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.component'
+import { HiddenTagsBadgeComponent } from '../../hidden-tags-badge/hidden-tags-badge.component'
 import { EditDialogMode } from '../../edit-dialog/edit-dialog.component'
 import { TagEditDialogComponent } from '../../edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
 import { TagComponent } from '../../tag/tag.component'
@@ -52,6 +53,7 @@ import { TagComponent } from '../../tag/tag.component'
     ReactiveFormsModule,
     RouterModule,
     BootstrapIconComponent,
+    HiddenTagsBadgeComponent,
   ],
 })
 export class TagsComponent implements OnInit, ControlValueAccessor {

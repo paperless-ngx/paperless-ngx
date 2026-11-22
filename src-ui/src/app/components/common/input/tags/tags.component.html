@@ -28,10 +28,7 @@
               @if (item.id === hiddenTagIds[0]) {
                 <button class="tag-wrap hidden-tags btn p-0 d-flex align-items-center mw-100" (click)="removeHiddenTags()" (mousedown)="$event.stopImmediatePropagation()" type="button" title="Remove tags you don't have access to" i18n-title>
                   <pngx-bs-icon name="x" style="margin-inline-end: 1px;"></pngx-bs-icon>
-                  <span class="badge text-bg-secondary d-inline-flex align-items-center gap-1">
-                    <pngx-bs-icon name="eye-slash" width=".8em" height=".8em"></pngx-bs-icon>
-                    <ng-container i18n>{{hiddenTagIds.length}} hidden</ng-container>
-                  </span>
+                  <pngx-hidden-tags-badge class="d-flex" [count]="hiddenTagIds.length"></pngx-hidden-tags-badge>
                 </button>
               } @else {
                 <span class="implied-tag"></span>
