@@ -27,6 +27,7 @@ import { SettingsService } from 'src/app/services/settings.service'
 import {
   collapseImpliedAncestors,
   getTagAncestors,
+  partitionTags,
 } from 'src/app/utils/collapse-tags'
 import { matchesSearchText } from 'src/app/utils/text-search'
 import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.component'
@@ -161,14 +162,15 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
   }
 
   isHidden(id: number): boolean {
-    return this.tagsLoaded && !this.tagsById.has(id) && !this.isImplied(id)
+    return this.hiddenTagIds.includes(id)
   }
 
   /**
    * Tags that are hidden from the current user.
    */
   get hiddenTagIds(): number[] {
-    return this.value?.filter((id) => this.isHidden(id)) ?? []
+    if (!this.tagsLoaded) return []
+    return partitionTags(this.value, this.tagsById, this.showsHierarchy).hidden
   }
 
   /**
