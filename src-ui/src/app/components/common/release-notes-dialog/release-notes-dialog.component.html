@@ -1,0 +1,92 @@
+<div class="modal-header">
+  <div>
+    @if (until()) {
+      <h4 class="modal-title" i18n>Paperless-ngx {{ until() }} is available</h4>
+      <p class="text-muted small mb-0" i18n>You are running {{ version }}</p>
+    } @else {
+      <h4 class="modal-title" i18n>What's new in Paperless-ngx</h4>
+      @if (since()) {
+        <p class="text-muted small mb-0" i18n>Updated from {{ since() }} to {{ version }}</p>
+      }
+    }
+  </div>
+  <div class="d-flex align-items-center gap-3 ms-auto">
+    <div class="btn-group btn-group-sm" role="group">
+      <a tabindex="-1" class="btn btn-dark border-dark-subtle d-flex align-items-center" [href]="repoUrl" target="_blank" rel="noopener noreferrer"
+        title="Star Paperless-ngx on GitHub" i18n-title>
+        <pngx-bs-icon name="github" class="me-1 d-flex" width="12" height="12"></pngx-bs-icon><span class="small" i18n>Star</span>
+      </a>
+      @if (stars() !== null) {
+        <a tabindex="-1" class="btn btn-dark border-dark-subtle d-flex align-items-center" [href]="repoUrl + '/stargazers'" target="_blank" rel="noopener noreferrer"
+          title="Stargazers" i18n-title>
+          <span class="small">{{ stars() | number }}</span>
+        </a>
+      }
+    </div>
+    <button type="button" class="btn-close m-0" aria-label="Close" i18n-aria-label (click)="close()"></button>
+  </div>
+</div>
+<div class="modal-body">
+  @if (!updateCheckingEnabled()) {
+    @if (!updateCheckingIsSet() && canChangeUpdateChecking) {
+      <p class="mb-2" i18n>Paperless-ngx can automatically check for updates and show release notes here, fetched from GitHub.</p>
+      <div class="btn-group btn-group-sm">
+        <button type="button" class="btn btn-outline-primary" (click)="setUpdateChecking(true)" i18n>Enable</button>
+        <button type="button" class="btn btn-outline-secondary" (click)="setUpdateChecking(false)" i18n>Disable</button>
+      </div>
+    } @else {
+      <p class="mb-0" i18n>Release notes are fetched from GitHub when update checking is enabled.</p>
+      <ng-container *ngTemplateOutlet="githubLink"></ng-container>
+    }
+  } @else if (loading()) {
+    <div class="d-flex align-items-center gap-2 text-muted">
+      <output class="spinner-border spinner-border-sm"></output>
+      <ng-container i18n>Loading release notes...</ng-container>
+    </div>
+  } @else if (!releases()?.length) {
+    <p class="mb-0" i18n>Release notes could not be loaded.</p>
+    <ng-container *ngTemplateOutlet="githubLink"></ng-container>
+  } @else {
+    @for (release of releases(); track release.version) {
+      <section class="release-notes" [class.border-top]="!$first" [class.pt-3]="!$first" [class.mt-3]="!$first">
+        <div class="d-flex align-items-baseline gap-2 mb-2">
+          <h5 class="mb-0">{{ release.version }}</h5>
+          <a class="d-flex flex-row align-items-center text-secondary btn-link" [href]="release.html_url" target="_blank" rel="noopener noreferrer"
+            title="View on GitHub" i18n-title>
+            @if (release.published_at) {
+              <span class="text-muted small me-2">{{ release.published_at | customDate }}</span>
+            }
+            <pngx-bs-icon name="box-arrow-up-right" class="mt-n1" width=".7rem"></pngx-bs-icon>
+          </a>
+        </div>
+        <div class="release-notes-body" [innerHTML]="release.body_html"></div>
+      </section>
+    }
+  }
+</div>
+<div class="modal-footer justify-content-between">
+  <div class="d-flex flex-wrap gap-3 small">
+    <a class="link-secondary text-decoration-none d-flex align-items-center" [href]="releasesUrl" target="_blank" rel="noopener noreferrer">
+      <pngx-bs-icon name="clock-history" class="me-1"></pngx-bs-icon><ng-container i18n>All releases</ng-container>
+    </a>
+    <a class="link-secondary text-decoration-none d-flex align-items-center" [href]="discussionsUrl" target="_blank" rel="noopener noreferrer">
+      <pngx-bs-icon name="chat-left-text" class="me-1"></pngx-bs-icon><ng-container i18n>Need support? Ask in Discussions</ng-container>
+    </a>
+  </div>
+  <div class="d-flex gap-3">
+    <button type="button" class="btn btn-outline-secondary" (click)="close()" i18n>Close</button>
+    @if (until()) {
+      <a class="btn btn-primary d-flex align-items-center" [href]="updatingDocsUrl" target="_blank" rel="noopener noreferrer">
+        <ng-container i18n>How to update</ng-container>
+        <pngx-bs-icon name="box-arrow-up-right" class="ms-2" width=".8rem"></pngx-bs-icon>
+      </a>
+    }
+  </div>
+</div>
+
+<ng-template #githubLink>
+  <a class="small" [href]="releaseUrl" target="_blank" rel="noopener noreferrer">
+    <ng-container i18n>View on GitHub</ng-container>
+    <pngx-bs-icon name="box-arrow-up-right" class="ms-1"></pngx-bs-icon>
+  </a>
+</ng-template>

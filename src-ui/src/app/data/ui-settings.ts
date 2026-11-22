@@ -75,6 +75,7 @@ export const SETTINGS_KEYS = {
   UPDATE_CHECKING_ENABLED: 'general-settings:update-checking:enabled',
   UPDATE_CHECKING_BACKEND_SETTING:
     'general-settings:update-checking:backend-setting',
+  WHATS_NEW_LAST_SEEN_VERSION: 'general-settings:whats-new:last-seen-version',
   SAVED_VIEWS_WARN_ON_UNSAVED_CHANGE:
     'general-settings:saved-views:warn-on-unsaved-change',
   DASHBOARD_VIEWS_VISIBLE_IDS:
@@ -220,6 +221,11 @@ export const SETTINGS: UiSetting[] = [
   },
   {
     key: SETTINGS_KEYS.UPDATE_CHECKING_BACKEND_SETTING,
+    type: 'string',
+    default: '',
+  },
+  {
+    key: SETTINGS_KEYS.WHATS_NEW_LAST_SEEN_VERSION,
     type: 'string',
     default: '',
   },
