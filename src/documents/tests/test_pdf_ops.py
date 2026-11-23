@@ -437,9 +437,46 @@ class TestDecrypt:
         assert result == dst
         assert pdf_ops.needs_decrypt(dst) is False
 
+    @pytest.mark.parametrize(
+        "encryption",
+        [
+            pytest.param(
+                pikepdf.Encryption(
+                    owner="owner",
+                    user="grün",
+                    R=3,
+                    aes=False,
+                    metadata=False,
+                ),
+                id="legacy-rc4",
+            ),
+            pytest.param(
+                pikepdf.Encryption(owner="owner", user="grün", R=6),
+                id="modern-aes",
+            ),
+        ],
+    )
+    def test_decrypt_with_non_ascii_password(
+        self,
+        tmp_path: Path,
+        encryption: pikepdf.Encryption,
+        source_fingerprints: list[str],
+    ) -> None:
+        src = tmp_path / "encrypted.pdf"
+        dst = tmp_path / "out.pdf"
+        with pikepdf.open(THREE_PAGES) as pdf:
+            pdf.save(src, encryption=encryption)
+
+        assert pdf_ops.decrypt_pdf(src, constant(dst), encryption.user) == dst
+        assert pdf_ops.needs_decrypt(dst) is False
+        assert fingerprints(dst) == source_fingerprints
+        assert pdf_ops.needs_decrypt(src) is True
+
+    @pytest.mark.parametrize("password", ["wrong", "fälsch", "間違い"])
     def test_wrong_password_raises_and_never_requests_a_destination(
         self,
         tmp_path: Path,
+        password: str,
     ) -> None:
         """
         GIVEN:
@@ -457,7 +494,7 @@ class TestDecrypt:
             return requested[-1]
 
         with pytest.raises(pikepdf.PasswordError):
-            pdf_ops.decrypt_pdf(ENCRYPTED, make_dst, "wrong")
+            pdf_ops.decrypt_pdf(ENCRYPTED, make_dst, password)
 
         assert requested == []
 
