@@ -162,7 +162,19 @@ def decrypt_pdf(src: Path, make_dst: Callable[[], Path], password: str) -> Path:
     """
     import pikepdf
 
-    with pikepdf.open(src, password=password) as pdf:
+    try:
+        pdf = pikepdf.open(src, password=password)
+    except pikepdf.PasswordError as password_error:
+        if password.isascii():
+            raise
+        # pikepdf opens strings as UTF-8, but older PDFs use PDFDocEncoding.
+        try:
+            legacy_password = password.encode("pdfdoc")
+        except UnicodeEncodeError:
+            raise password_error from None
+        pdf = pikepdf.open(src, password=legacy_password)
+
+    with pdf:
         pdf.remove_unreferenced_resources()
         dst = make_dst()
         pdf.save(dst)
