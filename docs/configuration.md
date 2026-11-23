@@ -510,9 +510,9 @@ You can read more about this in [the Django project's documentation](https://doc
 
     - With neither setting configured, Paperless accepts any host.
     - With only `PAPERLESS_URL` set, Paperless accepts the hostname from that URL
-      and `localhost` (used by the Docker health check).
-    - `PAPERLESS_ALLOWED_HOSTS` adds hosts to `localhost` and the hostname from
-      `PAPERLESS_URL`, if set. A blank list adds no hosts.
+      and the loopback hosts `localhost`, `127.0.0.1`, and `[::1]`.
+    - `PAPERLESS_ALLOWED_HOSTS` adds hosts to those loopback hosts and the hostname
+      from `PAPERLESS_URL`, if set. A blank list adds no hosts.
     - With `PAPERLESS_ALLOWED_HOSTS=*`, Paperless accepts any host, even when
       `PAPERLESS_URL` is set.
 
