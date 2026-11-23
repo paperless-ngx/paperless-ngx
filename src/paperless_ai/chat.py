@@ -23,6 +23,7 @@ from paperless_ai.prompts.context import ChatRefinePromptContext
 from paperless_ai.prompts.render import render_prompt
 
 if TYPE_CHECKING:
+    from llama_index.core.llms import LLM
     from llama_index.core.response_synthesizers import BaseSynthesizer
     from llama_index.core.schema import NodeWithScore
 
@@ -215,7 +216,7 @@ async def _start_answer(
 
 def _build_synthesizer(
     config: AIConfig,
-    llm: object,
+    llm: "LLM",
     output_language: str | None,
     *,
     chunk_size: int,
