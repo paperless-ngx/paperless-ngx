@@ -86,7 +86,13 @@ def fake_response_stream(chunks: list[str]) -> MagicMock:
         for chunk in chunks:
             yield chunk
 
-    return MagicMock(async_response_gen=response_gen)
+    async def async_response_gen() -> AsyncIterator[str]:
+        async for chunk in stream.response_gen:
+            yield chunk
+
+    stream = MagicMock(async_response_gen=async_response_gen)
+    stream.response_gen = response_gen()
+    return stream
 
 
 def _fake_documents_queryset(pks: list[int]) -> MagicMock:

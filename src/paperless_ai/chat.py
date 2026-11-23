@@ -1,6 +1,7 @@
 import json
 import logging
 from collections.abc import AsyncIterator
+from contextlib import aclosing
 from typing import TYPE_CHECKING
 
 from asgiref.sync import sync_to_async
@@ -118,13 +119,16 @@ async def stream_chat_with_documents(
     output_language: str | None = None,
 ) -> AsyncIterator[str]:
     try:
-        async for chunk in _stream_chat_with_documents(
-            query_str,
-            documents,
-            unrestricted=unrestricted,
-            output_language=output_language,
-        ):
-            yield chunk
+        async with aclosing(
+            _stream_chat_with_documents(
+                query_str,
+                documents,
+                unrestricted=unrestricted,
+                output_language=output_language,
+            ),
+        ) as chunks:
+            async for chunk in chunks:
+                yield chunk
     except Exception as e:
         logger.exception("Failed to stream document chat response: %s", e)
         yield CHAT_ERROR_MESSAGE
@@ -150,8 +154,15 @@ async def _stream_chat_with_documents(
 
     logger.debug("Document chat query: %s", query_str)
     response_stream = await response_synthesizer.asynthesize(query_str, top_nodes)
-    async for chunk in response_stream.async_response_gen():
-        yield chunk
+    # llama-index forwards chunks without closing what it reads from, so own
+    # the provider stream here. Exit order closes the forwarder, then the
+    # provider stream, so a disconnect releases the LLM request immediately.
+    async with (
+        aclosing(response_stream.response_gen),
+        aclosing(response_stream.async_response_gen()) as chunks,
+    ):
+        async for chunk in chunks:
+            yield chunk
 
     if references:
         yield _format_chat_metadata_trailer(references)
