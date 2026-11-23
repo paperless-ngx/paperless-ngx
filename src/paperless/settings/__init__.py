@@ -714,7 +714,6 @@ CELERY_TIMEZONE = TIME_ZONE
 
 CELERY_WORKER_HIJACK_ROOT_LOGGER = False
 CELERY_WORKER_CONCURRENCY: Final[int] = get_int_from_env("PAPERLESS_TASK_WORKERS", 1)
-TASK_WORKERS = CELERY_WORKER_CONCURRENCY
 CELERY_WORKER_MAX_TASKS_PER_CHILD = 1
 CELERY_WORKER_SEND_TASK_EVENTS = True
 CELERY_TASK_SEND_SENT_EVENT = True
@@ -995,9 +994,6 @@ OCR_USER_ARGS = os.getenv("PAPERLESS_OCR_USER_ARGS")
 MAX_IMAGE_PIXELS: Final[int | None] = get_int_from_env(
     "PAPERLESS_MAX_IMAGE_PIXELS",
 )
-
-# GNUPG needs a home directory for some reason
-GNUPG_HOME = os.getenv("HOME", "/tmp")
 
 # Fallback layout for .eml consumption
 EMAIL_PARSE_DEFAULT_LAYOUT = get_int_from_env(

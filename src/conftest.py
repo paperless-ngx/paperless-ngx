@@ -154,12 +154,6 @@ def fake_progress_manager(
 
 
 @pytest.fixture(scope="session")
-def shared_samples_dir() -> Path:
-    """Directory of sample files used by more than one app's tests."""
-    return samples.SHARED_SAMPLES_DIR
-
-
-@pytest.fixture(scope="session")
 def simple_digital_pdf_file() -> Path:
     """One-page PDF with a text layer."""
     return samples.SIMPLE_DIGITAL_PDF

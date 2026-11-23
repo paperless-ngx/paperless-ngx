@@ -4,20 +4,12 @@ import logging
 import mimetypes
 import shutil
 import subprocess
-import tempfile
 from pathlib import Path
-from typing import TYPE_CHECKING
 from typing import Final
 
-from django.conf import settings
-
-from documents.loggers import LoggingMixin
 from documents.utils import copy_file_with_basic_stats
 from documents.utils import run_subprocess
 from paperless.parsers.registry import get_parser_registry
-
-if TYPE_CHECKING:
-    import datetime
 
 logger = logging.getLogger("paperless.parsing")
 
@@ -42,17 +34,6 @@ def get_default_file_extension(mime_type: str) -> str:
 
     ext = mimetypes.guess_extension(mime_type)
     return ext if ext else ""
-
-
-def is_file_ext_supported(ext: str) -> bool:
-    """
-    Returns True if the file extension is supported, False otherwise
-    TODO: Investigate why this really exists, why not use mimetype
-    """
-    if ext:
-        return ext.lower() in get_supported_file_extensions()
-    else:
-        return False
 
 
 def get_supported_file_extensions() -> set[str]:
@@ -276,77 +257,3 @@ def make_thumbnail_from_pdf(in_path: Path, temp_dir: Path, logging_group=None) -
 
 class ParseError(Exception):
     pass
-
-
-class DocumentParser(LoggingMixin):
-    """
-    Subclass this to make your own parser.  Have a look at
-    `paperless_tesseract.parsers` for inspiration.
-    """
-
-    logging_name = "paperless.parsing"
-
-    def __init__(self, logging_group, progress_callback=None) -> None:
-        super().__init__()
-        self.renew_logging_group()
-        self.logging_group = logging_group
-        self.settings = self.get_settings()
-        settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
-        self.tempdir = Path(
-            tempfile.mkdtemp(prefix="paperless-", dir=settings.SCRATCH_DIR),
-        )
-
-        self.archive_path = None
-        self.text = None
-        self.date: datetime.datetime | None = None
-        self.progress_callback = progress_callback
-
-    def progress(self, current_progress, max_progress) -> None:
-        if self.progress_callback:
-            self.progress_callback(current_progress, max_progress)
-
-    def get_settings(self):  # pragma: no cover
-        """
-        A parser must implement this
-        """
-        raise NotImplementedError
-
-    def read_file_handle_unicode_errors(self, filepath: Path) -> str:
-        """
-        Helper utility for reading from a file, and handling a problem with its
-        unicode, falling back to ignoring the error to remove the invalid bytes
-        """
-        try:
-            text = filepath.read_text(encoding="utf-8")
-        except UnicodeDecodeError as e:
-            self.log.warning(f"Unicode error during text reading, continuing: {e}")
-            text = filepath.read_bytes().decode("utf-8", errors="replace")
-        return text
-
-    def extract_metadata(self, document_path, mime_type):
-        return []
-
-    def get_page_count(self, document_path, mime_type) -> None:
-        return None
-
-    def parse(self, document_path, mime_type, file_name=None):
-        raise NotImplementedError
-
-    def get_archive_path(self):
-        return self.archive_path
-
-    def get_thumbnail(self, document_path, mime_type, file_name=None):
-        """
-        Returns the path to a file we can use as a thumbnail for this document.
-        """
-        raise NotImplementedError
-
-    def get_text(self):
-        return self.text
-
-    def get_date(self) -> datetime.datetime | None:
-        return self.date
-
-    def cleanup(self) -> None:
-        self.log.debug(f"Deleting directory {self.tempdir}")
-        shutil.rmtree(self.tempdir)

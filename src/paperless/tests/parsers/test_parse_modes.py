@@ -29,16 +29,6 @@ if TYPE_CHECKING:
 # ---------------------------------------------------------------------------
 
 _LONG_TEXT = "This is a test document with enough text. " * 5  # >50 chars
-_SHORT_TEXT = "Hi."  # <50 chars
-
-
-def _make_extract_text(text: str | None):
-    """Return a side_effect function for ``extract_text`` that returns *text*."""
-
-    def _extract(sidecar_file, pdf_file):
-        return text
-
-    return _extract
 
 
 # ---------------------------------------------------------------------------
