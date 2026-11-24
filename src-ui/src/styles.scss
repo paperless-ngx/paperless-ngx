@@ -13,6 +13,9 @@ $form-file-button-hover-bg: var(--pngx-bg-alt);
 @include meta.load-css("print");
 
 // re-created bootstrap styles
+.mt-n1 {
+  margin-top: -0.25rem;
+}
 .mt-n2 {
   margin-top: -0.5rem;
 }

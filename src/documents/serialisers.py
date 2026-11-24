@@ -544,43 +544,6 @@ class DocumentTypeSerializer(MatchingModelSerializer, OwnedObjectSerializer):
         )
 
 
-class DeprecatedColors:
-    COLOURS = (
-        (1, "#a6cee3"),
-        (2, "#1f78b4"),
-        (3, "#b2df8a"),
-        (4, "#33a02c"),
-        (5, "#fb9a99"),
-        (6, "#e31a1c"),
-        (7, "#fdbf6f"),
-        (8, "#ff7f00"),
-        (9, "#cab2d6"),
-        (10, "#6a3d9a"),
-        (11, "#b15928"),
-        (12, "#000000"),
-        (13, "#cccccc"),
-    )
-
-
-@extend_schema_field(
-    serializers.ChoiceField(
-        choices=DeprecatedColors.COLOURS,
-    ),
-)
-class ColorField(serializers.Field):
-    def to_internal_value(self, data):
-        for id, color in DeprecatedColors.COLOURS:
-            if id == data:
-                return color
-        raise serializers.ValidationError
-
-    def to_representation(self, value):
-        for id, color in DeprecatedColors.COLOURS:
-            if color == value:
-                return id
-        return 1
-
-
 class TagSerializer(MatchingModelSerializer, OwnedObjectSerializer):
     def get_text_color(self, obj) -> str:
         try:

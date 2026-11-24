@@ -32,6 +32,7 @@ from documents.views import MergeDocumentsAsVersionsView
 from documents.views import MergeDocumentsView
 from documents.views import OcrTemplateViewSet
 from documents.views import PostDocumentView
+from documents.views import ReleaseNotesView
 from documents.views import RemoteVersionView
 from documents.views import RemovePasswordDocumentsView
 from documents.views import ReprocessDocumentsView
@@ -226,6 +227,11 @@ urlpatterns = [
                     "^remote_version/",
                     RemoteVersionView.as_view(),
                     name="remoteversion",
+                ),
+                re_path(
+                    "^release_notes/",
+                    ReleaseNotesView.as_view(),
+                    name="release_notes",
                 ),
                 re_path(
                     "^ui_settings/",

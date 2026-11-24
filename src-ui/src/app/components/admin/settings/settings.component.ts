@@ -164,6 +164,7 @@ export class SettingsComponent
     bulkEditConfirmationDialogs: new FormControl(null),
     bulkEditApplyOnClose: new FormControl(null),
     documentListItemPerPage: new FormControl(null),
+    tagsShowHierarchy: new FormControl(null),
     slimSidebarEnabled: new FormControl(null),
     sidebarHiddenItems: new FormControl<HideableSidebarItemID[]>([]),
     darkModeUseSystem: new FormControl(null),
@@ -343,6 +344,7 @@ export class SettingsComponent
       bulkEditApplyOnClose: this.settings.get(
         SETTINGS_KEYS.BULK_EDIT_APPLY_ON_CLOSE
       ),
+      tagsShowHierarchy: this.settings.get(SETTINGS_KEYS.TAGS_SHOW_HIERARCHY),
       documentListItemPerPage: this.settings.get(
         SETTINGS_KEYS.DOCUMENT_LIST_SIZE
       ),
@@ -607,6 +609,10 @@ export class SettingsComponent
     this.settings.set(
       SETTINGS_KEYS.DEFAULT_PERMS_EDIT_GROUPS,
       this.settingsForm.value.defaultPermsEditGroups
+    )
+    this.settings.set(
+      SETTINGS_KEYS.TAGS_SHOW_HIERARCHY,
+      this.settingsForm.value.tagsShowHierarchy
     )
     this.settings.set(
       SETTINGS_KEYS.DOCUMENT_EDITING_REMOVE_INBOX_TAGS,

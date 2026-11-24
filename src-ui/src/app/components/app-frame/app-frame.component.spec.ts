@@ -42,6 +42,7 @@ import { environment } from 'src/environments/environment'
 import { ProfileEditDialogComponent } from '../common/profile-edit-dialog/profile-edit-dialog.component'
 import { UploadStatusTrayComponent } from '../common/upload-status-tray/upload-status-tray.component'
 import { DocumentDetailComponent } from '../document-detail/document-detail.component'
+import { ReleaseNotesDialogComponent } from '../common/release-notes-dialog/release-notes-dialog.component'
 import { AppFrameComponent } from './app-frame.component'
 import { GlobalSearchComponent } from './global-search/global-search.component'
 
@@ -707,6 +708,131 @@ describe('AppFrameComponent', () => {
 
   it('should call maybeRefreshDocumentCounts after saved views reload', () => {
     expect(maybeRefreshSpy).toHaveBeenCalled()
+  })
+
+  it('should show new release pill and mark releases seen on click', () => {
+    settingsService.set(SETTINGS_KEYS.VERSION, '3.5.1')
+    settingsService.set(SETTINGS_KEYS.WHATS_NEW_LAST_SEEN_VERSION, '3.4.2')
+    fixture.detectChanges()
+
+    const pill = fixture.debugElement
+      .queryAll(By.css('button'))
+      .find((b) => b.nativeElement.textContent.trim() === 'New')
+    expect(pill).toBeTruthy()
+
+    pill.nativeElement.click()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}ui_settings/`
+    )
+    expect(req.request.body.settings.whats_new.last_seen_version).toEqual(
+      '3.5.1'
+    )
+    req.flush({ success: true })
+    fixture.detectChanges()
+
+    expect(
+      fixture.debugElement
+        .queryAll(By.css('button'))
+        .find((b) => b.nativeElement.textContent.trim() === 'New')
+    ).toBeUndefined()
+  })
+
+  it('should dismiss new release pill without opening release notes', () => {
+    settingsService.set(SETTINGS_KEYS.VERSION, '3.5.1')
+    settingsService.set(SETTINGS_KEYS.WHATS_NEW_LAST_SEEN_VERSION, '3.4.2')
+    fixture.detectChanges()
+    const modalSpy = jest.spyOn(modalService, 'open')
+
+    fixture.debugElement
+      .query(By.css('button[aria-label="Dismiss"]'))
+      .nativeElement.click()
+    const req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}ui_settings/`
+    )
+    expect(req.request.body.settings.whats_new.last_seen_version).toEqual(
+      '3.5.1'
+    )
+    req.flush({ success: true })
+    fixture.detectChanges()
+
+    expect(modalSpy).not.toHaveBeenCalled()
+    expect(
+      fixture.debugElement.query(By.css('button[aria-label="Dismiss"]'))
+    ).toBeNull()
+  })
+
+  it('should open current release notes from the version without marking seen', () => {
+    settingsService.set(SETTINGS_KEYS.VERSION, '3.5.1')
+    settingsService.set(SETTINGS_KEYS.WHATS_NEW_LAST_SEEN_VERSION, '3.5.1')
+    fixture.detectChanges()
+    const modalSpy = jest.spyOn(modalService, 'open')
+
+    const versionButton = fixture.debugElement
+      .queryAll(By.css('button'))
+      .find((b) => b.nativeElement.textContent.includes('3.5.1'))
+    versionButton.nativeElement.click()
+
+    expect(modalSpy).toHaveBeenCalledWith(
+      ReleaseNotesDialogComponent,
+      expect.anything()
+    )
+    httpTestingController.expectNone(`${environment.apiBaseUrl}ui_settings/`)
+  })
+
+  it('should open available release notes from update available', () => {
+    jest
+      .spyOn(remoteVersionService, 'checkForUpdates')
+      .mockReturnValue(of({ version: '3.6.0', update_available: true }))
+    settingsService.set(SETTINGS_KEYS.VERSION, '3.5.1')
+    settingsService.set(SETTINGS_KEYS.UPDATE_CHECKING_ENABLED, true)
+    component.ngOnInit()
+    fixture.detectChanges()
+    const modalSpy = jest.spyOn(modalService, 'open')
+    const saveSpy = jest.spyOn(settingsService, 'markReleasesSeen')
+
+    const updateButton = fixture.debugElement
+      .queryAll(By.css('button'))
+      .find((b) => b.nativeElement.textContent.includes('Update available'))
+    expect(updateButton.nativeElement.title).toEqual(
+      'Paperless-ngx 3.6.0 is available'
+    )
+    updateButton.nativeElement.click()
+
+    const dialog = modalSpy.mock.results[0].value
+      .componentInstance as ReleaseNotesDialogComponent
+    expect(dialog.since()).toEqual('3.5.1')
+    expect(dialog.until()).toEqual('3.6.0')
+    expect(saveSpy).not.toHaveBeenCalled()
+  })
+
+  it('should save update checking chosen in the release notes dialog', () => {
+    const setUpdateCheckingSpy = jest
+      .spyOn(component, 'setUpdateChecking')
+      .mockImplementation(() => {})
+    const modalSpy = jest.spyOn(modalService, 'open')
+    component.showReleaseNotes()
+
+    const dialog = modalSpy.mock.results[0].value
+      .componentInstance as ReleaseNotesDialogComponent
+    dialog.updateCheckingChosen.emit(true)
+    expect(setUpdateCheckingSpy).toHaveBeenCalledWith(true)
+  })
+
+  it('should show new release dot instead of documentation in slim sidebar', () => {
+    settingsService.set(SETTINGS_KEYS.SLIM_SIDEBAR, true)
+    settingsService.set(SETTINGS_KEYS.VERSION, '3.5.1')
+    settingsService.set(SETTINGS_KEYS.WHATS_NEW_LAST_SEEN_VERSION, '3.4.2')
+    fixture.detectChanges()
+
+    const whatsNew = fixture.debugElement.query(
+      By.css('button[aria-label="See what\'s new in this version"]')
+    ).nativeElement
+    const docs = fixture.debugElement.query(
+      By.css('a[href="https://docs.paperless-ngx.com"].nav-anchor')
+    ).nativeElement
+    expect(docs.classList).toContain('d-md-none')
+    // both share one li so the tour anchor points at whichever is shown
+    expect(whatsNew.closest('li')).toBe(docs.closest('li'))
   })
 
   it('should show tasks badge for needs-attention tasks', () => {

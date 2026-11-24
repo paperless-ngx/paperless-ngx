@@ -372,8 +372,9 @@
                 </a>
               </li>
             }
-            <li class="nav-item mt-2 position-relative" [class.d-none]="settingsService.sidebarItemIsHidden(HideableSidebarItemID.Documentation) && !settingsService.organizingSidebarItems()" tourAnchor="tour.outro">
-              <a class="text-muted small d-flex align-items-center flex-wrap text-decoration-none nav-anchor" [class.opacity-50]="settingsService.sidebarItemIsHidden(HideableSidebarItemID.Documentation)" [class.pe-5]="settingsService.organizingSidebarItems() && !slimSidebarEnabled && !slimSidebarAnimating()"
+            <li class="nav-item mt-2 position-relative" [class.d-none]="settingsService.sidebarItemIsHidden(HideableSidebarItemID.Documentation) && !settingsService.organizingSidebarItems()"
+              [class.d-md-block]="slimSidebarEnabled && settingsService.unseenReleasesSince()" tourAnchor="tour.outro">
+              <a class="text-muted small d-flex align-items-center flex-wrap text-decoration-none nav-anchor" [class.d-md-none]="slimSidebarEnabled && settingsService.unseenReleasesSince()" [class.opacity-50]="settingsService.sidebarItemIsHidden(HideableSidebarItemID.Documentation)" [class.pe-5]="settingsService.organizingSidebarItems() && !slimSidebarEnabled && !slimSidebarAnimating()"
                 target="_blank" rel="noopener noreferrer" href="https://docs.paperless-ngx.com" ngbPopover="Documentation"
                 i18n-ngbPopover [disablePopover]="!slimSidebarPopoversEnabled" placement="end" container="body"
                 triggers="mouseenter:mouseleave" popoverClass="popover-slim">
@@ -382,23 +383,35 @@
               @if (settingsService.organizingSidebarItems()) {
                 <pngx-input-switch class="position-absolute top-50 end-0 translate-middle-y me-1" [class.d-none]="slimSidebarEnabled || slimSidebarAnimating()" [compact]="true" title="Documentation" i18n-title [ngModel]="!settingsService.sidebarItemIsHidden(HideableSidebarItemID.Documentation)" (ngModelChange)="toggleSidebarItem(HideableSidebarItemID.Documentation, $event)"></pngx-input-switch>
               }
+              @if (slimSidebarEnabled && settingsService.unseenReleasesSince()) {
+                <button type="button" class="btn btn-link border-0 w-100 text-muted small d-none d-md-flex align-items-center nav-anchor position-relative" (click)="showReleaseNotes()"
+                  aria-label="See what's new in this version" i18n-aria-label
+                  ngbPopover="What's new" i18n-ngbPopover placement="end" container="body"
+                  triggers="mouseenter:mouseleave" popoverClass="popover-slim">
+                  <pngx-bs-icon class="d-flex" name="info-circle"></pngx-bs-icon>
+                  <div class="position-absolute top-0 start-50 ms-1 p-1 bg-success rounded-circle"></div>
+                </button>
+              }
             </li>
             <li class="nav-item" [class.visually-hidden]="slimSidebarEnabled">
               <div class="text-muted small d-flex align-items-center flex-wrap nav-label">
                 <div class="me-2">
-                  <a class="text-muted text-decoration-none" target="_blank" rel="noopener noreferrer"
-                    href="https://github.com/paperless-ngx/paperless-ngx" ngbPopover="GitHub" i18n-ngbPopover
-                    [disablePopover]="!slimSidebarPopoversEnabled" placement="end" container="body"
-                    triggers="mouseenter:mouseleave" popoverClass="popover-slim">
+                  <button type="button" class="bg-transparent border-0 p-0 text-muted" (click)="showReleaseNotes()" title="See what's new in this version" i18n-title>
                     {{ versionString }}
-                  </a>
+                  </button>
+                  @if (settingsService.unseenReleasesSince()) {
+                    <div class="btn-group ms-2 align-baseline">
+                      <button type="button" class="btn btn-whats-new rounded-start-pill smaller py-1 px-2 fw-bold lh-sm" (click)="showReleaseNotes()"
+                        title="See what's new in this version" i18n-title i18n>New</button>
+                      <button type="button" class="btn btn-whats-new rounded-end-pill smaller py-1 px-1 lh-sm d-flex align-items-center" (click)="dismissReleaseNotes()"
+                        title="Dismiss" i18n-title aria-label="Dismiss" i18n-aria-label>
+                        <pngx-bs-icon name="x" class="d-flex" width="1em" height="1em"></pngx-bs-icon>
+                      </button>
+                    </div>
+                  }
                 </div>
                 @if (!settingsService.updateCheckingIsSet || appRemoteVersion()) {
                   <div class="version-check d-flex align-items-center">
-                    <ng-template #updateAvailablePopContent>
-                      <span class="small">Paperless-ngx {{ appRemoteVersion().version }} <ng-container i18n>is
-                          available.</ng-container><br /><ng-container i18n>Click to view.</ng-container></span>
-                    </ng-template>
                     <ng-template #updateCheckingNotEnabledPopContent>
                       <p class="small mb-2">
                         <ng-container i18n>Paperless-ngx can automatically check for updates</ng-container>
@@ -415,15 +428,13 @@
                     </ng-template>
                     @if (settingsService.updateCheckingIsSet) {
                       @if (appRemoteVersion().update_available) {
-                        <a class="small text-decoration-none" target="_blank" rel="noopener noreferrer"
-                          href="https://github.com/paperless-ngx/paperless-ngx/releases"
-                          [ngbPopover]="updateAvailablePopContent" popoverClass="shadow" triggers="mouseenter:mouseleave"
-                          container="body">
+                        <button type="button" class="bg-transparent border-0 p-0 small text-primary" (click)="showAvailableReleaseNotes()"
+                          title="Paperless-ngx {{ appRemoteVersion().version }} is available" i18n-title>
                           <pngx-bs-icon width="1.2em" height="1.2em" name="info-circle" class="me-1"></pngx-bs-icon>
                           @if (appRemoteVersion()?.update_available) {
                             <ng-container i18n>Update available</ng-container>
                           }
-                        </a>
+                        </button>
                       }
                     } @else {
                       <a  *pngxIfPermissions="{ action: PermissionAction.Change, type: PermissionType.UISettings }" class="small text-decoration-none" routerLink="/settings" fragment="update-checking" aria-label="Configure update checking" i18n-aria-label

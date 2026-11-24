@@ -3152,100 +3152,6 @@ class DocumentOperationPermissionMixin(PassUserMixin, DocumentSelectionMixin):
             from_webui=from_webui,
         )
 
-    def _has_document_permissions(
-        self,
-        *,
-        user: User,
-        documents: list[int],
-        method,
-        parameters: dict[str, Any],
-    ) -> bool:
-        if user.is_superuser:
-            return True
-
-        root_docs = {
-            get_root_document(doc)
-            for doc in Document.objects.select_related(
-                "owner",
-                "root_document__owner",
-            ).filter(pk__in=documents)
-        }
-        user_is_owner_of_all_documents = all(
-            (doc.owner == user or doc.owner is None) for doc in root_docs
-        )
-
-        # check global and object permissions for all documents
-        has_perms = (
-            user.has_perm(
-                "documents.change_document",
-            )
-            and not Document.global_objects.filter(pk__in=documents)
-            .exclude(pk__in=permitted_document_ids(user, perm="change_document"))
-            .exists()
-        )
-
-        # check ownership for methods that change original document
-        if (
-            (
-                has_perms
-                and method
-                in [
-                    bulk_edit.set_permissions,
-                    bulk_edit.delete,
-                    bulk_edit.rotate,
-                    bulk_edit.delete_pages,
-                    bulk_edit.edit_pdf,
-                    bulk_edit.merge_as_versions,
-                    bulk_edit.remove_password,
-                    bulk_edit.run_workflow,
-                ]
-            )
-            or (
-                method in [bulk_edit.merge, bulk_edit.split]
-                and parameters.get("delete_originals")
-            )
-            or (method == bulk_edit.edit_pdf and parameters.get("update_document"))
-        ):
-            has_perms = has_perms and user_is_owner_of_all_documents
-
-        # check global add permissions for methods that create documents
-        if (
-            has_perms
-            and (
-                method in [bulk_edit.split, bulk_edit.merge]
-                or (
-                    method in [bulk_edit.edit_pdf, bulk_edit.remove_password]
-                    and not parameters.get("update_document")
-                )
-            )
-            and not user.has_perm("documents.add_document")
-        ):
-            has_perms = False
-
-        # check global delete permissions for methods that delete documents
-        if (
-            has_perms
-            and (
-                method == bulk_edit.delete
-                # Sources stop being documents of their own, and removing one
-                # again afterwards needs delete_document
-                or method == bulk_edit.merge_as_versions
-                or (
-                    method in [bulk_edit.merge, bulk_edit.split]
-                    and parameters.get("delete_originals")
-                )
-                or (
-                    method in [bulk_edit.edit_pdf, bulk_edit.remove_password]
-                    and parameters.get("delete_original")
-                    and not parameters.get("update_document")
-                )
-            )
-            and not user.has_perm("documents.delete_document")
-        ):
-            has_perms = False
-
-        return has_perms
-
     def _execute_document_action(
         self,
         *,
@@ -4474,6 +4380,139 @@ class UiSettingsView(GenericAPIView[Any]):
         )
 
 
+GITHUB_CACHE_KEY = "github_data:%s"
+GITHUB_RELEASES_CACHE_TIMEOUT = 60 * 60 * 12
+GITHUB_REQUEST_TIMEOUT = 5
+
+
+GITHUB_RELEASES_URL = (
+    "https://api.github.com/repos/paperless-ngx/paperless-ngx/releases"
+)
+GITHUB_RELEASES_PER_PAGE = 10
+# Caps how far back a range can walk, e.g. for a bad `since`
+GITHUB_RELEASES_MAX_PAGES = 3
+
+
+def _fetch_github_releases_json(url: str, params: dict | None = None) -> Any | None:
+    try:
+        resp = httpx.get(
+            url,
+            params=params,
+            # GitHub renders release bodies as HTML
+            headers={"Accept": "application/vnd.github.html+json"},
+            timeout=GITHUB_REQUEST_TIMEOUT,
+        )
+        resp.raise_for_status()
+        return resp.json()
+    except ValueError as e:
+        logger.debug(f"An error occurred parsing GitHub releases json: {e}")
+    except httpx.HTTPError as e:
+        logger.debug(f"An error occurred fetching GitHub releases: {e}")
+    return None
+
+
+def _parse_github_release(release: dict[str, Any]) -> dict[str, Any] | None:
+    if release.get("draft") or release.get("prerelease"):
+        return None
+    try:
+        # Some early tags used ngx-x.y.z
+        release_version = packaging_version.parse(
+            release["tag_name"].removeprefix("ngx-"),
+        )
+    except packaging_version.InvalidVersion:
+        return None
+    return {
+        "version": str(release_version),
+        "name": release.get("name") or release["tag_name"],
+        "body_html": release.get("body_html") or "",
+        "html_url": release["html_url"],
+        "published_at": release.get("published_at"),
+    }
+
+
+def get_github_release(version_str: str) -> dict[str, Any] | None:
+    """
+    Fetch a single pngx release from GitHub by version.
+    """
+    cache_key = GITHUB_CACHE_KEY % f"release:{version_str}"
+    release = cache.get(cache_key)
+    if release is not None:
+        return release
+    data = _fetch_github_releases_json(f"{GITHUB_RELEASES_URL}/tags/v{version_str}")
+    if data is None:
+        return None
+    try:
+        release = _parse_github_release(data)
+    except (KeyError, TypeError, AttributeError) as e:
+        logger.debug(f"An error occurred parsing GitHub release json: {e}")
+        return None
+    if release is not None:
+        cache.set(cache_key, release, GITHUB_RELEASES_CACHE_TIMEOUT)
+    return release
+
+
+def get_github_releases(
+    since: packaging_version.Version,
+    until: packaging_version.Version,
+) -> list[dict[str, Any]] | None:
+    """
+    Fetch pngx releases from GitHub after `since` up to and including `until`,
+    newest first.
+    """
+    # Keyed on the range so an upgrade (pill) or a newly detected release
+    # (update available) changes `until` and gets a fresh fetch
+    cache_key = GITHUB_CACHE_KEY % f"releases:{since}:{until}"
+    releases = cache.get(cache_key)
+    if releases is not None:
+        return releases
+    releases = []
+    # Releases are listed newest first, so stop paging once we reach `since`
+    for page in range(1, GITHUB_RELEASES_MAX_PAGES + 1):
+        data = _fetch_github_releases_json(
+            GITHUB_RELEASES_URL,
+            params={"per_page": GITHUB_RELEASES_PER_PAGE, "page": page},
+        )
+        if data is None:
+            return None
+        try:
+            batch = [r for r in map(_parse_github_release, data) if r is not None]
+        except (KeyError, TypeError, AttributeError) as e:
+            logger.debug(f"An error occurred parsing GitHub releases json: {e}")
+            return None
+        releases.extend(batch)
+        if len(data) < GITHUB_RELEASES_PER_PAGE or any(
+            packaging_version.parse(r["version"]) <= since for r in batch
+        ):
+            break
+    releases = [
+        r for r in releases if since < packaging_version.parse(r["version"]) <= until
+    ]
+    cache.set(cache_key, releases, GITHUB_RELEASES_CACHE_TIMEOUT)
+    return releases
+
+
+def get_github_stars() -> int | None:
+    """
+    Fetch the number of stars for the Paperless-NGX repository from GitHub.
+    """
+    count = cache.get(GITHUB_CACHE_KEY % "stars")
+    if count is not None:
+        return count
+    try:
+        resp = httpx.get(
+            "https://api.github.com/repos/paperless-ngx/paperless-ngx",
+            headers={"Accept": "application/vnd.github+json"},
+            timeout=GITHUB_REQUEST_TIMEOUT,
+        )
+        resp.raise_for_status()
+        count = resp.json()["stargazers_count"]
+    except Exception as e:
+        logger.debug(f"An error occurred fetching GitHub stars: {e}")
+        return None
+    cache.set(GITHUB_CACHE_KEY % "stars", count, 60 * 60)
+    return count
+
+
 @extend_schema_view(
     get=extend_schema(
         description="Get the current version of the Paperless-NGX server",
@@ -4517,6 +4556,61 @@ class RemoteVersionView(GenericAPIView[Any]):
             {
                 "version": remote_version,
                 "update_available": is_greater_than_current,
+            },
+        )
+
+
+@extend_schema_view(
+    get=extend_schema(
+        description=(
+            "Get release notes from GitHub for releases newer than `since`, "
+            "up to and including `until` (default: the running version). "
+            "Without `since`, only the `until` version's notes are returned."
+        ),
+        parameters=[
+            OpenApiParameter(
+                name="since",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.QUERY,
+                required=False,
+            ),
+            OpenApiParameter(
+                name="until",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.QUERY,
+                required=False,
+            ),
+        ],
+        responses={
+            (200, "application/json"): OpenApiTypes.OBJECT,
+        },
+    ),
+)
+class ReleaseNotesView(GenericAPIView[Any]):
+    def get(self, request, format=None):
+        current_version = packaging_version.parse(version.__full_version_str__)
+        since = until = None
+        try:
+            if since_param := request.query_params.get("since"):
+                since = packaging_version.parse(since_param)
+            if until_param := request.query_params.get("until"):
+                until = packaging_version.parse(until_param)
+        except packaging_version.InvalidVersion:
+            return HttpResponseBadRequest("Invalid version")
+        # Newer releases can be requested e.g. for "update available"
+        until = until or current_version
+
+        if since is None:
+            release = get_github_release(str(until))
+            releases = [release] if release else []
+        else:
+            releases = get_github_releases(since, until) or []
+
+        return Response(
+            {
+                "version": version.__full_version_str__,
+                "releases": releases,
+                "stars": get_github_stars(),
             },
         )
 
@@ -5478,6 +5572,8 @@ class CustomFieldViewSet(PermissionsAwareDocumentCountMixin, ModelViewSet[Custom
 class SystemStatusView(PassUserMixin):
     permission_classes = (IsAuthenticated,)
     TASK_SUMMARY_DAYS = 30
+    # Seconds to wait on the broker before reporting it as unreachable
+    BROKER_SOCKET_TIMEOUT = 5
 
     def get(self, request, format=None):
         if not has_system_status_permission(request.user):
@@ -5523,7 +5619,11 @@ class SystemStatusView(PassUserMixin):
         if redis_url_parsed.hostname is not None:
             redis_constructed_url += f":{redis_url_parsed.port}"
         redis_error = None
-        with Redis.from_url(url=redis_url) as client:
+        with Redis.from_url(
+            url=redis_url,
+            socket_timeout=self.BROKER_SOCKET_TIMEOUT,
+            socket_connect_timeout=self.BROKER_SOCKET_TIMEOUT,
+        ) as client:
             try:
                 client.ping()
                 redis_status = "OK"
@@ -5538,12 +5638,22 @@ class SystemStatusView(PassUserMixin):
         celery_url = None
         try:
             celery_ping = None
-            for ping_attempt in range(3):
-                celery_ping = celery_app.control.inspect().ping()
-                if celery_ping:
-                    break
-                if ping_attempt < 2:
-                    sleep(0.25)
+            # Use a dedicated connection with socket timeouts. Without them a
+            # stalled broker blocks this request (and its DB connection) forever
+            with celery_app.connection_for_read(
+                transport_options={
+                    "socket_timeout": self.BROKER_SOCKET_TIMEOUT,
+                    "socket_connect_timeout": self.BROKER_SOCKET_TIMEOUT,
+                },
+            ) as celery_connection:
+                for ping_attempt in range(3):
+                    celery_ping = celery_app.control.inspect(
+                        connection=celery_connection,
+                    ).ping()
+                    if celery_ping:
+                        break
+                    if ping_attempt < 2:
+                        sleep(0.25)
 
             if not celery_ping:
                 celery_active = "WARNING"

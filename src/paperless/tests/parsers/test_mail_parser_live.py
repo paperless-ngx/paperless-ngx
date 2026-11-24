@@ -37,13 +37,6 @@ def extract_text(pdf_path: Path) -> str:
         return tmp.read()
 
 
-class MailAttachmentMock:
-    def __init__(self, payload: bytes, content_id: str) -> None:
-        self.payload = payload
-        self.content_id = content_id
-        self.content_type = "image/png"
-
-
 @pytest.mark.live
 @pytest.mark.nginx
 @pytest.mark.skipif(

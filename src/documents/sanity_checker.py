@@ -49,8 +49,6 @@ class SanityCheckMessages:
         self._document_error_pks: set[int] = set()
         self._document_warning_pks: set[int] = set()
         self._document_info_pks: set[int] = set()
-        self._document_error_issue_count: int = 0
-        self._document_warning_issue_count: int = 0
         self.has_error: bool = False
         self.has_warning: bool = False
         self.has_info: bool = False
@@ -76,17 +74,17 @@ class SanityCheckMessages:
     def error(self, doc_pk: int | None, message: str) -> None:
         self._messages[doc_pk].append({"level": logging.ERROR, "message": message})
         self.has_error = True
-        if doc_pk is not None:
-            self._document_error_issue_count += 1
-            if self._add_document_issue(doc_pk, self._document_error_pks):
-                self.document_error_count += 1
+        if doc_pk is not None and self._add_document_issue(
+            doc_pk,
+            self._document_error_pks,
+        ):
+            self.document_error_count += 1
 
     def warning(self, doc_pk: int | None, message: str) -> None:
         self._messages[doc_pk].append({"level": logging.WARNING, "message": message})
         self.has_warning = True
 
         if doc_pk is not None:
-            self._document_warning_issue_count += 1
             if self._add_document_issue(doc_pk, self._document_warning_pks):
                 self.document_warning_count += 1
         else:
@@ -115,21 +113,6 @@ class SanityCheckMessages:
 
     def __getitem__(self, item: int | None) -> list[MessageEntry]:
         return self._messages[item]
-
-    # -- Summarize Helpers --------------------------------------------------
-
-    @property
-    def has_global_issues(self) -> bool:
-        return None in self._messages
-
-    @property
-    def total_issue_count(self) -> int:
-        """Total number of error and warning messages across all documents and global."""
-        return (
-            self._document_error_issue_count
-            + self._document_warning_issue_count
-            + self.global_warning_count
-        )
 
     # -- Logging output (used by Celery task path) --------------------------
 

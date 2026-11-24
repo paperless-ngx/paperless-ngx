@@ -20,6 +20,7 @@ import {
   Document,
 } from 'src/app/data/document'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
+import { CollapseTagsPipe } from 'src/app/pipes/collapse-tags.pipe'
 import { CorrespondentNamePipe } from 'src/app/pipes/correspondent-name.pipe'
 import { CustomDatePipe } from 'src/app/pipes/custom-date.pipe'
 import { DocumentTitlePipe } from 'src/app/pipes/document-title.pipe'
@@ -45,6 +46,7 @@ import { LoadingComponentWithPermissions } from '../../loading-component/loading
     TagComponent,
     CustomFieldDisplayComponent,
     AsyncPipe,
+    CollapseTagsPipe,
     NgOptimizedImage,
     UsernamePipe,
     CorrespondentNamePipe,
@@ -90,12 +92,13 @@ export class DocumentCardSmallComponent
   @Output()
   clickStoragePath = new EventEmitter<number>()
 
-  get moreTags(): number {
-    const document = this.document()
-    const limit = document?.notes.length > 0 ? 6 : 7
-    return document?.tags.length > limit
-      ? document.tags.length - (limit - 1)
-      : null
+  private get tagLimit(): number {
+    return this.document()?.notes.length > 0 ? 6 : 7
+  }
+
+  getMoreTags(tagIDs: number[]): number {
+    const limit = this.tagLimit
+    return tagIDs?.length > limit ? tagIDs.length - (limit - 1) : null
   }
 
   @ViewChild('popupPreview') popupPreview: PreviewPopupComponent
@@ -116,14 +119,9 @@ export class DocumentCardSmallComponent
     return this.documentService.getDownloadUrl(this.document().id)
   }
 
-  get tagIDs() {
-    const document = this.document()
-    const limit = document.notes.length > 0 ? 6 : 7
-    if (document.tags.length > limit) {
-      return document.tags.slice(0, limit - 1)
-    } else {
-      return document.tags
-    }
+  getTagIDs(tagIDs: number[]): number[] {
+    const limit = this.tagLimit
+    return tagIDs?.length > limit ? tagIDs.slice(0, limit - 1) : tagIDs
   }
 
   mouseLeaveCard() {
