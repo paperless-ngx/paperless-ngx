@@ -362,7 +362,7 @@ class TestTagHierarchy(DirectoriesMixin, APITestCase):
 
         x = Tag.objects.create(name="X2")
         y = Tag.objects.create(name="Y2", tn_parent=x)
-        assert y.parent_pk == x.pk
+        assert y.tn_parent_id == x.pk
 
         # Moving X under D would make deepest node Y exceed depth 5 -> reject
         resp_fail = self.client.patch(
@@ -383,7 +383,7 @@ class TestTagHierarchy(DirectoriesMixin, APITestCase):
         )
         assert resp_ok.status_code in (200, 202)
         x.refresh_from_db()
-        assert x.parent_pk == c.id
+        assert x.tn_parent_id == c.id
 
     def test_is_root_filter_returns_only_root_tags(self) -> None:
         other_root = Tag.objects.create(name="Other parent")

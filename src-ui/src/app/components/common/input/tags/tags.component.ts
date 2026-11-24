@@ -21,7 +21,13 @@ import { NgSelectComponent, NgSelectModule } from '@ng-select/ng-select'
 import { first, firstValueFrom, tap } from 'rxjs'
 import { BootstrapIconComponent } from 'src/app/components/common/bootstrap-icon/bootstrap-icon.component'
 import { Tag } from 'src/app/data/tag'
+import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { TagService } from 'src/app/services/rest/tag.service'
+import { SettingsService } from 'src/app/services/settings.service'
+import {
+  collapseImpliedAncestors,
+  getTagAncestors,
+} from 'src/app/utils/collapse-tags'
 import { matchesSearchText } from 'src/app/utils/text-search'
 import { EditDialogMode } from '../../edit-dialog/edit-dialog.component'
 import { TagEditDialogComponent } from '../../edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
@@ -50,6 +56,7 @@ import { TagComponent } from '../../tag/tag.component'
 export class TagsComponent implements OnInit, ControlValueAccessor {
   private tagService = inject(TagService)
   private modalService = inject(NgbModal)
+  private readonly settingsService = inject(SettingsService)
   private readonly changeDetector = inject(ChangeDetectorRef)
 
   constructor() {
@@ -131,12 +138,59 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
       term
     )
 
+  /**
+   * Selected tags that are ancestors of another selected tag which are shown
+   * as segments of their descendant's badge.
+   */
+  isImplied(id: number): boolean {
+    if (!this.showsHierarchy || !this.tags || !this.value) return false
+    return !collapseImpliedAncestors(this.value, this.tagsById).includes(id)
+  }
+
+  private get showsHierarchy(): boolean {
+    return (
+      this.preserveHierarchy &&
+      !!this.settingsService.get(SETTINGS_KEYS.TAGS_SHOW_HIERARCHY)
+    )
+  }
+
+  /**
+   * Remove the last visible tag (in case its actually a hidden ancestor)
+   */
+  readonly onKeyDown = (event: KeyboardEvent): boolean => {
+    if (event.key !== 'Backspace' || this.select?.searchTerm) return true
+    const visible = this.value?.filter((id) => !this.isImplied(id)) ?? []
+    if (visible.length === (this.value?.length ?? 0)) return true
+    this.removeTag(visible.at(-1))
+    return false
+  }
+
   getTag(id: number) {
     if (this.tags) {
       return this.tags.find((tag) => tag.id == id)
     } else {
       return null
     }
+  }
+
+  /**
+   * Remove a whole badge i.e. the tag plus any ancestors that no other selected
+   * tag still needs.
+   */
+  removeBadge(tagID: number) {
+    if (this.disabled) return
+    if (!this.showsHierarchy) return this.removeTag(tagID)
+
+    const ancestors = new Set(this.getParentChain(tagID).map((t) => t.id))
+    const needed = new Set(
+      this.value
+        .filter((id) => id !== tagID && !ancestors.has(id))
+        .flatMap((id) => this.getParentChain(id).map((t) => t.id))
+    )
+    this.value = this.value.filter(
+      (id) => id !== tagID && (!ancestors.has(id) || needed.has(id))
+    )
+    this.onChange(this.value)
   }
 
   removeTag(tagID: number) {
@@ -235,18 +289,17 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
   }
 
   getParentChain(id: number): Tag[] {
-    // Returns ancestors from root → immediate parent for a tag id
-    const chain: Tag[] = []
-    let current = this.getTag(id)
-    const guard = new Set<number>()
-    while (current?.parent) {
-      if (guard.has(current.parent)) break
-      guard.add(current.parent)
-      const parent = this.getTag(current.parent)
-      if (!parent) break
-      chain.unshift(parent)
-      current = parent
+    return getTagAncestors(id, this.tagsById)
+  }
+
+  private tagsByIdSource: Tag[]
+  private tagsByIdCache: Map<number, Tag>
+
+  private get tagsById(): Map<number, Tag> {
+    if (this.tagsByIdSource !== this.tags) {
+      this.tagsByIdSource = this.tags
+      this.tagsByIdCache = new Map(this.tags?.map((t) => [t.id, t]))
     }
-    return chain
+    return this.tagsByIdCache
   }
 }

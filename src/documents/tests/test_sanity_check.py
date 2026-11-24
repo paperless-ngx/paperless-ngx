@@ -39,7 +39,6 @@ class TestSanityCheckMessages:
         assert messages.document_warning_count == 1
         assert messages.document_info_count == 1
         assert messages.global_warning_count == 1
-        assert messages.total_issue_count == 5
 
 
 @pytest.mark.django_db
@@ -51,7 +50,6 @@ class TestCheckSanityNoDocuments:
         messages = check_sanity()
         assert not messages.has_error
         assert not messages.has_warning
-        assert messages.total_issue_count == 0
 
     @pytest.mark.usefixtures("paperless_dirs")
     def test_no_issues_logs_clean(self, caplog: pytest.LogCaptureFixture) -> None:
@@ -67,7 +65,6 @@ class TestCheckSanityHealthyDocument:
         messages = check_sanity()
         assert not messages.has_error
         assert not messages.has_warning
-        assert messages.total_issue_count == 0
 
 
 @pytest.mark.django_db

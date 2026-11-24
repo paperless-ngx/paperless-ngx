@@ -4,14 +4,18 @@ from typing import TYPE_CHECKING
 from unittest import mock
 
 import pytest
+from asgiref.sync import async_to_sync
 from rest_framework import status
 from rest_framework.test import APIClient
 from rest_framework.test import APITestCase
 
+from documents.views import _iterate_in_sync_thread
 from paperless_testing.factories import UserFactory
 from paperless_testing.permissions import grant_global
 
 if TYPE_CHECKING:
+    from collections.abc import Generator
+
     from django.contrib.auth.models import User
     from pytest_mock import MockerFixture
 
@@ -62,7 +66,7 @@ class TestChatStreamingViewInputValidation(APITestCase):
             ),
             mock.patch(
                 "paperless_ai.chat.stream_chat_with_documents",
-                return_value=iter(chunks),
+                return_value=(c for c in chunks),
             ),
         ):
             resp = self.client.post(
@@ -74,7 +78,11 @@ class TestChatStreamingViewInputValidation(APITestCase):
 
         assert resp.status_code == status.HTTP_200_OK
         assert not resp.has_header("Content-Encoding")
-        assert list(resp.streaming_content) == [c.encode() for c in chunks]
+
+        async def read_parts() -> list[bytes]:
+            return [part async for part in resp.streaming_content]
+
+        assert async_to_sync(read_parts)() == [c.encode() for c in chunks]
 
     def test_missing_question_is_rejected(self) -> None:
         with mock.patch(
@@ -155,3 +163,74 @@ class TestChatStreamingViewUnrestrictedFlag:
         assert (
             mocked_stream_chat.call_args.kwargs["unrestricted"] is expected_unrestricted
         )
+
+
+class TestIterateInSyncThread:
+    @pytest.fixture
+    def events(self) -> list[str]:
+        return []
+
+    @pytest.fixture
+    def chunks(self, events: list[str]) -> Generator[str, None, None]:
+        def generate() -> Generator[str, None, None]:
+            try:
+                for chunk in ("first", "second"):
+                    events.append(f"produced {chunk}")
+                    yield chunk
+            finally:
+                events.append("closed")
+
+        return generate()
+
+    def test_yields_each_chunk_before_pulling_the_next(
+        self,
+        chunks: Generator[str, None, None],
+        events: list[str],
+    ) -> None:
+        """
+        GIVEN:
+            - A sync generator wrapped for async iteration
+        WHEN:
+            - The wrapper is consumed
+        THEN:
+            - Each chunk is delivered before the next one is generated,
+              rather than the whole generator being drained up front
+        """
+
+        async def consume() -> None:
+            async for chunk in _iterate_in_sync_thread(chunks):
+                events.append(f"received {chunk}")
+
+        async_to_sync(consume)()
+
+        assert events == [
+            "produced first",
+            "received first",
+            "produced second",
+            "received second",
+            "closed",
+        ]
+
+    def test_closing_early_closes_the_source_generator(
+        self,
+        chunks: Generator[str, None, None],
+        events: list[str],
+    ) -> None:
+        """
+        GIVEN:
+            - A sync generator wrapped for async iteration
+        WHEN:
+            - The consumer closes the wrapper after the first chunk, as
+              happens when the client disconnects
+        THEN:
+            - The source generator is closed, so its cleanup runs
+        """
+
+        async def consume_one() -> None:
+            wrapper = _iterate_in_sync_thread(chunks)
+            await anext(wrapper)
+            await wrapper.aclose()
+
+        async_to_sync(consume_one)()
+
+        assert events == ["produced first", "closed"]

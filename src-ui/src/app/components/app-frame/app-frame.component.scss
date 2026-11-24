@@ -700,3 +700,15 @@ main {
 .smaller {
   font-size: 0.75rem;
 }
+
+// From active / hover of sidebar nav links
+.btn-whats-new {
+  --bs-btn-color: var(--bs-primary);
+  --bs-btn-bg: color-mix(in srgb, var(--bs-primary) 13%, transparent);
+  --bs-btn-border-width: 0;
+  --bs-btn-font-weight: 600;
+  --bs-btn-hover-color: var(--bs-primary);
+  --bs-btn-hover-bg: color-mix(in srgb, var(--bs-primary) 20%, transparent);
+  --bs-btn-active-color: var(--bs-primary);
+  --bs-btn-active-bg: color-mix(in srgb, var(--bs-primary) 20%, transparent);
+}

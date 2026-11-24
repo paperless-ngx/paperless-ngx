@@ -87,6 +87,7 @@ import folderFill from 'bootstrap-icons/icons/folder-fill.svg'
 import folder from 'bootstrap-icons/icons/folder.svg'
 import funnel from 'bootstrap-icons/icons/funnel.svg'
 import gear from 'bootstrap-icons/icons/gear.svg'
+import github from 'bootstrap-icons/icons/github.svg'
 import globe2 from 'bootstrap-icons/icons/globe2.svg'
 import google from 'bootstrap-icons/icons/google.svg'
 import grid from 'bootstrap-icons/icons/grid.svg'
@@ -249,6 +250,7 @@ export const icons: Record<string, string> = {
   folderFill,
   funnel,
   gear,
+  github,
   globe2,
   google,
   grid,

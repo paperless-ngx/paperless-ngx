@@ -188,6 +188,62 @@ describe('ChatComponent', () => {
     expect(component.loading()).toBe(false)
   })
 
+  it('should reveal a complete answer within one second', () => {
+    component.input.set('Hello')
+    component.sendMessage()
+
+    const answer = 'A'.repeat(660)
+    mockStream$.next(answer)
+    mockStream$.complete()
+
+    expect(component.messages()[1].content.length).toBeGreaterThan(0)
+    expect(component.messages()[1].content.length).toBeLessThan(answer.length)
+    expect(component.loading()).toBe(true)
+
+    jest.advanceTimersByTime(800)
+    expect(component.messages()[1].content).toBe(answer)
+    expect(component.loading()).toBe(false)
+  })
+
+  it('should give a long answer more time to reveal', () => {
+    component.input.set('Hello')
+    component.sendMessage()
+
+    const answer = 'A'.repeat(3000)
+    mockStream$.next(answer)
+    mockStream$.complete()
+
+    jest.advanceTimersByTime(800)
+    expect(component.messages()[1].content.length).toBeLessThan(answer.length)
+    expect(component.loading()).toBe(true)
+
+    jest.advanceTimersByTime(2500)
+    expect(component.messages()[1].content).toBe(answer)
+    expect(component.loading()).toBe(false)
+  })
+
+  it('should reveal fast incoming chunks without making them pop in', () => {
+    component.input.set('Hello')
+    component.sendMessage()
+
+    let answer = ''
+    for (let i = 0; i < 20; i++) {
+      answer += 'A'.repeat(100)
+      const visibleBefore = component.messages()[1].content.length
+      mockStream$.next(answer)
+      jest.advanceTimersByTime(10)
+      expect(
+        component.messages()[1].content.length - visibleBefore
+      ).toBeLessThan(100)
+    }
+    expect(component.messages()[1].content.length).toBeLessThan(answer.length)
+
+    mockStream$.complete()
+    jest.advanceTimersByTime(5200)
+    expect(component.messages()[1].content).toBe(answer)
+    expect(component.loading()).toBe(false)
+  })
+
   it('should show a slow response message while waiting', () => {
     component.input.set('Hello')
     component.sendMessage()

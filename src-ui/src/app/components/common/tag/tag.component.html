@@ -1,13 +1,18 @@
 @if (tag()) {
-  @if (showParents() && tag().parent) {
-    <pngx-tag [tagID]="tag().parent" [clickable]="clickable()" [linkTitle]="linkTitle()"></pngx-tag>
-      &nbsp;&gt;&nbsp;
-  }
-  @if (!clickable()) {
-    <span class="badge" [style.background]="tag().color" [style.color]="tag().text_color">{{tag().name}}</span>
-  }
-  @if (clickable()) {
-    <a [title]="linkTitle()" class="badge" [style.background]="tag().color" [style.color]="tag().text_color">{{tag().name}}</a>
+  @if (ancestorSegments.length) {
+    <span #pill class="split-pill d-inline-flex mw-100" [title]="path()" (mouseleave)="setFocus(pill, null)">
+      @for (ancestor of ancestorSegments; track ancestor.id; let first = $first) {
+        <span #segment class="badge split-parent" [class.rounded-end-0]="first" [class.rounded-0]="!first" [style.background]="ancestor.color" [style.color]="ancestor.text_color" (mouseenter)="setFocus(pill, segment)" (click)="onParentClick($event, ancestor.id)">{{ancestor.name}}</span>
+      }
+      <span #leaf class="badge rounded-start-0 split-child" [style.background]="tag().color" [style.color]="tag().text_color" (mouseenter)="setFocus(pill, leaf)">{{tag().name}}</span>
+    </span>
+  } @else {
+    @if (!clickable()) {
+      <span class="badge" [style.background]="tag().color" [style.color]="tag().text_color">{{tag().name}}</span>
+    }
+    @if (clickable()) {
+      <a [title]="linkTitle()" class="badge" [style.background]="tag().color" [style.color]="tag().text_color">{{tag().name}}</a>
+    }
   }
 } @else if (loading) {
   <span class="placeholder-glow">

@@ -285,12 +285,12 @@ The API supports various bulk-editing operations which are executed asynchronous
 
 ### Documents
 
-Document bulk operations return `{"result":"OK","task_id":"…"}` when queued.
-Check `/api/tasks/?task_id={uuid}` for the outcome, including any follow-up processing,
-deletion, or recovery. Failed operations may leave partial changes applied.
-
-For operations with child tasks, `result_data` includes `succeeded_count` and
-`failed_count` (task counts). Merges report skipped inputs in `failed_document_ids`.
+Document bulk operations, including the dedicated document action endpoints, return
+`{"result":"OK","task_id":"…"}` when queued. Use `/api/tasks/?task_id={uuid}`
+to check the outcome, including follow-up processing, deletion, or recovery.
+Failed operations may leave partial changes applied. For operations with child tasks,
+`result_data` includes `succeeded_count` and `failed_count` (task counts). Merges
+report skipped inputs in `failed_document_ids`.
 
 The `/api/documents/bulk_edit/` endpoint accepts:
 
