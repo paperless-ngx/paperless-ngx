@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
+import os
 from typing import TYPE_CHECKING
 
 import pytest
 from hypothesis import HealthCheck
+from hypothesis import example
 from hypothesis import given
 from hypothesis import settings
 from hypothesis import strategies as st
@@ -17,6 +19,34 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 
+settings.register_profile(
+    "dev",
+    max_examples=50,
+    deadline=None,
+    suppress_health_check=[HealthCheck.function_scoped_fixture],
+)
+settings.register_profile(
+    "ci",
+    max_examples=100,
+    deadline=None,
+    suppress_health_check=[HealthCheck.function_scoped_fixture],
+)
+settings.register_profile(
+    "recorded",
+    max_examples=250,
+    deadline=None,
+    suppress_health_check=[HealthCheck.function_scoped_fixture],
+)
+settings.register_profile(
+    "stress",
+    max_examples=500,
+    deadline=None,
+    suppress_health_check=[HealthCheck.function_scoped_fixture],
+)
+if "HYPOTHESIS_PROFILE" in os.environ:
+    settings.load_profile(os.environ["HYPOTHESIS_PROFILE"])
+
+
 _SAFE_COMPONENT_STRATEGY = st.text(
     alphabet="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-",
     min_size=1,
@@ -26,8 +56,9 @@ _SAFE_COMPONENT_STRATEGY = st.text(
 
 class TestPathSecurity:
     @given(parts=st.lists(_SAFE_COMPONENT_STRATEGY, min_size=1, max_size=5))
+    @example(parts=["p_single_file.pdf"])
+    @example(parts=["p_dir", "p_subdir", "p_leaf.txt"])
     @settings(
-        max_examples=100,
         deadline=None,
         suppress_health_check=[HealthCheck.function_scoped_fixture],
     )
@@ -50,8 +81,9 @@ class TestPathSecurity:
         extra_depth=st.integers(min_value=1, max_value=8),
         filename=_SAFE_COMPONENT_STRATEGY,
     )
+    @example(prefix=[], extra_depth=1, filename="p_passwd")
+    @example(prefix=["p_sub"], extra_depth=2, filename="p_escape.txt")
     @settings(
-        max_examples=100,
         deadline=None,
         suppress_health_check=[HealthCheck.function_scoped_fixture],
     )
@@ -79,8 +111,9 @@ class TestPathSecurity:
         sibling_suffix=_SAFE_COMPONENT_STRATEGY,
         parts=st.lists(_SAFE_COMPONENT_STRATEGY, min_size=1, max_size=4),
     )
+    @example(sibling_suffix="rogue", parts=["p_secret.pdf"])
+    @example(sibling_suffix="_backup", parts=["p_sub", "p_file.png"])
     @settings(
-        max_examples=100,
         deadline=None,
         suppress_health_check=[HealthCheck.function_scoped_fixture],
     )
@@ -100,8 +133,8 @@ class TestPathSecurity:
             validate_path_in_root(sibling.joinpath(*parts), root)
 
     @given(filename=_SAFE_COMPONENT_STRATEGY)
+    @example(filename="p_sensitive_outside.txt")
     @settings(
-        max_examples=50,
         deadline=None,
         suppress_health_check=[HealthCheck.function_scoped_fixture],
     )
@@ -130,8 +163,8 @@ class TestPathSecurity:
             validate_path_in_root(symlink_in_root, root)
 
     @given(filename=_SAFE_COMPONENT_STRATEGY)
+    @example(filename="p_internal_target.txt")
     @settings(
-        max_examples=50,
         deadline=None,
         suppress_health_check=[HealthCheck.function_scoped_fixture],
     )

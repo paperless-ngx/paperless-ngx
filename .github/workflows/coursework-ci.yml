@@ -120,10 +120,12 @@ jobs:
       - run: uv sync --python 3.12 --group testing --frozen
       - name: Run PBT-03 and save evidence log
         shell: bash
+        env:
+          HYPOTHESIS_PROFILE: recorded
         run: |
           set -o pipefail
           mkdir -p .artifacts
-          uv run --python 3.12 --dev --frozen pytest src/documents/tests/test_path_security.py -k TestPathSecurity -v --hypothesis-seed=20261008 --hypothesis-show-statistics 2>&1 | tee .artifacts/pbt-03-run.log
+          uv run --python 3.12 --dev --frozen pytest src/documents/tests/test_path_security.py -k TestPathSecurity -v --hypothesis-seed=20261008 --hypothesis-show-statistics --cov=documents.file_handling --cov-report=term-missing 2>&1 | tee .artifacts/pbt-03-run.log
       - name: Upload PBT-03 test evidence
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: always()

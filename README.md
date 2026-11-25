@@ -28,12 +28,13 @@
 
 ## Quy trình
 
-Tái lập PBT-01/02 với seed cố định (Linux/macOS hoặc CI):
+Tái lập PBT-01/02/03 với seed cố định (Linux/macOS hoặc CI):
 
 ```bash
 uv sync --python 3.12 --group testing --frozen
 uv run --python 3.12 --dev --frozen pytest src/paperless/tests/test_parser_utils.py -k TestPostProcessText --hypothesis-seed=20261008
 uv run --python 3.12 --dev --frozen pytest src/documents/tests/search/test_unicode_normalization.py -k TestTheNormalizer --hypothesis-seed=20261008
+HYPOTHESIS_PROFILE=recorded uv run --python 3.12 --dev --frozen pytest src/documents/tests/test_path_security.py -k TestPathSecurity -v --hypothesis-seed=20261008 --hypothesis-show-statistics --cov=documents.file_handling --cov-report=term-missing
 ```
 
 1. Nhận việc từ Project, chuyển `Stage` sang `In Progress`.
