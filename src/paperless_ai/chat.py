@@ -3,6 +3,7 @@ import logging
 from collections.abc import AsyncIterator
 from contextlib import aclosing
 from typing import TYPE_CHECKING
+from typing import NamedTuple
 
 from asgiref.sync import sync_to_async
 from django.db import connections
@@ -22,6 +23,7 @@ from paperless_ai.prompts.context import ChatRefinePromptContext
 from paperless_ai.prompts.render import render_prompt
 
 if TYPE_CHECKING:
+    from llama_index.core.llms import LLM
     from llama_index.core.response_synthesizers import BaseSynthesizer
     from llama_index.core.schema import NodeWithScore
 
@@ -150,22 +152,90 @@ async def _stream_chat_with_documents(
     if prepared is None:
         yield CHAT_NO_CONTENT_MESSAGE
         return
-    response_synthesizer, top_nodes, references = prepared
 
     logger.debug("Document chat query: %s", query_str)
-    response_stream = await response_synthesizer.asynthesize(query_str, top_nodes)
+    try:
+        first_chunk, chunks, provider_stream = await _start_answer(
+            prepared.synthesizer,
+            query_str,
+            prepared.top_nodes,
+        )
+    except Exception as e:
+        if not _is_bad_request(e):
+            raise
+        logger.warning(
+            "The LLM server rejected the prompt (%s). Retrying with smaller "
+            "prompts. Set PAPERLESS_AI_LLM_CONTEXT_SIZE to the context size the "
+            "LLM server actually uses to avoid the extra request.",
+            e,
+        )
+        first_chunk, chunks, provider_stream = await _start_answer(
+            prepared.fallback_synthesizer,
+            query_str,
+            prepared.top_nodes,
+        )
+
     # llama-index forwards chunks without closing what it reads from, so own
     # the provider stream here. Exit order closes the forwarder, then the
     # provider stream, so a disconnect releases the LLM request immediately.
-    async with (
-        aclosing(response_stream.response_gen),
-        aclosing(response_stream.async_response_gen()) as chunks,
-    ):
+    async with aclosing(provider_stream), aclosing(chunks):
+        if first_chunk is not None:
+            yield first_chunk
         async for chunk in chunks:
             yield chunk
 
-    if references:
-        yield _format_chat_metadata_trailer(references)
+    if prepared.references:
+        yield _format_chat_metadata_trailer(prepared.references)
+
+
+class _PreparedChat(NamedTuple):
+    synthesizer: "BaseSynthesizer"
+    # Packs the retrieved chunks by the embedding chunk size, as chat did before
+    # it filled the context window. Used when the server rejects the larger prompt.
+    fallback_synthesizer: "BaseSynthesizer"
+    top_nodes: list["NodeWithScore"]
+    references: list[dict[str, int | str]]
+
+
+def _is_bad_request(exc: Exception) -> bool:
+    return getattr(exc, "status_code", None) == 400
+
+
+async def _start_answer(
+    synthesizer: "BaseSynthesizer",
+    query_str: str,
+    top_nodes: list["NodeWithScore"],
+) -> tuple[str | None, AsyncIterator[str], AsyncIterator[str]]:
+    """Begin the answer and pull its first chunk, so a server rejecting the prompt
+    surfaces here, before anything has been streamed to the user. Also returns the
+    provider stream, which the caller must close."""
+    response_stream = await synthesizer.asynthesize(query_str, top_nodes)
+    chunks = response_stream.async_response_gen()
+    return await anext(chunks, None), chunks, response_stream.response_gen
+
+
+def _build_synthesizer(
+    config: AIConfig,
+    llm: "LLM",
+    output_language: str | None,
+    *,
+    chunk_size: int,
+) -> "BaseSynthesizer":
+    from llama_index.core.prompts import PromptTemplate
+    from llama_index.core.response_synthesizers import get_response_synthesizer
+
+    return get_response_synthesizer(
+        llm=llm,
+        prompt_helper=get_rag_prompt_helper(
+            chunk_size=chunk_size,
+            context_size=config.llm_context_size,
+        ),
+        text_qa_template=PromptTemplate(template=_build_chat_prompt(output_language)),
+        refine_template=PromptTemplate(
+            template=_build_refine_prompt(output_language),
+        ),
+        streaming=True,
+    )
 
 
 def _prepare_chat(
@@ -174,7 +244,7 @@ def _prepare_chat(
     *,
     unrestricted: bool,
     output_language: str | None,
-) -> tuple["BaseSynthesizer", list["NodeWithScore"], list[dict[str, int | str]]] | None:
+) -> _PreparedChat | None:
     """Everything before the answer streams, all of it blocking: ORM queries,
     the index read lock and its thread-bound sqlite connection, the query
     embedding, and building the LLM client. Returns None when there is no
@@ -183,8 +253,6 @@ def _prepare_chat(
     if not documents.exists():
         return None
 
-    from llama_index.core.prompts import PromptTemplate
-    from llama_index.core.response_synthesizers import get_response_synthesizer
     from llama_index.core.retrievers import VectorIndexRetriever
 
     config = AIConfig()
@@ -232,21 +300,24 @@ def _prepare_chat(
     references = _get_document_references(documents, top_nodes)
 
     client = AIClient()
-    response_synthesizer = get_response_synthesizer(
-        llm=client.llm,
-        prompt_helper=get_rag_prompt_helper(
-            chunk_size=config.llm_embedding_chunk_size,
-            context_size=config.llm_context_size,
-        ),
-        text_qa_template=PromptTemplate(template=_build_chat_prompt(output_language)),
-        refine_template=PromptTemplate(
-            template=_build_refine_prompt(output_language),
-        ),
-        streaming=True,
+    # Chunk size limit equal to the context size lets llama_index pack the retrieved
+    # chunks into as few LLM calls as the window allows, instead of one call per
+    # embedding-sized chunk.
+    synthesizer = _build_synthesizer(
+        config,
+        client.llm,
+        output_language,
+        chunk_size=config.llm_context_size,
+    )
+    fallback_synthesizer = _build_synthesizer(
+        config,
+        client.llm,
+        output_language,
+        chunk_size=config.llm_embedding_chunk_size,
     )
 
     # No ORM access happens while the answer streams, so hand the pooled DB
     # connection back now rather than pin it for the whole stream. See #12976.
     connections.close_all()
 
-    return response_synthesizer, top_nodes, references
+    return _PreparedChat(synthesizer, fallback_synthesizer, top_nodes, references)

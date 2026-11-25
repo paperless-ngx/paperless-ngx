@@ -7,6 +7,7 @@ from unittest.mock import patch
 
 import pytest
 
+from paperless_ai.chat import _PreparedChat
 from paperless_ai.chat import stream_chat_with_documents
 
 if TYPE_CHECKING:
@@ -39,7 +40,7 @@ async def test_closing_after_a_chunk_closes_the_provider_stream() -> None:
 
     with patch(
         "paperless_ai.chat._prepare_chat",
-        return_value=(synthesizer, [], references),
+        return_value=_PreparedChat(synthesizer, synthesizer, [], references),
     ):
         chunks = stream_chat_with_documents("Any info?", MagicMock())
         assert await anext(chunks) == "first"
