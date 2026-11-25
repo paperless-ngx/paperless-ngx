@@ -90,6 +90,15 @@ def test_allauth_trusted_proxy_count_defaults_to_trusted_proxies(
     assert _get_allauth_trusted_proxy_count(["proxy-v4", "proxy-v6"]) == 2
 
 
+def test_token_throttle_proxy_count_uses_trusted_proxy_configuration() -> None:
+    expected = (
+        0
+        if paperless_settings.ALLAUTH_TRUSTED_CLIENT_IP_HEADER
+        else paperless_settings.ALLAUTH_TRUSTED_PROXY_COUNT
+    )
+    assert paperless_settings.REST_FRAMEWORK["NUM_PROXIES"] == expected
+
+
 def test_allauth_trusted_proxy_count_can_be_overridden(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
