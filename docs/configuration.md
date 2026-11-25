@@ -551,6 +551,12 @@ when its IPv4 and IPv6 addresses are both listed in
     Only trust `X-Forwarded-For` when untrusted clients cannot connect directly
     to Paperless-ngx.
 
+    This count also controls which address Django REST Framework uses from
+    `X-Forwarded-For` for the API token throttle. With a count of zero, the
+    throttle uses the connecting address instead. If
+    `PAPERLESS_ALLAUTH_TRUSTED_CLIENT_IP_HEADER` is set, the token throttle
+    uses the connecting address regardless of this count.
+
     Defaults to the number of entries in `PAPERLESS_TRUSTED_PROXIES`.
 
 #### [`PAPERLESS_ALLAUTH_TRUSTED_CLIENT_IP_HEADER=<header-name>`](#PAPERLESS_ALLAUTH_TRUSTED_CLIENT_IP_HEADER) {#PAPERLESS_ALLAUTH_TRUSTED_CLIENT_IP_HEADER}

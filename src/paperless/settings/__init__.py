@@ -505,6 +505,11 @@ ALLAUTH_TRUSTED_PROXY_COUNT = _get_allauth_trusted_proxy_count(TRUSTED_PROXIES)
 ALLAUTH_TRUSTED_CLIENT_IP_HEADER = os.getenv(
     "PAPERLESS_ALLAUTH_TRUSTED_CLIENT_IP_HEADER",
 )
+# Do not use client-supplied X-Forwarded-For values for the API token throttle.
+# A dedicated allauth header does not imply that X-Forwarded-For is trusted.
+REST_FRAMEWORK["NUM_PROXIES"] = (
+    0 if ALLAUTH_TRUSTED_CLIENT_IP_HEADER else ALLAUTH_TRUSTED_PROXY_COUNT
+)
 
 USE_X_FORWARDED_HOST = get_bool_from_env("PAPERLESS_USE_X_FORWARD_HOST", "false")
 USE_X_FORWARDED_PORT = get_bool_from_env("PAPERLESS_USE_X_FORWARD_PORT", "false")
