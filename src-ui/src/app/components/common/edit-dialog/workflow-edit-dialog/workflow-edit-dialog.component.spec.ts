@@ -1290,6 +1290,33 @@ describe('WorkflowEditDialogComponent', () => {
     ])
   })
 
+  it('should preserve commas in passwords when saving', () => {
+    component.object = {
+      name: 'Workflow with comma in password',
+      id: 1,
+      order: 1,
+      enabled: true,
+      triggers: [],
+      actions: [
+        {
+          id: 1,
+          type: WorkflowActionType.PasswordRemoval,
+          passwords: ['first,part', 'second'],
+        },
+      ],
+    }
+    component.ngOnInit()
+
+    const formActions = component.objectForm.get('actions') as FormArray
+    expect(formActions.value[0].passwords).toBe('first,part\nsecond')
+    component.save()
+
+    expect(component.objectForm.get('actions').value[0].passwords).toEqual([
+      'first,part',
+      'second',
+    ])
+  })
+
   it('should parse passwords again when retrying a failed save', () => {
     component.object = {
       name: 'Workflow with blank Passwords',
