@@ -1,7 +1,12 @@
 import json
 import logging
-import sys
+from collections.abc import AsyncIterator
+from contextlib import aclosing
+from typing import TYPE_CHECKING
+from typing import NamedTuple
 
+from asgiref.sync import sync_to_async
+from django.db import connections
 from django.db.models import QuerySet
 
 from documents.models import Document
@@ -16,6 +21,11 @@ from paperless_ai.indexing import read_store
 from paperless_ai.prompts.context import ChatQaPromptContext
 from paperless_ai.prompts.context import ChatRefinePromptContext
 from paperless_ai.prompts.render import render_prompt
+
+if TYPE_CHECKING:
+    from llama_index.core.llms import LLM
+    from llama_index.core.response_synthesizers import BaseSynthesizer
+    from llama_index.core.schema import NodeWithScore
 
 logger = logging.getLogger("paperless_ai.chat")
 
@@ -103,38 +113,146 @@ def _format_chat_metadata_trailer(references: list[dict[str, int | str]]) -> str
     )
 
 
-def stream_chat_with_documents(
+async def stream_chat_with_documents(
     query_str: str,
     documents: QuerySet[Document],
     *,
     unrestricted: bool = False,
     output_language: str | None = None,
-):
+) -> AsyncIterator[str]:
     try:
-        yield from _stream_chat_with_documents(
-            query_str,
-            documents,
-            unrestricted=unrestricted,
-            output_language=output_language,
-        )
+        async with aclosing(
+            _stream_chat_with_documents(
+                query_str,
+                documents,
+                unrestricted=unrestricted,
+                output_language=output_language,
+            ),
+        ) as chunks:
+            async for chunk in chunks:
+                yield chunk
     except Exception as e:
         logger.exception("Failed to stream document chat response: %s", e)
         yield CHAT_ERROR_MESSAGE
 
 
-def _stream_chat_with_documents(
+async def _stream_chat_with_documents(
     query_str: str,
     documents: QuerySet[Document],
     *,
     unrestricted: bool = False,
     output_language: str | None = None,
-):
-    if not documents.exists():
+) -> AsyncIterator[str]:
+    prepared = await sync_to_async(_prepare_chat)(
+        query_str,
+        documents,
+        unrestricted=unrestricted,
+        output_language=output_language,
+    )
+    if prepared is None:
         yield CHAT_NO_CONTENT_MESSAGE
         return
 
+    logger.debug("Document chat query: %s", query_str)
+    try:
+        first_chunk, chunks, provider_stream = await _start_answer(
+            prepared.synthesizer,
+            query_str,
+            prepared.top_nodes,
+        )
+    except Exception as e:
+        if not _is_bad_request(e):
+            raise
+        logger.warning(
+            "The LLM server rejected the prompt (%s). Retrying with smaller "
+            "prompts. Set PAPERLESS_AI_LLM_CONTEXT_SIZE to the context size the "
+            "LLM server actually uses to avoid the extra request.",
+            e,
+        )
+        first_chunk, chunks, provider_stream = await _start_answer(
+            prepared.fallback_synthesizer,
+            query_str,
+            prepared.top_nodes,
+        )
+
+    # llama-index forwards chunks without closing what it reads from, so own
+    # the provider stream here. Exit order closes the forwarder, then the
+    # provider stream, so a disconnect releases the LLM request immediately.
+    async with aclosing(provider_stream), aclosing(chunks):
+        if first_chunk is not None:
+            yield first_chunk
+        async for chunk in chunks:
+            yield chunk
+
+    if prepared.references:
+        yield _format_chat_metadata_trailer(prepared.references)
+
+
+class _PreparedChat(NamedTuple):
+    synthesizer: "BaseSynthesizer"
+    # Packs the retrieved chunks by the embedding chunk size, as chat did before
+    # it filled the context window. Used when the server rejects the larger prompt.
+    fallback_synthesizer: "BaseSynthesizer"
+    top_nodes: list["NodeWithScore"]
+    references: list[dict[str, int | str]]
+
+
+def _is_bad_request(exc: Exception) -> bool:
+    return getattr(exc, "status_code", None) == 400
+
+
+async def _start_answer(
+    synthesizer: "BaseSynthesizer",
+    query_str: str,
+    top_nodes: list["NodeWithScore"],
+) -> tuple[str | None, AsyncIterator[str], AsyncIterator[str]]:
+    """Begin the answer and pull its first chunk, so a server rejecting the prompt
+    surfaces here, before anything has been streamed to the user. Also returns the
+    provider stream, which the caller must close."""
+    response_stream = await synthesizer.asynthesize(query_str, top_nodes)
+    chunks = response_stream.async_response_gen()
+    return await anext(chunks, None), chunks, response_stream.response_gen
+
+
+def _build_synthesizer(
+    config: AIConfig,
+    llm: "LLM",
+    output_language: str | None,
+    *,
+    chunk_size: int,
+) -> "BaseSynthesizer":
     from llama_index.core.prompts import PromptTemplate
     from llama_index.core.response_synthesizers import get_response_synthesizer
+
+    return get_response_synthesizer(
+        llm=llm,
+        prompt_helper=get_rag_prompt_helper(
+            chunk_size=chunk_size,
+            context_size=config.llm_context_size,
+        ),
+        text_qa_template=PromptTemplate(template=_build_chat_prompt(output_language)),
+        refine_template=PromptTemplate(
+            template=_build_refine_prompt(output_language),
+        ),
+        streaming=True,
+    )
+
+
+def _prepare_chat(
+    query_str: str,
+    documents: QuerySet[Document],
+    *,
+    unrestricted: bool,
+    output_language: str | None,
+) -> _PreparedChat | None:
+    """Everything before the answer streams, all of it blocking: ORM queries,
+    the index read lock and its thread-bound sqlite connection, the query
+    embedding, and building the LLM client. Returns None when there is no
+    content to answer from.
+    """
+    if not documents.exists():
+        return None
+
     from llama_index.core.retrievers import VectorIndexRetriever
 
     config = AIConfig()
@@ -150,8 +268,6 @@ def _stream_chat_with_documents(
 
     # Hold the shared read lock only while reading the index, so the compaction
     # swap cannot replace the database file while this connection is open.
-    # Everything after retrieval works on the nodes already in memory, so a slow
-    # LLM stream never holds the lock.
     with read_store() as store:
         if permitted_ids is not None:
             filters = _permitted_documents_filter(store, permitted_ids)
@@ -179,35 +295,29 @@ def _stream_chat_with_documents(
 
     if not top_nodes:
         logger.warning("No nodes found for the given documents.")
-        yield CHAT_NO_CONTENT_MESSAGE
-        return
-
-    client = AIClient()
+        return None
 
     references = _get_document_references(documents, top_nodes)
 
-    prompt_template = PromptTemplate(template=_build_chat_prompt(output_language))
-    refine_template = PromptTemplate(template=_build_refine_prompt(output_language))
-    response_synthesizer = get_response_synthesizer(
-        llm=client.llm,
-        prompt_helper=get_rag_prompt_helper(
-            chunk_size=config.llm_embedding_chunk_size,
-            context_size=config.llm_context_size,
-        ),
-        text_qa_template=prompt_template,
-        refine_template=refine_template,
-        streaming=True,
+    client = AIClient()
+    # Chunk size limit equal to the context size lets llama_index pack the retrieved
+    # chunks into as few LLM calls as the window allows, instead of one call per
+    # embedding-sized chunk.
+    synthesizer = _build_synthesizer(
+        config,
+        client.llm,
+        output_language,
+        chunk_size=config.llm_context_size,
+    )
+    fallback_synthesizer = _build_synthesizer(
+        config,
+        client.llm,
+        output_language,
+        chunk_size=config.llm_embedding_chunk_size,
     )
 
-    logger.debug("Document chat query: %s", query_str)
-    # Release the pooled DB connection for the slow streaming LLM response
-    # so it is not pinned for the whole stream; see paperless_ai.db and
-    # #12976.
-    with db_connection_released():
-        response_stream = response_synthesizer.synthesize(query_str, top_nodes)
-        for chunk in response_stream.response_gen:
-            yield chunk
-            sys.stdout.flush()
+    # No ORM access happens while the answer streams, so hand the pooled DB
+    # connection back now rather than pin it for the whole stream. See #12976.
+    connections.close_all()
 
-        if references:
-            yield _format_chat_metadata_trailer(references)
+    return _PreparedChat(synthesizer, fallback_synthesizer, top_nodes, references)

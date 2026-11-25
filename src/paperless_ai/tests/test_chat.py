@@ -4,10 +4,12 @@ import json
 from contextlib import contextmanager
 from typing import TYPE_CHECKING
 from typing import Any
+from unittest.mock import AsyncMock
 from unittest.mock import MagicMock
 from unittest.mock import patch
 
 import pytest
+from asgiref.sync import async_to_sync
 from django.db.models.signals import post_init
 from django.utils import timezone
 from llama_index.core import settings as llama_settings
@@ -26,6 +28,7 @@ from paperless_ai.chat import stream_chat_with_documents
 from paperless_testing.factories import DocumentFactory
 
 if TYPE_CHECKING:
+    from collections.abc import AsyncIterator
     from collections.abc import Iterator
     from pathlib import Path
 
@@ -64,6 +67,32 @@ def assert_chat_output(
     assert json.loads(trailer.removeprefix(CHAT_METADATA_DELIMITER)) == {
         "references": expected_references,
     }
+
+
+def collect(chunks: AsyncIterator[str]) -> list[str]:
+    """Drain the chat stream from sync test code. Its blocking setup then runs
+    on the test's own thread, inside the test's DB transaction."""
+
+    async def drain() -> list[str]:
+        return [chunk async for chunk in chunks]
+
+    return async_to_sync(drain)()
+
+
+def fake_response_stream(chunks: list[str]) -> MagicMock:
+    """An AsyncStreamingResponse stand-in yielding ``chunks``."""
+
+    async def response_gen() -> AsyncIterator[str]:
+        for chunk in chunks:
+            yield chunk
+
+    async def async_response_gen() -> AsyncIterator[str]:
+        async for chunk in stream.response_gen:
+            yield chunk
+
+    stream = MagicMock(async_response_gen=async_response_gen)
+    stream.response_gen = response_gen()
+    return stream
 
 
 def _fake_documents_queryset(pks: list[int]) -> MagicMock:
@@ -170,19 +199,19 @@ def test_stream_chat_with_one_document_retrieval(
             ),
         ]
 
-        mock_response_stream = MagicMock()
-        mock_response_stream.response_gen = iter(["chunk1", "chunk2"])
         mock_synthesizer = mock_get_response_synthesizer.return_value
-        mock_synthesizer.synthesize.return_value = mock_response_stream
+        mock_synthesizer.asynthesize = AsyncMock(
+            return_value=fake_response_stream(["chunk1", "chunk2"]),
+        )
 
         with patch(
             "llama_index.core.retrievers.VectorIndexRetriever",
             return_value=mock_retriever_instance,
         ):
-            output = list(stream_chat_with_documents("What is this?", documents))
+            output = collect(stream_chat_with_documents("What is this?", documents))
 
         mock_retriever_instance.retrieve.assert_called_once_with("What is this?")
-        mock_synthesizer.synthesize.assert_called_once_with(
+        mock_synthesizer.asynthesize.assert_awaited_once_with(
             "What is this?",
             mock_retriever_instance.retrieve.return_value,
         )
@@ -236,20 +265,19 @@ def test_stream_chat_with_multiple_documents_retrieval(patch_embed_nodes) -> Non
             MagicMock(metadata={"document_id": str(doc2.pk), "title": "Document 2"}),
         ]
 
-        mock_response_stream = MagicMock()
-        mock_response_stream.response_gen = iter(["chunk1", "chunk2"])
-
         mock_synthesizer = mock_get_response_synthesizer.return_value
-        mock_synthesizer.synthesize.return_value = mock_response_stream
+        mock_synthesizer.asynthesize = AsyncMock(
+            return_value=fake_response_stream(["chunk1", "chunk2"]),
+        )
 
         with patch(
             "llama_index.core.retrievers.VectorIndexRetriever",
             return_value=mock_retriever_instance,
         ):
-            output = list(stream_chat_with_documents("What's up?", documents))
+            output = collect(stream_chat_with_documents("What's up?", documents))
 
         mock_retriever_instance.retrieve.assert_called_once_with("What's up?")
-        mock_synthesizer.synthesize.assert_called_once_with(
+        mock_synthesizer.asynthesize.assert_awaited_once_with(
             "What's up?",
             mock_retriever_instance.retrieve.return_value,
         )
@@ -266,7 +294,9 @@ def test_stream_chat_with_multiple_documents_retrieval(patch_embed_nodes) -> Non
 
 def test_stream_chat_empty_document_list() -> None:
     with patch("paperless_ai.chat.load_or_build_index") as mock_load_index:
-        output = list(stream_chat_with_documents("Any info?", Document.objects.none()))
+        output = collect(
+            stream_chat_with_documents("Any info?", Document.objects.none()),
+        )
         mock_load_index.assert_not_called()
         assert output == ["Sorry, I couldn't find any content to answer your question."]
 
@@ -286,7 +316,7 @@ def test_stream_chat_no_matching_nodes() -> None:
         mock_index.vector_store.get_nodes.return_value = []
         mock_load_index.return_value = mock_index
 
-        output = list(
+        output = collect(
             stream_chat_with_documents("Any info?", _fake_documents_queryset([1])),
         )
 
@@ -317,7 +347,7 @@ def test_stream_chat_unexpected_failure_returns_generic_error(caplog) -> None:
             )
             mock_retriever_cls.return_value = mock_retriever
 
-            output = list(
+            output = collect(
                 stream_chat_with_documents("Any info?", _fake_documents_queryset([1])),
             )
 
@@ -367,7 +397,7 @@ class TestStreamChatRetrieval:
     ) -> None:
         doc = DocumentFactory.create(content="hello world")
         # Nothing indexed for this document yet.
-        out = list(
+        out = collect(
             chat.stream_chat_with_documents(
                 "question?",
                 Document.objects.filter(pk=doc.pk),
@@ -390,7 +420,7 @@ class TestStreamChatRetrieval:
         indexing.llm_index_add_or_update_document(included)
         indexing.llm_index_add_or_update_document(excluded)
 
-        list(
+        collect(
             chat.stream_chat_with_documents(
                 "question?",
                 Document.objects.filter(pk=included.pk),
@@ -419,7 +449,7 @@ class TestStreamChatRetrieval:
         document = DocumentFactory.create(content="indexed document content")
         indexing.llm_index_add_or_update_document(document)
 
-        list(
+        collect(
             chat.stream_chat_with_documents(
                 "question?",
                 Document.objects.filter(pk=document.pk),
@@ -455,7 +485,7 @@ class TestStreamChatRetrieval:
             deleted_at=timezone.now(),
         )
 
-        list(
+        collect(
             chat.stream_chat_with_documents(
                 "question?",
                 Document.objects.filter(pk=kept.pk),
@@ -487,7 +517,7 @@ class TestStreamChatRetrieval:
             indexing.llm_index_add_or_update_document(doc)
         permitted = Document.objects.filter(pk__in=[docs[0].pk, docs[1].pk])
 
-        list(chat.stream_chat_with_documents("question?", permitted))
+        collect(chat.stream_chat_with_documents("question?", permitted))
 
         metadata_filter = captured_filters[0].filters[0]
         assert metadata_filter.operator == FilterOperator.NIN
@@ -520,16 +550,21 @@ class TestStreamChatRetrieval:
         synthesizer = mocker.patch(
             "llama_index.core.response_synthesizers.get_response_synthesizer",
         ).return_value
-        synthesizer.synthesize.return_value.response_gen = iter(["chunk"])
+        synthesizer.asynthesize = AsyncMock(
+            return_value=fake_response_stream(["chunk"]),
+        )
 
-        list(
+        collect(
             chat.stream_chat_with_documents(
                 "question?",
                 Document.objects.filter(pk=permitted_doc.pk),
             ),
         )
 
-        synthesizer.synthesize.assert_called_once_with("question?", [permitted_node])
+        synthesizer.asynthesize.assert_awaited_once_with(
+            "question?",
+            [permitted_node],
+        )
 
     @pytest.mark.django_db
     def test_get_document_references_only_queries_referenced_documents(
@@ -612,9 +647,9 @@ class TestChatReadLock:
             ]
         )
 
-        def synthesize(*_args: object) -> object:
+        def asynthesize(*_args: object) -> MagicMock:
             events.append("synthesize")
-            return mocker.MagicMock(response_gen=iter(["chunk"]))
+            return fake_response_stream(["chunk"])
 
         mocker.patch("paperless_ai.chat.read_store", fake_read_store)
         mocker.patch("paperless_ai.chat.AIClient")
@@ -625,9 +660,9 @@ class TestChatReadLock:
         )
         mocker.patch(
             "llama_index.core.response_synthesizers.get_response_synthesizer",
-        ).return_value.synthesize.side_effect = synthesize
+        ).return_value.asynthesize = AsyncMock(side_effect=asynthesize)
 
-        list(
+        collect(
             stream_chat_with_documents(
                 "What is this?",
                 Document.objects.filter(pk=document.pk),

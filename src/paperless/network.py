@@ -1,3 +1,4 @@
+import asyncio
 import ipaddress
 import socket
 from collections.abc import Collection
@@ -175,7 +176,9 @@ class PinnedHostAsyncHTTPTransport(httpx.AsyncHTTPTransport):
         self.allow_internal = allow_internal
 
     async def handle_async_request(self, request: httpx.Request) -> httpx.Response:
-        request = _rewrite_request_to_pinned_ip(
+        # Resolving the host blocks, so keep it off the event loop
+        request = await asyncio.to_thread(
+            _rewrite_request_to_pinned_ip,
             request,
             allow_internal=self.allow_internal,
         )

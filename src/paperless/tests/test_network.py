@@ -1,10 +1,18 @@
+from __future__ import annotations
+
+import asyncio
+from typing import TYPE_CHECKING
 from unittest import mock
 
 import httpx
 import pytest
 
+from paperless.network import PinnedHostAsyncHTTPTransport
 from paperless.network import PinnedHostHTTPTransport
 from paperless.network import is_public_ip
+
+if TYPE_CHECKING:
+    from pytest_mock import MockerFixture
 
 
 def test_pinned_host_transport_blocks_internal_rebinding():
@@ -49,6 +57,58 @@ def test_pinned_host_transport_rewrites_to_vetted_ip():
         response = transport.handle_request(request)
 
     assert response.status_code == 200
+
+
+class TestPinnedHostAsyncHTTPTransport:
+    def test_blocks_internal_rebinding(self, mocker: MockerFixture) -> None:
+        """
+        GIVEN:
+            - A hostname that resolves to a loopback address
+        WHEN:
+            - The async transport sends a request to it
+        THEN:
+            - The request is refused as a non-public address
+        """
+        mocker.patch(
+            "paperless.network.resolve_hostname_ips",
+            return_value=["127.0.0.1"],
+        )
+        transport = PinnedHostAsyncHTTPTransport(allow_internal=False)
+        request = httpx.Request("GET", "http://example.com/test")
+
+        with pytest.raises(httpx.ConnectError, match="non-public address"):
+            asyncio.run(transport.handle_async_request(request))
+
+    def test_rewrites_to_vetted_ip(self, mocker: MockerFixture) -> None:
+        """
+        GIVEN:
+            - A hostname that resolves to a public address
+        WHEN:
+            - The async transport sends a request to it
+        THEN:
+            - The connection goes to that address, keeping the original Host
+              header and TLS SNI hostname
+        """
+        mocker.patch(
+            "paperless.network.resolve_hostname_ips",
+            return_value=["93.184.216.34"],
+        )
+        sent = mocker.patch.object(
+            httpx.AsyncHTTPTransport,
+            "handle_async_request",
+            autospec=True,
+            side_effect=lambda _self, req: httpx.Response(200, request=req),
+        )
+        transport = PinnedHostAsyncHTTPTransport(allow_internal=False)
+        request = httpx.Request("GET", "https://example.com:8443/test")
+
+        response = asyncio.run(transport.handle_async_request(request))
+
+        assert response.status_code == 200
+        rewritten = sent.call_args.args[1]
+        assert str(rewritten.url) == "https://93.184.216.34:8443/test"
+        assert rewritten.headers["Host"] == "example.com:8443"
+        assert rewritten.extensions["sni_hostname"] == "example.com"
 
 
 @pytest.mark.parametrize(
