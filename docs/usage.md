@@ -659,7 +659,7 @@ will be aborted and the file will be deleted.
 
 "Password Removal" actions attempt to remove password protection from encrypted PDF documents. You can specify:
 
-- One or more passwords to try, separated by commas or new lines
+- One or more passwords to try, one per line (commas within a password are supported)
 - Each password is tried in order until one successfully unlocks the document
 
 Password removal never modifies a file in place. Instead, once a working password is found, the
