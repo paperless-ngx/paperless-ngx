@@ -38,9 +38,11 @@ jobs:
           uv pip freeze >> pbt-04-evidence/environment.txt
       - name: Run properties
         shell: bash
+        env:
+          HYPOTHESIS_PROFILE: recorded
         run: |
           set -o pipefail
-          uv run --python 3.12 --group testing --frozen pytest src/documents/tests/test_parsers.py -k TestMimeExtensionProperties -n 0 --hypothesis-seed=13 --hypothesis-show-statistics --junitxml=pbt-04-evidence/properties.xml 2>&1 | tee pbt-04-evidence/properties.log
+          uv run --python 3.12 --group testing --frozen pytest src/documents/tests/test_parsers.py -k TestMimeExtensionProperties -n 0 -v --hypothesis-seed=13 --hypothesis-show-statistics --cov=documents.parsers --cov-branch --cov-report=term-missing --junitxml=pbt-04-evidence/properties.xml 2>&1 | tee pbt-04-evidence/properties.log
       - name: Run parser regressions
         if: ${{ !cancelled() }}
         shell: bash

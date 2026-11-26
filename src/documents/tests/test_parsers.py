@@ -1,3 +1,4 @@
+import os
 from collections.abc import Generator
 from contextlib import contextmanager
 from string import ascii_letters
@@ -26,6 +27,23 @@ from paperless.parsers.remote import RemoteDocumentParser
 from paperless.parsers.tesseract import RasterisedDocumentParser
 from paperless.parsers.text import TextDocumentParser
 from paperless.parsers.tika import TikaDocumentParser
+
+for _profile_name, _max_examples in (
+    ("default_pbt04", 100),
+    ("dev", 50),
+    ("ci", 100),
+    ("recorded", 250),
+    ("stress", 500),
+):
+    hypothesis_settings.register_profile(
+        _profile_name,
+        max_examples=_max_examples,
+        deadline=None,
+        print_blob=True,
+    )
+_pbt04_settings = hypothesis_settings.get_profile(
+    os.environ.get("HYPOTHESIS_PROFILE", "default_pbt04"),
+)
 
 
 @pytest.fixture()
@@ -184,7 +202,7 @@ def _registry_mappings(draw):
 class TestMimeExtensionProperties:
     @pytest.mark.parametrize("tika_enabled", [False, True])
     @given(data=st.data())
-    @hypothesis_settings(max_examples=100, deadline=None, print_blob=True)
+    @_pbt04_settings
     def test_supported_mime_has_valid_extension(self, tika_enabled, data) -> None:
         with _isolated_builtin_registry(tika_enabled=tika_enabled):
             registry = document_parsers.get_parser_registry()
@@ -225,7 +243,7 @@ class TestMimeExtensionProperties:
             )
 
     @given(data=st.data())
-    @hypothesis_settings(max_examples=100, deadline=None, print_blob=True)
+    @_pbt04_settings
     def test_extension_membership_is_case_insensitive(self, data) -> None:
         with _isolated_builtin_registry(tika_enabled=False):
             extensions = get_supported_file_extensions()
@@ -259,7 +277,7 @@ class TestMimeExtensionProperties:
             {"application/x-pbt-a": [".alias"], "application/x-pbt-b": []},
         ),
     )
-    @hypothesis_settings(max_examples=100, deadline=None, print_blob=True)
+    @_pbt04_settings
     def test_registry_extensions_include_defaults_and_aliases(self, case) -> None:
         mappings, aliases = case
         expected = {ext for mapping in mappings for ext in mapping.values()} | {
@@ -305,3 +323,17 @@ class TestMimeExtensionProperties:
             assert get_default_file_extension("application/zip") == ".zip"
             assert not is_mime_type_supported("application/x-pbt-unknown")
             assert get_default_file_extension("application/x-pbt-unknown") == ""
+
+    def test_parser_without_mapping_uses_mimetypes_fallback(self) -> None:
+        parser = SimpleNamespace(supported_mime_types=dict)
+        registry = SimpleNamespace(get_parser_for_file=lambda *_args: parser)
+        with (
+            patch("documents.parsers.get_parser_registry", return_value=registry),
+            patch(
+                "documents.parsers.mimetypes.guess_extension",
+                return_value=".fallback",
+            ),
+        ):
+            assert get_default_file_extension("application/x-pbt-fallback") == (
+                ".fallback"
+            )

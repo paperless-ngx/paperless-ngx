@@ -11,7 +11,7 @@ Nhóm kiểm thử một baseline cố định của Paperless-ngx như QA độ
 | PBT-01 Text normalization | `paperless.parsers.utils.post_process_text`     | [Cycle 3 evidence](pbt-01-cycle-3-evidence.md): idempotence; loại NUL; chuẩn hóa khoảng trắng nhưng giữ ranh giới dòng                                                            |
 | PBT-02 Unicode search     | `documents.search._query.normalize_search_text` | [Cycle 3 evidence](pbt-02-cycle-3-evidence.md): NFC idempotence; chuỗi Unicode tương đương cho cùng kết quả; input NFC không đổi nghĩa                                            |
 | PBT-03 Path security      | `documents.file_handling.validate_path_in_root` | [Thiết kế](pbt-03-path-security-design.md), [Bằng chứng Cycle 3](pbt-03-cycle-3-evidence.md): path trong root hợp lệ; traversal/prefix confusion bị chặn; symlink không vượt biên |
-| PBT-04 MIME-extension     | `documents.parsers`                             | MIME hỗ trợ có extension; extension không phân biệt hoa thường; registry và supported set nhất quán                                                                               |
+| PBT-04 MIME-extension     | `documents.parsers`                             | [Cycle 3 evidence](pbt-04-cycle-3-evidence.md): MIME hỗ trợ có extension; extension không phân biệt hoa thường; registry và supported set nhất quán                               |
 | PBT-05 Parser selection   | `ParserRegistry.get_parser_for_file`            | [Thiết kế](pbt-05-parser-selection-design.md): Score cao nhất thắng; external thắng khi hòa; remote bị loại khi `allow_remote=false`                                              |
 
 Mỗi suite phải có ít nhất 3 property độc lập, strategy có giới hạn, shrinking, seed tái lập và counterexample tối thiểu.
