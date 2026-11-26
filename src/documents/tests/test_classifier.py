@@ -1,3 +1,5 @@
+import hashlib
+import hmac
 import pickle
 import warnings
 from datetime import UTC
@@ -31,6 +33,7 @@ from documents.models import Tag
 from documents.tests.helpers import dummy_preprocess
 from paperless.settings import CLASSIFIER_LANGUAGES
 from paperless.signed_pickle import HMAC_SIZE
+from paperless.signed_pickle import compute_signature
 from paperless.signed_pickle import signed_pickle_dumps
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import DocumentFactory
@@ -423,7 +426,7 @@ class TestClassifier(DirectoriesMixin, TestCase):
             - The ClassifierModelCorruptError is raised
         """
         garbage_data = b"this is not valid pickle data"
-        signature = DocumentClassifier._compute_hmac(garbage_data)
+        signature = compute_signature(garbage_data)
         Path(settings.MODEL_FILE).write_bytes(signature + garbage_data)
 
         with self.assertRaises(ClassifierModelCorruptError):
@@ -944,9 +947,17 @@ class TestClassifierSave:
         classifier.save()
 
         raw = model_file.read_bytes()
-        signature = raw[: DocumentClassifier.HMAC_SIZE]
-        data = raw[DocumentClassifier.HMAC_SIZE :]
-        assert signature == DocumentClassifier._compute_hmac(data)
+        signature = raw[:HMAC_SIZE]
+        data = raw[HMAC_SIZE:]
+        # Computed independently so the on-disk format stays what is documented
+        assert (
+            signature
+            == hmac.new(
+                settings.SECRET_KEY.encode(),
+                data,
+                hashlib.sha256,
+            ).digest()
+        )
         # A pickle opens with the PROTO opcode followed by the protocol number
         assert data[:2] == bytes([pickle.PROTO[0], pickle.HIGHEST_PROTOCOL])
         assert pickle.loads(data)[:3] == (

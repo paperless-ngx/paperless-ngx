@@ -12,6 +12,8 @@ from django.test import override_settings
 from paperless.celery import signed_pickle_dumps
 from paperless.celery import signed_pickle_loads
 from paperless.signed_pickle import HMAC_SIZE
+from paperless.signed_pickle import compute_signature
+from paperless.signed_pickle import verify_signed
 
 
 def test_tasks_registered_without_system_checks() -> None:
@@ -79,6 +81,14 @@ class TestSignedPickleSerializer:
         tampered[0] ^= 0xFF
         with pytest.raises(ValueError, match="HMAC verification failed"):
             signed_pickle_loads(bytes(tampered))
+
+    def test_verified_data_is_a_view_not_a_copy(self) -> None:
+        """Verified data is a view of the payload, so large payloads aren't copied."""
+        data = b"x" * 1024
+        payload = compute_signature(data) + data
+        verified = verify_signed(payload)
+        assert verified.obj is payload
+        assert bytes(verified) == data
 
     def test_truncated_payload_rejected(self) -> None:
         """A payload shorter than HMAC_SIZE is rejected."""

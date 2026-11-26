@@ -87,7 +87,6 @@ src/documents/classifier.py:0: error: Incompatible types in assignment (expressi
 src/documents/classifier.py:0: error: Incompatible types in assignment (expression has type "None", variable has type "DocumentClassifier")  [assignment]
 src/documents/classifier.py:0: error: Incompatible types in assignment (expression has type "None", variable has type "DocumentClassifier")  [assignment]
 src/documents/classifier.py:0: error: Incompatible types in assignment (expression has type "str", variable has type "None")  [assignment]
-src/documents/classifier.py:0: error: Item "None" of "str | None" has no attribute "encode"  [union-attr]
 src/documents/classifier.py:0: error: List comprehension has incompatible type List[int]; expected List[list[int]]  [misc]
 src/documents/classifier.py:0: error: Module "sklearn.exceptions" has no attribute "InconsistentVersionWarning"  [attr-defined]
 src/documents/classifier.py:0: error: Unsupported operand types for >= ("datetime" and "None")  [operator]
