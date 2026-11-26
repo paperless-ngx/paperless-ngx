@@ -28,7 +28,7 @@
 
 ## Quy trình
 
-Tái lập PBT-01/02/03/04 với seed cố định (Linux/macOS hoặc CI):
+Tái lập PBT-01/02/03/04/05 với seed cố định (Linux/macOS hoặc CI):
 
 ```bash
 uv sync --python 3.12 --group testing --frozen
@@ -36,6 +36,7 @@ HYPOTHESIS_PROFILE=recorded uv run --python 3.12 --dev --frozen pytest src/paper
 HYPOTHESIS_PROFILE=recorded uv run --python 3.12 --dev --frozen pytest src/documents/tests/search/test_unicode_normalization.py -k TestTheNormalizer -n 0 --hypothesis-seed=20261008 --hypothesis-show-statistics --cov=documents.search._query --cov-branch --cov-report=term-missing
 HYPOTHESIS_PROFILE=recorded uv run --python 3.12 --dev --frozen pytest src/documents/tests/test_path_security.py -k TestPathSecurity -n 0 -v --hypothesis-seed=20261008 --hypothesis-show-statistics --cov=documents.file_handling --cov-branch --cov-report=term-missing
 HYPOTHESIS_PROFILE=recorded uv run --python 3.12 --group testing --frozen pytest src/documents/tests/test_parsers.py -k TestMimeExtensionProperties -n 0 --hypothesis-seed=13 --hypothesis-show-statistics --cov=documents.parsers --cov-branch --cov-report=term-missing
+HYPOTHESIS_PROFILE=recorded uv run --python 3.12 --dev --frozen pytest src/paperless/tests/test_parser_selection_pbt.py -k TestPbtParserSelection -n 0 --hypothesis-seed=20261008 --hypothesis-show-statistics --cov=paperless.parsers.registry --cov-branch --cov-report=term-missing
 ```
 
 1. Nhận việc từ Project, chuyển `Stage` sang `In Progress`.

@@ -4,15 +4,18 @@ Suite: PBT-05 Parser selection
 Target: paperless.parsers.registry.ParserRegistry.get_parser_for_file
 Owner: Phùng Nguyễn Hoài Bo (@HubertPhung)
 Reviewer: Vũ Thế Huỳnh (@1convitt)
-Issue: #14
+Issue: #14, #39
 """
 
 from __future__ import annotations
 
 import importlib.util
+import os
 from pathlib import Path
 from typing import NamedTuple
 
+from hypothesis import HealthCheck
+from hypothesis import example
 from hypothesis import given
 from hypothesis import settings
 from hypothesis import strategies as st
@@ -28,6 +31,24 @@ except ImportError:
     _mod = importlib.util.module_from_spec(_spec)  # type: ignore[arg-type]
     _spec.loader.exec_module(_mod)  # type: ignore[union-attr]
     ParserRegistry = _mod.ParserRegistry
+
+
+for _profile_name, _max_examples in [
+    ("dev", 50),
+    ("ci", 100),
+    ("default_pbt05", 200),
+    ("recorded", 250),
+    ("stress", 500),
+]:
+    settings.register_profile(
+        _profile_name,
+        max_examples=_max_examples,
+        deadline=None,
+        suppress_health_check=[HealthCheck.function_scoped_fixture],
+    )
+_pbt05_settings = settings.get_profile(
+    os.environ.get("HYPOTHESIS_PROFILE", "default_pbt05"),
+)
 
 
 class MockParserSpec(NamedTuple):
@@ -95,7 +116,47 @@ class TestPbtParserSelection:
         target_mime=st.sampled_from(MIME_POOL),
         allow_remote=st.booleans(),
     )
-    @settings(max_examples=200, deadline=None)
+    @example(
+        specs=[
+            MockParserSpec(
+                "low",
+                ("application/pdf",),
+                10,
+                is_external=False,
+                uses_remote_service=False,
+            ),
+            MockParserSpec(
+                "high",
+                ("application/pdf",),
+                95,
+                is_external=True,
+                uses_remote_service=False,
+            ),
+        ],
+        target_mime="application/pdf",
+        allow_remote=True,
+    )
+    @example(
+        specs=[
+            MockParserSpec(
+                "neg_a",
+                ("text/plain",),
+                -100,
+                is_external=False,
+                uses_remote_service=False,
+            ),
+            MockParserSpec(
+                "neg_b",
+                ("text/plain",),
+                -1,
+                is_external=False,
+                uses_remote_service=False,
+            ),
+        ],
+        target_mime="text/plain",
+        allow_remote=False,
+    )
+    @_pbt05_settings
     def test_highest_scoring_eligible_parser_wins(
         self,
         specs: list[MockParserSpec],
@@ -151,7 +212,9 @@ class TestPbtParserSelection:
         builtin_count=st.integers(min_value=1, max_value=4),
         target_mime=st.sampled_from(MIME_POOL),
     )
-    @settings(max_examples=200, deadline=None)
+    @example(tie_score=0, ext_count=1, builtin_count=1, target_mime="application/pdf")
+    @example(tie_score=50, ext_count=2, builtin_count=3, target_mime="image/png")
+    @_pbt05_settings
     def test_external_parser_wins_tie_with_builtin(
         self,
         tie_score: int,
@@ -213,7 +276,17 @@ class TestPbtParserSelection:
         ),
         target_mime=st.sampled_from(MIME_POOL),
     )
-    @settings(max_examples=200, deadline=None)
+    @example(
+        remote_scores=[100],
+        local_scores=[10],
+        target_mime="application/pdf",
+    )
+    @example(
+        remote_scores=[90, 95],
+        local_scores=[None],
+        target_mime="text/plain",
+    )
+    @_pbt05_settings
     def test_remote_parsers_excluded_when_not_allowed(
         self,
         remote_scores: list[int],
@@ -276,7 +349,8 @@ class TestPbtParserSelection:
         filename=st.text(min_size=1, max_size=20),
         allow_remote=st.booleans(),
     )
-    @settings(max_examples=200, deadline=None)
+    @example(target_mime="application/pdf", filename="empty.pdf", allow_remote=True)
+    @_pbt05_settings
     def test_none_returned_when_registry_is_empty(
         self,
         target_mime: str,
@@ -311,7 +385,20 @@ class TestPbtParserSelection:
         target_mime=st.sampled_from(MIME_POOL),
         allow_remote=st.booleans(),
     )
-    @settings(max_examples=200, deadline=None)
+    @example(
+        specs=[
+            MockParserSpec(
+                "only_other",
+                ("other/unsupported-mime",),
+                80,
+                is_external=False,
+                uses_remote_service=False,
+            ),
+        ],
+        target_mime="application/pdf",
+        allow_remote=True,
+    )
+    @_pbt05_settings
     def test_none_returned_when_mime_unsupported_despite_valid_scores(
         self,
         specs: list[MockParserSpec],
@@ -353,7 +440,19 @@ class TestPbtParserSelection:
         ),
         allow_remote=st.booleans(),
     )
-    @settings(max_examples=200, deadline=None)
+    @example(
+        specs=[
+            MockParserSpec(
+                "decliner",
+                ("application/pdf",),
+                None,
+                is_external=False,
+                uses_remote_service=False,
+            ),
+        ],
+        allow_remote=True,
+    )
+    @_pbt05_settings
     def test_none_returned_when_matching_parsers_decline_with_none_score(
         self,
         specs: list[MockParserSpec],
@@ -393,7 +492,18 @@ class TestPbtParserSelection:
             max_size=5,
         ),
     )
-    @settings(max_examples=200, deadline=None)
+    @example(
+        specs=[
+            MockParserSpec(
+                "cloud_ocr",
+                ("application/pdf",),
+                100,
+                is_external=True,
+                uses_remote_service=True,
+            ),
+        ],
+    )
+    @_pbt05_settings
     def test_none_returned_when_only_remote_parsers_available_and_not_allowed(
         self,
         specs: list[MockParserSpec],
