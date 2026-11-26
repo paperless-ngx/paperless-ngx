@@ -887,8 +887,8 @@ class TestSavedZoneExtraction:
         WHEN:
             - Zone extraction runs
         THEN:
-            - No on-commit callbacks are registered; finishing is left to the
-              caller
+            - The only on-commit callback is the deferred file move; reindexing
+              and other finishing is left to the caller
         """
         make_zone(template, "Title")
         mock_zone_ocr_run.return_value = subprocess.CompletedProcess(
@@ -900,7 +900,10 @@ class TestSavedZoneExtraction:
         with django_capture_on_commit_callbacks() as callbacks:
             run_zone_extraction(document, templates=[template])
 
-        assert callbacks == []
+        assert all(
+            callback.__qualname__.startswith("request_file_move")
+            for callback in callbacks
+        )
 
     def test_document_run_renders_each_page_once_across_templates(
         self,
