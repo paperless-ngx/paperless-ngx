@@ -33,7 +33,7 @@ Tái lập PBT-01/02/03 với seed cố định (Linux/macOS hoặc CI):
 ```bash
 uv sync --python 3.12 --group testing --frozen
 HYPOTHESIS_PROFILE=recorded uv run --python 3.12 --dev --frozen pytest src/paperless/tests/test_parser_utils.py -k TestPostProcessText -n 0 --hypothesis-seed=20261008 --hypothesis-show-statistics --cov=paperless.parsers.utils --cov-branch --cov-report=term-missing
-uv run --python 3.12 --dev --frozen pytest src/documents/tests/search/test_unicode_normalization.py -k TestTheNormalizer --hypothesis-seed=20261008
+HYPOTHESIS_PROFILE=recorded uv run --python 3.12 --dev --frozen pytest src/documents/tests/search/test_unicode_normalization.py -k TestTheNormalizer -n 0 --hypothesis-seed=20261008 --hypothesis-show-statistics --cov=documents.search._query --cov-branch --cov-report=term-missing
 HYPOTHESIS_PROFILE=recorded uv run --python 3.12 --dev --frozen pytest src/documents/tests/test_path_security.py -k TestPathSecurity -n 0 -v --hypothesis-seed=20261008 --hypothesis-show-statistics --cov=documents.file_handling --cov-branch --cov-report=term-missing
 ```
 

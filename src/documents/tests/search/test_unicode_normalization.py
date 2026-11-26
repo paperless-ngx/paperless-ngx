@@ -8,6 +8,7 @@ way is invisible to a query written the other.
 
 from __future__ import annotations
 
+import os
 import unicodedata
 from typing import TYPE_CHECKING
 
@@ -33,6 +34,23 @@ if TYPE_CHECKING:
 
 pytestmark = [pytest.mark.search, pytest.mark.django_db]
 
+for _profile_name, _max_examples in (
+    ("default_pbt02", 200),
+    ("dev", 50),
+    ("ci", 100),
+    ("recorded", 250),
+    ("stress", 500),
+):
+    settings.register_profile(
+        _profile_name,
+        max_examples=_max_examples,
+        deadline=None,
+        print_blob=True,
+    )
+_pbt02_settings = settings.get_profile(
+    os.environ.get("HYPOTHESIS_PROFILE", "default_pbt02"),
+)
+
 # がっこうの書類 ("school documents"). The が is precomposed in NFC and
 # か + U+3099 in NFD, so the two spellings differ by one codepoint.
 _NFC = "がっこうの書類"
@@ -44,7 +62,7 @@ _NFD_WORD = unicodedata.normalize("NFD", _NFC_WORD)
 
 class TestTheNormalizer:
     @given(st.text())
-    @settings(max_examples=200)
+    @_pbt02_settings
     def test_normalization_is_idempotent(self, text: str) -> None:
         normalized = normalize_search_text(text)
 
@@ -52,12 +70,12 @@ class TestTheNormalizer:
 
     @given(st.text())
     @example("か\u3099")
-    @settings(max_examples=200)
+    @_pbt02_settings
     def test_normalization_matches_nfc_oracle(self, text: str) -> None:
         assert normalize_search_text(text) == unicodedata.normalize("NFC", text)
 
     @given(st.text())
-    @settings(max_examples=200)
+    @_pbt02_settings
     def test_canonical_equivalents_normalize_equally(self, text: str) -> None:
         text = f"が{text}"
         nfc = unicodedata.normalize("NFC", text)
