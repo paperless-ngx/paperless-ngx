@@ -2205,7 +2205,7 @@ class DocumentViewSet(
             raise Http404
 
         try:
-            doc_name, doc_data = serializer.validated_data.get("document")
+            doc_name, doc_file = serializer.validated_data.get("document")
             version_label = serializer.validated_data.get("version_label")
 
             t = int(mktime(datetime.now().timetuple()))
@@ -2216,7 +2216,9 @@ class DocumentViewSet(
                 pathvalidate.sanitize_filename(doc_name),
             )
 
-            temp_file_path.write_bytes(doc_data)
+            with temp_file_path.open("wb") as scratch_file:
+                for chunk in doc_file.chunks():
+                    scratch_file.write(chunk)
 
             os.utime(temp_file_path, times=(t, t))
 
@@ -3498,7 +3500,7 @@ class PostDocumentView(GenericAPIView[Any]):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        doc_name, doc_data = serializer.validated_data.get("document")
+        doc_name, doc_file = serializer.validated_data.get("document")
         doc_name = normalize("NFC", doc_name)
         correspondent_id = serializer.validated_data.get("correspondent")
         document_type_id = serializer.validated_data.get("document_type")
@@ -3518,7 +3520,9 @@ class PostDocumentView(GenericAPIView[Any]):
             pathvalidate.sanitize_filename(doc_name),
         )
 
-        temp_file_path.write_bytes(doc_data)
+        with temp_file_path.open("wb") as scratch_file:
+            for chunk in doc_file.chunks():
+                scratch_file.write(chunk)
 
         os.utime(temp_file_path, times=(t, t))
 
