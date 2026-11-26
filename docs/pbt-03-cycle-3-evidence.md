@@ -243,9 +243,9 @@ uv sync --python 3.12 --group testing --frozen
 
 # Chạy profile recorded (250 examples) và xuất coverage
 HYPOTHESIS_PROFILE=recorded uv run --python 3.12 --dev --frozen pytest \
-  src/documents/tests/test_path_security.py -k TestPathSecurity -v \
+  src/documents/tests/test_path_security.py -k TestPathSecurity -n 0 -v \
   --hypothesis-seed=20261008 --hypothesis-show-statistics \
-  --cov=documents.file_handling --cov-report=term-missing
+  --cov=documents.file_handling --cov-branch --cov-report=term-missing
 ```
 
 ### 8.2. Chạy trên môi trường Windows (PowerShell)
@@ -255,7 +255,7 @@ $env:PYTHONPATH="src"
 $env:DJANGO_SETTINGS_MODULE="paperless.settings"
 $env:PAPERLESS_SECRET_KEY="test-secret-key-for-pbt-tests"
 $env:HYPOTHESIS_PROFILE="recorded"
-pytest src/documents/tests/test_path_security.py -k TestPathSecurity -v --hypothesis-seed=20261008 --hypothesis-show-statistics --cov=documents.file_handling --cov-report=term-missing
+pytest src/documents/tests/test_path_security.py -k TestPathSecurity -n 0 -v --hypothesis-seed=20261008 --hypothesis-show-statistics --cov=documents.file_handling --cov-branch --cov-report=term-missing
 ```
 
 ### 8.3. Kiểm tra tự động trên GitHub Actions (CI)
