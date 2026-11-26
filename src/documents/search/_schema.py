@@ -385,7 +385,9 @@ def open_or_rebuild_index(index_dir: Path | None = None) -> tantivy.Index:
         return tantivy.Index.open(str(index_dir))
     except ValueError:
         logger.exception(
-            "Search index is corrupted or incomplete - rebuilding from scratch.",
+            "Search index is corrupted or incomplete. A new, empty index was "
+            "created, but existing documents are not indexed yet. "
+            "Run 'document_index reindex' to repopulate it.",
         )
         wipe_index(index_dir)
         idx = tantivy.Index(build_schema(), path=str(index_dir))
