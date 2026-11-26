@@ -3,7 +3,8 @@
 Đồ án môn **Kiểm thử phần mềm** trên mã nguồn [Paperless-ngx](https://github.com/paperless-ngx/paperless-ngx), áp dụng **K01 — Property-Based Testing**.
 
 - **Project:** https://github.com/users/0Yaam/projects/2
-- **Current cycle:** Cycle 3 - execution, evidence, and root-cause analysis.
+- **Current cycle:** Cycle 4 - final report, clean-machine demo, and peer review.
+- **Cycle 4 baseline:** `dev@b29fec117053637428a935d43af16d9e1d65c1fb`.
 - **Baseline upstream:** `da3de299f`
 - **Mục tiêu:** 5 suite độc lập, mỗi suite tối thiểu 3 property; tổng tối thiểu 15 property.
 
@@ -19,12 +20,12 @@
 
 ## Kế hoạch
 
-| Cycle | Nội dung                                               | Trạng thái  |
-| ----- | ------------------------------------------------------ | ----------- |
-| 1     | Chốt invariant, strategy, oracle và tiêu chí pass/fail | Đã chốt     |
-| 2     | Viết Hypothesis tests và lệnh chạy độc lập             | **Đang mở** |
-| 3     | Chạy test, lưu counterexample, metrics, defect và RCA  | Backlog     |
-| 4     | Báo cáo, demo tái lập và peer review                   | Backlog     |
+| Cycle | Nội dung                                               | Trạng thái |
+| ----- | ------------------------------------------------------ | ---------- |
+| 1     | Chốt invariant, strategy, oracle và tiêu chí pass/fail | Complete   |
+| 2     | Viết Hypothesis tests và lệnh chạy độc lập             | Complete   |
+| 3     | Chạy test, lưu counterexample, metrics, defect và RCA  | Complete   |
+| 4     | Báo cáo, demo tái lập và peer review                   | **Active** |
 
 ## Quy trình
 
