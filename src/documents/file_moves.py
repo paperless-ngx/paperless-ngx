@@ -432,12 +432,21 @@ def request_file_move(document: Document) -> None:
     Ask for the document's files to follow its committed state.
 
     Inside an open scope the request is recorded and performed when the scope
-    ends. Otherwise the move happens now and only the final filename columns
-    are copied onto the caller's instance, so source_path is current after
-    save() while other in-memory fields are left alone.
+    ends. Inside a user transaction with no scope it runs on commit. Otherwise
+    the move happens now and only the final filename columns are copied onto
+    the caller's instance, so source_path is current after save() while other
+    in-memory fields are left alone.
     """
     collector = _active_collector.get()
     if collector is not None and collector.add(document.pk):
+        return
+
+    if in_user_transaction():
+        # An enclosing transaction can still roll back the filename columns,
+        # and the move would take media.lock while it holds document rows.
+        # Wait for the commit, so the caller's instance keeps its old paths.
+        pk = document.pk
+        transaction.on_commit(lambda: _flush([pk]))
         return
 
     moved = move_files_for_document(document.pk)

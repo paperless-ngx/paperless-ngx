@@ -667,6 +667,50 @@ class TestRequestFileMoveWithoutScope:
         assert document.correspondent == unsaved
         assert document.title == "original"
 
+    def test_inside_atomic_waits_for_commit(
+        self,
+        document: Document,
+        paperless_dirs: PaperlessDirs,
+        django_capture_on_commit_callbacks: OnCommitCapture,
+    ) -> None:
+        """
+        GIVEN:
+            - No file move scope is open, but a transaction is
+        WHEN:
+            - A save inside the transaction requests a move
+        THEN:
+            - Nothing moves until the transaction commits
+        """
+        with django_capture_on_commit_callbacks(execute=True):
+            with transaction.atomic():
+                document.title = "renamed"
+                document.save()
+                assert (paperless_dirs.originals_dir / "original.pdf").is_file()
+
+        assert (paperless_dirs.originals_dir / "renamed.pdf").is_file()
+
+    def test_inside_rolled_back_atomic_moves_nothing(
+        self,
+        document: Document,
+        paperless_dirs: PaperlessDirs,
+        django_capture_on_commit_callbacks: OnCommitCapture,
+    ) -> None:
+        """
+        GIVEN:
+            - No file move scope is open, but a transaction is
+        WHEN:
+            - The transaction rolls back after a save requested a move
+        THEN:
+            - The file stays at its original path
+        """
+        with django_capture_on_commit_callbacks(execute=True):
+            with pytest.raises(RuntimeError), transaction.atomic():
+                document.title = "renamed"
+                document.save()
+                raise RuntimeError
+
+        assert (paperless_dirs.originals_dir / "original.pdf").is_file()
+
 
 @pytest.mark.django_db
 class TestReceiver:
