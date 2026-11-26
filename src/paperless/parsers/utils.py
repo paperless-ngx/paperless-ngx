@@ -364,13 +364,14 @@ def extract_pdf_metadata(
     namespace_pattern = re.compile(r"\{(.*)\}(.*)")
 
     try:
-        pdf = pikepdf.open(document_path)
-        meta = pdf.open_metadata()
+        with pikepdf.open(document_path) as pdf:
+            meta = pdf.open_metadata()
+            items = list(meta.items())
     except Exception as e:
         _log.warning("Could not open PDF metadata for %s: %s", document_path, e)
         return []
 
-    for key, value in meta.items():
+    for key, value in items:
         if isinstance(value, list):
             value = " ".join(str(e) for e in value)
         value = str(value)
