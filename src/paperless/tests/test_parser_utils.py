@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import codecs
+import os
 import re
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -20,6 +21,24 @@ from paperless.parsers.utils import read_file_handle_unicode_errors
 
 if TYPE_CHECKING:
     from pytest_mock import MockerFixture
+
+for _profile_name, _max_examples in (
+    ("default_pbt01", 200),
+    ("dev", 50),
+    ("ci", 100),
+    ("recorded", 250),
+    ("stress", 500),
+):
+    settings.register_profile(
+        _profile_name,
+        max_examples=_max_examples,
+        deadline=None,
+        print_blob=True,
+    )
+_pbt01_settings = settings.get_profile(
+    os.environ.get("HYPOTHESIS_PROFILE", "default_pbt01"),
+)
+
 
 SAMPLES = Path(__file__).parent / "samples" / "tesseract"
 
@@ -108,19 +127,19 @@ class TestPostProcessText:
 
     @given(st.one_of(st.none(), st.text()))
     @example("a\0\0b")
-    @settings(max_examples=200, deadline=None)
+    @_pbt01_settings
     def test_is_idempotent(self, source: str | None) -> None:
         result = post_process_text(source)
         assert post_process_text(result) == result
 
     @given(st.text(), st.text())
-    @settings(max_examples=200, deadline=None)
+    @_pbt01_settings
     def test_removes_nul_characters(self, prefix: str, suffix: str) -> None:
         result = post_process_text(f"{prefix}\0{suffix}")
         assert result is None or "\0" not in result
 
     @given(st.text(alphabet=st.characters(exclude_characters="\0")))
-    @settings(max_examples=200, deadline=None)
+    @_pbt01_settings
     def test_preserves_internal_line_boundaries(self, source: str) -> None:
         source = f"a\n{source}b"
         result = post_process_text(source)

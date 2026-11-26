@@ -84,7 +84,20 @@ jobs:
           enable-cache: true
           python-version: "3.12"
       - run: uv sync --python 3.12 --group testing --frozen
-      - run: uv run --python 3.12 --dev --frozen pytest src/paperless/tests/test_parser_utils.py -k TestPostProcessText --hypothesis-seed=20261008
+      - name: Run PBT-01 and save evidence log
+        shell: bash
+        env:
+          HYPOTHESIS_PROFILE: recorded
+        run: |
+          set -o pipefail
+          mkdir -p .artifacts
+          uv run --python 3.12 --dev --frozen pytest src/paperless/tests/test_parser_utils.py -k TestPostProcessText -n 0 -v --hypothesis-seed=20261008 --hypothesis-show-statistics --cov=paperless.parsers.utils --cov-branch --cov-report=term-missing 2>&1 | tee .artifacts/pbt-01-run.log
+      - name: Upload PBT-01 test evidence
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: always()
+        with:
+          name: pbt-01-evidence
+          path: .artifacts/pbt-01-run.log
   pbt-02:
     name: PBT-02 Unicode search normalization
     runs-on: ubuntu-latest

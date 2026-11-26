@@ -3,7 +3,7 @@
 Đồ án môn **Kiểm thử phần mềm** trên mã nguồn [Paperless-ngx](https://github.com/paperless-ngx/paperless-ngx), áp dụng **K01 — Property-Based Testing**.
 
 - **Project:** https://github.com/users/0Yaam/projects/2
-- **Cycle đang mở:** Cycle 2 — Implement Property Suites; việc thiết kế chưa xong được chuyển tiếp từ Cycle 1.
+- **Current cycle:** Cycle 3 - execution, evidence, and root-cause analysis.
 - **Baseline upstream:** `da3de299f`
 - **Mục tiêu:** 5 suite độc lập, mỗi suite tối thiểu 3 property; tổng tối thiểu 15 property.
 
@@ -32,7 +32,7 @@ Tái lập PBT-01/02/03 với seed cố định (Linux/macOS hoặc CI):
 
 ```bash
 uv sync --python 3.12 --group testing --frozen
-uv run --python 3.12 --dev --frozen pytest src/paperless/tests/test_parser_utils.py -k TestPostProcessText --hypothesis-seed=20261008
+HYPOTHESIS_PROFILE=recorded uv run --python 3.12 --dev --frozen pytest src/paperless/tests/test_parser_utils.py -k TestPostProcessText -n 0 --hypothesis-seed=20261008 --hypothesis-show-statistics --cov=paperless.parsers.utils --cov-branch --cov-report=term-missing
 uv run --python 3.12 --dev --frozen pytest src/documents/tests/search/test_unicode_normalization.py -k TestTheNormalizer --hypothesis-seed=20261008
 HYPOTHESIS_PROFILE=recorded uv run --python 3.12 --dev --frozen pytest src/documents/tests/test_path_security.py -k TestPathSecurity -n 0 -v --hypothesis-seed=20261008 --hypothesis-show-statistics --cov=documents.file_handling --cov-branch --cov-report=term-missing
 ```
