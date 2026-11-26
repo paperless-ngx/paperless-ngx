@@ -91,6 +91,84 @@ class TestDirectoryExportSink:
                 writer.close()
         assert json.loads((target / "manifest.json").read_text()) == [{"pk": 1}]
 
+    @pytest.mark.parametrize(
+        ("existing", "unchanged"),
+        [
+            pytest.param(_dumps({"version": "x"}), True, id="identical"),
+            pytest.param(_dumps({"version": "y"}), False, id="same-size-different"),
+        ],
+    )
+    def test_add_json_compare_json(
+        self,
+        tmp_path: Path,
+        *,
+        existing: str,
+        unchanged: bool,
+    ) -> None:
+        target: Path = tmp_path / "out"
+        target.mkdir()
+        (target / "metadata.json").write_text(existing)
+        os.utime(target / "metadata.json", (1, 1))
+        with DirectoryExportSink(
+            target,
+            compare_checksums=False,
+            compare_json=True,
+            delete=False,
+        ) as sink:
+            sink.add_json({"version": "x"}, "metadata.json")
+        assert json.loads((target / "metadata.json").read_text()) == (
+            json.loads(existing) if unchanged else {"version": "x"}
+        )
+        # An unchanged file is not rewritten, so its mtime is left alone
+        assert ((target / "metadata.json").stat().st_mtime == 1) is unchanged
+
+    @pytest.mark.parametrize(
+        ("existing", "unchanged"),
+        [
+            pytest.param([{"pk": 1}], True, id="identical"),
+            pytest.param([{"pk": 2}], False, id="changed"),
+        ],
+    )
+    def test_stream_compare_json(
+        self,
+        tmp_path: Path,
+        *,
+        existing: list[dict],
+        unchanged: bool,
+    ) -> None:
+        target: Path = tmp_path / "out"
+        target.mkdir()
+        # Write the existing manifest the same way the sink does
+        with DirectoryExportSink(
+            target,
+            compare_checksums=False,
+            compare_json=False,
+            delete=False,
+        ) as sink:
+            with sink.stream("manifest.json") as handle:
+                writer: StreamingManifestWriter = StreamingManifestWriter(handle)
+                for record in existing:
+                    writer.write_record(record)
+                writer.close()
+        os.utime(target / "manifest.json", (1, 1))
+
+        with DirectoryExportSink(
+            target,
+            compare_checksums=False,
+            compare_json=True,
+            delete=False,
+        ) as sink:
+            with sink.stream("manifest.json") as handle:
+                writer = StreamingManifestWriter(handle)
+                writer.write_record({"pk": 1})
+                writer.close()
+
+        assert json.loads((target / "manifest.json").read_text()) == (
+            existing if unchanged else [{"pk": 1}]
+        )
+        assert ((target / "manifest.json").stat().st_mtime == 1) is unchanged
+        assert not (target / "manifest.json.tmp").exists()
+
     def test_add_file_skips_when_size_and_mtime_match(
         self,
         tmp_path: Path,
