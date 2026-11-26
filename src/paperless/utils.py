@@ -11,8 +11,9 @@ logger = logging.getLogger("paperless.utils")
 # - Python dateparser languages: https://dateparser.readthedocs.io/en/latest/supported_locales.html
 # - ISO 639-2: https://www.loc.gov/standards/iso639-2/php/code_list.php
 OCR_TO_DATEPARSER_LANGUAGES = {
-    # TODO check these Dateparser languages as they are not referenced on the ISO639-2 standard,
-    # so we didn't find the equivalent in Tesseract:
+    # These dateparser languages have no equivalent in any Tesseract release
+    # (checked against tessdata, tessdata_best and tessdata_fast), so they cannot
+    # be reached from the OCR language. Set PAPERLESS_DATE_PARSER_LANGUAGES to use them:
     # agq, asa, bez, brx, cgg, ckb, dav, dje, dyo, ebu, guz, jgo, jmc, kde, kea, khq, kln,
     # ksb, ksf, ksh, lag, lkt, lrc, luy, mer, mfe, mgh, mgo, mua, mzn, naq, nmg, nnh, nus,
     # rof, rwk, saq, sbp, she, ses, shi, teo, twq, tzm, vun, wae, xog, yav, yue
@@ -76,6 +77,7 @@ OCR_TO_DATEPARSER_LANGUAGES = {
     "msa": "ms",
     "mlt": "mt",
     "mya": "my",
+    "nor": "nb",
     "nep": "ne",
     "nld": "nl",
     "ori": "or",
