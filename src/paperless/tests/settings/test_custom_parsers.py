@@ -61,6 +61,20 @@ class TestRedisSocketConversion:
                 ("redis://myredishost:6379", "redis://myredishost:6379"),
                 id="host_with_port_unchanged",
             ),
+            # "unix" or "+socket" appearing outside the scheme must not trigger conversion
+            pytest.param(
+                "redis://unix-redis:6379",
+                ("redis://unix-redis:6379", "redis://unix-redis:6379"),
+                id="tcp_host_containing_unix",
+            ),
+            pytest.param(
+                "redis://:unixsecret@myredishost:6379",
+                (
+                    "redis://:unixsecret@myredishost:6379",
+                    "redis://:unixsecret@myredishost:6379",
+                ),
+                id="tcp_password_containing_unix",
+            ),
             # Credentials in unix:// URL contain multiple colons (user:password@)
             # Regression test for https://github.com/paperless-ngx/paperless-ngx/pull/12239
             pytest.param(
