@@ -13,6 +13,11 @@ from paperless.utils import ocr_to_dateparser_languages
         pytest.param("fra+ita+lao", ["fr", "it", "lo"], id="multiple-languages"),
         pytest.param("fil", ["fil"], id="no-two-letter-equivalent"),
         pytest.param(
+            "afr+vie+kan+chr+mkd",  # codespell:ignore
+            ["af", "vi", "kn", "chr", "mk"],
+            id="previously-unmapped-languages",
+        ),
+        pytest.param(
             "aze_cyrl+srp_latn",
             ["az-Cyrl", "sr-Latn"],
             id="script-supported-by-dateparser",
@@ -47,6 +52,19 @@ from paperless.utils import ocr_to_dateparser_languages
 )
 def test_ocr_to_dateparser_languages(ocr_language: str, expected: list[str]) -> None:
     assert sorted(ocr_to_dateparser_languages(ocr_language)) == sorted(expected)
+
+
+def test_ocr_to_dateparser_map_values_supported_by_dateparser() -> None:
+    from dateparser.languages.loader import LocaleDataLoader
+
+    loader = LocaleDataLoader()
+    unsupported = []
+    for ocr_code, dateparser_code in utils.OCR_TO_DATEPARSER_LANGUAGES.items():
+        try:
+            loader.get_locale_map(locales=[dateparser_code])
+        except Exception:
+            unsupported.append((ocr_code, dateparser_code))
+    assert unsupported == []
 
 
 def test_ocr_to_dateparser_languages_exception(

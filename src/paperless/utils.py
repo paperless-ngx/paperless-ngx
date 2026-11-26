@@ -2,17 +2,15 @@ import logging
 
 logger = logging.getLogger("paperless.utils")
 
+# Translation map from languages supported by Tesseract OCR
+# to languages supported by dateparser.
+# To add a language, make sure it is supported by both libraries.
+# The ISO 639-2 will help you link a 3-char to 2-char language code.
+# Links:
+# - Tesseract languages: https://tesseract-ocr.github.io/tessdoc/Data-Files-in-different-versions.html
+# - Python dateparser languages: https://dateparser.readthedocs.io/en/latest/supported_locales.html
+# - ISO 639-2: https://www.loc.gov/standards/iso639-2/php/code_list.php
 OCR_TO_DATEPARSER_LANGUAGES = {
-    """
-    Translation map from languages supported by Tesseract OCR
-    to languages supported by dateparser.
-    To add a language, make sure it is supported by both libraries.
-    The ISO 639-2 will help you link a 3-char to 2-char language code.
-    Links:
-    - Tesseract languages: https://tesseract-ocr.github.io/tessdoc/Data-Files-in-different-versions.html
-    - Python dateparser languages: https://dateparser.readthedocs.io/en/latest/supported_locales.html
-    - ISO 639-2: https://www.loc.gov/standards/iso639-2/php/code_list.php
-    """
     # TODO check these Dateparser languages as they are not referenced on the ISO639-2 standard,
     # so we didn't find the equivalent in Tesseract:
     # agq, asa, bez, brx, cgg, ckb, dav, dje, dyo, ebu, guz, jgo, jmc, kde, kea, khq, kln,
@@ -22,7 +20,6 @@ OCR_TO_DATEPARSER_LANGUAGES = {
     "amh": "am",
     "ara": "ar",
     "asm": "as",
-    "ast": "ast",
     "aze": "az",
     "bel": "be",
     "bul": "bg",
@@ -31,7 +28,7 @@ OCR_TO_DATEPARSER_LANGUAGES = {
     "bre": "br",
     "bos": "bs",
     "cat": "ca",
-    "cher": "chr",
+    "chr": "chr",
     "ces": "cs",
     "cym": "cy",
     "dan": "da",
@@ -65,13 +62,14 @@ OCR_TO_DATEPARSER_LANGUAGES = {
     "kat": "ka",
     "kaz": "kk",
     "khm": "km",
-    "knda": "kn",
+    "kan": "kn",
     "kor": "ko",
     "kir": "ky",
     "ltz": "lb",
     "lao": "lo",
     "lit": "lt",
     "lav": "lv",
+    "mkd": "mk",
     "mal": "ml",
     "mon": "mn",
     "mar": "mr",
@@ -106,7 +104,7 @@ OCR_TO_DATEPARSER_LANGUAGES = {
     "ukr": "uk",
     "urd": "ur",
     "uzb": "uz",
-    "via": "vi",
+    "vie": "vi",  # codespell:ignore
     "yid": "yi",
     "yor": "yo",
     "chi": "zh",
