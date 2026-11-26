@@ -12,6 +12,7 @@ import {
 import { DocumentMetadata } from 'src/app/data/document-metadata'
 import { DocumentSuggestions } from 'src/app/data/document-suggestions'
 import { FilterRule } from 'src/app/data/filter-rule'
+import { OcrZoneRunResponse } from 'src/app/data/ocr-template'
 import { Results, SelectionData } from 'src/app/data/results'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { BulkOperationResponse } from '../../data/bulk-operation'
@@ -368,6 +369,32 @@ export class DocumentService extends AbstractPaperlessService<Document> {
         remote_ocr: remoteOcr,
         from_webui: true,
       }
+    )
+  }
+
+  runZoneOcrDocuments(
+    selection: DocumentSelectionQuery,
+    templateId: number | null = null
+  ) {
+    return this.http.post<BulkOperationResponse>(
+      this.getResourceUrl(null, 'run_zone_ocr'),
+      {
+        ...selection,
+        ...(templateId ? { template: templateId } : {}),
+        from_webui: true,
+      }
+    )
+  }
+
+  runZoneOcr(
+    id: number,
+    templateId: number | null = null,
+    versionId: number | null = null
+  ): Observable<OcrZoneRunResponse> {
+    return this.http.post<OcrZoneRunResponse>(
+      this.getResourceUrl(id, 'run-zone-ocr'),
+      { ...(templateId ? { template: templateId } : {}), from_webui: true },
+      { params: versionId ? { version: versionId.toString() } : {} }
     )
   }
 

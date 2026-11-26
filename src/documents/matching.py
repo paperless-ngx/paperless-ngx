@@ -14,6 +14,7 @@ from documents.models import Correspondent
 from documents.models import Document
 from documents.models import DocumentType
 from documents.models import MatchingModel
+from documents.models import OcrTemplate
 from documents.models import StoragePath
 from documents.models import Tag
 from documents.models import Workflow
@@ -30,7 +31,7 @@ logger = logging.getLogger("paperless.matching")
 
 
 def log_reason(
-    matching_model: MatchingModel | WorkflowTrigger,
+    matching_model: MatchingModel | WorkflowTrigger | OcrTemplate,
     document: Document,
     reason: str,
 ) -> None:
@@ -161,7 +162,10 @@ def match_storage_paths(document: Document, classifier: DocumentClassifier, user
     )
 
 
-def matches(matching_model: MatchingModel, document: Document):
+def matches(
+    matching_model: MatchingModel | WorkflowTrigger | OcrTemplate,
+    document: Document,
+) -> bool:
     search_flags = 0
 
     document_content = document.get_effective_content() or ""

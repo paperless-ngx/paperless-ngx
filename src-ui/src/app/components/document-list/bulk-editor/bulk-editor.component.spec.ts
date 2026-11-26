@@ -1386,6 +1386,70 @@ describe('BulkEditorComponent', () => {
     ) // listAllFilteredIds
   })
 
+  it('should support run zone ocr', () => {
+    const queued = jest
+      .spyOn(TestBed.inject(TaskNotificationService), 'showQueued')
+      .mockImplementation(() => {})
+    const reload = jest.spyOn(documentListViewService, 'reload')
+    let modal: NgbModalRef
+    modalService.activeInstances.subscribe((m) => (modal = m[0]))
+    jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(true)
+    jest
+      .spyOn(documentListViewService, 'documents', 'get')
+      .mockReturnValue([{ id: 3 }, { id: 4 }])
+    jest
+      .spyOn(documentListViewService, 'selected', 'get')
+      .mockReturnValue(new Set([3, 4]))
+    jest
+      .spyOn(permissionsService, 'currentUserHasObjectPermissions')
+      .mockReturnValue(true)
+    fixture.detectChanges()
+    component.runZoneOcrSelected()
+    expect(modal).not.toBeUndefined()
+    modal.componentInstance.confirm()
+    let req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/run_zone_ocr/`
+    )
+    req.flush({ result: 'OK', task_id: 'zone-ocr-1' })
+    expect(req.request.body).toEqual({
+      documents: [3, 4],
+      from_webui: true,
+    })
+    expect(queued).toHaveBeenLastCalledWith(
+      'zone-ocr-1',
+      "Bulk operation 'Run zone OCR' queued.",
+      { content: "Bulk operation 'Run zone OCR' completed." }
+    )
+    expect(reload).not.toHaveBeenCalled()
+
+    component.runZoneOcrSelected()
+    modal.componentInstance.template = 3
+    modal.componentInstance.confirm()
+    req = httpTestingController.expectOne(
+      `${environment.apiBaseUrl}documents/run_zone_ocr/`
+    )
+    req.flush({ result: 'OK', task_id: 'zone-ocr-2' })
+    expect(req.request.body).toEqual({
+      documents: [3, 4],
+      template: 3,
+      from_webui: true,
+    })
+    expect(queued).toHaveBeenLastCalledWith(
+      'zone-ocr-2',
+      "Bulk operation 'Run zone OCR' queued.",
+      { content: "Bulk operation 'Run zone OCR' completed." }
+    )
+    httpTestingController.match(
+      `${environment.apiBaseUrl}ocr_templates/?page=1&page_size=100000`
+    ) // template list
+    httpTestingController.match(
+      `${environment.apiBaseUrl}documents/?page=1&page_size=50&ordering=-created&truncate_content=true&include_selection_data=true`
+    ) // list reload
+    httpTestingController.match(
+      `${environment.apiBaseUrl}documents/?page=1&page_size=100000&fields=id`
+    ) // listAllFilteredIds
+  })
+
   it('should support rotate', () => {
     const toast = jest.spyOn(toastService, 'show')
     let modal: NgbModalRef

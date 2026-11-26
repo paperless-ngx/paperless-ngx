@@ -227,6 +227,7 @@ SPECTACULAR_SETTINGS = {
     },
     "ENUM_NAME_OVERRIDES": {
         "MatchingAlgorithm": "documents.models.MatchingModel.MATCHING_ALGORITHMS",
+        "WorkflowTriggerMatchingAlgorithmEnum": "documents.models.WorkflowTrigger.WorkflowTriggerMatching",
         "BarcodeFormatEnum": "documents.models.DocumentBarcode.Format",
         "NoteFormatEnum": "documents.models.Note.Format",
     },

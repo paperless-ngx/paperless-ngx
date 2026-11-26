@@ -5,9 +5,9 @@ import math
 import re
 from datetime import datetime
 from datetime import timedelta
-from decimal import Decimal
 from typing import TYPE_CHECKING
 from typing import Any
+from typing import NotRequired
 from typing import TypedDict
 
 import magic
@@ -16,13 +16,12 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
-from django.core.validators import DecimalValidator
 from django.core.validators import EmailValidator
 from django.core.validators import MaxLengthValidator
 from django.core.validators import MaxValueValidator
 from django.core.validators import MinValueValidator
-from django.core.validators import RegexValidator
 from django.core.validators import integer_validator
+from django.db import transaction
 from django.db.models import Count
 from django.db.models import Q
 from django.db.models.functions import Lower
@@ -62,6 +61,8 @@ from documents.models import DocumentBarcode
 from documents.models import DocumentType
 from documents.models import MatchingModel
 from documents.models import Note
+from documents.models import OcrTemplate
+from documents.models import OcrTemplateZone
 from documents.models import PaperlessTask
 from documents.models import SavedView
 from documents.models import SavedViewFilterRule
@@ -85,16 +86,21 @@ from documents.permissions import get_document_count_filter_for_user
 from documents.permissions import get_permission_grantees
 from documents.permissions import has_perms_owner_aware
 from documents.permissions import permitted_document_ids
+from documents.permissions import permitted_object_ids
 from documents.permissions import restrict_queryset_to_visible
 from documents.permissions import set_permissions_for_objects
 from documents.regex import validate_regex_pattern
 from documents.templating.filepath import validate_filepath_template_and_render
 from documents.templating.utils import convert_format_str_to_template_format
 from documents.templating.workflows import validate_workflow_template
+from documents.validators import monetary_validator
 from documents.validators import uri_validator
 from documents.validators import url_validator
 from documents.versioning import has_prefetched_effective_content
 from documents.versioning import sort_versions_newest_first
+from documents.zone_ocr import OCR_SUPPORTED_FIELD_TYPES
+from documents.zone_ocr import ZoneOcrSkipReason
+from documents.zone_ocr import field_key
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -168,36 +174,29 @@ class DocumentUpdateFieldsModelSerializer(DynamicFieldsModelSerializer):
         return instance
 
 
-class MatchingModelSerializer(serializers.ModelSerializer[Any]):
-    document_count = serializers.IntegerField(read_only=True)
-
-    def get_slug(self, obj) -> str:
-        return slugify(obj.name)
-
-    slug = SerializerMethodField()
-
-    def validate(self, data):
+# Name and owner uniqueness and match regex validation for models with a name,
+# an owner and match rules. A comment, not a docstring, so it stays out of the
+# API schema descriptions of every serializer built on it.
+class MatchRuleSerializer(serializers.ModelSerializer[Any]):
+    def validate(self, attrs: dict[str, Any]) -> dict[str, Any]:
         # TODO: remove pending https://github.com/encode/django-rest-framework/issues/7173
-        name = data.get(
-            "name",
-            self.instance.name if hasattr(self.instance, "name") else None,
-        )
+        name = attrs.get("name", getattr(self.instance, "name", None))
         owner = (
-            data["owner"]
-            if "owner" in data
+            attrs["owner"]
+            if "owner" in attrs
             else self.user
             if hasattr(self, "user")
             else None
         )
-        pk = self.instance.pk if hasattr(self.instance, "pk") else None
-        if ("name" in data or "owner" in data) and self.Meta.model.objects.filter(
+        pk = getattr(self.instance, "pk", None)
+        if ("name" in attrs or "owner" in attrs) and self.Meta.model.objects.filter(
             name=name,
             owner=owner,
         ).exclude(pk=pk).exists():
             raise serializers.ValidationError(
                 {"error": "Object violates owner / name unique constraint"},
             )
-        return data
+        return attrs
 
     def validate_match(self, match):
         if (
@@ -212,6 +211,15 @@ class MatchingModelSerializer(serializers.ModelSerializer[Any]):
                     "Invalid regular expression, see log for details.",
                 )
         return match
+
+
+class MatchingModelSerializer(MatchRuleSerializer):
+    document_count = serializers.IntegerField(read_only=True)
+
+    def get_slug(self, obj) -> str:
+        return slugify(obj.name)
+
+    slug = SerializerMethodField()
 
 
 class SetPermissionsMixin:
@@ -867,17 +875,7 @@ class CustomFieldInstanceSerializer(serializers.ModelSerializer[CustomFieldInsta
                 field.data_type == CustomField.FieldDataType.MONETARY
                 and data["value"] != ""
             ):
-                try:
-                    # First try to validate as a number from legacy format
-                    DecimalValidator(max_digits=12, decimal_places=2)(
-                        Decimal(str(data["value"])),
-                    )
-                except Exception:
-                    # If that fails, try to validate as a monetary string
-                    RegexValidator(
-                        regex=r"^[A-Z]{3}-?\d+(\.\d{1,2})$",
-                        message="Must be a two-decimal number with optional currency code e.g. GBP123.45",
-                    )(data["value"])
+                monetary_validator(data["value"])
             elif field.data_type == CustomField.FieldDataType.STRING:
                 MaxLengthValidator(limit_value=128)(data["value"])
             elif field.data_type == CustomField.FieldDataType.SELECT:
@@ -1769,6 +1767,65 @@ class DeleteDocumentsSerializer(DocumentSelectionSerializer):
 class ReprocessDocumentsSerializer(DocumentSelectionSerializer):
     remote_ocr = serializers.BooleanField(required=False, default=False)
     from_webui = serializers.BooleanField(required=False, default=False)
+
+
+class OcrTemplateField(serializers.PrimaryKeyRelatedField[OcrTemplate]):
+    pass
+
+
+class RunZoneOcrSerializer(serializers.Serializer[Any]):
+    template = OcrTemplateField(
+        queryset=OcrTemplate.objects.none(),
+        required=False,
+        allow_null=True,
+    )
+    from_webui = serializers.BooleanField(required=False, default=False)
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        request = self.context.get("request")
+        user = getattr(request, "user", None) if request else None
+        if user is not None and user.is_authenticated:
+            template_field = self.fields.get("template")
+            if not isinstance(
+                template_field,
+                serializers.PrimaryKeyRelatedField,
+            ):  # pragma: no cover
+                return
+            template_field.queryset = OcrTemplate.objects.filter(
+                id__in=permitted_object_ids(user, OcrTemplate, "view_ocrtemplate"),
+            ).prefetch_related("zones", "zones__custom_field")
+
+
+class RunZoneOcrResponseSerializer(serializers.Serializer[dict[str, Any]]):
+    """The response of queueing zone OCR on one document."""
+
+    result = serializers.ChoiceField(
+        choices=["OK", "skipped"],
+        read_only=True,
+        help_text="OK when the run was queued, skipped when it was not.",
+    )
+    task_id = serializers.CharField(
+        read_only=True,
+        required=False,
+        help_text="The queued task. Absent when the run was skipped.",
+    )
+    reason = serializers.ChoiceField(
+        choices=[reason.value for reason in ZoneOcrSkipReason],
+        read_only=True,
+        required=False,
+        help_text="Present only when the run was skipped.",
+    )
+
+
+class OcrErrorSerializer(serializers.Serializer[dict[str, Any]]):
+    """The body of an error response from the OCR template actions."""
+
+    error = serializers.CharField(read_only=True)
+
+
+class RunZoneOcrDocumentsSerializer(DocumentSelectionSerializer, RunZoneOcrSerializer):
+    pass
 
 
 class BulkEditSerializer(
@@ -3682,3 +3739,367 @@ class StoragePathTestSerializer(SerializerWithPerms):
             document_field.queryset = Document.objects.filter(
                 id__in=permitted_document_ids(user),
             )
+
+
+class ZoneData(TypedDict):
+    """Validated data of one OcrTemplateZoneSerializer."""
+
+    name: str
+    x: int
+    y: int
+    width: int
+    height: int
+    target: NotRequired[str]
+    custom_field: NotRequired[CustomField | None]
+    page: NotRequired[int | None]
+    ocr_language: NotRequired[str]
+    transform: NotRequired[str]
+    date_format: NotRequired[str]
+    order: NotRequired[int]
+    zone_source_width: NotRequired[int | None]
+    zone_source_height: NotRequired[int | None]
+    validation_regex: NotRequired[str]
+
+
+class OcrTemplateZoneSerializer(serializers.ModelSerializer[OcrTemplateZone]):
+    class Meta:
+        model = OcrTemplateZone
+        fields = [
+            "id",
+            "name",
+            "target",
+            "custom_field",
+            "page",
+            "x",
+            "y",
+            "width",
+            "height",
+            "ocr_language",
+            "transform",
+            "date_format",
+            "order",
+            "zone_source_width",
+            "zone_source_height",
+            "validation_regex",
+        ]
+
+    def validate_custom_field(
+        self,
+        value: CustomField | None,
+    ) -> CustomField | None:
+        if value is None:
+            return value
+        if value.data_type not in OCR_SUPPORTED_FIELD_TYPES:
+            supported = ", ".join(
+                str(data_type.label).lower()
+                for data_type in CustomField.FieldDataType
+                if data_type in OCR_SUPPORTED_FIELD_TYPES
+            )
+            raise serializers.ValidationError(
+                f"Custom field type '{value.data_type}' is not supported for OCR extraction. "
+                f"Use one of: {supported}.",
+            )
+        return value
+
+    def validate_ocr_language(self, value: str) -> str:
+        # Tesseract language codes joined by "+", e.g. "deu+eng", "chi_sim" or
+        # "script/Latin".
+        code = r"[A-Za-z0-9_]+(/[A-Za-z0-9_]+)?"
+        if not re.fullmatch(rf"{code}(\+{code})*", value):
+            raise serializers.ValidationError(
+                "Use Tesseract language codes joined by '+', e.g. 'deu+eng'.",
+            )
+        return value
+
+    def validate_date_format(self, value: str) -> str:
+        # The format must read back a full date: without a day, month or year
+        # strptime fills in 1 or 1900 instead of failing. A missing year is
+        # rejected before parsing, since Python deprecates parsing a day of month
+        # without one.
+        if value:
+            if not re.search(r"%[Yy]", value.replace("%%", "")):
+                raise serializers.ValidationError(
+                    "The date format must include the day, month and year.",
+                )
+            sample = datetime(2024, 3, 15)
+            try:
+                round_trip = datetime.strptime(sample.strftime(value), value)
+            except ValueError as e:
+                logger.debug(f"Invalid zone date format {value!r}: {e!s}")
+                raise serializers.ValidationError(
+                    "Invalid date format, see log for details.",
+                ) from e
+            if round_trip.date() != sample.date():
+                raise serializers.ValidationError(
+                    "The date format must read back a full date (day, month and year).",
+                )
+        return value
+
+    def validate_validation_regex(self, value: str) -> str:
+        if value:
+            try:
+                validate_regex_pattern(value)
+            except ValueError as e:
+                logger.debug(f"Invalid regular expression: {e!s}")
+                raise serializers.ValidationError(
+                    "Invalid regular expression, see log for details.",
+                ) from e
+        return value
+
+    def validate_page(self, value: int | None) -> int | None:
+        if value is not None and value != -1 and value < 1:
+            raise serializers.ValidationError(
+                "Page must be positive or -1 for the last page.",
+            )
+        return value
+
+    def validate(self, attrs: ZoneData) -> ZoneData:
+        # A template PATCH still replaces each zone in full.
+        if self.root.partial:
+            for name, field in self.fields.items():
+                if field.required and name not in attrs:
+                    raise serializers.ValidationError(
+                        {name: field.error_messages["required"]},
+                    )
+        # A custom field target may be left unassigned, as the editor creates new
+        # zones, and a zone is left unassigned when its custom field is deleted;
+        # built-in targets never use a custom field.
+        if (
+            attrs.get("target", OcrTemplateZone.TargetType.CUSTOM_FIELD)
+            != OcrTemplateZone.TargetType.CUSTOM_FIELD
+            and attrs.get("custom_field") is not None
+        ):
+            raise serializers.ValidationError(
+                {"custom_field": "Only zones targeting a custom field can set one."},
+            )
+        return attrs
+
+
+class OcrTemplateZoneTestSerializer(OcrTemplateZoneSerializer):
+    name = serializers.CharField(default="test")
+    x = serializers.IntegerField(min_value=0, default=0)
+    y = serializers.IntegerField(min_value=0, default=0)
+    width = serializers.IntegerField(min_value=2)
+    height = serializers.IntegerField(min_value=2)
+
+    class Meta(OcrTemplateZoneSerializer.Meta):
+        fields = [
+            "name",
+            "x",
+            "y",
+            "width",
+            "height",
+            "page",
+            "ocr_language",
+            "transform",
+            "date_format",
+            "validation_regex",
+            "zone_source_width",
+            "zone_source_height",
+        ]
+        extra_kwargs = {
+            "zone_source_width": {"min_value": 1},
+            "zone_source_height": {"min_value": 1},
+        }
+
+
+class DocumentField(serializers.PrimaryKeyRelatedField[Document]):
+    pass
+
+
+class OcrTemplateTestSerializer(serializers.Serializer[dict[str, Any]]):
+    document = DocumentField(queryset=Document.objects.none())
+    zone = OcrTemplateZoneTestSerializer()
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        request = self.context.get("request")
+        user = getattr(request, "user", None) if request else None
+        if user is not None and user.is_authenticated:
+            document_field = self.fields.get("document")
+            if not isinstance(
+                document_field,
+                serializers.PrimaryKeyRelatedField,
+            ):  # pragma: no cover
+                return
+            document_field.queryset = Document.objects.filter(
+                id__in=permitted_document_ids(user),
+            )
+
+
+class OcrTemplateTestResultSerializer(serializers.Serializer[dict[str, Any]]):
+    """The extraction preview returned for an ad-hoc zone."""
+
+    raw_text = serializers.CharField(read_only=True, allow_null=True)
+    value = serializers.CharField(read_only=True, allow_null=True)
+    regex = serializers.CharField(read_only=True, allow_null=True)
+    regex_match = serializers.BooleanField(
+        read_only=True,
+        allow_null=True,
+        help_text="Whether the value fully matches the regex, or null when not checked.",
+    )
+
+
+class OcrTemplateSerializer(MatchRuleSerializer, OwnedObjectSerializer):
+    zones = OcrTemplateZoneSerializer(many=True, required=False)
+    combine_formats = serializers.DictField(
+        child=serializers.CharField(allow_blank=True, trim_whitespace=False),
+        required=False,
+    )
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        # Writes accept documents the user can view, plus the sample document
+        # the template already stores, so saving a template unchanged keeps it.
+        # Reads serialize the stored pk regardless of the queryset.
+        sample_field = self.fields.get("sample_document")
+        if not isinstance(
+            sample_field,
+            serializers.PrimaryKeyRelatedField,
+        ):  # pragma: no cover
+            return
+        if self.user is None:
+            sample_field.queryset = Document.objects.none()
+            return
+        allowed = Q(id__in=permitted_document_ids(self.user))
+        if isinstance(self.instance, OcrTemplate) and self.instance.sample_document_id:
+            allowed |= Q(id=self.instance.sample_document_id)
+        sample_field.queryset = Document.objects.filter(allowed)
+
+    class Meta:
+        model = OcrTemplate
+        fields = [
+            "id",
+            "name",
+            "match",
+            "matching_algorithm",
+            "is_insensitive",
+            "source_width",
+            "source_height",
+            "sample_document",
+            "enabled",
+            "combine_formats",
+            "created",
+            "updated",
+            "zones",
+            "owner",
+            "permissions",
+            "user_can_change",
+            "set_permissions",
+        ]
+        read_only_fields = ["created", "updated"]
+
+    def validate(self, attrs: dict[str, Any]) -> dict[str, Any]:
+        attrs = super().validate(attrs)
+        zones: list[ZoneData] | None = attrs.get("zones")
+        if zones is not None:
+            names = [zone["name"] for zone in zones]
+            duplicates = sorted({name for name in names if names.count(name) > 1})
+            if duplicates:
+                # Combine format tokens refer to zones by name.
+                raise serializers.ValidationError(
+                    {"zones": f"Zone names must be unique: {', '.join(duplicates)}"},
+                )
+        if "combine_formats" in attrs:
+            if zones is not None:
+                keys = {
+                    field_key(
+                        OcrTemplateZone.TargetType(
+                            zone.get("target", OcrTemplateZone.TargetType.CUSTOM_FIELD),
+                        ),
+                        custom_field.pk
+                        if (custom_field := zone.get("custom_field"))
+                        else None,
+                    )
+                    for zone in zones
+                }
+            elif self.instance:
+                keys = {
+                    field_key(OcrTemplateZone.TargetType(target), custom_field_id)
+                    for target, custom_field_id in self.instance.zones.values_list(
+                        "target",
+                        "custom_field",
+                    )
+                }
+            else:
+                keys = set()
+            unknown = sorted(set(attrs["combine_formats"]) - keys)
+            if unknown:
+                raise serializers.ValidationError(
+                    {
+                        "combine_formats": (
+                            "Keys must match the field of a zone: " + ", ".join(unknown)
+                        ),
+                    },
+                )
+        # Each zone's name, x, y, width, height and source size.
+        boxes: list[tuple[str, int, int, int, int, int | None, int | None]] = []
+        if zones is not None:
+            boxes = [
+                (
+                    zone["name"],
+                    zone["x"],
+                    zone["y"],
+                    zone["width"],
+                    zone["height"],
+                    zone.get("zone_source_width"),
+                    zone.get("zone_source_height"),
+                )
+                for zone in zones
+            ]
+        elif self.instance and ("source_width" in attrs or "source_height" in attrs):
+            boxes = list(
+                self.instance.zones.values_list(
+                    "name",
+                    "x",
+                    "y",
+                    "width",
+                    "height",
+                    "zone_source_width",
+                    "zone_source_height",
+                ),
+            )
+        source_width = attrs.get(
+            "source_width",
+            getattr(self.instance, "source_width", None),
+        )
+        source_height = attrs.get(
+            "source_height",
+            getattr(self.instance, "source_height", None),
+        )
+        if not boxes:
+            return attrs
+        assert source_width is not None
+        assert source_height is not None
+        for name, x, y, width, height, zone_width, zone_height in boxes:
+            if x + width > (zone_width or source_width) or y + height > (
+                zone_height or source_height
+            ):
+                raise serializers.ValidationError(
+                    {"zones": f"Zone '{name}' extends beyond its source dimensions."},
+                )
+        return attrs
+
+    @transaction.atomic
+    def create(self, validated_data: dict[str, Any]) -> OcrTemplate:
+        zones_data: list[ZoneData] = validated_data.pop("zones", [])
+        template = super().create(validated_data)
+        for zone_data in zones_data:
+            OcrTemplateZone.objects.create(template=template, **zone_data)
+        return template
+
+    @transaction.atomic
+    def update(
+        self,
+        instance: OcrTemplate,
+        validated_data: dict[str, Any],
+    ) -> OcrTemplate:
+        zones_data: list[ZoneData] | None = validated_data.pop("zones", None)
+        instance = super().update(instance, validated_data)
+
+        if zones_data is not None:
+            instance.zones.all().delete()
+            for zone_data in zones_data:
+                OcrTemplateZone.objects.create(template=instance, **zone_data)
+
+        return instance

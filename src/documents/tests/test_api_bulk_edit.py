@@ -1,10 +1,13 @@
 import json
 from unittest import mock
 
+import pytest
 from auditlog.models import LogEntry
 from django.contrib.auth.models import User
 from django.test import override_settings
+from pytest_mock import MockerFixture
 from rest_framework import status
+from rest_framework.test import APIClient
 from rest_framework.test import APITestCase
 
 from documents.bulk_operations import execute_bulk_operation
@@ -20,10 +23,13 @@ from documents.models import WorkflowAction
 from documents.models import WorkflowTrigger
 from paperless_testing.dirs import DirectoriesMixin
 from paperless_testing.factories import DocumentFactory
+from paperless_testing.factories import OcrTemplateFactory
 from paperless_testing.factories import UserFactory
 from paperless_testing.permissions import grant_all_global
 from paperless_testing.permissions import grant_global
 from paperless_testing.permissions import grant_object
+
+RUN_ZONE_OCR_BULK_URL = "/api/documents/run_zone_ocr/"
 
 
 class TestBulkEditAPI(DirectoriesMixin, APITestCase):
@@ -1235,6 +1241,31 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_api_bulk_edit_rejects_update_callback_parameter(self) -> None:
+        with mock.patch(
+            "documents.views.execute_bulk_operation.apply_async",
+            return_value=mock.Mock(id="test-bulk-operation"),
+        ) as enqueue:
+            response = self.client.post(
+                "/api/documents/bulk_edit/",
+                json.dumps(
+                    {
+                        "documents": [self.doc2.id],
+                        "method": "modify_tags",
+                        "parameters": {
+                            "add_tags": [self.t2.id],
+                            "remove_tags": [],
+                            "update_callback": "x",
+                        },
+                    },
+                ),
+                content_type="application/json",
+            )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        enqueue.assert_not_called()
+        self.async_task.assert_not_called()
+        self.assertEqual(list(self.doc2.tags.all()), [self.t1])
 
     def test_api_modify_tags_no_tags(self) -> None:
         response = self.client.post(
@@ -2867,3 +2898,136 @@ class TestBulkEditAPI(DirectoriesMixin, APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn(b"notadate", response.content)
+
+
+@pytest.mark.django_db
+@pytest.mark.usefixtures("paperless_dirs")
+class TestRunZoneOcrBulkEditAPI:
+    """Bulk run_zone_ocr endpoint for selected documents and chosen templates."""
+
+    @pytest.fixture
+    def mock_run_zone_ocr(self, mocker: MockerFixture) -> mock.MagicMock:
+        """
+        Mocks the bulk method and runs accepted requests through the worker
+        synchronously, as the TestBulkEditAPI setup does.
+        """
+        mocker.patch("documents.bulk_operations.bulk_update_documents")
+        method = mocker.patch("documents.views.bulk_edit.run_zone_ocr")
+        method.return_value = "OK"
+        method.__name__ = "run_zone_ocr"
+
+        def run_operation(*, kwargs: dict, headers: dict) -> mock.Mock:
+            execute_bulk_operation(**kwargs)
+            return mocker.Mock(id="test-bulk-operation")
+
+        mocker.patch(
+            "documents.views.execute_bulk_operation.apply_async",
+            side_effect=run_operation,
+        )
+        return method
+
+    @pytest.fixture
+    def document(self) -> Document:
+        return DocumentFactory()
+
+    def test_rejects_private_template(
+        self,
+        rest_api_client: APIClient,
+        document: Document,
+        mock_run_zone_ocr: mock.MagicMock,
+    ) -> None:
+        """
+        GIVEN:
+            - A user who can change the documents but not view the template
+        WHEN:
+            - API is called with that template
+        THEN:
+            - The whole request is rejected with 400 on the template field
+        """
+        user = UserFactory(username="editor")
+        grant_global(user, "view_document", "change_document")
+        template = OcrTemplateFactory(
+            name="Private",
+            owner=UserFactory(username="other"),
+        )
+        rest_api_client.force_authenticate(user=user)
+
+        response = rest_api_client.post(
+            RUN_ZONE_OCR_BULK_URL,
+            {"documents": [document.id], "template": template.pk},
+            format="json",
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert "template" in response.json()
+        mock_run_zone_ocr.assert_not_called()
+
+    def test_rejects_owned_document_without_global_change_permission(
+        self,
+        rest_api_client: APIClient,
+        mock_run_zone_ocr: mock.MagicMock,
+    ) -> None:
+        """
+        GIVEN:
+            - A user without the global change_document permission
+            - A document owned by that user
+        WHEN:
+            - API is called with that document
+        THEN:
+            - The request is rejected with 403 and nothing is run
+        """
+        user = UserFactory(username="viewer")
+        grant_global(user, "view_document")
+        document = DocumentFactory(owner=user)
+        rest_api_client.force_authenticate(user=user)
+
+        response = rest_api_client.post(
+            RUN_ZONE_OCR_BULK_URL,
+            {"documents": [document.id]},
+            format="json",
+        )
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+        mock_run_zone_ocr.assert_not_called()
+
+    def test_object_change_permission_required_for_foreign_document(
+        self,
+        rest_api_client: APIClient,
+        mock_run_zone_ocr: mock.MagicMock,
+    ) -> None:
+        """
+        GIVEN:
+            - A user with global change_document permission
+            - A document owned by someone else, with no object permission for the user
+        WHEN:
+            - API is called with that document
+            - API is called again after the user is granted change on the document
+        THEN:
+            - The first request is rejected with 403 and nothing is run
+            - The second request is accepted and run_zone_ocr is called
+        """
+        user = UserFactory(username="editor")
+        grant_global(user, "view_document", "change_document")
+        document = DocumentFactory(owner=UserFactory(username="other"))
+        rest_api_client.force_authenticate(user=user)
+
+        denied = rest_api_client.post(
+            RUN_ZONE_OCR_BULK_URL,
+            {"documents": [document.id]},
+            format="json",
+        )
+
+        assert denied.status_code == status.HTTP_403_FORBIDDEN
+        mock_run_zone_ocr.assert_not_called()
+
+        grant_object(user, document, "change_document")
+
+        allowed = rest_api_client.post(
+            RUN_ZONE_OCR_BULK_URL,
+            {"documents": [document.id]},
+            format="json",
+        )
+
+        assert allowed.status_code == status.HTTP_200_OK
+        mock_run_zone_ocr.assert_called_once()
+        assert mock_run_zone_ocr.call_args.args[0] == [document.id]
