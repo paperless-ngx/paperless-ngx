@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-25 23:54+0000\n"
+"POT-Creation-Date: 2026-11-26 22:28+0000\n"
 "PO-Revision-Date: 2022-02-17 04:17\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -65,7 +65,7 @@ msgstr ""
 msgid "owner"
 msgstr ""
 
-#: documents/models.py:60 documents/models.py:1530
+#: documents/models.py:60 documents/models.py:1530 documents/models.py:2392
 msgid "None"
 msgstr ""
 
@@ -94,19 +94,20 @@ msgid "Automatic"
 msgstr ""
 
 #: documents/models.py:69 documents/models.py:705 documents/models.py:2157
-#: paperless_mail/models.py:23 paperless_mail/models.py:143
+#: documents/models.py:2220 paperless_mail/models.py:23
+#: paperless_mail/models.py:143
 msgid "name"
 msgstr ""
 
-#: documents/models.py:71 documents/models.py:1600
+#: documents/models.py:71 documents/models.py:1600 documents/models.py:2222
 msgid "match"
 msgstr ""
 
-#: documents/models.py:74 documents/models.py:1603
+#: documents/models.py:74 documents/models.py:1603 documents/models.py:2226
 msgid "matching algorithm"
 msgstr ""
 
-#: documents/models.py:79 documents/models.py:1608
+#: documents/models.py:79 documents/models.py:1608 documents/models.py:2231
 msgid "is insensitive"
 msgstr ""
 
@@ -216,6 +217,7 @@ msgstr ""
 
 #: documents/models.py:304 documents/models.py:1023 documents/models.py:1142
 #: documents/models.py:1204 documents/models.py:1332 documents/models.py:1391
+#: documents/models.py:2269
 msgid "created"
 msgstr ""
 
@@ -528,7 +530,7 @@ msgstr ""
 msgid "Large Cards"
 msgstr ""
 
-#: documents/models.py:691 documents/models.py:1877
+#: documents/models.py:691 documents/models.py:1877 documents/models.py:2319
 msgid "Title"
 msgstr ""
 
@@ -1028,7 +1030,7 @@ msgstr ""
 msgid "notes"
 msgstr ""
 
-#: documents/models.py:1069
+#: documents/models.py:1069 documents/models.py:2345
 msgid "page"
 msgstr ""
 
@@ -1158,7 +1160,7 @@ msgstr ""
 msgid "Extra data for the custom field, such as select options"
 msgstr ""
 
-#: documents/models.py:1358
+#: documents/models.py:1358 documents/models.py:2338
 msgid "custom field"
 msgstr ""
 
@@ -1453,7 +1455,7 @@ msgstr ""
 msgid "Workflow Action Type"
 msgstr ""
 
-#: documents/models.py:1890 documents/models.py:2159
+#: documents/models.py:1890 documents/models.py:2159 documents/models.py:2432
 #: paperless_mail/models.py:145
 msgid "order"
 msgstr ""
@@ -1644,7 +1646,8 @@ msgstr ""
 msgid "actions"
 msgstr ""
 
-#: documents/models.py:2175 paperless_mail/models.py:154
+#: documents/models.py:2175 documents/models.py:2255
+#: paperless_mail/models.py:154
 msgid "enabled"
 msgstr ""
 
@@ -1668,49 +1671,257 @@ msgstr ""
 msgid "workflow runs"
 msgstr ""
 
-#: documents/serialisers.py:483 documents/serialisers.py:807
-#: documents/serialisers.py:2856 documents/views.py:356 documents/views.py:622
-#: documents/views.py:2760 paperless_mail/serialisers.py:145
+#: documents/models.py:2234
+msgid "source width"
+msgstr ""
+
+#: documents/models.py:2236
+msgid "Width of the image the zones were drawn on (px)"
+msgstr ""
+
+#: documents/models.py:2240
+msgid "source height"
+msgstr ""
+
+#: documents/models.py:2242
+msgid "Height of the image the zones were drawn on (px)"
+msgstr ""
+
+#: documents/models.py:2251
+msgid "sample document"
+msgstr ""
+
+#: documents/models.py:2252
+msgid "Document used for previewing zones in the editor"
+msgstr ""
+
+#: documents/models.py:2258
+msgid "combine formats"
+msgstr ""
+
+#: documents/models.py:2262
+msgid ""
+"Per-target format strings for combining several zones into one field, keyed "
+"by target (custom field id, or 'title'/'asn'/'created'). Tokens like {Zone "
+"Name} are replaced with that zone's value."
+msgstr ""
+
+#: documents/models.py:2276
+msgid "updated"
+msgstr ""
+
+#: documents/models.py:2282
+msgid "OCR template"
+msgstr ""
+
+#: documents/models.py:2283
+msgid "OCR templates"
+msgstr ""
+
+#: documents/models.py:2308
+msgid "template"
+msgstr ""
+
+#: documents/models.py:2312
+msgid "zone name"
+msgstr ""
+
+#: documents/models.py:2314
+msgid "Descriptive name for this zone (e.g. 'Invoice Number')"
+msgstr ""
+
+#: documents/models.py:2318
+msgid "Custom field"
+msgstr ""
+
+#: documents/models.py:2320
+msgid "Archive serial number"
+msgstr ""
+
+#: documents/models.py:2321
+msgid "Date created"
+msgstr ""
+
+#: documents/models.py:2324
+msgid "target"
+msgstr ""
+
+#: documents/models.py:2329
+msgid ""
+"Where the extracted value is written: a custom field, or a built-in document "
+"field (title, ASN, created date)"
+msgstr ""
+
+#: documents/models.py:2341
+msgid "Target custom field (only used when target is 'custom_field')"
+msgstr ""
+
+#: documents/models.py:2348
+msgid "Page (1 = first, -1 = last; blank = first page)"
+msgstr ""
+
+#: documents/models.py:2351
+msgid "x"
+msgstr ""
+
+#: documents/models.py:2351
+msgid "Left edge (px)"
+msgstr ""
+
+#: documents/models.py:2352
+msgid "y"
+msgstr ""
+
+#: documents/models.py:2352
+msgid "Top edge (px)"
+msgstr ""
+
+#: documents/models.py:2354
+msgid "width"
+msgstr ""
+
+#: documents/models.py:2356
+msgid "Zone width (px)"
+msgstr ""
+
+#: documents/models.py:2359
+msgid "height"
+msgstr ""
+
+#: documents/models.py:2361
+msgid "Zone height (px)"
+msgstr ""
+
+#: documents/models.py:2366
+msgid "zone source width"
+msgstr ""
+
+#: documents/models.py:2370
+msgid ""
+"Width of the page image this zone was drawn on (px). Falls back to template "
+"source_width if unset."
+msgstr ""
+
+#: documents/models.py:2375
+msgid "zone source height"
+msgstr ""
+
+#: documents/models.py:2379
+msgid ""
+"Height of the page image this zone was drawn on (px). Falls back to template "
+"source_height if unset."
+msgstr ""
+
+#: documents/models.py:2385
+msgid "OCR language"
+msgstr ""
+
+#: documents/models.py:2388
+msgid "Tesseract language code(s), e.g. 'deu+eng'"
+msgstr ""
+
+#: documents/models.py:2393
+msgid "Strip whitespace"
+msgstr ""
+
+#: documents/models.py:2394
+msgid "Uppercase"
+msgstr ""
+
+#: documents/models.py:2395
+msgid "Lowercase"
+msgstr ""
+
+#: documents/models.py:2396
+msgid "Numeric only"
+msgstr ""
+
+#: documents/models.py:2399
+msgid "Remove leading/trailing punctuation"
+msgstr ""
+
+#: documents/models.py:2401
+msgid "Parse date"
+msgstr ""
+
+#: documents/models.py:2402
+msgid "Read QR/barcode"
+msgstr ""
+
+#: documents/models.py:2405
+msgid "transform"
+msgstr ""
+
+#: documents/models.py:2412
+msgid "date format"
+msgstr ""
+
+#: documents/models.py:2417
+msgid ""
+"Python strptime format for the 'Parse date' transform (e.g. %d.%m.%Y). Blank "
+"= auto-detect."
+msgstr ""
+
+#: documents/models.py:2423
+msgid "validation regex"
+msgstr ""
+
+#: documents/models.py:2428
+msgid ""
+"Optional regex pattern. Extracted text is only accepted if it fully matches."
+msgstr ""
+
+#: documents/models.py:2436
+msgid "OCR template zone"
+msgstr ""
+
+#: documents/models.py:2437
+msgid "OCR template zones"
+msgstr ""
+
+#: documents/serialisers.py:491 documents/serialisers.py:815
+#: documents/serialisers.py:2913 documents/views.py:372 documents/views.py:638
+#: documents/views.py:2868 paperless_mail/serialisers.py:145
 msgid "Insufficient permissions."
 msgstr ""
 
-#: documents/serialisers.py:639
+#: documents/serialisers.py:647
 msgid "Invalid color."
 msgstr ""
 
-#: documents/serialisers.py:2323
+#: documents/serialisers.py:2380
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr ""
 
-#: documents/serialisers.py:2367
+#: documents/serialisers.py:2424
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
 msgstr ""
 
-#: documents/serialisers.py:2374
+#: documents/serialisers.py:2431
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
 msgstr ""
 
-#: documents/serialisers.py:2391 documents/serialisers.py:2401
+#: documents/serialisers.py:2448 documents/serialisers.py:2458
 msgid ""
 "Custom fields must be a list of integers or an object mapping ids to values."
 msgstr ""
 
-#: documents/serialisers.py:2396
+#: documents/serialisers.py:2453
 msgid "Some custom fields don't exist or were specified twice."
 msgstr ""
 
-#: documents/serialisers.py:2543
+#: documents/serialisers.py:2600
 msgid "Invalid variable detected."
 msgstr ""
 
-#: documents/serialisers.py:2912
+#: documents/serialisers.py:2969
 msgid "Duplicate document identifiers are not allowed."
 msgstr ""
 
-#: documents/serialisers.py:2942 documents/views.py:4841
+#: documents/serialisers.py:2999 documents/views.py:5001
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr ""
@@ -1957,44 +2168,44 @@ msgstr ""
 msgid "As a final step, please complete the following form:"
 msgstr ""
 
-#: documents/validators.py:36
+#: documents/validators.py:39
 msgid ", "
 msgstr ""
 
-#: documents/views.py:311
+#: documents/views.py:327
 msgid "Specify only one of text, title_search, query, or more_like_id."
 msgstr ""
 
-#: documents/views.py:349 documents/views.py:2757
+#: documents/views.py:365 documents/views.py:2865
 msgid "Invalid more_like_id"
 msgstr ""
 
-#: documents/views.py:1681
+#: documents/views.py:1697
 msgid "Invalid AI configuration."
 msgstr ""
 
-#: documents/views.py:1692
+#: documents/views.py:1708
 msgid "AI backend request timed out."
 msgstr ""
 
-#: documents/views.py:1704
+#: documents/views.py:1720
 msgid "AI backend rejected the request. Check logs for details."
 msgstr ""
 
-#: documents/views.py:4857
+#: documents/views.py:5017
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr ""
 
-#: documents/views.py:4904
+#: documents/views.py:5064
 msgid "Bundle is already being processed."
 msgstr ""
 
-#: documents/views.py:4970
+#: documents/views.py:5130
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr ""
 
-#: documents/views.py:4984
+#: documents/views.py:5144
 msgid "The share link bundle is unavailable."
 msgstr ""
 
@@ -2286,155 +2497,155 @@ msgstr ""
 msgid "paperless application settings"
 msgstr ""
 
-#: paperless/settings/__init__.py:587
+#: paperless/settings/__init__.py:588
 msgid "English (US)"
 msgstr ""
 
-#: paperless/settings/__init__.py:588
+#: paperless/settings/__init__.py:589
 msgid "Arabic"
 msgstr ""
 
-#: paperless/settings/__init__.py:589
+#: paperless/settings/__init__.py:590
 msgid "Afrikaans"
 msgstr ""
 
-#: paperless/settings/__init__.py:590
+#: paperless/settings/__init__.py:591
 msgid "Belarusian"
 msgstr ""
 
-#: paperless/settings/__init__.py:591
+#: paperless/settings/__init__.py:592
 msgid "Bulgarian"
 msgstr ""
 
-#: paperless/settings/__init__.py:592
+#: paperless/settings/__init__.py:593
 msgid "Catalan"
 msgstr ""
 
-#: paperless/settings/__init__.py:593
+#: paperless/settings/__init__.py:594
 msgid "Czech"
 msgstr ""
 
-#: paperless/settings/__init__.py:594
+#: paperless/settings/__init__.py:595
 msgid "Danish"
 msgstr ""
 
-#: paperless/settings/__init__.py:595
+#: paperless/settings/__init__.py:596
 msgid "German"
 msgstr ""
 
-#: paperless/settings/__init__.py:596
+#: paperless/settings/__init__.py:597
 msgid "Greek"
 msgstr ""
 
-#: paperless/settings/__init__.py:597
+#: paperless/settings/__init__.py:598
 msgid "English (GB)"
 msgstr ""
 
-#: paperless/settings/__init__.py:598
+#: paperless/settings/__init__.py:599
 msgid "Spanish"
 msgstr ""
 
-#: paperless/settings/__init__.py:599
+#: paperless/settings/__init__.py:600
 msgid "Persian"
 msgstr ""
 
-#: paperless/settings/__init__.py:600
+#: paperless/settings/__init__.py:601
 msgid "Finnish"
 msgstr ""
 
-#: paperless/settings/__init__.py:601
+#: paperless/settings/__init__.py:602
 msgid "French"
 msgstr ""
 
-#: paperless/settings/__init__.py:602
+#: paperless/settings/__init__.py:603
 msgid "Hungarian"
 msgstr ""
 
-#: paperless/settings/__init__.py:603
+#: paperless/settings/__init__.py:604
 msgid "Indonesian"
 msgstr ""
 
-#: paperless/settings/__init__.py:604
+#: paperless/settings/__init__.py:605
 msgid "Italian"
 msgstr ""
 
-#: paperless/settings/__init__.py:605
+#: paperless/settings/__init__.py:606
 msgid "Japanese"
 msgstr ""
 
-#: paperless/settings/__init__.py:606
+#: paperless/settings/__init__.py:607
 msgid "Korean"
 msgstr ""
 
-#: paperless/settings/__init__.py:607
+#: paperless/settings/__init__.py:608
 msgid "Luxembourgish"
 msgstr ""
 
-#: paperless/settings/__init__.py:608
+#: paperless/settings/__init__.py:609
 msgid "Norwegian"
 msgstr ""
 
-#: paperless/settings/__init__.py:609
+#: paperless/settings/__init__.py:610
 msgid "Dutch"
 msgstr ""
 
-#: paperless/settings/__init__.py:610
+#: paperless/settings/__init__.py:611
 msgid "Polish"
 msgstr ""
 
-#: paperless/settings/__init__.py:611
+#: paperless/settings/__init__.py:612
 msgid "Portuguese (Brazil)"
 msgstr ""
 
-#: paperless/settings/__init__.py:612
+#: paperless/settings/__init__.py:613
 msgid "Portuguese"
 msgstr ""
 
-#: paperless/settings/__init__.py:613
+#: paperless/settings/__init__.py:614
 msgid "Romanian"
 msgstr ""
 
-#: paperless/settings/__init__.py:614
+#: paperless/settings/__init__.py:615
 msgid "Russian"
 msgstr ""
 
-#: paperless/settings/__init__.py:615
+#: paperless/settings/__init__.py:616
 msgid "Slovak"
 msgstr ""
 
-#: paperless/settings/__init__.py:616
+#: paperless/settings/__init__.py:617
 msgid "Slovenian"
 msgstr ""
 
-#: paperless/settings/__init__.py:617
+#: paperless/settings/__init__.py:618
 msgid "Serbian"
 msgstr ""
 
-#: paperless/settings/__init__.py:618
+#: paperless/settings/__init__.py:619
 msgid "Swedish"
 msgstr ""
 
-#: paperless/settings/__init__.py:619
+#: paperless/settings/__init__.py:620
 msgid "Turkish"
 msgstr ""
 
-#: paperless/settings/__init__.py:620
+#: paperless/settings/__init__.py:621
 msgid "Ukrainian"
 msgstr ""
 
-#: paperless/settings/__init__.py:621
+#: paperless/settings/__init__.py:622
 msgid "Vietnamese"
 msgstr ""
 
-#: paperless/settings/__init__.py:622
+#: paperless/settings/__init__.py:623
 msgid "Chinese Simplified"
 msgstr ""
 
-#: paperless/settings/__init__.py:623
+#: paperless/settings/__init__.py:624
 msgid "Chinese Traditional"
 msgstr ""
 
-#: paperless/urls.py:444
+#: paperless/urls.py:452
 msgid "Paperless-ngx administration"
 msgstr ""
 
