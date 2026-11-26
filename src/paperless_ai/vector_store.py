@@ -4,6 +4,7 @@ import sqlite3
 import struct
 from collections.abc import Iterator
 from collections.abc import Sequence
+from contextlib import ExitStack
 from contextlib import contextmanager
 from pathlib import Path
 from types import TracebackType
@@ -212,33 +213,38 @@ class PaperlessSqliteVecVectorStore(BasePydanticVectorStore):
 
     @staticmethod
     def _open_connection(db_path: str) -> sqlite3.Connection:
-        conn = sqlite3.connect(
-            db_path,
-            timeout=30,
-            isolation_level=None,  # autocommit; explicit transactions below
-        )
-        conn.row_factory = sqlite3.Row
-        conn.enable_load_extension(True)  # noqa: FBT003
-        sqlite_vec.load(conn)
-        conn.enable_load_extension(False)  # noqa: FBT003
-        conn.execute(f"PRAGMA page_size={DB_PAGE_SIZE}")
-        conn.execute("PRAGMA journal_mode=WAL")
-        conn.execute("PRAGMA synchronous=NORMAL")
-        IndexMetaTable.create(conn)
-        # vec0 metadata columns only get an efficient lookup path inside a
-        # KNN (MATCH) query; a plain `WHERE document_id = ?` is a full table
-        # scan regardless of index size. This plain, indexed table is how
-        # delete()/upsert_document() find a document's chunk ids without
-        # that scan.
-        DocumentChunksTable.create(conn)
-        # modified used to be a vec0 metadata column, but vec0 only inlines
-        # TEXT metadata up to 12 bytes -- an ISO timestamp is always longer,
-        # so every read recompiled and stepped a fresh SQL statement per row.
-        # It was never filtered on inside a KNN query either, so it never
-        # needed to be a vec0 column at all. One row per document here (not
-        # per chunk, like document_chunks), since every chunk of a document
-        # shares the same modified value -- see get_modified_times().
-        DocumentMetaTable.create(conn)
+        with ExitStack() as stack:
+            conn = sqlite3.connect(
+                db_path,
+                timeout=30,
+                isolation_level=None,  # autocommit; explicit transactions below
+            )
+            # Closes the connection (and its WAL/SHM handles) if any setup step
+            # below raises. pop_all() disarms it once setup has succeeded.
+            stack.callback(conn.close)
+            conn.row_factory = sqlite3.Row
+            conn.enable_load_extension(True)  # noqa: FBT003
+            sqlite_vec.load(conn)
+            conn.enable_load_extension(False)  # noqa: FBT003
+            conn.execute(f"PRAGMA page_size={DB_PAGE_SIZE}")
+            conn.execute("PRAGMA journal_mode=WAL")
+            conn.execute("PRAGMA synchronous=NORMAL")
+            IndexMetaTable.create(conn)
+            # vec0 metadata columns only get an efficient lookup path inside a
+            # KNN (MATCH) query; a plain `WHERE document_id = ?` is a full table
+            # scan regardless of index size. This plain, indexed table is how
+            # delete()/upsert_document() find a document's chunk ids without
+            # that scan.
+            DocumentChunksTable.create(conn)
+            # modified used to be a vec0 metadata column, but vec0 only inlines
+            # TEXT metadata up to 12 bytes -- an ISO timestamp is always longer,
+            # so every read recompiled and stepped a fresh SQL statement per row.
+            # It was never filtered on inside a KNN query either, so it never
+            # needed to be a vec0 column at all. One row per document here (not
+            # per chunk, like document_chunks), since every chunk of a document
+            # shares the same modified value -- see get_modified_times().
+            DocumentMetaTable.create(conn)
+            stack.pop_all()
         return conn
 
     @property

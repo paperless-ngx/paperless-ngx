@@ -1256,3 +1256,36 @@ class TestIndexPageSize:
 
             assert page_size_of(legacy_page_size_db) == DB_PAGE_SIZE
             assert DocumentChunksTable.count(store.client) == 2
+
+
+def test_open_connection_closes_connection_when_setup_fails(
+    tmp_path: Path,
+    mocker: MockerFixture,
+) -> None:
+    """
+    GIVEN a table setup step that fails after the connection was opened
+    WHEN the store is created
+    THEN the setup error propagates
+    AND the connection that was opened is closed, not leaked
+    """
+    opened: list[sqlite3.Connection] = []
+    real_connect = sqlite3.connect
+
+    def recording_connect(*args, **kwargs) -> sqlite3.Connection:
+        conn = real_connect(*args, **kwargs)
+        opened.append(conn)
+        return conn
+
+    mocker.patch("paperless_ai.vector_store.sqlite3.connect", recording_connect)
+    mocker.patch.object(
+        DocumentMetaTable,
+        "create",
+        side_effect=RuntimeError("setup failed"),
+    )
+
+    with pytest.raises(RuntimeError, match="setup failed"):
+        PaperlessSqliteVecVectorStore(uri=str(tmp_path))
+
+    assert len(opened) == 1
+    with pytest.raises(sqlite3.ProgrammingError):
+        opened[0].execute("SELECT 1")
