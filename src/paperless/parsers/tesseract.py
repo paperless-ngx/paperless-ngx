@@ -443,7 +443,7 @@ class RasterisedDocumentParser:
             self.log.warning(
                 f"PDF/A metadata stamping failed ({e!s}); falling back to plain PDF.",
             )
-            pdfa_path.write_bytes(plain_pdf_path.read_bytes())
+            shutil.copyfile(plain_pdf_path, pdfa_path)
 
         return pdfa_path
 

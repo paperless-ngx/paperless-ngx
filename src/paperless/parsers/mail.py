@@ -566,7 +566,7 @@ class MailDocumentParser:
         # If no HTML content, create the PDF from the message.
         # Otherwise, create 2 PDFs and merge them with Gotenberg.
         if not mail_message.html:
-            archive_path.write_bytes(mail_pdf_file.read_bytes())
+            shutil.copyfile(mail_pdf_file, archive_path)
         else:
             pdf_of_html_content = self.generate_pdf_from_html(
                 mail_message.html,
