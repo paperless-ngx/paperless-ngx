@@ -9,39 +9,39 @@ import {
 } from '../services/permissions.service'
 import { TagService } from '../services/rest/tag.service'
 import { SettingsService } from '../services/settings.service'
-import { collapseImpliedAncestors } from '../utils/collapse-tags'
+import { partitionTags, TagPartition } from '../utils/tag-display'
 
 /**
- * Drops tag IDs whose descendant is also in the list for when the child's
- * Tag badge already shows its parent.
+ * Splits a document's tag IDs into regular ones vs those the
+ * current user cannot view, see partitionTags.
  */
 @Pipe({
-  name: 'collapseTags',
+  name: 'displayTags',
 })
-export class CollapseTagsPipe implements PipeTransform {
+export class DisplayTagsPipe implements PipeTransform {
   private readonly permissionsService = inject(PermissionsService)
   private readonly tagService = inject(TagService)
   private readonly settingsService = inject(SettingsService)
 
-  transform(ids: number[]): Observable<number[]> {
+  transform(ids: number[]): Observable<TagPartition> {
+    if (!ids?.length) return of({ visible: [], hidden: [] })
     if (
-      !ids?.length ||
-      !this.settingsService.get(SETTINGS_KEYS.TAGS_SHOW_HIERARCHY) ||
       !this.permissionsService.currentUserCan(
         PermissionAction.View,
         PermissionType.Tag
       )
     ) {
-      return of(ids ?? [])
+      return of({ visible: [], hidden: ids })
     }
     return this.tagService.listAll().pipe(
       map((tags) =>
-        collapseImpliedAncestors(
+        partitionTags(
           ids,
-          new Map<number, Tag>(tags.results.map((t) => [t.id, t]))
+          new Map<number, Tag>(tags.results.map((t) => [t.id, t])),
+          !!this.settingsService.get(SETTINGS_KEYS.TAGS_SHOW_HIERARCHY)
         )
       ),
-      catchError(() => of(ids))
+      catchError(() => of({ visible: ids, hidden: [] }))
     )
   }
 }

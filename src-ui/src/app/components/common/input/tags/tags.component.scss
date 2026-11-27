@@ -12,6 +12,15 @@
   display: none !important;
 }
 
+// hidden tags bundle always sits after the visible tags
+::ng-deep .paperless-input-tags .ng-value:has(> .hidden-tags) {
+  order: 1;
+}
+
+::ng-deep .paperless-input-tags .ng-value-container .ng-input {
+  order: 2;
+}
+
 // let a long (nowrap) split badge shrink to the field instead of widening it
 ng-select,
 ::ng-deep .paperless-input-tags .ng-value-container {

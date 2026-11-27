@@ -415,10 +415,17 @@ th[pngxSortable] {
   .ng-select.ng-select-multiple .ng-select-container .ng-value-container .ng-value {
     background-color: transparent;
     border-color: transparent;
+    // split ng-select's 5px bottom margin so values stay vertically centered
+    margin-block: 2.5px;
   }
 
   .ng-select.ng-select-multiple .ng-select-container .ng-value-container {
-    padding-top: 1px;
+    padding-top: 0;
+  }
+
+  // undo bootstrap's .btn .badge nudge
+  .tag-wrap .badge {
+    top: 0;
   }
 }
 

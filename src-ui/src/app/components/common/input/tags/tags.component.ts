@@ -24,11 +24,10 @@ import { Tag } from 'src/app/data/tag'
 import { SETTINGS_KEYS } from 'src/app/data/ui-settings'
 import { TagService } from 'src/app/services/rest/tag.service'
 import { SettingsService } from 'src/app/services/settings.service'
-import {
-  collapseImpliedAncestors,
-  getTagAncestors,
-} from 'src/app/utils/collapse-tags'
+import { getTagAncestors, partitionTags } from 'src/app/utils/tag-display'
 import { matchesSearchText } from 'src/app/utils/text-search'
+import { ConfirmDialogComponent } from '../../confirm-dialog/confirm-dialog.component'
+import { HiddenTagsBadgeComponent } from '../../hidden-tags-badge/hidden-tags-badge.component'
 import { EditDialogMode } from '../../edit-dialog/edit-dialog.component'
 import { TagEditDialogComponent } from '../../edit-dialog/tag-edit-dialog/tag-edit-dialog.component'
 import { TagComponent } from '../../tag/tag.component'
@@ -51,6 +50,7 @@ import { TagComponent } from '../../tag/tag.component'
     ReactiveFormsModule,
     RouterModule,
     BootstrapIconComponent,
+    HiddenTagsBadgeComponent,
   ],
 })
 export class TagsComponent implements OnInit, ControlValueAccessor {
@@ -85,6 +85,7 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
   ngOnInit(): void {
     this.tagService.listAll().subscribe((result) => {
       this.tags = result.results
+      this.tagsLoaded = true
       this.changeDetector.markForCheck()
     })
   }
@@ -128,6 +129,8 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
 
   tags: Tag[] = []
 
+  private tagsLoaded = false
+
   public createTagRef: (name) => void
 
   public searchFn = (term: string, tag: Tag): boolean =>
@@ -143,8 +146,7 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
    * as segments of their descendant's badge.
    */
   isImplied(id: number): boolean {
-    if (!this.showsHierarchy || !this.tags || !this.value) return false
-    return !collapseImpliedAncestors(this.value, this.tagsById).includes(id)
+    return !!this.value?.includes(id) && !this.display.shown.has(id)
   }
 
   private get showsHierarchy(): boolean {
@@ -154,15 +156,101 @@ export class TagsComponent implements OnInit, ControlValueAccessor {
     )
   }
 
+  isHidden(id: number): boolean {
+    return this.display.hiddenSet.has(id)
+  }
+
   /**
-   * Remove the last visible tag (in case its actually a hidden ancestor)
+   * Tags that are hidden from the current user.
+   */
+  get hiddenTagIds(): number[] {
+    return this.display.hidden
+  }
+
+  private displayCache: {
+    value: number[]
+    tagsById: Map<number, Tag>
+    showsHierarchy: boolean
+    tagsLoaded: boolean
+    shown: Set<number>
+    hidden: number[]
+    hiddenSet: Set<number>
+  }
+
+  /**
+   * Partition of the current value, recomputed only when the value, tags or
+   * hierarchy setting change.
+   */
+  private get display() {
+    const tagsById = this.tagsById
+    const showsHierarchy = this.showsHierarchy
+    const cached = this.displayCache
+    if (
+      cached?.value === this.value &&
+      cached.tagsById === tagsById &&
+      cached.showsHierarchy === showsHierarchy &&
+      cached.tagsLoaded === this.tagsLoaded
+    ) {
+      return cached
+    }
+    const { visible, hidden } = partitionTags(
+      this.value,
+      tagsById,
+      showsHierarchy
+    )
+    const hiddenIds = this.tagsLoaded ? hidden : []
+    this.displayCache = {
+      value: this.value,
+      tagsById,
+      showsHierarchy,
+      tagsLoaded: this.tagsLoaded,
+      shown: new Set([...visible, ...hidden]),
+      hidden: hiddenIds,
+      hiddenSet: new Set(hiddenIds),
+    }
+    return this.displayCache
+  }
+
+  /**
+   * Remove the last visible tag (in case its actually a hidden ancestor or a
+   * tag the user cannot view)
    */
   readonly onKeyDown = (event: KeyboardEvent): boolean => {
     if (event.key !== 'Backspace' || this.select?.searchTerm) return true
-    const visible = this.value?.filter((id) => !this.isImplied(id)) ?? []
+    const visible =
+      this.value?.filter((id) => !this.isImplied(id) && !this.isHidden(id)) ??
+      []
     if (visible.length === (this.value?.length ?? 0)) return true
-    this.removeTag(visible.at(-1))
+    if (visible.length) this.removeTag(visible.at(-1))
     return false
+  }
+
+  /**
+   * Changes from ng-select itself (e.g. clear all) never drop hidden tags,
+   * those are only removed via their own badge.
+   */
+  onModelChange(newValue: number[]) {
+    const kept = this.hiddenTagIds.filter((id) => !newValue?.includes(id))
+    this.value = [...(newValue ?? []), ...kept]
+  }
+
+  removeHiddenTags() {
+    if (this.disabled) return
+    const hidden = new Set(this.hiddenTagIds)
+    if (!hidden.size) return
+    const modal = this.modalService.open(ConfirmDialogComponent, {
+      backdrop: 'static',
+    })
+    modal.componentInstance.title = $localize`Remove hidden tags`
+    modal.componentInstance.messageBold = $localize`Remove ${hidden.size} tag(s) you don't have access to?`
+    modal.componentInstance.message = $localize`You will not be able to add them back.`
+    modal.componentInstance.btnClass = 'btn-danger'
+    modal.componentInstance.btnCaption = $localize`Remove`
+    modal.componentInstance.confirmClicked.pipe(first()).subscribe(() => {
+      modal.close()
+      this.value = this.value.filter((id) => !hidden.has(id))
+      this.onChange(this.value)
+    })
   }
 
   getTag(id: number) {

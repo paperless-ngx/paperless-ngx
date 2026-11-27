@@ -41,3 +41,27 @@ export function getTagAncestors(id: number, tagsById: Map<number, Tag>): Tag[] {
   }
   return chain
 }
+
+export interface TagPartition {
+  visible: number[]
+  hidden: number[]
+}
+
+/**
+ * Splits a document's tag IDs for display. Tags missing from tagsById are hidden
+ * from the current user and when showing hierarchy, ancestors of a child are dropped
+ * since the descendant badge will show them.
+ */
+export function partitionTags(
+  ids: number[],
+  tagsById: Map<number, Tag>,
+  showHierarchy: boolean
+): TagPartition {
+  const shown = showHierarchy
+    ? collapseImpliedAncestors(ids, tagsById)
+    : (ids ?? [])
+  return {
+    visible: shown.filter((id) => tagsById.has(id)),
+    hidden: shown.filter((id) => !tagsById.has(id)),
+  }
+}

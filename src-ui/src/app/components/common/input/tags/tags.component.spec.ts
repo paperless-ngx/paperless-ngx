@@ -333,4 +333,87 @@ describe('TagsComponent', () => {
       ).toBe(true)
     })
   })
+
+  describe('hidden tags', () => {
+    // 98, 99 are not in the tags list i.e. the user cannot view them
+    beforeEach(() => {
+      component.tags = tags
+      component.value = [1, 98, 2, 99]
+      fixture.detectChanges()
+    })
+
+    it('should collapse hidden tags into a single badge', async () => {
+      await fixture.whenStable()
+      fixture.detectChanges()
+      expect(component.hiddenTagIds).toEqual([98, 99])
+      expect(component.isHidden(1)).toBe(false)
+      const badges = fixture.nativeElement.querySelectorAll('.ng-value')
+      const visible = Array.from(badges).filter(
+        (b: HTMLElement) => !b.querySelector('.implied-tag')
+      ) as HTMLElement[]
+      expect(visible).toHaveLength(3)
+      expect(visible[1].textContent).toContain('2 hidden')
+    })
+
+    it('should only recompute hidden tags when the value or tags change', () => {
+      const first = component.hiddenTagIds
+      expect(component.hiddenTagIds).toBe(first)
+      component.value = [1, 99]
+      expect(component.hiddenTagIds).toEqual([99])
+      component.tags = [...tags, { id: 99, name: 'now visible' }]
+      expect(component.hiddenTagIds).toEqual([])
+    })
+
+    it('should not treat tags as hidden before tags load', () => {
+      ;(component as any).tagsLoaded = false
+      expect(component.hiddenTagIds).toEqual([])
+    })
+
+    it('should not treat a hidden ancestor of a visible tag as hidden', () => {
+      component.tags = [{ id: 3, name: 'child', parent: 98 }]
+      component.value = [3, 98]
+      expect(component.hiddenTagIds).toEqual([])
+    })
+
+    it('should keep hidden tags when ng-select changes the selection', () => {
+      component.onModelChange([])
+      expect(component.value).toEqual([98, 99])
+      component.onModelChange([1, 10])
+      expect(component.value).toEqual([1, 10, 98, 99])
+    })
+
+    it('should skip hidden tags on backspace', () => {
+      const backspace = new KeyboardEvent('keydown', { key: 'Backspace' })
+      expect(component.onKeyDown(backspace)).toBe(false)
+      expect(component.value).toEqual([1, 98, 99])
+      expect(component.onKeyDown(backspace)).toBe(false)
+      expect(component.onKeyDown(backspace)).toBe(false)
+      expect(component.value).toEqual([98, 99])
+    })
+
+    it('should remove all hidden tags after confirmation', () => {
+      let propagated: number[]
+      component.registerOnChange((value: number[]) => (propagated = value))
+      let activeInstances: NgbModalRef[]
+      modalService.activeInstances.subscribe((v) => (activeInstances = v))
+
+      component.removeHiddenTags()
+      expect(modalService.hasOpenModals()).toBeTruthy()
+      expect(component.value).toEqual([1, 98, 2, 99])
+
+      activeInstances[0].componentInstance.confirmClicked.emit()
+      expect(component.value).toEqual([1, 2])
+      expect(propagated).toEqual([1, 2])
+    })
+
+    it('should not remove hidden tags when disabled or none exist', () => {
+      component.disabled = true
+      component.removeHiddenTags()
+      expect(modalService.hasOpenModals()).toBeFalsy()
+      component.disabled = false
+      component.value = [1]
+      component.removeHiddenTags()
+      expect(modalService.hasOpenModals()).toBeFalsy()
+    })
+  })
 })

@@ -6,7 +6,7 @@ import { Tag } from '../data/tag'
 import { PermissionsService } from '../services/permissions.service'
 import { TagService } from '../services/rest/tag.service'
 import { SettingsService } from '../services/settings.service'
-import { CollapseTagsPipe } from './collapse-tags.pipe'
+import { DisplayTagsPipe } from './display-tags.pipe'
 
 const tags: Tag[] = [
   { id: 1, name: 'Parent' },
@@ -14,8 +14,8 @@ const tags: Tag[] = [
   { id: 3, name: 'Other' },
 ]
 
-describe('CollapseTagsPipe', () => {
-  let pipe: CollapseTagsPipe
+describe('DisplayTagsPipe', () => {
+  let pipe: DisplayTagsPipe
   let tagService: TagService
   let settingsService: SettingsService
   let permissionsService: PermissionsService
@@ -23,12 +23,12 @@ describe('CollapseTagsPipe', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
-        CollapseTagsPipe,
+        DisplayTagsPipe,
         provideHttpClient(withInterceptorsFromDi()),
         provideHttpClientTesting(),
       ],
     })
-    pipe = TestBed.inject(CollapseTagsPipe)
+    pipe = TestBed.inject(DisplayTagsPipe)
     tagService = TestBed.inject(TagService)
     settingsService = TestBed.inject(SettingsService)
     permissionsService = TestBed.inject(PermissionsService)
@@ -39,29 +39,43 @@ describe('CollapseTagsPipe', () => {
       .mockReturnValue(of({ count: 3, all: [1, 2, 3], results: tags }))
   })
 
-  it('should drop parents implied by a selected child', async () => {
-    expect(await firstValueFrom(pipe.transform([1, 2, 3]))).toEqual([2, 3])
+  it('should split visible and hidden tags, collapsing implied parents', async () => {
+    expect(await firstValueFrom(pipe.transform([1, 2, 98, 3]))).toEqual({
+      visible: [2, 3],
+      hidden: [98],
+    })
   })
 
-  it('should pass ids through when hierarchy display is off or not permitted', async () => {
+  it('should not collapse parents when hierarchy display is off', async () => {
     jest.spyOn(settingsService, 'get').mockReturnValue(false)
-    expect(await firstValueFrom(pipe.transform([1, 2]))).toEqual([1, 2])
+    expect(await firstValueFrom(pipe.transform([1, 2]))).toEqual({
+      visible: [1, 2],
+      hidden: [],
+    })
+  })
 
-    jest.spyOn(settingsService, 'get').mockReturnValue(true)
+  it('should hide all tags without tag view permission', async () => {
     jest.spyOn(permissionsService, 'currentUserCan').mockReturnValue(false)
-    expect(await firstValueFrom(pipe.transform([1, 2]))).toEqual([1, 2])
+    expect(await firstValueFrom(pipe.transform([1, 2]))).toEqual({
+      visible: [],
+      hidden: [1, 2],
+    })
     expect(tagService.listAll).not.toHaveBeenCalled()
   })
 
   it('should handle empty input', async () => {
-    expect(await firstValueFrom(pipe.transform(null))).toEqual([])
-    expect(await firstValueFrom(pipe.transform([]))).toEqual([])
+    const empty = { visible: [], hidden: [] }
+    expect(await firstValueFrom(pipe.transform(null))).toEqual(empty)
+    expect(await firstValueFrom(pipe.transform([]))).toEqual(empty)
   })
 
-  it('should fall back to the original ids if tags fail to load', async () => {
+  it('should show the original ids if tags fail to load', async () => {
     jest
       .spyOn(tagService, 'listAll')
       .mockReturnValue(throwError(() => new Error('failed')))
-    expect(await firstValueFrom(pipe.transform([1, 2]))).toEqual([1, 2])
+    expect(await firstValueFrom(pipe.transform([1, 2]))).toEqual({
+      visible: [1, 2],
+      hidden: [],
+    })
   })
 })

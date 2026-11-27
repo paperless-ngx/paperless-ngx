@@ -68,6 +68,7 @@ import exclamationCircleFill from 'bootstrap-icons/icons/exclamation-circle-fill
 import exclamationTriangleFill from 'bootstrap-icons/icons/exclamation-triangle-fill.svg'
 import exclamationTriangle from 'bootstrap-icons/icons/exclamation-triangle.svg'
 import eye from 'bootstrap-icons/icons/eye.svg'
+import eyeSlash from 'bootstrap-icons/icons/eye-slash.svg'
 import fileEarmarkArrowUp from 'bootstrap-icons/icons/file-earmark-arrow-up.svg'
 import fileEarmarkCheck from 'bootstrap-icons/icons/file-earmark-check.svg'
 import fileEarmarkDiff from 'bootstrap-icons/icons/file-earmark-diff.svg'
@@ -234,6 +235,7 @@ export const icons: Record<string, string> = {
   exclamationTriangle,
   exclamationTriangleFill,
   eye,
+  eyeSlash,
   fileEarmark,
   fileEarmarkArrowUp,
   fileEarmarkCheck,

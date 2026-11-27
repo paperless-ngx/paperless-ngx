@@ -17,7 +17,7 @@ import {
 } from 'src/app/services/permissions.service'
 import { TagService } from 'src/app/services/rest/tag.service'
 import { SettingsService } from 'src/app/services/settings.service'
-import { getTagAncestors } from 'src/app/utils/collapse-tags'
+import { getTagAncestors } from 'src/app/utils/tag-display'
 
 const FOCUS_ANIMATION_MS = 200
 // matches the .split-parent min-width in tag.component.scss

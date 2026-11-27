@@ -1,5 +1,9 @@
 import { Tag } from '../data/tag'
-import { collapseImpliedAncestors, getTagAncestors } from './collapse-tags'
+import {
+  collapseImpliedAncestors,
+  getTagAncestors,
+  partitionTags,
+} from './tag-display'
 
 const tags: Tag[] = [
   { id: 1, name: 'Finance' },
@@ -43,5 +47,35 @@ describe('getTagAncestors', () => {
       [8, { id: 8, name: 'b', parent: 7 }],
     ])
     expect(getTagAncestors(7, cyclic).map((t) => t.id)).toEqual([7, 8])
+  })
+})
+
+describe('partitionTags', () => {
+  it('splits ids into visible and hidden, keeping order', () => {
+    expect(partitionTags([5, 98, 4, 99], tagsById, true)).toEqual({
+      visible: [5, 4],
+      hidden: [98, 99],
+    })
+    expect(partitionTags(null, tagsById, true)).toEqual({
+      visible: [],
+      hidden: [],
+    })
+  })
+
+  it('drops implied ancestors only when showing hierarchy', () => {
+    expect(partitionTags([1, 2, 3], tagsById, true).visible).toEqual([3])
+    expect(partitionTags([1, 2, 3], tagsById, false).visible).toEqual([1, 2, 3])
+  })
+
+  it('drops a hidden ancestor of a visible tag only when showing hierarchy', () => {
+    const withHiddenParent = new Map(tagsById)
+    withHiddenParent.set(6, { id: 6, name: 'Child', parent: 98 })
+    expect(partitionTags([6, 98, 99], withHiddenParent, true)).toEqual({
+      visible: [6],
+      hidden: [99],
+    })
+    expect(partitionTags([6, 98, 99], withHiddenParent, false).hidden).toEqual([
+      98, 99,
+    ])
   })
 })
