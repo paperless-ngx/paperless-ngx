@@ -105,6 +105,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
@@ -114,21 +115,19 @@ jobs:
           version: ${{ env.DEFAULT_UV_VERSION }}
           enable-cache: true
           python-version: 3.12
-      - run: uv sync --python 3.12 --group testing --frozen
-      - name: Run PBT-02 and save evidence log
+      - name: Run PBT-02 clean-machine demo and save evidence
         shell: bash
         env:
-          HYPOTHESIS_PROFILE: recorded
-        run: |
-          set -o pipefail
-          mkdir -p .artifacts
-          uv run --python 3.12 --dev --frozen pytest src/documents/tests/search/test_unicode_normalization.py -k TestTheNormalizer -n 0 -v --hypothesis-seed=20261008 --hypothesis-show-statistics --cov=documents.search._query --cov-branch --cov-report=term-missing 2>&1 | tee .artifacts/pbt-02-run.log
+          PBT02_ARTIFACT_DIR: .artifacts
+        run: bash scripts/demo-pbt-02.sh
       - name: Upload PBT-02 test evidence
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: always()
         with:
           name: pbt-02-evidence
-          path: .artifacts/pbt-02-run.log
+          path: .artifacts/
+          if-no-files-found: error
+          include-hidden-files: true
   pbt-03:
     name: PBT-03 path security
     runs-on: ubuntu-latest
