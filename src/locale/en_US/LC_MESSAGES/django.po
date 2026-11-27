@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-26 22:28+0000\n"
+"POT-Creation-Date: 2026-11-27 00:52+0000\n"
 "PO-Revision-Date: 2022-02-17 04:17\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -2168,8 +2168,24 @@ msgstr ""
 msgid "As a final step, please complete the following form:"
 msgstr ""
 
+#: documents/validators.py:27
+#, python-format
+msgid "Unable to parse URI %(value)s, missing scheme"
+msgstr ""
+
+#: documents/validators.py:32
+#, python-format
+msgid "Unable to parse URI %(value)s, missing net location or path"
+msgstr ""
+
 #: documents/validators.py:39
-msgid ", "
+#, python-format
+msgid "URI scheme '%(scheme)s' is not allowed. Allowed schemes: %(allowed)s"
+msgstr ""
+
+#: documents/validators.py:52
+#, python-format
+msgid "Unable to parse URI %(value)s"
 msgstr ""
 
 #: documents/views.py:327
