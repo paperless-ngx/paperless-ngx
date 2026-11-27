@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import abc
+import filecmp
 import hashlib
 import json
 import os
@@ -166,11 +167,18 @@ class DirectoryExportSink(ExportSink):
 
     @staticmethod
     def _content_unchanged(target: Path, new_bytes: bytes) -> bool:
-        """True if ``target`` already holds byte-identical content (BLAKE2b)."""
-        return (
-            hashlib.blake2b(target.read_bytes()).hexdigest()
-            == hashlib.blake2b(new_bytes).hexdigest()
-        )
+        """
+        True if ``target`` already holds byte-identical content (BLAKE2b).
+
+        The existing file is hashed in chunks rather than read into memory.
+        """
+        if target.stat().st_size != len(new_bytes):
+            return False
+        with target.open("rb") as handle:
+            return (
+                hashlib.file_digest(handle, "blake2b").hexdigest()
+                == hashlib.blake2b(new_bytes).hexdigest()
+            )
 
     def add_json(self, content: list | dict, arcname: str) -> None:
         target = (self._target / arcname).resolve()
@@ -214,10 +222,9 @@ class DirectoryExportSink(ExportSink):
     def _commit_streamed_file(self, target: Path, tmp: Path) -> None:
         if target in self._snapshot:
             self._snapshot.discard(target)
-            if self._compare_json and self._content_unchanged(
-                target,
-                tmp.read_bytes(),
-            ):
+            # A streamed manifest can be very large, so compare the two files
+            # in chunks instead of reading them into memory
+            if self._compare_json and filecmp.cmp(target, tmp, shallow=False):
                 tmp.unlink()
                 return
         tmp.rename(target)
