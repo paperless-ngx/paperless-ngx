@@ -8,6 +8,10 @@ import pytest
 from paperless_testing.factories import DocumentFactory
 
 if TYPE_CHECKING:
+    from unittest.mock import MagicMock
+
+    from pytest_mock import MockerFixture
+
     from documents.models import Document
     from paperless_testing.dirs import PaperlessDirs
 
@@ -65,3 +69,9 @@ def searchable_document(_search_index: None) -> "Document":
     doc = DocumentFactory.create(title="quarterly invoice", content="acme corp")
     get_backend().add_or_update(doc)
     return doc
+
+
+@pytest.fixture
+def mock_zone_ocr_run(mocker: "MockerFixture") -> "MagicMock":
+    """Patch the subprocess runner used by zone OCR (tesseract and pdftoppm)."""
+    return mocker.patch("documents.zone_ocr.subprocess.run")

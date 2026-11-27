@@ -13,8 +13,10 @@ from rest_framework.exceptions import PermissionDenied
 from documents import bulk_edit
 from documents.models import CustomFieldInstance
 from documents.models import Document
+from documents.models import OcrTemplate
 from documents.models import PaperlessTask
 from documents.permissions import has_document_operation_permissions
+from documents.permissions import has_perms_owner_aware
 from documents.tasks import bulk_update_documents
 
 MODIFIED_FIELDS = {
@@ -34,6 +36,7 @@ QUEUED_OPERATIONS = frozenset(
         "delete",
         "reprocess",
         "run_workflow",
+        "run_zone_ocr",
         "rotate",
         "merge",
         "merge_as_versions",
@@ -52,10 +55,11 @@ USER_OPERATIONS = frozenset(
         "edit_pdf",
         "remove_password",
         "merge_as_versions",
+        "run_zone_ocr",
     },
 )
-# merge_as_versions doesn't queue any consume tasks
-TRIGGER_SOURCE_OPERATIONS = USER_OPERATIONS - {"merge_as_versions"}
+# These don't queue any consume tasks
+TRIGGER_SOURCE_OPERATIONS = USER_OPERATIONS - {"merge_as_versions", "run_zone_ocr"}
 
 
 def snapshot_field(doc_ids: list[int], field: str) -> dict[int, Any]:
@@ -112,6 +116,15 @@ def execute_bulk_operation(
 
     if operation == "run_workflow" and not user.has_perm("documents.view_workflow"):
         raise PermissionDenied("Insufficient permissions to run this workflow")
+
+    if operation == "run_zone_ocr" and parameters.get("template") is not None:
+        template = OcrTemplate.objects.filter(pk=parameters["template"]).first()
+        if template is not None and not has_perms_owner_aware(
+            user,
+            "view_ocrtemplate",
+            template,
+        ):
+            raise PermissionDenied("Insufficient permissions to run this OCR template")
 
     actor_context = set_actor(user) if settings.AUDIT_LOG_ENABLED else nullcontext()
 

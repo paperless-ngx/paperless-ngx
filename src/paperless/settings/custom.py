@@ -4,6 +4,9 @@ import os
 from hashlib import sha256
 from pathlib import Path
 from typing import Any
+from urllib.parse import parse_qsl
+from urllib.parse import urlencode
+from urllib.parse import urlsplit
 
 from celery.schedules import crontab
 
@@ -26,6 +29,23 @@ def parse_hosting_settings() -> tuple[str | None, str, str, str, str]:
     return script_name, base_url, login_url, login_redirect_url, logout_redirect_url
 
 
+def _rewrite_socket_url(url: str, scheme: str, old_param: str, new_param: str) -> str:
+    """
+    Swaps the scheme of a socket URL and renames the database query parameter.
+    The URL is rewritten by hand, as urlunsplit drops the empty netloc
+    ("scheme:///path" would become "scheme:/path") for non-standard schemes.
+    """
+    parts = urlsplit(url)
+    base = f"{scheme}{url[len(parts.scheme) :]}".split("?", maxsplit=1)[0]
+    query = urlencode(
+        [
+            (new_param if key == old_param else key, value)
+            for key, value in parse_qsl(parts.query, keep_blank_values=True)
+        ],
+    )
+    return f"{base}?{query}" if query else base
+
+
 def parse_redis_url(env_redis: str | None) -> tuple[str, str]:
     """
     Gets the Redis information from the environment or a default and handles
@@ -38,30 +58,25 @@ def parse_redis_url(env_redis: str | None) -> tuple[str, str]:
     if env_redis is None:
         return ("redis://localhost:6379", "redis://localhost:6379")
 
-    if "unix" in env_redis.lower():
-        # channels_redis socket format, looks like:
-        # "unix:///path/to/redis.sock"
-        _, path = env_redis.split(":", maxsplit=1)
-        # Optionally setting a db number
-        if "?db=" in env_redis:
-            path, number = path.split("?db=")
-            return (f"redis+socket:{path}?virtual_host={number}", env_redis)
-        else:
-            return (f"redis+socket:{path}", env_redis)
-
-    elif "+socket" in env_redis.lower():
-        # celery socket style, looks like:
-        # "redis+socket:///path/to/redis.sock"
-        _, path = env_redis.split(":", maxsplit=1)
-        if "?virtual_host=" in env_redis:
-            # Virtual host (aka db number)
-            path, number = path.split("?virtual_host=")
-            return (env_redis, f"unix:{path}?db={number}")
-        else:
-            return (env_redis, f"unix:{path}")
-
-    # Not a socket
-    return (env_redis, env_redis)
+    match urlsplit(env_redis).scheme.lower():
+        case "unix":
+            # channels_redis socket format, looks like:
+            # "unix:///path/to/redis.sock" with an optional "?db=N"
+            return (
+                _rewrite_socket_url(env_redis, "redis+socket", "db", "virtual_host"),
+                env_redis,
+            )
+        case "redis+socket":
+            # celery socket style, looks like:
+            # "redis+socket:///path/to/redis.sock" with an optional "?virtual_host=N"
+            # (virtual host is the db number)
+            return (
+                env_redis,
+                _rewrite_socket_url(env_redis, "unix", "virtual_host", "db"),
+            )
+        case _:
+            # Not a socket
+            return (env_redis, env_redis)
 
 
 def parse_beat_schedule() -> dict:

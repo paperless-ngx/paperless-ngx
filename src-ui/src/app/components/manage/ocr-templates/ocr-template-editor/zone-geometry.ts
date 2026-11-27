@@ -1,0 +1,204 @@
+import { OcrTemplateZone } from 'src/app/data/ocr-template'
+
+export interface DrawingRect {
+  startX: number
+  startY: number
+  endX: number
+  endY: number
+}
+
+export interface Dimensions {
+  width: number
+  height: number
+}
+
+export interface Point {
+  x: number
+  y: number
+}
+
+export interface DisplayRect {
+  x: number
+  y: number
+  w: number
+  h: number
+}
+
+export interface MoveStart {
+  mouseX: number
+  mouseY: number
+  zoneX: number
+  zoneY: number
+}
+
+export type ResizeHandle = 'n' | 's' | 'e' | 'w' | 'ne' | 'nw' | 'se' | 'sw'
+
+export interface ResizeHandleMarker extends Point {
+  handle: ResizeHandle
+}
+
+export const HANDLE_SIZE = 8
+export const MIN_ZONE_SIZE = 10
+
+const ZONE_COLORS = [
+  '#4f8ff7',
+  '#ff6b6b',
+  '#51cf66',
+  '#ffd43b',
+  '#cc5de8',
+  '#ff922b',
+  '#20c997',
+  '#e599f7',
+]
+
+/** Outline color for a zone, shared by the preview overlay and the zone list. */
+export function getZoneColor(index: number): string {
+  return ZONE_COLORS[index % ZONE_COLORS.length]
+}
+
+export function getZonePage(
+  zone: OcrTemplateZone,
+  previewPage: number,
+  previewPageCount: number | null
+): number {
+  const page = zone.page ?? 1
+  if (page === -1) return previewPageCount ?? previewPage + 1
+  return Math.max(page, 1)
+}
+
+export function isZoneOnPage(
+  zone: OcrTemplateZone,
+  previewPage: number,
+  previewPageCount: number | null
+): boolean {
+  return getZonePage(zone, previewPage, previewPageCount) === previewPage + 1
+}
+
+function getZoneSourceSize(
+  zone: OcrTemplateZone,
+  imageSize: Dimensions
+): Dimensions {
+  return {
+    width: zone.zone_source_width || imageSize.width,
+    height: zone.zone_source_height || imageSize.height,
+  }
+}
+
+export function getZoneDisplayRect(
+  zone: OcrTemplateZone,
+  imageSize: Dimensions
+): DisplayRect {
+  const sourceSize = getZoneSourceSize(zone, imageSize)
+  // The SVG viewBox uses the preview image's natural dimensions.
+  const scaleX = imageSize.width / sourceSize.width
+  const scaleY = imageSize.height / sourceSize.height
+
+  return {
+    x: zone.x * scaleX,
+    y: zone.y * scaleY,
+    w: zone.width * scaleX,
+    h: zone.height * scaleY,
+  }
+}
+
+export function getResizeHandles(rect: DisplayRect): ResizeHandleMarker[] {
+  return [
+    { handle: 'nw', x: rect.x, y: rect.y },
+    { handle: 'n', x: rect.x + rect.w / 2, y: rect.y },
+    { handle: 'ne', x: rect.x + rect.w, y: rect.y },
+    { handle: 'w', x: rect.x, y: rect.y + rect.h / 2 },
+    { handle: 'e', x: rect.x + rect.w, y: rect.y + rect.h / 2 },
+    { handle: 'sw', x: rect.x, y: rect.y + rect.h },
+    { handle: 's', x: rect.x + rect.w / 2, y: rect.y + rect.h },
+    { handle: 'se', x: rect.x + rect.w, y: rect.y + rect.h },
+  ]
+}
+
+export function findHandleAt(
+  point: Point,
+  rect: DisplayRect,
+  handleSize = HANDLE_SIZE
+): ResizeHandle | null {
+  return (
+    getResizeHandles(rect).find(
+      ({ x, y }) =>
+        Math.abs(point.x - x) <= handleSize &&
+        Math.abs(point.y - y) <= handleSize
+    )?.handle ?? null
+  )
+}
+
+export function findZoneAt(
+  point: Point,
+  zones: OcrTemplateZone[],
+  previewPage: number,
+  previewPageCount: number | null,
+  imageSize: Dimensions
+): number | null {
+  for (let i = zones.length - 1; i >= 0; i--) {
+    const zone = zones[i]
+    if (!isZoneOnPage(zone, previewPage, previewPageCount)) continue
+    const rect = getZoneDisplayRect(zone, imageSize)
+
+    if (
+      point.x >= rect.x &&
+      point.x <= rect.x + rect.w &&
+      point.y >= rect.y &&
+      point.y <= rect.y + rect.h
+    ) {
+      return i
+    }
+  }
+
+  return null
+}
+
+export function moveZone(
+  zone: OcrTemplateZone,
+  point: Point,
+  moveStart: MoveStart,
+  imageSize: Dimensions
+) {
+  const sourceSize = getZoneSourceSize(zone, imageSize)
+  const scaleX = sourceSize.width / imageSize.width
+  const scaleY = sourceSize.height / imageSize.height
+  const dx = Math.round((point.x - moveStart.mouseX) * scaleX)
+  const dy = Math.round((point.y - moveStart.mouseY) * scaleY)
+
+  zone.x = clamp(moveStart.zoneX + dx, 0, sourceSize.width - zone.width)
+  zone.y = clamp(moveStart.zoneY + dy, 0, sourceSize.height - zone.height)
+}
+
+export function resizeZone(
+  zone: OcrTemplateZone,
+  handle: ResizeHandle,
+  point: Point,
+  imageSize: Dimensions
+) {
+  const sourceSize = getZoneSourceSize(zone, imageSize)
+  const scaleX = sourceSize.width / imageSize.width
+  const scaleY = sourceSize.height / imageSize.height
+  const imageX = clamp(Math.round(point.x * scaleX), 0, sourceSize.width)
+  const imageY = clamp(Math.round(point.y * scaleY), 0, sourceSize.height)
+
+  if (handle.includes('w')) {
+    const right = Math.min(zone.x + zone.width, sourceSize.width)
+    zone.x = clamp(imageX, 0, right - MIN_ZONE_SIZE)
+    zone.width = right - zone.x
+  }
+  if (handle.includes('e')) {
+    zone.width = Math.max(MIN_ZONE_SIZE, imageX - zone.x)
+  }
+  if (handle.includes('n')) {
+    const bottom = Math.min(zone.y + zone.height, sourceSize.height)
+    zone.y = clamp(imageY, 0, bottom - MIN_ZONE_SIZE)
+    zone.height = bottom - zone.y
+  }
+  if (handle.includes('s')) {
+    zone.height = Math.max(MIN_ZONE_SIZE, imageY - zone.y)
+  }
+}
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.max(min, Math.min(value, max))
+}

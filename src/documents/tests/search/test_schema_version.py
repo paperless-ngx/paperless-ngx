@@ -225,3 +225,21 @@ class TestCorruptedIndex:
 
         assert (current_index_missing_meta_json / "meta.json").exists()
         tantivy.Index.open(str(current_index_missing_meta_json))
+
+    def test_missing_meta_json_flags_index_for_reindex(
+        self,
+        current_index_missing_meta_json: Path,
+    ) -> None:
+        """
+        GIVEN:
+            - An index directory with matching sentinels but a missing meta.json
+        WHEN:
+            - open_or_rebuild_index() recreates it as an empty index
+        THEN:
+            - needs_rebuild() is True, so the next
+              `document_index reindex --if-needed` repopulates the index
+              instead of reporting the empty one as up to date
+        """
+        open_or_rebuild_index(current_index_missing_meta_json)
+
+        assert needs_rebuild(current_index_missing_meta_json)

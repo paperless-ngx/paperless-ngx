@@ -385,9 +385,16 @@ def open_or_rebuild_index(index_dir: Path | None = None) -> tantivy.Index:
         return tantivy.Index.open(str(index_dir))
     except ValueError:
         logger.exception(
-            "Search index is corrupted or incomplete - rebuilding from scratch.",
+            "Search index is corrupted or incomplete. A new, empty index was "
+            "created, but existing documents are not indexed yet. "
+            "They will be reindexed on the next startup, or run "
+            "'document_index reindex' to do so now.",
         )
         wipe_index(index_dir)
         idx = tantivy.Index(build_schema(), path=str(index_dir))
         _write_sentinels(index_dir)
+        # The new index is stamped as current but is empty. Flag it so the next
+        # `document_index reindex --if-needed` repopulates it. Reindexing here
+        # would block whichever process happened to open the index first.
+        (index_dir / REBUILD_MARKER).touch()
         return idx

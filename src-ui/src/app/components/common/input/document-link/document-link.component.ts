@@ -81,6 +81,9 @@ export class DocumentLinkComponent
   @Input()
   placeholder: string = $localize`Search for documents`
 
+  @Input()
+  multiple: boolean = true
+
   /**
    * Parent for ng-select dropdown, needed to prevent close on click.
    */

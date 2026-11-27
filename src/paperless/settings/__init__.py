@@ -227,6 +227,7 @@ SPECTACULAR_SETTINGS = {
     },
     "ENUM_NAME_OVERRIDES": {
         "MatchingAlgorithm": "documents.models.MatchingModel.MATCHING_ALGORITHMS",
+        "WorkflowTriggerMatchingAlgorithmEnum": "documents.models.WorkflowTrigger.WorkflowTriggerMatching",
         "BarcodeFormatEnum": "documents.models.DocumentBarcode.Format",
         "NoteFormatEnum": "documents.models.Note.Format",
     },
@@ -554,6 +555,13 @@ COOKIE_PREFIX = os.getenv("PAPERLESS_COOKIE_PREFIX", "")
 CSRF_COOKIE_NAME = f"{COOKIE_PREFIX}csrftoken"
 SESSION_COOKIE_NAME = f"{COOKIE_PREFIX}sessionid"
 LANGUAGE_COOKIE_NAME = f"{COOKIE_PREFIX}django_language"
+
+# Mark the session, CSRF and language cookies as Secure, so browsers only send
+# them over HTTPS. Off by default, as it breaks any access over plain HTTP.
+COOKIE_SECURE = get_bool_from_env("PAPERLESS_COOKIE_SECURE", "false")
+SESSION_COOKIE_SECURE = COOKIE_SECURE
+CSRF_COOKIE_SECURE = COOKIE_SECURE
+LANGUAGE_COOKIE_SECURE = COOKIE_SECURE
 
 EMAIL_CERTIFICATE_FILE = get_path_from_env("PAPERLESS_EMAIL_CERTIFICATE_LOCATION")
 EMAIL_ALLOW_INTERNAL_HOSTS = get_bool_from_env(

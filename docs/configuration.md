@@ -641,6 +641,20 @@ you're running two instances of paperless on the same host.
 
     Defaults to `""`, which does not alter the cookie names.
 
+#### [`PAPERLESS_COOKIE_SECURE=<bool>`](#PAPERLESS_COOKIE_SECURE) {#PAPERLESS_COOKIE_SECURE}
+
+: Marks the session, CSRF and language cookies with the `Secure` attribute, so browsers only send them over HTTPS. This sets the Django settings [`SESSION_COOKIE_SECURE`](https://docs.djangoproject.com/en/stable/ref/settings/#session-cookie-secure), [`CSRF_COOKIE_SECURE`](https://docs.djangoproject.com/en/stable/ref/settings/#csrf-cookie-secure) and [`LANGUAGE_COOKIE_SECURE`](https://docs.djangoproject.com/en/stable/ref/settings/#language-cookie-secure) together.
+
+    Enable this if you access paperless exclusively over HTTPS, for example behind a reverse proxy which terminates TLS.
+
+    !!! warning
+
+        Browsers will not send `Secure` cookies over plain HTTP, so logging in over HTTP, for example directly via a LAN address which bypasses the reverse proxy, will fail. Some browsers make an exception for `localhost`.
+
+    After changing this, you may have to login again.
+
+    Defaults to `false`.
+
 #### [`PAPERLESS_ENABLE_HTTP_REMOTE_USER=<bool>`](#PAPERLESS_ENABLE_HTTP_REMOTE_USER) {#PAPERLESS_ENABLE_HTTP_REMOTE_USER}
 
 : Allows authentication via HTTP_REMOTE_USER which is used by some SSO
