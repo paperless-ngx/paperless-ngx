@@ -99,15 +99,14 @@ def build_pdfs(
                         f"{page_count} pages",
                     )
         for specs, make_dst in outputs:
-            dst = pikepdf.new()
-            for spec in specs:
-                dst.pages.append(source.pages[spec.page - 1])
-                if spec.rotate:
-                    dst.pages[-1].rotate(spec.rotate, relative=True)
-            dst.remove_unreferenced_resources()
-            path = make_dst()
-            dst.save(path)
-            dst.close()
+            with pikepdf.new() as dst:
+                for spec in specs:
+                    dst.pages.append(source.pages[spec.page - 1])
+                    if spec.rotate:
+                        dst.pages[-1].rotate(spec.rotate, relative=True)
+                dst.remove_unreferenced_resources()
+                path = make_dst()
+                dst.save(path)
             written.append(path)
     return written
 
