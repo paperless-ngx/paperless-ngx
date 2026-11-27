@@ -296,9 +296,8 @@ class ApplicationConfigurationSerializer(
         return super().update(instance, validated_data)
 
     def _sanitize_raster_image(self, file: UploadedFile) -> UploadedFile:
-        try:
+        with Image.open(file) as image:
             data = BytesIO()
-            image = Image.open(file)
             image.save(data, format=image.format)
             data.seek(0)
 
@@ -310,8 +309,6 @@ class ApplicationConfigurationSerializer(
                 size=data.getbuffer().nbytes,
                 charset=getattr(file, "charset", None),
             )
-        finally:
-            image.close()
 
     def validate_app_logo(self, file: UploadedFile):
         """
