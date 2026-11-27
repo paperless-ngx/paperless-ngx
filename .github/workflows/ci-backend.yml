@@ -114,9 +114,12 @@ jobs:
           python-version: ${{ steps.setup-python.outputs.python-version }}
       - name: Install system dependencies
         timeout-minutes: 10
+        env:
+          DEBIAN_FRONTEND: noninteractive
+          NEEDRESTART_MODE: l
         run: |
           sudo apt-get update -qq
-          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends \
+          sudo apt-get install --yes -qq --no-install-recommends \
             unpaper tesseract-ocr imagemagick ghostscript poppler-utils
       - name: Configure ImageMagick
         run: |
