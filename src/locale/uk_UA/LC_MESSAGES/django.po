@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-17 20:48+0000\n"
-"PO-Revision-Date: 2026-11-17 20:50\n"
+"POT-Creation-Date: 2026-11-27 02:54+0000\n"
+"PO-Revision-Date: 2026-11-27 02:55\n"
 "Last-Translator: \n"
 "Language-Team: Ukrainian\n"
 "Language: uk_UA\n"
@@ -53,7 +53,7 @@ msgstr "{name!r} не є дійсним користувацьким полем.
 msgid "{data_type} does not support query expr {expr!r}."
 msgstr "{data_type} не підтримує вираз {expr!r}."
 
-#: documents/filters.py:815 documents/models.py:195
+#: documents/filters.py:815 documents/models.py:191
 msgid "Maximum nesting depth exceeded."
 msgstr "Перевищена максимальна глибина вкладення."
 
@@ -61,31 +61,31 @@ msgstr "Перевищена максимальна глибина вкладе�
 msgid "Custom field not found"
 msgstr "Не знайдено користувацьке поле"
 
-#: documents/models.py:43 documents/models.py:1188 documents/models.py:1236
+#: documents/models.py:43 documents/models.py:1184 documents/models.py:1232
 msgid "owner"
 msgstr "власник"
 
-#: documents/models.py:60 documents/models.py:1534
+#: documents/models.py:60 documents/models.py:1530 documents/models.py:2392
 msgid "None"
 msgstr "Немає"
 
-#: documents/models.py:61 documents/models.py:1535
+#: documents/models.py:61 documents/models.py:1531
 msgid "Any word"
 msgstr "Будь-яке слово"
 
-#: documents/models.py:62 documents/models.py:1536
+#: documents/models.py:62 documents/models.py:1532
 msgid "All words"
 msgstr "Усі слова"
 
-#: documents/models.py:63 documents/models.py:1537
+#: documents/models.py:63 documents/models.py:1533
 msgid "Exact match"
 msgstr "Точна відповідність"
 
-#: documents/models.py:64 documents/models.py:1538
+#: documents/models.py:64 documents/models.py:1534
 msgid "Regular expression"
 msgstr "Регулярний вираз"
 
-#: documents/models.py:65 documents/models.py:1539
+#: documents/models.py:65 documents/models.py:1535
 msgid "Fuzzy word"
 msgstr "Приблизний пошук"
 
@@ -93,24 +93,25 @@ msgstr "Приблизний пошук"
 msgid "Automatic"
 msgstr "Автоматично"
 
-#: documents/models.py:69 documents/models.py:709 documents/models.py:2161
-#: paperless_mail/models.py:23 paperless_mail/models.py:143
+#: documents/models.py:69 documents/models.py:705 documents/models.py:2157
+#: documents/models.py:2220 paperless_mail/models.py:23
+#: paperless_mail/models.py:143
 msgid "name"
 msgstr "назва"
 
-#: documents/models.py:71 documents/models.py:1604
+#: documents/models.py:71 documents/models.py:1600 documents/models.py:2222
 msgid "match"
 msgstr "відповідність"
 
-#: documents/models.py:74 documents/models.py:1607
+#: documents/models.py:74 documents/models.py:1603 documents/models.py:2226
 msgid "matching algorithm"
 msgstr "алгоритм зіставляння"
 
-#: documents/models.py:79 documents/models.py:1612
+#: documents/models.py:79 documents/models.py:1608 documents/models.py:2231
 msgid "is insensitive"
 msgstr "нечутливий до регістру"
 
-#: documents/models.py:102 documents/models.py:227
+#: documents/models.py:102 documents/models.py:223
 msgid "correspondent"
 msgstr "кореспондент"
 
@@ -138,1561 +139,1759 @@ msgstr "Позначає цей тег як вхідний тег: всі нещ
 msgid "tag"
 msgstr "тег"
 
-#: documents/models.py:132 documents/models.py:274
+#: documents/models.py:132 documents/models.py:270
 msgid "tags"
 msgstr "теги"
 
-#: documents/models.py:188
+#: documents/models.py:184
 msgid "Cannot set itself as parent."
 msgstr ""
 
-#: documents/models.py:192
+#: documents/models.py:188
 msgid "Cannot set parent to a descendant."
 msgstr ""
 
-#: documents/models.py:202 documents/models.py:247
+#: documents/models.py:198 documents/models.py:243
 msgid "document type"
 msgstr "тип документа"
 
-#: documents/models.py:203
+#: documents/models.py:199
 msgid "document types"
 msgstr "типи документів"
 
-#: documents/models.py:208
+#: documents/models.py:204
 msgid "path"
 msgstr "шлях"
 
-#: documents/models.py:212 documents/models.py:236
+#: documents/models.py:208 documents/models.py:232
 msgid "storage path"
 msgstr "шлях зберігання"
 
-#: documents/models.py:213
+#: documents/models.py:209
 msgid "storage paths"
 msgstr "шляхи зберігання"
 
-#: documents/models.py:239
+#: documents/models.py:235
 msgid "title"
 msgstr "заголовок"
 
-#: documents/models.py:251 documents/models.py:1014
+#: documents/models.py:247 documents/models.py:1010
 msgid "content"
 msgstr "вміст"
 
-#: documents/models.py:254
+#: documents/models.py:250
 msgid "The raw, text-only data of the document. This field is primarily used for searching."
 msgstr "Необроблений текст документа. Це поле використовується в переважно для пошуку."
 
-#: documents/models.py:268
+#: documents/models.py:264
 msgid "mime type"
 msgstr "тип MIME"
 
-#: documents/models.py:278
+#: documents/models.py:274
 msgid "checksum"
 msgstr "контрольна сума"
 
-#: documents/models.py:282
+#: documents/models.py:278
 msgid "The checksum of the original document."
 msgstr "Контрольна сума оригінального документа."
 
-#: documents/models.py:286
+#: documents/models.py:282
 msgid "archive checksum"
 msgstr "контрольна сума архіву"
 
-#: documents/models.py:292
+#: documents/models.py:288
 msgid "The checksum of the archived document."
 msgstr "Контрольна сума архівованого документа."
 
-#: documents/models.py:296
+#: documents/models.py:292
 msgid "page count"
 msgstr "кількість сторінок"
 
-#: documents/models.py:303
+#: documents/models.py:299
 msgid "The number of pages of the document."
 msgstr "Кількість сторінок документа."
 
-#: documents/models.py:308 documents/models.py:1027 documents/models.py:1146
-#: documents/models.py:1208 documents/models.py:1336 documents/models.py:1395
+#: documents/models.py:304 documents/models.py:1023 documents/models.py:1142
+#: documents/models.py:1204 documents/models.py:1332 documents/models.py:1391
+#: documents/models.py:2269
 msgid "created"
 msgstr "створено"
 
-#: documents/models.py:314
+#: documents/models.py:310
 msgid "modified"
 msgstr "змінено"
 
-#: documents/models.py:321
+#: documents/models.py:317
 msgid "added"
 msgstr "додано"
 
-#: documents/models.py:328
+#: documents/models.py:324
 msgid "filename"
 msgstr "назва файлу"
 
-#: documents/models.py:334
+#: documents/models.py:330
 msgid "Current filename in storage"
 msgstr "Поточна назва файлу в сховищі"
 
-#: documents/models.py:338
+#: documents/models.py:334
 msgid "archive filename"
 msgstr "назва файлу архіву"
 
-#: documents/models.py:344
+#: documents/models.py:340
 msgid "Current archive filename in storage"
 msgstr "Поточна назва файлу архіву в сховищі"
 
-#: documents/models.py:348
+#: documents/models.py:344
 msgid "original filename"
 msgstr "оригінальна назва файлу"
 
-#: documents/models.py:354
+#: documents/models.py:350
 msgid "The original name of the file when it was uploaded"
 msgstr "Оригінальна назва файлу, коли його було завантажено"
 
-#: documents/models.py:361
+#: documents/models.py:357
 msgid "archive serial number"
 msgstr "архівний серійний номер (АСН)"
 
-#: documents/models.py:371
+#: documents/models.py:367
 msgid "The position of this document in your physical document archive."
 msgstr "Позиція цього документа у вашому фізичному архіві документів."
 
-#: documents/models.py:381
+#: documents/models.py:377
 msgid "root document for this version"
 msgstr "кореневий документ для цієї версії"
 
-#: documents/models.py:385
+#: documents/models.py:381
 msgid "version index"
 msgstr ""
 
-#: documents/models.py:389
+#: documents/models.py:385
 msgid "Index of this version within the root document."
 msgstr ""
 
-#: documents/models.py:393
+#: documents/models.py:389
 msgid "version label"
 msgstr "мітка версії"
 
-#: documents/models.py:397
+#: documents/models.py:393
 msgid "Optional short label for a document version."
 msgstr ""
 
-#: documents/models.py:402 documents/models.py:1038 documents/models.py:1069
-#: documents/models.py:1173 documents/models.py:2204
+#: documents/models.py:398 documents/models.py:1034 documents/models.py:1065
+#: documents/models.py:1169 documents/models.py:2200
 msgid "document"
 msgstr "документ"
 
-#: documents/models.py:403 documents/models.py:1279
+#: documents/models.py:399 documents/models.py:1275
 msgid "documents"
 msgstr "документи"
 
-#: documents/models.py:628 documents/models.py:1142
+#: documents/models.py:624 documents/models.py:1138
 msgid "Archive"
 msgstr "Архів"
 
-#: documents/models.py:629
+#: documents/models.py:625
 msgid "Bank"
 msgstr ""
 
-#: documents/models.py:630
+#: documents/models.py:626
 msgid "Basket"
 msgstr ""
 
-#: documents/models.py:631
+#: documents/models.py:627
 msgid "Bell"
 msgstr ""
 
-#: documents/models.py:632
+#: documents/models.py:628
 msgid "Bookmark"
 msgstr ""
 
-#: documents/models.py:633
+#: documents/models.py:629
 msgid "Boxes"
 msgstr ""
 
-#: documents/models.py:634
+#: documents/models.py:630
 msgid "Briefcase"
 msgstr ""
 
-#: documents/models.py:635
+#: documents/models.py:631
 msgid "Building"
 msgstr ""
 
-#: documents/models.py:636
+#: documents/models.py:632
 msgid "Calculator"
 msgstr ""
 
-#: documents/models.py:637
+#: documents/models.py:633
 msgid "Calendar"
 msgstr ""
 
-#: documents/models.py:638
+#: documents/models.py:634
 msgid "Camera"
 msgstr ""
 
-#: documents/models.py:639
+#: documents/models.py:635
 msgid "Checklist"
 msgstr ""
 
-#: documents/models.py:640
+#: documents/models.py:636
 msgid "Cash"
 msgstr ""
 
-#: documents/models.py:641
+#: documents/models.py:637
 msgid "Chat"
 msgstr ""
 
-#: documents/models.py:642
+#: documents/models.py:638
 msgid "Check"
 msgstr ""
 
-#: documents/models.py:643
+#: documents/models.py:639
 msgid "Clipboard"
 msgstr ""
 
-#: documents/models.py:644
+#: documents/models.py:640
 msgid "Clock"
 msgstr ""
 
-#: documents/models.py:645
+#: documents/models.py:641
 msgid "Credit card"
 msgstr ""
 
-#: documents/models.py:646
+#: documents/models.py:642
 msgid "Download"
 msgstr ""
 
-#: documents/models.py:647
+#: documents/models.py:643
 msgid "Envelope"
 msgstr ""
 
-#: documents/models.py:648
+#: documents/models.py:644
 msgid "Warning"
 msgstr ""
 
-#: documents/models.py:649
+#: documents/models.py:645
 msgid "File"
 msgstr ""
 
-#: documents/models.py:650
+#: documents/models.py:646
 msgid "Checked file"
 msgstr ""
 
-#: documents/models.py:651
+#: documents/models.py:647
 msgid "Locked file"
 msgstr ""
 
-#: documents/models.py:652
+#: documents/models.py:648
 msgid "Medical file"
 msgstr ""
 
-#: documents/models.py:653
+#: documents/models.py:649
 msgid "Person file"
 msgstr ""
 
-#: documents/models.py:656
+#: documents/models.py:652
 msgid "Spreadsheet"
 msgstr ""
 
-#: documents/models.py:658
+#: documents/models.py:654
 msgid "Text file"
 msgstr ""
 
-#: documents/models.py:659
+#: documents/models.py:655
 msgid "Files"
 msgstr ""
 
-#: documents/models.py:660
+#: documents/models.py:656
 msgid "Folder"
 msgstr ""
 
-#: documents/models.py:661 paperless_mail/admin.py:58
+#: documents/models.py:657 paperless_mail/admin.py:58
 msgid "Filter"
 msgstr "Фільтр"
 
-#: documents/models.py:662
+#: documents/models.py:658
 msgid "Gear"
 msgstr ""
 
-#: documents/models.py:663
+#: documents/models.py:659
 msgid "Globe"
 msgstr ""
 
-#: documents/models.py:664
+#: documents/models.py:660
 msgid "Hash"
 msgstr ""
 
-#: documents/models.py:665
+#: documents/models.py:661
 msgid "Heart"
 msgstr ""
 
-#: documents/models.py:666
+#: documents/models.py:662
 msgid "House"
 msgstr ""
 
-#: documents/models.py:667
+#: documents/models.py:663
 msgid "Inbox"
 msgstr ""
 
-#: documents/models.py:668
+#: documents/models.py:664
 msgid "Journals"
 msgstr ""
 
-#: documents/models.py:669
+#: documents/models.py:665
 msgid "Task list"
 msgstr ""
 
-#: documents/models.py:670
+#: documents/models.py:666
 msgid "Newspaper"
 msgstr ""
 
-#: documents/models.py:671
+#: documents/models.py:667
 msgid "Attachment"
 msgstr ""
 
-#: documents/models.py:672
+#: documents/models.py:668
 msgid "People"
 msgstr ""
 
-#: documents/models.py:673
+#: documents/models.py:669
 msgid "Person"
 msgstr ""
 
-#: documents/models.py:674
+#: documents/models.py:670
 msgid "Printer"
 msgstr ""
 
-#: documents/models.py:675
+#: documents/models.py:671
 msgid "Receipt"
 msgstr ""
 
-#: documents/models.py:676
+#: documents/models.py:672
 msgid "Safe"
 msgstr ""
 
-#: documents/models.py:677
+#: documents/models.py:673
 msgid "Search"
 msgstr ""
 
-#: documents/models.py:678
+#: documents/models.py:674
 msgid "Send"
 msgstr ""
 
-#: documents/models.py:679
+#: documents/models.py:675
 msgid "Shop"
 msgstr ""
 
-#: documents/models.py:680
+#: documents/models.py:676
 msgid "Stack"
 msgstr ""
 
-#: documents/models.py:681
+#: documents/models.py:677
 msgid "Stars"
 msgstr ""
 
-#: documents/models.py:682
+#: documents/models.py:678
 msgid "Tag"
 msgstr ""
 
-#: documents/models.py:683 documents/models.py:698 documents/models.py:1882
+#: documents/models.py:679 documents/models.py:694 documents/models.py:1878
 msgid "Tags"
 msgstr "Теги"
 
-#: documents/models.py:684
+#: documents/models.py:680
 msgid "Telephone"
 msgstr ""
 
-#: documents/models.py:685
+#: documents/models.py:681
 msgid "Truck"
 msgstr ""
 
-#: documents/models.py:686
+#: documents/models.py:682
 msgid "Barcode"
 msgstr ""
 
-#: documents/models.py:687
+#: documents/models.py:683
 msgid "Wallet"
 msgstr ""
 
-#: documents/models.py:690
+#: documents/models.py:686
 msgid "Table"
 msgstr "Таблиця"
 
-#: documents/models.py:691
+#: documents/models.py:687
 msgid "Small Cards"
 msgstr "Малі Картки"
 
-#: documents/models.py:692
+#: documents/models.py:688
 msgid "Large Cards"
 msgstr "Великі Картки"
 
-#: documents/models.py:695 documents/models.py:1881
+#: documents/models.py:691 documents/models.py:1877 documents/models.py:2319
 msgid "Title"
 msgstr "Назва"
 
-#: documents/models.py:696 documents/models.py:926 documents/models.py:1556
+#: documents/models.py:692 documents/models.py:922 documents/models.py:1552
 msgid "Created"
 msgstr "Створено"
 
-#: documents/models.py:697 documents/models.py:1555
+#: documents/models.py:693 documents/models.py:1551
 msgid "Added"
 msgstr "Додано"
 
-#: documents/models.py:699 documents/models.py:1883
+#: documents/models.py:695 documents/models.py:1879
 msgid "Correspondent"
 msgstr "Кореспондент"
 
-#: documents/models.py:700
+#: documents/models.py:696
 msgid "Document Type"
 msgstr "Тип документа"
 
-#: documents/models.py:701
+#: documents/models.py:697
 msgid "Storage Path"
 msgstr "Шлях до сховища"
 
-#: documents/models.py:702
+#: documents/models.py:698
 msgid "Note"
 msgstr "Примітка"
 
-#: documents/models.py:703
+#: documents/models.py:699
 msgid "Owner"
 msgstr "Власник"
 
-#: documents/models.py:704
+#: documents/models.py:700
 msgid "Shared"
 msgstr "Спільні"
 
-#: documents/models.py:705
+#: documents/models.py:701
 msgid "ASN"
 msgstr "ASN"
 
-#: documents/models.py:706
+#: documents/models.py:702
 msgid "Pages"
 msgstr "Сторінки"
 
-#: documents/models.py:712
+#: documents/models.py:708
 msgid "icon"
 msgstr ""
 
-#: documents/models.py:719
+#: documents/models.py:715
 msgid "sort field"
 msgstr "поле сортування"
 
-#: documents/models.py:724
+#: documents/models.py:720
 msgid "sort reverse"
 msgstr "зворотнє сортування"
 
-#: documents/models.py:727
+#: documents/models.py:723
 msgid "View page size"
 msgstr "Розмір перегляду сторінок"
 
-#: documents/models.py:735
+#: documents/models.py:731
 msgid "View display mode"
 msgstr "Режим відображення"
 
-#: documents/models.py:742
+#: documents/models.py:738
 msgid "Document display fields"
 msgstr "Відображення полів документу"
 
-#: documents/models.py:749 documents/models.py:815
+#: documents/models.py:745 documents/models.py:811
 msgid "saved view"
 msgstr "збережене представлення"
 
-#: documents/models.py:750
+#: documents/models.py:746
 msgid "saved views"
 msgstr "збережені представлення"
 
-#: documents/models.py:758
+#: documents/models.py:754
 msgid "title contains"
 msgstr "заголовок містить"
 
-#: documents/models.py:759
+#: documents/models.py:755
 msgid "content contains"
 msgstr "вміст містить"
 
-#: documents/models.py:760
+#: documents/models.py:756
 msgid "ASN is"
 msgstr "АСН"
 
-#: documents/models.py:761
+#: documents/models.py:757
 msgid "correspondent is"
 msgstr "кореспондент"
 
-#: documents/models.py:762
+#: documents/models.py:758
 msgid "document type is"
 msgstr "тип документа"
 
-#: documents/models.py:763
+#: documents/models.py:759
 msgid "is in inbox"
 msgstr "у вхідних"
 
-#: documents/models.py:764
+#: documents/models.py:760
 msgid "has tag"
 msgstr "має тег"
 
-#: documents/models.py:765
+#: documents/models.py:761
 msgid "has any tag"
 msgstr "має будь-який тег"
 
-#: documents/models.py:766
+#: documents/models.py:762
 msgid "created before"
 msgstr "створено до"
 
-#: documents/models.py:767
+#: documents/models.py:763
 msgid "created after"
 msgstr "створено після"
 
-#: documents/models.py:768
+#: documents/models.py:764
 msgid "created year is"
 msgstr "рік створення"
 
-#: documents/models.py:769
+#: documents/models.py:765
 msgid "created month is"
 msgstr "місяць створення"
 
-#: documents/models.py:770
+#: documents/models.py:766
 msgid "created day is"
 msgstr "день створення"
 
-#: documents/models.py:771
+#: documents/models.py:767
 msgid "added before"
 msgstr "додано до"
 
-#: documents/models.py:772
+#: documents/models.py:768
 msgid "added after"
 msgstr "додано після"
 
-#: documents/models.py:773
+#: documents/models.py:769
 msgid "modified before"
 msgstr "змінено до"
 
-#: documents/models.py:774
+#: documents/models.py:770
 msgid "modified after"
 msgstr "змінено після"
 
-#: documents/models.py:775
+#: documents/models.py:771
 msgid "does not have tag"
 msgstr "не має тегу"
 
-#: documents/models.py:776
+#: documents/models.py:772
 msgid "does not have ASN"
 msgstr "не має АСН"
 
-#: documents/models.py:777
+#: documents/models.py:773
 msgid "title or content contains"
 msgstr "заголовок або вміст містить"
 
-#: documents/models.py:778
+#: documents/models.py:774
 msgid "fulltext query"
 msgstr "повнотекстовий запит"
 
-#: documents/models.py:779
+#: documents/models.py:775
 msgid "more like this"
 msgstr "шукати подібне"
 
-#: documents/models.py:780
+#: documents/models.py:776
 msgid "has tags in"
 msgstr "має теги в"
 
-#: documents/models.py:781
+#: documents/models.py:777
 msgid "ASN greater than"
 msgstr "АСН більший ніж"
 
-#: documents/models.py:782
+#: documents/models.py:778
 msgid "ASN less than"
 msgstr "АСН менший ніж"
 
-#: documents/models.py:783
+#: documents/models.py:779
 msgid "storage path is"
 msgstr "шлях зберігання"
 
-#: documents/models.py:784
+#: documents/models.py:780
 msgid "has correspondent in"
 msgstr "має кореспондента в"
 
-#: documents/models.py:785
+#: documents/models.py:781
 msgid "does not have correspondent in"
 msgstr "не має кореспондента в"
 
-#: documents/models.py:786
+#: documents/models.py:782
 msgid "has document type in"
 msgstr "має тип документа в"
 
-#: documents/models.py:787
+#: documents/models.py:783
 msgid "does not have document type in"
 msgstr "не має типу документа в"
 
-#: documents/models.py:788
+#: documents/models.py:784
 msgid "has storage path in"
 msgstr "має шлях до сховища в"
 
-#: documents/models.py:789
+#: documents/models.py:785
 msgid "does not have storage path in"
 msgstr "не має шляху до сховища в"
 
-#: documents/models.py:790
+#: documents/models.py:786
 msgid "owner is"
 msgstr "власник є"
 
-#: documents/models.py:791
+#: documents/models.py:787
 msgid "has owner in"
 msgstr "має власника в"
 
-#: documents/models.py:792
+#: documents/models.py:788
 msgid "does not have owner"
 msgstr "не має власника"
 
-#: documents/models.py:793
+#: documents/models.py:789
 msgid "does not have owner in"
 msgstr "не має власника в"
 
-#: documents/models.py:794
+#: documents/models.py:790
 msgid "has custom field value"
 msgstr "має значення спеціального поля"
 
-#: documents/models.py:795
+#: documents/models.py:791
 msgid "is shared by me"
 msgstr "поділився я"
 
-#: documents/models.py:796
+#: documents/models.py:792
 msgid "has custom fields"
 msgstr "має користувацькі поля"
 
-#: documents/models.py:797
+#: documents/models.py:793
 msgid "has custom field in"
 msgstr "має користувацькі поля у"
 
-#: documents/models.py:798
+#: documents/models.py:794
 msgid "does not have custom field in"
 msgstr "не має користувацьких полей у"
 
-#: documents/models.py:799
+#: documents/models.py:795
 msgid "does not have custom field"
 msgstr "не має користувацьких полей"
 
-#: documents/models.py:800
+#: documents/models.py:796
 msgid "custom fields query"
 msgstr ""
 
-#: documents/models.py:801
+#: documents/models.py:797
 msgid "created to"
 msgstr ""
 
-#: documents/models.py:802
+#: documents/models.py:798
 msgid "created from"
 msgstr "створено з"
 
-#: documents/models.py:803
+#: documents/models.py:799
 msgid "added to"
 msgstr "додано до"
 
-#: documents/models.py:804
+#: documents/models.py:800
 msgid "added from"
 msgstr "додано з"
 
-#: documents/models.py:805
+#: documents/models.py:801
 msgid "mime type is"
 msgstr "тип mime є"
 
-#: documents/models.py:806
+#: documents/models.py:802
 msgid "simple title search"
 msgstr ""
 
-#: documents/models.py:807
+#: documents/models.py:803
 msgid "simple text search"
 msgstr ""
 
-#: documents/models.py:808
+#: documents/models.py:804
 msgid "has duplicates"
 msgstr ""
 
-#: documents/models.py:818
+#: documents/models.py:814
 msgid "rule type"
 msgstr "тип правила"
 
-#: documents/models.py:820 documents/models.py:1077
+#: documents/models.py:816 documents/models.py:1073
 msgid "value"
 msgstr "значення"
 
-#: documents/models.py:823
+#: documents/models.py:819
 msgid "filter rule"
 msgstr "правило фільтрації"
 
-#: documents/models.py:824
+#: documents/models.py:820
 msgid "filter rules"
 msgstr "правила фільтрації"
 
-#: documents/models.py:854 documents/models.py:1202
+#: documents/models.py:850 documents/models.py:1198
 msgid "Pending"
 msgstr ""
 
-#: documents/models.py:855 documents/models.py:933
+#: documents/models.py:851 documents/models.py:929
 msgid "Started"
 msgstr ""
 
-#: documents/models.py:856
+#: documents/models.py:852
 msgid "Success"
 msgstr ""
 
-#: documents/models.py:857
+#: documents/models.py:853
 msgid "Failure"
 msgstr ""
 
-#: documents/models.py:858
+#: documents/models.py:854
 msgid "Revoked"
 msgstr ""
 
-#: documents/models.py:861
+#: documents/models.py:857
 msgid "Consume File"
 msgstr ""
 
-#: documents/models.py:862
+#: documents/models.py:858
 msgid "Train Classifier"
 msgstr "Навчити класифікатор"
 
-#: documents/models.py:863
+#: documents/models.py:859
 msgid "Sanity Check"
 msgstr ""
 
-#: documents/models.py:864
+#: documents/models.py:860
 msgid "Index Optimize"
 msgstr ""
 
-#: documents/models.py:865 documents/models.py:1551
+#: documents/models.py:861 documents/models.py:1547
 msgid "Mail Fetch"
 msgstr "Завантаження пошти"
 
-#: documents/models.py:866
+#: documents/models.py:862
 msgid "LLM Index"
 msgstr ""
 
-#: documents/models.py:867
+#: documents/models.py:863
 msgid "Empty Trash"
 msgstr ""
 
-#: documents/models.py:868
+#: documents/models.py:864
 msgid "Check Workflows"
 msgstr ""
 
-#: documents/models.py:869
+#: documents/models.py:865
 msgid "Bulk Update"
 msgstr ""
 
-#: documents/models.py:870
+#: documents/models.py:866
 msgid "Reprocess Document"
 msgstr ""
 
-#: documents/models.py:871
+#: documents/models.py:867
 msgid "Build Share Link"
 msgstr ""
 
-#: documents/models.py:872
+#: documents/models.py:868
 msgid "Bulk Delete"
 msgstr ""
 
-#: documents/models.py:873
+#: documents/models.py:869
 msgid "Apply AI Suggestions"
 msgstr ""
 
-#: documents/models.py:882 documents/models.py:1545
+#: documents/models.py:878 documents/models.py:1541
 msgid "Scheduled"
 msgstr "Заплановано"
 
-#: documents/models.py:883 documents/models.py:1552
+#: documents/models.py:879 documents/models.py:1548
 msgid "Web UI"
 msgstr "Веб-інтерфейс"
 
-#: documents/models.py:884
+#: documents/models.py:880
 msgid "API Upload"
 msgstr ""
 
-#: documents/models.py:885
+#: documents/models.py:881
 msgid "Folder Consume"
 msgstr ""
 
-#: documents/models.py:886
+#: documents/models.py:882
 msgid "Email Consume"
 msgstr ""
 
-#: documents/models.py:887
+#: documents/models.py:883
 msgid "System"
 msgstr ""
 
-#: documents/models.py:888 documents/models.py:1546
+#: documents/models.py:884 documents/models.py:1542
 msgid "Manual"
 msgstr ""
 
-#: documents/models.py:894
+#: documents/models.py:890
 msgid "Task ID"
 msgstr "ID завдання"
 
-#: documents/models.py:895
+#: documents/models.py:891
 msgid "Celery task ID"
 msgstr ""
 
-#: documents/models.py:901
+#: documents/models.py:897
 msgid "Task Type"
 msgstr ""
 
-#: documents/models.py:902
+#: documents/models.py:898
 msgid "The kind of work being performed"
 msgstr ""
 
-#: documents/models.py:909
+#: documents/models.py:905
 msgid "Trigger Source"
 msgstr ""
 
-#: documents/models.py:910
+#: documents/models.py:906
 msgid "What initiated this task"
 msgstr ""
 
-#: documents/models.py:919
+#: documents/models.py:915
 msgid "Status"
 msgstr ""
 
-#: documents/models.py:939
+#: documents/models.py:935
 msgid "Completed"
 msgstr ""
 
-#: documents/models.py:947
+#: documents/models.py:943
 msgid "Duration (seconds)"
 msgstr ""
 
-#: documents/models.py:948
+#: documents/models.py:944
 msgid "Elapsed time from start to completion"
 msgstr ""
 
-#: documents/models.py:954
+#: documents/models.py:950
 msgid "Wait Time (seconds)"
 msgstr "Час очікування (сек)"
 
-#: documents/models.py:955
+#: documents/models.py:951
 msgid "Time from task creation to worker pickup"
 msgstr ""
 
-#: documents/models.py:962
+#: documents/models.py:958
 msgid "Input Data"
 msgstr "Вхідні дані"
 
-#: documents/models.py:963
+#: documents/models.py:959
 msgid "Structured input parameters for the task"
 msgstr ""
 
-#: documents/models.py:969
+#: documents/models.py:965
 msgid "Result Data"
 msgstr "Дані результату"
 
-#: documents/models.py:970
+#: documents/models.py:966
 msgid "Structured result data from task execution"
 msgstr ""
 
-#: documents/models.py:976
+#: documents/models.py:972
 msgid "Acknowledged"
 msgstr "Підтверджено"
 
-#: documents/models.py:981
+#: documents/models.py:977
 msgid "Task"
 msgstr "Задача"
 
-#: documents/models.py:982
+#: documents/models.py:978
 msgid "Tasks"
 msgstr "Задачі"
 
-#: documents/models.py:1010
+#: documents/models.py:1006
 msgid "Plain"
 msgstr ""
 
-#: documents/models.py:1011
+#: documents/models.py:1007
 msgid "Markdown"
 msgstr ""
 
-#: documents/models.py:1016
+#: documents/models.py:1012
 msgid "Note for the document"
 msgstr "Примітка до документа"
 
-#: documents/models.py:1023 documents/models.py:1129
+#: documents/models.py:1019 documents/models.py:1125
 msgid "format"
 msgstr ""
 
-#: documents/models.py:1047
+#: documents/models.py:1043
 msgid "user"
 msgstr "користувач"
 
-#: documents/models.py:1052
+#: documents/models.py:1048
 msgid "note"
 msgstr "примітка"
 
-#: documents/models.py:1053
+#: documents/models.py:1049
 msgid "notes"
 msgstr "нотатки"
 
-#: documents/models.py:1073
+#: documents/models.py:1069 documents/models.py:2345
 msgid "page"
 msgstr ""
 
-#: documents/models.py:1074
+#: documents/models.py:1070
 msgid "Page of the original file, starting at 1"
 msgstr ""
 
-#: documents/models.py:1133
+#: documents/models.py:1129
 msgid "document barcode"
 msgstr ""
 
-#: documents/models.py:1134
+#: documents/models.py:1130
 msgid "document barcodes"
 msgstr ""
 
-#: documents/models.py:1143
+#: documents/models.py:1139
 msgid "Original"
 msgstr "Оригінал"
 
-#: documents/models.py:1154 documents/models.py:1216
+#: documents/models.py:1150 documents/models.py:1212
 #: paperless_mail/models.py:75
 msgid "expiration"
 msgstr "закінчується"
 
-#: documents/models.py:1161 documents/models.py:1223
+#: documents/models.py:1157 documents/models.py:1219
 msgid "slug"
 msgstr "слаг"
 
-#: documents/models.py:1193
+#: documents/models.py:1189
 msgid "share link"
 msgstr "поділитися посиланням"
 
-#: documents/models.py:1194
+#: documents/models.py:1190
 msgid "share links"
 msgstr "поділитися посиланнями"
 
-#: documents/models.py:1203
+#: documents/models.py:1199
 msgid "Processing"
 msgstr "Обробка"
 
-#: documents/models.py:1204
+#: documents/models.py:1200
 msgid "Ready"
 msgstr "Готово"
 
-#: documents/models.py:1205
+#: documents/models.py:1201
 msgid "Failed"
 msgstr ""
 
-#: documents/models.py:1252
+#: documents/models.py:1248
 msgid "size (bytes)"
 msgstr ""
 
-#: documents/models.py:1258
+#: documents/models.py:1254
 msgid "last error"
 msgstr ""
 
-#: documents/models.py:1265
+#: documents/models.py:1261
 msgid "file path"
 msgstr ""
 
-#: documents/models.py:1271
+#: documents/models.py:1267
 msgid "built at"
 msgstr ""
 
-#: documents/models.py:1284
+#: documents/models.py:1280
 msgid "share link bundle"
 msgstr ""
 
-#: documents/models.py:1285
+#: documents/models.py:1281
 msgid "share link bundles"
 msgstr ""
 
-#: documents/models.py:1288
+#: documents/models.py:1284
 #, python-format
 msgid "Share link bundle %(slug)s"
 msgstr ""
 
-#: documents/models.py:1324
+#: documents/models.py:1320
 msgid "String"
 msgstr "Текст"
 
-#: documents/models.py:1325
+#: documents/models.py:1321
 msgid "URL"
 msgstr "URL-адреса"
 
-#: documents/models.py:1326
+#: documents/models.py:1322
 msgid "Date"
 msgstr "Дата"
 
-#: documents/models.py:1327
+#: documents/models.py:1323
 msgid "Boolean"
 msgstr "Логічне значення"
 
-#: documents/models.py:1328
+#: documents/models.py:1324
 msgid "Integer"
 msgstr "Ціле число"
 
-#: documents/models.py:1329
+#: documents/models.py:1325
 msgid "Float"
 msgstr "З рухомою комою"
 
-#: documents/models.py:1330
+#: documents/models.py:1326
 msgid "Monetary"
 msgstr "Монетарний"
 
-#: documents/models.py:1331
+#: documents/models.py:1327
 msgid "Document Link"
 msgstr "Посилання на документ"
 
-#: documents/models.py:1332
+#: documents/models.py:1328
 msgid "Select"
 msgstr "Вибрати"
 
-#: documents/models.py:1333
+#: documents/models.py:1329
 msgid "Long Text"
 msgstr "Довгий текст"
 
-#: documents/models.py:1345
+#: documents/models.py:1341
 msgid "data type"
 msgstr "тип даних"
 
-#: documents/models.py:1352
+#: documents/models.py:1348
 msgid "extra data"
 msgstr "додаткові дані"
 
-#: documents/models.py:1356
+#: documents/models.py:1352
 msgid "Extra data for the custom field, such as select options"
 msgstr "Додаткові дані для користувальницького поля, такі як варіанти вибору"
 
-#: documents/models.py:1362
+#: documents/models.py:1358 documents/models.py:2338
 msgid "custom field"
 msgstr "користувацьке поле"
 
-#: documents/models.py:1363
+#: documents/models.py:1359
 msgid "custom fields"
 msgstr "користувацькі поля"
 
-#: documents/models.py:1463
+#: documents/models.py:1459
 msgid "custom field instance"
 msgstr "спеціальний екземпляр поля"
 
-#: documents/models.py:1464
+#: documents/models.py:1460
 msgid "custom field instances"
 msgstr "спеціальні екземпляри поля"
 
-#: documents/models.py:1542
+#: documents/models.py:1538
 msgid "Consumption Started"
 msgstr "Використання розпочато"
 
-#: documents/models.py:1543
+#: documents/models.py:1539
 msgid "Document Added"
 msgstr "Документ додано"
 
-#: documents/models.py:1544
+#: documents/models.py:1540
 msgid "Document Updated"
 msgstr "Документ оновлено"
 
-#: documents/models.py:1549
+#: documents/models.py:1545
 msgid "Consume Folder"
 msgstr "Використати теку"
 
-#: documents/models.py:1550
+#: documents/models.py:1546
 msgid "Api Upload"
 msgstr "Завантаження API"
 
-#: documents/models.py:1557
+#: documents/models.py:1553
 msgid "Modified"
 msgstr "Змінено"
 
-#: documents/models.py:1558
+#: documents/models.py:1554
 msgid "Custom Field"
 msgstr ""
 
-#: documents/models.py:1561
+#: documents/models.py:1557
 msgid "Workflow Trigger Type"
 msgstr "Тип тригера робочого процесу"
 
-#: documents/models.py:1573
+#: documents/models.py:1569
 msgid "filter path"
 msgstr "шлях фільтра"
 
-#: documents/models.py:1578
+#: documents/models.py:1574
 msgid "Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
 msgstr "Використовувати лише документи зі шляхом, який відповідає цьому, якщо вказано. Допускаються символи підставлення, позначені як *. Регістр не враховується."
 
-#: documents/models.py:1585
+#: documents/models.py:1581
 msgid "filter filename"
 msgstr "фільтрувати за назвою файлу"
 
-#: documents/models.py:1590 paperless_mail/models.py:200
+#: documents/models.py:1586 paperless_mail/models.py:200
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
 msgstr "Обробляти лише ті документи, які повністю відповідають назві файлу, якщо вказано. Шаблони, такі як *.pdf чи *invoice* дозволені. Без врахування регістру."
 
-#: documents/models.py:1601
+#: documents/models.py:1597
 msgid "filter documents from this mail rule"
 msgstr "фільтрувати документи з цього правила пошти"
 
-#: documents/models.py:1617
+#: documents/models.py:1613
 msgid "has these tag(s)"
 msgstr "має цей тег(и)"
 
-#: documents/models.py:1624
+#: documents/models.py:1620
 msgid "has all of these tag(s)"
 msgstr ""
 
-#: documents/models.py:1631
+#: documents/models.py:1627
 msgid "does not have these tag(s)"
 msgstr ""
 
-#: documents/models.py:1639
+#: documents/models.py:1635
 msgid "has this document type"
 msgstr "має тип документа"
 
-#: documents/models.py:1646
+#: documents/models.py:1642
 msgid "has one of these document types"
 msgstr ""
 
-#: documents/models.py:1653
+#: documents/models.py:1649
 msgid "does not have these document type(s)"
 msgstr ""
 
-#: documents/models.py:1661
+#: documents/models.py:1657
 msgid "has this correspondent"
 msgstr "має кореспондента"
 
-#: documents/models.py:1668
+#: documents/models.py:1664
 msgid "does not have these correspondent(s)"
 msgstr ""
 
-#: documents/models.py:1675
+#: documents/models.py:1671
 msgid "has one of these correspondents"
 msgstr ""
 
-#: documents/models.py:1683
+#: documents/models.py:1679
 msgid "has this storage path"
 msgstr ""
 
-#: documents/models.py:1690
+#: documents/models.py:1686
 msgid "has one of these storage paths"
 msgstr ""
 
-#: documents/models.py:1697
+#: documents/models.py:1693
 msgid "does not have these storage path(s)"
 msgstr ""
 
-#: documents/models.py:1701
+#: documents/models.py:1697
 msgid "filter custom field query"
 msgstr ""
 
-#: documents/models.py:1704
+#: documents/models.py:1700
 msgid "JSON-encoded custom field query expression."
 msgstr ""
 
-#: documents/models.py:1708
+#: documents/models.py:1704
 msgid "schedule offset days"
 msgstr ""
 
-#: documents/models.py:1711
+#: documents/models.py:1707
 msgid "The number of days to offset the schedule trigger by."
 msgstr ""
 
-#: documents/models.py:1716
+#: documents/models.py:1712
 msgid "schedule is recurring"
 msgstr ""
 
-#: documents/models.py:1719
+#: documents/models.py:1715
 msgid "If the schedule should be recurring."
 msgstr ""
 
-#: documents/models.py:1724
+#: documents/models.py:1720
 msgid "schedule recurring delay in days"
 msgstr "запланувати періодичну затримку в днях"
 
-#: documents/models.py:1728
+#: documents/models.py:1724
 msgid "The number of days between recurring schedule triggers."
 msgstr ""
 
-#: documents/models.py:1733
+#: documents/models.py:1729
 msgid "schedule date field"
 msgstr "поле дати розкладу"
 
-#: documents/models.py:1738
+#: documents/models.py:1734
 msgid "The field to check for a schedule trigger."
 msgstr ""
 
-#: documents/models.py:1747
+#: documents/models.py:1743
 msgid "schedule date custom field"
 msgstr ""
 
-#: documents/models.py:1751
+#: documents/models.py:1747
 msgid "workflow trigger"
 msgstr "тригер робочого процесу"
 
-#: documents/models.py:1752
+#: documents/models.py:1748
 msgid "workflow triggers"
 msgstr "тригери робочого процесу"
 
-#: documents/models.py:1760
+#: documents/models.py:1756
 msgid "email subject"
 msgstr ""
 
-#: documents/models.py:1764
+#: documents/models.py:1760
 msgid "The subject of the email, can include some placeholders, see documentation."
 msgstr ""
 
-#: documents/models.py:1770
+#: documents/models.py:1766
 msgid "email body"
 msgstr ""
 
-#: documents/models.py:1773
+#: documents/models.py:1769
 msgid "The body (message) of the email, can include some placeholders, see documentation."
 msgstr ""
 
-#: documents/models.py:1779
+#: documents/models.py:1775
 msgid "emails to"
 msgstr ""
 
-#: documents/models.py:1782
+#: documents/models.py:1778
 msgid "The destination email addresses, comma separated."
 msgstr ""
 
-#: documents/models.py:1788
+#: documents/models.py:1784
 msgid "include document in email"
 msgstr ""
 
-#: documents/models.py:1799
+#: documents/models.py:1795
 msgid "webhook url"
 msgstr ""
 
-#: documents/models.py:1802
+#: documents/models.py:1798
 msgid "The destination URL for the notification."
 msgstr ""
 
-#: documents/models.py:1807
+#: documents/models.py:1803
 msgid "use parameters"
 msgstr ""
 
-#: documents/models.py:1812
+#: documents/models.py:1808
 msgid "send as JSON"
 msgstr ""
 
-#: documents/models.py:1816
+#: documents/models.py:1812
 msgid "webhook parameters"
 msgstr ""
 
-#: documents/models.py:1819
+#: documents/models.py:1815
 msgid "The parameters to send with the webhook URL if body not used."
 msgstr ""
 
-#: documents/models.py:1823
+#: documents/models.py:1819
 msgid "webhook body"
 msgstr ""
 
-#: documents/models.py:1826
+#: documents/models.py:1822
 msgid "The body to send with the webhook URL if parameters not used."
 msgstr ""
 
-#: documents/models.py:1830
+#: documents/models.py:1826
 msgid "webhook headers"
 msgstr ""
 
-#: documents/models.py:1833
+#: documents/models.py:1829
 msgid "The headers to send with the webhook URL."
 msgstr ""
 
-#: documents/models.py:1838
+#: documents/models.py:1834
 msgid "include document in webhook"
 msgstr ""
 
-#: documents/models.py:1849
+#: documents/models.py:1845
 msgid "Assignment"
 msgstr "Призначення"
 
-#: documents/models.py:1853
+#: documents/models.py:1849
 msgid "Removal"
 msgstr "Видалення"
 
-#: documents/models.py:1857 documents/templates/account/password_reset.html:15
+#: documents/models.py:1853 documents/templates/account/password_reset.html:15
 msgid "Email"
 msgstr "Ел. пошта"
 
-#: documents/models.py:1861
+#: documents/models.py:1857
 msgid "Webhook"
 msgstr ""
 
-#: documents/models.py:1865
+#: documents/models.py:1861
 msgid "Password removal"
 msgstr ""
 
-#: documents/models.py:1869
+#: documents/models.py:1865
 msgid "Move to trash"
 msgstr ""
 
-#: documents/models.py:1873
+#: documents/models.py:1869
 msgid "Remote OCR"
 msgstr ""
 
-#: documents/models.py:1877
+#: documents/models.py:1873
 msgid "Apply AI suggestions"
 msgstr ""
 
-#: documents/models.py:1884
+#: documents/models.py:1880
 msgid "Document type"
 msgstr ""
 
-#: documents/models.py:1885
+#: documents/models.py:1881
 msgid "Storage path"
 msgstr ""
 
-#: documents/models.py:1886
+#: documents/models.py:1882
 msgid "Created date"
 msgstr ""
 
-#: documents/models.py:1889
+#: documents/models.py:1885
 msgid "Workflow Action Type"
 msgstr "Тип дії робочого процесу"
 
-#: documents/models.py:1894 documents/models.py:2163
+#: documents/models.py:1890 documents/models.py:2159 documents/models.py:2432
 #: paperless_mail/models.py:145
 msgid "order"
 msgstr "порядок"
 
-#: documents/models.py:1897
+#: documents/models.py:1893
 msgid "assign title"
 msgstr "призначити назву"
 
-#: documents/models.py:1901
+#: documents/models.py:1897
 msgid "Assign a document title, must  be a Jinja2 template, see documentation."
 msgstr ""
 
-#: documents/models.py:1909 paperless_mail/models.py:274
+#: documents/models.py:1905 paperless_mail/models.py:274
 msgid "assign this tag"
 msgstr "призначити цей тег"
 
-#: documents/models.py:1918 paperless_mail/models.py:282
+#: documents/models.py:1914 paperless_mail/models.py:282
 msgid "assign this document type"
 msgstr "призначити цей тип документа"
 
-#: documents/models.py:1927 paperless_mail/models.py:296
+#: documents/models.py:1923 paperless_mail/models.py:296
 msgid "assign this correspondent"
 msgstr "призначити цього кореспондента"
 
-#: documents/models.py:1936
+#: documents/models.py:1932
 msgid "assign this storage path"
 msgstr "призначити шлях до сховища"
 
-#: documents/models.py:1945
+#: documents/models.py:1941
 msgid "assign this owner"
 msgstr "призначити власника"
 
-#: documents/models.py:1952
+#: documents/models.py:1948
 msgid "grant view permissions to these users"
 msgstr "надати дозволи на перегляд цим користувачам"
 
-#: documents/models.py:1959
+#: documents/models.py:1955
 msgid "grant view permissions to these groups"
 msgstr "надати дозволи на перегляд цим групам"
 
-#: documents/models.py:1966
+#: documents/models.py:1962
 msgid "grant change permissions to these users"
 msgstr "надати дозволи на зміну цим користувачам"
 
-#: documents/models.py:1973
+#: documents/models.py:1969
 msgid "grant change permissions to these groups"
 msgstr "надати дозволи на зміну цим групам"
 
-#: documents/models.py:1980
+#: documents/models.py:1976
 msgid "assign these custom fields"
 msgstr "призначити користувацькі поля"
 
-#: documents/models.py:1984
+#: documents/models.py:1980
 msgid "custom field values"
 msgstr ""
 
-#: documents/models.py:1988
+#: documents/models.py:1984
 msgid "Optional values to assign to the custom fields."
 msgstr ""
 
-#: documents/models.py:1997
+#: documents/models.py:1993
 msgid "remove these tag(s)"
 msgstr "видалити тег(и)"
 
-#: documents/models.py:2002
+#: documents/models.py:1998
 msgid "remove all tags"
 msgstr "видалити всі теги"
 
-#: documents/models.py:2009
+#: documents/models.py:2005
 msgid "remove these document type(s)"
 msgstr "видалити тип(и) документів"
 
-#: documents/models.py:2014
+#: documents/models.py:2010
 msgid "remove all document types"
 msgstr "видалити всі типи документів"
 
-#: documents/models.py:2021
+#: documents/models.py:2017
 msgid "remove these correspondent(s)"
 msgstr "видалити кореспондента (-ів)"
 
-#: documents/models.py:2026
+#: documents/models.py:2022
 msgid "remove all correspondents"
 msgstr "видалити всіх кореспондентів"
 
-#: documents/models.py:2033
+#: documents/models.py:2029
 msgid "remove these storage path(s)"
 msgstr "видалити шлях для зберігання"
 
-#: documents/models.py:2038
+#: documents/models.py:2034
 msgid "remove all storage paths"
 msgstr "видалити всі шляхи зберігання"
 
-#: documents/models.py:2045
+#: documents/models.py:2041
 msgid "remove these owner(s)"
 msgstr "видалити власника (-ів)"
 
-#: documents/models.py:2050
+#: documents/models.py:2046
 msgid "remove all owners"
 msgstr "видалити всіх власників"
 
-#: documents/models.py:2057
+#: documents/models.py:2053
 msgid "remove view permissions for these users"
 msgstr "видалити дозволи на перегляд для цих користувачів"
 
-#: documents/models.py:2064
+#: documents/models.py:2060
 msgid "remove view permissions for these groups"
 msgstr "видалити дозволи на перегляд для цих груп"
 
-#: documents/models.py:2071
+#: documents/models.py:2067
 msgid "remove change permissions for these users"
 msgstr "видалити дозволи на редагування для цих користувачів"
 
-#: documents/models.py:2078
+#: documents/models.py:2074
 msgid "remove change permissions for these groups"
 msgstr "видалити дозволи на редагування для цих груп"
 
-#: documents/models.py:2083
+#: documents/models.py:2079
 msgid "remove all permissions"
 msgstr "видалити всі дозволи"
 
-#: documents/models.py:2090
+#: documents/models.py:2086
 msgid "remove these custom fields"
 msgstr "видалити користувацькі поля"
 
-#: documents/models.py:2095
+#: documents/models.py:2091
 msgid "remove all custom fields"
 msgstr "видалити всі користувацькі поля"
 
-#: documents/models.py:2104
+#: documents/models.py:2100
 msgid "email"
 msgstr ""
 
-#: documents/models.py:2113
+#: documents/models.py:2109
 msgid "webhook"
 msgstr ""
 
-#: documents/models.py:2117
+#: documents/models.py:2113
 msgid "passwords"
 msgstr ""
 
-#: documents/models.py:2121
+#: documents/models.py:2117
 msgid "Passwords to try when removing PDF protection. Separate with commas or new lines."
 msgstr ""
 
-#: documents/models.py:2126
+#: documents/models.py:2122
 msgid "AI suggestion fields"
 msgstr ""
 
-#: documents/models.py:2130
+#: documents/models.py:2126
 msgid "Which of the AI-suggested fields to apply to the document."
 msgstr ""
 
-#: documents/models.py:2135
+#: documents/models.py:2131
 msgid "create missing objects"
 msgstr ""
 
-#: documents/models.py:2138
+#: documents/models.py:2134
 msgid "Create suggested tags, correspondents, document types and storage paths that do not already exist instead of skipping them."
 msgstr ""
 
-#: documents/models.py:2144
+#: documents/models.py:2140
 msgid "overwrite existing values"
 msgstr ""
 
-#: documents/models.py:2147
+#: documents/models.py:2143
 msgid "Apply suggestions even if the document already has a value for that field. Tags are always added to, never replaced."
 msgstr ""
 
-#: documents/models.py:2153
+#: documents/models.py:2149
 msgid "workflow action"
 msgstr "дія робочого циклу"
 
-#: documents/models.py:2154
+#: documents/models.py:2150
 msgid "workflow actions"
 msgstr "дії робочого циклу"
 
-#: documents/models.py:2169
+#: documents/models.py:2165
 msgid "triggers"
 msgstr "тригери"
 
-#: documents/models.py:2176
+#: documents/models.py:2172
 msgid "actions"
 msgstr "дії"
 
-#: documents/models.py:2179 paperless_mail/models.py:154
+#: documents/models.py:2175 documents/models.py:2255
+#: paperless_mail/models.py:154
 msgid "enabled"
 msgstr "ввімкнено"
 
-#: documents/models.py:2190
+#: documents/models.py:2186
 msgid "workflow"
 msgstr ""
 
-#: documents/models.py:2194
+#: documents/models.py:2190
 msgid "workflow trigger type"
 msgstr ""
 
-#: documents/models.py:2208
+#: documents/models.py:2204
 msgid "date run"
 msgstr ""
 
-#: documents/models.py:2214
+#: documents/models.py:2210
 msgid "workflow run"
 msgstr ""
 
-#: documents/models.py:2215
+#: documents/models.py:2211
 msgid "workflow runs"
 msgstr ""
 
-#: documents/serialisers.py:483 documents/serialisers.py:844
-#: documents/serialisers.py:2893 documents/views.py:359 documents/views.py:625
-#: documents/views.py:2783 paperless_mail/serialisers.py:145
+#: documents/models.py:2234
+msgid "source width"
+msgstr ""
+
+#: documents/models.py:2236
+msgid "Width of the image the zones were drawn on (px)"
+msgstr ""
+
+#: documents/models.py:2240
+msgid "source height"
+msgstr ""
+
+#: documents/models.py:2242
+msgid "Height of the image the zones were drawn on (px)"
+msgstr ""
+
+#: documents/models.py:2251
+msgid "sample document"
+msgstr ""
+
+#: documents/models.py:2252
+msgid "Document used for previewing zones in the editor"
+msgstr ""
+
+#: documents/models.py:2258
+msgid "combine formats"
+msgstr ""
+
+#: documents/models.py:2262
+msgid "Per-target format strings for combining several zones into one field, keyed by target (custom field id, or 'title'/'asn'/'created'). Tokens like {Zone Name} are replaced with that zone's value."
+msgstr ""
+
+#: documents/models.py:2276
+msgid "updated"
+msgstr ""
+
+#: documents/models.py:2282
+msgid "OCR template"
+msgstr ""
+
+#: documents/models.py:2283
+msgid "OCR templates"
+msgstr ""
+
+#: documents/models.py:2308
+msgid "template"
+msgstr ""
+
+#: documents/models.py:2312
+msgid "zone name"
+msgstr ""
+
+#: documents/models.py:2314
+msgid "Descriptive name for this zone (e.g. 'Invoice Number')"
+msgstr ""
+
+#: documents/models.py:2318
+msgid "Custom field"
+msgstr ""
+
+#: documents/models.py:2320
+msgid "Archive serial number"
+msgstr ""
+
+#: documents/models.py:2321
+msgid "Date created"
+msgstr ""
+
+#: documents/models.py:2324
+msgid "target"
+msgstr ""
+
+#: documents/models.py:2329
+msgid "Where the extracted value is written: a custom field, or a built-in document field (title, ASN, created date)"
+msgstr ""
+
+#: documents/models.py:2341
+msgid "Target custom field (only used when target is 'custom_field')"
+msgstr ""
+
+#: documents/models.py:2348
+msgid "Page (1 = first, -1 = last; blank = first page)"
+msgstr ""
+
+#: documents/models.py:2351
+msgid "x"
+msgstr ""
+
+#: documents/models.py:2351
+msgid "Left edge (px)"
+msgstr ""
+
+#: documents/models.py:2352
+msgid "y"
+msgstr ""
+
+#: documents/models.py:2352
+msgid "Top edge (px)"
+msgstr ""
+
+#: documents/models.py:2354
+msgid "width"
+msgstr ""
+
+#: documents/models.py:2356
+msgid "Zone width (px)"
+msgstr ""
+
+#: documents/models.py:2359
+msgid "height"
+msgstr ""
+
+#: documents/models.py:2361
+msgid "Zone height (px)"
+msgstr ""
+
+#: documents/models.py:2366
+msgid "zone source width"
+msgstr ""
+
+#: documents/models.py:2370
+msgid "Width of the page image this zone was drawn on (px). Falls back to template source_width if unset."
+msgstr ""
+
+#: documents/models.py:2375
+msgid "zone source height"
+msgstr ""
+
+#: documents/models.py:2379
+msgid "Height of the page image this zone was drawn on (px). Falls back to template source_height if unset."
+msgstr ""
+
+#: documents/models.py:2385
+msgid "OCR language"
+msgstr ""
+
+#: documents/models.py:2388
+msgid "Tesseract language code(s), e.g. 'deu+eng'"
+msgstr ""
+
+#: documents/models.py:2393
+msgid "Strip whitespace"
+msgstr ""
+
+#: documents/models.py:2394
+msgid "Uppercase"
+msgstr ""
+
+#: documents/models.py:2395
+msgid "Lowercase"
+msgstr ""
+
+#: documents/models.py:2396
+msgid "Numeric only"
+msgstr ""
+
+#: documents/models.py:2399
+msgid "Remove leading/trailing punctuation"
+msgstr ""
+
+#: documents/models.py:2401
+msgid "Parse date"
+msgstr ""
+
+#: documents/models.py:2402
+msgid "Read QR/barcode"
+msgstr ""
+
+#: documents/models.py:2405
+msgid "transform"
+msgstr ""
+
+#: documents/models.py:2412
+msgid "date format"
+msgstr ""
+
+#: documents/models.py:2417
+msgid "Python strptime format for the 'Parse date' transform (e.g. %d.%m.%Y). Blank = auto-detect."
+msgstr ""
+
+#: documents/models.py:2423
+msgid "validation regex"
+msgstr ""
+
+#: documents/models.py:2428
+msgid "Optional regex pattern. Extracted text is only accepted if it fully matches."
+msgstr ""
+
+#: documents/models.py:2436
+msgid "OCR template zone"
+msgstr ""
+
+#: documents/models.py:2437
+msgid "OCR template zones"
+msgstr ""
+
+#: documents/serialisers.py:491 documents/serialisers.py:815
+#: documents/serialisers.py:2913 documents/views.py:372 documents/views.py:638
+#: documents/views.py:2868 paperless_mail/serialisers.py:145
 msgid "Insufficient permissions."
 msgstr ""
 
-#: documents/serialisers.py:676
+#: documents/serialisers.py:647
 msgid "Invalid color."
 msgstr "Неправильний колір."
 
-#: documents/serialisers.py:2360
+#: documents/serialisers.py:2380
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Тип файлу %(type)s не підтримується"
 
-#: documents/serialisers.py:2404
+#: documents/serialisers.py:2424
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
 msgstr ""
 
-#: documents/serialisers.py:2411
+#: documents/serialisers.py:2431
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
 msgstr ""
 
-#: documents/serialisers.py:2428 documents/serialisers.py:2438
+#: documents/serialisers.py:2448 documents/serialisers.py:2458
 msgid "Custom fields must be a list of integers or an object mapping ids to values."
 msgstr ""
 
-#: documents/serialisers.py:2433
+#: documents/serialisers.py:2453
 msgid "Some custom fields don't exist or were specified twice."
 msgstr ""
 
-#: documents/serialisers.py:2580
+#: documents/serialisers.py:2600
 msgid "Invalid variable detected."
 msgstr "Виявлено неправильну змінну."
 
-#: documents/serialisers.py:2949
+#: documents/serialisers.py:2969
 msgid "Duplicate document identifiers are not allowed."
 msgstr ""
 
-#: documents/serialisers.py:2979 documents/views.py:4770
+#: documents/serialisers.py:2999 documents/views.py:5001
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr ""
@@ -1929,44 +2128,60 @@ msgstr "Ви збираєтеся використовувати ваш облі
 msgid "As a final step, please complete the following form:"
 msgstr "Як останній крок, будь ласка, заповніть наступну форму:"
 
-#: documents/validators.py:36
-msgid ", "
+#: documents/validators.py:27
+#, python-format
+msgid "Unable to parse URI %(value)s, missing scheme"
 msgstr ""
 
-#: documents/views.py:314
+#: documents/validators.py:32
+#, python-format
+msgid "Unable to parse URI %(value)s, missing net location or path"
+msgstr ""
+
+#: documents/validators.py:39
+#, python-format
+msgid "URI scheme '%(scheme)s' is not allowed. Allowed schemes: %(allowed)s"
+msgstr ""
+
+#: documents/validators.py:52
+#, python-format
+msgid "Unable to parse URI %(value)s"
+msgstr ""
+
+#: documents/views.py:327
 msgid "Specify only one of text, title_search, query, or more_like_id."
 msgstr ""
 
-#: documents/views.py:352 documents/views.py:2780
+#: documents/views.py:365 documents/views.py:2865
 msgid "Invalid more_like_id"
 msgstr ""
 
-#: documents/views.py:1684
+#: documents/views.py:1697
 msgid "Invalid AI configuration."
 msgstr ""
 
-#: documents/views.py:1695
+#: documents/views.py:1708
 msgid "AI backend request timed out."
 msgstr ""
 
-#: documents/views.py:1707
+#: documents/views.py:1720
 msgid "AI backend rejected the request. Check logs for details."
 msgstr ""
 
-#: documents/views.py:4786
+#: documents/views.py:5017
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr ""
 
-#: documents/views.py:4833
+#: documents/views.py:5064
 msgid "Bundle is already being processed."
 msgstr ""
 
-#: documents/views.py:4899
+#: documents/views.py:5130
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr ""
 
-#: documents/views.py:4913
+#: documents/views.py:5144
 msgid "The share link bundle is unavailable."
 msgstr ""
 
@@ -2258,155 +2473,155 @@ msgstr ""
 msgid "paperless application settings"
 msgstr "налаштування програми документообігу"
 
-#: paperless/settings/__init__.py:582
+#: paperless/settings/__init__.py:595
 msgid "English (US)"
 msgstr "Англійська (США)"
 
-#: paperless/settings/__init__.py:583
+#: paperless/settings/__init__.py:596
 msgid "Arabic"
 msgstr "Арабська"
 
-#: paperless/settings/__init__.py:584
+#: paperless/settings/__init__.py:597
 msgid "Afrikaans"
 msgstr "Африкаанс"
 
-#: paperless/settings/__init__.py:585
+#: paperless/settings/__init__.py:598
 msgid "Belarusian"
 msgstr "Білоруська"
 
-#: paperless/settings/__init__.py:586
+#: paperless/settings/__init__.py:599
 msgid "Bulgarian"
 msgstr "Болгарська"
 
-#: paperless/settings/__init__.py:587
+#: paperless/settings/__init__.py:600
 msgid "Catalan"
 msgstr "Каталонська"
 
-#: paperless/settings/__init__.py:588
+#: paperless/settings/__init__.py:601
 msgid "Czech"
 msgstr "Чеська"
 
-#: paperless/settings/__init__.py:589
+#: paperless/settings/__init__.py:602
 msgid "Danish"
 msgstr "Данська"
 
-#: paperless/settings/__init__.py:590
+#: paperless/settings/__init__.py:603
 msgid "German"
 msgstr "Німецька"
 
-#: paperless/settings/__init__.py:591
+#: paperless/settings/__init__.py:604
 msgid "Greek"
 msgstr "Грецька"
 
-#: paperless/settings/__init__.py:592
+#: paperless/settings/__init__.py:605
 msgid "English (GB)"
 msgstr "Англійська (Велика Британія)"
 
-#: paperless/settings/__init__.py:593
+#: paperless/settings/__init__.py:606
 msgid "Spanish"
 msgstr "Іспанська"
 
-#: paperless/settings/__init__.py:594
+#: paperless/settings/__init__.py:607
 msgid "Persian"
 msgstr ""
 
-#: paperless/settings/__init__.py:595
+#: paperless/settings/__init__.py:608
 msgid "Finnish"
 msgstr "Фінська"
 
-#: paperless/settings/__init__.py:596
+#: paperless/settings/__init__.py:609
 msgid "French"
 msgstr "Французька"
 
-#: paperless/settings/__init__.py:597
+#: paperless/settings/__init__.py:610
 msgid "Hungarian"
 msgstr "Угорська"
 
-#: paperless/settings/__init__.py:598
+#: paperless/settings/__init__.py:611
 msgid "Indonesian"
 msgstr ""
 
-#: paperless/settings/__init__.py:599
+#: paperless/settings/__init__.py:612
 msgid "Italian"
 msgstr "Італійська"
 
-#: paperless/settings/__init__.py:600
+#: paperless/settings/__init__.py:613
 msgid "Japanese"
 msgstr "Японська"
 
-#: paperless/settings/__init__.py:601
+#: paperless/settings/__init__.py:614
 msgid "Korean"
 msgstr "Корейська"
 
-#: paperless/settings/__init__.py:602
+#: paperless/settings/__init__.py:615
 msgid "Luxembourgish"
 msgstr "Люксембурзька"
 
-#: paperless/settings/__init__.py:603
+#: paperless/settings/__init__.py:616
 msgid "Norwegian"
 msgstr "Норвезька"
 
-#: paperless/settings/__init__.py:604
+#: paperless/settings/__init__.py:617
 msgid "Dutch"
 msgstr "Нідерландська"
 
-#: paperless/settings/__init__.py:605
+#: paperless/settings/__init__.py:618
 msgid "Polish"
 msgstr "Польська"
 
-#: paperless/settings/__init__.py:606
+#: paperless/settings/__init__.py:619
 msgid "Portuguese (Brazil)"
 msgstr "Португальська (Бразилія)"
 
-#: paperless/settings/__init__.py:607
+#: paperless/settings/__init__.py:620
 msgid "Portuguese"
 msgstr "Португальська"
 
-#: paperless/settings/__init__.py:608
+#: paperless/settings/__init__.py:621
 msgid "Romanian"
 msgstr "Румунська"
 
-#: paperless/settings/__init__.py:609
+#: paperless/settings/__init__.py:622
 msgid "Russian"
 msgstr "Російська"
 
-#: paperless/settings/__init__.py:610
+#: paperless/settings/__init__.py:623
 msgid "Slovak"
 msgstr "Словацька"
 
-#: paperless/settings/__init__.py:611
+#: paperless/settings/__init__.py:624
 msgid "Slovenian"
 msgstr "Словенська"
 
-#: paperless/settings/__init__.py:612
+#: paperless/settings/__init__.py:625
 msgid "Serbian"
 msgstr "Сербська"
 
-#: paperless/settings/__init__.py:613
+#: paperless/settings/__init__.py:626
 msgid "Swedish"
 msgstr "Шведська"
 
-#: paperless/settings/__init__.py:614
+#: paperless/settings/__init__.py:627
 msgid "Turkish"
 msgstr "Турецька"
 
-#: paperless/settings/__init__.py:615
+#: paperless/settings/__init__.py:628
 msgid "Ukrainian"
 msgstr "Українська"
 
-#: paperless/settings/__init__.py:616
+#: paperless/settings/__init__.py:629
 msgid "Vietnamese"
 msgstr ""
 
-#: paperless/settings/__init__.py:617
+#: paperless/settings/__init__.py:630
 msgid "Chinese Simplified"
 msgstr "Китайська спрощена"
 
-#: paperless/settings/__init__.py:618
+#: paperless/settings/__init__.py:631
 msgid "Chinese Traditional"
 msgstr ""
 
-#: paperless/urls.py:438
+#: paperless/urls.py:452
 msgid "Paperless-ngx administration"
 msgstr "Адміністрування Paperless-ngx"
 

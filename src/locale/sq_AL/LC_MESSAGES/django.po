@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: paperless-ngx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-17 20:48+0000\n"
-"PO-Revision-Date: 2026-11-17 20:49\n"
+"POT-Creation-Date: 2026-11-27 02:54+0000\n"
+"PO-Revision-Date: 2026-11-27 02:55\n"
 "Last-Translator: \n"
 "Language-Team: Albanian\n"
 "Language: sq_AL\n"
@@ -53,7 +53,7 @@ msgstr "{name!r} nuk është fushë e personalizuar e vlefshme."
 msgid "{data_type} does not support query expr {expr!r}."
 msgstr "{data_type} nuk e mbështet shprehjen e kërkimit {expr!r}."
 
-#: documents/filters.py:815 documents/models.py:195
+#: documents/filters.py:815 documents/models.py:191
 msgid "Maximum nesting depth exceeded."
 msgstr "Është tejkaluar thellësia maksimale e ndërfutjes."
 
@@ -61,31 +61,31 @@ msgstr "Është tejkaluar thellësia maksimale e ndërfutjes."
 msgid "Custom field not found"
 msgstr "Fusha e personalizuar nuk u gjet"
 
-#: documents/models.py:43 documents/models.py:1188 documents/models.py:1236
+#: documents/models.py:43 documents/models.py:1184 documents/models.py:1232
 msgid "owner"
 msgstr "pronari"
 
-#: documents/models.py:60 documents/models.py:1534
+#: documents/models.py:60 documents/models.py:1530 documents/models.py:2392
 msgid "None"
 msgstr "Asgjë"
 
-#: documents/models.py:61 documents/models.py:1535
+#: documents/models.py:61 documents/models.py:1531
 msgid "Any word"
 msgstr "Çdo fjalë"
 
-#: documents/models.py:62 documents/models.py:1536
+#: documents/models.py:62 documents/models.py:1532
 msgid "All words"
 msgstr "Të gjitha fjalët"
 
-#: documents/models.py:63 documents/models.py:1537
+#: documents/models.py:63 documents/models.py:1533
 msgid "Exact match"
 msgstr "Përputhje e saktë"
 
-#: documents/models.py:64 documents/models.py:1538
+#: documents/models.py:64 documents/models.py:1534
 msgid "Regular expression"
 msgstr "Shprehje e rregullt"
 
-#: documents/models.py:65 documents/models.py:1539
+#: documents/models.py:65 documents/models.py:1535
 msgid "Fuzzy word"
 msgstr "Fjalë e përafërt"
 
@@ -93,24 +93,25 @@ msgstr "Fjalë e përafërt"
 msgid "Automatic"
 msgstr "Automatike"
 
-#: documents/models.py:69 documents/models.py:709 documents/models.py:2161
-#: paperless_mail/models.py:23 paperless_mail/models.py:143
+#: documents/models.py:69 documents/models.py:705 documents/models.py:2157
+#: documents/models.py:2220 paperless_mail/models.py:23
+#: paperless_mail/models.py:143
 msgid "name"
 msgstr "emri"
 
-#: documents/models.py:71 documents/models.py:1604
+#: documents/models.py:71 documents/models.py:1600 documents/models.py:2222
 msgid "match"
 msgstr "përputhje"
 
-#: documents/models.py:74 documents/models.py:1607
+#: documents/models.py:74 documents/models.py:1603 documents/models.py:2226
 msgid "matching algorithm"
 msgstr "algoritmi i përputhjes"
 
-#: documents/models.py:79 documents/models.py:1612
+#: documents/models.py:79 documents/models.py:1608 documents/models.py:2231
 msgid "is insensitive"
 msgstr "është pa dallim shkronjash"
 
-#: documents/models.py:102 documents/models.py:227
+#: documents/models.py:102 documents/models.py:223
 msgid "correspondent"
 msgstr "korrespondenti"
 
@@ -138,1561 +139,1759 @@ msgstr "E shënon këtë etiketë si etiketë të kutisë hyrëse: të gjitha do
 msgid "tag"
 msgstr "etiketë"
 
-#: documents/models.py:132 documents/models.py:274
+#: documents/models.py:132 documents/models.py:270
 msgid "tags"
 msgstr "etiketat"
 
-#: documents/models.py:188
+#: documents/models.py:184
 msgid "Cannot set itself as parent."
 msgstr "Nuk mund të caktohet vetja si prind."
 
-#: documents/models.py:192
+#: documents/models.py:188
 msgid "Cannot set parent to a descendant."
 msgstr "Prindi nuk mund të caktohet te një pasardhës."
 
-#: documents/models.py:202 documents/models.py:247
+#: documents/models.py:198 documents/models.py:243
 msgid "document type"
 msgstr "lloji i dokumentit"
 
-#: documents/models.py:203
+#: documents/models.py:199
 msgid "document types"
 msgstr "llojet e dokumenteve"
 
-#: documents/models.py:208
+#: documents/models.py:204
 msgid "path"
 msgstr "shtegu"
 
-#: documents/models.py:212 documents/models.py:236
+#: documents/models.py:208 documents/models.py:232
 msgid "storage path"
 msgstr "shtegu i ruajtjes"
 
-#: documents/models.py:213
+#: documents/models.py:209
 msgid "storage paths"
 msgstr "shtigjet e ruajtjes"
 
-#: documents/models.py:239
+#: documents/models.py:235
 msgid "title"
 msgstr "titulli"
 
-#: documents/models.py:251 documents/models.py:1014
+#: documents/models.py:247 documents/models.py:1010
 msgid "content"
 msgstr "përmbajtja"
 
-#: documents/models.py:254
+#: documents/models.py:250
 msgid "The raw, text-only data of the document. This field is primarily used for searching."
 msgstr "Të dhënat e papërpunuara vetëm tekst të dokumentit. Kjo fushë përdoret kryesisht për kërkim."
 
-#: documents/models.py:268
+#: documents/models.py:264
 msgid "mime type"
 msgstr "lloji MIME"
 
-#: documents/models.py:278
+#: documents/models.py:274
 msgid "checksum"
 msgstr "shuma e kontrollit"
 
-#: documents/models.py:282
+#: documents/models.py:278
 msgid "The checksum of the original document."
 msgstr "Shuma e kontrollit e dokumentit origjinal."
 
-#: documents/models.py:286
+#: documents/models.py:282
 msgid "archive checksum"
 msgstr "shuma e kontrollit e arkivit"
 
-#: documents/models.py:292
+#: documents/models.py:288
 msgid "The checksum of the archived document."
 msgstr "Shuma e kontrollit e dokumentit të arkivuar."
 
-#: documents/models.py:296
+#: documents/models.py:292
 msgid "page count"
 msgstr "numri i faqeve"
 
-#: documents/models.py:303
+#: documents/models.py:299
 msgid "The number of pages of the document."
 msgstr "Numri i faqeve të dokumentit."
 
-#: documents/models.py:308 documents/models.py:1027 documents/models.py:1146
-#: documents/models.py:1208 documents/models.py:1336 documents/models.py:1395
+#: documents/models.py:304 documents/models.py:1023 documents/models.py:1142
+#: documents/models.py:1204 documents/models.py:1332 documents/models.py:1391
+#: documents/models.py:2269
 msgid "created"
 msgstr "krijuar"
 
-#: documents/models.py:314
+#: documents/models.py:310
 msgid "modified"
 msgstr "ndryshuar"
 
-#: documents/models.py:321
+#: documents/models.py:317
 msgid "added"
 msgstr "shtuar"
 
-#: documents/models.py:328
+#: documents/models.py:324
 msgid "filename"
 msgstr "emri skedarit"
 
-#: documents/models.py:334
+#: documents/models.py:330
 msgid "Current filename in storage"
 msgstr "Emri aktual i skedarit në ruajtje"
 
-#: documents/models.py:338
+#: documents/models.py:334
 msgid "archive filename"
 msgstr "emri i skedarit të arkivit"
 
-#: documents/models.py:344
+#: documents/models.py:340
 msgid "Current archive filename in storage"
 msgstr "Emri aktual i skedarit të arkivit në ruajtje"
 
-#: documents/models.py:348
+#: documents/models.py:344
 msgid "original filename"
 msgstr "emri origjinal i skedarit"
 
-#: documents/models.py:354
+#: documents/models.py:350
 msgid "The original name of the file when it was uploaded"
 msgstr "Emri origjinal i skedarit kur u ngarkua"
 
-#: documents/models.py:361
+#: documents/models.py:357
 msgid "archive serial number"
 msgstr "numri serial i arkivit"
 
-#: documents/models.py:371
+#: documents/models.py:367
 msgid "The position of this document in your physical document archive."
 msgstr "Pozicioni i këtij dokumenti në arkivin tuaj fizik të dokumenteve."
 
-#: documents/models.py:381
+#: documents/models.py:377
 msgid "root document for this version"
 msgstr "dokumenti rrënjë për këtë version"
 
-#: documents/models.py:385
+#: documents/models.py:381
 msgid "version index"
 msgstr "indeksi i versionit"
 
-#: documents/models.py:389
+#: documents/models.py:385
 msgid "Index of this version within the root document."
 msgstr "Indeksi i këtij versioni brenda dokumentit rrënjë."
 
-#: documents/models.py:393
+#: documents/models.py:389
 msgid "version label"
 msgstr "etiketa e versionit"
 
-#: documents/models.py:397
+#: documents/models.py:393
 msgid "Optional short label for a document version."
 msgstr "Etiketë e shkurtër opsionale për një version dokumenti."
 
-#: documents/models.py:402 documents/models.py:1038 documents/models.py:1069
-#: documents/models.py:1173 documents/models.py:2204
+#: documents/models.py:398 documents/models.py:1034 documents/models.py:1065
+#: documents/models.py:1169 documents/models.py:2200
 msgid "document"
 msgstr "dokumenti"
 
-#: documents/models.py:403 documents/models.py:1279
+#: documents/models.py:399 documents/models.py:1275
 msgid "documents"
 msgstr "dokumentet"
 
-#: documents/models.py:628 documents/models.py:1142
+#: documents/models.py:624 documents/models.py:1138
 msgid "Archive"
 msgstr "Arkiv"
 
-#: documents/models.py:629
+#: documents/models.py:625
 msgid "Bank"
 msgstr ""
 
-#: documents/models.py:630
+#: documents/models.py:626
 msgid "Basket"
 msgstr ""
 
-#: documents/models.py:631
+#: documents/models.py:627
 msgid "Bell"
 msgstr ""
 
-#: documents/models.py:632
+#: documents/models.py:628
 msgid "Bookmark"
 msgstr ""
 
-#: documents/models.py:633
+#: documents/models.py:629
 msgid "Boxes"
 msgstr ""
 
-#: documents/models.py:634
+#: documents/models.py:630
 msgid "Briefcase"
 msgstr ""
 
-#: documents/models.py:635
+#: documents/models.py:631
 msgid "Building"
 msgstr ""
 
-#: documents/models.py:636
+#: documents/models.py:632
 msgid "Calculator"
 msgstr ""
 
-#: documents/models.py:637
+#: documents/models.py:633
 msgid "Calendar"
 msgstr ""
 
-#: documents/models.py:638
+#: documents/models.py:634
 msgid "Camera"
 msgstr ""
 
-#: documents/models.py:639
+#: documents/models.py:635
 msgid "Checklist"
 msgstr ""
 
-#: documents/models.py:640
+#: documents/models.py:636
 msgid "Cash"
 msgstr ""
 
-#: documents/models.py:641
+#: documents/models.py:637
 msgid "Chat"
 msgstr ""
 
-#: documents/models.py:642
+#: documents/models.py:638
 msgid "Check"
 msgstr ""
 
-#: documents/models.py:643
+#: documents/models.py:639
 msgid "Clipboard"
 msgstr ""
 
-#: documents/models.py:644
+#: documents/models.py:640
 msgid "Clock"
 msgstr ""
 
-#: documents/models.py:645
+#: documents/models.py:641
 msgid "Credit card"
 msgstr ""
 
-#: documents/models.py:646
+#: documents/models.py:642
 msgid "Download"
 msgstr ""
 
-#: documents/models.py:647
+#: documents/models.py:643
 msgid "Envelope"
 msgstr ""
 
-#: documents/models.py:648
+#: documents/models.py:644
 msgid "Warning"
 msgstr ""
 
-#: documents/models.py:649
+#: documents/models.py:645
 msgid "File"
 msgstr ""
 
-#: documents/models.py:650
+#: documents/models.py:646
 msgid "Checked file"
 msgstr ""
 
-#: documents/models.py:651
+#: documents/models.py:647
 msgid "Locked file"
 msgstr ""
 
-#: documents/models.py:652
+#: documents/models.py:648
 msgid "Medical file"
 msgstr ""
 
-#: documents/models.py:653
+#: documents/models.py:649
 msgid "Person file"
 msgstr ""
 
-#: documents/models.py:656
+#: documents/models.py:652
 msgid "Spreadsheet"
 msgstr ""
 
-#: documents/models.py:658
+#: documents/models.py:654
 msgid "Text file"
 msgstr ""
 
-#: documents/models.py:659
+#: documents/models.py:655
 msgid "Files"
 msgstr ""
 
-#: documents/models.py:660
+#: documents/models.py:656
 msgid "Folder"
 msgstr ""
 
-#: documents/models.py:661 paperless_mail/admin.py:58
+#: documents/models.py:657 paperless_mail/admin.py:58
 msgid "Filter"
 msgstr "Filtër"
 
-#: documents/models.py:662
+#: documents/models.py:658
 msgid "Gear"
 msgstr ""
 
-#: documents/models.py:663
+#: documents/models.py:659
 msgid "Globe"
 msgstr ""
 
-#: documents/models.py:664
+#: documents/models.py:660
 msgid "Hash"
 msgstr ""
 
-#: documents/models.py:665
+#: documents/models.py:661
 msgid "Heart"
 msgstr ""
 
-#: documents/models.py:666
+#: documents/models.py:662
 msgid "House"
 msgstr ""
 
-#: documents/models.py:667
+#: documents/models.py:663
 msgid "Inbox"
 msgstr ""
 
-#: documents/models.py:668
+#: documents/models.py:664
 msgid "Journals"
 msgstr ""
 
-#: documents/models.py:669
+#: documents/models.py:665
 msgid "Task list"
 msgstr ""
 
-#: documents/models.py:670
+#: documents/models.py:666
 msgid "Newspaper"
 msgstr ""
 
-#: documents/models.py:671
+#: documents/models.py:667
 msgid "Attachment"
 msgstr ""
 
-#: documents/models.py:672
+#: documents/models.py:668
 msgid "People"
 msgstr ""
 
-#: documents/models.py:673
+#: documents/models.py:669
 msgid "Person"
 msgstr ""
 
-#: documents/models.py:674
+#: documents/models.py:670
 msgid "Printer"
 msgstr ""
 
-#: documents/models.py:675
+#: documents/models.py:671
 msgid "Receipt"
 msgstr ""
 
-#: documents/models.py:676
+#: documents/models.py:672
 msgid "Safe"
 msgstr ""
 
-#: documents/models.py:677
+#: documents/models.py:673
 msgid "Search"
 msgstr ""
 
-#: documents/models.py:678
+#: documents/models.py:674
 msgid "Send"
 msgstr ""
 
-#: documents/models.py:679
+#: documents/models.py:675
 msgid "Shop"
 msgstr ""
 
-#: documents/models.py:680
+#: documents/models.py:676
 msgid "Stack"
 msgstr ""
 
-#: documents/models.py:681
+#: documents/models.py:677
 msgid "Stars"
 msgstr ""
 
-#: documents/models.py:682
+#: documents/models.py:678
 msgid "Tag"
 msgstr "Etiketa"
 
-#: documents/models.py:683 documents/models.py:698 documents/models.py:1882
+#: documents/models.py:679 documents/models.py:694 documents/models.py:1878
 msgid "Tags"
 msgstr "Etiketat"
 
-#: documents/models.py:684
+#: documents/models.py:680
 msgid "Telephone"
 msgstr ""
 
-#: documents/models.py:685
+#: documents/models.py:681
 msgid "Truck"
 msgstr "Kamion"
 
-#: documents/models.py:686
+#: documents/models.py:682
 msgid "Barcode"
 msgstr "Barkodi"
 
-#: documents/models.py:687
+#: documents/models.py:683
 msgid "Wallet"
 msgstr "Portofol"
 
-#: documents/models.py:690
+#: documents/models.py:686
 msgid "Table"
 msgstr "Tabelë"
 
-#: documents/models.py:691
+#: documents/models.py:687
 msgid "Small Cards"
 msgstr "Karta të vogla"
 
-#: documents/models.py:692
+#: documents/models.py:688
 msgid "Large Cards"
 msgstr "Karta të mëdha"
 
-#: documents/models.py:695 documents/models.py:1881
+#: documents/models.py:691 documents/models.py:1877 documents/models.py:2319
 msgid "Title"
 msgstr "Titulli"
 
-#: documents/models.py:696 documents/models.py:926 documents/models.py:1556
+#: documents/models.py:692 documents/models.py:922 documents/models.py:1552
 msgid "Created"
 msgstr "Krijuar"
 
-#: documents/models.py:697 documents/models.py:1555
+#: documents/models.py:693 documents/models.py:1551
 msgid "Added"
 msgstr "Shtuar"
 
-#: documents/models.py:699 documents/models.py:1883
+#: documents/models.py:695 documents/models.py:1879
 msgid "Correspondent"
 msgstr "Korrespondenti"
 
-#: documents/models.py:700
+#: documents/models.py:696
 msgid "Document Type"
 msgstr "Lloji i dokumentit"
 
-#: documents/models.py:701
+#: documents/models.py:697
 msgid "Storage Path"
 msgstr "Shtegu i ruajtjes"
 
-#: documents/models.py:702
+#: documents/models.py:698
 msgid "Note"
 msgstr "Shënim"
 
-#: documents/models.py:703
+#: documents/models.py:699
 msgid "Owner"
 msgstr "Pronari"
 
-#: documents/models.py:704
+#: documents/models.py:700
 msgid "Shared"
 msgstr "I ndarë"
 
-#: documents/models.py:705
+#: documents/models.py:701
 msgid "ASN"
 msgstr "[SQ] ASN"
 
-#: documents/models.py:706
+#: documents/models.py:702
 msgid "Pages"
 msgstr "Faqet"
 
-#: documents/models.py:712
+#: documents/models.py:708
 msgid "icon"
 msgstr "ikonë"
 
-#: documents/models.py:719
+#: documents/models.py:715
 msgid "sort field"
 msgstr "fusha e renditjes"
 
-#: documents/models.py:724
+#: documents/models.py:720
 msgid "sort reverse"
 msgstr "renditje e kundërt"
 
-#: documents/models.py:727
+#: documents/models.py:723
 msgid "View page size"
 msgstr "Madhësia e faqes së pamjes"
 
-#: documents/models.py:735
+#: documents/models.py:731
 msgid "View display mode"
 msgstr "Mënyra e shfaqjes së pamjes"
 
-#: documents/models.py:742
+#: documents/models.py:738
 msgid "Document display fields"
 msgstr "Fushat e shfaqjes së dokumentit"
 
-#: documents/models.py:749 documents/models.py:815
+#: documents/models.py:745 documents/models.py:811
 msgid "saved view"
 msgstr "pamje e ruajtur"
 
-#: documents/models.py:750
+#: documents/models.py:746
 msgid "saved views"
 msgstr "pamje të ruajtura"
 
-#: documents/models.py:758
+#: documents/models.py:754
 msgid "title contains"
 msgstr "titulli përmban"
 
-#: documents/models.py:759
+#: documents/models.py:755
 msgid "content contains"
 msgstr "përmbajtja përmban"
 
-#: documents/models.py:760
+#: documents/models.py:756
 msgid "ASN is"
 msgstr "ASN është"
 
-#: documents/models.py:761
+#: documents/models.py:757
 msgid "correspondent is"
 msgstr "korrespondenti është"
 
-#: documents/models.py:762
+#: documents/models.py:758
 msgid "document type is"
 msgstr "lloji i dokumentit është"
 
-#: documents/models.py:763
+#: documents/models.py:759
 msgid "is in inbox"
 msgstr "është në kutinë hyrëse"
 
-#: documents/models.py:764
+#: documents/models.py:760
 msgid "has tag"
 msgstr "ka etiketë"
 
-#: documents/models.py:765
+#: documents/models.py:761
 msgid "has any tag"
 msgstr "ka ndonjë etiketë"
 
-#: documents/models.py:766
+#: documents/models.py:762
 msgid "created before"
 msgstr "krijuar para"
 
-#: documents/models.py:767
+#: documents/models.py:763
 msgid "created after"
 msgstr "krijuar pas"
 
-#: documents/models.py:768
+#: documents/models.py:764
 msgid "created year is"
 msgstr "viti i krijimit është"
 
-#: documents/models.py:769
+#: documents/models.py:765
 msgid "created month is"
 msgstr "muaji i krijimit është"
 
-#: documents/models.py:770
+#: documents/models.py:766
 msgid "created day is"
 msgstr "dita e krijimit është"
 
-#: documents/models.py:771
+#: documents/models.py:767
 msgid "added before"
 msgstr "më parë shtuar"
 
-#: documents/models.py:772
+#: documents/models.py:768
 msgid "added after"
 msgstr "shtuar pas"
 
-#: documents/models.py:773
+#: documents/models.py:769
 msgid "modified before"
 msgstr "ndryshuar para"
 
-#: documents/models.py:774
+#: documents/models.py:770
 msgid "modified after"
 msgstr "ndryshuar pas"
 
-#: documents/models.py:775
+#: documents/models.py:771
 msgid "does not have tag"
 msgstr "nuk ka etiketë"
 
-#: documents/models.py:776
+#: documents/models.py:772
 msgid "does not have ASN"
 msgstr "nuk ka ASN"
 
-#: documents/models.py:777
+#: documents/models.py:773
 msgid "title or content contains"
 msgstr "përmban titull ose përmbajtje"
 
-#: documents/models.py:778
+#: documents/models.py:774
 msgid "fulltext query"
 msgstr "kërkim në tekst të plotë"
 
-#: documents/models.py:779
+#: documents/models.py:775
 msgid "more like this"
 msgstr "më shumë si kjo"
 
-#: documents/models.py:780
+#: documents/models.py:776
 msgid "has tags in"
 msgstr "ka etiketa në"
 
-#: documents/models.py:781
+#: documents/models.py:777
 msgid "ASN greater than"
 msgstr "ASN më i madh se"
 
-#: documents/models.py:782
+#: documents/models.py:778
 msgid "ASN less than"
 msgstr "ASN më i vogël se"
 
-#: documents/models.py:783
+#: documents/models.py:779
 msgid "storage path is"
 msgstr "shtegu i ruajtjes është"
 
-#: documents/models.py:784
+#: documents/models.py:780
 msgid "has correspondent in"
 msgstr "ka korrespondent në"
 
-#: documents/models.py:785
+#: documents/models.py:781
 msgid "does not have correspondent in"
 msgstr "nuk ka korrespondent në"
 
-#: documents/models.py:786
+#: documents/models.py:782
 msgid "has document type in"
 msgstr "ka lloj dokumenti në"
 
-#: documents/models.py:787
+#: documents/models.py:783
 msgid "does not have document type in"
 msgstr "nuk ka lloj dokumenti në"
 
-#: documents/models.py:788
+#: documents/models.py:784
 msgid "has storage path in"
 msgstr "ka shteg ruajtjeje në"
 
-#: documents/models.py:789
+#: documents/models.py:785
 msgid "does not have storage path in"
 msgstr "nuk ka rrugë ruajtjeje"
 
-#: documents/models.py:790
+#: documents/models.py:786
 msgid "owner is"
 msgstr "pronari është"
 
-#: documents/models.py:791
+#: documents/models.py:787
 msgid "has owner in"
 msgstr "ka pronar në"
 
-#: documents/models.py:792
+#: documents/models.py:788
 msgid "does not have owner"
 msgstr "nuk ka pronar"
 
-#: documents/models.py:793
+#: documents/models.py:789
 msgid "does not have owner in"
 msgstr "nuk ka pronar në"
 
-#: documents/models.py:794
+#: documents/models.py:790
 msgid "has custom field value"
 msgstr "ka vlerë fushe të personalizuar"
 
-#: documents/models.py:795
+#: documents/models.py:791
 msgid "is shared by me"
 msgstr "është ndarë nga unë"
 
-#: documents/models.py:796
+#: documents/models.py:792
 msgid "has custom fields"
 msgstr "ka fusha të personalizuara"
 
-#: documents/models.py:797
+#: documents/models.py:793
 msgid "has custom field in"
 msgstr "ka fushë të personalizuar në"
 
-#: documents/models.py:798
+#: documents/models.py:794
 msgid "does not have custom field in"
 msgstr "nuk ka fushë të personalizuar në"
 
-#: documents/models.py:799
+#: documents/models.py:795
 msgid "does not have custom field"
 msgstr "nuk ka fushë të personalizuar"
 
-#: documents/models.py:800
+#: documents/models.py:796
 msgid "custom fields query"
 msgstr "kërkim i fushave të personalizuara"
 
-#: documents/models.py:801
+#: documents/models.py:797
 msgid "created to"
 msgstr "krijuar deri më"
 
-#: documents/models.py:802
+#: documents/models.py:798
 msgid "created from"
 msgstr "krijuar nga"
 
-#: documents/models.py:803
+#: documents/models.py:799
 msgid "added to"
 msgstr "shtuar deri më"
 
-#: documents/models.py:804
+#: documents/models.py:800
 msgid "added from"
 msgstr "shtuar nga"
 
-#: documents/models.py:805
+#: documents/models.py:801
 msgid "mime type is"
 msgstr "lloji MIME është"
 
-#: documents/models.py:806
+#: documents/models.py:802
 msgid "simple title search"
 msgstr "kërkim i thjeshtë titulli"
 
-#: documents/models.py:807
+#: documents/models.py:803
 msgid "simple text search"
 msgstr "kërkim i thjeshtë teksti"
 
-#: documents/models.py:808
+#: documents/models.py:804
 msgid "has duplicates"
 msgstr "ka dublikatë"
 
-#: documents/models.py:818
+#: documents/models.py:814
 msgid "rule type"
 msgstr "lloji i rregullit"
 
-#: documents/models.py:820 documents/models.py:1077
+#: documents/models.py:816 documents/models.py:1073
 msgid "value"
 msgstr "vlera"
 
-#: documents/models.py:823
+#: documents/models.py:819
 msgid "filter rule"
 msgstr "rregull filtri"
 
-#: documents/models.py:824
+#: documents/models.py:820
 msgid "filter rules"
 msgstr "rregulla filtri"
 
-#: documents/models.py:854 documents/models.py:1202
+#: documents/models.py:850 documents/models.py:1198
 msgid "Pending"
 msgstr "Në pritje"
 
-#: documents/models.py:855 documents/models.py:933
+#: documents/models.py:851 documents/models.py:929
 msgid "Started"
 msgstr "Filluar"
 
-#: documents/models.py:856
+#: documents/models.py:852
 msgid "Success"
 msgstr "Sukses"
 
-#: documents/models.py:857
+#: documents/models.py:853
 msgid "Failure"
 msgstr "Dështim"
 
-#: documents/models.py:858
+#: documents/models.py:854
 msgid "Revoked"
 msgstr "Revokuar"
 
-#: documents/models.py:861
+#: documents/models.py:857
 msgid "Consume File"
 msgstr "Konsumo skedarin"
 
-#: documents/models.py:862
+#: documents/models.py:858
 msgid "Train Classifier"
 msgstr "Trajno klasifikuesin"
 
-#: documents/models.py:863
+#: documents/models.py:859
 msgid "Sanity Check"
 msgstr "Kontroll logjik"
 
-#: documents/models.py:864
+#: documents/models.py:860
 msgid "Index Optimize"
 msgstr "Optimizim indeksi"
 
-#: documents/models.py:865 documents/models.py:1551
+#: documents/models.py:861 documents/models.py:1547
 msgid "Mail Fetch"
 msgstr "Marrje email-i"
 
-#: documents/models.py:866
+#: documents/models.py:862
 msgid "LLM Index"
 msgstr "Indeks LLM"
 
-#: documents/models.py:867
+#: documents/models.py:863
 msgid "Empty Trash"
 msgstr "Zbraz koshin"
 
-#: documents/models.py:868
+#: documents/models.py:864
 msgid "Check Workflows"
 msgstr "Kontrollo rrjedhat e punës"
 
-#: documents/models.py:869
+#: documents/models.py:865
 msgid "Bulk Update"
 msgstr "Përditësim në masë"
 
-#: documents/models.py:870
+#: documents/models.py:866
 msgid "Reprocess Document"
 msgstr "Ripërpuno dokumentin"
 
-#: documents/models.py:871
+#: documents/models.py:867
 msgid "Build Share Link"
 msgstr "Ndarja e krijimit të lidhjes"
 
-#: documents/models.py:872
+#: documents/models.py:868
 msgid "Bulk Delete"
 msgstr "Fshirje në masë"
 
-#: documents/models.py:873
+#: documents/models.py:869
 msgid "Apply AI Suggestions"
 msgstr "Apliko sugjerimet e AI"
 
-#: documents/models.py:882 documents/models.py:1545
+#: documents/models.py:878 documents/models.py:1541
 msgid "Scheduled"
 msgstr "Planifikuar"
 
-#: documents/models.py:883 documents/models.py:1552
+#: documents/models.py:879 documents/models.py:1548
 msgid "Web UI"
 msgstr "Ndërfaqja web"
 
-#: documents/models.py:884
+#: documents/models.py:880
 msgid "API Upload"
 msgstr "Ngarkim API"
 
-#: documents/models.py:885
+#: documents/models.py:881
 msgid "Folder Consume"
 msgstr "Konsum nga dosja"
 
-#: documents/models.py:886
+#: documents/models.py:882
 msgid "Email Consume"
 msgstr "Konsum nga email-i"
 
-#: documents/models.py:887
+#: documents/models.py:883
 msgid "System"
 msgstr "Sistemi"
 
-#: documents/models.py:888 documents/models.py:1546
+#: documents/models.py:884 documents/models.py:1542
 msgid "Manual"
 msgstr "Manuale"
 
-#: documents/models.py:894
+#: documents/models.py:890
 msgid "Task ID"
 msgstr "ID e detyrës"
 
-#: documents/models.py:895
+#: documents/models.py:891
 msgid "Celery task ID"
 msgstr "ID e detyrës Celery"
 
-#: documents/models.py:901
+#: documents/models.py:897
 msgid "Task Type"
 msgstr "Lloji i detyrës"
 
-#: documents/models.py:902
+#: documents/models.py:898
 msgid "The kind of work being performed"
 msgstr "Lloji i punës që po kryhet"
 
-#: documents/models.py:909
+#: documents/models.py:905
 msgid "Trigger Source"
 msgstr "Burimi i nisjes"
 
-#: documents/models.py:910
+#: documents/models.py:906
 msgid "What initiated this task"
 msgstr "Çfarë e nisi këtë detyrë"
 
-#: documents/models.py:919
+#: documents/models.py:915
 msgid "Status"
 msgstr "Statusi"
 
-#: documents/models.py:939
+#: documents/models.py:935
 msgid "Completed"
 msgstr "Përfunduar"
 
-#: documents/models.py:947
+#: documents/models.py:943
 msgid "Duration (seconds)"
 msgstr "Kohëzgjatja (sekonda)"
 
-#: documents/models.py:948
+#: documents/models.py:944
 msgid "Elapsed time from start to completion"
 msgstr "Koha e kaluar nga fillimi deri në përfundim"
 
-#: documents/models.py:954
+#: documents/models.py:950
 msgid "Wait Time (seconds)"
 msgstr "Koha e pritjes (sekonda)"
 
-#: documents/models.py:955
+#: documents/models.py:951
 msgid "Time from task creation to worker pickup"
 msgstr "Koha nga krijimi i detyrës deri te marrja nga punëtori"
 
-#: documents/models.py:962
+#: documents/models.py:958
 msgid "Input Data"
 msgstr "Të dhënat hyrëse"
 
-#: documents/models.py:963
+#: documents/models.py:959
 msgid "Structured input parameters for the task"
 msgstr "Parametra hyrës të strukturuar për detyrën"
 
-#: documents/models.py:969
+#: documents/models.py:965
 msgid "Result Data"
 msgstr "Të dhënat e rezultatit"
 
-#: documents/models.py:970
+#: documents/models.py:966
 msgid "Structured result data from task execution"
 msgstr "Të dhëna të strukturuara të rezultatit nga ekzekutimi i detyrës"
 
-#: documents/models.py:976
+#: documents/models.py:972
 msgid "Acknowledged"
 msgstr "Pranuar"
 
-#: documents/models.py:981
+#: documents/models.py:977
 msgid "Task"
 msgstr "Detyrë"
 
-#: documents/models.py:982
+#: documents/models.py:978
 msgid "Tasks"
 msgstr "Detyrat"
 
-#: documents/models.py:1010
+#: documents/models.py:1006
 msgid "Plain"
 msgstr ""
 
-#: documents/models.py:1011
+#: documents/models.py:1007
 msgid "Markdown"
 msgstr ""
 
-#: documents/models.py:1016
+#: documents/models.py:1012
 msgid "Note for the document"
 msgstr "Shënim për dokumentin"
 
-#: documents/models.py:1023 documents/models.py:1129
+#: documents/models.py:1019 documents/models.py:1125
 msgid "format"
 msgstr "Format"
 
-#: documents/models.py:1047
+#: documents/models.py:1043
 msgid "user"
 msgstr "përdoruesi"
 
-#: documents/models.py:1052
+#: documents/models.py:1048
 msgid "note"
 msgstr "shënim"
 
-#: documents/models.py:1053
+#: documents/models.py:1049
 msgid "notes"
 msgstr "shënime"
 
-#: documents/models.py:1073
+#: documents/models.py:1069 documents/models.py:2345
 msgid "page"
 msgstr "Faqe"
 
-#: documents/models.py:1074
+#: documents/models.py:1070
 msgid "Page of the original file, starting at 1"
 msgstr "Faqe e skedarit origjinal, duke filluar nga 1"
 
-#: documents/models.py:1133
+#: documents/models.py:1129
 msgid "document barcode"
 msgstr "Dokumenti me barkod"
 
-#: documents/models.py:1134
+#: documents/models.py:1130
 msgid "document barcodes"
 msgstr "Kodi i barkodit në dokument"
 
-#: documents/models.py:1143
+#: documents/models.py:1139
 msgid "Original"
 msgstr "Origjinal"
 
-#: documents/models.py:1154 documents/models.py:1216
+#: documents/models.py:1150 documents/models.py:1212
 #: paperless_mail/models.py:75
 msgid "expiration"
 msgstr "skadimi"
 
-#: documents/models.py:1161 documents/models.py:1223
+#: documents/models.py:1157 documents/models.py:1219
 msgid "slug"
 msgstr "[SQ] slug"
 
-#: documents/models.py:1193
+#: documents/models.py:1189
 msgid "share link"
 msgstr "lidhje ndarjeje"
 
-#: documents/models.py:1194
+#: documents/models.py:1190
 msgid "share links"
 msgstr "lidhje ndarjeje"
 
-#: documents/models.py:1203
+#: documents/models.py:1199
 msgid "Processing"
 msgstr "Në përpunim"
 
-#: documents/models.py:1204
+#: documents/models.py:1200
 msgid "Ready"
 msgstr "Gati"
 
-#: documents/models.py:1205
+#: documents/models.py:1201
 msgid "Failed"
 msgstr "Dështoi"
 
-#: documents/models.py:1252
+#: documents/models.py:1248
 msgid "size (bytes)"
 msgstr "madhësia (bajt)"
 
-#: documents/models.py:1258
+#: documents/models.py:1254
 msgid "last error"
 msgstr "gabimi i fundit"
 
-#: documents/models.py:1265
+#: documents/models.py:1261
 msgid "file path"
 msgstr "shtegu i skedarit"
 
-#: documents/models.py:1271
+#: documents/models.py:1267
 msgid "built at"
 msgstr "ndërtuar më"
 
-#: documents/models.py:1284
+#: documents/models.py:1280
 msgid "share link bundle"
 msgstr "paketë lidhjeje ndarjeje"
 
-#: documents/models.py:1285
+#: documents/models.py:1281
 msgid "share link bundles"
 msgstr "paketa lidhjesh ndarjeje"
 
-#: documents/models.py:1288
+#: documents/models.py:1284
 #, python-format
 msgid "Share link bundle %(slug)s"
 msgstr "Paketa e lidhjes së ndarjes %(slug)s"
 
-#: documents/models.py:1324
+#: documents/models.py:1320
 msgid "String"
 msgstr "Varg"
 
-#: documents/models.py:1325
+#: documents/models.py:1321
 msgid "URL"
 msgstr "[SQ] URL"
 
-#: documents/models.py:1326
+#: documents/models.py:1322
 msgid "Date"
 msgstr "Datë"
 
-#: documents/models.py:1327
+#: documents/models.py:1323
 msgid "Boolean"
 msgstr "[SQ] Boolean"
 
-#: documents/models.py:1328
+#: documents/models.py:1324
 msgid "Integer"
 msgstr "Numër i plotë"
 
-#: documents/models.py:1329
+#: documents/models.py:1325
 msgid "Float"
 msgstr "Numër dhjetor"
 
-#: documents/models.py:1330
+#: documents/models.py:1326
 msgid "Monetary"
 msgstr "Monetar"
 
-#: documents/models.py:1331
+#: documents/models.py:1327
 msgid "Document Link"
 msgstr "Lidhje dokumenti"
 
-#: documents/models.py:1332
+#: documents/models.py:1328
 msgid "Select"
 msgstr "Përzgjedhje"
 
-#: documents/models.py:1333
+#: documents/models.py:1329
 msgid "Long Text"
 msgstr "Tekst i gjatë"
 
-#: documents/models.py:1345
+#: documents/models.py:1341
 msgid "data type"
 msgstr "lloji i të dhënave"
 
-#: documents/models.py:1352
+#: documents/models.py:1348
 msgid "extra data"
 msgstr "të dhëna shtesë"
 
-#: documents/models.py:1356
+#: documents/models.py:1352
 msgid "Extra data for the custom field, such as select options"
 msgstr "Të dhëna shtesë për fushën e personalizuar, si opsionet e përzgjedhjes"
 
-#: documents/models.py:1362
+#: documents/models.py:1358 documents/models.py:2338
 msgid "custom field"
 msgstr "fushë e personalizuar"
 
-#: documents/models.py:1363
+#: documents/models.py:1359
 msgid "custom fields"
 msgstr "fusha të personalizuara"
 
-#: documents/models.py:1463
+#: documents/models.py:1459
 msgid "custom field instance"
 msgstr "instancë fushe të personalizuar"
 
-#: documents/models.py:1464
+#: documents/models.py:1460
 msgid "custom field instances"
 msgstr "instanca fushash të personalizuara"
 
-#: documents/models.py:1542
+#: documents/models.py:1538
 msgid "Consumption Started"
 msgstr "Konsumi filloi"
 
-#: documents/models.py:1543
+#: documents/models.py:1539
 msgid "Document Added"
 msgstr "Dokumenti u shtua"
 
-#: documents/models.py:1544
+#: documents/models.py:1540
 msgid "Document Updated"
 msgstr "Dokumenti u përditësua"
 
-#: documents/models.py:1549
+#: documents/models.py:1545
 msgid "Consume Folder"
 msgstr "Konsumo dosjen"
 
-#: documents/models.py:1550
+#: documents/models.py:1546
 msgid "Api Upload"
 msgstr "Ngarkim API"
 
-#: documents/models.py:1557
+#: documents/models.py:1553
 msgid "Modified"
 msgstr "Ndryshuar"
 
-#: documents/models.py:1558
+#: documents/models.py:1554
 msgid "Custom Field"
 msgstr "Fusha e personalizuar"
 
-#: documents/models.py:1561
+#: documents/models.py:1557
 msgid "Workflow Trigger Type"
 msgstr "Lloji i nisësit të rrjedhës së punës"
 
-#: documents/models.py:1573
+#: documents/models.py:1569
 msgid "filter path"
 msgstr "filtro shtegun"
 
-#: documents/models.py:1578
+#: documents/models.py:1574
 msgid "Only consume documents with a path that matches this if specified. Wildcards specified as * are allowed. Case insensitive."
 msgstr "Konsumo vetëm dokumentet me shteg që përputhet me këtë, nëse është specifikuar. Lejohen shenja të përgjithshme si *. Pa dallim shkronjash."
 
-#: documents/models.py:1585
+#: documents/models.py:1581
 msgid "filter filename"
 msgstr "filtro emrin e skedarit"
 
-#: documents/models.py:1590 paperless_mail/models.py:200
+#: documents/models.py:1586 paperless_mail/models.py:200
 msgid "Only consume documents which entirely match this filename if specified. Wildcards such as *.pdf or *invoice* are allowed. Case insensitive."
 msgstr "Konsumo vetëm dokumentet që përputhen plotësisht me këtë emër skedari, nëse është specifikuar. Lejohen shenja të përgjithshme si *.pdf ose *invoice*. Pa dallim shkronjash."
 
-#: documents/models.py:1601
+#: documents/models.py:1597
 msgid "filter documents from this mail rule"
 msgstr "filtro dokumentet nga ky rregull email-i"
 
-#: documents/models.py:1617
+#: documents/models.py:1613
 msgid "has these tag(s)"
 msgstr "ka këto etiketë(a)"
 
-#: documents/models.py:1624
+#: documents/models.py:1620
 msgid "has all of these tag(s)"
 msgstr "i ka të gjitha këto tag(s)"
 
-#: documents/models.py:1631
+#: documents/models.py:1627
 msgid "does not have these tag(s)"
 msgstr "nuk ka këto etiketë(a)"
 
-#: documents/models.py:1639
+#: documents/models.py:1635
 msgid "has this document type"
 msgstr "ka këtë lloj dokumenti"
 
-#: documents/models.py:1646
+#: documents/models.py:1642
 msgid "has one of these document types"
 msgstr "ka një nga këto lloje dokumentesh"
 
-#: documents/models.py:1653
+#: documents/models.py:1649
 msgid "does not have these document type(s)"
 msgstr "nuk ka këto lloj(e) dokumentesh"
 
-#: documents/models.py:1661
+#: documents/models.py:1657
 msgid "has this correspondent"
 msgstr "ka këtë korrespondent"
 
-#: documents/models.py:1668
+#: documents/models.py:1664
 msgid "does not have these correspondent(s)"
 msgstr "nuk ka këta korrespondentë"
 
-#: documents/models.py:1675
+#: documents/models.py:1671
 msgid "has one of these correspondents"
 msgstr "ka një nga këta korrespondentë"
 
-#: documents/models.py:1683
+#: documents/models.py:1679
 msgid "has this storage path"
 msgstr "ka këtë shteg ruajtjeje"
 
-#: documents/models.py:1690
+#: documents/models.py:1686
 msgid "has one of these storage paths"
 msgstr "ka një nga këto shtigje ruajtjeje"
 
-#: documents/models.py:1697
+#: documents/models.py:1693
 msgid "does not have these storage path(s)"
 msgstr "nuk ka këto shtegje ruajtjeje"
 
-#: documents/models.py:1701
+#: documents/models.py:1697
 msgid "filter custom field query"
 msgstr "filtro kërkimin e fushës së personalizuar"
 
-#: documents/models.py:1704
+#: documents/models.py:1700
 msgid "JSON-encoded custom field query expression."
 msgstr "Shprehje kërkimi e fushës së personalizuar e koduar si JSON."
 
-#: documents/models.py:1708
+#: documents/models.py:1704
 msgid "schedule offset days"
 msgstr "ditët e zhvendosjes së orarit"
 
-#: documents/models.py:1711
+#: documents/models.py:1707
 msgid "The number of days to offset the schedule trigger by."
 msgstr "Numri i ditëve me të cilat zhvendoset nisësi i orarit."
 
-#: documents/models.py:1716
+#: documents/models.py:1712
 msgid "schedule is recurring"
 msgstr "orari është i përsëritur"
 
-#: documents/models.py:1719
+#: documents/models.py:1715
 msgid "If the schedule should be recurring."
 msgstr "Nëse orari duhet të përsëritet."
 
-#: documents/models.py:1724
+#: documents/models.py:1720
 msgid "schedule recurring delay in days"
 msgstr "vonesa e përsëritjes së orarit në ditë"
 
-#: documents/models.py:1728
+#: documents/models.py:1724
 msgid "The number of days between recurring schedule triggers."
 msgstr "Numri i ditëve midis nisjeve të përsëritura të orarit."
 
-#: documents/models.py:1733
+#: documents/models.py:1729
 msgid "schedule date field"
 msgstr "fusha e datës së orarit"
 
-#: documents/models.py:1738
+#: documents/models.py:1734
 msgid "The field to check for a schedule trigger."
 msgstr "Fusha që kontrollohet për një nisës orari."
 
-#: documents/models.py:1747
+#: documents/models.py:1743
 msgid "schedule date custom field"
 msgstr "fushë e personalizuar date për orarin"
 
-#: documents/models.py:1751
+#: documents/models.py:1747
 msgid "workflow trigger"
 msgstr "nisës rrjedhe pune"
 
-#: documents/models.py:1752
+#: documents/models.py:1748
 msgid "workflow triggers"
 msgstr "nisës rrjedhash pune"
 
-#: documents/models.py:1760
+#: documents/models.py:1756
 msgid "email subject"
 msgstr "subjekti i email-it"
 
-#: documents/models.py:1764
+#: documents/models.py:1760
 msgid "The subject of the email, can include some placeholders, see documentation."
 msgstr "Subjekti i email-it, mund të përfshijë disa vendmbajtëse; shih dokumentacionin."
 
-#: documents/models.py:1770
+#: documents/models.py:1766
 msgid "email body"
 msgstr "trupi i email-it"
 
-#: documents/models.py:1773
+#: documents/models.py:1769
 msgid "The body (message) of the email, can include some placeholders, see documentation."
 msgstr "Trupi (mesazhi) i email-it, mund të përfshijë disa vendmbajtëse; shih dokumentacionin."
 
-#: documents/models.py:1779
+#: documents/models.py:1775
 msgid "emails to"
 msgstr "email-et për"
 
-#: documents/models.py:1782
+#: documents/models.py:1778
 msgid "The destination email addresses, comma separated."
 msgstr "Adresat email të destinacionit, të ndara me presje."
 
-#: documents/models.py:1788
+#: documents/models.py:1784
 msgid "include document in email"
 msgstr "përfshi dokumentin në email"
 
-#: documents/models.py:1799
+#: documents/models.py:1795
 msgid "webhook url"
 msgstr "URL e webhook-ut"
 
-#: documents/models.py:1802
+#: documents/models.py:1798
 msgid "The destination URL for the notification."
 msgstr "URL-ja e destinacionit për njoftimin."
 
-#: documents/models.py:1807
+#: documents/models.py:1803
 msgid "use parameters"
 msgstr "përdor parametrat"
 
-#: documents/models.py:1812
+#: documents/models.py:1808
 msgid "send as JSON"
 msgstr "dërgo si JSON"
 
-#: documents/models.py:1816
+#: documents/models.py:1812
 msgid "webhook parameters"
 msgstr "parametrat e webhook-ut"
 
-#: documents/models.py:1819
+#: documents/models.py:1815
 msgid "The parameters to send with the webhook URL if body not used."
 msgstr "Parametrat që dërgohen me URL-në e webhook-ut nëse nuk përdoret trupi."
 
-#: documents/models.py:1823
+#: documents/models.py:1819
 msgid "webhook body"
 msgstr "trupi i webhook-ut"
 
-#: documents/models.py:1826
+#: documents/models.py:1822
 msgid "The body to send with the webhook URL if parameters not used."
 msgstr "Trupi që dërgohet me URL-në e webhook-ut nëse nuk përdoren parametrat."
 
-#: documents/models.py:1830
+#: documents/models.py:1826
 msgid "webhook headers"
 msgstr "kokat e webhook-ut"
 
-#: documents/models.py:1833
+#: documents/models.py:1829
 msgid "The headers to send with the webhook URL."
 msgstr "Kokat që dërgohen me URL-në e webhook-ut."
 
-#: documents/models.py:1838
+#: documents/models.py:1834
 msgid "include document in webhook"
 msgstr "përfshi dokumentin në webhook"
 
-#: documents/models.py:1849
+#: documents/models.py:1845
 msgid "Assignment"
 msgstr "Caktim"
 
-#: documents/models.py:1853
+#: documents/models.py:1849
 msgid "Removal"
 msgstr "Heqje"
 
-#: documents/models.py:1857 documents/templates/account/password_reset.html:15
+#: documents/models.py:1853 documents/templates/account/password_reset.html:15
 msgid "Email"
 msgstr "[SQ] Email"
 
-#: documents/models.py:1861
+#: documents/models.py:1857
 msgid "Webhook"
 msgstr "Webhook"
 
-#: documents/models.py:1865
+#: documents/models.py:1861
 msgid "Password removal"
 msgstr "Heqje fjalëkalimi"
 
-#: documents/models.py:1869
+#: documents/models.py:1865
 msgid "Move to trash"
 msgstr "Zhvendos në kosh"
 
-#: documents/models.py:1873
+#: documents/models.py:1869
 msgid "Remote OCR"
 msgstr "OCR në distancë"
 
-#: documents/models.py:1877
+#: documents/models.py:1873
 msgid "Apply AI suggestions"
 msgstr "Apliko sugjerimet e IA-së"
 
-#: documents/models.py:1884
+#: documents/models.py:1880
 msgid "Document type"
 msgstr "Lloji i dokumentit"
 
-#: documents/models.py:1885
+#: documents/models.py:1881
 msgid "Storage path"
 msgstr "Rruga e ruajtjes"
 
-#: documents/models.py:1886
+#: documents/models.py:1882
 msgid "Created date"
 msgstr "Data e krijimit"
 
-#: documents/models.py:1889
+#: documents/models.py:1885
 msgid "Workflow Action Type"
 msgstr "Lloji i veprimit të rrjedhës së punës"
 
-#: documents/models.py:1894 documents/models.py:2163
+#: documents/models.py:1890 documents/models.py:2159 documents/models.py:2432
 #: paperless_mail/models.py:145
 msgid "order"
 msgstr "renditja"
 
-#: documents/models.py:1897
+#: documents/models.py:1893
 msgid "assign title"
 msgstr "cakto titullin"
 
-#: documents/models.py:1901
+#: documents/models.py:1897
 msgid "Assign a document title, must  be a Jinja2 template, see documentation."
 msgstr "Cakto një titull dokumenti; duhet të jetë shabllon Jinja2, shih dokumentacionin."
 
-#: documents/models.py:1909 paperless_mail/models.py:274
+#: documents/models.py:1905 paperless_mail/models.py:274
 msgid "assign this tag"
 msgstr "cakto këtë etiketë"
 
-#: documents/models.py:1918 paperless_mail/models.py:282
+#: documents/models.py:1914 paperless_mail/models.py:282
 msgid "assign this document type"
 msgstr "cakto këtë lloj dokumenti"
 
-#: documents/models.py:1927 paperless_mail/models.py:296
+#: documents/models.py:1923 paperless_mail/models.py:296
 msgid "assign this correspondent"
 msgstr "cakto këtë korrespondent"
 
-#: documents/models.py:1936
+#: documents/models.py:1932
 msgid "assign this storage path"
 msgstr "cakto këtë shteg ruajtjeje"
 
-#: documents/models.py:1945
+#: documents/models.py:1941
 msgid "assign this owner"
 msgstr "cakto këtë pronar"
 
-#: documents/models.py:1952
+#: documents/models.py:1948
 msgid "grant view permissions to these users"
 msgstr "jep leje shikimi këtyre përdoruesve"
 
-#: documents/models.py:1959
+#: documents/models.py:1955
 msgid "grant view permissions to these groups"
 msgstr "jepni leje shikimi këtyre grupeve"
 
-#: documents/models.py:1966
+#: documents/models.py:1962
 msgid "grant change permissions to these users"
 msgstr "jep leje ndryshimi këtyre përdoruesve"
 
-#: documents/models.py:1973
+#: documents/models.py:1969
 msgid "grant change permissions to these groups"
 msgstr "jep leje ndryshimi këtyre grupeve"
 
-#: documents/models.py:1980
+#: documents/models.py:1976
 msgid "assign these custom fields"
 msgstr "cakto këto fusha të personalizuara"
 
-#: documents/models.py:1984
+#: documents/models.py:1980
 msgid "custom field values"
 msgstr "vlerat e fushave të personalizuara"
 
-#: documents/models.py:1988
+#: documents/models.py:1984
 msgid "Optional values to assign to the custom fields."
 msgstr "Vlera opsionale për t'u caktuar fushave të personalizuara."
 
-#: documents/models.py:1997
+#: documents/models.py:1993
 msgid "remove these tag(s)"
 msgstr "hiq këto etiketë(a)"
 
-#: documents/models.py:2002
+#: documents/models.py:1998
 msgid "remove all tags"
 msgstr "hiq të gjitha etiketat"
 
-#: documents/models.py:2009
+#: documents/models.py:2005
 msgid "remove these document type(s)"
 msgstr "hiq këto lloj(e) dokumentesh"
 
-#: documents/models.py:2014
+#: documents/models.py:2010
 msgid "remove all document types"
 msgstr "hiq të gjitha llojet e dokumenteve"
 
-#: documents/models.py:2021
+#: documents/models.py:2017
 msgid "remove these correspondent(s)"
 msgstr "hiq këta korrespondentë"
 
-#: documents/models.py:2026
+#: documents/models.py:2022
 msgid "remove all correspondents"
 msgstr "hiq të gjithë korrespondentët"
 
-#: documents/models.py:2033
+#: documents/models.py:2029
 msgid "remove these storage path(s)"
 msgstr "hiq këto shtigje ruajtjeje"
 
-#: documents/models.py:2038
+#: documents/models.py:2034
 msgid "remove all storage paths"
 msgstr "hiq të gjitha shtigjet e ruajtjes"
 
-#: documents/models.py:2045
+#: documents/models.py:2041
 msgid "remove these owner(s)"
 msgstr "hiq këta pronarë"
 
-#: documents/models.py:2050
+#: documents/models.py:2046
 msgid "remove all owners"
 msgstr "hiq të gjithë pronarët"
 
-#: documents/models.py:2057
+#: documents/models.py:2053
 msgid "remove view permissions for these users"
 msgstr "hiq lejet e shikimit për këta përdorues"
 
-#: documents/models.py:2064
+#: documents/models.py:2060
 msgid "remove view permissions for these groups"
 msgstr "hiq lejet e shikimit për këto grupe"
 
-#: documents/models.py:2071
+#: documents/models.py:2067
 msgid "remove change permissions for these users"
 msgstr "hiq lejet e ndryshimit për këta përdorues"
 
-#: documents/models.py:2078
+#: documents/models.py:2074
 msgid "remove change permissions for these groups"
 msgstr "hiq lejet e ndryshimit për këto grupe"
 
-#: documents/models.py:2083
+#: documents/models.py:2079
 msgid "remove all permissions"
 msgstr "hiq të gjitha lejet"
 
-#: documents/models.py:2090
+#: documents/models.py:2086
 msgid "remove these custom fields"
 msgstr "hiq këto fusha të personalizuara"
 
-#: documents/models.py:2095
+#: documents/models.py:2091
 msgid "remove all custom fields"
 msgstr "hiq të gjitha fushat e personalizuara"
 
-#: documents/models.py:2104
+#: documents/models.py:2100
 msgid "email"
 msgstr "email"
 
-#: documents/models.py:2113
+#: documents/models.py:2109
 msgid "webhook"
 msgstr "webhook"
 
-#: documents/models.py:2117
+#: documents/models.py:2113
 msgid "passwords"
 msgstr "fjalëkalimet"
 
-#: documents/models.py:2121
+#: documents/models.py:2117
 msgid "Passwords to try when removing PDF protection. Separate with commas or new lines."
 msgstr "Fjalëkalimet që provohen gjatë heqjes së mbrojtjes PDF. Ndaji me presje ose rreshta të rinj."
 
-#: documents/models.py:2126
+#: documents/models.py:2122
 msgid "AI suggestion fields"
 msgstr "Fushat e sugjerimeve të AI"
 
-#: documents/models.py:2130
+#: documents/models.py:2126
 msgid "Which of the AI-suggested fields to apply to the document."
 msgstr "Cilat nga fushat e sugjeruara nga AI t'i aplikoni në dokument."
 
-#: documents/models.py:2135
+#: documents/models.py:2131
 msgid "create missing objects"
 msgstr "krijo objektet e munguara"
 
-#: documents/models.py:2138
+#: documents/models.py:2134
 msgid "Create suggested tags, correspondents, document types and storage paths that do not already exist instead of skipping them."
 msgstr "Krijoni etiketa të sugjeruara, korrespondentë, lloje dokumentesh dhe shtigje ruajtjeje që nuk ekzistojnë ende, në vend që t'i anashkaloni."
 
-#: documents/models.py:2144
+#: documents/models.py:2140
 msgid "overwrite existing values"
 msgstr "mbishkruaj vlera ekzistuese"
 
-#: documents/models.py:2147
+#: documents/models.py:2143
 msgid "Apply suggestions even if the document already has a value for that field. Tags are always added to, never replaced."
 msgstr "Zbato sugjerimet edhe nëse dokumenti tashmë ka një vlerë për atë fushë. Etiketat gjithmonë shtohen, kurrë nuk zëvendësohen."
 
-#: documents/models.py:2153
+#: documents/models.py:2149
 msgid "workflow action"
 msgstr "veprim rrjedhe pune"
 
-#: documents/models.py:2154
+#: documents/models.py:2150
 msgid "workflow actions"
 msgstr "veprime rrjedhe pune"
 
-#: documents/models.py:2169
+#: documents/models.py:2165
 msgid "triggers"
 msgstr "shkaktarë"
 
-#: documents/models.py:2176
+#: documents/models.py:2172
 msgid "actions"
 msgstr "veprimet"
 
-#: documents/models.py:2179 paperless_mail/models.py:154
+#: documents/models.py:2175 documents/models.py:2255
+#: paperless_mail/models.py:154
 msgid "enabled"
 msgstr "aktivizuar"
 
-#: documents/models.py:2190
+#: documents/models.py:2186
 msgid "workflow"
 msgstr "rrjedhë pune"
 
-#: documents/models.py:2194
+#: documents/models.py:2190
 msgid "workflow trigger type"
 msgstr "lloji i nisësit të rrjedhës së punës"
 
-#: documents/models.py:2208
+#: documents/models.py:2204
 msgid "date run"
 msgstr "data e ekzekutimit"
 
-#: documents/models.py:2214
+#: documents/models.py:2210
 msgid "workflow run"
 msgstr "ekzekutim rrjedhe pune"
 
-#: documents/models.py:2215
+#: documents/models.py:2211
 msgid "workflow runs"
 msgstr "ekzekutime rrjedhash pune"
 
-#: documents/serialisers.py:483 documents/serialisers.py:844
-#: documents/serialisers.py:2893 documents/views.py:359 documents/views.py:625
-#: documents/views.py:2783 paperless_mail/serialisers.py:145
+#: documents/models.py:2234
+msgid "source width"
+msgstr ""
+
+#: documents/models.py:2236
+msgid "Width of the image the zones were drawn on (px)"
+msgstr ""
+
+#: documents/models.py:2240
+msgid "source height"
+msgstr ""
+
+#: documents/models.py:2242
+msgid "Height of the image the zones were drawn on (px)"
+msgstr ""
+
+#: documents/models.py:2251
+msgid "sample document"
+msgstr ""
+
+#: documents/models.py:2252
+msgid "Document used for previewing zones in the editor"
+msgstr ""
+
+#: documents/models.py:2258
+msgid "combine formats"
+msgstr ""
+
+#: documents/models.py:2262
+msgid "Per-target format strings for combining several zones into one field, keyed by target (custom field id, or 'title'/'asn'/'created'). Tokens like {Zone Name} are replaced with that zone's value."
+msgstr ""
+
+#: documents/models.py:2276
+msgid "updated"
+msgstr ""
+
+#: documents/models.py:2282
+msgid "OCR template"
+msgstr ""
+
+#: documents/models.py:2283
+msgid "OCR templates"
+msgstr ""
+
+#: documents/models.py:2308
+msgid "template"
+msgstr ""
+
+#: documents/models.py:2312
+msgid "zone name"
+msgstr ""
+
+#: documents/models.py:2314
+msgid "Descriptive name for this zone (e.g. 'Invoice Number')"
+msgstr ""
+
+#: documents/models.py:2318
+msgid "Custom field"
+msgstr ""
+
+#: documents/models.py:2320
+msgid "Archive serial number"
+msgstr ""
+
+#: documents/models.py:2321
+msgid "Date created"
+msgstr ""
+
+#: documents/models.py:2324
+msgid "target"
+msgstr ""
+
+#: documents/models.py:2329
+msgid "Where the extracted value is written: a custom field, or a built-in document field (title, ASN, created date)"
+msgstr ""
+
+#: documents/models.py:2341
+msgid "Target custom field (only used when target is 'custom_field')"
+msgstr ""
+
+#: documents/models.py:2348
+msgid "Page (1 = first, -1 = last; blank = first page)"
+msgstr ""
+
+#: documents/models.py:2351
+msgid "x"
+msgstr ""
+
+#: documents/models.py:2351
+msgid "Left edge (px)"
+msgstr ""
+
+#: documents/models.py:2352
+msgid "y"
+msgstr ""
+
+#: documents/models.py:2352
+msgid "Top edge (px)"
+msgstr ""
+
+#: documents/models.py:2354
+msgid "width"
+msgstr ""
+
+#: documents/models.py:2356
+msgid "Zone width (px)"
+msgstr ""
+
+#: documents/models.py:2359
+msgid "height"
+msgstr ""
+
+#: documents/models.py:2361
+msgid "Zone height (px)"
+msgstr ""
+
+#: documents/models.py:2366
+msgid "zone source width"
+msgstr ""
+
+#: documents/models.py:2370
+msgid "Width of the page image this zone was drawn on (px). Falls back to template source_width if unset."
+msgstr ""
+
+#: documents/models.py:2375
+msgid "zone source height"
+msgstr ""
+
+#: documents/models.py:2379
+msgid "Height of the page image this zone was drawn on (px). Falls back to template source_height if unset."
+msgstr ""
+
+#: documents/models.py:2385
+msgid "OCR language"
+msgstr ""
+
+#: documents/models.py:2388
+msgid "Tesseract language code(s), e.g. 'deu+eng'"
+msgstr ""
+
+#: documents/models.py:2393
+msgid "Strip whitespace"
+msgstr ""
+
+#: documents/models.py:2394
+msgid "Uppercase"
+msgstr ""
+
+#: documents/models.py:2395
+msgid "Lowercase"
+msgstr ""
+
+#: documents/models.py:2396
+msgid "Numeric only"
+msgstr ""
+
+#: documents/models.py:2399
+msgid "Remove leading/trailing punctuation"
+msgstr ""
+
+#: documents/models.py:2401
+msgid "Parse date"
+msgstr ""
+
+#: documents/models.py:2402
+msgid "Read QR/barcode"
+msgstr ""
+
+#: documents/models.py:2405
+msgid "transform"
+msgstr ""
+
+#: documents/models.py:2412
+msgid "date format"
+msgstr ""
+
+#: documents/models.py:2417
+msgid "Python strptime format for the 'Parse date' transform (e.g. %d.%m.%Y). Blank = auto-detect."
+msgstr ""
+
+#: documents/models.py:2423
+msgid "validation regex"
+msgstr ""
+
+#: documents/models.py:2428
+msgid "Optional regex pattern. Extracted text is only accepted if it fully matches."
+msgstr ""
+
+#: documents/models.py:2436
+msgid "OCR template zone"
+msgstr ""
+
+#: documents/models.py:2437
+msgid "OCR template zones"
+msgstr ""
+
+#: documents/serialisers.py:491 documents/serialisers.py:815
+#: documents/serialisers.py:2913 documents/views.py:372 documents/views.py:638
+#: documents/views.py:2868 paperless_mail/serialisers.py:145
 msgid "Insufficient permissions."
 msgstr "Leje të pamjaftueshme."
 
-#: documents/serialisers.py:676
+#: documents/serialisers.py:647
 msgid "Invalid color."
 msgstr "Ngjyrë e pavlefshme."
 
-#: documents/serialisers.py:2360
+#: documents/serialisers.py:2380
 #, python-format
 msgid "File type %(type)s not supported"
 msgstr "Lloji i skedarit %(type)s nuk mbështetet"
 
-#: documents/serialisers.py:2404
+#: documents/serialisers.py:2424
 #, python-format
 msgid "Custom field id must be an integer: %(id)s"
 msgstr "ID-ja e fushës së personalizuar duhet të jetë numër i plotë: %(id)s"
 
-#: documents/serialisers.py:2411
+#: documents/serialisers.py:2431
 #, python-format
 msgid "Custom field with id %(id)s does not exist"
 msgstr "Fusha e personalizuar me ID %(id)s nuk ekziston"
 
-#: documents/serialisers.py:2428 documents/serialisers.py:2438
+#: documents/serialisers.py:2448 documents/serialisers.py:2458
 msgid "Custom fields must be a list of integers or an object mapping ids to values."
 msgstr "Fushat e personalizuara duhet të jenë listë numrash të plotë ose objekt që lidh ID-të me vlerat"
 
-#: documents/serialisers.py:2433
+#: documents/serialisers.py:2453
 msgid "Some custom fields don't exist or were specified twice."
 msgstr "Disa fusha të personalizuara nuk ekzistojnë ose janë specifikuar dy herë."
 
-#: documents/serialisers.py:2580
+#: documents/serialisers.py:2600
 msgid "Invalid variable detected."
 msgstr "U zbulua variabël e pavlefshme."
 
-#: documents/serialisers.py:2949
+#: documents/serialisers.py:2969
 msgid "Duplicate document identifiers are not allowed."
 msgstr "Identifikuesit dublikatë të dokumenteve nuk lejohen."
 
-#: documents/serialisers.py:2979 documents/views.py:4770
+#: documents/serialisers.py:2999 documents/views.py:5001
 #, python-format
 msgid "Documents not found: %(ids)s"
 msgstr "Dokumentet nuk u gjetën: %(ids)s"
@@ -1929,44 +2128,60 @@ msgstr "You are about to use your %(provider_name)s llogari to login."
 msgid "As a final step, please complete the following form:"
 msgstr "Si hap i fundit, ju lutemi plotësoni formularin e mëposhtëm:"
 
-#: documents/validators.py:36
-msgid ", "
-msgstr " ,"
+#: documents/validators.py:27
+#, python-format
+msgid "Unable to parse URI %(value)s, missing scheme"
+msgstr ""
 
-#: documents/views.py:314
+#: documents/validators.py:32
+#, python-format
+msgid "Unable to parse URI %(value)s, missing net location or path"
+msgstr ""
+
+#: documents/validators.py:39
+#, python-format
+msgid "URI scheme '%(scheme)s' is not allowed. Allowed schemes: %(allowed)s"
+msgstr ""
+
+#: documents/validators.py:52
+#, python-format
+msgid "Unable to parse URI %(value)s"
+msgstr ""
+
+#: documents/views.py:327
 msgid "Specify only one of text, title_search, query, or more_like_id."
 msgstr "Specifikoni vetëm njërën prej: text, title_search, query, ose more_like_id."
 
-#: documents/views.py:352 documents/views.py:2780
+#: documents/views.py:365 documents/views.py:2865
 msgid "Invalid more_like_id"
 msgstr "ID e pavlefshme e \"më shumë ngjashmëri\""
 
-#: documents/views.py:1684
+#: documents/views.py:1697
 msgid "Invalid AI configuration."
 msgstr "Konfigurim AI i pavlefshëm."
 
-#: documents/views.py:1695
+#: documents/views.py:1708
 msgid "AI backend request timed out."
 msgstr "Kërkesa në backend-in e AI-së ka skaduar kohën."
 
-#: documents/views.py:1707
+#: documents/views.py:1720
 msgid "AI backend rejected the request. Check logs for details."
 msgstr "Backend-i i AI-së refuzoi kërkesën. Kontrolloni regjistrimet për detaje."
 
-#: documents/views.py:4786
+#: documents/views.py:5017
 #, python-format
 msgid "Insufficient permissions to share document %(id)s."
 msgstr "Leje të pamjaftueshme për të ndarë dokumentin %(id)s."
 
-#: documents/views.py:4833
+#: documents/views.py:5064
 msgid "Bundle is already being processed."
 msgstr "Paketa po përpunohet tashmë."
 
-#: documents/views.py:4899
+#: documents/views.py:5130
 msgid "The share link bundle is still being prepared. Please try again later."
 msgstr "Paketa e lidhjes së ndarjes ende po përgatitet. Ju lutemi provoni përsëri më vonë."
 
-#: documents/views.py:4913
+#: documents/views.py:5144
 msgid "The share link bundle is unavailable."
 msgstr "Paketa e lidhjes së ndarjes nuk është e disponueshme."
 
@@ -2258,155 +2473,155 @@ msgstr "Cakton kohën limit të LLM në sekonda"
 msgid "paperless application settings"
 msgstr "cilësimet e aplikimit pa përdorim letre"
 
-#: paperless/settings/__init__.py:582
+#: paperless/settings/__init__.py:595
 msgid "English (US)"
 msgstr "Anglisht (SHBA)"
 
-#: paperless/settings/__init__.py:583
+#: paperless/settings/__init__.py:596
 msgid "Arabic"
 msgstr "Arabisht"
 
-#: paperless/settings/__init__.py:584
+#: paperless/settings/__init__.py:597
 msgid "Afrikaans"
 msgstr "Afrikanisht"
 
-#: paperless/settings/__init__.py:585
+#: paperless/settings/__init__.py:598
 msgid "Belarusian"
 msgstr "Bjellorusisht"
 
-#: paperless/settings/__init__.py:586
+#: paperless/settings/__init__.py:599
 msgid "Bulgarian"
 msgstr "Bullgarisht"
 
-#: paperless/settings/__init__.py:587
+#: paperless/settings/__init__.py:600
 msgid "Catalan"
 msgstr "Katalanisht"
 
-#: paperless/settings/__init__.py:588
+#: paperless/settings/__init__.py:601
 msgid "Czech"
 msgstr "Çekisht"
 
-#: paperless/settings/__init__.py:589
+#: paperless/settings/__init__.py:602
 msgid "Danish"
 msgstr "Danisht"
 
-#: paperless/settings/__init__.py:590
+#: paperless/settings/__init__.py:603
 msgid "German"
 msgstr "Gjermanisht"
 
-#: paperless/settings/__init__.py:591
+#: paperless/settings/__init__.py:604
 msgid "Greek"
 msgstr "Greqisht"
 
-#: paperless/settings/__init__.py:592
+#: paperless/settings/__init__.py:605
 msgid "English (GB)"
 msgstr "Anglisht (MB)"
 
-#: paperless/settings/__init__.py:593
+#: paperless/settings/__init__.py:606
 msgid "Spanish"
 msgstr "Spanjisht"
 
-#: paperless/settings/__init__.py:594
+#: paperless/settings/__init__.py:607
 msgid "Persian"
 msgstr "Persisht"
 
-#: paperless/settings/__init__.py:595
+#: paperless/settings/__init__.py:608
 msgid "Finnish"
 msgstr "Finlandisht"
 
-#: paperless/settings/__init__.py:596
+#: paperless/settings/__init__.py:609
 msgid "French"
 msgstr "Frëngjisht"
 
-#: paperless/settings/__init__.py:597
+#: paperless/settings/__init__.py:610
 msgid "Hungarian"
 msgstr "Hungarisht"
 
-#: paperless/settings/__init__.py:598
+#: paperless/settings/__init__.py:611
 msgid "Indonesian"
 msgstr "Indonezisht"
 
-#: paperless/settings/__init__.py:599
+#: paperless/settings/__init__.py:612
 msgid "Italian"
 msgstr "Italisht"
 
-#: paperless/settings/__init__.py:600
+#: paperless/settings/__init__.py:613
 msgid "Japanese"
 msgstr "Japonisht"
 
-#: paperless/settings/__init__.py:601
+#: paperless/settings/__init__.py:614
 msgid "Korean"
 msgstr "Koreane"
 
-#: paperless/settings/__init__.py:602
+#: paperless/settings/__init__.py:615
 msgid "Luxembourgish"
 msgstr "Luksemburgisht"
 
-#: paperless/settings/__init__.py:603
+#: paperless/settings/__init__.py:616
 msgid "Norwegian"
 msgstr "Norvegjeze"
 
-#: paperless/settings/__init__.py:604
+#: paperless/settings/__init__.py:617
 msgid "Dutch"
 msgstr "Holandisht"
 
-#: paperless/settings/__init__.py:605
+#: paperless/settings/__init__.py:618
 msgid "Polish"
 msgstr "Polonisht"
 
-#: paperless/settings/__init__.py:606
+#: paperless/settings/__init__.py:619
 msgid "Portuguese (Brazil)"
 msgstr "Portugeze (Brazili)"
 
-#: paperless/settings/__init__.py:607
+#: paperless/settings/__init__.py:620
 msgid "Portuguese"
 msgstr "Portugalisht"
 
-#: paperless/settings/__init__.py:608
+#: paperless/settings/__init__.py:621
 msgid "Romanian"
 msgstr "Rumanisht"
 
-#: paperless/settings/__init__.py:609
+#: paperless/settings/__init__.py:622
 msgid "Russian"
 msgstr "Rusisht"
 
-#: paperless/settings/__init__.py:610
+#: paperless/settings/__init__.py:623
 msgid "Slovak"
 msgstr "Sllovakisht"
 
-#: paperless/settings/__init__.py:611
+#: paperless/settings/__init__.py:624
 msgid "Slovenian"
 msgstr "Sllovenisht"
 
-#: paperless/settings/__init__.py:612
+#: paperless/settings/__init__.py:625
 msgid "Serbian"
 msgstr "Serbisht"
 
-#: paperless/settings/__init__.py:613
+#: paperless/settings/__init__.py:626
 msgid "Swedish"
 msgstr "Suedisht"
 
-#: paperless/settings/__init__.py:614
+#: paperless/settings/__init__.py:627
 msgid "Turkish"
 msgstr "Turqisht"
 
-#: paperless/settings/__init__.py:615
+#: paperless/settings/__init__.py:628
 msgid "Ukrainian"
 msgstr "Ukrainisht"
 
-#: paperless/settings/__init__.py:616
+#: paperless/settings/__init__.py:629
 msgid "Vietnamese"
 msgstr "Vietnamisht"
 
-#: paperless/settings/__init__.py:617
+#: paperless/settings/__init__.py:630
 msgid "Chinese Simplified"
 msgstr "Kinezisht e thjeshtuar"
 
-#: paperless/settings/__init__.py:618
+#: paperless/settings/__init__.py:631
 msgid "Chinese Traditional"
 msgstr "Kinezisht tradicionale"
 
-#: paperless/urls.py:438
+#: paperless/urls.py:452
 msgid "Paperless-ngx administration"
 msgstr "Paperless-ngx Administration"
 
