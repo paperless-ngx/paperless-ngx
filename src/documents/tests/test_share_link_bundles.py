@@ -434,13 +434,9 @@ class ShareLinkBundleBuildTaskTests(DirectoriesMixin, APITestCase):
                 "documents.tasks.OriginalsOnlyStrategy.add_document",
                 side_effect=RuntimeError("zip failure"),
             ),
-            mock.patch("pathlib.Path.unlink") as unlink_mock,
+            self.assertRaises(RuntimeError),
         ):
-            unlink_mock.side_effect = [OSError("unlink"), OSError("unlink-finally")] + [
-                None,
-            ] * 5
-            with self.assertRaises(RuntimeError):
-                build_share_link_bundle(bundle.pk)
+            build_share_link_bundle(bundle.pk)
 
         bundle.refresh_from_db()
         self.assertEqual(bundle.status, ShareLinkBundle.Status.FAILED)
@@ -448,10 +444,6 @@ class ShareLinkBundleBuildTaskTests(DirectoriesMixin, APITestCase):
         assert isinstance(bundle.last_error, dict)
         self.assertEqual(bundle.last_error.get("message"), "zip failure")
         self.assertEqual(bundle.last_error.get("exception_type"), "RuntimeError")
-        scratch_zips = list(Path(settings.SCRATCH_DIR).glob("*.zip"))
-        self.assertTrue(scratch_zips)
-        for path in scratch_zips:
-            path.unlink(missing_ok=True)
 
     def test_build_share_link_bundle_missing_bundle_noop(self) -> None:
         # Should not raise when bundle does not exist

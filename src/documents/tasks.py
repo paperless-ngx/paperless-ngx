@@ -6,7 +6,6 @@ import zipfile
 from collections.abc import Callable
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from tempfile import mkstemp
 
 from celery import Task
 from celery import shared_task
@@ -897,26 +896,25 @@ def build_share_link_bundle(bundle_id: int) -> None:
 
     documents = list(bundle.documents.all().order_by("pk"))
 
-    _, temp_zip_path_str = mkstemp(suffix=".zip", dir=settings.SCRATCH_DIR)
-    temp_zip_path = Path(temp_zip_path_str)
-
     try:
         strategy_class = (
             ArchiveOnlyStrategy
             if bundle.file_version == ShareLink.FileVersion.ARCHIVE
             else OriginalsOnlyStrategy
         )
-        with zipfile.ZipFile(temp_zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
-            strategy = strategy_class(zipf)
-            for document in documents:
-                strategy.add_document(document)
-
         output_dir = settings.SHARE_LINK_BUNDLE_DIR
         output_dir.mkdir(parents=True, exist_ok=True)
         final_path = (output_dir / f"{bundle.slug}.zip").resolve()
-        if final_path.exists():
-            final_path.unlink()
-        shutil.move(temp_zip_path, final_path)
+
+        with TemporaryDirectory(dir=settings.SCRATCH_DIR) as tmp_dir:
+            temp_zip_path = Path(tmp_dir) / "bundle.zip"
+            with zipfile.ZipFile(temp_zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
+                strategy = strategy_class(zipf)
+                for document in documents:
+                    strategy.add_document(document)
+
+            final_path.unlink(missing_ok=True)
+            shutil.move(temp_zip_path, final_path)
 
         bundle.file_path = f"{bundle.slug}.zip"
         bundle.size_bytes = final_path.stat().st_size
@@ -947,16 +945,7 @@ def build_share_link_bundle(bundle_id: int) -> None:
             "timestamp": timezone.now().isoformat(),
         }
         bundle.save(update_fields=["status", "last_error"])
-        try:
-            temp_zip_path.unlink()
-        except OSError:
-            pass
         raise
-    finally:
-        try:
-            temp_zip_path.unlink(missing_ok=True)
-        except OSError:
-            pass
 
 
 @shared_task
