@@ -20,6 +20,7 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
@@ -29,33 +30,26 @@ jobs:
           version: ${{ env.DEFAULT_UV_VERSION }}
           enable-cache: true
           python-version: "3.12"
-      - run: uv sync --python 3.12 --group testing --frozen
-      - name: Record environment
-        run: |
-          mkdir -p pbt-04-evidence
-          git rev-parse HEAD > pbt-04-evidence/environment.txt
-          uv run --python 3.12 --group testing --frozen python --version >> pbt-04-evidence/environment.txt
-          uv pip freeze >> pbt-04-evidence/environment.txt
-      - name: Run properties
+      - name: Run PBT-04 clean-machine demo and save evidence
         shell: bash
         env:
-          HYPOTHESIS_PROFILE: recorded
-        run: |
-          set -o pipefail
-          uv run --python 3.12 --group testing --frozen pytest src/documents/tests/test_parsers.py -k TestMimeExtensionProperties -n 0 -v --hypothesis-seed=13 --hypothesis-show-statistics --cov=documents.parsers --cov-branch --cov-report=term-missing --junitxml=pbt-04-evidence/properties.xml 2>&1 | tee pbt-04-evidence/properties.log
+          PBT04_ARTIFACT_DIR: .artifacts
+        run: bash scripts/demo-pbt-04.sh
       - name: Run parser regressions
         if: ${{ !cancelled() }}
         shell: bash
         run: |
           set -o pipefail
-          uv run --python 3.12 --group testing --frozen pytest src/documents/tests/test_parsers.py -n 0 --hypothesis-seed=13 --junitxml=pbt-04-evidence/regressions.xml 2>&1 | tee pbt-04-evidence/regressions.log
+          mkdir -p .artifacts
+          uv run --python 3.12 --group testing --frozen pytest src/documents/tests/test_parsers.py -n 0 --hypothesis-seed=13 --junitxml=.artifacts/regressions.xml 2>&1 | tee .artifacts/regressions.log
       - name: Upload evidence
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: pbt-04-evidence
-          path: pbt-04-evidence/
-          if-no-files-found: warn
+          path: .artifacts/
+          if-no-files-found: error
+          include-hidden-files: true
   setup:
     name: Validate coursework setup
     runs-on: ubuntu-latest
