@@ -66,7 +66,8 @@ Bộ test `src/documents/tests/test_path_security.py` cài đặt **5 property �
 ### Phần F — Cấu trúc Harness tự động & Tích hợp CI
 
 - **Mã nguồn kiểm thử**: `src/documents/tests/test_path_security.py` (khai báo tập trung 4 profile `dev`, `ci`, `recorded`, `stress` điều khiển qua biến `HYPOTHESIS_PROFILE`).
-- **Cấu hình CI**: Job `pbt-03` trong `.github/workflows/coursework-ci.yml`, chạy đơn tiến trình (`-n 0`) trên `ubuntu-latest` với Python 3.12 (`uv sync --python 3.12 --group testing --frozen`) và tải lên tệp log `.artifacts/pbt-03-run.log` dưới tên artifact `pbt-03-evidence`.
+- **Script kiểm chứng máy sạch**: [`scripts/demo-pbt-03.sh`](../scripts/demo-pbt-03.sh) kiểm tra baseline `b29fec117053637428a935d43af16d9e1d65c1fb`, kiểm tra không có sửa đổi mã nguồn mục tiêu hay sửa đổi chưa commit, đồng bộ phụ thuộc khóa cứng, chạy tất định PBT-03 với branch coverage và tự động xác minh kết quả qua `verification.json` + SHA-256 log.
+- **Cấu hình CI**: Job `pbt-03` trong [`.github/workflows/coursework-ci.yml`](../.github/workflows/coursework-ci.yml#L125) gọi trực tiếp `bash scripts/demo-pbt-03.sh` trên `ubuntu-latest` Python `3.12` (`fetch-depth: 0`, `PBT03_ARTIFACT_DIR: .artifacts`) và tải lên gói artifact `pbt-03-evidence` (`.artifacts/`).
 
 ### Phần G — Số liệu Cycle 3, Kết quả đo từ Checkout sạch & Phân tích RCA
 
@@ -121,15 +122,20 @@ Bộ test `src/documents/tests/test_path_security.py` cài đặt **5 property �
 ### Các bước chạy lại trên máy mới (Linux / macOS / WSL2)
 
 ```bash
-# 1. Clone mới repository và checkout đúng baseline Cycle 4
+# 1. Clone mới repository (lịch sử đầy đủ để đối chiếu baseline)
 git clone https://github.com/0Yaam/paperless-ngx.git
 cd paperless-ngx
-git checkout b29fec117053637428a935d43af16d9e1d65c1fb
 
-# 2. Cài đặt chính xác các thư viện kiểm thử đã khóa trong uv.lock
+# 2. Chạy script tái lập máy sạch chuẩn hóa cho PBT-03
+bash scripts/demo-pbt-03.sh
+```
+
+Script [`scripts/demo-pbt-03.sh`](../scripts/demo-pbt-03.sh) tự động thực hiện tuần tự: kiểm tra `git`/`uv` và lịch sử `baseline` (`b29fec117053637428a935d43af16d9e1d65c1fb`), xác minh không có trôi mã nguồn hay sửa đổi chưa commit, đồng bộ môi trường bằng `uv sync --python 3.12 --group testing --frozen`, chạy `pytest` tất định với `HYPOTHESIS_PROFILE=recorded` và `--hypothesis-seed=20261008 --cov=documents.file_handling --cov-branch`, xuất báo cáo JSON và xác minh tự động `5/5` property + `100%` độ bao phủ hàm mục tiêu. Toàn bộ bằng chứng (`environment.txt`, `pbt-03-run.log`, `coverage.json`, `verification.json`) được lưu tại `.artifacts/pbt-03-cycle-4/`.
+
+Khi cần chạy thủ công từng bước tách rời:
+
+```bash
 uv sync --python 3.12 --group testing --frozen
-
-# 3. Chạy PBT-03 tất định với profile recorded và đo branch coverage
 HYPOTHESIS_PROFILE=recorded uv run --python 3.12 --dev --frozen pytest \
   src/documents/tests/test_path_security.py -k TestPathSecurity -n 0 -v \
   --hypothesis-seed=20261008 --hypothesis-show-statistics \
@@ -161,7 +167,8 @@ Pop-Location
 - **Kết quả Pytest**: `5 passed` (`100%`)
 - **Thống kê Hypothesis**: Mỗi hàm test đạt `250 passing, 0 failing` (tổng `1,250` ca sinh hợp lệ + `8` ca `@example`); số ca invalid deduplicated lần lượt là `43 / 25 / 35 / 0 / 0`.
 - **Branch Coverage**: `BrPart = 0`, không có dòng nào trong khoảng `15–29` (`UnsafeFilePathError` và `validate_path_in_root`) xuất hiện tại cột `Missing`.
-- **Artifact trên GitHub Actions**: Tải gói `pbt-03-evidence` (chứa `.artifacts/pbt-03-run.log`) trong workflow **Coursework CI** $\rightarrow$ job **PBT-03 path security**.
+- **Tệp xác minh tự động**: `verification.json` in ra JSON đạt ngưỡng kèm mã băm `log_sha256` của tệp `pbt-03-run.log`.
+- **Artifact trên GitHub Actions**: Tải gói `pbt-03-evidence` (chứa `environment.txt`, `pbt-03-run.log`, `coverage.json`, `verification.json`) trong workflow **Coursework CI** $\rightarrow$ job **PBT-03 path security**.
 
 ---
 
@@ -170,20 +177,17 @@ Pop-Location
 Thực hiện tuần tự 4 bước sau tại buổi bảo vệ mà không cần bước cài đặt ngầm nào khác:
 
 1. **Kiểm tra trạng thái trước khi chạy (30 giây)**:
-   Xác nhận đúng commit baseline đang kiểm thử:
+   Xác nhận đúng commit trên nhánh `dev` và lịch sử baseline:
 
    ```bash
    git rev-parse --short HEAD   # Kỳ vọng: b29fec117 hoặc commit merge mới nhất trên dev
    ```
 
-2. **Chạy trực tiếp cả 4 nhóm tình huống an ninh + đo Branch Coverage (90 giây)**:
+2. **Chạy trực tiếp script demo tự động cả 4 nhóm tình huống an ninh + đo Branch Coverage (90 giây)**:
    Chạy câu lệnh duy nhất:
 
    ```bash
-   HYPOTHESIS_PROFILE=recorded uv run --python 3.12 --dev --frozen pytest \
-     src/documents/tests/test_path_security.py -k TestPathSecurity -n 0 -v \
-     --hypothesis-seed=20261008 --hypothesis-show-statistics \
-     --cov=documents.file_handling --cov-branch --cov-report=term-missing
+   bash scripts/demo-pbt-03.sh
    ```
 
    Giải thích 5 kết quả in ra màn hình cho Hội đồng:
