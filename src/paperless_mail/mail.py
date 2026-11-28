@@ -2,6 +2,7 @@ import datetime
 import imaplib
 import itertools
 import logging
+import os
 import socket
 import ssl
 import tempfile
@@ -1135,12 +1136,12 @@ class MailAccountHandler(LoggingMixin):
         doc_type,
     ):
         settings.SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
-        _, temp_filename = tempfile.mkstemp(
+        fd, temp_filename = tempfile.mkstemp(
             prefix="paperless-mail-",
             dir=settings.SCRATCH_DIR,
             suffix=".eml",
         )
-        with Path(temp_filename).open("wb") as f:
+        with os.fdopen(fd, "wb") as f:
             # Move "From"-header to beginning of file
             # TODO: This ugly workaround is needed because the parser is
             #   chosen only by the mime_type detected via magic
