@@ -2089,6 +2089,38 @@ class TestDocumentApi(DirectoriesMixin, ConsumeTaskMixin, APITestCase):
         self.assertIsNone(overrides.document_type_id)
         self.assertIsNone(overrides.tag_ids)
 
+    def test_upload_type_is_detected_from_a_prefix(self) -> None:
+        """
+        GIVEN:
+            - An upload larger than the prefix read to detect its type
+        WHEN:
+            - The document is posted
+        THEN:
+            - The type is detected from the prefix and the upload is accepted
+            - The file handed to the consumer holds the whole upload
+        """
+        self.consume_file_mock.return_value = celery.result.AsyncResult(
+            id=str(uuid.uuid4()),
+        )
+        content = SIMPLE_DIGITAL_PDF.read_bytes()
+
+        with (
+            mock.patch("documents.serialisers._MIME_SNIFF_BYTES", 1024),
+            SimpleUploadedFile(
+                "simple.pdf",
+                content,
+                content_type="application/pdf",
+            ) as f,
+        ):
+            response = self.client.post(
+                "/api/documents/post_document/",
+                {"document": f},
+            )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        input_doc, _ = self.assert_queue_consumption_task_call_args()
+        self.assertEqual(input_doc.original_file.read_bytes(), content)
+
     def test_upload_with_path_traversal_filename_is_reduced_to_basename(self) -> None:
         self.consume_file_mock.return_value = celery.result.AsyncResult(
             id=str(uuid.uuid4()),

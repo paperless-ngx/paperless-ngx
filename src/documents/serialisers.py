@@ -112,6 +112,10 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger("paperless.serializers")
 
+# How much of an upload is read to detect its type. libmagic examines at most
+# 7 MiB (its default bytes_max), so this is more than it will ever look at.
+_MIME_SNIFF_BYTES = 8 * 1024 * 1024
+
 
 # https://www.django-rest-framework.org/api-guide/serializers/#example
 class DynamicFieldsModelSerializer(serializers.ModelSerializer[Any]):
@@ -2363,8 +2367,9 @@ class PostDocumentSerializer(serializers.Serializer[dict[str, Any]]):
     )
 
     def validate_document(self, document):
-        document_data = document.file.read()
-        mime_type = magic.from_buffer(document_data, mime=True)
+        # libmagic only examines a bounded prefix, so an upload of any size is
+        # never read into memory just to detect its type
+        mime_type = magic.from_buffer(document.read(_MIME_SNIFF_BYTES), mime=True)
 
         if not is_mime_type_supported(mime_type):
             if (
@@ -2380,7 +2385,7 @@ class PostDocumentSerializer(serializers.Serializer[dict[str, Any]]):
                     _("File type %(type)s not supported") % {"type": mime_type},
                 )
 
-        return document.name, document_data
+        return document.name, document
 
     def validate_correspondent(self, correspondent):
         if correspondent:
